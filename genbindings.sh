@@ -3,6 +3,12 @@
 set -e
 set -x
 
+if [ ! -d "$1/lightning" ]; then
+	echo "USAGE: $0 path-to-rust-lightning"
+	exit 1
+fi
+LIGHTNING_PATH="$(realpath "$1/lightning")"
+
 # Generate (and reasonably test) C bindings
 
 # First build the latest c-bindings-gen binary
@@ -24,19 +30,26 @@ OUT="$(pwd)/lightning-c-bindings/src"
 OUT_TEMPL="$(pwd)/lightning-c-bindings/src/c_types/derived.rs"
 OUT_F="$(pwd)/lightning-c-bindings/include/rust_types.h"
 OUT_CPP="$(pwd)/lightning-c-bindings/include/lightningpp.hpp"
+BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
-cd lightning
+pushd "$LIGHTNING_PATH"
 RUSTC_BOOTSTRAP=1 cargo rustc --profile=check -- -Zunstable-options --pretty=expanded |
-	RUST_BACKTRACE=1 ../c-bindings-gen/target/release/c-bindings-gen $OUT/ lightning $OUT_TEMPL $OUT_F $OUT_CPP
-cd ..
+	RUST_BACKTRACE=1 "$BIN" "$OUT/" lightning "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
+popd
+
+HOST_PLATFORM="$(rustc --version --verbose | grep "host:")"
+if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+	# OSX sed is for some reason not compatible with GNU sed
+	sed -i '' 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH"'" }|' lightning-c-bindings/Cargo.toml
+else
+	sed -i 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH"'" }|' lightning-c-bindings/Cargo.toml
+fi
 
 # Now cd to lightning-c-bindings, build the generated bindings, and call cbindgen to build a C header file
 PATH="$PATH:~/.cargo/bin"
 cd lightning-c-bindings
 cargo build
 cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1
-
-HOST_PLATFORM="$(rustc --version --verbose | grep "host:")"
 
 # cbindgen is relatively braindead when exporting typedefs -
 # it happily exports all our typedefs for private types, even with the

@@ -17,7 +17,8 @@ crate-type = ["staticlib"
 [dependencies]
 bitcoin = "0.26"
 secp256k1 = { version = "0.20.1", features = ["global-context-less-secure"] }
-lightning = { version = "0.0.12", path = "../lightning" }
+# Note that the following line is matched by genbindings to update the path
+lightning = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "8b4ea56966878140b11aa3e17b44fcf1e01d6413" }
 
 [patch.crates-io]
 # Rust-Secp256k1 PR 279. Should be dropped once merged.
@@ -29,8 +30,3 @@ panic = "abort"
 
 [profile.release]
 panic = "abort"
-
-# We eventually want to join the root workspace, but for now, the bindings generation is
-# a bit brittle and we don't want to hold up other developers from making changes just
-# because they break the bindings
-[workspace]

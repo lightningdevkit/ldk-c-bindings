@@ -7,7 +7,12 @@ if [ ! -d "$1/lightning" ]; then
 	echo "USAGE: $0 path-to-rust-lightning"
 	exit 1
 fi
-LIGHTNING_PATH="$(realpath "$1/lightning")"
+
+# On reasonable systems, we can use realpath here, but OSX is a diva with 20-year-old software.
+ORIG_PWD="$(pwd)"
+cd "$1/lightning"
+LIGHTNING_PATH="$(pwd)"
+cd "$ORIG_PWD"
 
 # Generate (and reasonably test) C bindings
 

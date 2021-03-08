@@ -8112,7 +8112,7 @@ void PeerManager_disconnect_by_node_id(const struct LDKPeerManager *NONNULL_PTR 
  * It will send pings to each peer and disconnect those which did not respond to the last round of pings.
  * Will most likely call send_data on all of the registered descriptors, thus, be very careful with reentrancy issues!
  */
-void PeerManager_timer_tick_occured(const struct LDKPeerManager *NONNULL_PTR this_arg);
+void PeerManager_timer_tick_occurred(const struct LDKPeerManager *NONNULL_PTR this_arg);
 
 /**
  * Build the commitment secret from the seed and the commitment number

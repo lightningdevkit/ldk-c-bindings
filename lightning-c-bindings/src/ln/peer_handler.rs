@@ -784,7 +784,7 @@ pub extern "C" fn PeerManager_disconnect_by_node_id(this_arg: &PeerManager, mut 
 /// It will send pings to each peer and disconnect those which did not respond to the last round of pings.
 /// Will most likely call send_data on all of the registered descriptors, thus, be very careful with reentrancy issues!
 #[no_mangle]
-pub extern "C" fn PeerManager_timer_tick_occured(this_arg: &PeerManager) {
-	unsafe { &*this_arg.inner }.timer_tick_occured()
+pub extern "C" fn PeerManager_timer_tick_occurred(this_arg: &PeerManager) {
+	unsafe { &*this_arg.inner }.timer_tick_occurred()
 }
 

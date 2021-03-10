@@ -932,7 +932,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						write!(w, "\n").unwrap();
 					} else if path_matches_nongeneric(&trait_path.1, &["From"]) {
 					} else if path_matches_nongeneric(&trait_path.1, &["Default"]) {
-						writeln!(w, "/// Creates a \"default\" {}. See other documentaiton for details on what this implies.", ident).unwrap();
+						writeln!(w, "/// Creates a \"default\" {}. See struct and individual field documentaiton for details on which values are used.", ident).unwrap();
 						write!(w, "#[must_use]\n#[no_mangle]\npub extern \"C\" fn {}_default() -> {} {{\n", ident, ident).unwrap();
 						write!(w, "\t{} {{ inner: Box::into_raw(Box::new(Default::default())), is_owned: true }}\n", ident).unwrap();
 						write!(w, "}}\n").unwrap();

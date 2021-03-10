@@ -4490,8 +4490,8 @@ pub struct ChannelMessageHandler {
 	pub handle_error: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ErrorMessage),
 /// Implementation of MessageSendEventsProvider for this object.
 	pub MessageSendEventsProvider: crate::util::events::MessageSendEventsProvider,
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 impl lightning::util::events::MessageSendEventsProvider for ChannelMessageHandler {
@@ -4643,8 +4643,8 @@ pub struct RoutingMessageHandler {
 	pub handle_query_short_channel_ids: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: crate::ln::msgs::QueryShortChannelIds) -> crate::c_types::derived::CResult_NoneLightningErrorZ,
 /// Implementation of MessageSendEventsProvider for this object.
 	pub MessageSendEventsProvider: crate::util::events::MessageSendEventsProvider,
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for RoutingMessageHandler {}

@@ -723,8 +723,8 @@ pub struct Persist {
 	/// [`ChannelMonitorUpdateErr`]: enum.ChannelMonitorUpdateErr.html
 	#[must_use]
 	pub update_persisted_channel: extern "C" fn (this_arg: *const c_void, id: crate::chain::transaction::OutPoint, update: &crate::chain::channelmonitor::ChannelMonitorUpdate, data: &crate::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for Persist {}

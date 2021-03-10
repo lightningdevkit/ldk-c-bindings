@@ -41,9 +41,15 @@ type nativeChainMonitor = nativeChainMonitorImport<crate::chain::keysinterface::
 #[must_use]
 #[repr(C)]
 pub struct ChainMonitor {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChainMonitor,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -54,8 +60,9 @@ impl Drop for ChainMonitor {
 		}
 	}
 }
+/// Frees any resources used by the ChainMonitor, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChainMonitor_free(this_ptr: ChainMonitor) { }
+pub extern "C" fn ChainMonitor_free(this_obj: ChainMonitor) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChainMonitor_free_void(this_ptr: *mut c_void) {
@@ -127,6 +134,8 @@ impl From<nativeChainMonitor> for crate::chain::Watch {
 		ret
 	}
 }
+/// Constructs a new Watch which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned Watch must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn ChainMonitor_as_Watch(this_arg: &ChainMonitor) -> crate::chain::Watch {
 	crate::chain::Watch {
@@ -167,6 +176,8 @@ impl From<nativeChainMonitor> for crate::util::events::EventsProvider {
 		ret
 	}
 }
+/// Constructs a new EventsProvider which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned EventsProvider must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn ChainMonitor_as_EventsProvider(this_arg: &ChainMonitor) -> crate::util::events::EventsProvider {
 	crate::util::events::EventsProvider {

@@ -89,9 +89,15 @@ type nativeTxCreationKeys = nativeTxCreationKeysImport;
 #[must_use]
 #[repr(C)]
 pub struct TxCreationKeys {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeTxCreationKeys,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -102,8 +108,9 @@ impl Drop for TxCreationKeys {
 		}
 	}
 }
+/// Frees any resources used by the TxCreationKeys, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn TxCreationKeys_free(this_ptr: TxCreationKeys) { }
+pub extern "C" fn TxCreationKeys_free(this_obj: TxCreationKeys) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn TxCreationKeys_free_void(this_ptr: *mut c_void) {
@@ -178,6 +185,7 @@ pub extern "C" fn TxCreationKeys_get_broadcaster_delayed_payment_key(this_ptr: &
 pub extern "C" fn TxCreationKeys_set_broadcaster_delayed_payment_key(this_ptr: &mut TxCreationKeys, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *this_ptr.inner }.broadcaster_delayed_payment_key = val.into_rust();
 }
+/// Constructs a new TxCreationKeys given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn TxCreationKeys_new(mut per_commitment_point_arg: crate::c_types::PublicKey, mut revocation_key_arg: crate::c_types::PublicKey, mut broadcaster_htlc_key_arg: crate::c_types::PublicKey, mut countersignatory_htlc_key_arg: crate::c_types::PublicKey, mut broadcaster_delayed_payment_key_arg: crate::c_types::PublicKey) -> TxCreationKeys {
@@ -204,10 +212,12 @@ pub(crate) extern "C" fn TxCreationKeys_clone_void(this_ptr: *const c_void) -> *
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTxCreationKeys)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the TxCreationKeys
 pub extern "C" fn TxCreationKeys_clone(orig: &TxCreationKeys) -> TxCreationKeys {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the TxCreationKeys object into a byte array which can be read by TxCreationKeys_read
 pub extern "C" fn TxCreationKeys_write(obj: &TxCreationKeys) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -216,6 +226,7 @@ pub(crate) extern "C" fn TxCreationKeys_write_void(obj: *const c_void) -> crate:
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTxCreationKeys) })
 }
 #[no_mangle]
+/// Read a TxCreationKeys from a byte array, created by TxCreationKeys_write
 pub extern "C" fn TxCreationKeys_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_TxCreationKeysDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::chan_utils::TxCreationKeys { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -229,9 +240,15 @@ type nativeChannelPublicKeys = nativeChannelPublicKeysImport;
 #[must_use]
 #[repr(C)]
 pub struct ChannelPublicKeys {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelPublicKeys,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -242,8 +259,9 @@ impl Drop for ChannelPublicKeys {
 		}
 	}
 }
+/// Frees any resources used by the ChannelPublicKeys, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelPublicKeys_free(this_ptr: ChannelPublicKeys) { }
+pub extern "C" fn ChannelPublicKeys_free(this_obj: ChannelPublicKeys) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelPublicKeys_free_void(this_ptr: *mut c_void) {
@@ -332,6 +350,7 @@ pub extern "C" fn ChannelPublicKeys_get_htlc_basepoint(this_ptr: &ChannelPublicK
 pub extern "C" fn ChannelPublicKeys_set_htlc_basepoint(this_ptr: &mut ChannelPublicKeys, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *this_ptr.inner }.htlc_basepoint = val.into_rust();
 }
+/// Constructs a new ChannelPublicKeys given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelPublicKeys_new(mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_point_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey) -> ChannelPublicKeys {
@@ -358,10 +377,12 @@ pub(crate) extern "C" fn ChannelPublicKeys_clone_void(this_ptr: *const c_void) -
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelPublicKeys)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ChannelPublicKeys
 pub extern "C" fn ChannelPublicKeys_clone(orig: &ChannelPublicKeys) -> ChannelPublicKeys {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the ChannelPublicKeys object into a byte array which can be read by ChannelPublicKeys_read
 pub extern "C" fn ChannelPublicKeys_write(obj: &ChannelPublicKeys) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -370,6 +391,7 @@ pub(crate) extern "C" fn ChannelPublicKeys_write_void(obj: *const c_void) -> cra
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelPublicKeys) })
 }
 #[no_mangle]
+/// Read a ChannelPublicKeys from a byte array, created by ChannelPublicKeys_write
 pub extern "C" fn ChannelPublicKeys_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelPublicKeysDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::chan_utils::ChannelPublicKeys { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -395,6 +417,7 @@ pub extern "C" fn TxCreationKeys_from_channel_static_keys(mut per_commitment_poi
 	local_ret
 }
 
+/// The maximum length of a script returned by get_revokeable_redeemscript.
 
 #[no_mangle]
 pub static REVOKEABLE_REDEEMSCRIPT_MAX_LENGTH: usize = lightning::ln::chan_utils::REVOKEABLE_REDEEMSCRIPT_MAX_LENGTH;
@@ -415,9 +438,15 @@ type nativeHTLCOutputInCommitment = nativeHTLCOutputInCommitmentImport;
 #[must_use]
 #[repr(C)]
 pub struct HTLCOutputInCommitment {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeHTLCOutputInCommitment,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -428,8 +457,9 @@ impl Drop for HTLCOutputInCommitment {
 		}
 	}
 }
+/// Frees any resources used by the HTLCOutputInCommitment, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn HTLCOutputInCommitment_free(this_ptr: HTLCOutputInCommitment) { }
+pub extern "C" fn HTLCOutputInCommitment_free(this_obj: HTLCOutputInCommitment) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn HTLCOutputInCommitment_free_void(this_ptr: *mut c_void) {
@@ -512,10 +542,12 @@ pub(crate) extern "C" fn HTLCOutputInCommitment_clone_void(this_ptr: *const c_vo
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeHTLCOutputInCommitment)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the HTLCOutputInCommitment
 pub extern "C" fn HTLCOutputInCommitment_clone(orig: &HTLCOutputInCommitment) -> HTLCOutputInCommitment {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the HTLCOutputInCommitment object into a byte array which can be read by HTLCOutputInCommitment_read
 pub extern "C" fn HTLCOutputInCommitment_write(obj: &HTLCOutputInCommitment) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -524,6 +556,7 @@ pub(crate) extern "C" fn HTLCOutputInCommitment_write_void(obj: *const c_void) -
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeHTLCOutputInCommitment) })
 }
 #[no_mangle]
+/// Read a HTLCOutputInCommitment from a byte array, created by HTLCOutputInCommitment_write
 pub extern "C" fn HTLCOutputInCommitment_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_HTLCOutputInCommitmentDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::chan_utils::HTLCOutputInCommitment { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -565,9 +598,15 @@ type nativeChannelTransactionParameters = nativeChannelTransactionParametersImpo
 #[must_use]
 #[repr(C)]
 pub struct ChannelTransactionParameters {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelTransactionParameters,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -578,8 +617,9 @@ impl Drop for ChannelTransactionParameters {
 		}
 	}
 }
+/// Frees any resources used by the ChannelTransactionParameters, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelTransactionParameters_free(this_ptr: ChannelTransactionParameters) { }
+pub extern "C" fn ChannelTransactionParameters_free(this_obj: ChannelTransactionParameters) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
@@ -658,6 +698,7 @@ pub extern "C" fn ChannelTransactionParameters_set_funding_outpoint(this_ptr: &m
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *this_ptr.inner }.funding_outpoint = local_val;
 }
+/// Constructs a new ChannelTransactionParameters given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_new(mut holder_pubkeys_arg: crate::ln::chan_utils::ChannelPublicKeys, mut holder_selected_contest_delay_arg: u16, mut is_outbound_from_holder_arg: bool, mut counterparty_parameters_arg: crate::ln::chan_utils::CounterpartyChannelTransactionParameters, mut funding_outpoint_arg: crate::chain::transaction::OutPoint) -> ChannelTransactionParameters {
@@ -686,6 +727,7 @@ pub(crate) extern "C" fn ChannelTransactionParameters_clone_void(this_ptr: *cons
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelTransactionParameters)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ChannelTransactionParameters
 pub extern "C" fn ChannelTransactionParameters_clone(orig: &ChannelTransactionParameters) -> ChannelTransactionParameters {
 	orig.clone()
 }
@@ -697,9 +739,15 @@ type nativeCounterpartyChannelTransactionParameters = nativeCounterpartyChannelT
 #[must_use]
 #[repr(C)]
 pub struct CounterpartyChannelTransactionParameters {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeCounterpartyChannelTransactionParameters,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -710,8 +758,9 @@ impl Drop for CounterpartyChannelTransactionParameters {
 		}
 	}
 }
+/// Frees any resources used by the CounterpartyChannelTransactionParameters, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn CounterpartyChannelTransactionParameters_free(this_ptr: CounterpartyChannelTransactionParameters) { }
+pub extern "C" fn CounterpartyChannelTransactionParameters_free(this_obj: CounterpartyChannelTransactionParameters) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn CounterpartyChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
@@ -749,6 +798,7 @@ pub extern "C" fn CounterpartyChannelTransactionParameters_get_selected_contest_
 pub extern "C" fn CounterpartyChannelTransactionParameters_set_selected_contest_delay(this_ptr: &mut CounterpartyChannelTransactionParameters, mut val: u16) {
 	unsafe { &mut *this_ptr.inner }.selected_contest_delay = val;
 }
+/// Constructs a new CounterpartyChannelTransactionParameters given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn CounterpartyChannelTransactionParameters_new(mut pubkeys_arg: crate::ln::chan_utils::ChannelPublicKeys, mut selected_contest_delay_arg: u16) -> CounterpartyChannelTransactionParameters {
@@ -772,6 +822,7 @@ pub(crate) extern "C" fn CounterpartyChannelTransactionParameters_clone_void(thi
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCounterpartyChannelTransactionParameters)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the CounterpartyChannelTransactionParameters
 pub extern "C" fn CounterpartyChannelTransactionParameters_clone(orig: &CounterpartyChannelTransactionParameters) -> CounterpartyChannelTransactionParameters {
 	orig.clone()
 }
@@ -806,6 +857,7 @@ pub extern "C" fn ChannelTransactionParameters_as_counterparty_broadcastable(thi
 }
 
 #[no_mangle]
+/// Serialize the CounterpartyChannelTransactionParameters object into a byte array which can be read by CounterpartyChannelTransactionParameters_read
 pub extern "C" fn CounterpartyChannelTransactionParameters_write(obj: &CounterpartyChannelTransactionParameters) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -814,12 +866,14 @@ pub(crate) extern "C" fn CounterpartyChannelTransactionParameters_write_void(obj
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeCounterpartyChannelTransactionParameters) })
 }
 #[no_mangle]
+/// Read a CounterpartyChannelTransactionParameters from a byte array, created by CounterpartyChannelTransactionParameters_write
 pub extern "C" fn CounterpartyChannelTransactionParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CounterpartyChannelTransactionParametersDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::chan_utils::CounterpartyChannelTransactionParameters { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the ChannelTransactionParameters object into a byte array which can be read by ChannelTransactionParameters_read
 pub extern "C" fn ChannelTransactionParameters_write(obj: &ChannelTransactionParameters) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -828,6 +882,7 @@ pub(crate) extern "C" fn ChannelTransactionParameters_write_void(obj: *const c_v
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelTransactionParameters) })
 }
 #[no_mangle]
+/// Read a ChannelTransactionParameters from a byte array, created by ChannelTransactionParameters_write
 pub extern "C" fn ChannelTransactionParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelTransactionParametersDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::chan_utils::ChannelTransactionParameters { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -845,9 +900,15 @@ type nativeDirectedChannelTransactionParameters = nativeDirectedChannelTransacti
 #[must_use]
 #[repr(C)]
 pub struct DirectedChannelTransactionParameters {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeDirectedChannelTransactionParameters,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -858,8 +919,9 @@ impl Drop for DirectedChannelTransactionParameters {
 		}
 	}
 }
+/// Frees any resources used by the DirectedChannelTransactionParameters, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn DirectedChannelTransactionParameters_free(this_ptr: DirectedChannelTransactionParameters) { }
+pub extern "C" fn DirectedChannelTransactionParameters_free(this_obj: DirectedChannelTransactionParameters) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn DirectedChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
@@ -929,9 +991,15 @@ type nativeHolderCommitmentTransaction = nativeHolderCommitmentTransactionImport
 #[must_use]
 #[repr(C)]
 pub struct HolderCommitmentTransaction {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeHolderCommitmentTransaction,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -942,8 +1010,9 @@ impl Drop for HolderCommitmentTransaction {
 		}
 	}
 }
+/// Frees any resources used by the HolderCommitmentTransaction, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn HolderCommitmentTransaction_free(this_ptr: HolderCommitmentTransaction) { }
+pub extern "C" fn HolderCommitmentTransaction_free(this_obj: HolderCommitmentTransaction) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn HolderCommitmentTransaction_free_void(this_ptr: *mut c_void) {
@@ -991,10 +1060,12 @@ pub(crate) extern "C" fn HolderCommitmentTransaction_clone_void(this_ptr: *const
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeHolderCommitmentTransaction)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the HolderCommitmentTransaction
 pub extern "C" fn HolderCommitmentTransaction_clone(orig: &HolderCommitmentTransaction) -> HolderCommitmentTransaction {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the HolderCommitmentTransaction object into a byte array which can be read by HolderCommitmentTransaction_read
 pub extern "C" fn HolderCommitmentTransaction_write(obj: &HolderCommitmentTransaction) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -1003,6 +1074,7 @@ pub(crate) extern "C" fn HolderCommitmentTransaction_write_void(obj: *const c_vo
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeHolderCommitmentTransaction) })
 }
 #[no_mangle]
+/// Read a HolderCommitmentTransaction from a byte array, created by HolderCommitmentTransaction_write
 pub extern "C" fn HolderCommitmentTransaction_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_HolderCommitmentTransactionDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::chan_utils::HolderCommitmentTransaction { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -1026,9 +1098,15 @@ type nativeBuiltCommitmentTransaction = nativeBuiltCommitmentTransactionImport;
 #[must_use]
 #[repr(C)]
 pub struct BuiltCommitmentTransaction {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeBuiltCommitmentTransaction,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1039,8 +1117,9 @@ impl Drop for BuiltCommitmentTransaction {
 		}
 	}
 }
+/// Frees any resources used by the BuiltCommitmentTransaction, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn BuiltCommitmentTransaction_free(this_ptr: BuiltCommitmentTransaction) { }
+pub extern "C" fn BuiltCommitmentTransaction_free(this_obj: BuiltCommitmentTransaction) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn BuiltCommitmentTransaction_free_void(this_ptr: *mut c_void) {
@@ -1085,6 +1164,7 @@ pub extern "C" fn BuiltCommitmentTransaction_get_txid(this_ptr: &BuiltCommitment
 pub extern "C" fn BuiltCommitmentTransaction_set_txid(this_ptr: &mut BuiltCommitmentTransaction, mut val: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &mut *this_ptr.inner }.txid = ::bitcoin::hash_types::Txid::from_slice(&val.data[..]).unwrap();
 }
+/// Constructs a new BuiltCommitmentTransaction given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn BuiltCommitmentTransaction_new(mut transaction_arg: crate::c_types::Transaction, mut txid_arg: crate::c_types::ThirtyTwoBytes) -> BuiltCommitmentTransaction {
@@ -1108,10 +1188,12 @@ pub(crate) extern "C" fn BuiltCommitmentTransaction_clone_void(this_ptr: *const 
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBuiltCommitmentTransaction)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the BuiltCommitmentTransaction
 pub extern "C" fn BuiltCommitmentTransaction_clone(orig: &BuiltCommitmentTransaction) -> BuiltCommitmentTransaction {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the BuiltCommitmentTransaction object into a byte array which can be read by BuiltCommitmentTransaction_read
 pub extern "C" fn BuiltCommitmentTransaction_write(obj: &BuiltCommitmentTransaction) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -1120,6 +1202,7 @@ pub(crate) extern "C" fn BuiltCommitmentTransaction_write_void(obj: *const c_voi
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBuiltCommitmentTransaction) })
 }
 #[no_mangle]
+/// Read a BuiltCommitmentTransaction from a byte array, created by BuiltCommitmentTransaction_write
 pub extern "C" fn BuiltCommitmentTransaction_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_BuiltCommitmentTransactionDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::chan_utils::BuiltCommitmentTransaction { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -1157,9 +1240,15 @@ type nativeCommitmentTransaction = nativeCommitmentTransactionImport;
 #[must_use]
 #[repr(C)]
 pub struct CommitmentTransaction {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeCommitmentTransaction,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1170,8 +1259,9 @@ impl Drop for CommitmentTransaction {
 		}
 	}
 }
+/// Frees any resources used by the CommitmentTransaction, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn CommitmentTransaction_free(this_ptr: CommitmentTransaction) { }
+pub extern "C" fn CommitmentTransaction_free(this_obj: CommitmentTransaction) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn CommitmentTransaction_free_void(this_ptr: *mut c_void) {
@@ -1202,10 +1292,12 @@ pub(crate) extern "C" fn CommitmentTransaction_clone_void(this_ptr: *const c_voi
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCommitmentTransaction)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the CommitmentTransaction
 pub extern "C" fn CommitmentTransaction_clone(orig: &CommitmentTransaction) -> CommitmentTransaction {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the CommitmentTransaction object into a byte array which can be read by CommitmentTransaction_read
 pub extern "C" fn CommitmentTransaction_write(obj: &CommitmentTransaction) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -1214,6 +1306,7 @@ pub(crate) extern "C" fn CommitmentTransaction_write_void(obj: *const c_void) ->
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeCommitmentTransaction) })
 }
 #[no_mangle]
+/// Read a CommitmentTransaction from a byte array, created by CommitmentTransaction_write
 pub extern "C" fn CommitmentTransaction_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CommitmentTransactionDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::chan_utils::CommitmentTransaction { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -1291,9 +1384,15 @@ type nativeTrustedCommitmentTransaction = nativeTrustedCommitmentTransactionImpo
 #[must_use]
 #[repr(C)]
 pub struct TrustedCommitmentTransaction {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeTrustedCommitmentTransaction,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1304,8 +1403,9 @@ impl Drop for TrustedCommitmentTransaction {
 		}
 	}
 }
+/// Frees any resources used by the TrustedCommitmentTransaction, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn TrustedCommitmentTransaction_free(this_ptr: TrustedCommitmentTransaction) { }
+pub extern "C" fn TrustedCommitmentTransaction_free(this_obj: TrustedCommitmentTransaction) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn TrustedCommitmentTransaction_free_void(this_ptr: *mut c_void) {

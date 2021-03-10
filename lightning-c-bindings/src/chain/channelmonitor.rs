@@ -26,9 +26,15 @@ type nativeChannelMonitorUpdate = nativeChannelMonitorUpdateImport;
 #[must_use]
 #[repr(C)]
 pub struct ChannelMonitorUpdate {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelMonitorUpdate,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -39,8 +45,9 @@ impl Drop for ChannelMonitorUpdate {
 		}
 	}
 }
+/// Frees any resources used by the ChannelMonitorUpdate, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelMonitorUpdate_free(this_ptr: ChannelMonitorUpdate) { }
+pub extern "C" fn ChannelMonitorUpdate_free(this_obj: ChannelMonitorUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelMonitorUpdate_free_void(this_ptr: *mut c_void) {
@@ -106,13 +113,22 @@ pub(crate) extern "C" fn ChannelMonitorUpdate_clone_void(this_ptr: *const c_void
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelMonitorUpdate)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ChannelMonitorUpdate
 pub extern "C" fn ChannelMonitorUpdate_clone(orig: &ChannelMonitorUpdate) -> ChannelMonitorUpdate {
 	orig.clone()
 }
+/// If:
+///    (1) a channel has been force closed and
+///    (2) we receive a preimage from a forward link that allows us to spend an HTLC output on
+///        this channel's (the backward link's) broadcasted commitment transaction
+/// then we allow the `ChannelManager` to send a `ChannelMonitorUpdate` with this update ID,
+/// with the update providing said payment preimage. No other update types are allowed after
+/// force-close.
 
 #[no_mangle]
 pub static CLOSED_CHANNEL_UPDATE_ID: u64 = lightning::chain::channelmonitor::CLOSED_CHANNEL_UPDATE_ID;
 #[no_mangle]
+/// Serialize the ChannelMonitorUpdate object into a byte array which can be read by ChannelMonitorUpdate_read
 pub extern "C" fn ChannelMonitorUpdate_write(obj: &ChannelMonitorUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -121,6 +137,7 @@ pub(crate) extern "C" fn ChannelMonitorUpdate_write_void(obj: *const c_void) -> 
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelMonitorUpdate) })
 }
 #[no_mangle]
+/// Read a ChannelMonitorUpdate from a byte array, created by ChannelMonitorUpdate_write
 pub extern "C" fn ChannelMonitorUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelMonitorUpdateDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::chain::channelmonitor::ChannelMonitorUpdate { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -219,6 +236,7 @@ impl ChannelMonitorUpdateErr {
 		}
 	}
 }
+/// Creates a copy of the ChannelMonitorUpdateErr
 #[no_mangle]
 pub extern "C" fn ChannelMonitorUpdateErr_clone(orig: &ChannelMonitorUpdateErr) -> ChannelMonitorUpdateErr {
 	orig.clone()
@@ -235,9 +253,15 @@ type nativeMonitorUpdateError = nativeMonitorUpdateErrorImport;
 #[must_use]
 #[repr(C)]
 pub struct MonitorUpdateError {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeMonitorUpdateError,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -248,8 +272,9 @@ impl Drop for MonitorUpdateError {
 		}
 	}
 }
+/// Frees any resources used by the MonitorUpdateError, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn MonitorUpdateError_free(this_ptr: MonitorUpdateError) { }
+pub extern "C" fn MonitorUpdateError_free(this_obj: MonitorUpdateError) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn MonitorUpdateError_free_void(this_ptr: *mut c_void) {
@@ -280,6 +305,7 @@ pub(crate) extern "C" fn MonitorUpdateError_clone_void(this_ptr: *const c_void) 
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeMonitorUpdateError)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the MonitorUpdateError
 pub extern "C" fn MonitorUpdateError_clone(orig: &MonitorUpdateError) -> MonitorUpdateError {
 	orig.clone()
 }
@@ -360,8 +386,10 @@ impl MonitorEvent {
 		}
 	}
 }
+/// Frees any resources used by the MonitorEvent
 #[no_mangle]
 pub extern "C" fn MonitorEvent_free(this_ptr: MonitorEvent) { }
+/// Creates a copy of the MonitorEvent
 #[no_mangle]
 pub extern "C" fn MonitorEvent_clone(orig: &MonitorEvent) -> MonitorEvent {
 	orig.clone()
@@ -378,9 +406,15 @@ type nativeHTLCUpdate = nativeHTLCUpdateImport;
 #[must_use]
 #[repr(C)]
 pub struct HTLCUpdate {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeHTLCUpdate,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -391,8 +425,9 @@ impl Drop for HTLCUpdate {
 		}
 	}
 }
+/// Frees any resources used by the HTLCUpdate, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn HTLCUpdate_free(this_ptr: HTLCUpdate) { }
+pub extern "C" fn HTLCUpdate_free(this_obj: HTLCUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn HTLCUpdate_free_void(this_ptr: *mut c_void) {
@@ -423,10 +458,12 @@ pub(crate) extern "C" fn HTLCUpdate_clone_void(this_ptr: *const c_void) -> *mut 
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeHTLCUpdate)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the HTLCUpdate
 pub extern "C" fn HTLCUpdate_clone(orig: &HTLCUpdate) -> HTLCUpdate {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the HTLCUpdate object into a byte array which can be read by HTLCUpdate_read
 pub extern "C" fn HTLCUpdate_write(obj: &HTLCUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -435,6 +472,7 @@ pub(crate) extern "C" fn HTLCUpdate_write_void(obj: *const c_void) -> crate::c_t
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeHTLCUpdate) })
 }
 #[no_mangle]
+/// Read a HTLCUpdate from a byte array, created by HTLCUpdate_write
 pub extern "C" fn HTLCUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_HTLCUpdateDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::chain::channelmonitor::HTLCUpdate { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -463,9 +501,15 @@ type nativeChannelMonitor = nativeChannelMonitorImport<crate::chain::keysinterfa
 #[must_use]
 #[repr(C)]
 pub struct ChannelMonitor {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelMonitor,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -476,8 +520,9 @@ impl Drop for ChannelMonitor {
 		}
 	}
 }
+/// Frees any resources used by the ChannelMonitor, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_free(this_ptr: ChannelMonitor) { }
+pub extern "C" fn ChannelMonitor_free(this_obj: ChannelMonitor) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelMonitor_free_void(this_ptr: *mut c_void) {
@@ -494,6 +539,7 @@ impl ChannelMonitor {
 	}
 }
 #[no_mangle]
+/// Serialize the ChannelMonitor object into a byte array which can be read by ChannelMonitor_read
 pub extern "C" fn ChannelMonitor_write(obj: &ChannelMonitor) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -529,6 +575,24 @@ pub extern "C" fn ChannelMonitor_get_funding_txo(this_arg: &ChannelMonitor) -> c
 	let mut ret = unsafe { &*this_arg.inner }.get_funding_txo();
 	let (mut orig_ret_0, mut orig_ret_1) = ret; let mut local_ret = (crate::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(orig_ret_0)), is_owned: true }, orig_ret_1.into_bytes().into()).into();
 	local_ret
+}
+
+/// Gets a list of txids, with their output scripts (in the order they appear in the
+/// transaction), which we must learn about spends of via block_connected().
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelMonitor_get_outputs_to_watch(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
+	let mut ret = unsafe { &*this_arg.inner }.get_outputs_to_watch();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, orig_orig_ret_0_1_0_1.into_bytes().into()).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
+	local_ret.into()
+}
+
+/// Loads the funding txo and outputs to watch into the given `chain::Filter` by repeatedly
+/// calling `chain::Filter::register_output` and `chain::Filter::register_tx` until all outputs
+/// have been registered.
+#[no_mangle]
+pub extern "C" fn ChannelMonitor_load_outputs_to_watch(this_arg: &ChannelMonitor, filter: &crate::chain::Filter) {
+	unsafe { &*this_arg.inner }.load_outputs_to_watch(filter)
 }
 
 /// Get the list of HTLCs who's status has been updated on chain. This should be called by
@@ -614,6 +678,8 @@ pub extern "C" fn ChannelMonitor_block_disconnected(this_arg: &ChannelMonitor, h
 /// kept up-to-date.
 #[repr(C)]
 pub struct Persist {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Persist a new channel's data. The data can be stored any way you want, but
 	/// the identifier provided by Rust-Lightning is the channel's outpoint (and
@@ -657,6 +723,8 @@ pub struct Persist {
 	/// [`ChannelMonitorUpdateErr`]: enum.ChannelMonitorUpdateErr.html
 	#[must_use]
 	pub update_persisted_channel: extern "C" fn (this_arg: *const c_void, id: crate::chain::transaction::OutPoint, update: &crate::chain::channelmonitor::ChannelMonitorUpdate, data: &crate::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for Persist {}
@@ -695,6 +763,7 @@ impl Drop for Persist {
 	}
 }
 #[no_mangle]
+/// Read a C2Tuple_BlockHashChannelMonitorZ from a byte array, created by C2Tuple_BlockHashChannelMonitorZ_write
 pub extern "C" fn C2Tuple_BlockHashChannelMonitorZ_read(ser: crate::c_types::u8slice, arg: &crate::chain::keysinterface::KeysInterface) -> crate::c_types::derived::CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
 	let arg_conv = arg;
 	let res: Result<(bitcoin::hash_types::BlockHash, lightning::chain::channelmonitor::ChannelMonitor<crate::chain::keysinterface::Sign>), lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);

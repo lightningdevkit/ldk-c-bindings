@@ -1731,6 +1731,66 @@ impl From<crate::c_types::CResultTempl<crate::ln::features::ChannelFeatures, cra
 	}
 }
 #[repr(C)]
+pub union CResult_InvoiceFeaturesDecodeErrorZPtr {
+	pub result: *mut crate::ln::features::InvoiceFeatures,
+	pub err: *mut crate::ln::msgs::DecodeError,
+}
+#[repr(C)]
+pub struct CResult_InvoiceFeaturesDecodeErrorZ {
+	pub contents: CResult_InvoiceFeaturesDecodeErrorZPtr,
+	pub result_ok: bool,
+}
+#[no_mangle]
+pub extern "C" fn CResult_InvoiceFeaturesDecodeErrorZ_ok(o: crate::ln::features::InvoiceFeatures) -> CResult_InvoiceFeaturesDecodeErrorZ {
+	CResult_InvoiceFeaturesDecodeErrorZ {
+		contents: CResult_InvoiceFeaturesDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+pub extern "C" fn CResult_InvoiceFeaturesDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_InvoiceFeaturesDecodeErrorZ {
+	CResult_InvoiceFeaturesDecodeErrorZ {
+		contents: CResult_InvoiceFeaturesDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+pub extern "C" fn CResult_InvoiceFeaturesDecodeErrorZ_free(_res: CResult_InvoiceFeaturesDecodeErrorZ) { }
+impl Drop for CResult_InvoiceFeaturesDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::ln::features::InvoiceFeatures, crate::ln::msgs::DecodeError>> for CResult_InvoiceFeaturesDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::ln::features::InvoiceFeatures, crate::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_InvoiceFeaturesDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_InvoiceFeaturesDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+#[repr(C)]
 pub union CResult_ChannelConfigDecodeErrorZPtr {
 	pub result: *mut crate::util::config::ChannelConfig,
 	pub err: *mut crate::ln::msgs::DecodeError,
@@ -2878,6 +2938,138 @@ pub extern "C" fn C2Tuple_OutPointScriptZ_new(a: crate::chain::transaction::OutP
 
 #[no_mangle]
 pub extern "C" fn C2Tuple_OutPointScriptZ_free(_res: C2Tuple_OutPointScriptZ) { }
+#[repr(C)]
+pub struct C2Tuple_u32ScriptZ {
+	pub a: u32,
+	pub b: crate::c_types::derived::CVec_u8Z,
+}
+impl From<(u32, crate::c_types::derived::CVec_u8Z)> for C2Tuple_u32ScriptZ {
+	fn from (tup: (u32, crate::c_types::derived::CVec_u8Z)) -> Self {
+		Self {
+			a: tup.0,
+			b: tup.1,
+		}
+	}
+}
+impl C2Tuple_u32ScriptZ {
+	#[allow(unused)] pub(crate) fn to_rust(mut self) -> (u32, crate::c_types::derived::CVec_u8Z) {
+		(self.a, self.b)
+	}
+}
+impl Clone for C2Tuple_u32ScriptZ {
+	fn clone(&self) -> Self {
+		Self {
+			a: self.a.clone(),
+			b: self.b.clone(),
+		}
+	}
+}
+#[no_mangle]
+pub extern "C" fn C2Tuple_u32ScriptZ_clone(orig: &C2Tuple_u32ScriptZ) -> C2Tuple_u32ScriptZ { orig.clone() }
+#[no_mangle]
+pub extern "C" fn C2Tuple_u32ScriptZ_new(a: u32, b: crate::c_types::derived::CVec_u8Z) -> C2Tuple_u32ScriptZ {
+	C2Tuple_u32ScriptZ { a, b, }
+}
+
+#[no_mangle]
+pub extern "C" fn C2Tuple_u32ScriptZ_free(_res: C2Tuple_u32ScriptZ) { }
+#[repr(C)]
+pub struct CVec_C2Tuple_u32ScriptZZ {
+	pub data: *mut crate::c_types::derived::C2Tuple_u32ScriptZ,
+	pub datalen: usize
+}
+impl CVec_C2Tuple_u32ScriptZZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_u32ScriptZ> {
+		if self.datalen == 0 { return Vec::new(); }
+		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = std::ptr::null_mut();
+		self.datalen = 0;
+		ret
+	}
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_u32ScriptZ] {
+		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+	}
+}
+impl From<Vec<crate::c_types::derived::C2Tuple_u32ScriptZ>> for CVec_C2Tuple_u32ScriptZZ {
+	fn from(v: Vec<crate::c_types::derived::C2Tuple_u32ScriptZ>) -> Self {
+		let datalen = v.len();
+		let data = Box::into_raw(v.into_boxed_slice());
+		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
+	}
+}
+#[no_mangle]
+pub extern "C" fn CVec_C2Tuple_u32ScriptZZ_free(_res: CVec_C2Tuple_u32ScriptZZ) { }
+impl Drop for CVec_C2Tuple_u32ScriptZZ {
+	fn drop(&mut self) {
+		if self.datalen == 0 { return; }
+		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+	}
+}
+impl Clone for CVec_C2Tuple_u32ScriptZZ {
+	fn clone(&self) -> Self {
+		let mut res = Vec::new();
+		if self.datalen == 0 { return Self::from(res); }
+		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		Self::from(res)
+	}
+}
+#[repr(C)]
+pub struct C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
+	pub a: crate::c_types::ThirtyTwoBytes,
+	pub b: crate::c_types::derived::CVec_C2Tuple_u32ScriptZZ,
+}
+impl From<(crate::c_types::ThirtyTwoBytes, crate::c_types::derived::CVec_C2Tuple_u32ScriptZZ)> for C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
+	fn from (tup: (crate::c_types::ThirtyTwoBytes, crate::c_types::derived::CVec_C2Tuple_u32ScriptZZ)) -> Self {
+		Self {
+			a: tup.0,
+			b: tup.1,
+		}
+	}
+}
+impl C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
+	#[allow(unused)] pub(crate) fn to_rust(mut self) -> (crate::c_types::ThirtyTwoBytes, crate::c_types::derived::CVec_C2Tuple_u32ScriptZZ) {
+		(self.a, self.b)
+	}
+}
+#[no_mangle]
+pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ_new(a: crate::c_types::ThirtyTwoBytes, b: crate::c_types::derived::CVec_C2Tuple_u32ScriptZZ) -> C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
+	C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ { a, b, }
+}
+
+#[no_mangle]
+pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ_free(_res: C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ) { }
+#[repr(C)]
+pub struct CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
+	pub data: *mut crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ,
+	pub datalen: usize
+}
+impl CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ> {
+		if self.datalen == 0 { return Vec::new(); }
+		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = std::ptr::null_mut();
+		self.datalen = 0;
+		ret
+	}
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ] {
+		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+	}
+}
+impl From<Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ>> for CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
+	fn from(v: Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ>) -> Self {
+		let datalen = v.len();
+		let data = Box::into_raw(v.into_boxed_slice());
+		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
+	}
+}
+#[no_mangle]
+pub extern "C" fn CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ_free(_res: CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ) { }
+impl Drop for CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
+	fn drop(&mut self) {
+		if self.datalen == 0 { return; }
+		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+	}
+}
 #[repr(C)]
 pub struct CVec_TransactionZ {
 	pub data: *mut crate::c_types::Transaction,

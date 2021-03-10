@@ -266,10 +266,16 @@ typedef struct LDKCResult_PublicKeyErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKTxCreationKeys {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeTxCreationKeys *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKTxCreationKeys;
 
@@ -280,10 +286,16 @@ typedef struct MUST_USE_STRUCT LDKTxCreationKeys {
  */
 typedef struct MUST_USE_STRUCT LDKDecodeError {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeDecodeError *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKDecodeError;
 
@@ -304,10 +316,16 @@ typedef struct LDKCResult_TxCreationKeysDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKChannelPublicKeys {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelPublicKeys *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelPublicKeys;
 
@@ -338,10 +356,16 @@ typedef struct LDKCResult_TxCreationKeysErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKHTLCOutputInCommitment {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeHTLCOutputInCommitment *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKHTLCOutputInCommitment;
 
@@ -362,10 +386,16 @@ typedef struct LDKCResult_HTLCOutputInCommitmentDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKCounterpartyChannelTransactionParameters {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeCounterpartyChannelTransactionParameters *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKCounterpartyChannelTransactionParameters;
 
@@ -390,10 +420,16 @@ typedef struct LDKCResult_CounterpartyChannelTransactionParametersDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKChannelTransactionParameters {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelTransactionParameters *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelTransactionParameters;
 
@@ -425,10 +461,16 @@ typedef struct LDKCVec_SignatureZ {
  */
 typedef struct MUST_USE_STRUCT LDKHolderCommitmentTransaction {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeHolderCommitmentTransaction *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKHolderCommitmentTransaction;
 
@@ -449,10 +491,16 @@ typedef struct LDKCResult_HolderCommitmentTransactionDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKBuiltCommitmentTransaction {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeBuiltCommitmentTransaction *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKBuiltCommitmentTransaction;
 
@@ -478,10 +526,16 @@ typedef struct LDKCResult_BuiltCommitmentTransactionDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKCommitmentTransaction {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeCommitmentTransaction *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKCommitmentTransaction;
 
@@ -507,10 +561,16 @@ typedef struct LDKCResult_CommitmentTransactionDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKTrustedCommitmentTransaction {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeTrustedCommitmentTransaction *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKTrustedCommitmentTransaction;
 
@@ -547,10 +607,16 @@ typedef struct LDKCResult_CVec_SignatureZNoneZ {
  */
 typedef struct MUST_USE_STRUCT LDKAcceptChannel {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeAcceptChannel *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKAcceptChannel;
 
@@ -561,10 +627,16 @@ typedef struct MUST_USE_STRUCT LDKAcceptChannel {
  */
 typedef struct MUST_USE_STRUCT LDKOpenChannel {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeOpenChannel *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKOpenChannel;
 
@@ -575,10 +647,16 @@ typedef struct MUST_USE_STRUCT LDKOpenChannel {
  */
 typedef struct MUST_USE_STRUCT LDKFundingCreated {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeFundingCreated *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKFundingCreated;
 
@@ -589,10 +667,16 @@ typedef struct MUST_USE_STRUCT LDKFundingCreated {
  */
 typedef struct MUST_USE_STRUCT LDKFundingSigned {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeFundingSigned *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKFundingSigned;
 
@@ -603,10 +687,16 @@ typedef struct MUST_USE_STRUCT LDKFundingSigned {
  */
 typedef struct MUST_USE_STRUCT LDKFundingLocked {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeFundingLocked *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKFundingLocked;
 
@@ -617,10 +707,16 @@ typedef struct MUST_USE_STRUCT LDKFundingLocked {
  */
 typedef struct MUST_USE_STRUCT LDKAnnouncementSignatures {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeAnnouncementSignatures *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKAnnouncementSignatures;
 
@@ -632,10 +728,16 @@ typedef struct MUST_USE_STRUCT LDKAnnouncementSignatures {
  */
 typedef struct MUST_USE_STRUCT LDKCommitmentUpdate {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeCommitmentUpdate *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKCommitmentUpdate;
 
@@ -646,10 +748,16 @@ typedef struct MUST_USE_STRUCT LDKCommitmentUpdate {
  */
 typedef struct MUST_USE_STRUCT LDKRevokeAndACK {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeRevokeAndACK *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKRevokeAndACK;
 
@@ -660,10 +768,16 @@ typedef struct MUST_USE_STRUCT LDKRevokeAndACK {
  */
 typedef struct MUST_USE_STRUCT LDKClosingSigned {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeClosingSigned *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKClosingSigned;
 
@@ -674,10 +788,16 @@ typedef struct MUST_USE_STRUCT LDKClosingSigned {
  */
 typedef struct MUST_USE_STRUCT LDKShutdown {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeShutdown *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKShutdown;
 
@@ -688,10 +808,16 @@ typedef struct MUST_USE_STRUCT LDKShutdown {
  */
 typedef struct MUST_USE_STRUCT LDKChannelReestablish {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelReestablish *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelReestablish;
 
@@ -702,10 +828,16 @@ typedef struct MUST_USE_STRUCT LDKChannelReestablish {
  */
 typedef struct MUST_USE_STRUCT LDKChannelAnnouncement {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelAnnouncement *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelAnnouncement;
 
@@ -716,10 +848,16 @@ typedef struct MUST_USE_STRUCT LDKChannelAnnouncement {
  */
 typedef struct MUST_USE_STRUCT LDKChannelUpdate {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelUpdate *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelUpdate;
 
@@ -730,10 +868,16 @@ typedef struct MUST_USE_STRUCT LDKChannelUpdate {
  */
 typedef struct MUST_USE_STRUCT LDKNodeAnnouncement {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeNodeAnnouncement *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKNodeAnnouncement;
 
@@ -744,10 +888,16 @@ typedef struct MUST_USE_STRUCT LDKNodeAnnouncement {
  */
 typedef struct MUST_USE_STRUCT LDKErrorMessage {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeErrorMessage *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKErrorMessage;
 
@@ -774,10 +924,16 @@ typedef enum LDKErrorAction_Tag {
 } LDKErrorAction_Tag;
 
 typedef struct LDKErrorAction_LDKDisconnectPeer_Body {
+   /**
+    * An error message which we should make an effort to send before we disconnect.
+    */
    struct LDKErrorMessage msg;
 } LDKErrorAction_LDKDisconnectPeer_Body;
 
 typedef struct LDKErrorAction_LDKSendErrorMessage_Body {
+   /**
+    * The message to send.
+    */
    struct LDKErrorMessage msg;
 } LDKErrorAction_LDKSendErrorMessage_Body;
 
@@ -814,16 +970,34 @@ typedef enum LDKHTLCFailChannelUpdate_Tag {
 } LDKHTLCFailChannelUpdate_Tag;
 
 typedef struct LDKHTLCFailChannelUpdate_LDKChannelUpdateMessage_Body {
+   /**
+    * The unwrapped message we received
+    */
    struct LDKChannelUpdate msg;
 } LDKHTLCFailChannelUpdate_LDKChannelUpdateMessage_Body;
 
 typedef struct LDKHTLCFailChannelUpdate_LDKChannelClosed_Body {
+   /**
+    * The short_channel_id which has now closed.
+    */
    uint64_t short_channel_id;
+   /**
+    * when this true, this channel should be permanently removed from the
+    * consideration. Otherwise, this channel can be restored as new channel_update is received
+    */
    bool is_permanent;
 } LDKHTLCFailChannelUpdate_LDKChannelClosed_Body;
 
 typedef struct LDKHTLCFailChannelUpdate_LDKNodeFailure_Body {
+   /**
+    * The node_id that has failed.
+    */
    struct LDKPublicKey node_id;
+   /**
+    * when this true, node should be permanently removed from the
+    * consideration. Otherwise, the channels connected to this node can be
+    * restored as new channel_update is received
+    */
    bool is_permanent;
 } LDKHTLCFailChannelUpdate_LDKNodeFailure_Body;
 
@@ -846,10 +1020,16 @@ typedef struct MUST_USE_STRUCT LDKHTLCFailChannelUpdate {
  */
 typedef struct MUST_USE_STRUCT LDKQueryChannelRange {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeQueryChannelRange *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKQueryChannelRange;
 
@@ -867,10 +1047,16 @@ typedef struct MUST_USE_STRUCT LDKQueryChannelRange {
  */
 typedef struct MUST_USE_STRUCT LDKQueryShortChannelIds {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeQueryShortChannelIds *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKQueryShortChannelIds;
 
@@ -971,89 +1157,188 @@ typedef enum LDKMessageSendEvent_Tag {
 } LDKMessageSendEvent_Tag;
 
 typedef struct LDKMessageSendEvent_LDKSendAcceptChannel_Body {
+   /**
+    * The node_id of the node which should receive this message
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The message which should be sent.
+    */
    struct LDKAcceptChannel msg;
 } LDKMessageSendEvent_LDKSendAcceptChannel_Body;
 
 typedef struct LDKMessageSendEvent_LDKSendOpenChannel_Body {
+   /**
+    * The node_id of the node which should receive this message
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The message which should be sent.
+    */
    struct LDKOpenChannel msg;
 } LDKMessageSendEvent_LDKSendOpenChannel_Body;
 
 typedef struct LDKMessageSendEvent_LDKSendFundingCreated_Body {
+   /**
+    * The node_id of the node which should receive this message
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The message which should be sent.
+    */
    struct LDKFundingCreated msg;
 } LDKMessageSendEvent_LDKSendFundingCreated_Body;
 
 typedef struct LDKMessageSendEvent_LDKSendFundingSigned_Body {
+   /**
+    * The node_id of the node which should receive this message
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The message which should be sent.
+    */
    struct LDKFundingSigned msg;
 } LDKMessageSendEvent_LDKSendFundingSigned_Body;
 
 typedef struct LDKMessageSendEvent_LDKSendFundingLocked_Body {
+   /**
+    * The node_id of the node which should receive these message(s)
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The funding_locked message which should be sent.
+    */
    struct LDKFundingLocked msg;
 } LDKMessageSendEvent_LDKSendFundingLocked_Body;
 
 typedef struct LDKMessageSendEvent_LDKSendAnnouncementSignatures_Body {
+   /**
+    * The node_id of the node which should receive these message(s)
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The announcement_signatures message which should be sent.
+    */
    struct LDKAnnouncementSignatures msg;
 } LDKMessageSendEvent_LDKSendAnnouncementSignatures_Body;
 
 typedef struct LDKMessageSendEvent_LDKUpdateHTLCs_Body {
+   /**
+    * The node_id of the node which should receive these message(s)
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The update messages which should be sent. ALL messages in the struct should be sent!
+    */
    struct LDKCommitmentUpdate updates;
 } LDKMessageSendEvent_LDKUpdateHTLCs_Body;
 
 typedef struct LDKMessageSendEvent_LDKSendRevokeAndACK_Body {
+   /**
+    * The node_id of the node which should receive this message
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The message which should be sent.
+    */
    struct LDKRevokeAndACK msg;
 } LDKMessageSendEvent_LDKSendRevokeAndACK_Body;
 
 typedef struct LDKMessageSendEvent_LDKSendClosingSigned_Body {
+   /**
+    * The node_id of the node which should receive this message
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The message which should be sent.
+    */
    struct LDKClosingSigned msg;
 } LDKMessageSendEvent_LDKSendClosingSigned_Body;
 
 typedef struct LDKMessageSendEvent_LDKSendShutdown_Body {
+   /**
+    * The node_id of the node which should receive this message
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The message which should be sent.
+    */
    struct LDKShutdown msg;
 } LDKMessageSendEvent_LDKSendShutdown_Body;
 
 typedef struct LDKMessageSendEvent_LDKSendChannelReestablish_Body {
+   /**
+    * The node_id of the node which should receive this message
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The message which should be sent.
+    */
    struct LDKChannelReestablish msg;
 } LDKMessageSendEvent_LDKSendChannelReestablish_Body;
 
 typedef struct LDKMessageSendEvent_LDKBroadcastChannelAnnouncement_Body {
+   /**
+    * The channel_announcement which should be sent.
+    */
    struct LDKChannelAnnouncement msg;
+   /**
+    * The followup channel_update which should be sent.
+    */
    struct LDKChannelUpdate update_msg;
 } LDKMessageSendEvent_LDKBroadcastChannelAnnouncement_Body;
 
 typedef struct LDKMessageSendEvent_LDKBroadcastNodeAnnouncement_Body {
+   /**
+    * The node_announcement which should be sent.
+    */
    struct LDKNodeAnnouncement msg;
 } LDKMessageSendEvent_LDKBroadcastNodeAnnouncement_Body;
 
 typedef struct LDKMessageSendEvent_LDKBroadcastChannelUpdate_Body {
+   /**
+    * The channel_update which should be sent.
+    */
    struct LDKChannelUpdate msg;
 } LDKMessageSendEvent_LDKBroadcastChannelUpdate_Body;
 
 typedef struct LDKMessageSendEvent_LDKHandleError_Body {
+   /**
+    * The node_id of the node which should receive this message
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The action which should be taken.
+    */
    struct LDKErrorAction action;
 } LDKMessageSendEvent_LDKHandleError_Body;
 
 typedef struct LDKMessageSendEvent_LDKPaymentFailureNetworkUpdate_Body {
+   /**
+    * The channel/node update which should be sent to NetGraphMsgHandler
+    */
    struct LDKHTLCFailChannelUpdate update;
 } LDKMessageSendEvent_LDKPaymentFailureNetworkUpdate_Body;
 
 typedef struct LDKMessageSendEvent_LDKSendChannelRangeQuery_Body {
+   /**
+    * The node_id of this message recipient
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The query_channel_range which should be sent.
+    */
    struct LDKQueryChannelRange msg;
 } LDKMessageSendEvent_LDKSendChannelRangeQuery_Body;
 
 typedef struct LDKMessageSendEvent_LDKSendShortIdsQuery_Body {
+   /**
+    * The node_id of this message recipient
+    */
    struct LDKPublicKey node_id;
+   /**
+    * The query_short_channel_ids which should be sent.
+    */
    struct LDKQueryShortChannelIds msg;
 } LDKMessageSendEvent_LDKSendShortIdsQuery_Body;
 
@@ -1093,10 +1378,16 @@ typedef struct LDKCVec_MessageSendEventZ {
  */
 typedef struct MUST_USE_STRUCT LDKLightningError {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeLightningError *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKLightningError;
 
@@ -1153,10 +1444,16 @@ typedef struct LDKCVec_PublicKeyZ {
  */
 typedef struct MUST_USE_STRUCT LDKPeerHandleError {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativePeerHandleError *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKPeerHandleError;
 
@@ -1200,10 +1497,16 @@ typedef struct LDKCResult_boolPeerHandleErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKInitFeatures {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeInitFeatures *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKInitFeatures;
 
@@ -1224,10 +1527,16 @@ typedef struct LDKCResult_InitFeaturesDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKNodeFeatures {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeNodeFeatures *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKNodeFeatures;
 
@@ -1248,10 +1557,16 @@ typedef struct LDKCResult_NodeFeaturesDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKChannelFeatures {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelFeatures *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelFeatures;
 
@@ -1268,15 +1583,51 @@ typedef struct LDKCResult_ChannelFeaturesDecodeErrorZ {
 
 
 /**
+ * Features used within an invoice.
+ */
+typedef struct MUST_USE_STRUCT LDKInvoiceFeatures {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeInvoiceFeatures *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKInvoiceFeatures;
+
+typedef union LDKCResult_InvoiceFeaturesDecodeErrorZPtr {
+   struct LDKInvoiceFeatures *result;
+   struct LDKDecodeError *err;
+} LDKCResult_InvoiceFeaturesDecodeErrorZPtr;
+
+typedef struct LDKCResult_InvoiceFeaturesDecodeErrorZ {
+   union LDKCResult_InvoiceFeaturesDecodeErrorZPtr contents;
+   bool result_ok;
+} LDKCResult_InvoiceFeaturesDecodeErrorZ;
+
+
+
+/**
  * Options which apply on a per-channel basis and may change at runtime or based on negotiation
  * with our counterparty.
  */
 typedef struct MUST_USE_STRUCT LDKChannelConfig {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelConfig *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelConfig;
 
@@ -1298,10 +1649,16 @@ typedef struct LDKCResult_ChannelConfigDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKDirectionalChannelInfo {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeDirectionalChannelInfo *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKDirectionalChannelInfo;
 
@@ -1323,10 +1680,16 @@ typedef struct LDKCResult_DirectionalChannelInfoDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKChannelInfo {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelInfo *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelInfo;
 
@@ -1347,10 +1710,16 @@ typedef struct LDKCResult_ChannelInfoDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKRoutingFees {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeRoutingFees *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKRoutingFees;
 
@@ -1413,24 +1782,54 @@ typedef enum LDKNetAddress_Tag {
 } LDKNetAddress_Tag;
 
 typedef struct LDKNetAddress_LDKIPv4_Body {
+   /**
+    * The 4-byte IPv4 address
+    */
    struct LDKFourBytes addr;
+   /**
+    * The port on which the node is listening
+    */
    uint16_t port;
 } LDKNetAddress_LDKIPv4_Body;
 
 typedef struct LDKNetAddress_LDKIPv6_Body {
+   /**
+    * The 16-byte IPv6 address
+    */
    struct LDKSixteenBytes addr;
+   /**
+    * The port on which the node is listening
+    */
    uint16_t port;
 } LDKNetAddress_LDKIPv6_Body;
 
 typedef struct LDKNetAddress_LDKOnionV2_Body {
+   /**
+    * The bytes (usually encoded in base32 with \".onion\" appended)
+    */
    struct LDKTenBytes addr;
+   /**
+    * The port on which the node is listening
+    */
    uint16_t port;
 } LDKNetAddress_LDKOnionV2_Body;
 
 typedef struct LDKNetAddress_LDKOnionV3_Body {
+   /**
+    * The ed25519 long-term public key of the peer
+    */
    struct LDKThirtyTwoBytes ed25519_pubkey;
+   /**
+    * The checksum of the pubkey and version, as included in the onion address
+    */
    uint16_t checksum;
+   /**
+    * The version byte, as defined by the Tor Onion v3 spec.
+    */
    uint8_t version;
+   /**
+    * The port on which the node is listening
+    */
    uint16_t port;
 } LDKNetAddress_LDKOnionV3_Body;
 
@@ -1456,10 +1855,16 @@ typedef struct LDKCVec_NetAddressZ {
  */
 typedef struct MUST_USE_STRUCT LDKNodeAnnouncementInfo {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeNodeAnnouncementInfo *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKNodeAnnouncementInfo;
 
@@ -1485,10 +1890,16 @@ typedef struct LDKCVec_u64Z {
  */
 typedef struct MUST_USE_STRUCT LDKNodeInfo {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeNodeInfo *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKNodeInfo;
 
@@ -1509,10 +1920,16 @@ typedef struct LDKCResult_NodeInfoDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKNetworkGraph {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeNetworkGraph *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKNetworkGraph;
 
@@ -1560,10 +1977,16 @@ typedef struct LDKCResult_NoneChannelMonitorUpdateErrZ {
  */
 typedef struct MUST_USE_STRUCT LDKHTLCUpdate {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeHTLCUpdate *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKHTLCUpdate;
 
@@ -1577,10 +2000,16 @@ typedef struct MUST_USE_STRUCT LDKHTLCUpdate {
  */
 typedef struct MUST_USE_STRUCT LDKOutPoint {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeOutPoint *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKOutPoint;
 
@@ -1627,10 +2056,16 @@ typedef struct LDKCVec_MonitorEventZ {
  */
 typedef struct MUST_USE_STRUCT LDKDelayedPaymentOutputDescriptor {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeDelayedPaymentOutputDescriptor *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKDelayedPaymentOutputDescriptor;
 
@@ -1642,10 +2077,16 @@ typedef struct MUST_USE_STRUCT LDKDelayedPaymentOutputDescriptor {
  */
 typedef struct MUST_USE_STRUCT LDKStaticPaymentOutputDescriptor {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeStaticPaymentOutputDescriptor *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKStaticPaymentOutputDescriptor;
 
@@ -1713,7 +2154,13 @@ typedef enum LDKSpendableOutputDescriptor_Tag {
 } LDKSpendableOutputDescriptor_Tag;
 
 typedef struct LDKSpendableOutputDescriptor_LDKStaticOutput_Body {
+   /**
+    * The outpoint which is spendable
+    */
    struct LDKOutPoint outpoint;
+   /**
+    * The output which is referenced by the given outpoint.
+    */
    struct LDKTxOut output;
 } LDKSpendableOutputDescriptor_LDKStaticOutput_Body;
 
@@ -1803,37 +2250,98 @@ typedef enum LDKEvent_Tag {
 } LDKEvent_Tag;
 
 typedef struct LDKEvent_LDKFundingGenerationReady_Body {
+   /**
+    * The random channel_id we picked which you'll need to pass into
+    * ChannelManager::funding_transaction_generated.
+    */
    struct LDKThirtyTwoBytes temporary_channel_id;
+   /**
+    * The value, in satoshis, that the output should have.
+    */
    uint64_t channel_value_satoshis;
+   /**
+    * The script which should be used in the transaction output.
+    */
    struct LDKCVec_u8Z output_script;
+   /**
+    * The value passed in to ChannelManager::create_channel
+    */
    uint64_t user_channel_id;
 } LDKEvent_LDKFundingGenerationReady_Body;
 
 typedef struct LDKEvent_LDKFundingBroadcastSafe_Body {
+   /**
+    * The output, which was passed to ChannelManager::funding_transaction_generated, which is
+    * now safe to broadcast.
+    */
    struct LDKOutPoint funding_txo;
+   /**
+    * The value passed in to ChannelManager::create_channel
+    */
    uint64_t user_channel_id;
 } LDKEvent_LDKFundingBroadcastSafe_Body;
 
 typedef struct LDKEvent_LDKPaymentReceived_Body {
+   /**
+    * The hash for which the preimage should be handed to the ChannelManager.
+    */
    struct LDKThirtyTwoBytes payment_hash;
+   /**
+    * The \"payment secret\". This authenticates the sender to the recipient, preventing a
+    * number of deanonymization attacks during the routing process.
+    * As nodes upgrade, the invoices you provide should likely migrate to setting the
+    * payment_secret feature to required, at which point you should fail_backwards any HTLCs
+    * which have a None here.
+    * Until then, however, values of None should be ignored, and only incorrect Some values
+    * should result in an HTLC fail_backwards.
+    * Note that, in any case, this value must be passed as-is to any fail or claim calls as
+    * the HTLC index includes this value.
+    */
    struct LDKThirtyTwoBytes payment_secret;
+   /**
+    * The value, in thousandths of a satoshi, that this payment is for. Note that you must
+    * compare this to the expected value before accepting the payment (as otherwise you are
+    * providing proof-of-payment for less than the value you expected!).
+    */
    uint64_t amt;
 } LDKEvent_LDKPaymentReceived_Body;
 
 typedef struct LDKEvent_LDKPaymentSent_Body {
+   /**
+    * The preimage to the hash given to ChannelManager::send_payment.
+    * Note that this serves as a payment receipt, if you wish to have such a thing, you must
+    * store it somehow!
+    */
    struct LDKThirtyTwoBytes payment_preimage;
 } LDKEvent_LDKPaymentSent_Body;
 
 typedef struct LDKEvent_LDKPaymentFailed_Body {
+   /**
+    * The hash which was given to ChannelManager::send_payment.
+    */
    struct LDKThirtyTwoBytes payment_hash;
+   /**
+    * Indicates the payment was rejected for some reason by the recipient. This implies that
+    * the payment has failed, not just the route in question. If this is not set, you may
+    * retry the payment via a different route.
+    */
    bool rejected_by_dest;
 } LDKEvent_LDKPaymentFailed_Body;
 
 typedef struct LDKEvent_LDKPendingHTLCsForwardable_Body {
+   /**
+    * The minimum amount of time that should be waited prior to calling
+    * process_pending_htlc_forwards. To increase the effort required to correlate payments,
+    * you should wait a random amount of time in roughly the range (now + time_forwardable,
+    * now + 5*time_forwardable).
+    */
    uint64_t time_forwardable;
 } LDKEvent_LDKPendingHTLCsForwardable_Body;
 
 typedef struct LDKEvent_LDKSpendableOutputs_Body {
+   /**
+    * The outputs which you should store as spendable by you.
+    */
    struct LDKCVec_SpendableOutputDescriptorZ outputs;
 } LDKEvent_LDKSpendableOutputs_Body;
 
@@ -1873,10 +2381,16 @@ typedef struct LDKCResult_OutPointDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKChannelMonitorUpdate {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelMonitorUpdate *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelMonitorUpdate;
 
@@ -1911,10 +2425,16 @@ typedef struct LDKCResult_HTLCUpdateDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKMonitorUpdateError {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeMonitorUpdateError *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKMonitorUpdateError;
 
@@ -1935,6 +2455,26 @@ typedef struct LDKC2Tuple_OutPointScriptZ {
    struct LDKOutPoint a;
    struct LDKCVec_u8Z b;
 } LDKC2Tuple_OutPointScriptZ;
+
+typedef struct LDKC2Tuple_u32ScriptZ {
+   uint32_t a;
+   struct LDKCVec_u8Z b;
+} LDKC2Tuple_u32ScriptZ;
+
+typedef struct LDKCVec_C2Tuple_u32ScriptZZ {
+   struct LDKC2Tuple_u32ScriptZ *data;
+   uintptr_t datalen;
+} LDKCVec_C2Tuple_u32ScriptZZ;
+
+typedef struct LDKC2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
+   struct LDKThirtyTwoBytes a;
+   struct LDKCVec_C2Tuple_u32ScriptZZ b;
+} LDKC2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ;
+
+typedef struct LDKCVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
+   struct LDKC2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ *data;
+   uintptr_t datalen;
+} LDKCVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ;
 
 typedef struct LDKCVec_TransactionZ {
    struct LDKTransaction *data;
@@ -1999,10 +2539,16 @@ typedef struct LDKCResult_SignatureNoneZ {
  */
 typedef struct MUST_USE_STRUCT LDKUnsignedChannelAnnouncement {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeUnsignedChannelAnnouncement *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKUnsignedChannelAnnouncement;
 
@@ -2026,6 +2572,10 @@ typedef struct MUST_USE_STRUCT LDKUnsignedChannelAnnouncement {
  * of LN security model, orthogonal of key management issues.
  */
 typedef struct LDKSign {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Gets the per-commitment point for a specific commitment number
@@ -2150,8 +2700,20 @@ typedef struct LDKSign {
     * Will be called before any signatures are applied.
     */
    void (*ready_channel)(void *this_arg, const struct LDKChannelTransactionParameters *NONNULL_PTR channel_parameters);
+   /**
+    * Creates a copy of the object pointed to by this_arg, for a copy of this Sign.
+    * Note that the ultimate copy of the Sign will have all function pointers the same as the original.
+    * May be NULL if no action needs to be taken, the this_arg pointer will be copied into the new Sign.
+    */
    void *(*clone)(const void *this_arg);
+   /**
+    * Serialize the object into a byte array
+    */
    struct LDKCVec_u8Z (*write)(const void *this_arg);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKSign;
 
@@ -2177,10 +2739,16 @@ typedef struct LDKSign {
  */
 typedef struct MUST_USE_STRUCT LDKChannelMonitor {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelMonitor *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelMonitor;
 
@@ -2257,19 +2825,34 @@ typedef enum LDKAPIError_Tag {
 } LDKAPIError_Tag;
 
 typedef struct LDKAPIError_LDKAPIMisuseError_Body {
+   /**
+    * A human-readable error message
+    */
    struct LDKCVec_u8Z err;
 } LDKAPIError_LDKAPIMisuseError_Body;
 
 typedef struct LDKAPIError_LDKFeeRateTooHigh_Body {
+   /**
+    * A human-readable error message
+    */
    struct LDKCVec_u8Z err;
+   /**
+    * The feerate which was too high.
+    */
    uint32_t feerate;
 } LDKAPIError_LDKFeeRateTooHigh_Body;
 
 typedef struct LDKAPIError_LDKRouteError_Body {
+   /**
+    * A human-readable error message
+    */
    struct LDKStr err;
 } LDKAPIError_LDKRouteError_Body;
 
 typedef struct LDKAPIError_LDKChannelUnavailable_Body {
+   /**
+    * A human-readable error message
+    */
    struct LDKCVec_u8Z err;
 } LDKAPIError_LDKChannelUnavailable_Body;
 
@@ -2313,10 +2896,16 @@ typedef struct LDKCVec_APIErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKChannelDetails {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelDetails *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelDetails;
 
@@ -2434,6 +3023,10 @@ typedef struct LDKCVec_ChannelMonitorZ {
  * [`PermanentFailure`]: channelmonitor/enum.ChannelMonitorUpdateErr.html#variant.PermanentFailure
  */
 typedef struct LDKWatch {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Watches a channel identified by `funding_txo` using `monitor`.
@@ -2462,6 +3055,10 @@ typedef struct LDKWatch {
     * events.
     */
    struct LDKCVec_MonitorEventZ (*release_pending_monitor_events)(const void *this_arg);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKWatch;
 
@@ -2469,11 +3066,19 @@ typedef struct LDKWatch {
  * An interface to send a transaction to the Bitcoin network.
  */
 typedef struct LDKBroadcasterInterface {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Sends a transaction out to (hopefully) be mined.
     */
    void (*broadcast_transaction)(const void *this_arg, struct LDKTransaction tx);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKBroadcasterInterface;
 
@@ -2496,6 +3101,10 @@ typedef struct LDKu8slice {
  * A trait to describe an object which can get user secrets and key material.
  */
 typedef struct LDKKeysInterface {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Get node secret key (aka node_id or network_key).
@@ -2542,6 +3151,10 @@ typedef struct LDKKeysInterface {
     * you've read all of the provided bytes to ensure no corruption occurred.
     */
    struct LDKCResult_SignDecodeErrorZ (*read_chan_signer)(const void *this_arg, struct LDKu8slice reader);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKKeysInterface;
 
@@ -2553,6 +3166,10 @@ typedef struct LDKKeysInterface {
  * called from inside the library in response to chain events, P2P events, or timer events).
  */
 typedef struct LDKFeeEstimator {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Gets estimated satoshis of fee required per 1000 Weight-Units.
@@ -2565,6 +3182,10 @@ typedef struct LDKFeeEstimator {
     *  * ceil(satoshis-per-kbyte / 4)
     */
    uint32_t (*get_est_sat_per_1000_weight)(const void *this_arg, enum LDKConfirmationTarget confirmation_target);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKFeeEstimator;
 
@@ -2572,11 +3193,19 @@ typedef struct LDKFeeEstimator {
  * A trait encapsulating the operations required of a logger
  */
 typedef struct LDKLogger {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Logs the `Record`
     */
    void (*log)(const void *this_arg, const char *record);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKLogger;
 
@@ -2622,10 +3251,16 @@ typedef struct LDKLogger {
  */
 typedef struct MUST_USE_STRUCT LDKChannelManager {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelManager *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelManager;
 
@@ -2682,10 +3317,16 @@ typedef struct LDKCResult_CVec_CVec_u8ZZNoneZ {
  */
 typedef struct MUST_USE_STRUCT LDKInMemorySigner {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeInMemorySigner *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKInMemorySigner;
 
@@ -2724,10 +3365,16 @@ typedef struct LDKCResult_TransactionNoneZ {
  */
 typedef struct MUST_USE_STRUCT LDKRouteHop {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeRouteHop *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKRouteHop;
 
@@ -2749,10 +3396,16 @@ typedef struct LDKCVec_CVec_RouteHopZZ {
  */
 typedef struct MUST_USE_STRUCT LDKRoute {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeRoute *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKRoute;
 
@@ -2773,10 +3426,16 @@ typedef struct LDKCResult_RouteDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKRouteHint {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeRouteHint *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKRouteHint;
 
@@ -2822,10 +3481,16 @@ typedef struct LDKCResult_CResult_NetAddressu8ZDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKUpdateAddHTLC {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeUpdateAddHTLC *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKUpdateAddHTLC;
 
@@ -2841,10 +3506,16 @@ typedef struct LDKCVec_UpdateAddHTLCZ {
  */
 typedef struct MUST_USE_STRUCT LDKUpdateFulfillHTLC {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeUpdateFulfillHTLC *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKUpdateFulfillHTLC;
 
@@ -2860,10 +3531,16 @@ typedef struct LDKCVec_UpdateFulfillHTLCZ {
  */
 typedef struct MUST_USE_STRUCT LDKUpdateFailHTLC {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeUpdateFailHTLC *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKUpdateFailHTLC;
 
@@ -2879,10 +3556,16 @@ typedef struct LDKCVec_UpdateFailHTLCZ {
  */
 typedef struct MUST_USE_STRUCT LDKUpdateFailMalformedHTLC {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeUpdateFailMalformedHTLC *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKUpdateFailMalformedHTLC;
 
@@ -2938,10 +3621,16 @@ typedef struct LDKCResult_ClosingSignedDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKCommitmentSigned {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeCommitmentSigned *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKCommitmentSigned;
 
@@ -2992,10 +3681,16 @@ typedef struct LDKCResult_FundingLockedDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKInit {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeInit *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKInit;
 
@@ -3066,10 +3761,16 @@ typedef struct LDKCResult_UpdateFailMalformedHTLCDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKUpdateFee {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeUpdateFee *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKUpdateFee;
 
@@ -3110,10 +3811,16 @@ typedef struct LDKCResult_UpdateAddHTLCDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKPing {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativePing *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKPing;
 
@@ -3134,10 +3841,16 @@ typedef struct LDKCResult_PingDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKPong {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativePong *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKPong;
 
@@ -3178,10 +3891,16 @@ typedef struct LDKCResult_ChannelAnnouncementDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKUnsignedChannelUpdate {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeUnsignedChannelUpdate *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKUnsignedChannelUpdate;
 
@@ -3222,10 +3941,16 @@ typedef struct LDKCResult_ErrorMessageDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKUnsignedNodeAnnouncement {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeUnsignedNodeAnnouncement *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKUnsignedNodeAnnouncement;
 
@@ -3269,10 +3994,16 @@ typedef struct LDKCResult_QueryShortChannelIdsDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKReplyShortChannelIdsEnd {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeReplyShortChannelIdsEnd *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKReplyShortChannelIdsEnd;
 
@@ -3309,10 +4040,16 @@ typedef struct LDKCResult_QueryChannelRangeDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKReplyChannelRange {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeReplyChannelRange *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKReplyChannelRange;
 
@@ -3335,10 +4072,16 @@ typedef struct LDKCResult_ReplyChannelRangeDecodeErrorZ {
  */
 typedef struct MUST_USE_STRUCT LDKGossipTimestampFilter {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeGossipTimestampFilter *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKGossipTimestampFilter;
 
@@ -3356,12 +4099,20 @@ typedef struct LDKCResult_GossipTimestampFilterDecodeErrorZ {
  * A trait indicating an object may generate message send events
  */
 typedef struct LDKMessageSendEventsProvider {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Gets the list of pending events which were generated by previous actions, clearing the list
     * in the process.
     */
    struct LDKCVec_MessageSendEventZ (*get_and_clear_pending_msg_events)(const void *this_arg);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKMessageSendEventsProvider;
 
@@ -3369,12 +4120,20 @@ typedef struct LDKMessageSendEventsProvider {
  * A trait indicating an object may generate events
  */
 typedef struct LDKEventsProvider {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Gets the list of pending events which were generated by previous actions, clearing the list
     * in the process.
     */
    struct LDKCVec_EventZ (*get_and_clear_pending_events)(const void *this_arg);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKEventsProvider;
 
@@ -3387,10 +4146,16 @@ typedef struct LDKEventsProvider {
  */
 typedef struct MUST_USE_STRUCT LDKChannelHandshakeConfig {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelHandshakeConfig *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelHandshakeConfig;
 
@@ -3411,10 +4176,16 @@ typedef struct MUST_USE_STRUCT LDKChannelHandshakeConfig {
  */
 typedef struct MUST_USE_STRUCT LDKChannelHandshakeLimits {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelHandshakeLimits *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelHandshakeLimits;
 
@@ -3428,10 +4199,16 @@ typedef struct MUST_USE_STRUCT LDKChannelHandshakeLimits {
  */
 typedef struct MUST_USE_STRUCT LDKUserConfig {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeUserConfig *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKUserConfig;
 
@@ -3440,6 +4217,10 @@ typedef struct MUST_USE_STRUCT LDKUserConfig {
  * UTXOs.
  */
 typedef struct LDKAccess {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Returns the transaction output of a funding transaction encoded by [`short_channel_id`].
@@ -3449,6 +4230,10 @@ typedef struct LDKAccess {
     * [`short_channel_id`]: https://github.com/lightningnetwork/lightning-rfc/blob/master/07-routing-gossip.md#definition-of-short_channel_id
     */
    struct LDKCResult_TxOutAccessErrorZ (*get_utxo)(const void *this_arg, const uint8_t (*genesis_hash)[32], uint64_t short_channel_id);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKAccess;
 
@@ -3459,6 +4244,10 @@ typedef struct LDKAccess {
  * Useful when needing to replay chain data upon startup or as new chain events occur.
  */
 typedef struct LDKListen {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Notifies the listener that a block was added at the given height.
@@ -3468,6 +4257,10 @@ typedef struct LDKListen {
     * Notifies the listener that a block was removed at the given height.
     */
    void (*block_disconnected)(const void *this_arg, const uint8_t (*header)[80], uint32_t height);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKListen;
 
@@ -3495,6 +4288,10 @@ typedef struct LDKListen {
  * [BIP 158]: https://github.com/bitcoin/bips/blob/master/bip-0158.mediawiki
  */
 typedef struct LDKFilter {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Registers interest in a transaction with `txid` and having an output with `script_pubkey` as
@@ -3506,6 +4303,10 @@ typedef struct LDKFilter {
     * `script_pubkey` as the spending condition.
     */
    void (*register_output)(const void *this_arg, const struct LDKOutPoint *NONNULL_PTR outpoint, struct LDKu8slice script_pubkey);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKFilter;
 
@@ -3523,6 +4324,10 @@ typedef struct LDKFilter {
  * kept up-to-date.
  */
 typedef struct LDKPersist {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Persist a new channel's data. The data can be stored any way you want, but
@@ -3568,6 +4373,10 @@ typedef struct LDKPersist {
     * [`ChannelMonitorUpdateErr`]: enum.ChannelMonitorUpdateErr.html
     */
    struct LDKCResult_NoneChannelMonitorUpdateErrZ (*update_persisted_channel)(const void *this_arg, struct LDKOutPoint id, const struct LDKChannelMonitorUpdate *NONNULL_PTR update, const struct LDKChannelMonitor *NONNULL_PTR data);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKPersist;
 
@@ -3587,10 +4396,16 @@ typedef struct LDKPersist {
  */
 typedef struct MUST_USE_STRUCT LDKChainMonitor {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChainMonitor *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChainMonitor;
 
@@ -3607,10 +4422,16 @@ typedef struct MUST_USE_STRUCT LDKChainMonitor {
  */
 typedef struct MUST_USE_STRUCT LDKKeysManager {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeKeysManager *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKKeysManager;
 
@@ -3625,10 +4446,16 @@ typedef struct MUST_USE_STRUCT LDKKeysManager {
  */
 typedef struct MUST_USE_STRUCT LDKChainParameters {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChainParameters *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChainParameters;
 
@@ -3643,6 +4470,10 @@ typedef struct LDKThreeBytes {
  * they MUST NOT be called in parallel when the two calls have the same their_node_id.
  */
 typedef struct LDKChannelMessageHandler {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Handle an incoming open_channel message from the given peer.
@@ -3723,7 +4554,14 @@ typedef struct LDKChannelMessageHandler {
     * Handle an incoming error message from the given peer.
     */
    void (*handle_error)(const void *this_arg, struct LDKPublicKey their_node_id, const struct LDKErrorMessage *NONNULL_PTR msg);
+   /**
+    * Implementation of MessageSendEventsProvider for this object.
+    */
    struct LDKMessageSendEventsProvider MessageSendEventsProvider;
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKChannelMessageHandler;
 
@@ -3758,10 +4596,16 @@ typedef struct LDKChannelMessageHandler {
  */
 typedef struct MUST_USE_STRUCT LDKChannelManagerReadArgs {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeChannelManagerReadArgs *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKChannelManagerReadArgs;
 
@@ -3775,10 +4619,16 @@ typedef struct MUST_USE_STRUCT LDKChannelManagerReadArgs {
  */
 typedef struct MUST_USE_STRUCT LDKDataLossProtect {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeDataLossProtect *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKDataLossProtect;
 
@@ -3792,6 +4642,10 @@ typedef struct MUST_USE_STRUCT LDKDataLossProtect {
  * repeated disk I/O for queries accessing different parts of the network graph.
  */
 typedef struct LDKRoutingMessageHandler {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Handle an incoming node_announcement message, returning true if it should be forwarded on,
@@ -3854,7 +4708,14 @@ typedef struct LDKRoutingMessageHandler {
     * list of short_channel_ids.
     */
    struct LDKCResult_NoneLightningErrorZ (*handle_query_short_channel_ids)(const void *this_arg, struct LDKPublicKey their_node_id, struct LDKQueryShortChannelIds msg);
+   /**
+    * Implementation of MessageSendEventsProvider for this object.
+    */
    struct LDKMessageSendEventsProvider MessageSendEventsProvider;
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKRoutingMessageHandler;
 
@@ -3866,10 +4727,16 @@ typedef struct LDKRoutingMessageHandler {
  */
 typedef struct MUST_USE_STRUCT LDKIgnoringMessageHandler {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeIgnoringMessageHandler *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKIgnoringMessageHandler;
 
@@ -3881,10 +4748,16 @@ typedef struct MUST_USE_STRUCT LDKIgnoringMessageHandler {
  */
 typedef struct MUST_USE_STRUCT LDKErroringMessageHandler {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeErroringMessageHandler *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKErroringMessageHandler;
 
@@ -3895,10 +4768,16 @@ typedef struct MUST_USE_STRUCT LDKErroringMessageHandler {
  */
 typedef struct MUST_USE_STRUCT LDKMessageHandler {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeMessageHandler *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKMessageHandler;
 
@@ -3916,6 +4795,10 @@ typedef struct MUST_USE_STRUCT LDKMessageHandler {
  * PeerManager::socket_disconnected().
  */
 typedef struct LDKSocketDescriptor {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
    void *this_arg;
    /**
     * Attempts to send some data from the given slice to the peer.
@@ -3942,9 +4825,25 @@ typedef struct LDKSocketDescriptor {
     * socket_disconnected but prior to socket_disconnected returning.
     */
    void (*disconnect_socket)(void *this_arg);
+   /**
+    * Checks if two objects are equal given this object's this_arg pointer and another object.
+    */
    bool (*eq)(const void *this_arg, const struct LDKSocketDescriptor *NONNULL_PTR other_arg);
+   /**
+    * Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.
+    * This is used, for example, for inclusion of this object in a hash map.
+    */
    uint64_t (*hash)(const void *this_arg);
+   /**
+    * Creates a copy of the object pointed to by this_arg, for a copy of this SocketDescriptor.
+    * Note that the ultimate copy of the SocketDescriptor will have all function pointers the same as the original.
+    * May be NULL if no action needs to be taken, the this_arg pointer will be copied into the new SocketDescriptor.
+    */
    void *(*clone)(const void *this_arg);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
    void (*free)(void *this_arg);
 } LDKSocketDescriptor;
 
@@ -3962,10 +4861,16 @@ typedef struct LDKSocketDescriptor {
  */
 typedef struct MUST_USE_STRUCT LDKPeerManager {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativePeerManager *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKPeerManager;
 
@@ -3980,10 +4885,16 @@ typedef struct MUST_USE_STRUCT LDKPeerManager {
  */
 typedef struct MUST_USE_STRUCT LDKDirectedChannelTransactionParameters {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeDirectedChannelTransactionParameters *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKDirectedChannelTransactionParameters;
 
@@ -3996,10 +4907,16 @@ typedef struct MUST_USE_STRUCT LDKDirectedChannelTransactionParameters {
  */
 typedef struct MUST_USE_STRUCT LDKLockedNetworkGraph {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeLockedNetworkGraph *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKLockedNetworkGraph;
 
@@ -4014,10 +4931,16 @@ typedef struct MUST_USE_STRUCT LDKLockedNetworkGraph {
  */
 typedef struct MUST_USE_STRUCT LDKNetGraphMsgHandler {
    /**
+    * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
    LDKnativeNetGraphMsgHandler *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
    bool is_owned;
 } LDKNetGraphMsgHandler;
 
@@ -4207,6 +5130,12 @@ struct LDKCResult_ChannelFeaturesDecodeErrorZ CResult_ChannelFeaturesDecodeError
 
 void CResult_ChannelFeaturesDecodeErrorZ_free(struct LDKCResult_ChannelFeaturesDecodeErrorZ _res);
 
+struct LDKCResult_InvoiceFeaturesDecodeErrorZ CResult_InvoiceFeaturesDecodeErrorZ_ok(struct LDKInvoiceFeatures o);
+
+struct LDKCResult_InvoiceFeaturesDecodeErrorZ CResult_InvoiceFeaturesDecodeErrorZ_err(struct LDKDecodeError e);
+
+void CResult_InvoiceFeaturesDecodeErrorZ_free(struct LDKCResult_InvoiceFeaturesDecodeErrorZ _res);
+
 struct LDKCResult_ChannelConfigDecodeErrorZ CResult_ChannelConfigDecodeErrorZ_ok(struct LDKChannelConfig o);
 
 struct LDKCResult_ChannelConfigDecodeErrorZ CResult_ChannelConfigDecodeErrorZ_err(struct LDKDecodeError e);
@@ -4322,6 +5251,20 @@ struct LDKC2Tuple_OutPointScriptZ C2Tuple_OutPointScriptZ_clone(const struct LDK
 struct LDKC2Tuple_OutPointScriptZ C2Tuple_OutPointScriptZ_new(struct LDKOutPoint a, struct LDKCVec_u8Z b);
 
 void C2Tuple_OutPointScriptZ_free(struct LDKC2Tuple_OutPointScriptZ _res);
+
+struct LDKC2Tuple_u32ScriptZ C2Tuple_u32ScriptZ_clone(const struct LDKC2Tuple_u32ScriptZ *NONNULL_PTR orig);
+
+struct LDKC2Tuple_u32ScriptZ C2Tuple_u32ScriptZ_new(uint32_t a, struct LDKCVec_u8Z b);
+
+void C2Tuple_u32ScriptZ_free(struct LDKC2Tuple_u32ScriptZ _res);
+
+void CVec_C2Tuple_u32ScriptZZ_free(struct LDKCVec_C2Tuple_u32ScriptZZ _res);
+
+struct LDKC2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ_new(struct LDKThirtyTwoBytes a, struct LDKCVec_C2Tuple_u32ScriptZZ b);
+
+void C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ_free(struct LDKC2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ _res);
+
+void CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ_free(struct LDKCVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ _res);
 
 void CVec_TransactionZ_free(struct LDKCVec_TransactionZ _res);
 
@@ -4751,14 +5694,29 @@ void CResult_GossipTimestampFilterDecodeErrorZ_free(struct LDKCResult_GossipTime
 
 struct LDKCResult_GossipTimestampFilterDecodeErrorZ CResult_GossipTimestampFilterDecodeErrorZ_clone(const struct LDKCResult_GossipTimestampFilterDecodeErrorZ *NONNULL_PTR orig);
 
+/**
+ * Frees any resources used by the Event
+ */
 void Event_free(struct LDKEvent this_ptr);
 
+/**
+ * Creates a copy of the Event
+ */
 struct LDKEvent Event_clone(const struct LDKEvent *NONNULL_PTR orig);
 
+/**
+ * Serialize the Event object into a byte array which can be read by Event_read
+ */
 struct LDKCVec_u8Z Event_write(const struct LDKEvent *NONNULL_PTR obj);
 
+/**
+ * Frees any resources used by the MessageSendEvent
+ */
 void MessageSendEvent_free(struct LDKMessageSendEvent this_ptr);
 
+/**
+ * Creates a copy of the MessageSendEvent
+ */
 struct LDKMessageSendEvent MessageSendEvent_clone(const struct LDKMessageSendEvent *NONNULL_PTR orig);
 
 /**
@@ -4771,10 +5729,19 @@ void MessageSendEventsProvider_free(struct LDKMessageSendEventsProvider this_ptr
  */
 void EventsProvider_free(struct LDKEventsProvider this_ptr);
 
+/**
+ * Frees any resources used by the APIError
+ */
 void APIError_free(struct LDKAPIError this_ptr);
 
+/**
+ * Creates a copy of the APIError
+ */
 struct LDKAPIError APIError_clone(const struct LDKAPIError *NONNULL_PTR orig);
 
+/**
+ * Creates a copy of the Level
+ */
 enum LDKLevel Level_clone(const enum LDKLevel *NONNULL_PTR orig);
 
 /**
@@ -4787,7 +5754,10 @@ MUST_USE_RES enum LDKLevel Level_max(void);
  */
 void Logger_free(struct LDKLogger this_ptr);
 
-void ChannelHandshakeConfig_free(struct LDKChannelHandshakeConfig this_ptr);
+/**
+ * Frees any resources used by the ChannelHandshakeConfig, if is_owned is set and inner is non-NULL.
+ */
+void ChannelHandshakeConfig_free(struct LDKChannelHandshakeConfig this_obj);
 
 /**
  * Confirmations we will wait for before considering the channel locked in.
@@ -4861,13 +5831,25 @@ uint64_t ChannelHandshakeConfig_get_our_htlc_minimum_msat(const struct LDKChanne
  */
 void ChannelHandshakeConfig_set_our_htlc_minimum_msat(struct LDKChannelHandshakeConfig *NONNULL_PTR this_ptr, uint64_t val);
 
+/**
+ * Constructs a new ChannelHandshakeConfig given each field
+ */
 MUST_USE_RES struct LDKChannelHandshakeConfig ChannelHandshakeConfig_new(uint32_t minimum_depth_arg, uint16_t our_to_self_delay_arg, uint64_t our_htlc_minimum_msat_arg);
 
+/**
+ * Creates a copy of the ChannelHandshakeConfig
+ */
 struct LDKChannelHandshakeConfig ChannelHandshakeConfig_clone(const struct LDKChannelHandshakeConfig *NONNULL_PTR orig);
 
+/**
+ * Creates a "default" ChannelHandshakeConfig. See other documentaiton for details on what this implies.
+ */
 MUST_USE_RES struct LDKChannelHandshakeConfig ChannelHandshakeConfig_default(void);
 
-void ChannelHandshakeLimits_free(struct LDKChannelHandshakeLimits this_ptr);
+/**
+ * Frees any resources used by the ChannelHandshakeLimits, if is_owned is set and inner is non-NULL.
+ */
+void ChannelHandshakeLimits_free(struct LDKChannelHandshakeLimits this_obj);
 
 /**
  * Minimum allowed satoshis when a channel is funded, this is supplied by the sender and so
@@ -5039,8 +6021,8 @@ void ChannelHandshakeLimits_set_force_announced_channel_preference(struct LDKCha
  * Not checking this value would be a security issue, as our peer would be able to set it to
  * max relative lock-time (a year) and we would \"lose\" money as it would be locked for a long time.
  *
- * Default value: MAX_LOCAL_BREAKDOWN_TIMEOUT (1008), which we also enforce as a maximum value
- * so you can tweak config to reduce the loss of having useless locked funds (if your peer accepts)
+ * Default value: 2016, which we also enforce as a maximum value so you can tweak config to
+ * reduce the loss of having useless locked funds (if your peer accepts)
  */
 uint16_t ChannelHandshakeLimits_get_their_to_self_delay(const struct LDKChannelHandshakeLimits *NONNULL_PTR this_ptr);
 
@@ -5050,18 +6032,30 @@ uint16_t ChannelHandshakeLimits_get_their_to_self_delay(const struct LDKChannelH
  * Not checking this value would be a security issue, as our peer would be able to set it to
  * max relative lock-time (a year) and we would \"lose\" money as it would be locked for a long time.
  *
- * Default value: MAX_LOCAL_BREAKDOWN_TIMEOUT (1008), which we also enforce as a maximum value
- * so you can tweak config to reduce the loss of having useless locked funds (if your peer accepts)
+ * Default value: 2016, which we also enforce as a maximum value so you can tweak config to
+ * reduce the loss of having useless locked funds (if your peer accepts)
  */
 void ChannelHandshakeLimits_set_their_to_self_delay(struct LDKChannelHandshakeLimits *NONNULL_PTR this_ptr, uint16_t val);
 
+/**
+ * Constructs a new ChannelHandshakeLimits given each field
+ */
 MUST_USE_RES struct LDKChannelHandshakeLimits ChannelHandshakeLimits_new(uint64_t min_funding_satoshis_arg, uint64_t max_htlc_minimum_msat_arg, uint64_t min_max_htlc_value_in_flight_msat_arg, uint64_t max_channel_reserve_satoshis_arg, uint16_t min_max_accepted_htlcs_arg, uint64_t min_dust_limit_satoshis_arg, uint64_t max_dust_limit_satoshis_arg, uint32_t max_minimum_depth_arg, bool force_announced_channel_preference_arg, uint16_t their_to_self_delay_arg);
 
+/**
+ * Creates a copy of the ChannelHandshakeLimits
+ */
 struct LDKChannelHandshakeLimits ChannelHandshakeLimits_clone(const struct LDKChannelHandshakeLimits *NONNULL_PTR orig);
 
+/**
+ * Creates a "default" ChannelHandshakeLimits. See other documentaiton for details on what this implies.
+ */
 MUST_USE_RES struct LDKChannelHandshakeLimits ChannelHandshakeLimits_default(void);
 
-void ChannelConfig_free(struct LDKChannelConfig this_ptr);
+/**
+ * Frees any resources used by the ChannelConfig, if is_owned is set and inner is non-NULL.
+ */
+void ChannelConfig_free(struct LDKChannelConfig this_obj);
 
 /**
  * Amount (in millionths of a satoshi) the channel will charge per transferred satoshi.
@@ -5141,17 +6135,35 @@ bool ChannelConfig_get_commit_upfront_shutdown_pubkey(const struct LDKChannelCon
  */
 void ChannelConfig_set_commit_upfront_shutdown_pubkey(struct LDKChannelConfig *NONNULL_PTR this_ptr, bool val);
 
+/**
+ * Constructs a new ChannelConfig given each field
+ */
 MUST_USE_RES struct LDKChannelConfig ChannelConfig_new(uint32_t fee_proportional_millionths_arg, bool announced_channel_arg, bool commit_upfront_shutdown_pubkey_arg);
 
+/**
+ * Creates a copy of the ChannelConfig
+ */
 struct LDKChannelConfig ChannelConfig_clone(const struct LDKChannelConfig *NONNULL_PTR orig);
 
+/**
+ * Creates a "default" ChannelConfig. See other documentaiton for details on what this implies.
+ */
 MUST_USE_RES struct LDKChannelConfig ChannelConfig_default(void);
 
+/**
+ * Serialize the ChannelConfig object into a byte array which can be read by ChannelConfig_read
+ */
 struct LDKCVec_u8Z ChannelConfig_write(const struct LDKChannelConfig *NONNULL_PTR obj);
 
+/**
+ * Read a ChannelConfig from a byte array, created by ChannelConfig_write
+ */
 struct LDKCResult_ChannelConfigDecodeErrorZ ChannelConfig_read(struct LDKu8slice ser);
 
-void UserConfig_free(struct LDKUserConfig this_ptr);
+/**
+ * Frees any resources used by the UserConfig, if is_owned is set and inner is non-NULL.
+ */
+void UserConfig_free(struct LDKUserConfig this_obj);
 
 /**
  * Channel config that we propose to our counterparty.
@@ -5183,12 +6195,24 @@ struct LDKChannelConfig UserConfig_get_channel_options(const struct LDKUserConfi
  */
 void UserConfig_set_channel_options(struct LDKUserConfig *NONNULL_PTR this_ptr, struct LDKChannelConfig val);
 
+/**
+ * Constructs a new UserConfig given each field
+ */
 MUST_USE_RES struct LDKUserConfig UserConfig_new(struct LDKChannelHandshakeConfig own_channel_config_arg, struct LDKChannelHandshakeLimits peer_channel_config_limits_arg, struct LDKChannelConfig channel_options_arg);
 
+/**
+ * Creates a copy of the UserConfig
+ */
 struct LDKUserConfig UserConfig_clone(const struct LDKUserConfig *NONNULL_PTR orig);
 
+/**
+ * Creates a "default" UserConfig. See other documentaiton for details on what this implies.
+ */
 MUST_USE_RES struct LDKUserConfig UserConfig_default(void);
 
+/**
+ * Creates a copy of the AccessError
+ */
 enum LDKAccessError AccessError_clone(const enum LDKAccessError *NONNULL_PTR orig);
 
 /**
@@ -5216,6 +6240,9 @@ void Filter_free(struct LDKFilter this_ptr);
  */
 void BroadcasterInterface_free(struct LDKBroadcasterInterface this_ptr);
 
+/**
+ * Creates a copy of the ConfirmationTarget
+ */
 enum LDKConfirmationTarget ConfirmationTarget_clone(const enum LDKConfirmationTarget *NONNULL_PTR orig);
 
 /**
@@ -5223,7 +6250,10 @@ enum LDKConfirmationTarget ConfirmationTarget_clone(const enum LDKConfirmationTa
  */
 void FeeEstimator_free(struct LDKFeeEstimator this_ptr);
 
-void ChainMonitor_free(struct LDKChainMonitor this_ptr);
+/**
+ * Frees any resources used by the ChainMonitor, if is_owned is set and inner is non-NULL.
+ */
+void ChainMonitor_free(struct LDKChainMonitor this_obj);
 
 /**
  * Dispatches to per-channel monitors, which are responsible for updating their on-chain view
@@ -5264,11 +6294,22 @@ void ChainMonitor_block_disconnected(const struct LDKChainMonitor *NONNULL_PTR t
  */
 MUST_USE_RES struct LDKChainMonitor ChainMonitor_new(struct LDKFilter *chain_source, struct LDKBroadcasterInterface broadcaster, struct LDKLogger logger, struct LDKFeeEstimator feeest, struct LDKPersist persister);
 
+/**
+ * Constructs a new Watch which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned Watch must be freed before this_arg is
+ */
 struct LDKWatch ChainMonitor_as_Watch(const struct LDKChainMonitor *NONNULL_PTR this_arg);
 
+/**
+ * Constructs a new EventsProvider which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned EventsProvider must be freed before this_arg is
+ */
 struct LDKEventsProvider ChainMonitor_as_EventsProvider(const struct LDKChainMonitor *NONNULL_PTR this_arg);
 
-void ChannelMonitorUpdate_free(struct LDKChannelMonitorUpdate this_ptr);
+/**
+ * Frees any resources used by the ChannelMonitorUpdate, if is_owned is set and inner is non-NULL.
+ */
+void ChannelMonitorUpdate_free(struct LDKChannelMonitorUpdate this_obj);
 
 /**
  * The sequence number of this update. Updates *must* be replayed in-order according to this
@@ -5304,32 +6345,74 @@ uint64_t ChannelMonitorUpdate_get_update_id(const struct LDKChannelMonitorUpdate
  */
 void ChannelMonitorUpdate_set_update_id(struct LDKChannelMonitorUpdate *NONNULL_PTR this_ptr, uint64_t val);
 
+/**
+ * Creates a copy of the ChannelMonitorUpdate
+ */
 struct LDKChannelMonitorUpdate ChannelMonitorUpdate_clone(const struct LDKChannelMonitorUpdate *NONNULL_PTR orig);
 
+/**
+ * Serialize the ChannelMonitorUpdate object into a byte array which can be read by ChannelMonitorUpdate_read
+ */
 struct LDKCVec_u8Z ChannelMonitorUpdate_write(const struct LDKChannelMonitorUpdate *NONNULL_PTR obj);
 
+/**
+ * Read a ChannelMonitorUpdate from a byte array, created by ChannelMonitorUpdate_write
+ */
 struct LDKCResult_ChannelMonitorUpdateDecodeErrorZ ChannelMonitorUpdate_read(struct LDKu8slice ser);
 
+/**
+ * Creates a copy of the ChannelMonitorUpdateErr
+ */
 enum LDKChannelMonitorUpdateErr ChannelMonitorUpdateErr_clone(const enum LDKChannelMonitorUpdateErr *NONNULL_PTR orig);
 
-void MonitorUpdateError_free(struct LDKMonitorUpdateError this_ptr);
+/**
+ * Frees any resources used by the MonitorUpdateError, if is_owned is set and inner is non-NULL.
+ */
+void MonitorUpdateError_free(struct LDKMonitorUpdateError this_obj);
 
+/**
+ * Creates a copy of the MonitorUpdateError
+ */
 struct LDKMonitorUpdateError MonitorUpdateError_clone(const struct LDKMonitorUpdateError *NONNULL_PTR orig);
 
+/**
+ * Frees any resources used by the MonitorEvent
+ */
 void MonitorEvent_free(struct LDKMonitorEvent this_ptr);
 
+/**
+ * Creates a copy of the MonitorEvent
+ */
 struct LDKMonitorEvent MonitorEvent_clone(const struct LDKMonitorEvent *NONNULL_PTR orig);
 
-void HTLCUpdate_free(struct LDKHTLCUpdate this_ptr);
+/**
+ * Frees any resources used by the HTLCUpdate, if is_owned is set and inner is non-NULL.
+ */
+void HTLCUpdate_free(struct LDKHTLCUpdate this_obj);
 
+/**
+ * Creates a copy of the HTLCUpdate
+ */
 struct LDKHTLCUpdate HTLCUpdate_clone(const struct LDKHTLCUpdate *NONNULL_PTR orig);
 
+/**
+ * Serialize the HTLCUpdate object into a byte array which can be read by HTLCUpdate_read
+ */
 struct LDKCVec_u8Z HTLCUpdate_write(const struct LDKHTLCUpdate *NONNULL_PTR obj);
 
+/**
+ * Read a HTLCUpdate from a byte array, created by HTLCUpdate_write
+ */
 struct LDKCResult_HTLCUpdateDecodeErrorZ HTLCUpdate_read(struct LDKu8slice ser);
 
-void ChannelMonitor_free(struct LDKChannelMonitor this_ptr);
+/**
+ * Frees any resources used by the ChannelMonitor, if is_owned is set and inner is non-NULL.
+ */
+void ChannelMonitor_free(struct LDKChannelMonitor this_obj);
 
+/**
+ * Serialize the ChannelMonitor object into a byte array which can be read by ChannelMonitor_read
+ */
 struct LDKCVec_u8Z ChannelMonitor_write(const struct LDKChannelMonitor *NONNULL_PTR obj);
 
 /**
@@ -5350,6 +6433,19 @@ MUST_USE_RES uint64_t ChannelMonitor_get_latest_update_id(const struct LDKChanne
  * Gets the funding transaction outpoint of the channel this ChannelMonitor is monitoring for.
  */
 MUST_USE_RES struct LDKC2Tuple_OutPointScriptZ ChannelMonitor_get_funding_txo(const struct LDKChannelMonitor *NONNULL_PTR this_arg);
+
+/**
+ * Gets a list of txids, with their output scripts (in the order they appear in the
+ * transaction), which we must learn about spends of via block_connected().
+ */
+MUST_USE_RES struct LDKCVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ ChannelMonitor_get_outputs_to_watch(const struct LDKChannelMonitor *NONNULL_PTR this_arg);
+
+/**
+ * Loads the funding txo and outputs to watch into the given `chain::Filter` by repeatedly
+ * calling `chain::Filter::register_output` and `chain::Filter::register_tx` until all outputs
+ * have been registered.
+ */
+void ChannelMonitor_load_outputs_to_watch(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const struct LDKFilter *NONNULL_PTR filter);
 
 /**
  * Get the list of HTLCs who's status has been updated on chain. This should be called by
@@ -5408,9 +6504,15 @@ void ChannelMonitor_block_disconnected(const struct LDKChannelMonitor *NONNULL_P
  */
 void Persist_free(struct LDKPersist this_ptr);
 
+/**
+ * Read a C2Tuple_BlockHashChannelMonitorZ from a byte array, created by C2Tuple_BlockHashChannelMonitorZ_write
+ */
 struct LDKCResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ C2Tuple_BlockHashChannelMonitorZ_read(struct LDKu8slice ser, const struct LDKKeysInterface *NONNULL_PTR arg);
 
-void OutPoint_free(struct LDKOutPoint this_ptr);
+/**
+ * Frees any resources used by the OutPoint, if is_owned is set and inner is non-NULL.
+ */
+void OutPoint_free(struct LDKOutPoint this_obj);
 
 /**
  * The referenced transaction's txid.
@@ -5432,8 +6534,14 @@ uint16_t OutPoint_get_index(const struct LDKOutPoint *NONNULL_PTR this_ptr);
  */
 void OutPoint_set_index(struct LDKOutPoint *NONNULL_PTR this_ptr, uint16_t val);
 
+/**
+ * Constructs a new OutPoint given each field
+ */
 MUST_USE_RES struct LDKOutPoint OutPoint_new(struct LDKThirtyTwoBytes txid_arg, uint16_t index_arg);
 
+/**
+ * Creates a copy of the OutPoint
+ */
 struct LDKOutPoint OutPoint_clone(const struct LDKOutPoint *NONNULL_PTR orig);
 
 /**
@@ -5441,11 +6549,20 @@ struct LDKOutPoint OutPoint_clone(const struct LDKOutPoint *NONNULL_PTR orig);
  */
 MUST_USE_RES struct LDKThirtyTwoBytes OutPoint_to_channel_id(const struct LDKOutPoint *NONNULL_PTR this_arg);
 
+/**
+ * Serialize the OutPoint object into a byte array which can be read by OutPoint_read
+ */
 struct LDKCVec_u8Z OutPoint_write(const struct LDKOutPoint *NONNULL_PTR obj);
 
+/**
+ * Read a OutPoint from a byte array, created by OutPoint_write
+ */
 struct LDKCResult_OutPointDecodeErrorZ OutPoint_read(struct LDKu8slice ser);
 
-void DelayedPaymentOutputDescriptor_free(struct LDKDelayedPaymentOutputDescriptor this_ptr);
+/**
+ * Frees any resources used by the DelayedPaymentOutputDescriptor, if is_owned is set and inner is non-NULL.
+ */
+void DelayedPaymentOutputDescriptor_free(struct LDKDelayedPaymentOutputDescriptor this_obj);
 
 /**
  * The outpoint which is spendable
@@ -5520,11 +6637,20 @@ uint64_t DelayedPaymentOutputDescriptor_get_channel_value_satoshis(const struct 
  */
 void DelayedPaymentOutputDescriptor_set_channel_value_satoshis(struct LDKDelayedPaymentOutputDescriptor *NONNULL_PTR this_ptr, uint64_t val);
 
+/**
+ * Constructs a new DelayedPaymentOutputDescriptor given each field
+ */
 MUST_USE_RES struct LDKDelayedPaymentOutputDescriptor DelayedPaymentOutputDescriptor_new(struct LDKOutPoint outpoint_arg, struct LDKPublicKey per_commitment_point_arg, uint16_t to_self_delay_arg, struct LDKTxOut output_arg, struct LDKPublicKey revocation_pubkey_arg, struct LDKThirtyTwoBytes channel_keys_id_arg, uint64_t channel_value_satoshis_arg);
 
+/**
+ * Creates a copy of the DelayedPaymentOutputDescriptor
+ */
 struct LDKDelayedPaymentOutputDescriptor DelayedPaymentOutputDescriptor_clone(const struct LDKDelayedPaymentOutputDescriptor *NONNULL_PTR orig);
 
-void StaticPaymentOutputDescriptor_free(struct LDKStaticPaymentOutputDescriptor this_ptr);
+/**
+ * Frees any resources used by the StaticPaymentOutputDescriptor, if is_owned is set and inner is non-NULL.
+ */
+void StaticPaymentOutputDescriptor_free(struct LDKStaticPaymentOutputDescriptor this_obj);
 
 /**
  * The outpoint which is spendable
@@ -5565,18 +6691,39 @@ uint64_t StaticPaymentOutputDescriptor_get_channel_value_satoshis(const struct L
  */
 void StaticPaymentOutputDescriptor_set_channel_value_satoshis(struct LDKStaticPaymentOutputDescriptor *NONNULL_PTR this_ptr, uint64_t val);
 
+/**
+ * Constructs a new StaticPaymentOutputDescriptor given each field
+ */
 MUST_USE_RES struct LDKStaticPaymentOutputDescriptor StaticPaymentOutputDescriptor_new(struct LDKOutPoint outpoint_arg, struct LDKTxOut output_arg, struct LDKThirtyTwoBytes channel_keys_id_arg, uint64_t channel_value_satoshis_arg);
 
+/**
+ * Creates a copy of the StaticPaymentOutputDescriptor
+ */
 struct LDKStaticPaymentOutputDescriptor StaticPaymentOutputDescriptor_clone(const struct LDKStaticPaymentOutputDescriptor *NONNULL_PTR orig);
 
+/**
+ * Frees any resources used by the SpendableOutputDescriptor
+ */
 void SpendableOutputDescriptor_free(struct LDKSpendableOutputDescriptor this_ptr);
 
+/**
+ * Creates a copy of the SpendableOutputDescriptor
+ */
 struct LDKSpendableOutputDescriptor SpendableOutputDescriptor_clone(const struct LDKSpendableOutputDescriptor *NONNULL_PTR orig);
 
+/**
+ * Serialize the SpendableOutputDescriptor object into a byte array which can be read by SpendableOutputDescriptor_read
+ */
 struct LDKCVec_u8Z SpendableOutputDescriptor_write(const struct LDKSpendableOutputDescriptor *NONNULL_PTR obj);
 
+/**
+ * Read a SpendableOutputDescriptor from a byte array, created by SpendableOutputDescriptor_write
+ */
 struct LDKCResult_SpendableOutputDescriptorDecodeErrorZ SpendableOutputDescriptor_read(struct LDKu8slice ser);
 
+/**
+ * Creates a copy of a Sign
+ */
 struct LDKSign Sign_clone(const struct LDKSign *NONNULL_PTR orig);
 
 /**
@@ -5589,7 +6736,10 @@ void Sign_free(struct LDKSign this_ptr);
  */
 void KeysInterface_free(struct LDKKeysInterface this_ptr);
 
-void InMemorySigner_free(struct LDKInMemorySigner this_ptr);
+/**
+ * Frees any resources used by the InMemorySigner, if is_owned is set and inner is non-NULL.
+ */
+void InMemorySigner_free(struct LDKInMemorySigner this_obj);
 
 /**
  * Private key of anchor tx
@@ -5651,6 +6801,9 @@ const uint8_t (*InMemorySigner_get_commitment_seed(const struct LDKInMemorySigne
  */
 void InMemorySigner_set_commitment_seed(struct LDKInMemorySigner *NONNULL_PTR this_ptr, struct LDKThirtyTwoBytes val);
 
+/**
+ * Creates a copy of the InMemorySigner
+ */
 struct LDKInMemorySigner InMemorySigner_clone(const struct LDKInMemorySigner *NONNULL_PTR orig);
 
 /**
@@ -5719,13 +6872,26 @@ MUST_USE_RES struct LDKCResult_CVec_CVec_u8ZZNoneZ InMemorySigner_sign_counterpa
  */
 MUST_USE_RES struct LDKCResult_CVec_CVec_u8ZZNoneZ InMemorySigner_sign_dynamic_p2wsh_input(const struct LDKInMemorySigner *NONNULL_PTR this_arg, struct LDKTransaction spend_tx, uintptr_t input_idx, const struct LDKDelayedPaymentOutputDescriptor *NONNULL_PTR descriptor);
 
+/**
+ * Constructs a new Sign which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned Sign must be freed before this_arg is
+ */
 struct LDKSign InMemorySigner_as_Sign(const struct LDKInMemorySigner *NONNULL_PTR this_arg);
 
+/**
+ * Serialize the InMemorySigner object into a byte array which can be read by InMemorySigner_read
+ */
 struct LDKCVec_u8Z InMemorySigner_write(const struct LDKInMemorySigner *NONNULL_PTR obj);
 
+/**
+ * Read a InMemorySigner from a byte array, created by InMemorySigner_write
+ */
 struct LDKCResult_InMemorySignerDecodeErrorZ InMemorySigner_read(struct LDKu8slice ser);
 
-void KeysManager_free(struct LDKKeysManager this_ptr);
+/**
+ * Frees any resources used by the KeysManager, if is_owned is set and inner is non-NULL.
+ */
+void KeysManager_free(struct LDKKeysManager this_obj);
 
 /**
  * Constructs a KeysManager from a 32-byte seed. If the seed is in some way biased (eg your
@@ -5774,11 +6940,21 @@ MUST_USE_RES struct LDKInMemorySigner KeysManager_derive_channel_keys(const stru
  */
 MUST_USE_RES struct LDKCResult_TransactionNoneZ KeysManager_spend_spendable_outputs(const struct LDKKeysManager *NONNULL_PTR this_arg, struct LDKCVec_SpendableOutputDescriptorZ descriptors, struct LDKCVec_TxOutZ outputs, struct LDKCVec_u8Z change_destination_script, uint32_t feerate_sat_per_1000_weight);
 
+/**
+ * Constructs a new KeysInterface which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned KeysInterface must be freed before this_arg is
+ */
 struct LDKKeysInterface KeysManager_as_KeysInterface(const struct LDKKeysManager *NONNULL_PTR this_arg);
 
-void ChannelManager_free(struct LDKChannelManager this_ptr);
+/**
+ * Frees any resources used by the ChannelManager, if is_owned is set and inner is non-NULL.
+ */
+void ChannelManager_free(struct LDKChannelManager this_obj);
 
-void ChainParameters_free(struct LDKChainParameters this_ptr);
+/**
+ * Frees any resources used by the ChainParameters, if is_owned is set and inner is non-NULL.
+ */
+void ChainParameters_free(struct LDKChainParameters this_obj);
 
 /**
  * The network for determining the `chain_hash` in Lightning messages.
@@ -5814,9 +6990,15 @@ uintptr_t ChainParameters_get_latest_height(const struct LDKChainParameters *NON
  */
 void ChainParameters_set_latest_height(struct LDKChainParameters *NONNULL_PTR this_ptr, uintptr_t val);
 
+/**
+ * Constructs a new ChainParameters given each field
+ */
 MUST_USE_RES struct LDKChainParameters ChainParameters_new(enum LDKNetwork network_arg, struct LDKThirtyTwoBytes latest_hash_arg, uintptr_t latest_height_arg);
 
-void ChannelDetails_free(struct LDKChannelDetails this_ptr);
+/**
+ * Frees any resources used by the ChannelDetails, if is_owned is set and inner is non-NULL.
+ */
+void ChannelDetails_free(struct LDKChannelDetails this_obj);
 
 /**
  * The channel's ID (prior to funding transaction generation, this is a random 32 bytes,
@@ -5924,10 +7106,19 @@ bool ChannelDetails_get_is_live(const struct LDKChannelDetails *NONNULL_PTR this
  */
 void ChannelDetails_set_is_live(struct LDKChannelDetails *NONNULL_PTR this_ptr, bool val);
 
+/**
+ * Creates a copy of the ChannelDetails
+ */
 struct LDKChannelDetails ChannelDetails_clone(const struct LDKChannelDetails *NONNULL_PTR orig);
 
+/**
+ * Frees any resources used by the PaymentSendFailure
+ */
 void PaymentSendFailure_free(struct LDKPaymentSendFailure this_ptr);
 
+/**
+ * Creates a copy of the PaymentSendFailure
+ */
 struct LDKPaymentSendFailure PaymentSendFailure_clone(const struct LDKPaymentSendFailure *NONNULL_PTR orig);
 
 /**
@@ -6147,10 +7338,22 @@ MUST_USE_RES struct LDKPublicKey ChannelManager_get_our_node_id(const struct LDK
  */
 void ChannelManager_channel_monitor_updated(const struct LDKChannelManager *NONNULL_PTR this_arg, const struct LDKOutPoint *NONNULL_PTR funding_txo, uint64_t highest_applied_update_id);
 
+/**
+ * Constructs a new MessageSendEventsProvider which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned MessageSendEventsProvider must be freed before this_arg is
+ */
 struct LDKMessageSendEventsProvider ChannelManager_as_MessageSendEventsProvider(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
+/**
+ * Constructs a new EventsProvider which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned EventsProvider must be freed before this_arg is
+ */
 struct LDKEventsProvider ChannelManager_as_EventsProvider(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
+/**
+ * Constructs a new Listen which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned Listen must be freed before this_arg is
+ */
 struct LDKListen ChannelManager_as_Listen(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
 /**
@@ -6173,11 +7376,21 @@ void ChannelManager_block_disconnected(const struct LDKChannelManager *NONNULL_P
  */
 void ChannelManager_await_persistable_update(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
+/**
+ * Constructs a new ChannelMessageHandler which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned ChannelMessageHandler must be freed before this_arg is
+ */
 struct LDKChannelMessageHandler ChannelManager_as_ChannelMessageHandler(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
+/**
+ * Serialize the ChannelManager object into a byte array which can be read by ChannelManager_read
+ */
 struct LDKCVec_u8Z ChannelManager_write(const struct LDKChannelManager *NONNULL_PTR obj);
 
-void ChannelManagerReadArgs_free(struct LDKChannelManagerReadArgs this_ptr);
+/**
+ * Frees any resources used by the ChannelManagerReadArgs, if is_owned is set and inner is non-NULL.
+ */
+void ChannelManagerReadArgs_free(struct LDKChannelManagerReadArgs this_obj);
 
 /**
  * The keys provider which will give us relevant keys. Some keys will be loaded during
@@ -6270,13 +7483,25 @@ void ChannelManagerReadArgs_set_default_config(struct LDKChannelManagerReadArgs 
  */
 MUST_USE_RES struct LDKChannelManagerReadArgs ChannelManagerReadArgs_new(struct LDKKeysInterface keys_manager, struct LDKFeeEstimator fee_estimator, struct LDKWatch chain_monitor, struct LDKBroadcasterInterface tx_broadcaster, struct LDKLogger logger, struct LDKUserConfig default_config, struct LDKCVec_ChannelMonitorZ channel_monitors);
 
+/**
+ * Read a C2Tuple_BlockHashChannelManagerZ from a byte array, created by C2Tuple_BlockHashChannelManagerZ_write
+ */
 struct LDKCResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ C2Tuple_BlockHashChannelManagerZ_read(struct LDKu8slice ser, struct LDKChannelManagerReadArgs arg);
 
-void DecodeError_free(struct LDKDecodeError this_ptr);
+/**
+ * Frees any resources used by the DecodeError, if is_owned is set and inner is non-NULL.
+ */
+void DecodeError_free(struct LDKDecodeError this_obj);
 
+/**
+ * Creates a copy of the DecodeError
+ */
 struct LDKDecodeError DecodeError_clone(const struct LDKDecodeError *NONNULL_PTR orig);
 
-void Init_free(struct LDKInit this_ptr);
+/**
+ * Frees any resources used by the Init, if is_owned is set and inner is non-NULL.
+ */
+void Init_free(struct LDKInit this_obj);
 
 /**
  * The relevant features which the sender supports
@@ -6288,11 +7513,20 @@ struct LDKInitFeatures Init_get_features(const struct LDKInit *NONNULL_PTR this_
  */
 void Init_set_features(struct LDKInit *NONNULL_PTR this_ptr, struct LDKInitFeatures val);
 
+/**
+ * Constructs a new Init given each field
+ */
 MUST_USE_RES struct LDKInit Init_new(struct LDKInitFeatures features_arg);
 
+/**
+ * Creates a copy of the Init
+ */
 struct LDKInit Init_clone(const struct LDKInit *NONNULL_PTR orig);
 
-void ErrorMessage_free(struct LDKErrorMessage this_ptr);
+/**
+ * Frees any resources used by the ErrorMessage, if is_owned is set and inner is non-NULL.
+ */
+void ErrorMessage_free(struct LDKErrorMessage this_obj);
 
 /**
  * The channel ID involved in the error
@@ -6320,11 +7554,20 @@ struct LDKStr ErrorMessage_get_data(const struct LDKErrorMessage *NONNULL_PTR th
  */
 void ErrorMessage_set_data(struct LDKErrorMessage *NONNULL_PTR this_ptr, struct LDKCVec_u8Z val);
 
+/**
+ * Constructs a new ErrorMessage given each field
+ */
 MUST_USE_RES struct LDKErrorMessage ErrorMessage_new(struct LDKThirtyTwoBytes channel_id_arg, struct LDKCVec_u8Z data_arg);
 
+/**
+ * Creates a copy of the ErrorMessage
+ */
 struct LDKErrorMessage ErrorMessage_clone(const struct LDKErrorMessage *NONNULL_PTR orig);
 
-void Ping_free(struct LDKPing this_ptr);
+/**
+ * Frees any resources used by the Ping, if is_owned is set and inner is non-NULL.
+ */
+void Ping_free(struct LDKPing this_obj);
 
 /**
  * The desired response length
@@ -6348,11 +7591,20 @@ uint16_t Ping_get_byteslen(const struct LDKPing *NONNULL_PTR this_ptr);
  */
 void Ping_set_byteslen(struct LDKPing *NONNULL_PTR this_ptr, uint16_t val);
 
+/**
+ * Constructs a new Ping given each field
+ */
 MUST_USE_RES struct LDKPing Ping_new(uint16_t ponglen_arg, uint16_t byteslen_arg);
 
+/**
+ * Creates a copy of the Ping
+ */
 struct LDKPing Ping_clone(const struct LDKPing *NONNULL_PTR orig);
 
-void Pong_free(struct LDKPong this_ptr);
+/**
+ * Frees any resources used by the Pong, if is_owned is set and inner is non-NULL.
+ */
+void Pong_free(struct LDKPong this_obj);
 
 /**
  * The pong packet size.
@@ -6366,11 +7618,20 @@ uint16_t Pong_get_byteslen(const struct LDKPong *NONNULL_PTR this_ptr);
  */
 void Pong_set_byteslen(struct LDKPong *NONNULL_PTR this_ptr, uint16_t val);
 
+/**
+ * Constructs a new Pong given each field
+ */
 MUST_USE_RES struct LDKPong Pong_new(uint16_t byteslen_arg);
 
+/**
+ * Creates a copy of the Pong
+ */
 struct LDKPong Pong_clone(const struct LDKPong *NONNULL_PTR orig);
 
-void OpenChannel_free(struct LDKOpenChannel this_ptr);
+/**
+ * Frees any resources used by the OpenChannel, if is_owned is set and inner is non-NULL.
+ */
+void OpenChannel_free(struct LDKOpenChannel this_obj);
 
 /**
  * The genesis hash of the blockchain where the channel is to be opened
@@ -6552,9 +7813,15 @@ uint8_t OpenChannel_get_channel_flags(const struct LDKOpenChannel *NONNULL_PTR t
  */
 void OpenChannel_set_channel_flags(struct LDKOpenChannel *NONNULL_PTR this_ptr, uint8_t val);
 
+/**
+ * Creates a copy of the OpenChannel
+ */
 struct LDKOpenChannel OpenChannel_clone(const struct LDKOpenChannel *NONNULL_PTR orig);
 
-void AcceptChannel_free(struct LDKAcceptChannel this_ptr);
+/**
+ * Frees any resources used by the AcceptChannel, if is_owned is set and inner is non-NULL.
+ */
+void AcceptChannel_free(struct LDKAcceptChannel this_obj);
 
 /**
  * A temporary channel ID, until the funding outpoint is announced
@@ -6696,9 +7963,15 @@ struct LDKPublicKey AcceptChannel_get_first_per_commitment_point(const struct LD
  */
 void AcceptChannel_set_first_per_commitment_point(struct LDKAcceptChannel *NONNULL_PTR this_ptr, struct LDKPublicKey val);
 
+/**
+ * Creates a copy of the AcceptChannel
+ */
 struct LDKAcceptChannel AcceptChannel_clone(const struct LDKAcceptChannel *NONNULL_PTR orig);
 
-void FundingCreated_free(struct LDKFundingCreated this_ptr);
+/**
+ * Frees any resources used by the FundingCreated, if is_owned is set and inner is non-NULL.
+ */
+void FundingCreated_free(struct LDKFundingCreated this_obj);
 
 /**
  * A temporary channel ID, until the funding is established
@@ -6740,11 +8013,20 @@ struct LDKSignature FundingCreated_get_signature(const struct LDKFundingCreated 
  */
 void FundingCreated_set_signature(struct LDKFundingCreated *NONNULL_PTR this_ptr, struct LDKSignature val);
 
+/**
+ * Constructs a new FundingCreated given each field
+ */
 MUST_USE_RES struct LDKFundingCreated FundingCreated_new(struct LDKThirtyTwoBytes temporary_channel_id_arg, struct LDKThirtyTwoBytes funding_txid_arg, uint16_t funding_output_index_arg, struct LDKSignature signature_arg);
 
+/**
+ * Creates a copy of the FundingCreated
+ */
 struct LDKFundingCreated FundingCreated_clone(const struct LDKFundingCreated *NONNULL_PTR orig);
 
-void FundingSigned_free(struct LDKFundingSigned this_ptr);
+/**
+ * Frees any resources used by the FundingSigned, if is_owned is set and inner is non-NULL.
+ */
+void FundingSigned_free(struct LDKFundingSigned this_obj);
 
 /**
  * The channel ID
@@ -6766,11 +8048,20 @@ struct LDKSignature FundingSigned_get_signature(const struct LDKFundingSigned *N
  */
 void FundingSigned_set_signature(struct LDKFundingSigned *NONNULL_PTR this_ptr, struct LDKSignature val);
 
+/**
+ * Constructs a new FundingSigned given each field
+ */
 MUST_USE_RES struct LDKFundingSigned FundingSigned_new(struct LDKThirtyTwoBytes channel_id_arg, struct LDKSignature signature_arg);
 
+/**
+ * Creates a copy of the FundingSigned
+ */
 struct LDKFundingSigned FundingSigned_clone(const struct LDKFundingSigned *NONNULL_PTR orig);
 
-void FundingLocked_free(struct LDKFundingLocked this_ptr);
+/**
+ * Frees any resources used by the FundingLocked, if is_owned is set and inner is non-NULL.
+ */
+void FundingLocked_free(struct LDKFundingLocked this_obj);
 
 /**
  * The channel ID
@@ -6792,11 +8083,20 @@ struct LDKPublicKey FundingLocked_get_next_per_commitment_point(const struct LDK
  */
 void FundingLocked_set_next_per_commitment_point(struct LDKFundingLocked *NONNULL_PTR this_ptr, struct LDKPublicKey val);
 
+/**
+ * Constructs a new FundingLocked given each field
+ */
 MUST_USE_RES struct LDKFundingLocked FundingLocked_new(struct LDKThirtyTwoBytes channel_id_arg, struct LDKPublicKey next_per_commitment_point_arg);
 
+/**
+ * Creates a copy of the FundingLocked
+ */
 struct LDKFundingLocked FundingLocked_clone(const struct LDKFundingLocked *NONNULL_PTR orig);
 
-void Shutdown_free(struct LDKShutdown this_ptr);
+/**
+ * Frees any resources used by the Shutdown, if is_owned is set and inner is non-NULL.
+ */
+void Shutdown_free(struct LDKShutdown this_obj);
 
 /**
  * The channel ID
@@ -6820,11 +8120,20 @@ struct LDKu8slice Shutdown_get_scriptpubkey(const struct LDKShutdown *NONNULL_PT
  */
 void Shutdown_set_scriptpubkey(struct LDKShutdown *NONNULL_PTR this_ptr, struct LDKCVec_u8Z val);
 
+/**
+ * Constructs a new Shutdown given each field
+ */
 MUST_USE_RES struct LDKShutdown Shutdown_new(struct LDKThirtyTwoBytes channel_id_arg, struct LDKCVec_u8Z scriptpubkey_arg);
 
+/**
+ * Creates a copy of the Shutdown
+ */
 struct LDKShutdown Shutdown_clone(const struct LDKShutdown *NONNULL_PTR orig);
 
-void ClosingSigned_free(struct LDKClosingSigned this_ptr);
+/**
+ * Frees any resources used by the ClosingSigned, if is_owned is set and inner is non-NULL.
+ */
+void ClosingSigned_free(struct LDKClosingSigned this_obj);
 
 /**
  * The channel ID
@@ -6856,11 +8165,20 @@ struct LDKSignature ClosingSigned_get_signature(const struct LDKClosingSigned *N
  */
 void ClosingSigned_set_signature(struct LDKClosingSigned *NONNULL_PTR this_ptr, struct LDKSignature val);
 
+/**
+ * Constructs a new ClosingSigned given each field
+ */
 MUST_USE_RES struct LDKClosingSigned ClosingSigned_new(struct LDKThirtyTwoBytes channel_id_arg, uint64_t fee_satoshis_arg, struct LDKSignature signature_arg);
 
+/**
+ * Creates a copy of the ClosingSigned
+ */
 struct LDKClosingSigned ClosingSigned_clone(const struct LDKClosingSigned *NONNULL_PTR orig);
 
-void UpdateAddHTLC_free(struct LDKUpdateAddHTLC this_ptr);
+/**
+ * Frees any resources used by the UpdateAddHTLC, if is_owned is set and inner is non-NULL.
+ */
+void UpdateAddHTLC_free(struct LDKUpdateAddHTLC this_obj);
 
 /**
  * The channel ID
@@ -6912,9 +8230,15 @@ uint32_t UpdateAddHTLC_get_cltv_expiry(const struct LDKUpdateAddHTLC *NONNULL_PT
  */
 void UpdateAddHTLC_set_cltv_expiry(struct LDKUpdateAddHTLC *NONNULL_PTR this_ptr, uint32_t val);
 
+/**
+ * Creates a copy of the UpdateAddHTLC
+ */
 struct LDKUpdateAddHTLC UpdateAddHTLC_clone(const struct LDKUpdateAddHTLC *NONNULL_PTR orig);
 
-void UpdateFulfillHTLC_free(struct LDKUpdateFulfillHTLC this_ptr);
+/**
+ * Frees any resources used by the UpdateFulfillHTLC, if is_owned is set and inner is non-NULL.
+ */
+void UpdateFulfillHTLC_free(struct LDKUpdateFulfillHTLC this_obj);
 
 /**
  * The channel ID
@@ -6946,11 +8270,20 @@ const uint8_t (*UpdateFulfillHTLC_get_payment_preimage(const struct LDKUpdateFul
  */
 void UpdateFulfillHTLC_set_payment_preimage(struct LDKUpdateFulfillHTLC *NONNULL_PTR this_ptr, struct LDKThirtyTwoBytes val);
 
+/**
+ * Constructs a new UpdateFulfillHTLC given each field
+ */
 MUST_USE_RES struct LDKUpdateFulfillHTLC UpdateFulfillHTLC_new(struct LDKThirtyTwoBytes channel_id_arg, uint64_t htlc_id_arg, struct LDKThirtyTwoBytes payment_preimage_arg);
 
+/**
+ * Creates a copy of the UpdateFulfillHTLC
+ */
 struct LDKUpdateFulfillHTLC UpdateFulfillHTLC_clone(const struct LDKUpdateFulfillHTLC *NONNULL_PTR orig);
 
-void UpdateFailHTLC_free(struct LDKUpdateFailHTLC this_ptr);
+/**
+ * Frees any resources used by the UpdateFailHTLC, if is_owned is set and inner is non-NULL.
+ */
+void UpdateFailHTLC_free(struct LDKUpdateFailHTLC this_obj);
 
 /**
  * The channel ID
@@ -6972,9 +8305,15 @@ uint64_t UpdateFailHTLC_get_htlc_id(const struct LDKUpdateFailHTLC *NONNULL_PTR 
  */
 void UpdateFailHTLC_set_htlc_id(struct LDKUpdateFailHTLC *NONNULL_PTR this_ptr, uint64_t val);
 
+/**
+ * Creates a copy of the UpdateFailHTLC
+ */
 struct LDKUpdateFailHTLC UpdateFailHTLC_clone(const struct LDKUpdateFailHTLC *NONNULL_PTR orig);
 
-void UpdateFailMalformedHTLC_free(struct LDKUpdateFailMalformedHTLC this_ptr);
+/**
+ * Frees any resources used by the UpdateFailMalformedHTLC, if is_owned is set and inner is non-NULL.
+ */
+void UpdateFailMalformedHTLC_free(struct LDKUpdateFailMalformedHTLC this_obj);
 
 /**
  * The channel ID
@@ -7006,9 +8345,15 @@ uint16_t UpdateFailMalformedHTLC_get_failure_code(const struct LDKUpdateFailMalf
  */
 void UpdateFailMalformedHTLC_set_failure_code(struct LDKUpdateFailMalformedHTLC *NONNULL_PTR this_ptr, uint16_t val);
 
+/**
+ * Creates a copy of the UpdateFailMalformedHTLC
+ */
 struct LDKUpdateFailMalformedHTLC UpdateFailMalformedHTLC_clone(const struct LDKUpdateFailMalformedHTLC *NONNULL_PTR orig);
 
-void CommitmentSigned_free(struct LDKCommitmentSigned this_ptr);
+/**
+ * Frees any resources used by the CommitmentSigned, if is_owned is set and inner is non-NULL.
+ */
+void CommitmentSigned_free(struct LDKCommitmentSigned this_obj);
 
 /**
  * The channel ID
@@ -7035,11 +8380,20 @@ void CommitmentSigned_set_signature(struct LDKCommitmentSigned *NONNULL_PTR this
  */
 void CommitmentSigned_set_htlc_signatures(struct LDKCommitmentSigned *NONNULL_PTR this_ptr, struct LDKCVec_SignatureZ val);
 
+/**
+ * Constructs a new CommitmentSigned given each field
+ */
 MUST_USE_RES struct LDKCommitmentSigned CommitmentSigned_new(struct LDKThirtyTwoBytes channel_id_arg, struct LDKSignature signature_arg, struct LDKCVec_SignatureZ htlc_signatures_arg);
 
+/**
+ * Creates a copy of the CommitmentSigned
+ */
 struct LDKCommitmentSigned CommitmentSigned_clone(const struct LDKCommitmentSigned *NONNULL_PTR orig);
 
-void RevokeAndACK_free(struct LDKRevokeAndACK this_ptr);
+/**
+ * Frees any resources used by the RevokeAndACK, if is_owned is set and inner is non-NULL.
+ */
+void RevokeAndACK_free(struct LDKRevokeAndACK this_obj);
 
 /**
  * The channel ID
@@ -7071,11 +8425,20 @@ struct LDKPublicKey RevokeAndACK_get_next_per_commitment_point(const struct LDKR
  */
 void RevokeAndACK_set_next_per_commitment_point(struct LDKRevokeAndACK *NONNULL_PTR this_ptr, struct LDKPublicKey val);
 
+/**
+ * Constructs a new RevokeAndACK given each field
+ */
 MUST_USE_RES struct LDKRevokeAndACK RevokeAndACK_new(struct LDKThirtyTwoBytes channel_id_arg, struct LDKThirtyTwoBytes per_commitment_secret_arg, struct LDKPublicKey next_per_commitment_point_arg);
 
+/**
+ * Creates a copy of the RevokeAndACK
+ */
 struct LDKRevokeAndACK RevokeAndACK_clone(const struct LDKRevokeAndACK *NONNULL_PTR orig);
 
-void UpdateFee_free(struct LDKUpdateFee this_ptr);
+/**
+ * Frees any resources used by the UpdateFee, if is_owned is set and inner is non-NULL.
+ */
+void UpdateFee_free(struct LDKUpdateFee this_obj);
 
 /**
  * The channel ID
@@ -7097,11 +8460,20 @@ uint32_t UpdateFee_get_feerate_per_kw(const struct LDKUpdateFee *NONNULL_PTR thi
  */
 void UpdateFee_set_feerate_per_kw(struct LDKUpdateFee *NONNULL_PTR this_ptr, uint32_t val);
 
+/**
+ * Constructs a new UpdateFee given each field
+ */
 MUST_USE_RES struct LDKUpdateFee UpdateFee_new(struct LDKThirtyTwoBytes channel_id_arg, uint32_t feerate_per_kw_arg);
 
+/**
+ * Creates a copy of the UpdateFee
+ */
 struct LDKUpdateFee UpdateFee_clone(const struct LDKUpdateFee *NONNULL_PTR orig);
 
-void DataLossProtect_free(struct LDKDataLossProtect this_ptr);
+/**
+ * Frees any resources used by the DataLossProtect, if is_owned is set and inner is non-NULL.
+ */
+void DataLossProtect_free(struct LDKDataLossProtect this_obj);
 
 /**
  * Proof that the sender knows the per-commitment secret of a specific commitment transaction
@@ -7125,11 +8497,20 @@ struct LDKPublicKey DataLossProtect_get_my_current_per_commitment_point(const st
  */
 void DataLossProtect_set_my_current_per_commitment_point(struct LDKDataLossProtect *NONNULL_PTR this_ptr, struct LDKPublicKey val);
 
+/**
+ * Constructs a new DataLossProtect given each field
+ */
 MUST_USE_RES struct LDKDataLossProtect DataLossProtect_new(struct LDKThirtyTwoBytes your_last_per_commitment_secret_arg, struct LDKPublicKey my_current_per_commitment_point_arg);
 
+/**
+ * Creates a copy of the DataLossProtect
+ */
 struct LDKDataLossProtect DataLossProtect_clone(const struct LDKDataLossProtect *NONNULL_PTR orig);
 
-void ChannelReestablish_free(struct LDKChannelReestablish this_ptr);
+/**
+ * Frees any resources used by the ChannelReestablish, if is_owned is set and inner is non-NULL.
+ */
+void ChannelReestablish_free(struct LDKChannelReestablish this_obj);
 
 /**
  * The channel ID
@@ -7161,9 +8542,15 @@ uint64_t ChannelReestablish_get_next_remote_commitment_number(const struct LDKCh
  */
 void ChannelReestablish_set_next_remote_commitment_number(struct LDKChannelReestablish *NONNULL_PTR this_ptr, uint64_t val);
 
+/**
+ * Creates a copy of the ChannelReestablish
+ */
 struct LDKChannelReestablish ChannelReestablish_clone(const struct LDKChannelReestablish *NONNULL_PTR orig);
 
-void AnnouncementSignatures_free(struct LDKAnnouncementSignatures this_ptr);
+/**
+ * Frees any resources used by the AnnouncementSignatures, if is_owned is set and inner is non-NULL.
+ */
+void AnnouncementSignatures_free(struct LDKAnnouncementSignatures this_obj);
 
 /**
  * The channel ID
@@ -7205,19 +8592,40 @@ struct LDKSignature AnnouncementSignatures_get_bitcoin_signature(const struct LD
  */
 void AnnouncementSignatures_set_bitcoin_signature(struct LDKAnnouncementSignatures *NONNULL_PTR this_ptr, struct LDKSignature val);
 
+/**
+ * Constructs a new AnnouncementSignatures given each field
+ */
 MUST_USE_RES struct LDKAnnouncementSignatures AnnouncementSignatures_new(struct LDKThirtyTwoBytes channel_id_arg, uint64_t short_channel_id_arg, struct LDKSignature node_signature_arg, struct LDKSignature bitcoin_signature_arg);
 
+/**
+ * Creates a copy of the AnnouncementSignatures
+ */
 struct LDKAnnouncementSignatures AnnouncementSignatures_clone(const struct LDKAnnouncementSignatures *NONNULL_PTR orig);
 
+/**
+ * Frees any resources used by the NetAddress
+ */
 void NetAddress_free(struct LDKNetAddress this_ptr);
 
+/**
+ * Creates a copy of the NetAddress
+ */
 struct LDKNetAddress NetAddress_clone(const struct LDKNetAddress *NONNULL_PTR orig);
 
+/**
+ * Serialize the NetAddress object into a byte array which can be read by NetAddress_read
+ */
 struct LDKCVec_u8Z NetAddress_write(const struct LDKNetAddress *NONNULL_PTR obj);
 
+/**
+ * Read a Result from a byte array, created by Result_write
+ */
 struct LDKCResult_CResult_NetAddressu8ZDecodeErrorZ Result_read(struct LDKu8slice ser);
 
-void UnsignedNodeAnnouncement_free(struct LDKUnsignedNodeAnnouncement this_ptr);
+/**
+ * Frees any resources used by the UnsignedNodeAnnouncement, if is_owned is set and inner is non-NULL.
+ */
+void UnsignedNodeAnnouncement_free(struct LDKUnsignedNodeAnnouncement this_obj);
 
 /**
  * The advertised features
@@ -7278,9 +8686,15 @@ void UnsignedNodeAnnouncement_set_alias(struct LDKUnsignedNodeAnnouncement *NONN
  */
 void UnsignedNodeAnnouncement_set_addresses(struct LDKUnsignedNodeAnnouncement *NONNULL_PTR this_ptr, struct LDKCVec_NetAddressZ val);
 
+/**
+ * Creates a copy of the UnsignedNodeAnnouncement
+ */
 struct LDKUnsignedNodeAnnouncement UnsignedNodeAnnouncement_clone(const struct LDKUnsignedNodeAnnouncement *NONNULL_PTR orig);
 
-void NodeAnnouncement_free(struct LDKNodeAnnouncement this_ptr);
+/**
+ * Frees any resources used by the NodeAnnouncement, if is_owned is set and inner is non-NULL.
+ */
+void NodeAnnouncement_free(struct LDKNodeAnnouncement this_obj);
 
 /**
  * The signature by the node key
@@ -7302,11 +8716,20 @@ struct LDKUnsignedNodeAnnouncement NodeAnnouncement_get_contents(const struct LD
  */
 void NodeAnnouncement_set_contents(struct LDKNodeAnnouncement *NONNULL_PTR this_ptr, struct LDKUnsignedNodeAnnouncement val);
 
+/**
+ * Constructs a new NodeAnnouncement given each field
+ */
 MUST_USE_RES struct LDKNodeAnnouncement NodeAnnouncement_new(struct LDKSignature signature_arg, struct LDKUnsignedNodeAnnouncement contents_arg);
 
+/**
+ * Creates a copy of the NodeAnnouncement
+ */
 struct LDKNodeAnnouncement NodeAnnouncement_clone(const struct LDKNodeAnnouncement *NONNULL_PTR orig);
 
-void UnsignedChannelAnnouncement_free(struct LDKUnsignedChannelAnnouncement this_ptr);
+/**
+ * Frees any resources used by the UnsignedChannelAnnouncement, if is_owned is set and inner is non-NULL.
+ */
+void UnsignedChannelAnnouncement_free(struct LDKUnsignedChannelAnnouncement this_obj);
 
 /**
  * The advertised channel features
@@ -7378,9 +8801,15 @@ struct LDKPublicKey UnsignedChannelAnnouncement_get_bitcoin_key_2(const struct L
  */
 void UnsignedChannelAnnouncement_set_bitcoin_key_2(struct LDKUnsignedChannelAnnouncement *NONNULL_PTR this_ptr, struct LDKPublicKey val);
 
+/**
+ * Creates a copy of the UnsignedChannelAnnouncement
+ */
 struct LDKUnsignedChannelAnnouncement UnsignedChannelAnnouncement_clone(const struct LDKUnsignedChannelAnnouncement *NONNULL_PTR orig);
 
-void ChannelAnnouncement_free(struct LDKChannelAnnouncement this_ptr);
+/**
+ * Frees any resources used by the ChannelAnnouncement, if is_owned is set and inner is non-NULL.
+ */
+void ChannelAnnouncement_free(struct LDKChannelAnnouncement this_obj);
 
 /**
  * Authentication of the announcement by the first public node
@@ -7432,11 +8861,20 @@ struct LDKUnsignedChannelAnnouncement ChannelAnnouncement_get_contents(const str
  */
 void ChannelAnnouncement_set_contents(struct LDKChannelAnnouncement *NONNULL_PTR this_ptr, struct LDKUnsignedChannelAnnouncement val);
 
+/**
+ * Constructs a new ChannelAnnouncement given each field
+ */
 MUST_USE_RES struct LDKChannelAnnouncement ChannelAnnouncement_new(struct LDKSignature node_signature_1_arg, struct LDKSignature node_signature_2_arg, struct LDKSignature bitcoin_signature_1_arg, struct LDKSignature bitcoin_signature_2_arg, struct LDKUnsignedChannelAnnouncement contents_arg);
 
+/**
+ * Creates a copy of the ChannelAnnouncement
+ */
 struct LDKChannelAnnouncement ChannelAnnouncement_clone(const struct LDKChannelAnnouncement *NONNULL_PTR orig);
 
-void UnsignedChannelUpdate_free(struct LDKUnsignedChannelUpdate this_ptr);
+/**
+ * Frees any resources used by the UnsignedChannelUpdate, if is_owned is set and inner is non-NULL.
+ */
+void UnsignedChannelUpdate_free(struct LDKUnsignedChannelUpdate this_obj);
 
 /**
  * The genesis hash of the blockchain where the channel is to be opened
@@ -7518,9 +8956,15 @@ uint32_t UnsignedChannelUpdate_get_fee_proportional_millionths(const struct LDKU
  */
 void UnsignedChannelUpdate_set_fee_proportional_millionths(struct LDKUnsignedChannelUpdate *NONNULL_PTR this_ptr, uint32_t val);
 
+/**
+ * Creates a copy of the UnsignedChannelUpdate
+ */
 struct LDKUnsignedChannelUpdate UnsignedChannelUpdate_clone(const struct LDKUnsignedChannelUpdate *NONNULL_PTR orig);
 
-void ChannelUpdate_free(struct LDKChannelUpdate this_ptr);
+/**
+ * Frees any resources used by the ChannelUpdate, if is_owned is set and inner is non-NULL.
+ */
+void ChannelUpdate_free(struct LDKChannelUpdate this_obj);
 
 /**
  * A signature of the channel update
@@ -7542,11 +8986,20 @@ struct LDKUnsignedChannelUpdate ChannelUpdate_get_contents(const struct LDKChann
  */
 void ChannelUpdate_set_contents(struct LDKChannelUpdate *NONNULL_PTR this_ptr, struct LDKUnsignedChannelUpdate val);
 
+/**
+ * Constructs a new ChannelUpdate given each field
+ */
 MUST_USE_RES struct LDKChannelUpdate ChannelUpdate_new(struct LDKSignature signature_arg, struct LDKUnsignedChannelUpdate contents_arg);
 
+/**
+ * Creates a copy of the ChannelUpdate
+ */
 struct LDKChannelUpdate ChannelUpdate_clone(const struct LDKChannelUpdate *NONNULL_PTR orig);
 
-void QueryChannelRange_free(struct LDKQueryChannelRange this_ptr);
+/**
+ * Frees any resources used by the QueryChannelRange, if is_owned is set and inner is non-NULL.
+ */
+void QueryChannelRange_free(struct LDKQueryChannelRange this_obj);
 
 /**
  * The genesis hash of the blockchain being queried
@@ -7578,11 +9031,20 @@ uint32_t QueryChannelRange_get_number_of_blocks(const struct LDKQueryChannelRang
  */
 void QueryChannelRange_set_number_of_blocks(struct LDKQueryChannelRange *NONNULL_PTR this_ptr, uint32_t val);
 
+/**
+ * Constructs a new QueryChannelRange given each field
+ */
 MUST_USE_RES struct LDKQueryChannelRange QueryChannelRange_new(struct LDKThirtyTwoBytes chain_hash_arg, uint32_t first_blocknum_arg, uint32_t number_of_blocks_arg);
 
+/**
+ * Creates a copy of the QueryChannelRange
+ */
 struct LDKQueryChannelRange QueryChannelRange_clone(const struct LDKQueryChannelRange *NONNULL_PTR orig);
 
-void ReplyChannelRange_free(struct LDKReplyChannelRange this_ptr);
+/**
+ * Frees any resources used by the ReplyChannelRange, if is_owned is set and inner is non-NULL.
+ */
+void ReplyChannelRange_free(struct LDKReplyChannelRange this_obj);
 
 /**
  * The genesis hash of the blockchain being queried
@@ -7629,11 +9091,20 @@ void ReplyChannelRange_set_sync_complete(struct LDKReplyChannelRange *NONNULL_PT
  */
 void ReplyChannelRange_set_short_channel_ids(struct LDKReplyChannelRange *NONNULL_PTR this_ptr, struct LDKCVec_u64Z val);
 
+/**
+ * Constructs a new ReplyChannelRange given each field
+ */
 MUST_USE_RES struct LDKReplyChannelRange ReplyChannelRange_new(struct LDKThirtyTwoBytes chain_hash_arg, uint32_t first_blocknum_arg, uint32_t number_of_blocks_arg, bool sync_complete_arg, struct LDKCVec_u64Z short_channel_ids_arg);
 
+/**
+ * Creates a copy of the ReplyChannelRange
+ */
 struct LDKReplyChannelRange ReplyChannelRange_clone(const struct LDKReplyChannelRange *NONNULL_PTR orig);
 
-void QueryShortChannelIds_free(struct LDKQueryShortChannelIds this_ptr);
+/**
+ * Frees any resources used by the QueryShortChannelIds, if is_owned is set and inner is non-NULL.
+ */
+void QueryShortChannelIds_free(struct LDKQueryShortChannelIds this_obj);
 
 /**
  * The genesis hash of the blockchain being queried
@@ -7650,11 +9121,20 @@ void QueryShortChannelIds_set_chain_hash(struct LDKQueryShortChannelIds *NONNULL
  */
 void QueryShortChannelIds_set_short_channel_ids(struct LDKQueryShortChannelIds *NONNULL_PTR this_ptr, struct LDKCVec_u64Z val);
 
+/**
+ * Constructs a new QueryShortChannelIds given each field
+ */
 MUST_USE_RES struct LDKQueryShortChannelIds QueryShortChannelIds_new(struct LDKThirtyTwoBytes chain_hash_arg, struct LDKCVec_u64Z short_channel_ids_arg);
 
+/**
+ * Creates a copy of the QueryShortChannelIds
+ */
 struct LDKQueryShortChannelIds QueryShortChannelIds_clone(const struct LDKQueryShortChannelIds *NONNULL_PTR orig);
 
-void ReplyShortChannelIdsEnd_free(struct LDKReplyShortChannelIdsEnd this_ptr);
+/**
+ * Frees any resources used by the ReplyShortChannelIdsEnd, if is_owned is set and inner is non-NULL.
+ */
+void ReplyShortChannelIdsEnd_free(struct LDKReplyShortChannelIdsEnd this_obj);
 
 /**
  * The genesis hash of the blockchain that was queried
@@ -7678,11 +9158,20 @@ bool ReplyShortChannelIdsEnd_get_full_information(const struct LDKReplyShortChan
  */
 void ReplyShortChannelIdsEnd_set_full_information(struct LDKReplyShortChannelIdsEnd *NONNULL_PTR this_ptr, bool val);
 
+/**
+ * Constructs a new ReplyShortChannelIdsEnd given each field
+ */
 MUST_USE_RES struct LDKReplyShortChannelIdsEnd ReplyShortChannelIdsEnd_new(struct LDKThirtyTwoBytes chain_hash_arg, bool full_information_arg);
 
+/**
+ * Creates a copy of the ReplyShortChannelIdsEnd
+ */
 struct LDKReplyShortChannelIdsEnd ReplyShortChannelIdsEnd_clone(const struct LDKReplyShortChannelIdsEnd *NONNULL_PTR orig);
 
-void GossipTimestampFilter_free(struct LDKGossipTimestampFilter this_ptr);
+/**
+ * Frees any resources used by the GossipTimestampFilter, if is_owned is set and inner is non-NULL.
+ */
+void GossipTimestampFilter_free(struct LDKGossipTimestampFilter this_obj);
 
 /**
  * The genesis hash of the blockchain for channel and node information
@@ -7714,15 +9203,30 @@ uint32_t GossipTimestampFilter_get_timestamp_range(const struct LDKGossipTimesta
  */
 void GossipTimestampFilter_set_timestamp_range(struct LDKGossipTimestampFilter *NONNULL_PTR this_ptr, uint32_t val);
 
+/**
+ * Constructs a new GossipTimestampFilter given each field
+ */
 MUST_USE_RES struct LDKGossipTimestampFilter GossipTimestampFilter_new(struct LDKThirtyTwoBytes chain_hash_arg, uint32_t first_timestamp_arg, uint32_t timestamp_range_arg);
 
+/**
+ * Creates a copy of the GossipTimestampFilter
+ */
 struct LDKGossipTimestampFilter GossipTimestampFilter_clone(const struct LDKGossipTimestampFilter *NONNULL_PTR orig);
 
+/**
+ * Frees any resources used by the ErrorAction
+ */
 void ErrorAction_free(struct LDKErrorAction this_ptr);
 
+/**
+ * Creates a copy of the ErrorAction
+ */
 struct LDKErrorAction ErrorAction_clone(const struct LDKErrorAction *NONNULL_PTR orig);
 
-void LightningError_free(struct LDKLightningError this_ptr);
+/**
+ * Frees any resources used by the LightningError, if is_owned is set and inner is non-NULL.
+ */
+void LightningError_free(struct LDKLightningError this_obj);
 
 /**
  * A human-readable message describing the error
@@ -7744,11 +9248,20 @@ struct LDKErrorAction LightningError_get_action(const struct LDKLightningError *
  */
 void LightningError_set_action(struct LDKLightningError *NONNULL_PTR this_ptr, struct LDKErrorAction val);
 
+/**
+ * Constructs a new LightningError given each field
+ */
 MUST_USE_RES struct LDKLightningError LightningError_new(struct LDKCVec_u8Z err_arg, struct LDKErrorAction action_arg);
 
+/**
+ * Creates a copy of the LightningError
+ */
 struct LDKLightningError LightningError_clone(const struct LDKLightningError *NONNULL_PTR orig);
 
-void CommitmentUpdate_free(struct LDKCommitmentUpdate this_ptr);
+/**
+ * Frees any resources used by the CommitmentUpdate, if is_owned is set and inner is non-NULL.
+ */
+void CommitmentUpdate_free(struct LDKCommitmentUpdate this_obj);
 
 /**
  * update_add_htlc messages which should be sent
@@ -7790,12 +9303,24 @@ struct LDKCommitmentSigned CommitmentUpdate_get_commitment_signed(const struct L
  */
 void CommitmentUpdate_set_commitment_signed(struct LDKCommitmentUpdate *NONNULL_PTR this_ptr, struct LDKCommitmentSigned val);
 
+/**
+ * Constructs a new CommitmentUpdate given each field
+ */
 MUST_USE_RES struct LDKCommitmentUpdate CommitmentUpdate_new(struct LDKCVec_UpdateAddHTLCZ update_add_htlcs_arg, struct LDKCVec_UpdateFulfillHTLCZ update_fulfill_htlcs_arg, struct LDKCVec_UpdateFailHTLCZ update_fail_htlcs_arg, struct LDKCVec_UpdateFailMalformedHTLCZ update_fail_malformed_htlcs_arg, struct LDKUpdateFee update_fee_arg, struct LDKCommitmentSigned commitment_signed_arg);
 
+/**
+ * Creates a copy of the CommitmentUpdate
+ */
 struct LDKCommitmentUpdate CommitmentUpdate_clone(const struct LDKCommitmentUpdate *NONNULL_PTR orig);
 
+/**
+ * Frees any resources used by the HTLCFailChannelUpdate
+ */
 void HTLCFailChannelUpdate_free(struct LDKHTLCFailChannelUpdate this_ptr);
 
+/**
+ * Creates a copy of the HTLCFailChannelUpdate
+ */
 struct LDKHTLCFailChannelUpdate HTLCFailChannelUpdate_clone(const struct LDKHTLCFailChannelUpdate *NONNULL_PTR orig);
 
 /**
@@ -7808,150 +9333,364 @@ void ChannelMessageHandler_free(struct LDKChannelMessageHandler this_ptr);
  */
 void RoutingMessageHandler_free(struct LDKRoutingMessageHandler this_ptr);
 
+/**
+ * Serialize the AcceptChannel object into a byte array which can be read by AcceptChannel_read
+ */
 struct LDKCVec_u8Z AcceptChannel_write(const struct LDKAcceptChannel *NONNULL_PTR obj);
 
+/**
+ * Read a AcceptChannel from a byte array, created by AcceptChannel_write
+ */
 struct LDKCResult_AcceptChannelDecodeErrorZ AcceptChannel_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the AnnouncementSignatures object into a byte array which can be read by AnnouncementSignatures_read
+ */
 struct LDKCVec_u8Z AnnouncementSignatures_write(const struct LDKAnnouncementSignatures *NONNULL_PTR obj);
 
+/**
+ * Read a AnnouncementSignatures from a byte array, created by AnnouncementSignatures_write
+ */
 struct LDKCResult_AnnouncementSignaturesDecodeErrorZ AnnouncementSignatures_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the ChannelReestablish object into a byte array which can be read by ChannelReestablish_read
+ */
 struct LDKCVec_u8Z ChannelReestablish_write(const struct LDKChannelReestablish *NONNULL_PTR obj);
 
+/**
+ * Read a ChannelReestablish from a byte array, created by ChannelReestablish_write
+ */
 struct LDKCResult_ChannelReestablishDecodeErrorZ ChannelReestablish_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the ClosingSigned object into a byte array which can be read by ClosingSigned_read
+ */
 struct LDKCVec_u8Z ClosingSigned_write(const struct LDKClosingSigned *NONNULL_PTR obj);
 
+/**
+ * Read a ClosingSigned from a byte array, created by ClosingSigned_write
+ */
 struct LDKCResult_ClosingSignedDecodeErrorZ ClosingSigned_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the CommitmentSigned object into a byte array which can be read by CommitmentSigned_read
+ */
 struct LDKCVec_u8Z CommitmentSigned_write(const struct LDKCommitmentSigned *NONNULL_PTR obj);
 
+/**
+ * Read a CommitmentSigned from a byte array, created by CommitmentSigned_write
+ */
 struct LDKCResult_CommitmentSignedDecodeErrorZ CommitmentSigned_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the FundingCreated object into a byte array which can be read by FundingCreated_read
+ */
 struct LDKCVec_u8Z FundingCreated_write(const struct LDKFundingCreated *NONNULL_PTR obj);
 
+/**
+ * Read a FundingCreated from a byte array, created by FundingCreated_write
+ */
 struct LDKCResult_FundingCreatedDecodeErrorZ FundingCreated_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the FundingSigned object into a byte array which can be read by FundingSigned_read
+ */
 struct LDKCVec_u8Z FundingSigned_write(const struct LDKFundingSigned *NONNULL_PTR obj);
 
+/**
+ * Read a FundingSigned from a byte array, created by FundingSigned_write
+ */
 struct LDKCResult_FundingSignedDecodeErrorZ FundingSigned_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the FundingLocked object into a byte array which can be read by FundingLocked_read
+ */
 struct LDKCVec_u8Z FundingLocked_write(const struct LDKFundingLocked *NONNULL_PTR obj);
 
+/**
+ * Read a FundingLocked from a byte array, created by FundingLocked_write
+ */
 struct LDKCResult_FundingLockedDecodeErrorZ FundingLocked_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the Init object into a byte array which can be read by Init_read
+ */
 struct LDKCVec_u8Z Init_write(const struct LDKInit *NONNULL_PTR obj);
 
+/**
+ * Read a Init from a byte array, created by Init_write
+ */
 struct LDKCResult_InitDecodeErrorZ Init_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the OpenChannel object into a byte array which can be read by OpenChannel_read
+ */
 struct LDKCVec_u8Z OpenChannel_write(const struct LDKOpenChannel *NONNULL_PTR obj);
 
+/**
+ * Read a OpenChannel from a byte array, created by OpenChannel_write
+ */
 struct LDKCResult_OpenChannelDecodeErrorZ OpenChannel_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the RevokeAndACK object into a byte array which can be read by RevokeAndACK_read
+ */
 struct LDKCVec_u8Z RevokeAndACK_write(const struct LDKRevokeAndACK *NONNULL_PTR obj);
 
+/**
+ * Read a RevokeAndACK from a byte array, created by RevokeAndACK_write
+ */
 struct LDKCResult_RevokeAndACKDecodeErrorZ RevokeAndACK_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the Shutdown object into a byte array which can be read by Shutdown_read
+ */
 struct LDKCVec_u8Z Shutdown_write(const struct LDKShutdown *NONNULL_PTR obj);
 
+/**
+ * Read a Shutdown from a byte array, created by Shutdown_write
+ */
 struct LDKCResult_ShutdownDecodeErrorZ Shutdown_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the UpdateFailHTLC object into a byte array which can be read by UpdateFailHTLC_read
+ */
 struct LDKCVec_u8Z UpdateFailHTLC_write(const struct LDKUpdateFailHTLC *NONNULL_PTR obj);
 
+/**
+ * Read a UpdateFailHTLC from a byte array, created by UpdateFailHTLC_write
+ */
 struct LDKCResult_UpdateFailHTLCDecodeErrorZ UpdateFailHTLC_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the UpdateFailMalformedHTLC object into a byte array which can be read by UpdateFailMalformedHTLC_read
+ */
 struct LDKCVec_u8Z UpdateFailMalformedHTLC_write(const struct LDKUpdateFailMalformedHTLC *NONNULL_PTR obj);
 
+/**
+ * Read a UpdateFailMalformedHTLC from a byte array, created by UpdateFailMalformedHTLC_write
+ */
 struct LDKCResult_UpdateFailMalformedHTLCDecodeErrorZ UpdateFailMalformedHTLC_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the UpdateFee object into a byte array which can be read by UpdateFee_read
+ */
 struct LDKCVec_u8Z UpdateFee_write(const struct LDKUpdateFee *NONNULL_PTR obj);
 
+/**
+ * Read a UpdateFee from a byte array, created by UpdateFee_write
+ */
 struct LDKCResult_UpdateFeeDecodeErrorZ UpdateFee_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the UpdateFulfillHTLC object into a byte array which can be read by UpdateFulfillHTLC_read
+ */
 struct LDKCVec_u8Z UpdateFulfillHTLC_write(const struct LDKUpdateFulfillHTLC *NONNULL_PTR obj);
 
+/**
+ * Read a UpdateFulfillHTLC from a byte array, created by UpdateFulfillHTLC_write
+ */
 struct LDKCResult_UpdateFulfillHTLCDecodeErrorZ UpdateFulfillHTLC_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the UpdateAddHTLC object into a byte array which can be read by UpdateAddHTLC_read
+ */
 struct LDKCVec_u8Z UpdateAddHTLC_write(const struct LDKUpdateAddHTLC *NONNULL_PTR obj);
 
+/**
+ * Read a UpdateAddHTLC from a byte array, created by UpdateAddHTLC_write
+ */
 struct LDKCResult_UpdateAddHTLCDecodeErrorZ UpdateAddHTLC_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the Ping object into a byte array which can be read by Ping_read
+ */
 struct LDKCVec_u8Z Ping_write(const struct LDKPing *NONNULL_PTR obj);
 
+/**
+ * Read a Ping from a byte array, created by Ping_write
+ */
 struct LDKCResult_PingDecodeErrorZ Ping_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the Pong object into a byte array which can be read by Pong_read
+ */
 struct LDKCVec_u8Z Pong_write(const struct LDKPong *NONNULL_PTR obj);
 
+/**
+ * Read a Pong from a byte array, created by Pong_write
+ */
 struct LDKCResult_PongDecodeErrorZ Pong_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the UnsignedChannelAnnouncement object into a byte array which can be read by UnsignedChannelAnnouncement_read
+ */
 struct LDKCVec_u8Z UnsignedChannelAnnouncement_write(const struct LDKUnsignedChannelAnnouncement *NONNULL_PTR obj);
 
+/**
+ * Read a UnsignedChannelAnnouncement from a byte array, created by UnsignedChannelAnnouncement_write
+ */
 struct LDKCResult_UnsignedChannelAnnouncementDecodeErrorZ UnsignedChannelAnnouncement_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the ChannelAnnouncement object into a byte array which can be read by ChannelAnnouncement_read
+ */
 struct LDKCVec_u8Z ChannelAnnouncement_write(const struct LDKChannelAnnouncement *NONNULL_PTR obj);
 
+/**
+ * Read a ChannelAnnouncement from a byte array, created by ChannelAnnouncement_write
+ */
 struct LDKCResult_ChannelAnnouncementDecodeErrorZ ChannelAnnouncement_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the UnsignedChannelUpdate object into a byte array which can be read by UnsignedChannelUpdate_read
+ */
 struct LDKCVec_u8Z UnsignedChannelUpdate_write(const struct LDKUnsignedChannelUpdate *NONNULL_PTR obj);
 
+/**
+ * Read a UnsignedChannelUpdate from a byte array, created by UnsignedChannelUpdate_write
+ */
 struct LDKCResult_UnsignedChannelUpdateDecodeErrorZ UnsignedChannelUpdate_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the ChannelUpdate object into a byte array which can be read by ChannelUpdate_read
+ */
 struct LDKCVec_u8Z ChannelUpdate_write(const struct LDKChannelUpdate *NONNULL_PTR obj);
 
+/**
+ * Read a ChannelUpdate from a byte array, created by ChannelUpdate_write
+ */
 struct LDKCResult_ChannelUpdateDecodeErrorZ ChannelUpdate_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the ErrorMessage object into a byte array which can be read by ErrorMessage_read
+ */
 struct LDKCVec_u8Z ErrorMessage_write(const struct LDKErrorMessage *NONNULL_PTR obj);
 
+/**
+ * Read a ErrorMessage from a byte array, created by ErrorMessage_write
+ */
 struct LDKCResult_ErrorMessageDecodeErrorZ ErrorMessage_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the UnsignedNodeAnnouncement object into a byte array which can be read by UnsignedNodeAnnouncement_read
+ */
 struct LDKCVec_u8Z UnsignedNodeAnnouncement_write(const struct LDKUnsignedNodeAnnouncement *NONNULL_PTR obj);
 
+/**
+ * Read a UnsignedNodeAnnouncement from a byte array, created by UnsignedNodeAnnouncement_write
+ */
 struct LDKCResult_UnsignedNodeAnnouncementDecodeErrorZ UnsignedNodeAnnouncement_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the NodeAnnouncement object into a byte array which can be read by NodeAnnouncement_read
+ */
 struct LDKCVec_u8Z NodeAnnouncement_write(const struct LDKNodeAnnouncement *NONNULL_PTR obj);
 
+/**
+ * Read a NodeAnnouncement from a byte array, created by NodeAnnouncement_write
+ */
 struct LDKCResult_NodeAnnouncementDecodeErrorZ NodeAnnouncement_read(struct LDKu8slice ser);
 
+/**
+ * Read a QueryShortChannelIds from a byte array, created by QueryShortChannelIds_write
+ */
 struct LDKCResult_QueryShortChannelIdsDecodeErrorZ QueryShortChannelIds_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the QueryShortChannelIds object into a byte array which can be read by QueryShortChannelIds_read
+ */
 struct LDKCVec_u8Z QueryShortChannelIds_write(const struct LDKQueryShortChannelIds *NONNULL_PTR obj);
 
+/**
+ * Read a ReplyShortChannelIdsEnd from a byte array, created by ReplyShortChannelIdsEnd_write
+ */
 struct LDKCResult_ReplyShortChannelIdsEndDecodeErrorZ ReplyShortChannelIdsEnd_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the ReplyShortChannelIdsEnd object into a byte array which can be read by ReplyShortChannelIdsEnd_read
+ */
 struct LDKCVec_u8Z ReplyShortChannelIdsEnd_write(const struct LDKReplyShortChannelIdsEnd *NONNULL_PTR obj);
 
+/**
+ * Read a QueryChannelRange from a byte array, created by QueryChannelRange_write
+ */
 struct LDKCResult_QueryChannelRangeDecodeErrorZ QueryChannelRange_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the QueryChannelRange object into a byte array which can be read by QueryChannelRange_read
+ */
 struct LDKCVec_u8Z QueryChannelRange_write(const struct LDKQueryChannelRange *NONNULL_PTR obj);
 
+/**
+ * Read a ReplyChannelRange from a byte array, created by ReplyChannelRange_write
+ */
 struct LDKCResult_ReplyChannelRangeDecodeErrorZ ReplyChannelRange_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the ReplyChannelRange object into a byte array which can be read by ReplyChannelRange_read
+ */
 struct LDKCVec_u8Z ReplyChannelRange_write(const struct LDKReplyChannelRange *NONNULL_PTR obj);
 
+/**
+ * Read a GossipTimestampFilter from a byte array, created by GossipTimestampFilter_write
+ */
 struct LDKCResult_GossipTimestampFilterDecodeErrorZ GossipTimestampFilter_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the GossipTimestampFilter object into a byte array which can be read by GossipTimestampFilter_read
+ */
 struct LDKCVec_u8Z GossipTimestampFilter_write(const struct LDKGossipTimestampFilter *NONNULL_PTR obj);
 
-void IgnoringMessageHandler_free(struct LDKIgnoringMessageHandler this_ptr);
+/**
+ * Frees any resources used by the IgnoringMessageHandler, if is_owned is set and inner is non-NULL.
+ */
+void IgnoringMessageHandler_free(struct LDKIgnoringMessageHandler this_obj);
 
+/**
+ * Constructs a new IgnoringMessageHandler given each field
+ */
 MUST_USE_RES struct LDKIgnoringMessageHandler IgnoringMessageHandler_new(void);
 
+/**
+ * Constructs a new MessageSendEventsProvider which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned MessageSendEventsProvider must be freed before this_arg is
+ */
 struct LDKMessageSendEventsProvider IgnoringMessageHandler_as_MessageSendEventsProvider(const struct LDKIgnoringMessageHandler *NONNULL_PTR this_arg);
 
+/**
+ * Constructs a new RoutingMessageHandler which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned RoutingMessageHandler must be freed before this_arg is
+ */
 struct LDKRoutingMessageHandler IgnoringMessageHandler_as_RoutingMessageHandler(const struct LDKIgnoringMessageHandler *NONNULL_PTR this_arg);
 
-void ErroringMessageHandler_free(struct LDKErroringMessageHandler this_ptr);
+/**
+ * Frees any resources used by the ErroringMessageHandler, if is_owned is set and inner is non-NULL.
+ */
+void ErroringMessageHandler_free(struct LDKErroringMessageHandler this_obj);
 
 /**
  * Constructs a new ErroringMessageHandler
  */
 MUST_USE_RES struct LDKErroringMessageHandler ErroringMessageHandler_new(void);
 
+/**
+ * Constructs a new MessageSendEventsProvider which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned MessageSendEventsProvider must be freed before this_arg is
+ */
 struct LDKMessageSendEventsProvider ErroringMessageHandler_as_MessageSendEventsProvider(const struct LDKErroringMessageHandler *NONNULL_PTR this_arg);
 
+/**
+ * Constructs a new ChannelMessageHandler which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned ChannelMessageHandler must be freed before this_arg is
+ */
 struct LDKChannelMessageHandler ErroringMessageHandler_as_ChannelMessageHandler(const struct LDKErroringMessageHandler *NONNULL_PTR this_arg);
 
-void MessageHandler_free(struct LDKMessageHandler this_ptr);
+/**
+ * Frees any resources used by the MessageHandler, if is_owned is set and inner is non-NULL.
+ */
+void MessageHandler_free(struct LDKMessageHandler this_obj);
 
 /**
  * A message handler which handles messages specific to channels. Usually this is just a
@@ -7977,8 +9716,14 @@ const struct LDKRoutingMessageHandler *MessageHandler_get_route_handler(const st
  */
 void MessageHandler_set_route_handler(struct LDKMessageHandler *NONNULL_PTR this_ptr, struct LDKRoutingMessageHandler val);
 
+/**
+ * Constructs a new MessageHandler given each field
+ */
 MUST_USE_RES struct LDKMessageHandler MessageHandler_new(struct LDKChannelMessageHandler chan_handler_arg, struct LDKRoutingMessageHandler route_handler_arg);
 
+/**
+ * Creates a copy of a SocketDescriptor
+ */
 struct LDKSocketDescriptor SocketDescriptor_clone(const struct LDKSocketDescriptor *NONNULL_PTR orig);
 
 /**
@@ -7986,7 +9731,10 @@ struct LDKSocketDescriptor SocketDescriptor_clone(const struct LDKSocketDescript
  */
 void SocketDescriptor_free(struct LDKSocketDescriptor this_ptr);
 
-void PeerHandleError_free(struct LDKPeerHandleError this_ptr);
+/**
+ * Frees any resources used by the PeerHandleError, if is_owned is set and inner is non-NULL.
+ */
+void PeerHandleError_free(struct LDKPeerHandleError this_obj);
 
 /**
  * Used to indicate that we probably can't make any future connections to this peer, implying
@@ -8000,11 +9748,20 @@ bool PeerHandleError_get_no_connection_possible(const struct LDKPeerHandleError 
  */
 void PeerHandleError_set_no_connection_possible(struct LDKPeerHandleError *NONNULL_PTR this_ptr, bool val);
 
+/**
+ * Constructs a new PeerHandleError given each field
+ */
 MUST_USE_RES struct LDKPeerHandleError PeerHandleError_new(bool no_connection_possible_arg);
 
+/**
+ * Creates a copy of the PeerHandleError
+ */
 struct LDKPeerHandleError PeerHandleError_clone(const struct LDKPeerHandleError *NONNULL_PTR orig);
 
-void PeerManager_free(struct LDKPeerManager this_ptr);
+/**
+ * Frees any resources used by the PeerManager, if is_owned is set and inner is non-NULL.
+ */
+void PeerManager_free(struct LDKPeerManager this_obj);
 
 /**
  * Constructs a new PeerManager with the given message handlers and node_id secret key
@@ -8166,7 +9923,10 @@ struct LDKCResult_SecretKeyErrorZ derive_private_revocation_key(const uint8_t (*
  */
 struct LDKCResult_PublicKeyErrorZ derive_public_revocation_key(struct LDKPublicKey per_commitment_point, struct LDKPublicKey countersignatory_revocation_base_point);
 
-void TxCreationKeys_free(struct LDKTxCreationKeys this_ptr);
+/**
+ * Frees any resources used by the TxCreationKeys, if is_owned is set and inner is non-NULL.
+ */
+void TxCreationKeys_free(struct LDKTxCreationKeys this_obj);
 
 /**
  * The broadcaster's per-commitment public key which was used to derive the other keys.
@@ -8222,15 +9982,30 @@ struct LDKPublicKey TxCreationKeys_get_broadcaster_delayed_payment_key(const str
  */
 void TxCreationKeys_set_broadcaster_delayed_payment_key(struct LDKTxCreationKeys *NONNULL_PTR this_ptr, struct LDKPublicKey val);
 
+/**
+ * Constructs a new TxCreationKeys given each field
+ */
 MUST_USE_RES struct LDKTxCreationKeys TxCreationKeys_new(struct LDKPublicKey per_commitment_point_arg, struct LDKPublicKey revocation_key_arg, struct LDKPublicKey broadcaster_htlc_key_arg, struct LDKPublicKey countersignatory_htlc_key_arg, struct LDKPublicKey broadcaster_delayed_payment_key_arg);
 
+/**
+ * Creates a copy of the TxCreationKeys
+ */
 struct LDKTxCreationKeys TxCreationKeys_clone(const struct LDKTxCreationKeys *NONNULL_PTR orig);
 
+/**
+ * Serialize the TxCreationKeys object into a byte array which can be read by TxCreationKeys_read
+ */
 struct LDKCVec_u8Z TxCreationKeys_write(const struct LDKTxCreationKeys *NONNULL_PTR obj);
 
+/**
+ * Read a TxCreationKeys from a byte array, created by TxCreationKeys_write
+ */
 struct LDKCResult_TxCreationKeysDecodeErrorZ TxCreationKeys_read(struct LDKu8slice ser);
 
-void ChannelPublicKeys_free(struct LDKChannelPublicKeys this_ptr);
+/**
+ * Frees any resources used by the ChannelPublicKeys, if is_owned is set and inner is non-NULL.
+ */
+void ChannelPublicKeys_free(struct LDKChannelPublicKeys this_obj);
 
 /**
  * The public key which is used to sign all commitment transactions, as it appears in the
@@ -8300,12 +10075,24 @@ struct LDKPublicKey ChannelPublicKeys_get_htlc_basepoint(const struct LDKChannel
  */
 void ChannelPublicKeys_set_htlc_basepoint(struct LDKChannelPublicKeys *NONNULL_PTR this_ptr, struct LDKPublicKey val);
 
+/**
+ * Constructs a new ChannelPublicKeys given each field
+ */
 MUST_USE_RES struct LDKChannelPublicKeys ChannelPublicKeys_new(struct LDKPublicKey funding_pubkey_arg, struct LDKPublicKey revocation_basepoint_arg, struct LDKPublicKey payment_point_arg, struct LDKPublicKey delayed_payment_basepoint_arg, struct LDKPublicKey htlc_basepoint_arg);
 
+/**
+ * Creates a copy of the ChannelPublicKeys
+ */
 struct LDKChannelPublicKeys ChannelPublicKeys_clone(const struct LDKChannelPublicKeys *NONNULL_PTR orig);
 
+/**
+ * Serialize the ChannelPublicKeys object into a byte array which can be read by ChannelPublicKeys_read
+ */
 struct LDKCVec_u8Z ChannelPublicKeys_write(const struct LDKChannelPublicKeys *NONNULL_PTR obj);
 
+/**
+ * Read a ChannelPublicKeys from a byte array, created by ChannelPublicKeys_write
+ */
 struct LDKCResult_ChannelPublicKeysDecodeErrorZ ChannelPublicKeys_read(struct LDKu8slice ser);
 
 /**
@@ -8327,7 +10114,10 @@ MUST_USE_RES struct LDKCResult_TxCreationKeysErrorZ TxCreationKeys_from_channel_
  */
 struct LDKCVec_u8Z get_revokeable_redeemscript(struct LDKPublicKey revocation_key, uint16_t contest_delay, struct LDKPublicKey broadcaster_delayed_payment_key);
 
-void HTLCOutputInCommitment_free(struct LDKHTLCOutputInCommitment this_ptr);
+/**
+ * Frees any resources used by the HTLCOutputInCommitment, if is_owned is set and inner is non-NULL.
+ */
+void HTLCOutputInCommitment_free(struct LDKHTLCOutputInCommitment this_obj);
 
 /**
  * Whether the HTLC was \"offered\" (ie outbound in relation to this commitment transaction).
@@ -8377,10 +10167,19 @@ const uint8_t (*HTLCOutputInCommitment_get_payment_hash(const struct LDKHTLCOutp
  */
 void HTLCOutputInCommitment_set_payment_hash(struct LDKHTLCOutputInCommitment *NONNULL_PTR this_ptr, struct LDKThirtyTwoBytes val);
 
+/**
+ * Creates a copy of the HTLCOutputInCommitment
+ */
 struct LDKHTLCOutputInCommitment HTLCOutputInCommitment_clone(const struct LDKHTLCOutputInCommitment *NONNULL_PTR orig);
 
+/**
+ * Serialize the HTLCOutputInCommitment object into a byte array which can be read by HTLCOutputInCommitment_read
+ */
 struct LDKCVec_u8Z HTLCOutputInCommitment_write(const struct LDKHTLCOutputInCommitment *NONNULL_PTR obj);
 
+/**
+ * Read a HTLCOutputInCommitment from a byte array, created by HTLCOutputInCommitment_write
+ */
 struct LDKCResult_HTLCOutputInCommitmentDecodeErrorZ HTLCOutputInCommitment_read(struct LDKu8slice ser);
 
 /**
@@ -8400,7 +10199,10 @@ struct LDKCVec_u8Z make_funding_redeemscript(struct LDKPublicKey broadcaster, st
  */
 struct LDKTransaction build_htlc_transaction(const uint8_t (*prev_hash)[32], uint32_t feerate_per_kw, uint16_t contest_delay, const struct LDKHTLCOutputInCommitment *NONNULL_PTR htlc, struct LDKPublicKey broadcaster_delayed_payment_key, struct LDKPublicKey revocation_key);
 
-void ChannelTransactionParameters_free(struct LDKChannelTransactionParameters this_ptr);
+/**
+ * Frees any resources used by the ChannelTransactionParameters, if is_owned is set and inner is non-NULL.
+ */
+void ChannelTransactionParameters_free(struct LDKChannelTransactionParameters this_obj);
 
 /**
  * Holder public keys
@@ -8456,11 +10258,20 @@ struct LDKOutPoint ChannelTransactionParameters_get_funding_outpoint(const struc
  */
 void ChannelTransactionParameters_set_funding_outpoint(struct LDKChannelTransactionParameters *NONNULL_PTR this_ptr, struct LDKOutPoint val);
 
+/**
+ * Constructs a new ChannelTransactionParameters given each field
+ */
 MUST_USE_RES struct LDKChannelTransactionParameters ChannelTransactionParameters_new(struct LDKChannelPublicKeys holder_pubkeys_arg, uint16_t holder_selected_contest_delay_arg, bool is_outbound_from_holder_arg, struct LDKCounterpartyChannelTransactionParameters counterparty_parameters_arg, struct LDKOutPoint funding_outpoint_arg);
 
+/**
+ * Creates a copy of the ChannelTransactionParameters
+ */
 struct LDKChannelTransactionParameters ChannelTransactionParameters_clone(const struct LDKChannelTransactionParameters *NONNULL_PTR orig);
 
-void CounterpartyChannelTransactionParameters_free(struct LDKCounterpartyChannelTransactionParameters this_ptr);
+/**
+ * Frees any resources used by the CounterpartyChannelTransactionParameters, if is_owned is set and inner is non-NULL.
+ */
+void CounterpartyChannelTransactionParameters_free(struct LDKCounterpartyChannelTransactionParameters this_obj);
 
 /**
  * Counter-party public keys
@@ -8482,8 +10293,14 @@ uint16_t CounterpartyChannelTransactionParameters_get_selected_contest_delay(con
  */
 void CounterpartyChannelTransactionParameters_set_selected_contest_delay(struct LDKCounterpartyChannelTransactionParameters *NONNULL_PTR this_ptr, uint16_t val);
 
+/**
+ * Constructs a new CounterpartyChannelTransactionParameters given each field
+ */
 MUST_USE_RES struct LDKCounterpartyChannelTransactionParameters CounterpartyChannelTransactionParameters_new(struct LDKChannelPublicKeys pubkeys_arg, uint16_t selected_contest_delay_arg);
 
+/**
+ * Creates a copy of the CounterpartyChannelTransactionParameters
+ */
 struct LDKCounterpartyChannelTransactionParameters CounterpartyChannelTransactionParameters_clone(const struct LDKCounterpartyChannelTransactionParameters *NONNULL_PTR orig);
 
 /**
@@ -8507,15 +10324,30 @@ MUST_USE_RES struct LDKDirectedChannelTransactionParameters ChannelTransactionPa
  */
 MUST_USE_RES struct LDKDirectedChannelTransactionParameters ChannelTransactionParameters_as_counterparty_broadcastable(const struct LDKChannelTransactionParameters *NONNULL_PTR this_arg);
 
+/**
+ * Serialize the CounterpartyChannelTransactionParameters object into a byte array which can be read by CounterpartyChannelTransactionParameters_read
+ */
 struct LDKCVec_u8Z CounterpartyChannelTransactionParameters_write(const struct LDKCounterpartyChannelTransactionParameters *NONNULL_PTR obj);
 
+/**
+ * Read a CounterpartyChannelTransactionParameters from a byte array, created by CounterpartyChannelTransactionParameters_write
+ */
 struct LDKCResult_CounterpartyChannelTransactionParametersDecodeErrorZ CounterpartyChannelTransactionParameters_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the ChannelTransactionParameters object into a byte array which can be read by ChannelTransactionParameters_read
+ */
 struct LDKCVec_u8Z ChannelTransactionParameters_write(const struct LDKChannelTransactionParameters *NONNULL_PTR obj);
 
+/**
+ * Read a ChannelTransactionParameters from a byte array, created by ChannelTransactionParameters_write
+ */
 struct LDKCResult_ChannelTransactionParametersDecodeErrorZ ChannelTransactionParameters_read(struct LDKu8slice ser);
 
-void DirectedChannelTransactionParameters_free(struct LDKDirectedChannelTransactionParameters this_ptr);
+/**
+ * Frees any resources used by the DirectedChannelTransactionParameters, if is_owned is set and inner is non-NULL.
+ */
+void DirectedChannelTransactionParameters_free(struct LDKDirectedChannelTransactionParameters this_obj);
 
 /**
  * Get the channel pubkeys for the broadcaster
@@ -8546,7 +10378,10 @@ MUST_USE_RES bool DirectedChannelTransactionParameters_is_outbound(const struct 
  */
 MUST_USE_RES struct LDKOutPoint DirectedChannelTransactionParameters_funding_outpoint(const struct LDKDirectedChannelTransactionParameters *NONNULL_PTR this_arg);
 
-void HolderCommitmentTransaction_free(struct LDKHolderCommitmentTransaction this_ptr);
+/**
+ * Frees any resources used by the HolderCommitmentTransaction, if is_owned is set and inner is non-NULL.
+ */
+void HolderCommitmentTransaction_free(struct LDKHolderCommitmentTransaction this_obj);
 
 /**
  * Our counterparty's signature for the transaction
@@ -8563,10 +10398,19 @@ void HolderCommitmentTransaction_set_counterparty_sig(struct LDKHolderCommitment
  */
 void HolderCommitmentTransaction_set_counterparty_htlc_sigs(struct LDKHolderCommitmentTransaction *NONNULL_PTR this_ptr, struct LDKCVec_SignatureZ val);
 
+/**
+ * Creates a copy of the HolderCommitmentTransaction
+ */
 struct LDKHolderCommitmentTransaction HolderCommitmentTransaction_clone(const struct LDKHolderCommitmentTransaction *NONNULL_PTR orig);
 
+/**
+ * Serialize the HolderCommitmentTransaction object into a byte array which can be read by HolderCommitmentTransaction_read
+ */
 struct LDKCVec_u8Z HolderCommitmentTransaction_write(const struct LDKHolderCommitmentTransaction *NONNULL_PTR obj);
 
+/**
+ * Read a HolderCommitmentTransaction from a byte array, created by HolderCommitmentTransaction_write
+ */
 struct LDKCResult_HolderCommitmentTransactionDecodeErrorZ HolderCommitmentTransaction_read(struct LDKu8slice ser);
 
 /**
@@ -8575,7 +10419,10 @@ struct LDKCResult_HolderCommitmentTransactionDecodeErrorZ HolderCommitmentTransa
  */
 MUST_USE_RES struct LDKHolderCommitmentTransaction HolderCommitmentTransaction_new(struct LDKCommitmentTransaction commitment_tx, struct LDKSignature counterparty_sig, struct LDKCVec_SignatureZ counterparty_htlc_sigs, struct LDKPublicKey holder_funding_key, struct LDKPublicKey counterparty_funding_key);
 
-void BuiltCommitmentTransaction_free(struct LDKBuiltCommitmentTransaction this_ptr);
+/**
+ * Frees any resources used by the BuiltCommitmentTransaction, if is_owned is set and inner is non-NULL.
+ */
+void BuiltCommitmentTransaction_free(struct LDKBuiltCommitmentTransaction this_obj);
 
 /**
  * The commitment transaction
@@ -8603,12 +10450,24 @@ const uint8_t (*BuiltCommitmentTransaction_get_txid(const struct LDKBuiltCommitm
  */
 void BuiltCommitmentTransaction_set_txid(struct LDKBuiltCommitmentTransaction *NONNULL_PTR this_ptr, struct LDKThirtyTwoBytes val);
 
+/**
+ * Constructs a new BuiltCommitmentTransaction given each field
+ */
 MUST_USE_RES struct LDKBuiltCommitmentTransaction BuiltCommitmentTransaction_new(struct LDKTransaction transaction_arg, struct LDKThirtyTwoBytes txid_arg);
 
+/**
+ * Creates a copy of the BuiltCommitmentTransaction
+ */
 struct LDKBuiltCommitmentTransaction BuiltCommitmentTransaction_clone(const struct LDKBuiltCommitmentTransaction *NONNULL_PTR orig);
 
+/**
+ * Serialize the BuiltCommitmentTransaction object into a byte array which can be read by BuiltCommitmentTransaction_read
+ */
 struct LDKCVec_u8Z BuiltCommitmentTransaction_write(const struct LDKBuiltCommitmentTransaction *NONNULL_PTR obj);
 
+/**
+ * Read a BuiltCommitmentTransaction from a byte array, created by BuiltCommitmentTransaction_write
+ */
 struct LDKCResult_BuiltCommitmentTransactionDecodeErrorZ BuiltCommitmentTransaction_read(struct LDKu8slice ser);
 
 /**
@@ -8624,12 +10483,24 @@ MUST_USE_RES struct LDKThirtyTwoBytes BuiltCommitmentTransaction_get_sighash_all
  */
 MUST_USE_RES struct LDKSignature BuiltCommitmentTransaction_sign(const struct LDKBuiltCommitmentTransaction *NONNULL_PTR this_arg, const uint8_t (*funding_key)[32], struct LDKu8slice funding_redeemscript, uint64_t channel_value_satoshis);
 
-void CommitmentTransaction_free(struct LDKCommitmentTransaction this_ptr);
+/**
+ * Frees any resources used by the CommitmentTransaction, if is_owned is set and inner is non-NULL.
+ */
+void CommitmentTransaction_free(struct LDKCommitmentTransaction this_obj);
 
+/**
+ * Creates a copy of the CommitmentTransaction
+ */
 struct LDKCommitmentTransaction CommitmentTransaction_clone(const struct LDKCommitmentTransaction *NONNULL_PTR orig);
 
+/**
+ * Serialize the CommitmentTransaction object into a byte array which can be read by CommitmentTransaction_read
+ */
 struct LDKCVec_u8Z CommitmentTransaction_write(const struct LDKCommitmentTransaction *NONNULL_PTR obj);
 
+/**
+ * Read a CommitmentTransaction from a byte array, created by CommitmentTransaction_write
+ */
 struct LDKCResult_CommitmentTransactionDecodeErrorZ CommitmentTransaction_read(struct LDKu8slice ser);
 
 /**
@@ -8672,7 +10543,10 @@ MUST_USE_RES struct LDKTrustedCommitmentTransaction CommitmentTransaction_trust(
  */
 MUST_USE_RES struct LDKCResult_TrustedCommitmentTransactionNoneZ CommitmentTransaction_verify(const struct LDKCommitmentTransaction *NONNULL_PTR this_arg, const struct LDKDirectedChannelTransactionParameters *NONNULL_PTR channel_parameters, const struct LDKChannelPublicKeys *NONNULL_PTR broadcaster_keys, const struct LDKChannelPublicKeys *NONNULL_PTR countersignatory_keys);
 
-void TrustedCommitmentTransaction_free(struct LDKTrustedCommitmentTransaction this_ptr);
+/**
+ * Frees any resources used by the TrustedCommitmentTransaction, if is_owned is set and inner is non-NULL.
+ */
+void TrustedCommitmentTransaction_free(struct LDKTrustedCommitmentTransaction this_obj);
 
 /**
  * The transaction ID of the built Bitcoin transaction
@@ -8702,17 +10576,45 @@ MUST_USE_RES struct LDKCResult_CVec_SignatureZNoneZ TrustedCommitmentTransaction
  */
 uint64_t get_commitment_transaction_number_obscure_factor(struct LDKPublicKey broadcaster_payment_basepoint, struct LDKPublicKey countersignatory_payment_basepoint, bool outbound_from_broadcaster);
 
+/**
+ * Creates a copy of the InitFeatures
+ */
 struct LDKInitFeatures InitFeatures_clone(const struct LDKInitFeatures *NONNULL_PTR orig);
 
+/**
+ * Creates a copy of the NodeFeatures
+ */
 struct LDKNodeFeatures NodeFeatures_clone(const struct LDKNodeFeatures *NONNULL_PTR orig);
 
+/**
+ * Creates a copy of the ChannelFeatures
+ */
 struct LDKChannelFeatures ChannelFeatures_clone(const struct LDKChannelFeatures *NONNULL_PTR orig);
 
-void InitFeatures_free(struct LDKInitFeatures this_ptr);
+/**
+ * Creates a copy of the InvoiceFeatures
+ */
+struct LDKInvoiceFeatures InvoiceFeatures_clone(const struct LDKInvoiceFeatures *NONNULL_PTR orig);
 
-void NodeFeatures_free(struct LDKNodeFeatures this_ptr);
+/**
+ * Frees any resources used by the InitFeatures, if is_owned is set and inner is non-NULL.
+ */
+void InitFeatures_free(struct LDKInitFeatures this_obj);
 
-void ChannelFeatures_free(struct LDKChannelFeatures this_ptr);
+/**
+ * Frees any resources used by the NodeFeatures, if is_owned is set and inner is non-NULL.
+ */
+void NodeFeatures_free(struct LDKNodeFeatures this_obj);
+
+/**
+ * Frees any resources used by the ChannelFeatures, if is_owned is set and inner is non-NULL.
+ */
+void ChannelFeatures_free(struct LDKChannelFeatures this_obj);
+
+/**
+ * Frees any resources used by the InvoiceFeatures, if is_owned is set and inner is non-NULL.
+ */
+void InvoiceFeatures_free(struct LDKInvoiceFeatures this_obj);
 
 /**
  * Create a blank Features with no features set
@@ -8750,19 +10652,62 @@ MUST_USE_RES struct LDKChannelFeatures ChannelFeatures_empty(void);
  */
 MUST_USE_RES struct LDKChannelFeatures ChannelFeatures_known(void);
 
+/**
+ * Create a blank Features with no features set
+ */
+MUST_USE_RES struct LDKInvoiceFeatures InvoiceFeatures_empty(void);
+
+/**
+ * Creates features known by the implementation as defined by [`T::KNOWN_FEATURE_FLAGS`].
+ *
+ * [`T::KNOWN_FEATURE_FLAGS`]: sealed/trait.Context.html#associatedconstant.KNOWN_FEATURE_FLAGS
+ */
+MUST_USE_RES struct LDKInvoiceFeatures InvoiceFeatures_known(void);
+
+/**
+ * Serialize the InitFeatures object into a byte array which can be read by InitFeatures_read
+ */
 struct LDKCVec_u8Z InitFeatures_write(const struct LDKInitFeatures *NONNULL_PTR obj);
 
+/**
+ * Serialize the NodeFeatures object into a byte array which can be read by NodeFeatures_read
+ */
 struct LDKCVec_u8Z NodeFeatures_write(const struct LDKNodeFeatures *NONNULL_PTR obj);
 
+/**
+ * Serialize the ChannelFeatures object into a byte array which can be read by ChannelFeatures_read
+ */
 struct LDKCVec_u8Z ChannelFeatures_write(const struct LDKChannelFeatures *NONNULL_PTR obj);
 
+/**
+ * Serialize the InvoiceFeatures object into a byte array which can be read by InvoiceFeatures_read
+ */
+struct LDKCVec_u8Z InvoiceFeatures_write(const struct LDKInvoiceFeatures *NONNULL_PTR obj);
+
+/**
+ * Read a InitFeatures from a byte array, created by InitFeatures_write
+ */
 struct LDKCResult_InitFeaturesDecodeErrorZ InitFeatures_read(struct LDKu8slice ser);
 
+/**
+ * Read a NodeFeatures from a byte array, created by NodeFeatures_write
+ */
 struct LDKCResult_NodeFeaturesDecodeErrorZ NodeFeatures_read(struct LDKu8slice ser);
 
+/**
+ * Read a ChannelFeatures from a byte array, created by ChannelFeatures_write
+ */
 struct LDKCResult_ChannelFeaturesDecodeErrorZ ChannelFeatures_read(struct LDKu8slice ser);
 
-void RouteHop_free(struct LDKRouteHop this_ptr);
+/**
+ * Read a InvoiceFeatures from a byte array, created by InvoiceFeatures_write
+ */
+struct LDKCResult_InvoiceFeaturesDecodeErrorZ InvoiceFeatures_read(struct LDKu8slice ser);
+
+/**
+ * Frees any resources used by the RouteHop, if is_owned is set and inner is non-NULL.
+ */
+void RouteHop_free(struct LDKRouteHop this_obj);
 
 /**
  * The node_id of the node at this hop.
@@ -8834,11 +10779,20 @@ uint32_t RouteHop_get_cltv_expiry_delta(const struct LDKRouteHop *NONNULL_PTR th
  */
 void RouteHop_set_cltv_expiry_delta(struct LDKRouteHop *NONNULL_PTR this_ptr, uint32_t val);
 
+/**
+ * Constructs a new RouteHop given each field
+ */
 MUST_USE_RES struct LDKRouteHop RouteHop_new(struct LDKPublicKey pubkey_arg, struct LDKNodeFeatures node_features_arg, uint64_t short_channel_id_arg, struct LDKChannelFeatures channel_features_arg, uint64_t fee_msat_arg, uint32_t cltv_expiry_delta_arg);
 
+/**
+ * Creates a copy of the RouteHop
+ */
 struct LDKRouteHop RouteHop_clone(const struct LDKRouteHop *NONNULL_PTR orig);
 
-void Route_free(struct LDKRoute this_ptr);
+/**
+ * Frees any resources used by the Route, if is_owned is set and inner is non-NULL.
+ */
+void Route_free(struct LDKRoute this_obj);
 
 /**
  * The list of routes taken for a single (potentially-)multi-part payment. The pubkey of the
@@ -8850,15 +10804,30 @@ void Route_free(struct LDKRoute this_ptr);
  */
 void Route_set_paths(struct LDKRoute *NONNULL_PTR this_ptr, struct LDKCVec_CVec_RouteHopZZ val);
 
+/**
+ * Constructs a new Route given each field
+ */
 MUST_USE_RES struct LDKRoute Route_new(struct LDKCVec_CVec_RouteHopZZ paths_arg);
 
+/**
+ * Creates a copy of the Route
+ */
 struct LDKRoute Route_clone(const struct LDKRoute *NONNULL_PTR orig);
 
+/**
+ * Serialize the Route object into a byte array which can be read by Route_read
+ */
 struct LDKCVec_u8Z Route_write(const struct LDKRoute *NONNULL_PTR obj);
 
+/**
+ * Read a Route from a byte array, created by Route_write
+ */
 struct LDKCResult_RouteDecodeErrorZ Route_read(struct LDKu8slice ser);
 
-void RouteHint_free(struct LDKRouteHint this_ptr);
+/**
+ * Frees any resources used by the RouteHint, if is_owned is set and inner is non-NULL.
+ */
+void RouteHint_free(struct LDKRouteHint this_obj);
 
 /**
  * The node_id of the non-target end of the route
@@ -8900,10 +10869,16 @@ uint16_t RouteHint_get_cltv_expiry_delta(const struct LDKRouteHint *NONNULL_PTR 
  */
 void RouteHint_set_cltv_expiry_delta(struct LDKRouteHint *NONNULL_PTR this_ptr, uint16_t val);
 
+/**
+ * Creates a copy of the RouteHint
+ */
 struct LDKRouteHint RouteHint_clone(const struct LDKRouteHint *NONNULL_PTR orig);
 
 /**
  * Gets a route from us (payer) to the given target node (payee).
+ *
+ * If the payee provided features in their invoice, they should be provided via payee_features.
+ * Without this, MPP will only be used if the payee's features are available in the network graph.
  *
  * Extra routing hops between known nodes and the target will be used if they are included in
  * last_hops.
@@ -8920,15 +10895,27 @@ struct LDKRouteHint RouteHint_clone(const struct LDKRouteHint *NONNULL_PTR orig)
  * equal), however the enabled/disabled bit on such channels as well as the
  * htlc_minimum_msat/htlc_maximum_msat *are* checked as they may change based on the receiving node.
  */
-struct LDKCResult_RouteLightningErrorZ get_route(struct LDKPublicKey our_node_id, const struct LDKNetworkGraph *NONNULL_PTR network, struct LDKPublicKey payee, struct LDKCVec_ChannelDetailsZ *first_hops, struct LDKCVec_RouteHintZ last_hops, uint64_t final_value_msat, uint32_t final_cltv, struct LDKLogger logger);
+struct LDKCResult_RouteLightningErrorZ get_route(struct LDKPublicKey our_node_id, const struct LDKNetworkGraph *NONNULL_PTR network, struct LDKPublicKey payee, struct LDKInvoiceFeatures payee_features, struct LDKCVec_ChannelDetailsZ *first_hops, struct LDKCVec_RouteHintZ last_hops, uint64_t final_value_msat, uint32_t final_cltv, struct LDKLogger logger);
 
-void NetworkGraph_free(struct LDKNetworkGraph this_ptr);
+/**
+ * Frees any resources used by the NetworkGraph, if is_owned is set and inner is non-NULL.
+ */
+void NetworkGraph_free(struct LDKNetworkGraph this_obj);
 
+/**
+ * Creates a copy of the NetworkGraph
+ */
 struct LDKNetworkGraph NetworkGraph_clone(const struct LDKNetworkGraph *NONNULL_PTR orig);
 
-void LockedNetworkGraph_free(struct LDKLockedNetworkGraph this_ptr);
+/**
+ * Frees any resources used by the LockedNetworkGraph, if is_owned is set and inner is non-NULL.
+ */
+void LockedNetworkGraph_free(struct LDKLockedNetworkGraph this_obj);
 
-void NetGraphMsgHandler_free(struct LDKNetGraphMsgHandler this_ptr);
+/**
+ * Frees any resources used by the NetGraphMsgHandler, if is_owned is set and inner is non-NULL.
+ */
+void NetGraphMsgHandler_free(struct LDKNetGraphMsgHandler this_obj);
 
 /**
  * Creates a new tracker of the actual state of the network of channels and nodes,
@@ -8965,11 +10952,22 @@ MUST_USE_RES struct LDKLockedNetworkGraph NetGraphMsgHandler_read_locked_graph(c
  */
 MUST_USE_RES struct LDKNetworkGraph LockedNetworkGraph_graph(const struct LDKLockedNetworkGraph *NONNULL_PTR this_arg);
 
+/**
+ * Constructs a new RoutingMessageHandler which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned RoutingMessageHandler must be freed before this_arg is
+ */
 struct LDKRoutingMessageHandler NetGraphMsgHandler_as_RoutingMessageHandler(const struct LDKNetGraphMsgHandler *NONNULL_PTR this_arg);
 
+/**
+ * Constructs a new MessageSendEventsProvider which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned MessageSendEventsProvider must be freed before this_arg is
+ */
 struct LDKMessageSendEventsProvider NetGraphMsgHandler_as_MessageSendEventsProvider(const struct LDKNetGraphMsgHandler *NONNULL_PTR this_arg);
 
-void DirectionalChannelInfo_free(struct LDKDirectionalChannelInfo this_ptr);
+/**
+ * Frees any resources used by the DirectionalChannelInfo, if is_owned is set and inner is non-NULL.
+ */
+void DirectionalChannelInfo_free(struct LDKDirectionalChannelInfo this_obj);
 
 /**
  * When the last update to the channel direction was issued.
@@ -9039,13 +11037,25 @@ struct LDKChannelUpdate DirectionalChannelInfo_get_last_update_message(const str
  */
 void DirectionalChannelInfo_set_last_update_message(struct LDKDirectionalChannelInfo *NONNULL_PTR this_ptr, struct LDKChannelUpdate val);
 
+/**
+ * Creates a copy of the DirectionalChannelInfo
+ */
 struct LDKDirectionalChannelInfo DirectionalChannelInfo_clone(const struct LDKDirectionalChannelInfo *NONNULL_PTR orig);
 
+/**
+ * Serialize the DirectionalChannelInfo object into a byte array which can be read by DirectionalChannelInfo_read
+ */
 struct LDKCVec_u8Z DirectionalChannelInfo_write(const struct LDKDirectionalChannelInfo *NONNULL_PTR obj);
 
+/**
+ * Read a DirectionalChannelInfo from a byte array, created by DirectionalChannelInfo_write
+ */
 struct LDKCResult_DirectionalChannelInfoDecodeErrorZ DirectionalChannelInfo_read(struct LDKu8slice ser);
 
-void ChannelInfo_free(struct LDKChannelInfo this_ptr);
+/**
+ * Frees any resources used by the ChannelInfo, if is_owned is set and inner is non-NULL.
+ */
+void ChannelInfo_free(struct LDKChannelInfo this_obj);
 
 /**
  * Protocol features of a channel communicated during its announcement
@@ -9113,13 +11123,25 @@ struct LDKChannelAnnouncement ChannelInfo_get_announcement_message(const struct 
  */
 void ChannelInfo_set_announcement_message(struct LDKChannelInfo *NONNULL_PTR this_ptr, struct LDKChannelAnnouncement val);
 
+/**
+ * Creates a copy of the ChannelInfo
+ */
 struct LDKChannelInfo ChannelInfo_clone(const struct LDKChannelInfo *NONNULL_PTR orig);
 
+/**
+ * Serialize the ChannelInfo object into a byte array which can be read by ChannelInfo_read
+ */
 struct LDKCVec_u8Z ChannelInfo_write(const struct LDKChannelInfo *NONNULL_PTR obj);
 
+/**
+ * Read a ChannelInfo from a byte array, created by ChannelInfo_write
+ */
 struct LDKCResult_ChannelInfoDecodeErrorZ ChannelInfo_read(struct LDKu8slice ser);
 
-void RoutingFees_free(struct LDKRoutingFees this_ptr);
+/**
+ * Frees any resources used by the RoutingFees, if is_owned is set and inner is non-NULL.
+ */
+void RoutingFees_free(struct LDKRoutingFees this_obj);
 
 /**
  * Flat routing fee in satoshis
@@ -9143,15 +11165,30 @@ uint32_t RoutingFees_get_proportional_millionths(const struct LDKRoutingFees *NO
  */
 void RoutingFees_set_proportional_millionths(struct LDKRoutingFees *NONNULL_PTR this_ptr, uint32_t val);
 
+/**
+ * Constructs a new RoutingFees given each field
+ */
 MUST_USE_RES struct LDKRoutingFees RoutingFees_new(uint32_t base_msat_arg, uint32_t proportional_millionths_arg);
 
+/**
+ * Creates a copy of the RoutingFees
+ */
 struct LDKRoutingFees RoutingFees_clone(const struct LDKRoutingFees *NONNULL_PTR orig);
 
+/**
+ * Read a RoutingFees from a byte array, created by RoutingFees_write
+ */
 struct LDKCResult_RoutingFeesDecodeErrorZ RoutingFees_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the RoutingFees object into a byte array which can be read by RoutingFees_read
+ */
 struct LDKCVec_u8Z RoutingFees_write(const struct LDKRoutingFees *NONNULL_PTR obj);
 
-void NodeAnnouncementInfo_free(struct LDKNodeAnnouncementInfo this_ptr);
+/**
+ * Frees any resources used by the NodeAnnouncementInfo, if is_owned is set and inner is non-NULL.
+ */
+void NodeAnnouncementInfo_free(struct LDKNodeAnnouncementInfo this_obj);
 
 /**
  * Protocol features the node announced support for
@@ -9220,15 +11257,30 @@ struct LDKNodeAnnouncement NodeAnnouncementInfo_get_announcement_message(const s
  */
 void NodeAnnouncementInfo_set_announcement_message(struct LDKNodeAnnouncementInfo *NONNULL_PTR this_ptr, struct LDKNodeAnnouncement val);
 
+/**
+ * Constructs a new NodeAnnouncementInfo given each field
+ */
 MUST_USE_RES struct LDKNodeAnnouncementInfo NodeAnnouncementInfo_new(struct LDKNodeFeatures features_arg, uint32_t last_update_arg, struct LDKThreeBytes rgb_arg, struct LDKThirtyTwoBytes alias_arg, struct LDKCVec_NetAddressZ addresses_arg, struct LDKNodeAnnouncement announcement_message_arg);
 
+/**
+ * Creates a copy of the NodeAnnouncementInfo
+ */
 struct LDKNodeAnnouncementInfo NodeAnnouncementInfo_clone(const struct LDKNodeAnnouncementInfo *NONNULL_PTR orig);
 
+/**
+ * Serialize the NodeAnnouncementInfo object into a byte array which can be read by NodeAnnouncementInfo_read
+ */
 struct LDKCVec_u8Z NodeAnnouncementInfo_write(const struct LDKNodeAnnouncementInfo *NONNULL_PTR obj);
 
+/**
+ * Read a NodeAnnouncementInfo from a byte array, created by NodeAnnouncementInfo_write
+ */
 struct LDKCResult_NodeAnnouncementInfoDecodeErrorZ NodeAnnouncementInfo_read(struct LDKu8slice ser);
 
-void NodeInfo_free(struct LDKNodeInfo this_ptr);
+/**
+ * Frees any resources used by the NodeInfo, if is_owned is set and inner is non-NULL.
+ */
+void NodeInfo_free(struct LDKNodeInfo this_obj);
 
 /**
  * All valid channels a node has announced
@@ -9263,16 +11315,34 @@ struct LDKNodeAnnouncementInfo NodeInfo_get_announcement_info(const struct LDKNo
  */
 void NodeInfo_set_announcement_info(struct LDKNodeInfo *NONNULL_PTR this_ptr, struct LDKNodeAnnouncementInfo val);
 
+/**
+ * Constructs a new NodeInfo given each field
+ */
 MUST_USE_RES struct LDKNodeInfo NodeInfo_new(struct LDKCVec_u64Z channels_arg, struct LDKRoutingFees lowest_inbound_channel_fees_arg, struct LDKNodeAnnouncementInfo announcement_info_arg);
 
+/**
+ * Creates a copy of the NodeInfo
+ */
 struct LDKNodeInfo NodeInfo_clone(const struct LDKNodeInfo *NONNULL_PTR orig);
 
+/**
+ * Serialize the NodeInfo object into a byte array which can be read by NodeInfo_read
+ */
 struct LDKCVec_u8Z NodeInfo_write(const struct LDKNodeInfo *NONNULL_PTR obj);
 
+/**
+ * Read a NodeInfo from a byte array, created by NodeInfo_write
+ */
 struct LDKCResult_NodeInfoDecodeErrorZ NodeInfo_read(struct LDKu8slice ser);
 
+/**
+ * Serialize the NetworkGraph object into a byte array which can be read by NetworkGraph_read
+ */
 struct LDKCVec_u8Z NetworkGraph_write(const struct LDKNetworkGraph *NONNULL_PTR obj);
 
+/**
+ * Read a NetworkGraph from a byte array, created by NetworkGraph_write
+ */
 struct LDKCResult_NetworkGraphDecodeErrorZ NetworkGraph_read(struct LDKu8slice ser);
 
 /**

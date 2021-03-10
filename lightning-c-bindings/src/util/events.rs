@@ -24,16 +24,24 @@ pub enum Event {
 	/// Note that *all inputs* in the funding transaction must spend SegWit outputs or your
 	/// counterparty can steal your funds!
 	FundingGenerationReady {
+		/// The random channel_id we picked which you'll need to pass into
+		/// ChannelManager::funding_transaction_generated.
 		temporary_channel_id: crate::c_types::ThirtyTwoBytes,
+		/// The value, in satoshis, that the output should have.
 		channel_value_satoshis: u64,
+		/// The script which should be used in the transaction output.
 		output_script: crate::c_types::derived::CVec_u8Z,
+		/// The value passed in to ChannelManager::create_channel
 		user_channel_id: u64,
 	},
 	/// Used to indicate that the client may now broadcast the funding transaction it created for a
 	/// channel. Broadcasting such a transaction prior to this event may lead to our counterparty
 	/// trivially stealing all funds in the funding transaction!
 	FundingBroadcastSafe {
+		/// The output, which was passed to ChannelManager::funding_transaction_generated, which is
+		/// now safe to broadcast.
 		funding_txo: crate::chain::transaction::OutPoint,
+		/// The value passed in to ChannelManager::create_channel
 		user_channel_id: u64,
 	},
 	/// Indicates we've received money! Just gotta dig out that payment preimage and feed it to
@@ -47,8 +55,21 @@ pub enum Event {
 	/// ChannelManager::fail_htlc_backwards within the HTLC's timeout, the HTLC will be
 	/// automatically failed.
 	PaymentReceived {
+		/// The hash for which the preimage should be handed to the ChannelManager.
 		payment_hash: crate::c_types::ThirtyTwoBytes,
+		/// The \"payment secret\". This authenticates the sender to the recipient, preventing a
+		/// number of deanonymization attacks during the routing process.
+		/// As nodes upgrade, the invoices you provide should likely migrate to setting the
+		/// payment_secret feature to required, at which point you should fail_backwards any HTLCs
+		/// which have a None here.
+		/// Until then, however, values of None should be ignored, and only incorrect Some values
+		/// should result in an HTLC fail_backwards.
+		/// Note that, in any case, this value must be passed as-is to any fail or claim calls as
+		/// the HTLC index includes this value.
 		payment_secret: crate::c_types::ThirtyTwoBytes,
+		/// The value, in thousandths of a satoshi, that this payment is for. Note that you must
+		/// compare this to the expected value before accepting the payment (as otherwise you are
+		/// providing proof-of-payment for less than the value you expected!).
 		amt: u64,
 	},
 	/// Indicates an outbound payment we made succeeded (ie it made it all the way to its target
@@ -56,6 +77,9 @@ pub enum Event {
 	/// Note that duplicative PaymentSent Events may be generated - it is your responsibility to
 	/// deduplicate them by payment_preimage (which MUST be unique)!
 	PaymentSent {
+		/// The preimage to the hash given to ChannelManager::send_payment.
+		/// Note that this serves as a payment receipt, if you wish to have such a thing, you must
+		/// store it somehow!
 		payment_preimage: crate::c_types::ThirtyTwoBytes,
 	},
 	/// Indicates an outbound payment we made failed. Probably some intermediary node dropped
@@ -63,12 +87,20 @@ pub enum Event {
 	/// Note that duplicative PaymentFailed Events may be generated - it is your responsibility to
 	/// deduplicate them by payment_hash (which MUST be unique)!
 	PaymentFailed {
+		/// The hash which was given to ChannelManager::send_payment.
 		payment_hash: crate::c_types::ThirtyTwoBytes,
+		/// Indicates the payment was rejected for some reason by the recipient. This implies that
+		/// the payment has failed, not just the route in question. If this is not set, you may
+		/// retry the payment via a different route.
 		rejected_by_dest: bool,
 	},
 	/// Used to indicate that ChannelManager::process_pending_htlc_forwards should be called at a
 	/// time in the future.
 	PendingHTLCsForwardable {
+		/// The minimum amount of time that should be waited prior to calling
+		/// process_pending_htlc_forwards. To increase the effort required to correlate payments,
+		/// you should wait a random amount of time in roughly the range (now + time_forwardable,
+		/// now + 5*time_forwardable).
 		time_forwardable: u64,
 	},
 	/// Used to indicate that an output was generated on-chain which you should know how to spend.
@@ -76,6 +108,7 @@ pub enum Event {
 	/// counterparty spending them due to some kind of timeout. Thus, you need to store them
 	/// somewhere and spend them when you create on-chain transactions.
 	SpendableOutputs {
+		/// The outputs which you should store as spendable by you.
 		outputs: crate::c_types::derived::CVec_SpendableOutputDescriptorZ,
 	},
 }
@@ -306,13 +339,16 @@ impl Event {
 		}
 	}
 }
+/// Frees any resources used by the Event
 #[no_mangle]
 pub extern "C" fn Event_free(this_ptr: Event) { }
+/// Creates a copy of the Event
 #[no_mangle]
 pub extern "C" fn Event_clone(orig: &Event) -> Event {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the Event object into a byte array which can be read by Event_read
 pub extern "C" fn Event_write(obj: &Event) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
 }
@@ -326,59 +362,81 @@ pub enum MessageSendEvent {
 	/// Used to indicate that we've accepted a channel open and should send the accept_channel
 	/// message provided to the given peer.
 	SendAcceptChannel {
+		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
+		/// The message which should be sent.
 		msg: crate::ln::msgs::AcceptChannel,
 	},
 	/// Used to indicate that we've initiated a channel open and should send the open_channel
 	/// message provided to the given peer.
 	SendOpenChannel {
+		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
+		/// The message which should be sent.
 		msg: crate::ln::msgs::OpenChannel,
 	},
 	/// Used to indicate that a funding_created message should be sent to the peer with the given node_id.
 	SendFundingCreated {
+		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
+		/// The message which should be sent.
 		msg: crate::ln::msgs::FundingCreated,
 	},
 	/// Used to indicate that a funding_signed message should be sent to the peer with the given node_id.
 	SendFundingSigned {
+		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
+		/// The message which should be sent.
 		msg: crate::ln::msgs::FundingSigned,
 	},
 	/// Used to indicate that a funding_locked message should be sent to the peer with the given node_id.
 	SendFundingLocked {
+		/// The node_id of the node which should receive these message(s)
 		node_id: crate::c_types::PublicKey,
+		/// The funding_locked message which should be sent.
 		msg: crate::ln::msgs::FundingLocked,
 	},
 	/// Used to indicate that an announcement_signatures message should be sent to the peer with the given node_id.
 	SendAnnouncementSignatures {
+		/// The node_id of the node which should receive these message(s)
 		node_id: crate::c_types::PublicKey,
+		/// The announcement_signatures message which should be sent.
 		msg: crate::ln::msgs::AnnouncementSignatures,
 	},
 	/// Used to indicate that a series of HTLC update messages, as well as a commitment_signed
 	/// message should be sent to the peer with the given node_id.
 	UpdateHTLCs {
+		/// The node_id of the node which should receive these message(s)
 		node_id: crate::c_types::PublicKey,
+		/// The update messages which should be sent. ALL messages in the struct should be sent!
 		updates: crate::ln::msgs::CommitmentUpdate,
 	},
 	/// Used to indicate that a revoke_and_ack message should be sent to the peer with the given node_id.
 	SendRevokeAndACK {
+		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
+		/// The message which should be sent.
 		msg: crate::ln::msgs::RevokeAndACK,
 	},
 	/// Used to indicate that a closing_signed message should be sent to the peer with the given node_id.
 	SendClosingSigned {
+		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
+		/// The message which should be sent.
 		msg: crate::ln::msgs::ClosingSigned,
 	},
 	/// Used to indicate that a shutdown message should be sent to the peer with the given node_id.
 	SendShutdown {
+		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
+		/// The message which should be sent.
 		msg: crate::ln::msgs::Shutdown,
 	},
 	/// Used to indicate that a channel_reestablish message should be sent to the peer with the given node_id.
 	SendChannelReestablish {
+		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
+		/// The message which should be sent.
 		msg: crate::ln::msgs::ChannelReestablish,
 	},
 	/// Used to indicate that a channel_announcement and channel_update should be broadcast to all
@@ -390,36 +448,47 @@ pub enum MessageSendEvent {
 	/// node_announcement, including relevant feature flags which may be important for routing
 	/// through or to us.
 	BroadcastChannelAnnouncement {
+		/// The channel_announcement which should be sent.
 		msg: crate::ln::msgs::ChannelAnnouncement,
+		/// The followup channel_update which should be sent.
 		update_msg: crate::ln::msgs::ChannelUpdate,
 	},
 	/// Used to indicate that a node_announcement should be broadcast to all peers.
 	BroadcastNodeAnnouncement {
+		/// The node_announcement which should be sent.
 		msg: crate::ln::msgs::NodeAnnouncement,
 	},
 	/// Used to indicate that a channel_update should be broadcast to all peers.
 	BroadcastChannelUpdate {
+		/// The channel_update which should be sent.
 		msg: crate::ln::msgs::ChannelUpdate,
 	},
 	/// Broadcast an error downstream to be handled
 	HandleError {
+		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
+		/// The action which should be taken.
 		action: crate::ln::msgs::ErrorAction,
 	},
 	/// When a payment fails we may receive updates back from the hop where it failed. In such
 	/// cases this event is generated so that we can inform the network graph of this information.
 	PaymentFailureNetworkUpdate {
+		/// The channel/node update which should be sent to NetGraphMsgHandler
 		update: crate::ln::msgs::HTLCFailChannelUpdate,
 	},
 	/// Query a peer for channels with funding transaction UTXOs in a block range.
 	SendChannelRangeQuery {
+		/// The node_id of this message recipient
 		node_id: crate::c_types::PublicKey,
+		/// The query_channel_range which should be sent.
 		msg: crate::ln::msgs::QueryChannelRange,
 	},
 	/// Request routing gossip messages from a peer for a list of channels identified by
 	/// their short_channel_ids.
 	SendShortIdsQuery {
+		/// The node_id of this message recipient
 		node_id: crate::c_types::PublicKey,
+		/// The query_short_channel_ids which should be sent.
 		msg: crate::ln::msgs::QueryShortChannelIds,
 	},
 }
@@ -932,8 +1001,10 @@ impl MessageSendEvent {
 		}
 	}
 }
+/// Frees any resources used by the MessageSendEvent
 #[no_mangle]
 pub extern "C" fn MessageSendEvent_free(this_ptr: MessageSendEvent) { }
+/// Creates a copy of the MessageSendEvent
 #[no_mangle]
 pub extern "C" fn MessageSendEvent_clone(orig: &MessageSendEvent) -> MessageSendEvent {
 	orig.clone()
@@ -941,11 +1012,15 @@ pub extern "C" fn MessageSendEvent_clone(orig: &MessageSendEvent) -> MessageSend
 /// A trait indicating an object may generate message send events
 #[repr(C)]
 pub struct MessageSendEventsProvider {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Gets the list of pending events which were generated by previous actions, clearing the list
 	/// in the process.
 	#[must_use]
 	pub get_and_clear_pending_msg_events: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_MessageSendEventZ,
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 
@@ -979,11 +1054,15 @@ impl Drop for MessageSendEventsProvider {
 /// A trait indicating an object may generate events
 #[repr(C)]
 pub struct EventsProvider {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Gets the list of pending events which were generated by previous actions, clearing the list
 	/// in the process.
 	#[must_use]
 	pub get_and_clear_pending_events: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_EventZ,
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 

@@ -15,9 +15,15 @@ type nativeDelayedPaymentOutputDescriptor = nativeDelayedPaymentOutputDescriptor
 #[must_use]
 #[repr(C)]
 pub struct DelayedPaymentOutputDescriptor {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeDelayedPaymentOutputDescriptor,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -28,8 +34,9 @@ impl Drop for DelayedPaymentOutputDescriptor {
 		}
 	}
 }
+/// Frees any resources used by the DelayedPaymentOutputDescriptor, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn DelayedPaymentOutputDescriptor_free(this_ptr: DelayedPaymentOutputDescriptor) { }
+pub extern "C" fn DelayedPaymentOutputDescriptor_free(this_obj: DelayedPaymentOutputDescriptor) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn DelayedPaymentOutputDescriptor_free_void(this_ptr: *mut c_void) {
@@ -124,6 +131,7 @@ pub extern "C" fn DelayedPaymentOutputDescriptor_get_channel_value_satoshis(this
 pub extern "C" fn DelayedPaymentOutputDescriptor_set_channel_value_satoshis(this_ptr: &mut DelayedPaymentOutputDescriptor, mut val: u64) {
 	unsafe { &mut *this_ptr.inner }.channel_value_satoshis = val;
 }
+/// Constructs a new DelayedPaymentOutputDescriptor given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_new(mut outpoint_arg: crate::chain::transaction::OutPoint, mut per_commitment_point_arg: crate::c_types::PublicKey, mut to_self_delay_arg: u16, mut output_arg: crate::c_types::TxOut, mut revocation_pubkey_arg: crate::c_types::PublicKey, mut channel_keys_id_arg: crate::c_types::ThirtyTwoBytes, mut channel_value_satoshis_arg: u64) -> DelayedPaymentOutputDescriptor {
@@ -152,6 +160,7 @@ pub(crate) extern "C" fn DelayedPaymentOutputDescriptor_clone_void(this_ptr: *co
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeDelayedPaymentOutputDescriptor)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the DelayedPaymentOutputDescriptor
 pub extern "C" fn DelayedPaymentOutputDescriptor_clone(orig: &DelayedPaymentOutputDescriptor) -> DelayedPaymentOutputDescriptor {
 	orig.clone()
 }
@@ -164,9 +173,15 @@ type nativeStaticPaymentOutputDescriptor = nativeStaticPaymentOutputDescriptorIm
 #[must_use]
 #[repr(C)]
 pub struct StaticPaymentOutputDescriptor {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeStaticPaymentOutputDescriptor,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -177,8 +192,9 @@ impl Drop for StaticPaymentOutputDescriptor {
 		}
 	}
 }
+/// Frees any resources used by the StaticPaymentOutputDescriptor, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn StaticPaymentOutputDescriptor_free(this_ptr: StaticPaymentOutputDescriptor) { }
+pub extern "C" fn StaticPaymentOutputDescriptor_free(this_obj: StaticPaymentOutputDescriptor) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn StaticPaymentOutputDescriptor_free_void(this_ptr: *mut c_void) {
@@ -236,6 +252,7 @@ pub extern "C" fn StaticPaymentOutputDescriptor_get_channel_value_satoshis(this_
 pub extern "C" fn StaticPaymentOutputDescriptor_set_channel_value_satoshis(this_ptr: &mut StaticPaymentOutputDescriptor, mut val: u64) {
 	unsafe { &mut *this_ptr.inner }.channel_value_satoshis = val;
 }
+/// Constructs a new StaticPaymentOutputDescriptor given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_new(mut outpoint_arg: crate::chain::transaction::OutPoint, mut output_arg: crate::c_types::TxOut, mut channel_keys_id_arg: crate::c_types::ThirtyTwoBytes, mut channel_value_satoshis_arg: u64) -> StaticPaymentOutputDescriptor {
@@ -261,6 +278,7 @@ pub(crate) extern "C" fn StaticPaymentOutputDescriptor_clone_void(this_ptr: *con
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeStaticPaymentOutputDescriptor)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the StaticPaymentOutputDescriptor
 pub extern "C" fn StaticPaymentOutputDescriptor_clone(orig: &StaticPaymentOutputDescriptor) -> StaticPaymentOutputDescriptor {
 	orig.clone()
 }
@@ -279,7 +297,9 @@ pub enum SpendableOutputDescriptor {
 	/// These may include outputs from a transaction punishing our counterparty or claiming an HTLC
 	/// on-chain using the payment preimage or after it has timed out.
 	StaticOutput {
+		/// The outpoint which is spendable
 		outpoint: crate::chain::transaction::OutPoint,
+		/// The output which is referenced by the given outpoint.
 		output: crate::c_types::TxOut,
 	},
 	/// An output to a P2WSH script which can be spent with a single signature after a CSV delay.
@@ -415,17 +435,21 @@ impl SpendableOutputDescriptor {
 		}
 	}
 }
+/// Frees any resources used by the SpendableOutputDescriptor
 #[no_mangle]
 pub extern "C" fn SpendableOutputDescriptor_free(this_ptr: SpendableOutputDescriptor) { }
+/// Creates a copy of the SpendableOutputDescriptor
 #[no_mangle]
 pub extern "C" fn SpendableOutputDescriptor_clone(orig: &SpendableOutputDescriptor) -> SpendableOutputDescriptor {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the SpendableOutputDescriptor object into a byte array which can be read by SpendableOutputDescriptor_read
 pub extern "C" fn SpendableOutputDescriptor_write(obj: &SpendableOutputDescriptor) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
 }
 #[no_mangle]
+/// Read a SpendableOutputDescriptor from a byte array, created by SpendableOutputDescriptor_write
 pub extern "C" fn SpendableOutputDescriptor_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_SpendableOutputDescriptorDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::chain::keysinterface::SpendableOutputDescriptor::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -450,6 +474,8 @@ pub extern "C" fn SpendableOutputDescriptor_read(ser: crate::c_types::u8slice) -
 /// of LN security model, orthogonal of key management issues.
 #[repr(C)]
 pub struct Sign {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Gets the per-commitment point for a specific commitment number
 	///
@@ -559,12 +585,19 @@ pub struct Sign {
 	///
 	/// Will be called before any signatures are applied.
 	pub ready_channel: extern "C" fn (this_arg: *mut c_void, channel_parameters: &crate::ln::chan_utils::ChannelTransactionParameters),
+	/// Creates a copy of the object pointed to by this_arg, for a copy of this Sign.
+	/// Note that the ultimate copy of the Sign will have all function pointers the same as the original.
+	/// May be NULL if no action needs to be taken, the this_arg pointer will be copied into the new Sign.
 	pub clone: Option<extern "C" fn (this_arg: *const c_void) -> *mut c_void>,
+	/// Serialize the object into a byte array
 	pub write: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_u8Z,
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for Sign {}
 #[no_mangle]
+/// Creates a copy of a Sign
 pub extern "C" fn Sign_clone(orig: &Sign) -> Sign {
 	Sign {
 		this_arg: if let Some(f) = orig.clone { (f)(orig.this_arg) } else { orig.this_arg },
@@ -677,6 +710,8 @@ impl Drop for Sign {
 /// A trait to describe an object which can get user secrets and key material.
 #[repr(C)]
 pub struct KeysInterface {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Get node secret key (aka node_id or network_key).
 	///
@@ -717,6 +752,8 @@ pub struct KeysInterface {
 	/// you've read all of the provided bytes to ensure no corruption occurred.
 	#[must_use]
 	pub read_chan_signer: extern "C" fn (this_arg: *const c_void, reader: crate::c_types::u8slice) -> crate::c_types::derived::CResult_SignDecodeErrorZ,
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for KeysInterface {}
@@ -782,9 +819,15 @@ type nativeInMemorySigner = nativeInMemorySignerImport;
 #[must_use]
 #[repr(C)]
 pub struct InMemorySigner {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeInMemorySigner,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -795,8 +838,9 @@ impl Drop for InMemorySigner {
 		}
 	}
 }
+/// Frees any resources used by the InMemorySigner, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn InMemorySigner_free(this_ptr: InMemorySigner) { }
+pub extern "C" fn InMemorySigner_free(this_obj: InMemorySigner) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn InMemorySigner_free_void(this_ptr: *mut c_void) {
@@ -893,6 +937,7 @@ pub(crate) extern "C" fn InMemorySigner_clone_void(this_ptr: *const c_void) -> *
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInMemorySigner)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the InMemorySigner
 pub extern "C" fn InMemorySigner_clone(orig: &InMemorySigner) -> InMemorySigner {
 	orig.clone()
 }
@@ -1001,6 +1046,8 @@ impl From<nativeInMemorySigner> for crate::chain::keysinterface::Sign {
 		ret
 	}
 }
+/// Constructs a new Sign which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned Sign must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn InMemorySigner_as_Sign(this_arg: &InMemorySigner) -> crate::chain::keysinterface::Sign {
 	crate::chain::keysinterface::Sign {
@@ -1093,6 +1140,7 @@ extern "C" fn InMemorySigner_Sign_ready_channel(this_arg: *mut c_void, channel_p
 }
 
 #[no_mangle]
+/// Serialize the InMemorySigner object into a byte array which can be read by InMemorySigner_read
 pub extern "C" fn InMemorySigner_write(obj: &InMemorySigner) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -1101,6 +1149,7 @@ pub(crate) extern "C" fn InMemorySigner_write_void(obj: *const c_void) -> crate:
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeInMemorySigner) })
 }
 #[no_mangle]
+/// Read a InMemorySigner from a byte array, created by InMemorySigner_write
 pub extern "C" fn InMemorySigner_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_InMemorySignerDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::chain::keysinterface::InMemorySigner { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -1120,9 +1169,15 @@ type nativeKeysManager = nativeKeysManagerImport;
 #[must_use]
 #[repr(C)]
 pub struct KeysManager {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeKeysManager,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1133,8 +1188,9 @@ impl Drop for KeysManager {
 		}
 	}
 }
+/// Frees any resources used by the KeysManager, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn KeysManager_free(this_ptr: KeysManager) { }
+pub extern "C" fn KeysManager_free(this_obj: KeysManager) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn KeysManager_free_void(this_ptr: *mut c_void) {
@@ -1219,6 +1275,8 @@ impl From<nativeKeysManager> for crate::chain::keysinterface::KeysInterface {
 		ret
 	}
 }
+/// Constructs a new KeysInterface which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned KeysInterface must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn KeysManager_as_KeysInterface(this_arg: &KeysManager) -> crate::chain::keysinterface::KeysInterface {
 	crate::chain::keysinterface::KeysInterface {

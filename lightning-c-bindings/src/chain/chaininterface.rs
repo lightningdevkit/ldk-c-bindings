@@ -16,8 +16,8 @@ pub struct BroadcasterInterface {
 	pub this_arg: *mut c_void,
 	/// Sends a transaction out to (hopefully) be mined.
 	pub broadcast_transaction: extern "C" fn (this_arg: *const c_void, tx: crate::c_types::Transaction),
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Sync for BroadcasterInterface {}
@@ -122,8 +122,8 @@ pub struct FeeEstimator {
 	///  * ceil(satoshis-per-kbyte / 4)
 	#[must_use]
 	pub get_est_sat_per_1000_weight: extern "C" fn (this_arg: *const c_void, confirmation_target: crate::chain::chaininterface::ConfirmationTarget) -> u32,
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Sync for FeeEstimator {}

@@ -591,8 +591,8 @@ pub struct Sign {
 	pub clone: Option<extern "C" fn (this_arg: *const c_void) -> *mut c_void>,
 	/// Serialize the object into a byte array
 	pub write: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_u8Z,
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for Sign {}
@@ -752,8 +752,8 @@ pub struct KeysInterface {
 	/// you've read all of the provided bytes to ensure no corruption occurred.
 	#[must_use]
 	pub read_chan_signer: extern "C" fn (this_arg: *const c_void, reader: crate::c_types::u8slice) -> crate::c_types::derived::CResult_SignDecodeErrorZ,
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for KeysInterface {}

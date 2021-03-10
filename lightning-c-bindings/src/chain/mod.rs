@@ -71,8 +71,8 @@ pub struct Access {
 	/// [`short_channel_id`]: https://github.com/lightningnetwork/lightning-rfc/blob/master/07-routing-gossip.md#definition-of-short_channel_id
 	#[must_use]
 	pub get_utxo: extern "C" fn (this_arg: *const c_void, genesis_hash: *const [u8; 32], short_channel_id: u64) -> crate::c_types::derived::CResult_TxOutAccessErrorZ,
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for Access {}
@@ -118,8 +118,8 @@ pub struct Listen {
 	pub block_connected: extern "C" fn (this_arg: *const c_void, block: crate::c_types::u8slice, height: u32),
 	/// Notifies the listener that a block was removed at the given height.
 	pub block_disconnected: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], height: u32),
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 
@@ -203,8 +203,8 @@ pub struct Watch {
 	/// events.
 	#[must_use]
 	pub release_pending_monitor_events: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_MonitorEventZ,
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for Watch {}
@@ -279,8 +279,8 @@ pub struct Filter {
 	/// Registers interest in spends of a transaction output identified by `outpoint` having
 	/// `script_pubkey` as the spending condition.
 	pub register_output: extern "C" fn (this_arg: *const c_void, outpoint: &crate::chain::transaction::OutPoint, script_pubkey: crate::c_types::u8slice),
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for Filter {}

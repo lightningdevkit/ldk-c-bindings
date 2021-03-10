@@ -512,8 +512,8 @@ pub struct SocketDescriptor {
 	/// Note that the ultimate copy of the SocketDescriptor will have all function pointers the same as the original.
 	/// May be NULL if no action needs to be taken, the this_arg pointer will be copied into the new SocketDescriptor.
 	pub clone: Option<extern "C" fn (this_arg: *const c_void) -> *mut c_void>,
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 impl std::cmp::Eq for SocketDescriptor {}

@@ -95,8 +95,8 @@ pub struct Logger {
 	pub this_arg: *mut c_void,
 	/// Logs the `Record`
 	pub log: extern "C" fn (this_arg: *const c_void, record: *const std::os::raw::c_char),
-/// Frees any resources associated with this object given its this_arg pointer.
-/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Sync for Logger {}

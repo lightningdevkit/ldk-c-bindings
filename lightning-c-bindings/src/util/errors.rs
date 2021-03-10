@@ -13,24 +13,29 @@ pub enum APIError {
 	/// Indicates the API was wholly misused (see err for more). Cases where these can be returned
 	/// are documented, but generally indicates some precondition of a function was violated.
 	APIMisuseError {
+		/// A human-readable error message
 		err: crate::c_types::derived::CVec_u8Z,
 	},
 	/// Due to a high feerate, we were unable to complete the request.
 	/// For example, this may be returned if the feerate implies we cannot open a channel at the
 	/// requested value, but opening a larger channel would succeed.
 	FeeRateTooHigh {
+		/// A human-readable error message
 		err: crate::c_types::derived::CVec_u8Z,
+		/// The feerate which was too high.
 		feerate: u32,
 	},
 	/// A malformed Route was provided (eg overflowed value, node id mismatch, overly-looped route,
 	/// too-many-hops, etc).
 	RouteError {
+		/// A human-readable error message
 		err: crate::c_types::Str,
 	},
 	/// We were unable to complete the request as the Channel required to do so is unable to
 	/// complete the request (or was not found). This can take many forms, including disconnected
 	/// peer, channel at capacity, channel shutting down, etc.
 	ChannelUnavailable {
+		/// A human-readable error message
 		err: crate::c_types::derived::CVec_u8Z,
 	},
 	/// An attempt to call watch/update_channel returned an Err (ie you did this!), causing the
@@ -158,8 +163,10 @@ impl APIError {
 		}
 	}
 }
+/// Frees any resources used by the APIError
 #[no_mangle]
 pub extern "C" fn APIError_free(this_ptr: APIError) { }
+/// Creates a copy of the APIError
 #[no_mangle]
 pub extern "C" fn APIError_clone(orig: &APIError) -> APIError {
 	orig.clone()

@@ -11,9 +11,13 @@ use crate::c_types::*;
 /// An interface to send a transaction to the Bitcoin network.
 #[repr(C)]
 pub struct BroadcasterInterface {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Sends a transaction out to (hopefully) be mined.
 	pub broadcast_transaction: extern "C" fn (this_arg: *const c_void, tx: crate::c_types::Transaction),
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Sync for BroadcasterInterface {}
@@ -93,6 +97,7 @@ impl ConfirmationTarget {
 		}
 	}
 }
+/// Creates a copy of the ConfirmationTarget
 #[no_mangle]
 pub extern "C" fn ConfirmationTarget_clone(orig: &ConfirmationTarget) -> ConfirmationTarget {
 	orig.clone()
@@ -104,6 +109,8 @@ pub extern "C" fn ConfirmationTarget_clone(orig: &ConfirmationTarget) -> Confirm
 /// called from inside the library in response to chain events, P2P events, or timer events).
 #[repr(C)]
 pub struct FeeEstimator {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Gets estimated satoshis of fee required per 1000 Weight-Units.
 	///
@@ -115,6 +122,8 @@ pub struct FeeEstimator {
 	///  * ceil(satoshis-per-kbyte / 4)
 	#[must_use]
 	pub get_est_sat_per_1000_weight: extern "C" fn (this_arg: *const c_void, confirmation_target: crate::chain::chaininterface::ConfirmationTarget) -> u32,
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Sync for FeeEstimator {}
@@ -146,6 +155,7 @@ impl Drop for FeeEstimator {
 		}
 	}
 }
+/// Minimum relay fee as required by bitcoin network mempool policy.
 
 #[no_mangle]
 pub static MIN_RELAY_FEE_SAT_PER_1000_WEIGHT: u64 = lightning::chain::chaininterface::MIN_RELAY_FEE_SAT_PER_1000_WEIGHT;

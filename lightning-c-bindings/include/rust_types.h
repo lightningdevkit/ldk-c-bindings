@@ -47,6 +47,8 @@ struct nativeNodeFeaturesOpaque;
 typedef struct nativeNodeFeaturesOpaque LDKnativeNodeFeatures;
 struct nativeChannelFeaturesOpaque;
 typedef struct nativeChannelFeaturesOpaque LDKnativeChannelFeatures;
+struct nativeInvoiceFeaturesOpaque;
+typedef struct nativeInvoiceFeaturesOpaque LDKnativeInvoiceFeatures;
 struct nativeChannelHandshakeConfigOpaque;
 typedef struct nativeChannelHandshakeConfigOpaque LDKnativeChannelHandshakeConfig;
 struct nativeChannelHandshakeLimitsOpaque;

@@ -19,9 +19,15 @@ type nativeIgnoringMessageHandler = nativeIgnoringMessageHandlerImport;
 #[must_use]
 #[repr(C)]
 pub struct IgnoringMessageHandler {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeIgnoringMessageHandler,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -32,8 +38,9 @@ impl Drop for IgnoringMessageHandler {
 		}
 	}
 }
+/// Frees any resources used by the IgnoringMessageHandler, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn IgnoringMessageHandler_free(this_ptr: IgnoringMessageHandler) { }
+pub extern "C" fn IgnoringMessageHandler_free(this_obj: IgnoringMessageHandler) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn IgnoringMessageHandler_free_void(this_ptr: *mut c_void) {
@@ -49,6 +56,7 @@ impl IgnoringMessageHandler {
 		ret
 	}
 }
+/// Constructs a new IgnoringMessageHandler given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn IgnoringMessageHandler_new() -> IgnoringMessageHandler {
@@ -65,6 +73,8 @@ impl From<nativeIgnoringMessageHandler> for crate::util::events::MessageSendEven
 		ret
 	}
 }
+/// Constructs a new MessageSendEventsProvider which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned MessageSendEventsProvider must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn IgnoringMessageHandler_as_MessageSendEventsProvider(this_arg: &IgnoringMessageHandler) -> crate::util::events::MessageSendEventsProvider {
 	crate::util::events::MessageSendEventsProvider {
@@ -91,6 +101,8 @@ impl From<nativeIgnoringMessageHandler> for crate::ln::msgs::RoutingMessageHandl
 		ret
 	}
 }
+/// Constructs a new RoutingMessageHandler which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned RoutingMessageHandler must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn IgnoringMessageHandler_as_RoutingMessageHandler(this_arg: &IgnoringMessageHandler) -> crate::ln::msgs::RoutingMessageHandler {
 	crate::ln::msgs::RoutingMessageHandler {
@@ -192,9 +204,15 @@ type nativeErroringMessageHandler = nativeErroringMessageHandlerImport;
 #[must_use]
 #[repr(C)]
 pub struct ErroringMessageHandler {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeErroringMessageHandler,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -205,8 +223,9 @@ impl Drop for ErroringMessageHandler {
 		}
 	}
 }
+/// Frees any resources used by the ErroringMessageHandler, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ErroringMessageHandler_free(this_ptr: ErroringMessageHandler) { }
+pub extern "C" fn ErroringMessageHandler_free(this_obj: ErroringMessageHandler) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ErroringMessageHandler_free_void(this_ptr: *mut c_void) {
@@ -240,6 +259,8 @@ impl From<nativeErroringMessageHandler> for crate::util::events::MessageSendEven
 		ret
 	}
 }
+/// Constructs a new MessageSendEventsProvider which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned MessageSendEventsProvider must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn ErroringMessageHandler_as_MessageSendEventsProvider(this_arg: &ErroringMessageHandler) -> crate::util::events::MessageSendEventsProvider {
 	crate::util::events::MessageSendEventsProvider {
@@ -266,6 +287,8 @@ impl From<nativeErroringMessageHandler> for crate::ln::msgs::ChannelMessageHandl
 		ret
 	}
 }
+/// Constructs a new ChannelMessageHandler which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned ChannelMessageHandler must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn ErroringMessageHandler_as_ChannelMessageHandler(this_arg: &ErroringMessageHandler) -> crate::ln::msgs::ChannelMessageHandler {
 	crate::ln::msgs::ChannelMessageHandler {
@@ -370,9 +393,15 @@ type nativeMessageHandler = nativeMessageHandlerImport<crate::ln::msgs::ChannelM
 #[must_use]
 #[repr(C)]
 pub struct MessageHandler {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeMessageHandler,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -383,8 +412,9 @@ impl Drop for MessageHandler {
 		}
 	}
 }
+/// Frees any resources used by the MessageHandler, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn MessageHandler_free(this_ptr: MessageHandler) { }
+pub extern "C" fn MessageHandler_free(this_obj: MessageHandler) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn MessageHandler_free_void(this_ptr: *mut c_void) {
@@ -426,6 +456,7 @@ pub extern "C" fn MessageHandler_get_route_handler(this_ptr: &MessageHandler) ->
 pub extern "C" fn MessageHandler_set_route_handler(this_ptr: &mut MessageHandler, mut val: crate::ln::msgs::RoutingMessageHandler) {
 	unsafe { &mut *this_ptr.inner }.route_handler = val;
 }
+/// Constructs a new MessageHandler given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn MessageHandler_new(mut chan_handler_arg: crate::ln::msgs::ChannelMessageHandler, mut route_handler_arg: crate::ln::msgs::RoutingMessageHandler) -> MessageHandler {
@@ -447,6 +478,8 @@ pub extern "C" fn MessageHandler_new(mut chan_handler_arg: crate::ln::msgs::Chan
 /// PeerManager::socket_disconnected().
 #[repr(C)]
 pub struct SocketDescriptor {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Attempts to send some data from the given slice to the peer.
 	///
@@ -470,9 +503,17 @@ pub struct SocketDescriptor {
 	/// though races may occur whereby disconnect_socket is called after a call to
 	/// socket_disconnected but prior to socket_disconnected returning.
 	pub disconnect_socket: extern "C" fn (this_arg: *mut c_void),
+	/// Checks if two objects are equal given this object's this_arg pointer and another object.
 	pub eq: extern "C" fn (this_arg: *const c_void, other_arg: &SocketDescriptor) -> bool,
+	/// Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.
+	/// This is used, for example, for inclusion of this object in a hash map.
 	pub hash: extern "C" fn (this_arg: *const c_void) -> u64,
+	/// Creates a copy of the object pointed to by this_arg, for a copy of this SocketDescriptor.
+	/// Note that the ultimate copy of the SocketDescriptor will have all function pointers the same as the original.
+	/// May be NULL if no action needs to be taken, the this_arg pointer will be copied into the new SocketDescriptor.
 	pub clone: Option<extern "C" fn (this_arg: *const c_void) -> *mut c_void>,
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 impl std::cmp::Eq for SocketDescriptor {}
@@ -483,6 +524,7 @@ impl std::hash::Hash for SocketDescriptor {
 	fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) { hasher.write_u64((self.hash)(self.this_arg)) }
 }
 #[no_mangle]
+/// Creates a copy of a SocketDescriptor
 pub extern "C" fn SocketDescriptor_clone(orig: &SocketDescriptor) -> SocketDescriptor {
 	SocketDescriptor {
 		this_arg: if let Some(f) = orig.clone { (f)(orig.this_arg) } else { orig.this_arg },
@@ -540,9 +582,15 @@ type nativePeerHandleError = nativePeerHandleErrorImport;
 #[must_use]
 #[repr(C)]
 pub struct PeerHandleError {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativePeerHandleError,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -553,8 +601,9 @@ impl Drop for PeerHandleError {
 		}
 	}
 }
+/// Frees any resources used by the PeerHandleError, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn PeerHandleError_free(this_ptr: PeerHandleError) { }
+pub extern "C" fn PeerHandleError_free(this_obj: PeerHandleError) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn PeerHandleError_free_void(this_ptr: *mut c_void) {
@@ -583,6 +632,7 @@ pub extern "C" fn PeerHandleError_get_no_connection_possible(this_ptr: &PeerHand
 pub extern "C" fn PeerHandleError_set_no_connection_possible(this_ptr: &mut PeerHandleError, mut val: bool) {
 	unsafe { &mut *this_ptr.inner }.no_connection_possible = val;
 }
+/// Constructs a new PeerHandleError given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn PeerHandleError_new(mut no_connection_possible_arg: bool) -> PeerHandleError {
@@ -605,6 +655,7 @@ pub(crate) extern "C" fn PeerHandleError_clone_void(this_ptr: *const c_void) -> 
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePeerHandleError)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the PeerHandleError
 pub extern "C" fn PeerHandleError_clone(orig: &PeerHandleError) -> PeerHandleError {
 	orig.clone()
 }
@@ -623,9 +674,15 @@ type nativePeerManager = nativePeerManagerImport<crate::ln::peer_handler::Socket
 #[must_use]
 #[repr(C)]
 pub struct PeerManager {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativePeerManager,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -636,8 +693,9 @@ impl Drop for PeerManager {
 		}
 	}
 }
+/// Frees any resources used by the PeerManager, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn PeerManager_free(this_ptr: PeerManager) { }
+pub extern "C" fn PeerManager_free(this_obj: PeerManager) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn PeerManager_free_void(this_ptr: *mut c_void) {

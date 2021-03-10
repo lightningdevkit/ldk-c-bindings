@@ -27,9 +27,15 @@ type nativeDecodeError = nativeDecodeErrorImport;
 #[must_use]
 #[repr(C)]
 pub struct DecodeError {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeDecodeError,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -40,8 +46,9 @@ impl Drop for DecodeError {
 		}
 	}
 }
+/// Frees any resources used by the DecodeError, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn DecodeError_free(this_ptr: DecodeError) { }
+pub extern "C" fn DecodeError_free(this_obj: DecodeError) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn DecodeError_free_void(this_ptr: *mut c_void) {
@@ -72,6 +79,7 @@ pub(crate) extern "C" fn DecodeError_clone_void(this_ptr: *const c_void) -> *mut
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeDecodeError)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the DecodeError
 pub extern "C" fn DecodeError_clone(orig: &DecodeError) -> DecodeError {
 	orig.clone()
 }
@@ -83,9 +91,15 @@ type nativeInit = nativeInitImport;
 #[must_use]
 #[repr(C)]
 pub struct Init {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeInit,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -96,8 +110,9 @@ impl Drop for Init {
 		}
 	}
 }
+/// Frees any resources used by the Init, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn Init_free(this_ptr: Init) { }
+pub extern "C" fn Init_free(this_obj: Init) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn Init_free_void(this_ptr: *mut c_void) {
@@ -124,6 +139,7 @@ pub extern "C" fn Init_get_features(this_ptr: &Init) -> crate::ln::features::Ini
 pub extern "C" fn Init_set_features(this_ptr: &mut Init, mut val: crate::ln::features::InitFeatures) {
 	unsafe { &mut *this_ptr.inner }.features = *unsafe { Box::from_raw(val.take_inner()) };
 }
+/// Constructs a new Init given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Init_new(mut features_arg: crate::ln::features::InitFeatures) -> Init {
@@ -146,6 +162,7 @@ pub(crate) extern "C" fn Init_clone_void(this_ptr: *const c_void) -> *mut c_void
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInit)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the Init
 pub extern "C" fn Init_clone(orig: &Init) -> Init {
 	orig.clone()
 }
@@ -157,9 +174,15 @@ type nativeErrorMessage = nativeErrorMessageImport;
 #[must_use]
 #[repr(C)]
 pub struct ErrorMessage {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeErrorMessage,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -170,8 +193,9 @@ impl Drop for ErrorMessage {
 		}
 	}
 }
+/// Frees any resources used by the ErrorMessage, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ErrorMessage_free(this_ptr: ErrorMessage) { }
+pub extern "C" fn ErrorMessage_free(this_obj: ErrorMessage) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ErrorMessage_free_void(this_ptr: *mut c_void) {
@@ -215,6 +239,7 @@ pub extern "C" fn ErrorMessage_get_data(this_ptr: &ErrorMessage) -> crate::c_typ
 pub extern "C" fn ErrorMessage_set_data(this_ptr: &mut ErrorMessage, mut val: crate::c_types::derived::CVec_u8Z) {
 	unsafe { &mut *this_ptr.inner }.data = String::from_utf8(val.into_rust()).unwrap();
 }
+/// Constructs a new ErrorMessage given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ErrorMessage_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut data_arg: crate::c_types::derived::CVec_u8Z) -> ErrorMessage {
@@ -238,6 +263,7 @@ pub(crate) extern "C" fn ErrorMessage_clone_void(this_ptr: *const c_void) -> *mu
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeErrorMessage)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ErrorMessage
 pub extern "C" fn ErrorMessage_clone(orig: &ErrorMessage) -> ErrorMessage {
 	orig.clone()
 }
@@ -249,9 +275,15 @@ type nativePing = nativePingImport;
 #[must_use]
 #[repr(C)]
 pub struct Ping {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativePing,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -262,8 +294,9 @@ impl Drop for Ping {
 		}
 	}
 }
+/// Frees any resources used by the Ping, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn Ping_free(this_ptr: Ping) { }
+pub extern "C" fn Ping_free(this_obj: Ping) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn Ping_free_void(this_ptr: *mut c_void) {
@@ -303,6 +336,7 @@ pub extern "C" fn Ping_get_byteslen(this_ptr: &Ping) -> u16 {
 pub extern "C" fn Ping_set_byteslen(this_ptr: &mut Ping, mut val: u16) {
 	unsafe { &mut *this_ptr.inner }.byteslen = val;
 }
+/// Constructs a new Ping given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Ping_new(mut ponglen_arg: u16, mut byteslen_arg: u16) -> Ping {
@@ -326,6 +360,7 @@ pub(crate) extern "C" fn Ping_clone_void(this_ptr: *const c_void) -> *mut c_void
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePing)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the Ping
 pub extern "C" fn Ping_clone(orig: &Ping) -> Ping {
 	orig.clone()
 }
@@ -337,9 +372,15 @@ type nativePong = nativePongImport;
 #[must_use]
 #[repr(C)]
 pub struct Pong {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativePong,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -350,8 +391,9 @@ impl Drop for Pong {
 		}
 	}
 }
+/// Frees any resources used by the Pong, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn Pong_free(this_ptr: Pong) { }
+pub extern "C" fn Pong_free(this_obj: Pong) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn Pong_free_void(this_ptr: *mut c_void) {
@@ -380,6 +422,7 @@ pub extern "C" fn Pong_get_byteslen(this_ptr: &Pong) -> u16 {
 pub extern "C" fn Pong_set_byteslen(this_ptr: &mut Pong, mut val: u16) {
 	unsafe { &mut *this_ptr.inner }.byteslen = val;
 }
+/// Constructs a new Pong given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Pong_new(mut byteslen_arg: u16) -> Pong {
@@ -402,6 +445,7 @@ pub(crate) extern "C" fn Pong_clone_void(this_ptr: *const c_void) -> *mut c_void
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePong)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the Pong
 pub extern "C" fn Pong_clone(orig: &Pong) -> Pong {
 	orig.clone()
 }
@@ -413,9 +457,15 @@ type nativeOpenChannel = nativeOpenChannelImport;
 #[must_use]
 #[repr(C)]
 pub struct OpenChannel {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeOpenChannel,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -426,8 +476,9 @@ impl Drop for OpenChannel {
 		}
 	}
 }
+/// Frees any resources used by the OpenChannel, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn OpenChannel_free(this_ptr: OpenChannel) { }
+pub extern "C" fn OpenChannel_free(this_obj: OpenChannel) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn OpenChannel_free_void(this_ptr: *mut c_void) {
@@ -656,6 +707,7 @@ pub(crate) extern "C" fn OpenChannel_clone_void(this_ptr: *const c_void) -> *mut
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeOpenChannel)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the OpenChannel
 pub extern "C" fn OpenChannel_clone(orig: &OpenChannel) -> OpenChannel {
 	orig.clone()
 }
@@ -667,9 +719,15 @@ type nativeAcceptChannel = nativeAcceptChannelImport;
 #[must_use]
 #[repr(C)]
 pub struct AcceptChannel {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeAcceptChannel,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -680,8 +738,9 @@ impl Drop for AcceptChannel {
 		}
 	}
 }
+/// Frees any resources used by the AcceptChannel, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn AcceptChannel_free(this_ptr: AcceptChannel) { }
+pub extern "C" fn AcceptChannel_free(this_obj: AcceptChannel) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn AcceptChannel_free_void(this_ptr: *mut c_void) {
@@ -866,6 +925,7 @@ pub(crate) extern "C" fn AcceptChannel_clone_void(this_ptr: *const c_void) -> *m
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeAcceptChannel)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the AcceptChannel
 pub extern "C" fn AcceptChannel_clone(orig: &AcceptChannel) -> AcceptChannel {
 	orig.clone()
 }
@@ -877,9 +937,15 @@ type nativeFundingCreated = nativeFundingCreatedImport;
 #[must_use]
 #[repr(C)]
 pub struct FundingCreated {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeFundingCreated,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -890,8 +956,9 @@ impl Drop for FundingCreated {
 		}
 	}
 }
+/// Frees any resources used by the FundingCreated, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn FundingCreated_free(this_ptr: FundingCreated) { }
+pub extern "C" fn FundingCreated_free(this_obj: FundingCreated) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn FundingCreated_free_void(this_ptr: *mut c_void) {
@@ -951,6 +1018,7 @@ pub extern "C" fn FundingCreated_get_signature(this_ptr: &FundingCreated) -> cra
 pub extern "C" fn FundingCreated_set_signature(this_ptr: &mut FundingCreated, mut val: crate::c_types::Signature) {
 	unsafe { &mut *this_ptr.inner }.signature = val.into_rust();
 }
+/// Constructs a new FundingCreated given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn FundingCreated_new(mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_txid_arg: crate::c_types::ThirtyTwoBytes, mut funding_output_index_arg: u16, mut signature_arg: crate::c_types::Signature) -> FundingCreated {
@@ -976,6 +1044,7 @@ pub(crate) extern "C" fn FundingCreated_clone_void(this_ptr: *const c_void) -> *
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeFundingCreated)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the FundingCreated
 pub extern "C" fn FundingCreated_clone(orig: &FundingCreated) -> FundingCreated {
 	orig.clone()
 }
@@ -987,9 +1056,15 @@ type nativeFundingSigned = nativeFundingSignedImport;
 #[must_use]
 #[repr(C)]
 pub struct FundingSigned {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeFundingSigned,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1000,8 +1075,9 @@ impl Drop for FundingSigned {
 		}
 	}
 }
+/// Frees any resources used by the FundingSigned, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn FundingSigned_free(this_ptr: FundingSigned) { }
+pub extern "C" fn FundingSigned_free(this_obj: FundingSigned) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn FundingSigned_free_void(this_ptr: *mut c_void) {
@@ -1039,6 +1115,7 @@ pub extern "C" fn FundingSigned_get_signature(this_ptr: &FundingSigned) -> crate
 pub extern "C" fn FundingSigned_set_signature(this_ptr: &mut FundingSigned, mut val: crate::c_types::Signature) {
 	unsafe { &mut *this_ptr.inner }.signature = val.into_rust();
 }
+/// Constructs a new FundingSigned given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn FundingSigned_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut signature_arg: crate::c_types::Signature) -> FundingSigned {
@@ -1062,6 +1139,7 @@ pub(crate) extern "C" fn FundingSigned_clone_void(this_ptr: *const c_void) -> *m
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeFundingSigned)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the FundingSigned
 pub extern "C" fn FundingSigned_clone(orig: &FundingSigned) -> FundingSigned {
 	orig.clone()
 }
@@ -1073,9 +1151,15 @@ type nativeFundingLocked = nativeFundingLockedImport;
 #[must_use]
 #[repr(C)]
 pub struct FundingLocked {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeFundingLocked,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1086,8 +1170,9 @@ impl Drop for FundingLocked {
 		}
 	}
 }
+/// Frees any resources used by the FundingLocked, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn FundingLocked_free(this_ptr: FundingLocked) { }
+pub extern "C" fn FundingLocked_free(this_obj: FundingLocked) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn FundingLocked_free_void(this_ptr: *mut c_void) {
@@ -1125,6 +1210,7 @@ pub extern "C" fn FundingLocked_get_next_per_commitment_point(this_ptr: &Funding
 pub extern "C" fn FundingLocked_set_next_per_commitment_point(this_ptr: &mut FundingLocked, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *this_ptr.inner }.next_per_commitment_point = val.into_rust();
 }
+/// Constructs a new FundingLocked given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn FundingLocked_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut next_per_commitment_point_arg: crate::c_types::PublicKey) -> FundingLocked {
@@ -1148,6 +1234,7 @@ pub(crate) extern "C" fn FundingLocked_clone_void(this_ptr: *const c_void) -> *m
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeFundingLocked)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the FundingLocked
 pub extern "C" fn FundingLocked_clone(orig: &FundingLocked) -> FundingLocked {
 	orig.clone()
 }
@@ -1159,9 +1246,15 @@ type nativeShutdown = nativeShutdownImport;
 #[must_use]
 #[repr(C)]
 pub struct Shutdown {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeShutdown,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1172,8 +1265,9 @@ impl Drop for Shutdown {
 		}
 	}
 }
+/// Frees any resources used by the Shutdown, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn Shutdown_free(this_ptr: Shutdown) { }
+pub extern "C" fn Shutdown_free(this_obj: Shutdown) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn Shutdown_free_void(this_ptr: *mut c_void) {
@@ -1213,6 +1307,7 @@ pub extern "C" fn Shutdown_get_scriptpubkey(this_ptr: &Shutdown) -> crate::c_typ
 pub extern "C" fn Shutdown_set_scriptpubkey(this_ptr: &mut Shutdown, mut val: crate::c_types::derived::CVec_u8Z) {
 	unsafe { &mut *this_ptr.inner }.scriptpubkey = ::bitcoin::blockdata::script::Script::from(val.into_rust());
 }
+/// Constructs a new Shutdown given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Shutdown_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut scriptpubkey_arg: crate::c_types::derived::CVec_u8Z) -> Shutdown {
@@ -1236,6 +1331,7 @@ pub(crate) extern "C" fn Shutdown_clone_void(this_ptr: *const c_void) -> *mut c_
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeShutdown)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the Shutdown
 pub extern "C" fn Shutdown_clone(orig: &Shutdown) -> Shutdown {
 	orig.clone()
 }
@@ -1247,9 +1343,15 @@ type nativeClosingSigned = nativeClosingSignedImport;
 #[must_use]
 #[repr(C)]
 pub struct ClosingSigned {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeClosingSigned,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1260,8 +1362,9 @@ impl Drop for ClosingSigned {
 		}
 	}
 }
+/// Frees any resources used by the ClosingSigned, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ClosingSigned_free(this_ptr: ClosingSigned) { }
+pub extern "C" fn ClosingSigned_free(this_obj: ClosingSigned) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ClosingSigned_free_void(this_ptr: *mut c_void) {
@@ -1310,6 +1413,7 @@ pub extern "C" fn ClosingSigned_get_signature(this_ptr: &ClosingSigned) -> crate
 pub extern "C" fn ClosingSigned_set_signature(this_ptr: &mut ClosingSigned, mut val: crate::c_types::Signature) {
 	unsafe { &mut *this_ptr.inner }.signature = val.into_rust();
 }
+/// Constructs a new ClosingSigned given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ClosingSigned_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut fee_satoshis_arg: u64, mut signature_arg: crate::c_types::Signature) -> ClosingSigned {
@@ -1334,6 +1438,7 @@ pub(crate) extern "C" fn ClosingSigned_clone_void(this_ptr: *const c_void) -> *m
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeClosingSigned)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ClosingSigned
 pub extern "C" fn ClosingSigned_clone(orig: &ClosingSigned) -> ClosingSigned {
 	orig.clone()
 }
@@ -1345,9 +1450,15 @@ type nativeUpdateAddHTLC = nativeUpdateAddHTLCImport;
 #[must_use]
 #[repr(C)]
 pub struct UpdateAddHTLC {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeUpdateAddHTLC,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1358,8 +1469,9 @@ impl Drop for UpdateAddHTLC {
 		}
 	}
 }
+/// Frees any resources used by the UpdateAddHTLC, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn UpdateAddHTLC_free(this_ptr: UpdateAddHTLC) { }
+pub extern "C" fn UpdateAddHTLC_free(this_obj: UpdateAddHTLC) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn UpdateAddHTLC_free_void(this_ptr: *mut c_void) {
@@ -1445,6 +1557,7 @@ pub(crate) extern "C" fn UpdateAddHTLC_clone_void(this_ptr: *const c_void) -> *m
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUpdateAddHTLC)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the UpdateAddHTLC
 pub extern "C" fn UpdateAddHTLC_clone(orig: &UpdateAddHTLC) -> UpdateAddHTLC {
 	orig.clone()
 }
@@ -1456,9 +1569,15 @@ type nativeUpdateFulfillHTLC = nativeUpdateFulfillHTLCImport;
 #[must_use]
 #[repr(C)]
 pub struct UpdateFulfillHTLC {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeUpdateFulfillHTLC,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1469,8 +1588,9 @@ impl Drop for UpdateFulfillHTLC {
 		}
 	}
 }
+/// Frees any resources used by the UpdateFulfillHTLC, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn UpdateFulfillHTLC_free(this_ptr: UpdateFulfillHTLC) { }
+pub extern "C" fn UpdateFulfillHTLC_free(this_obj: UpdateFulfillHTLC) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn UpdateFulfillHTLC_free_void(this_ptr: *mut c_void) {
@@ -1519,6 +1639,7 @@ pub extern "C" fn UpdateFulfillHTLC_get_payment_preimage(this_ptr: &UpdateFulfil
 pub extern "C" fn UpdateFulfillHTLC_set_payment_preimage(this_ptr: &mut UpdateFulfillHTLC, mut val: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &mut *this_ptr.inner }.payment_preimage = ::lightning::ln::channelmanager::PaymentPreimage(val.data);
 }
+/// Constructs a new UpdateFulfillHTLC given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn UpdateFulfillHTLC_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut htlc_id_arg: u64, mut payment_preimage_arg: crate::c_types::ThirtyTwoBytes) -> UpdateFulfillHTLC {
@@ -1543,6 +1664,7 @@ pub(crate) extern "C" fn UpdateFulfillHTLC_clone_void(this_ptr: *const c_void) -
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUpdateFulfillHTLC)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the UpdateFulfillHTLC
 pub extern "C" fn UpdateFulfillHTLC_clone(orig: &UpdateFulfillHTLC) -> UpdateFulfillHTLC {
 	orig.clone()
 }
@@ -1554,9 +1676,15 @@ type nativeUpdateFailHTLC = nativeUpdateFailHTLCImport;
 #[must_use]
 #[repr(C)]
 pub struct UpdateFailHTLC {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeUpdateFailHTLC,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1567,8 +1695,9 @@ impl Drop for UpdateFailHTLC {
 		}
 	}
 }
+/// Frees any resources used by the UpdateFailHTLC, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn UpdateFailHTLC_free(this_ptr: UpdateFailHTLC) { }
+pub extern "C" fn UpdateFailHTLC_free(this_obj: UpdateFailHTLC) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn UpdateFailHTLC_free_void(this_ptr: *mut c_void) {
@@ -1621,6 +1750,7 @@ pub(crate) extern "C" fn UpdateFailHTLC_clone_void(this_ptr: *const c_void) -> *
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUpdateFailHTLC)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the UpdateFailHTLC
 pub extern "C" fn UpdateFailHTLC_clone(orig: &UpdateFailHTLC) -> UpdateFailHTLC {
 	orig.clone()
 }
@@ -1632,9 +1762,15 @@ type nativeUpdateFailMalformedHTLC = nativeUpdateFailMalformedHTLCImport;
 #[must_use]
 #[repr(C)]
 pub struct UpdateFailMalformedHTLC {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeUpdateFailMalformedHTLC,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1645,8 +1781,9 @@ impl Drop for UpdateFailMalformedHTLC {
 		}
 	}
 }
+/// Frees any resources used by the UpdateFailMalformedHTLC, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn UpdateFailMalformedHTLC_free(this_ptr: UpdateFailMalformedHTLC) { }
+pub extern "C" fn UpdateFailMalformedHTLC_free(this_obj: UpdateFailMalformedHTLC) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn UpdateFailMalformedHTLC_free_void(this_ptr: *mut c_void) {
@@ -1710,6 +1847,7 @@ pub(crate) extern "C" fn UpdateFailMalformedHTLC_clone_void(this_ptr: *const c_v
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUpdateFailMalformedHTLC)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the UpdateFailMalformedHTLC
 pub extern "C" fn UpdateFailMalformedHTLC_clone(orig: &UpdateFailMalformedHTLC) -> UpdateFailMalformedHTLC {
 	orig.clone()
 }
@@ -1721,9 +1859,15 @@ type nativeCommitmentSigned = nativeCommitmentSignedImport;
 #[must_use]
 #[repr(C)]
 pub struct CommitmentSigned {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeCommitmentSigned,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1734,8 +1878,9 @@ impl Drop for CommitmentSigned {
 		}
 	}
 }
+/// Frees any resources used by the CommitmentSigned, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn CommitmentSigned_free(this_ptr: CommitmentSigned) { }
+pub extern "C" fn CommitmentSigned_free(this_obj: CommitmentSigned) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn CommitmentSigned_free_void(this_ptr: *mut c_void) {
@@ -1779,6 +1924,7 @@ pub extern "C" fn CommitmentSigned_set_htlc_signatures(this_ptr: &mut Commitment
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item.into_rust() }); };
 	unsafe { &mut *this_ptr.inner }.htlc_signatures = local_val;
 }
+/// Constructs a new CommitmentSigned given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn CommitmentSigned_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut signature_arg: crate::c_types::Signature, mut htlc_signatures_arg: crate::c_types::derived::CVec_SignatureZ) -> CommitmentSigned {
@@ -1804,6 +1950,7 @@ pub(crate) extern "C" fn CommitmentSigned_clone_void(this_ptr: *const c_void) ->
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCommitmentSigned)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the CommitmentSigned
 pub extern "C" fn CommitmentSigned_clone(orig: &CommitmentSigned) -> CommitmentSigned {
 	orig.clone()
 }
@@ -1815,9 +1962,15 @@ type nativeRevokeAndACK = nativeRevokeAndACKImport;
 #[must_use]
 #[repr(C)]
 pub struct RevokeAndACK {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeRevokeAndACK,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1828,8 +1981,9 @@ impl Drop for RevokeAndACK {
 		}
 	}
 }
+/// Frees any resources used by the RevokeAndACK, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn RevokeAndACK_free(this_ptr: RevokeAndACK) { }
+pub extern "C" fn RevokeAndACK_free(this_obj: RevokeAndACK) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn RevokeAndACK_free_void(this_ptr: *mut c_void) {
@@ -1878,6 +2032,7 @@ pub extern "C" fn RevokeAndACK_get_next_per_commitment_point(this_ptr: &RevokeAn
 pub extern "C" fn RevokeAndACK_set_next_per_commitment_point(this_ptr: &mut RevokeAndACK, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *this_ptr.inner }.next_per_commitment_point = val.into_rust();
 }
+/// Constructs a new RevokeAndACK given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RevokeAndACK_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut per_commitment_secret_arg: crate::c_types::ThirtyTwoBytes, mut next_per_commitment_point_arg: crate::c_types::PublicKey) -> RevokeAndACK {
@@ -1902,6 +2057,7 @@ pub(crate) extern "C" fn RevokeAndACK_clone_void(this_ptr: *const c_void) -> *mu
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRevokeAndACK)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the RevokeAndACK
 pub extern "C" fn RevokeAndACK_clone(orig: &RevokeAndACK) -> RevokeAndACK {
 	orig.clone()
 }
@@ -1913,9 +2069,15 @@ type nativeUpdateFee = nativeUpdateFeeImport;
 #[must_use]
 #[repr(C)]
 pub struct UpdateFee {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeUpdateFee,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1926,8 +2088,9 @@ impl Drop for UpdateFee {
 		}
 	}
 }
+/// Frees any resources used by the UpdateFee, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn UpdateFee_free(this_ptr: UpdateFee) { }
+pub extern "C" fn UpdateFee_free(this_obj: UpdateFee) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn UpdateFee_free_void(this_ptr: *mut c_void) {
@@ -1965,6 +2128,7 @@ pub extern "C" fn UpdateFee_get_feerate_per_kw(this_ptr: &UpdateFee) -> u32 {
 pub extern "C" fn UpdateFee_set_feerate_per_kw(this_ptr: &mut UpdateFee, mut val: u32) {
 	unsafe { &mut *this_ptr.inner }.feerate_per_kw = val;
 }
+/// Constructs a new UpdateFee given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn UpdateFee_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut feerate_per_kw_arg: u32) -> UpdateFee {
@@ -1988,6 +2152,7 @@ pub(crate) extern "C" fn UpdateFee_clone_void(this_ptr: *const c_void) -> *mut c
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUpdateFee)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the UpdateFee
 pub extern "C" fn UpdateFee_clone(orig: &UpdateFee) -> UpdateFee {
 	orig.clone()
 }
@@ -2002,9 +2167,15 @@ type nativeDataLossProtect = nativeDataLossProtectImport;
 #[must_use]
 #[repr(C)]
 pub struct DataLossProtect {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeDataLossProtect,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -2015,8 +2186,9 @@ impl Drop for DataLossProtect {
 		}
 	}
 }
+/// Frees any resources used by the DataLossProtect, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn DataLossProtect_free(this_ptr: DataLossProtect) { }
+pub extern "C" fn DataLossProtect_free(this_obj: DataLossProtect) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn DataLossProtect_free_void(this_ptr: *mut c_void) {
@@ -2056,6 +2228,7 @@ pub extern "C" fn DataLossProtect_get_my_current_per_commitment_point(this_ptr: 
 pub extern "C" fn DataLossProtect_set_my_current_per_commitment_point(this_ptr: &mut DataLossProtect, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *this_ptr.inner }.my_current_per_commitment_point = val.into_rust();
 }
+/// Constructs a new DataLossProtect given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn DataLossProtect_new(mut your_last_per_commitment_secret_arg: crate::c_types::ThirtyTwoBytes, mut my_current_per_commitment_point_arg: crate::c_types::PublicKey) -> DataLossProtect {
@@ -2079,6 +2252,7 @@ pub(crate) extern "C" fn DataLossProtect_clone_void(this_ptr: *const c_void) -> 
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeDataLossProtect)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the DataLossProtect
 pub extern "C" fn DataLossProtect_clone(orig: &DataLossProtect) -> DataLossProtect {
 	orig.clone()
 }
@@ -2090,9 +2264,15 @@ type nativeChannelReestablish = nativeChannelReestablishImport;
 #[must_use]
 #[repr(C)]
 pub struct ChannelReestablish {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelReestablish,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -2103,8 +2283,9 @@ impl Drop for ChannelReestablish {
 		}
 	}
 }
+/// Frees any resources used by the ChannelReestablish, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelReestablish_free(this_ptr: ChannelReestablish) { }
+pub extern "C" fn ChannelReestablish_free(this_obj: ChannelReestablish) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelReestablish_free_void(this_ptr: *mut c_void) {
@@ -2168,6 +2349,7 @@ pub(crate) extern "C" fn ChannelReestablish_clone_void(this_ptr: *const c_void) 
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelReestablish)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ChannelReestablish
 pub extern "C" fn ChannelReestablish_clone(orig: &ChannelReestablish) -> ChannelReestablish {
 	orig.clone()
 }
@@ -2179,9 +2361,15 @@ type nativeAnnouncementSignatures = nativeAnnouncementSignaturesImport;
 #[must_use]
 #[repr(C)]
 pub struct AnnouncementSignatures {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeAnnouncementSignatures,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -2192,8 +2380,9 @@ impl Drop for AnnouncementSignatures {
 		}
 	}
 }
+/// Frees any resources used by the AnnouncementSignatures, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn AnnouncementSignatures_free(this_ptr: AnnouncementSignatures) { }
+pub extern "C" fn AnnouncementSignatures_free(this_obj: AnnouncementSignatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn AnnouncementSignatures_free_void(this_ptr: *mut c_void) {
@@ -2253,6 +2442,7 @@ pub extern "C" fn AnnouncementSignatures_get_bitcoin_signature(this_ptr: &Announ
 pub extern "C" fn AnnouncementSignatures_set_bitcoin_signature(this_ptr: &mut AnnouncementSignatures, mut val: crate::c_types::Signature) {
 	unsafe { &mut *this_ptr.inner }.bitcoin_signature = val.into_rust();
 }
+/// Constructs a new AnnouncementSignatures given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn AnnouncementSignatures_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut short_channel_id_arg: u64, mut node_signature_arg: crate::c_types::Signature, mut bitcoin_signature_arg: crate::c_types::Signature) -> AnnouncementSignatures {
@@ -2278,6 +2468,7 @@ pub(crate) extern "C" fn AnnouncementSignatures_clone_void(this_ptr: *const c_vo
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeAnnouncementSignatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the AnnouncementSignatures
 pub extern "C" fn AnnouncementSignatures_clone(orig: &AnnouncementSignatures) -> AnnouncementSignatures {
 	orig.clone()
 }
@@ -2288,26 +2479,36 @@ pub extern "C" fn AnnouncementSignatures_clone(orig: &AnnouncementSignatures) ->
 pub enum NetAddress {
 	/// An IPv4 address/port on which the peer is listening.
 	IPv4 {
+		/// The 4-byte IPv4 address
 		addr: crate::c_types::FourBytes,
+		/// The port on which the node is listening
 		port: u16,
 	},
 	/// An IPv6 address/port on which the peer is listening.
 	IPv6 {
+		/// The 16-byte IPv6 address
 		addr: crate::c_types::SixteenBytes,
+		/// The port on which the node is listening
 		port: u16,
 	},
 	/// An old-style Tor onion address/port on which the peer is listening.
 	OnionV2 {
+		/// The bytes (usually encoded in base32 with \".onion\" appended)
 		addr: crate::c_types::TenBytes,
+		/// The port on which the node is listening
 		port: u16,
 	},
 	/// A new-style Tor onion address/port on which the peer is listening.
 	/// To create the human-readable \"hostname\", concatenate ed25519_pubkey, checksum, and version,
 	/// wrap as base32 and append \".onion\".
 	OnionV3 {
+		/// The ed25519 long-term public key of the peer
 		ed25519_pubkey: crate::c_types::ThirtyTwoBytes,
+		/// The checksum of the pubkey and version, as included in the onion address
 		checksum: u16,
+		/// The version byte, as defined by the Tor Onion v3 spec.
 		version: u8,
+		/// The port on which the node is listening
 		port: u16,
 	},
 }
@@ -2458,17 +2659,21 @@ impl NetAddress {
 		}
 	}
 }
+/// Frees any resources used by the NetAddress
 #[no_mangle]
 pub extern "C" fn NetAddress_free(this_ptr: NetAddress) { }
+/// Creates a copy of the NetAddress
 #[no_mangle]
 pub extern "C" fn NetAddress_clone(orig: &NetAddress) -> NetAddress {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the NetAddress object into a byte array which can be read by NetAddress_read
 pub extern "C" fn NetAddress_write(obj: &NetAddress) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
 }
 #[no_mangle]
+/// Read a Result from a byte array, created by Result_write
 pub extern "C" fn Result_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CResult_NetAddressu8ZDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = match o { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::NetAddress::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { e }).into() }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -2482,9 +2687,15 @@ type nativeUnsignedNodeAnnouncement = nativeUnsignedNodeAnnouncementImport;
 #[must_use]
 #[repr(C)]
 pub struct UnsignedNodeAnnouncement {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeUnsignedNodeAnnouncement,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -2495,8 +2706,9 @@ impl Drop for UnsignedNodeAnnouncement {
 		}
 	}
 }
+/// Frees any resources used by the UnsignedNodeAnnouncement, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn UnsignedNodeAnnouncement_free(this_ptr: UnsignedNodeAnnouncement) { }
+pub extern "C" fn UnsignedNodeAnnouncement_free(this_obj: UnsignedNodeAnnouncement) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn UnsignedNodeAnnouncement_free_void(this_ptr: *mut c_void) {
@@ -2592,6 +2804,7 @@ pub(crate) extern "C" fn UnsignedNodeAnnouncement_clone_void(this_ptr: *const c_
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUnsignedNodeAnnouncement)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the UnsignedNodeAnnouncement
 pub extern "C" fn UnsignedNodeAnnouncement_clone(orig: &UnsignedNodeAnnouncement) -> UnsignedNodeAnnouncement {
 	orig.clone()
 }
@@ -2603,9 +2816,15 @@ type nativeNodeAnnouncement = nativeNodeAnnouncementImport;
 #[must_use]
 #[repr(C)]
 pub struct NodeAnnouncement {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeNodeAnnouncement,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -2616,8 +2835,9 @@ impl Drop for NodeAnnouncement {
 		}
 	}
 }
+/// Frees any resources used by the NodeAnnouncement, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn NodeAnnouncement_free(this_ptr: NodeAnnouncement) { }
+pub extern "C" fn NodeAnnouncement_free(this_obj: NodeAnnouncement) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn NodeAnnouncement_free_void(this_ptr: *mut c_void) {
@@ -2655,6 +2875,7 @@ pub extern "C" fn NodeAnnouncement_get_contents(this_ptr: &NodeAnnouncement) -> 
 pub extern "C" fn NodeAnnouncement_set_contents(this_ptr: &mut NodeAnnouncement, mut val: crate::ln::msgs::UnsignedNodeAnnouncement) {
 	unsafe { &mut *this_ptr.inner }.contents = *unsafe { Box::from_raw(val.take_inner()) };
 }
+/// Constructs a new NodeAnnouncement given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NodeAnnouncement_new(mut signature_arg: crate::c_types::Signature, mut contents_arg: crate::ln::msgs::UnsignedNodeAnnouncement) -> NodeAnnouncement {
@@ -2678,6 +2899,7 @@ pub(crate) extern "C" fn NodeAnnouncement_clone_void(this_ptr: *const c_void) ->
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNodeAnnouncement)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the NodeAnnouncement
 pub extern "C" fn NodeAnnouncement_clone(orig: &NodeAnnouncement) -> NodeAnnouncement {
 	orig.clone()
 }
@@ -2689,9 +2911,15 @@ type nativeUnsignedChannelAnnouncement = nativeUnsignedChannelAnnouncementImport
 #[must_use]
 #[repr(C)]
 pub struct UnsignedChannelAnnouncement {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeUnsignedChannelAnnouncement,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -2702,8 +2930,9 @@ impl Drop for UnsignedChannelAnnouncement {
 		}
 	}
 }
+/// Frees any resources used by the UnsignedChannelAnnouncement, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn UnsignedChannelAnnouncement_free(this_ptr: UnsignedChannelAnnouncement) { }
+pub extern "C" fn UnsignedChannelAnnouncement_free(this_obj: UnsignedChannelAnnouncement) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn UnsignedChannelAnnouncement_free_void(this_ptr: *mut c_void) {
@@ -2811,6 +3040,7 @@ pub(crate) extern "C" fn UnsignedChannelAnnouncement_clone_void(this_ptr: *const
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUnsignedChannelAnnouncement)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the UnsignedChannelAnnouncement
 pub extern "C" fn UnsignedChannelAnnouncement_clone(orig: &UnsignedChannelAnnouncement) -> UnsignedChannelAnnouncement {
 	orig.clone()
 }
@@ -2822,9 +3052,15 @@ type nativeChannelAnnouncement = nativeChannelAnnouncementImport;
 #[must_use]
 #[repr(C)]
 pub struct ChannelAnnouncement {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelAnnouncement,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -2835,8 +3071,9 @@ impl Drop for ChannelAnnouncement {
 		}
 	}
 }
+/// Frees any resources used by the ChannelAnnouncement, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelAnnouncement_free(this_ptr: ChannelAnnouncement) { }
+pub extern "C" fn ChannelAnnouncement_free(this_obj: ChannelAnnouncement) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelAnnouncement_free_void(this_ptr: *mut c_void) {
@@ -2907,6 +3144,7 @@ pub extern "C" fn ChannelAnnouncement_get_contents(this_ptr: &ChannelAnnouncemen
 pub extern "C" fn ChannelAnnouncement_set_contents(this_ptr: &mut ChannelAnnouncement, mut val: crate::ln::msgs::UnsignedChannelAnnouncement) {
 	unsafe { &mut *this_ptr.inner }.contents = *unsafe { Box::from_raw(val.take_inner()) };
 }
+/// Constructs a new ChannelAnnouncement given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelAnnouncement_new(mut node_signature_1_arg: crate::c_types::Signature, mut node_signature_2_arg: crate::c_types::Signature, mut bitcoin_signature_1_arg: crate::c_types::Signature, mut bitcoin_signature_2_arg: crate::c_types::Signature, mut contents_arg: crate::ln::msgs::UnsignedChannelAnnouncement) -> ChannelAnnouncement {
@@ -2933,6 +3171,7 @@ pub(crate) extern "C" fn ChannelAnnouncement_clone_void(this_ptr: *const c_void)
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelAnnouncement)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ChannelAnnouncement
 pub extern "C" fn ChannelAnnouncement_clone(orig: &ChannelAnnouncement) -> ChannelAnnouncement {
 	orig.clone()
 }
@@ -2944,9 +3183,15 @@ type nativeUnsignedChannelUpdate = nativeUnsignedChannelUpdateImport;
 #[must_use]
 #[repr(C)]
 pub struct UnsignedChannelUpdate {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeUnsignedChannelUpdate,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -2957,8 +3202,9 @@ impl Drop for UnsignedChannelUpdate {
 		}
 	}
 }
+/// Frees any resources used by the UnsignedChannelUpdate, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn UnsignedChannelUpdate_free(this_ptr: UnsignedChannelUpdate) { }
+pub extern "C" fn UnsignedChannelUpdate_free(this_obj: UnsignedChannelUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn UnsignedChannelUpdate_free_void(this_ptr: *mut c_void) {
@@ -3077,6 +3323,7 @@ pub(crate) extern "C" fn UnsignedChannelUpdate_clone_void(this_ptr: *const c_voi
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUnsignedChannelUpdate)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the UnsignedChannelUpdate
 pub extern "C" fn UnsignedChannelUpdate_clone(orig: &UnsignedChannelUpdate) -> UnsignedChannelUpdate {
 	orig.clone()
 }
@@ -3088,9 +3335,15 @@ type nativeChannelUpdate = nativeChannelUpdateImport;
 #[must_use]
 #[repr(C)]
 pub struct ChannelUpdate {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelUpdate,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -3101,8 +3354,9 @@ impl Drop for ChannelUpdate {
 		}
 	}
 }
+/// Frees any resources used by the ChannelUpdate, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelUpdate_free(this_ptr: ChannelUpdate) { }
+pub extern "C" fn ChannelUpdate_free(this_obj: ChannelUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelUpdate_free_void(this_ptr: *mut c_void) {
@@ -3140,6 +3394,7 @@ pub extern "C" fn ChannelUpdate_get_contents(this_ptr: &ChannelUpdate) -> crate:
 pub extern "C" fn ChannelUpdate_set_contents(this_ptr: &mut ChannelUpdate, mut val: crate::ln::msgs::UnsignedChannelUpdate) {
 	unsafe { &mut *this_ptr.inner }.contents = *unsafe { Box::from_raw(val.take_inner()) };
 }
+/// Constructs a new ChannelUpdate given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelUpdate_new(mut signature_arg: crate::c_types::Signature, mut contents_arg: crate::ln::msgs::UnsignedChannelUpdate) -> ChannelUpdate {
@@ -3163,6 +3418,7 @@ pub(crate) extern "C" fn ChannelUpdate_clone_void(this_ptr: *const c_void) -> *m
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelUpdate)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ChannelUpdate
 pub extern "C" fn ChannelUpdate_clone(orig: &ChannelUpdate) -> ChannelUpdate {
 	orig.clone()
 }
@@ -3177,9 +3433,15 @@ type nativeQueryChannelRange = nativeQueryChannelRangeImport;
 #[must_use]
 #[repr(C)]
 pub struct QueryChannelRange {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeQueryChannelRange,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -3190,8 +3452,9 @@ impl Drop for QueryChannelRange {
 		}
 	}
 }
+/// Frees any resources used by the QueryChannelRange, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn QueryChannelRange_free(this_ptr: QueryChannelRange) { }
+pub extern "C" fn QueryChannelRange_free(this_obj: QueryChannelRange) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn QueryChannelRange_free_void(this_ptr: *mut c_void) {
@@ -3240,6 +3503,7 @@ pub extern "C" fn QueryChannelRange_get_number_of_blocks(this_ptr: &QueryChannel
 pub extern "C" fn QueryChannelRange_set_number_of_blocks(this_ptr: &mut QueryChannelRange, mut val: u32) {
 	unsafe { &mut *this_ptr.inner }.number_of_blocks = val;
 }
+/// Constructs a new QueryChannelRange given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn QueryChannelRange_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut first_blocknum_arg: u32, mut number_of_blocks_arg: u32) -> QueryChannelRange {
@@ -3264,6 +3528,7 @@ pub(crate) extern "C" fn QueryChannelRange_clone_void(this_ptr: *const c_void) -
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeQueryChannelRange)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the QueryChannelRange
 pub extern "C" fn QueryChannelRange_clone(orig: &QueryChannelRange) -> QueryChannelRange {
 	orig.clone()
 }
@@ -3281,9 +3546,15 @@ type nativeReplyChannelRange = nativeReplyChannelRangeImport;
 #[must_use]
 #[repr(C)]
 pub struct ReplyChannelRange {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeReplyChannelRange,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -3294,8 +3565,9 @@ impl Drop for ReplyChannelRange {
 		}
 	}
 }
+/// Frees any resources used by the ReplyChannelRange, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ReplyChannelRange_free(this_ptr: ReplyChannelRange) { }
+pub extern "C" fn ReplyChannelRange_free(this_obj: ReplyChannelRange) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ReplyChannelRange_free_void(this_ptr: *mut c_void) {
@@ -3361,6 +3633,7 @@ pub extern "C" fn ReplyChannelRange_set_short_channel_ids(this_ptr: &mut ReplyCh
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
 	unsafe { &mut *this_ptr.inner }.short_channel_ids = local_val;
 }
+/// Constructs a new ReplyChannelRange given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ReplyChannelRange_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut first_blocknum_arg: u32, mut number_of_blocks_arg: u32, mut sync_complete_arg: bool, mut short_channel_ids_arg: crate::c_types::derived::CVec_u64Z) -> ReplyChannelRange {
@@ -3388,6 +3661,7 @@ pub(crate) extern "C" fn ReplyChannelRange_clone_void(this_ptr: *const c_void) -
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeReplyChannelRange)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ReplyChannelRange
 pub extern "C" fn ReplyChannelRange_clone(orig: &ReplyChannelRange) -> ReplyChannelRange {
 	orig.clone()
 }
@@ -3406,9 +3680,15 @@ type nativeQueryShortChannelIds = nativeQueryShortChannelIdsImport;
 #[must_use]
 #[repr(C)]
 pub struct QueryShortChannelIds {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeQueryShortChannelIds,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -3419,8 +3699,9 @@ impl Drop for QueryShortChannelIds {
 		}
 	}
 }
+/// Frees any resources used by the QueryShortChannelIds, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn QueryShortChannelIds_free(this_ptr: QueryShortChannelIds) { }
+pub extern "C" fn QueryShortChannelIds_free(this_obj: QueryShortChannelIds) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn QueryShortChannelIds_free_void(this_ptr: *mut c_void) {
@@ -3453,6 +3734,7 @@ pub extern "C" fn QueryShortChannelIds_set_short_channel_ids(this_ptr: &mut Quer
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
 	unsafe { &mut *this_ptr.inner }.short_channel_ids = local_val;
 }
+/// Constructs a new QueryShortChannelIds given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn QueryShortChannelIds_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut short_channel_ids_arg: crate::c_types::derived::CVec_u64Z) -> QueryShortChannelIds {
@@ -3477,6 +3759,7 @@ pub(crate) extern "C" fn QueryShortChannelIds_clone_void(this_ptr: *const c_void
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeQueryShortChannelIds)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the QueryShortChannelIds
 pub extern "C" fn QueryShortChannelIds_clone(orig: &QueryShortChannelIds) -> QueryShortChannelIds {
 	orig.clone()
 }
@@ -3491,9 +3774,15 @@ type nativeReplyShortChannelIdsEnd = nativeReplyShortChannelIdsEndImport;
 #[must_use]
 #[repr(C)]
 pub struct ReplyShortChannelIdsEnd {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeReplyShortChannelIdsEnd,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -3504,8 +3793,9 @@ impl Drop for ReplyShortChannelIdsEnd {
 		}
 	}
 }
+/// Frees any resources used by the ReplyShortChannelIdsEnd, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ReplyShortChannelIdsEnd_free(this_ptr: ReplyShortChannelIdsEnd) { }
+pub extern "C" fn ReplyShortChannelIdsEnd_free(this_obj: ReplyShortChannelIdsEnd) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ReplyShortChannelIdsEnd_free_void(this_ptr: *mut c_void) {
@@ -3545,6 +3835,7 @@ pub extern "C" fn ReplyShortChannelIdsEnd_get_full_information(this_ptr: &ReplyS
 pub extern "C" fn ReplyShortChannelIdsEnd_set_full_information(this_ptr: &mut ReplyShortChannelIdsEnd, mut val: bool) {
 	unsafe { &mut *this_ptr.inner }.full_information = val;
 }
+/// Constructs a new ReplyShortChannelIdsEnd given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ReplyShortChannelIdsEnd_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut full_information_arg: bool) -> ReplyShortChannelIdsEnd {
@@ -3568,6 +3859,7 @@ pub(crate) extern "C" fn ReplyShortChannelIdsEnd_clone_void(this_ptr: *const c_v
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeReplyShortChannelIdsEnd)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ReplyShortChannelIdsEnd
 pub extern "C" fn ReplyShortChannelIdsEnd_clone(orig: &ReplyShortChannelIdsEnd) -> ReplyShortChannelIdsEnd {
 	orig.clone()
 }
@@ -3581,9 +3873,15 @@ type nativeGossipTimestampFilter = nativeGossipTimestampFilterImport;
 #[must_use]
 #[repr(C)]
 pub struct GossipTimestampFilter {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeGossipTimestampFilter,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -3594,8 +3892,9 @@ impl Drop for GossipTimestampFilter {
 		}
 	}
 }
+/// Frees any resources used by the GossipTimestampFilter, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn GossipTimestampFilter_free(this_ptr: GossipTimestampFilter) { }
+pub extern "C" fn GossipTimestampFilter_free(this_obj: GossipTimestampFilter) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn GossipTimestampFilter_free_void(this_ptr: *mut c_void) {
@@ -3644,6 +3943,7 @@ pub extern "C" fn GossipTimestampFilter_get_timestamp_range(this_ptr: &GossipTim
 pub extern "C" fn GossipTimestampFilter_set_timestamp_range(this_ptr: &mut GossipTimestampFilter, mut val: u32) {
 	unsafe { &mut *this_ptr.inner }.timestamp_range = val;
 }
+/// Constructs a new GossipTimestampFilter given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn GossipTimestampFilter_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut first_timestamp_arg: u32, mut timestamp_range_arg: u32) -> GossipTimestampFilter {
@@ -3668,6 +3968,7 @@ pub(crate) extern "C" fn GossipTimestampFilter_clone_void(this_ptr: *const c_voi
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeGossipTimestampFilter)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the GossipTimestampFilter
 pub extern "C" fn GossipTimestampFilter_clone(orig: &GossipTimestampFilter) -> GossipTimestampFilter {
 	orig.clone()
 }
@@ -3678,12 +3979,14 @@ pub extern "C" fn GossipTimestampFilter_clone(orig: &GossipTimestampFilter) -> G
 pub enum ErrorAction {
 	/// The peer took some action which made us think they were useless. Disconnect them.
 	DisconnectPeer {
+		/// An error message which we should make an effort to send before we disconnect.
 		msg: crate::ln::msgs::ErrorMessage,
 	},
 	/// The peer did something harmless that we weren't able to process, just log and ignore
 	IgnoreError,
 	/// The peer did something incorrect. Tell them.
 	SendErrorMessage {
+		/// The message to send.
 		msg: crate::ln::msgs::ErrorMessage,
 	},
 }
@@ -3762,8 +4065,10 @@ impl ErrorAction {
 		}
 	}
 }
+/// Frees any resources used by the ErrorAction
 #[no_mangle]
 pub extern "C" fn ErrorAction_free(this_ptr: ErrorAction) { }
+/// Creates a copy of the ErrorAction
 #[no_mangle]
 pub extern "C" fn ErrorAction_clone(orig: &ErrorAction) -> ErrorAction {
 	orig.clone()
@@ -3776,9 +4081,15 @@ type nativeLightningError = nativeLightningErrorImport;
 #[must_use]
 #[repr(C)]
 pub struct LightningError {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeLightningError,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -3789,8 +4100,9 @@ impl Drop for LightningError {
 		}
 	}
 }
+/// Frees any resources used by the LightningError, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn LightningError_free(this_ptr: LightningError) { }
+pub extern "C" fn LightningError_free(this_obj: LightningError) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn LightningError_free_void(this_ptr: *mut c_void) {
@@ -3828,6 +4140,7 @@ pub extern "C" fn LightningError_get_action(this_ptr: &LightningError) -> crate:
 pub extern "C" fn LightningError_set_action(this_ptr: &mut LightningError, mut val: crate::ln::msgs::ErrorAction) {
 	unsafe { &mut *this_ptr.inner }.action = val.into_native();
 }
+/// Constructs a new LightningError given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn LightningError_new(mut err_arg: crate::c_types::derived::CVec_u8Z, mut action_arg: crate::ln::msgs::ErrorAction) -> LightningError {
@@ -3851,6 +4164,7 @@ pub(crate) extern "C" fn LightningError_clone_void(this_ptr: *const c_void) -> *
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeLightningError)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the LightningError
 pub extern "C" fn LightningError_clone(orig: &LightningError) -> LightningError {
 	orig.clone()
 }
@@ -3863,9 +4177,15 @@ type nativeCommitmentUpdate = nativeCommitmentUpdateImport;
 #[must_use]
 #[repr(C)]
 pub struct CommitmentUpdate {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeCommitmentUpdate,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -3876,8 +4196,9 @@ impl Drop for CommitmentUpdate {
 		}
 	}
 }
+/// Frees any resources used by the CommitmentUpdate, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn CommitmentUpdate_free(this_ptr: CommitmentUpdate) { }
+pub extern "C" fn CommitmentUpdate_free(this_obj: CommitmentUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn CommitmentUpdate_free_void(this_ptr: *mut c_void) {
@@ -3941,6 +4262,7 @@ pub extern "C" fn CommitmentUpdate_get_commitment_signed(this_ptr: &CommitmentUp
 pub extern "C" fn CommitmentUpdate_set_commitment_signed(this_ptr: &mut CommitmentUpdate, mut val: crate::ln::msgs::CommitmentSigned) {
 	unsafe { &mut *this_ptr.inner }.commitment_signed = *unsafe { Box::from_raw(val.take_inner()) };
 }
+/// Constructs a new CommitmentUpdate given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_new(mut update_add_htlcs_arg: crate::c_types::derived::CVec_UpdateAddHTLCZ, mut update_fulfill_htlcs_arg: crate::c_types::derived::CVec_UpdateFulfillHTLCZ, mut update_fail_htlcs_arg: crate::c_types::derived::CVec_UpdateFailHTLCZ, mut update_fail_malformed_htlcs_arg: crate::c_types::derived::CVec_UpdateFailMalformedHTLCZ, mut update_fee_arg: crate::ln::msgs::UpdateFee, mut commitment_signed_arg: crate::ln::msgs::CommitmentSigned) -> CommitmentUpdate {
@@ -3973,6 +4295,7 @@ pub(crate) extern "C" fn CommitmentUpdate_clone_void(this_ptr: *const c_void) ->
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCommitmentUpdate)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the CommitmentUpdate
 pub extern "C" fn CommitmentUpdate_clone(orig: &CommitmentUpdate) -> CommitmentUpdate {
 	orig.clone()
 }
@@ -3985,16 +4308,24 @@ pub extern "C" fn CommitmentUpdate_clone(orig: &CommitmentUpdate) -> CommitmentU
 pub enum HTLCFailChannelUpdate {
 	/// We received an error which included a full ChannelUpdate message.
 	ChannelUpdateMessage {
+		/// The unwrapped message we received
 		msg: crate::ln::msgs::ChannelUpdate,
 	},
 	/// We received an error which indicated only that a channel has been closed
 	ChannelClosed {
+		/// The short_channel_id which has now closed.
 		short_channel_id: u64,
+		/// when this true, this channel should be permanently removed from the
+		/// consideration. Otherwise, this channel can be restored as new channel_update is received
 		is_permanent: bool,
 	},
 	/// We received an error which indicated only that a node has failed
 	NodeFailure {
+		/// The node_id that has failed.
 		node_id: crate::c_types::PublicKey,
+		/// when this true, node should be permanently removed from the
+		/// consideration. Otherwise, the channels connected to this node can be
+		/// restored as new channel_update is received
 		is_permanent: bool,
 	},
 }
@@ -4099,8 +4430,10 @@ impl HTLCFailChannelUpdate {
 		}
 	}
 }
+/// Frees any resources used by the HTLCFailChannelUpdate
 #[no_mangle]
 pub extern "C" fn HTLCFailChannelUpdate_free(this_ptr: HTLCFailChannelUpdate) { }
+/// Creates a copy of the HTLCFailChannelUpdate
 #[no_mangle]
 pub extern "C" fn HTLCFailChannelUpdate_clone(orig: &HTLCFailChannelUpdate) -> HTLCFailChannelUpdate {
 	orig.clone()
@@ -4111,6 +4444,8 @@ pub extern "C" fn HTLCFailChannelUpdate_clone(orig: &HTLCFailChannelUpdate) -> H
 /// they MUST NOT be called in parallel when the two calls have the same their_node_id.
 #[repr(C)]
 pub struct ChannelMessageHandler {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Handle an incoming open_channel message from the given peer.
 	pub handle_open_channel: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, their_features: crate::ln::features::InitFeatures, msg: &crate::ln::msgs::OpenChannel),
@@ -4153,7 +4488,10 @@ pub struct ChannelMessageHandler {
 	pub handle_channel_reestablish: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ChannelReestablish),
 	/// Handle an incoming error message from the given peer.
 	pub handle_error: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ErrorMessage),
+/// Implementation of MessageSendEventsProvider for this object.
 	pub MessageSendEventsProvider: crate::util::events::MessageSendEventsProvider,
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 impl lightning::util::events::MessageSendEventsProvider for ChannelMessageHandler {
@@ -4252,6 +4590,8 @@ impl Drop for ChannelMessageHandler {
 /// repeated disk I/O for queries accessing different parts of the network graph.
 #[repr(C)]
 pub struct RoutingMessageHandler {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Handle an incoming node_announcement message, returning true if it should be forwarded on,
 	/// false or returning an Err otherwise.
@@ -4301,7 +4641,10 @@ pub struct RoutingMessageHandler {
 	/// list of short_channel_ids.
 	#[must_use]
 	pub handle_query_short_channel_ids: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: crate::ln::msgs::QueryShortChannelIds) -> crate::c_types::derived::CResult_NoneLightningErrorZ,
+/// Implementation of MessageSendEventsProvider for this object.
 	pub MessageSendEventsProvider: crate::util::events::MessageSendEventsProvider,
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for RoutingMessageHandler {}
@@ -4387,6 +4730,7 @@ impl Drop for RoutingMessageHandler {
 	}
 }
 #[no_mangle]
+/// Serialize the AcceptChannel object into a byte array which can be read by AcceptChannel_read
 pub extern "C" fn AcceptChannel_write(obj: &AcceptChannel) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4395,12 +4739,14 @@ pub(crate) extern "C" fn AcceptChannel_write_void(obj: *const c_void) -> crate::
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeAcceptChannel) })
 }
 #[no_mangle]
+/// Read a AcceptChannel from a byte array, created by AcceptChannel_write
 pub extern "C" fn AcceptChannel_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_AcceptChannelDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::AcceptChannel { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the AnnouncementSignatures object into a byte array which can be read by AnnouncementSignatures_read
 pub extern "C" fn AnnouncementSignatures_write(obj: &AnnouncementSignatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4409,12 +4755,14 @@ pub(crate) extern "C" fn AnnouncementSignatures_write_void(obj: *const c_void) -
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeAnnouncementSignatures) })
 }
 #[no_mangle]
+/// Read a AnnouncementSignatures from a byte array, created by AnnouncementSignatures_write
 pub extern "C" fn AnnouncementSignatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_AnnouncementSignaturesDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::AnnouncementSignatures { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the ChannelReestablish object into a byte array which can be read by ChannelReestablish_read
 pub extern "C" fn ChannelReestablish_write(obj: &ChannelReestablish) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4423,12 +4771,14 @@ pub(crate) extern "C" fn ChannelReestablish_write_void(obj: *const c_void) -> cr
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelReestablish) })
 }
 #[no_mangle]
+/// Read a ChannelReestablish from a byte array, created by ChannelReestablish_write
 pub extern "C" fn ChannelReestablish_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelReestablishDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::ChannelReestablish { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the ClosingSigned object into a byte array which can be read by ClosingSigned_read
 pub extern "C" fn ClosingSigned_write(obj: &ClosingSigned) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4437,12 +4787,14 @@ pub(crate) extern "C" fn ClosingSigned_write_void(obj: *const c_void) -> crate::
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeClosingSigned) })
 }
 #[no_mangle]
+/// Read a ClosingSigned from a byte array, created by ClosingSigned_write
 pub extern "C" fn ClosingSigned_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ClosingSignedDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::ClosingSigned { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the CommitmentSigned object into a byte array which can be read by CommitmentSigned_read
 pub extern "C" fn CommitmentSigned_write(obj: &CommitmentSigned) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4451,12 +4803,14 @@ pub(crate) extern "C" fn CommitmentSigned_write_void(obj: *const c_void) -> crat
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeCommitmentSigned) })
 }
 #[no_mangle]
+/// Read a CommitmentSigned from a byte array, created by CommitmentSigned_write
 pub extern "C" fn CommitmentSigned_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CommitmentSignedDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::CommitmentSigned { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the FundingCreated object into a byte array which can be read by FundingCreated_read
 pub extern "C" fn FundingCreated_write(obj: &FundingCreated) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4465,12 +4819,14 @@ pub(crate) extern "C" fn FundingCreated_write_void(obj: *const c_void) -> crate:
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeFundingCreated) })
 }
 #[no_mangle]
+/// Read a FundingCreated from a byte array, created by FundingCreated_write
 pub extern "C" fn FundingCreated_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_FundingCreatedDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::FundingCreated { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the FundingSigned object into a byte array which can be read by FundingSigned_read
 pub extern "C" fn FundingSigned_write(obj: &FundingSigned) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4479,12 +4835,14 @@ pub(crate) extern "C" fn FundingSigned_write_void(obj: *const c_void) -> crate::
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeFundingSigned) })
 }
 #[no_mangle]
+/// Read a FundingSigned from a byte array, created by FundingSigned_write
 pub extern "C" fn FundingSigned_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_FundingSignedDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::FundingSigned { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the FundingLocked object into a byte array which can be read by FundingLocked_read
 pub extern "C" fn FundingLocked_write(obj: &FundingLocked) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4493,12 +4851,14 @@ pub(crate) extern "C" fn FundingLocked_write_void(obj: *const c_void) -> crate::
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeFundingLocked) })
 }
 #[no_mangle]
+/// Read a FundingLocked from a byte array, created by FundingLocked_write
 pub extern "C" fn FundingLocked_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_FundingLockedDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::FundingLocked { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the Init object into a byte array which can be read by Init_read
 pub extern "C" fn Init_write(obj: &Init) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4507,12 +4867,14 @@ pub(crate) extern "C" fn Init_write_void(obj: *const c_void) -> crate::c_types::
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeInit) })
 }
 #[no_mangle]
+/// Read a Init from a byte array, created by Init_write
 pub extern "C" fn Init_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_InitDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::Init { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the OpenChannel object into a byte array which can be read by OpenChannel_read
 pub extern "C" fn OpenChannel_write(obj: &OpenChannel) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4521,12 +4883,14 @@ pub(crate) extern "C" fn OpenChannel_write_void(obj: *const c_void) -> crate::c_
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOpenChannel) })
 }
 #[no_mangle]
+/// Read a OpenChannel from a byte array, created by OpenChannel_write
 pub extern "C" fn OpenChannel_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_OpenChannelDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::OpenChannel { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the RevokeAndACK object into a byte array which can be read by RevokeAndACK_read
 pub extern "C" fn RevokeAndACK_write(obj: &RevokeAndACK) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4535,12 +4899,14 @@ pub(crate) extern "C" fn RevokeAndACK_write_void(obj: *const c_void) -> crate::c
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRevokeAndACK) })
 }
 #[no_mangle]
+/// Read a RevokeAndACK from a byte array, created by RevokeAndACK_write
 pub extern "C" fn RevokeAndACK_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RevokeAndACKDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::RevokeAndACK { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the Shutdown object into a byte array which can be read by Shutdown_read
 pub extern "C" fn Shutdown_write(obj: &Shutdown) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4549,12 +4915,14 @@ pub(crate) extern "C" fn Shutdown_write_void(obj: *const c_void) -> crate::c_typ
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeShutdown) })
 }
 #[no_mangle]
+/// Read a Shutdown from a byte array, created by Shutdown_write
 pub extern "C" fn Shutdown_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ShutdownDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::Shutdown { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the UpdateFailHTLC object into a byte array which can be read by UpdateFailHTLC_read
 pub extern "C" fn UpdateFailHTLC_write(obj: &UpdateFailHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4563,12 +4931,14 @@ pub(crate) extern "C" fn UpdateFailHTLC_write_void(obj: *const c_void) -> crate:
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUpdateFailHTLC) })
 }
 #[no_mangle]
+/// Read a UpdateFailHTLC from a byte array, created by UpdateFailHTLC_write
 pub extern "C" fn UpdateFailHTLC_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UpdateFailHTLCDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::UpdateFailHTLC { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the UpdateFailMalformedHTLC object into a byte array which can be read by UpdateFailMalformedHTLC_read
 pub extern "C" fn UpdateFailMalformedHTLC_write(obj: &UpdateFailMalformedHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4577,12 +4947,14 @@ pub(crate) extern "C" fn UpdateFailMalformedHTLC_write_void(obj: *const c_void) 
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUpdateFailMalformedHTLC) })
 }
 #[no_mangle]
+/// Read a UpdateFailMalformedHTLC from a byte array, created by UpdateFailMalformedHTLC_write
 pub extern "C" fn UpdateFailMalformedHTLC_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UpdateFailMalformedHTLCDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::UpdateFailMalformedHTLC { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the UpdateFee object into a byte array which can be read by UpdateFee_read
 pub extern "C" fn UpdateFee_write(obj: &UpdateFee) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4591,12 +4963,14 @@ pub(crate) extern "C" fn UpdateFee_write_void(obj: *const c_void) -> crate::c_ty
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUpdateFee) })
 }
 #[no_mangle]
+/// Read a UpdateFee from a byte array, created by UpdateFee_write
 pub extern "C" fn UpdateFee_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UpdateFeeDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::UpdateFee { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the UpdateFulfillHTLC object into a byte array which can be read by UpdateFulfillHTLC_read
 pub extern "C" fn UpdateFulfillHTLC_write(obj: &UpdateFulfillHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4605,12 +4979,14 @@ pub(crate) extern "C" fn UpdateFulfillHTLC_write_void(obj: *const c_void) -> cra
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUpdateFulfillHTLC) })
 }
 #[no_mangle]
+/// Read a UpdateFulfillHTLC from a byte array, created by UpdateFulfillHTLC_write
 pub extern "C" fn UpdateFulfillHTLC_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UpdateFulfillHTLCDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::UpdateFulfillHTLC { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the UpdateAddHTLC object into a byte array which can be read by UpdateAddHTLC_read
 pub extern "C" fn UpdateAddHTLC_write(obj: &UpdateAddHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4619,12 +4995,14 @@ pub(crate) extern "C" fn UpdateAddHTLC_write_void(obj: *const c_void) -> crate::
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUpdateAddHTLC) })
 }
 #[no_mangle]
+/// Read a UpdateAddHTLC from a byte array, created by UpdateAddHTLC_write
 pub extern "C" fn UpdateAddHTLC_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UpdateAddHTLCDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::UpdateAddHTLC { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the Ping object into a byte array which can be read by Ping_read
 pub extern "C" fn Ping_write(obj: &Ping) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4633,12 +5011,14 @@ pub(crate) extern "C" fn Ping_write_void(obj: *const c_void) -> crate::c_types::
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativePing) })
 }
 #[no_mangle]
+/// Read a Ping from a byte array, created by Ping_write
 pub extern "C" fn Ping_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_PingDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::Ping { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the Pong object into a byte array which can be read by Pong_read
 pub extern "C" fn Pong_write(obj: &Pong) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4647,12 +5027,14 @@ pub(crate) extern "C" fn Pong_write_void(obj: *const c_void) -> crate::c_types::
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativePong) })
 }
 #[no_mangle]
+/// Read a Pong from a byte array, created by Pong_write
 pub extern "C" fn Pong_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_PongDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::Pong { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the UnsignedChannelAnnouncement object into a byte array which can be read by UnsignedChannelAnnouncement_read
 pub extern "C" fn UnsignedChannelAnnouncement_write(obj: &UnsignedChannelAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4661,12 +5043,14 @@ pub(crate) extern "C" fn UnsignedChannelAnnouncement_write_void(obj: *const c_vo
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUnsignedChannelAnnouncement) })
 }
 #[no_mangle]
+/// Read a UnsignedChannelAnnouncement from a byte array, created by UnsignedChannelAnnouncement_write
 pub extern "C" fn UnsignedChannelAnnouncement_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UnsignedChannelAnnouncementDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::UnsignedChannelAnnouncement { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the ChannelAnnouncement object into a byte array which can be read by ChannelAnnouncement_read
 pub extern "C" fn ChannelAnnouncement_write(obj: &ChannelAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4675,12 +5059,14 @@ pub(crate) extern "C" fn ChannelAnnouncement_write_void(obj: *const c_void) -> c
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelAnnouncement) })
 }
 #[no_mangle]
+/// Read a ChannelAnnouncement from a byte array, created by ChannelAnnouncement_write
 pub extern "C" fn ChannelAnnouncement_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelAnnouncementDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::ChannelAnnouncement { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the UnsignedChannelUpdate object into a byte array which can be read by UnsignedChannelUpdate_read
 pub extern "C" fn UnsignedChannelUpdate_write(obj: &UnsignedChannelUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4689,12 +5075,14 @@ pub(crate) extern "C" fn UnsignedChannelUpdate_write_void(obj: *const c_void) ->
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUnsignedChannelUpdate) })
 }
 #[no_mangle]
+/// Read a UnsignedChannelUpdate from a byte array, created by UnsignedChannelUpdate_write
 pub extern "C" fn UnsignedChannelUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UnsignedChannelUpdateDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::UnsignedChannelUpdate { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the ChannelUpdate object into a byte array which can be read by ChannelUpdate_read
 pub extern "C" fn ChannelUpdate_write(obj: &ChannelUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4703,12 +5091,14 @@ pub(crate) extern "C" fn ChannelUpdate_write_void(obj: *const c_void) -> crate::
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelUpdate) })
 }
 #[no_mangle]
+/// Read a ChannelUpdate from a byte array, created by ChannelUpdate_write
 pub extern "C" fn ChannelUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelUpdateDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the ErrorMessage object into a byte array which can be read by ErrorMessage_read
 pub extern "C" fn ErrorMessage_write(obj: &ErrorMessage) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4717,12 +5107,14 @@ pub(crate) extern "C" fn ErrorMessage_write_void(obj: *const c_void) -> crate::c
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeErrorMessage) })
 }
 #[no_mangle]
+/// Read a ErrorMessage from a byte array, created by ErrorMessage_write
 pub extern "C" fn ErrorMessage_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ErrorMessageDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::ErrorMessage { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the UnsignedNodeAnnouncement object into a byte array which can be read by UnsignedNodeAnnouncement_read
 pub extern "C" fn UnsignedNodeAnnouncement_write(obj: &UnsignedNodeAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4731,12 +5123,14 @@ pub(crate) extern "C" fn UnsignedNodeAnnouncement_write_void(obj: *const c_void)
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUnsignedNodeAnnouncement) })
 }
 #[no_mangle]
+/// Read a UnsignedNodeAnnouncement from a byte array, created by UnsignedNodeAnnouncement_write
 pub extern "C" fn UnsignedNodeAnnouncement_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UnsignedNodeAnnouncementDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::UnsignedNodeAnnouncement { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the NodeAnnouncement object into a byte array which can be read by NodeAnnouncement_read
 pub extern "C" fn NodeAnnouncement_write(obj: &NodeAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4745,18 +5139,21 @@ pub(crate) extern "C" fn NodeAnnouncement_write_void(obj: *const c_void) -> crat
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNodeAnnouncement) })
 }
 #[no_mangle]
+/// Read a NodeAnnouncement from a byte array, created by NodeAnnouncement_write
 pub extern "C" fn NodeAnnouncement_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeAnnouncementDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::NodeAnnouncement { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Read a QueryShortChannelIds from a byte array, created by QueryShortChannelIds_write
 pub extern "C" fn QueryShortChannelIds_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_QueryShortChannelIdsDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::QueryShortChannelIds { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the QueryShortChannelIds object into a byte array which can be read by QueryShortChannelIds_read
 pub extern "C" fn QueryShortChannelIds_write(obj: &QueryShortChannelIds) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4765,12 +5162,14 @@ pub(crate) extern "C" fn QueryShortChannelIds_write_void(obj: *const c_void) -> 
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeQueryShortChannelIds) })
 }
 #[no_mangle]
+/// Read a ReplyShortChannelIdsEnd from a byte array, created by ReplyShortChannelIdsEnd_write
 pub extern "C" fn ReplyShortChannelIdsEnd_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ReplyShortChannelIdsEndDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::ReplyShortChannelIdsEnd { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the ReplyShortChannelIdsEnd object into a byte array which can be read by ReplyShortChannelIdsEnd_read
 pub extern "C" fn ReplyShortChannelIdsEnd_write(obj: &ReplyShortChannelIdsEnd) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4779,12 +5178,14 @@ pub(crate) extern "C" fn ReplyShortChannelIdsEnd_write_void(obj: *const c_void) 
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeReplyShortChannelIdsEnd) })
 }
 #[no_mangle]
+/// Read a QueryChannelRange from a byte array, created by QueryChannelRange_write
 pub extern "C" fn QueryChannelRange_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_QueryChannelRangeDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::QueryChannelRange { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the QueryChannelRange object into a byte array which can be read by QueryChannelRange_read
 pub extern "C" fn QueryChannelRange_write(obj: &QueryChannelRange) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4793,12 +5194,14 @@ pub(crate) extern "C" fn QueryChannelRange_write_void(obj: *const c_void) -> cra
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeQueryChannelRange) })
 }
 #[no_mangle]
+/// Read a ReplyChannelRange from a byte array, created by ReplyChannelRange_write
 pub extern "C" fn ReplyChannelRange_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ReplyChannelRangeDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::ReplyChannelRange { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the ReplyChannelRange object into a byte array which can be read by ReplyChannelRange_read
 pub extern "C" fn ReplyChannelRange_write(obj: &ReplyChannelRange) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -4807,12 +5210,14 @@ pub(crate) extern "C" fn ReplyChannelRange_write_void(obj: *const c_void) -> cra
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeReplyChannelRange) })
 }
 #[no_mangle]
+/// Read a GossipTimestampFilter from a byte array, created by GossipTimestampFilter_write
 pub extern "C" fn GossipTimestampFilter_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_GossipTimestampFilterDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::ln::msgs::GossipTimestampFilter { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the GossipTimestampFilter object into a byte array which can be read by GossipTimestampFilter_read
 pub extern "C" fn GossipTimestampFilter_write(obj: &GossipTimestampFilter) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }

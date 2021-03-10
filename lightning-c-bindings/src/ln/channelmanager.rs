@@ -56,9 +56,15 @@ type nativeChannelManager = nativeChannelManagerImport<crate::chain::keysinterfa
 #[must_use]
 #[repr(C)]
 pub struct ChannelManager {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelManager,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -69,8 +75,9 @@ impl Drop for ChannelManager {
 		}
 	}
 }
+/// Frees any resources used by the ChannelManager, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelManager_free(this_ptr: ChannelManager) { }
+pub extern "C" fn ChannelManager_free(this_obj: ChannelManager) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelManager_free_void(this_ptr: *mut c_void) {
@@ -98,9 +105,15 @@ type nativeChainParameters = nativeChainParametersImport;
 #[must_use]
 #[repr(C)]
 pub struct ChainParameters {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChainParameters,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -111,8 +124,9 @@ impl Drop for ChainParameters {
 		}
 	}
 }
+/// Frees any resources used by the ChainParameters, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChainParameters_free(this_ptr: ChainParameters) { }
+pub extern "C" fn ChainParameters_free(this_obj: ChainParameters) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChainParameters_free_void(this_ptr: *mut c_void) {
@@ -165,6 +179,7 @@ pub extern "C" fn ChainParameters_get_latest_height(this_ptr: &ChainParameters) 
 pub extern "C" fn ChainParameters_set_latest_height(this_ptr: &mut ChainParameters, mut val: usize) {
 	unsafe { &mut *this_ptr.inner }.latest_height = val;
 }
+/// Constructs a new ChainParameters given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChainParameters_new(mut network_arg: crate::bitcoin::network::Network, mut latest_hash_arg: crate::c_types::ThirtyTwoBytes, mut latest_height_arg: usize) -> ChainParameters {
@@ -182,9 +197,15 @@ type nativeChannelDetails = nativeChannelDetailsImport;
 #[must_use]
 #[repr(C)]
 pub struct ChannelDetails {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelDetails,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -195,8 +216,9 @@ impl Drop for ChannelDetails {
 		}
 	}
 }
+/// Frees any resources used by the ChannelDetails, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelDetails_free(this_ptr: ChannelDetails) { }
+pub extern "C" fn ChannelDetails_free(this_obj: ChannelDetails) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelDetails_free_void(this_ptr: *mut c_void) {
@@ -341,6 +363,7 @@ pub(crate) extern "C" fn ChannelDetails_clone_void(this_ptr: *const c_void) -> *
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelDetails)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ChannelDetails
 pub extern "C" fn ChannelDetails_clone(orig: &ChannelDetails) -> ChannelDetails {
 	orig.clone()
 }
@@ -504,8 +527,10 @@ impl PaymentSendFailure {
 		}
 	}
 }
+/// Frees any resources used by the PaymentSendFailure
 #[no_mangle]
 pub extern "C" fn PaymentSendFailure_free(this_ptr: PaymentSendFailure) { }
+/// Creates a copy of the PaymentSendFailure
 #[no_mangle]
 pub extern "C" fn PaymentSendFailure_clone(orig: &PaymentSendFailure) -> PaymentSendFailure {
 	orig.clone()
@@ -784,6 +809,8 @@ impl From<nativeChannelManager> for crate::util::events::MessageSendEventsProvid
 		ret
 	}
 }
+/// Constructs a new MessageSendEventsProvider which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned MessageSendEventsProvider must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn ChannelManager_as_MessageSendEventsProvider(this_arg: &ChannelManager) -> crate::util::events::MessageSendEventsProvider {
 	crate::util::events::MessageSendEventsProvider {
@@ -810,6 +837,8 @@ impl From<nativeChannelManager> for crate::util::events::EventsProvider {
 		ret
 	}
 }
+/// Constructs a new EventsProvider which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned EventsProvider must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn ChannelManager_as_EventsProvider(this_arg: &ChannelManager) -> crate::util::events::EventsProvider {
 	crate::util::events::EventsProvider {
@@ -836,6 +865,8 @@ impl From<nativeChannelManager> for crate::chain::Listen {
 		ret
 	}
 }
+/// Constructs a new Listen which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned Listen must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn ChannelManager_as_Listen(this_arg: &ChannelManager) -> crate::chain::Listen {
 	crate::chain::Listen {
@@ -887,6 +918,8 @@ impl From<nativeChannelManager> for crate::ln::msgs::ChannelMessageHandler {
 		ret
 	}
 }
+/// Constructs a new ChannelMessageHandler which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned ChannelMessageHandler must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn ChannelManager_as_ChannelMessageHandler(this_arg: &ChannelManager) -> crate::ln::msgs::ChannelMessageHandler {
 	crate::ln::msgs::ChannelMessageHandler {
@@ -984,6 +1017,7 @@ extern "C" fn ChannelManager_ChannelMessageHandler_get_and_clear_pending_msg_eve
 }
 
 #[no_mangle]
+/// Serialize the ChannelManager object into a byte array which can be read by ChannelManager_read
 pub extern "C" fn ChannelManager_write(obj: &ChannelManager) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -1023,9 +1057,15 @@ type nativeChannelManagerReadArgs = nativeChannelManagerReadArgsImport<'static, 
 #[must_use]
 #[repr(C)]
 pub struct ChannelManagerReadArgs {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelManagerReadArgs,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -1036,8 +1076,9 @@ impl Drop for ChannelManagerReadArgs {
 		}
 	}
 }
+/// Frees any resources used by the ChannelManagerReadArgs, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelManagerReadArgs_free(this_ptr: ChannelManagerReadArgs) { }
+pub extern "C" fn ChannelManagerReadArgs_free(this_obj: ChannelManagerReadArgs) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelManagerReadArgs_free_void(this_ptr: *mut c_void) {
@@ -1155,6 +1196,7 @@ pub extern "C" fn ChannelManagerReadArgs_new(mut keys_manager: crate::chain::key
 }
 
 #[no_mangle]
+/// Read a C2Tuple_BlockHashChannelManagerZ from a byte array, created by C2Tuple_BlockHashChannelManagerZ_write
 pub extern "C" fn C2Tuple_BlockHashChannelManagerZ_read(ser: crate::c_types::u8slice, arg: crate::ln::channelmanager::ChannelManagerReadArgs) -> crate::c_types::derived::CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ {
 	let arg_conv = *unsafe { Box::from_raw(arg.take_inner()) };
 	let res: Result<(bitcoin::hash_types::BlockHash, lightning::ln::channelmanager::ChannelManager<crate::chain::keysinterface::Sign, crate::chain::Watch, crate::chain::chaininterface::BroadcasterInterface, crate::chain::keysinterface::KeysInterface, crate::chain::chaininterface::FeeEstimator, crate::util::logger::Logger>), lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);

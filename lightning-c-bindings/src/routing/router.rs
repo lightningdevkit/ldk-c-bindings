@@ -15,9 +15,15 @@ type nativeRouteHop = nativeRouteHopImport;
 #[must_use]
 #[repr(C)]
 pub struct RouteHop {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeRouteHop,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -28,8 +34,9 @@ impl Drop for RouteHop {
 		}
 	}
 }
+/// Frees any resources used by the RouteHop, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn RouteHop_free(this_ptr: RouteHop) { }
+pub extern "C" fn RouteHop_free(this_obj: RouteHop) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn RouteHop_free_void(this_ptr: *mut c_void) {
@@ -121,6 +128,7 @@ pub extern "C" fn RouteHop_get_cltv_expiry_delta(this_ptr: &RouteHop) -> u32 {
 pub extern "C" fn RouteHop_set_cltv_expiry_delta(this_ptr: &mut RouteHop, mut val: u32) {
 	unsafe { &mut *this_ptr.inner }.cltv_expiry_delta = val;
 }
+/// Constructs a new RouteHop given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RouteHop_new(mut pubkey_arg: crate::c_types::PublicKey, mut node_features_arg: crate::ln::features::NodeFeatures, mut short_channel_id_arg: u64, mut channel_features_arg: crate::ln::features::ChannelFeatures, mut fee_msat_arg: u64, mut cltv_expiry_delta_arg: u32) -> RouteHop {
@@ -148,6 +156,7 @@ pub(crate) extern "C" fn RouteHop_clone_void(this_ptr: *const c_void) -> *mut c_
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRouteHop)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the RouteHop
 pub extern "C" fn RouteHop_clone(orig: &RouteHop) -> RouteHop {
 	orig.clone()
 }
@@ -160,9 +169,15 @@ type nativeRoute = nativeRouteImport;
 #[must_use]
 #[repr(C)]
 pub struct Route {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeRoute,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -173,8 +188,9 @@ impl Drop for Route {
 		}
 	}
 }
+/// Frees any resources used by the Route, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn Route_free(this_ptr: Route) { }
+pub extern "C" fn Route_free(this_obj: Route) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn Route_free_void(this_ptr: *mut c_void) {
@@ -201,6 +217,7 @@ pub extern "C" fn Route_set_paths(this_ptr: &mut Route, mut val: crate::c_types:
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { let mut local_val_0 = Vec::new(); for mut item in item.into_rust().drain(..) { local_val_0.push( { *unsafe { Box::from_raw(item.take_inner()) } }); }; local_val_0 }); };
 	unsafe { &mut *this_ptr.inner }.paths = local_val;
 }
+/// Constructs a new Route given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Route_new(mut paths_arg: crate::c_types::derived::CVec_CVec_RouteHopZZ) -> Route {
@@ -224,10 +241,12 @@ pub(crate) extern "C" fn Route_clone_void(this_ptr: *const c_void) -> *mut c_voi
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRoute)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the Route
 pub extern "C" fn Route_clone(orig: &Route) -> Route {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the Route object into a byte array which can be read by Route_read
 pub extern "C" fn Route_write(obj: &Route) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -236,6 +255,7 @@ pub(crate) extern "C" fn Route_write_void(obj: *const c_void) -> crate::c_types:
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRoute) })
 }
 #[no_mangle]
+/// Read a Route from a byte array, created by Route_write
 pub extern "C" fn Route_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::routing::router::Route { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -249,9 +269,15 @@ type nativeRouteHint = nativeRouteHintImport;
 #[must_use]
 #[repr(C)]
 pub struct RouteHint {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeRouteHint,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -262,8 +288,9 @@ impl Drop for RouteHint {
 		}
 	}
 }
+/// Frees any resources used by the RouteHint, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn RouteHint_free(this_ptr: RouteHint) { }
+pub extern "C" fn RouteHint_free(this_obj: RouteHint) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn RouteHint_free_void(this_ptr: *mut c_void) {
@@ -338,10 +365,14 @@ pub(crate) extern "C" fn RouteHint_clone_void(this_ptr: *const c_void) -> *mut c
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRouteHint)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the RouteHint
 pub extern "C" fn RouteHint_clone(orig: &RouteHint) -> RouteHint {
 	orig.clone()
 }
 /// Gets a route from us (payer) to the given target node (payee).
+///
+/// If the payee provided features in their invoice, they should be provided via payee_features.
+/// Without this, MPP will only be used if the payee's features are available in the network graph.
 ///
 /// Extra routing hops between known nodes and the target will be used if they are included in
 /// last_hops.
@@ -358,10 +389,11 @@ pub extern "C" fn RouteHint_clone(orig: &RouteHint) -> RouteHint {
 /// equal), however the enabled/disabled bit on such channels as well as the
 /// htlc_minimum_msat/htlc_maximum_msat *are* checked as they may change based on the receiving node.
 #[no_mangle]
-pub extern "C" fn get_route(mut our_node_id: crate::c_types::PublicKey, network: &crate::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::util::logger::Logger) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+pub extern "C" fn get_route(mut our_node_id: crate::c_types::PublicKey, network: &crate::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, mut payee_features: crate::ln::features::InvoiceFeatures, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::util::logger::Logger) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+	let mut local_payee_features = if payee_features.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(payee_features.take_inner()) } }) };
 	let mut local_first_hops_base = if first_hops == std::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { unsafe { &*item.inner } }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
 	let mut local_last_hops = Vec::new(); for mut item in last_hops.as_slice().iter() { local_last_hops.push( { unsafe { &*item.inner } }); };
-	let mut ret = lightning::routing::router::get_route(&our_node_id.into_rust(), unsafe { &*network.inner }, &payee.into_rust(), local_first_hops, &local_last_hops[..], final_value_msat, final_cltv, logger);
+	let mut ret = lightning::routing::router::get_route(&our_node_id.into_rust(), unsafe { &*network.inner }, &payee.into_rust(), local_payee_features, local_first_hops, &local_last_hops[..], final_value_msat, final_cltv, logger);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::routing::router::Route { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::LightningError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_ret
 }

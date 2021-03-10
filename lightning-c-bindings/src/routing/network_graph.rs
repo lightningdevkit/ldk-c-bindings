@@ -12,9 +12,15 @@ type nativeNetworkGraph = nativeNetworkGraphImport;
 #[must_use]
 #[repr(C)]
 pub struct NetworkGraph {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeNetworkGraph,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -25,8 +31,9 @@ impl Drop for NetworkGraph {
 		}
 	}
 }
+/// Frees any resources used by the NetworkGraph, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn NetworkGraph_free(this_ptr: NetworkGraph) { }
+pub extern "C" fn NetworkGraph_free(this_obj: NetworkGraph) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn NetworkGraph_free_void(this_ptr: *mut c_void) {
@@ -57,6 +64,7 @@ pub(crate) extern "C" fn NetworkGraph_clone_void(this_ptr: *const c_void) -> *mu
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNetworkGraph)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the NetworkGraph
 pub extern "C" fn NetworkGraph_clone(orig: &NetworkGraph) -> NetworkGraph {
 	orig.clone()
 }
@@ -70,9 +78,15 @@ type nativeLockedNetworkGraph = nativeLockedNetworkGraphImport<'static>;
 #[must_use]
 #[repr(C)]
 pub struct LockedNetworkGraph {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeLockedNetworkGraph,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -83,8 +97,9 @@ impl Drop for LockedNetworkGraph {
 		}
 	}
 }
+/// Frees any resources used by the LockedNetworkGraph, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn LockedNetworkGraph_free(this_ptr: LockedNetworkGraph) { }
+pub extern "C" fn LockedNetworkGraph_free(this_obj: LockedNetworkGraph) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn LockedNetworkGraph_free_void(this_ptr: *mut c_void) {
@@ -112,9 +127,15 @@ type nativeNetGraphMsgHandler = nativeNetGraphMsgHandlerImport<crate::chain::Acc
 #[must_use]
 #[repr(C)]
 pub struct NetGraphMsgHandler {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeNetGraphMsgHandler,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -125,8 +146,9 @@ impl Drop for NetGraphMsgHandler {
 		}
 	}
 }
+/// Frees any resources used by the NetGraphMsgHandler, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn NetGraphMsgHandler_free(this_ptr: NetGraphMsgHandler) { }
+pub extern "C" fn NetGraphMsgHandler_free(this_obj: NetGraphMsgHandler) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn NetGraphMsgHandler_free_void(this_ptr: *mut c_void) {
@@ -203,6 +225,8 @@ impl From<nativeNetGraphMsgHandler> for crate::ln::msgs::RoutingMessageHandler {
 		ret
 	}
 }
+/// Constructs a new RoutingMessageHandler which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned RoutingMessageHandler must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn NetGraphMsgHandler_as_RoutingMessageHandler(this_arg: &NetGraphMsgHandler) -> crate::ln::msgs::RoutingMessageHandler {
 	crate::ln::msgs::RoutingMessageHandler {
@@ -305,6 +329,8 @@ impl From<nativeNetGraphMsgHandler> for crate::util::events::MessageSendEventsPr
 		ret
 	}
 }
+/// Constructs a new MessageSendEventsProvider which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned MessageSendEventsProvider must be freed before this_arg is
 #[no_mangle]
 pub extern "C" fn NetGraphMsgHandler_as_MessageSendEventsProvider(this_arg: &NetGraphMsgHandler) -> crate::util::events::MessageSendEventsProvider {
 	crate::util::events::MessageSendEventsProvider {
@@ -330,9 +356,15 @@ type nativeDirectionalChannelInfo = nativeDirectionalChannelInfoImport;
 #[must_use]
 #[repr(C)]
 pub struct DirectionalChannelInfo {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeDirectionalChannelInfo,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -343,8 +375,9 @@ impl Drop for DirectionalChannelInfo {
 		}
 	}
 }
+/// Frees any resources used by the DirectionalChannelInfo, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_free(this_ptr: DirectionalChannelInfo) { }
+pub extern "C" fn DirectionalChannelInfo_free(this_obj: DirectionalChannelInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn DirectionalChannelInfo_free_void(this_ptr: *mut c_void) {
@@ -451,10 +484,12 @@ pub(crate) extern "C" fn DirectionalChannelInfo_clone_void(this_ptr: *const c_vo
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeDirectionalChannelInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the DirectionalChannelInfo
 pub extern "C" fn DirectionalChannelInfo_clone(orig: &DirectionalChannelInfo) -> DirectionalChannelInfo {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the DirectionalChannelInfo object into a byte array which can be read by DirectionalChannelInfo_read
 pub extern "C" fn DirectionalChannelInfo_write(obj: &DirectionalChannelInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -463,6 +498,7 @@ pub(crate) extern "C" fn DirectionalChannelInfo_write_void(obj: *const c_void) -
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeDirectionalChannelInfo) })
 }
 #[no_mangle]
+/// Read a DirectionalChannelInfo from a byte array, created by DirectionalChannelInfo_write
 pub extern "C" fn DirectionalChannelInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_DirectionalChannelInfoDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::routing::network_graph::DirectionalChannelInfo { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -477,9 +513,15 @@ type nativeChannelInfo = nativeChannelInfoImport;
 #[must_use]
 #[repr(C)]
 pub struct ChannelInfo {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelInfo,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -490,8 +532,9 @@ impl Drop for ChannelInfo {
 		}
 	}
 }
+/// Frees any resources used by the ChannelInfo, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelInfo_free(this_ptr: ChannelInfo) { }
+pub extern "C" fn ChannelInfo_free(this_obj: ChannelInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelInfo_free_void(this_ptr: *mut c_void) {
@@ -600,10 +643,12 @@ pub(crate) extern "C" fn ChannelInfo_clone_void(this_ptr: *const c_void) -> *mut
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ChannelInfo
 pub extern "C" fn ChannelInfo_clone(orig: &ChannelInfo) -> ChannelInfo {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the ChannelInfo object into a byte array which can be read by ChannelInfo_read
 pub extern "C" fn ChannelInfo_write(obj: &ChannelInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -612,6 +657,7 @@ pub(crate) extern "C" fn ChannelInfo_write_void(obj: *const c_void) -> crate::c_
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelInfo) })
 }
 #[no_mangle]
+/// Read a ChannelInfo from a byte array, created by ChannelInfo_write
 pub extern "C" fn ChannelInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelInfoDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::routing::network_graph::ChannelInfo { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -625,9 +671,15 @@ type nativeRoutingFees = nativeRoutingFeesImport;
 #[must_use]
 #[repr(C)]
 pub struct RoutingFees {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeRoutingFees,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -638,8 +690,9 @@ impl Drop for RoutingFees {
 		}
 	}
 }
+/// Frees any resources used by the RoutingFees, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn RoutingFees_free(this_ptr: RoutingFees) { }
+pub extern "C" fn RoutingFees_free(this_obj: RoutingFees) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn RoutingFees_free_void(this_ptr: *mut c_void) {
@@ -679,6 +732,7 @@ pub extern "C" fn RoutingFees_get_proportional_millionths(this_ptr: &RoutingFees
 pub extern "C" fn RoutingFees_set_proportional_millionths(this_ptr: &mut RoutingFees, mut val: u32) {
 	unsafe { &mut *this_ptr.inner }.proportional_millionths = val;
 }
+/// Constructs a new RoutingFees given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RoutingFees_new(mut base_msat_arg: u32, mut proportional_millionths_arg: u32) -> RoutingFees {
@@ -702,16 +756,19 @@ pub(crate) extern "C" fn RoutingFees_clone_void(this_ptr: *const c_void) -> *mut
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRoutingFees)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the RoutingFees
 pub extern "C" fn RoutingFees_clone(orig: &RoutingFees) -> RoutingFees {
 	orig.clone()
 }
 #[no_mangle]
+/// Read a RoutingFees from a byte array, created by RoutingFees_write
 pub extern "C" fn RoutingFees_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RoutingFeesDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::routing::network_graph::RoutingFees { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the RoutingFees object into a byte array which can be read by RoutingFees_read
 pub extern "C" fn RoutingFees_write(obj: &RoutingFees) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -727,9 +784,15 @@ type nativeNodeAnnouncementInfo = nativeNodeAnnouncementInfoImport;
 #[must_use]
 #[repr(C)]
 pub struct NodeAnnouncementInfo {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeNodeAnnouncementInfo,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -740,8 +803,9 @@ impl Drop for NodeAnnouncementInfo {
 		}
 	}
 }
+/// Frees any resources used by the NodeAnnouncementInfo, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn NodeAnnouncementInfo_free(this_ptr: NodeAnnouncementInfo) { }
+pub extern "C" fn NodeAnnouncementInfo_free(this_obj: NodeAnnouncementInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn NodeAnnouncementInfo_free_void(this_ptr: *mut c_void) {
@@ -832,6 +896,7 @@ pub extern "C" fn NodeAnnouncementInfo_set_announcement_message(this_ptr: &mut N
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *this_ptr.inner }.announcement_message = local_val;
 }
+/// Constructs a new NodeAnnouncementInfo given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NodeAnnouncementInfo_new(mut features_arg: crate::ln::features::NodeFeatures, mut last_update_arg: u32, mut rgb_arg: crate::c_types::ThreeBytes, mut alias_arg: crate::c_types::ThirtyTwoBytes, mut addresses_arg: crate::c_types::derived::CVec_NetAddressZ, mut announcement_message_arg: crate::ln::msgs::NodeAnnouncement) -> NodeAnnouncementInfo {
@@ -861,10 +926,12 @@ pub(crate) extern "C" fn NodeAnnouncementInfo_clone_void(this_ptr: *const c_void
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNodeAnnouncementInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the NodeAnnouncementInfo
 pub extern "C" fn NodeAnnouncementInfo_clone(orig: &NodeAnnouncementInfo) -> NodeAnnouncementInfo {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the NodeAnnouncementInfo object into a byte array which can be read by NodeAnnouncementInfo_read
 pub extern "C" fn NodeAnnouncementInfo_write(obj: &NodeAnnouncementInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -873,6 +940,7 @@ pub(crate) extern "C" fn NodeAnnouncementInfo_write_void(obj: *const c_void) -> 
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNodeAnnouncementInfo) })
 }
 #[no_mangle]
+/// Read a NodeAnnouncementInfo from a byte array, created by NodeAnnouncementInfo_write
 pub extern "C" fn NodeAnnouncementInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeAnnouncementInfoDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::routing::network_graph::NodeAnnouncementInfo { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -886,9 +954,15 @@ type nativeNodeInfo = nativeNodeInfoImport;
 #[must_use]
 #[repr(C)]
 pub struct NodeInfo {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeNodeInfo,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -899,8 +973,9 @@ impl Drop for NodeInfo {
 		}
 	}
 }
+/// Frees any resources used by the NodeInfo, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn NodeInfo_free(this_ptr: NodeInfo) { }
+pub extern "C" fn NodeInfo_free(this_obj: NodeInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn NodeInfo_free_void(this_ptr: *mut c_void) {
@@ -956,6 +1031,7 @@ pub extern "C" fn NodeInfo_set_announcement_info(this_ptr: &mut NodeInfo, mut va
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *this_ptr.inner }.announcement_info = local_val;
 }
+/// Constructs a new NodeInfo given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NodeInfo_new(mut channels_arg: crate::c_types::derived::CVec_u64Z, mut lowest_inbound_channel_fees_arg: crate::routing::network_graph::RoutingFees, mut announcement_info_arg: crate::routing::network_graph::NodeAnnouncementInfo) -> NodeInfo {
@@ -983,10 +1059,12 @@ pub(crate) extern "C" fn NodeInfo_clone_void(this_ptr: *const c_void) -> *mut c_
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNodeInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the NodeInfo
 pub extern "C" fn NodeInfo_clone(orig: &NodeInfo) -> NodeInfo {
 	orig.clone()
 }
 #[no_mangle]
+/// Serialize the NodeInfo object into a byte array which can be read by NodeInfo_read
 pub extern "C" fn NodeInfo_write(obj: &NodeInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -995,12 +1073,14 @@ pub(crate) extern "C" fn NodeInfo_write_void(obj: *const c_void) -> crate::c_typ
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNodeInfo) })
 }
 #[no_mangle]
+/// Read a NodeInfo from a byte array, created by NodeInfo_write
 pub extern "C" fn NodeInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeInfoDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::routing::network_graph::NodeInfo { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
+/// Serialize the NetworkGraph object into a byte array which can be read by NetworkGraph_read
 pub extern "C" fn NetworkGraph_write(obj: &NetworkGraph) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -1009,6 +1089,7 @@ pub(crate) extern "C" fn NetworkGraph_write_void(obj: *const c_void) -> crate::c
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNetworkGraph) })
 }
 #[no_mangle]
+/// Read a NetworkGraph from a byte array, created by NetworkGraph_write
 pub extern "C" fn NetworkGraph_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NetworkGraphDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::routing::network_graph::NetworkGraph { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };

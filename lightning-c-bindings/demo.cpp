@@ -508,7 +508,9 @@ int main() {
 		{
 			LDK::LockedNetworkGraph graph_2_locked = NetGraphMsgHandler_read_locked_graph(&net_graph2);
 			LDK::NetworkGraph graph_2_ref = LockedNetworkGraph_graph(&graph_2_locked);
-			LDK::CResult_RouteLightningErrorZ route = get_route(ChannelManager_get_our_node_id(&cm1), &graph_2_ref, ChannelManager_get_our_node_id(&cm2), &outbound_channels, LDKCVec_RouteHintZ {
+			LDK::CResult_RouteLightningErrorZ route = get_route(ChannelManager_get_our_node_id(&cm1), &graph_2_ref, ChannelManager_get_our_node_id(&cm2), LDKInvoiceFeatures {
+					.inner = NULL, .is_owned = false
+				}, &outbound_channels, LDKCVec_RouteHintZ {
 					.data = NULL, .datalen = 0
 				}, 5000, 10, logger1);
 			assert(route->result_ok);

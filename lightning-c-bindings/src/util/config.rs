@@ -15,9 +15,15 @@ type nativeChannelHandshakeConfig = nativeChannelHandshakeConfigImport;
 #[must_use]
 #[repr(C)]
 pub struct ChannelHandshakeConfig {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelHandshakeConfig,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -28,8 +34,9 @@ impl Drop for ChannelHandshakeConfig {
 		}
 	}
 }
+/// Frees any resources used by the ChannelHandshakeConfig, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelHandshakeConfig_free(this_ptr: ChannelHandshakeConfig) { }
+pub extern "C" fn ChannelHandshakeConfig_free(this_obj: ChannelHandshakeConfig) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelHandshakeConfig_free_void(this_ptr: *mut c_void) {
@@ -120,6 +127,7 @@ pub extern "C" fn ChannelHandshakeConfig_get_our_htlc_minimum_msat(this_ptr: &Ch
 pub extern "C" fn ChannelHandshakeConfig_set_our_htlc_minimum_msat(this_ptr: &mut ChannelHandshakeConfig, mut val: u64) {
 	unsafe { &mut *this_ptr.inner }.our_htlc_minimum_msat = val;
 }
+/// Constructs a new ChannelHandshakeConfig given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our_to_self_delay_arg: u16, mut our_htlc_minimum_msat_arg: u64) -> ChannelHandshakeConfig {
@@ -144,9 +152,11 @@ pub(crate) extern "C" fn ChannelHandshakeConfig_clone_void(this_ptr: *const c_vo
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelHandshakeConfig)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ChannelHandshakeConfig
 pub extern "C" fn ChannelHandshakeConfig_clone(orig: &ChannelHandshakeConfig) -> ChannelHandshakeConfig {
 	orig.clone()
 }
+/// Creates a "default" ChannelHandshakeConfig. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_default() -> ChannelHandshakeConfig {
@@ -170,9 +180,15 @@ type nativeChannelHandshakeLimits = nativeChannelHandshakeLimitsImport;
 #[must_use]
 #[repr(C)]
 pub struct ChannelHandshakeLimits {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelHandshakeLimits,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -183,8 +199,9 @@ impl Drop for ChannelHandshakeLimits {
 		}
 	}
 }
+/// Frees any resources used by the ChannelHandshakeLimits, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelHandshakeLimits_free(this_ptr: ChannelHandshakeLimits) { }
+pub extern "C" fn ChannelHandshakeLimits_free(this_obj: ChannelHandshakeLimits) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelHandshakeLimits_free_void(this_ptr: *mut c_void) {
@@ -378,8 +395,8 @@ pub extern "C" fn ChannelHandshakeLimits_set_force_announced_channel_preference(
 /// Not checking this value would be a security issue, as our peer would be able to set it to
 /// max relative lock-time (a year) and we would \"lose\" money as it would be locked for a long time.
 ///
-/// Default value: MAX_LOCAL_BREAKDOWN_TIMEOUT (1008), which we also enforce as a maximum value
-/// so you can tweak config to reduce the loss of having useless locked funds (if your peer accepts)
+/// Default value: 2016, which we also enforce as a maximum value so you can tweak config to
+/// reduce the loss of having useless locked funds (if your peer accepts)
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_their_to_self_delay(this_ptr: &ChannelHandshakeLimits) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.their_to_self_delay;
@@ -390,12 +407,13 @@ pub extern "C" fn ChannelHandshakeLimits_get_their_to_self_delay(this_ptr: &Chan
 /// Not checking this value would be a security issue, as our peer would be able to set it to
 /// max relative lock-time (a year) and we would \"lose\" money as it would be locked for a long time.
 ///
-/// Default value: MAX_LOCAL_BREAKDOWN_TIMEOUT (1008), which we also enforce as a maximum value
-/// so you can tweak config to reduce the loss of having useless locked funds (if your peer accepts)
+/// Default value: 2016, which we also enforce as a maximum value so you can tweak config to
+/// reduce the loss of having useless locked funds (if your peer accepts)
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_set_their_to_self_delay(this_ptr: &mut ChannelHandshakeLimits, mut val: u16) {
 	unsafe { &mut *this_ptr.inner }.their_to_self_delay = val;
 }
+/// Constructs a new ChannelHandshakeLimits given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_new(mut min_funding_satoshis_arg: u64, mut max_htlc_minimum_msat_arg: u64, mut min_max_htlc_value_in_flight_msat_arg: u64, mut max_channel_reserve_satoshis_arg: u64, mut min_max_accepted_htlcs_arg: u16, mut min_dust_limit_satoshis_arg: u64, mut max_dust_limit_satoshis_arg: u64, mut max_minimum_depth_arg: u32, mut force_announced_channel_preference_arg: bool, mut their_to_self_delay_arg: u16) -> ChannelHandshakeLimits {
@@ -427,9 +445,11 @@ pub(crate) extern "C" fn ChannelHandshakeLimits_clone_void(this_ptr: *const c_vo
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelHandshakeLimits)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ChannelHandshakeLimits
 pub extern "C" fn ChannelHandshakeLimits_clone(orig: &ChannelHandshakeLimits) -> ChannelHandshakeLimits {
 	orig.clone()
 }
+/// Creates a "default" ChannelHandshakeLimits. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_default() -> ChannelHandshakeLimits {
@@ -444,9 +464,15 @@ type nativeChannelConfig = nativeChannelConfigImport;
 #[must_use]
 #[repr(C)]
 pub struct ChannelConfig {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeChannelConfig,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -457,8 +483,9 @@ impl Drop for ChannelConfig {
 		}
 	}
 }
+/// Frees any resources used by the ChannelConfig, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn ChannelConfig_free(this_ptr: ChannelConfig) { }
+pub extern "C" fn ChannelConfig_free(this_obj: ChannelConfig) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn ChannelConfig_free_void(this_ptr: *mut c_void) {
@@ -555,6 +582,7 @@ pub extern "C" fn ChannelConfig_get_commit_upfront_shutdown_pubkey(this_ptr: &Ch
 pub extern "C" fn ChannelConfig_set_commit_upfront_shutdown_pubkey(this_ptr: &mut ChannelConfig, mut val: bool) {
 	unsafe { &mut *this_ptr.inner }.commit_upfront_shutdown_pubkey = val;
 }
+/// Constructs a new ChannelConfig given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelConfig_new(mut fee_proportional_millionths_arg: u32, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool) -> ChannelConfig {
@@ -579,15 +607,18 @@ pub(crate) extern "C" fn ChannelConfig_clone_void(this_ptr: *const c_void) -> *m
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelConfig)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the ChannelConfig
 pub extern "C" fn ChannelConfig_clone(orig: &ChannelConfig) -> ChannelConfig {
 	orig.clone()
 }
+/// Creates a "default" ChannelConfig. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelConfig_default() -> ChannelConfig {
 	ChannelConfig { inner: Box::into_raw(Box::new(Default::default())), is_owned: true }
 }
 #[no_mangle]
+/// Serialize the ChannelConfig object into a byte array which can be read by ChannelConfig_read
 pub extern "C" fn ChannelConfig_write(obj: &ChannelConfig) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -596,6 +627,7 @@ pub(crate) extern "C" fn ChannelConfig_write_void(obj: *const c_void) -> crate::
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelConfig) })
 }
 #[no_mangle]
+/// Read a ChannelConfig from a byte array, created by ChannelConfig_write
 pub extern "C" fn ChannelConfig_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelConfigDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::util::config::ChannelConfig { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
@@ -612,9 +644,15 @@ type nativeUserConfig = nativeUserConfigImport;
 #[must_use]
 #[repr(C)]
 pub struct UserConfig {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeUserConfig,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -625,8 +663,9 @@ impl Drop for UserConfig {
 		}
 	}
 }
+/// Frees any resources used by the UserConfig, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn UserConfig_free(this_ptr: UserConfig) { }
+pub extern "C" fn UserConfig_free(this_obj: UserConfig) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn UserConfig_free_void(this_ptr: *mut c_void) {
@@ -675,6 +714,7 @@ pub extern "C" fn UserConfig_get_channel_options(this_ptr: &UserConfig) -> crate
 pub extern "C" fn UserConfig_set_channel_options(this_ptr: &mut UserConfig, mut val: crate::util::config::ChannelConfig) {
 	unsafe { &mut *this_ptr.inner }.channel_options = *unsafe { Box::from_raw(val.take_inner()) };
 }
+/// Constructs a new UserConfig given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn UserConfig_new(mut own_channel_config_arg: crate::util::config::ChannelHandshakeConfig, mut peer_channel_config_limits_arg: crate::util::config::ChannelHandshakeLimits, mut channel_options_arg: crate::util::config::ChannelConfig) -> UserConfig {
@@ -699,9 +739,11 @@ pub(crate) extern "C" fn UserConfig_clone_void(this_ptr: *const c_void) -> *mut 
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUserConfig)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the UserConfig
 pub extern "C" fn UserConfig_clone(orig: &UserConfig) -> UserConfig {
 	orig.clone()
 }
+/// Creates a "default" UserConfig. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn UserConfig_default() -> UserConfig {

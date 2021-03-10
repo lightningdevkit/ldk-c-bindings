@@ -52,6 +52,7 @@ impl AccessError {
 		}
 	}
 }
+/// Creates a copy of the AccessError
 #[no_mangle]
 pub extern "C" fn AccessError_clone(orig: &AccessError) -> AccessError {
 	orig.clone()
@@ -60,6 +61,8 @@ pub extern "C" fn AccessError_clone(orig: &AccessError) -> AccessError {
 /// UTXOs.
 #[repr(C)]
 pub struct Access {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Returns the transaction output of a funding transaction encoded by [`short_channel_id`].
 	/// Returns an error if `genesis_hash` is for a different chain or if such a transaction output
@@ -68,6 +71,8 @@ pub struct Access {
 	/// [`short_channel_id`]: https://github.com/lightningnetwork/lightning-rfc/blob/master/07-routing-gossip.md#definition-of-short_channel_id
 	#[must_use]
 	pub get_utxo: extern "C" fn (this_arg: *const c_void, genesis_hash: *const [u8; 32], short_channel_id: u64) -> crate::c_types::derived::CResult_TxOutAccessErrorZ,
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for Access {}
@@ -106,11 +111,15 @@ impl Drop for Access {
 /// Useful when needing to replay chain data upon startup or as new chain events occur.
 #[repr(C)]
 pub struct Listen {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Notifies the listener that a block was added at the given height.
 	pub block_connected: extern "C" fn (this_arg: *const c_void, block: crate::c_types::u8slice, height: u32),
 	/// Notifies the listener that a block was removed at the given height.
 	pub block_disconnected: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], height: u32),
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 
@@ -167,6 +176,8 @@ impl Drop for Listen {
 /// [`PermanentFailure`]: channelmonitor/enum.ChannelMonitorUpdateErr.html#variant.PermanentFailure
 #[repr(C)]
 pub struct Watch {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Watches a channel identified by `funding_txo` using `monitor`.
 	///
@@ -192,6 +203,8 @@ pub struct Watch {
 	/// events.
 	#[must_use]
 	pub release_pending_monitor_events: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_MonitorEventZ,
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for Watch {}
@@ -257,6 +270,8 @@ impl Drop for Watch {
 /// [BIP 158]: https://github.com/bitcoin/bips/blob/master/bip-0158.mediawiki
 #[repr(C)]
 pub struct Filter {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Registers interest in a transaction with `txid` and having an output with `script_pubkey` as
 	/// a spending condition.
@@ -264,6 +279,8 @@ pub struct Filter {
 	/// Registers interest in spends of a transaction output identified by `outpoint` having
 	/// `script_pubkey` as the spending condition.
 	pub register_output: extern "C" fn (this_arg: *const c_void, outpoint: &crate::chain::transaction::OutPoint, script_pubkey: crate::c_types::u8slice),
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for Filter {}

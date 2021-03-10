@@ -74,6 +74,7 @@ impl Level {
 		}
 	}
 }
+/// Creates a copy of the Level
 #[no_mangle]
 pub extern "C" fn Level_clone(orig: &Level) -> Level {
 	orig.clone()
@@ -89,9 +90,13 @@ pub extern "C" fn Level_max() -> crate::util::logger::Level {
 /// A trait encapsulating the operations required of a logger
 #[repr(C)]
 pub struct Logger {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Logs the `Record`
 	pub log: extern "C" fn (this_arg: *const c_void, record: *const std::os::raw::c_char),
+/// Frees any resources associated with this object given its this_arg pointer.
+/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Sync for Logger {}

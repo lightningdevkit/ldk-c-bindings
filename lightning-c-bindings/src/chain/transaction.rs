@@ -15,9 +15,15 @@ type nativeOutPoint = nativeOutPointImport;
 #[must_use]
 #[repr(C)]
 pub struct OutPoint {
+	/// A pointer to the opaque Rust object.
+
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
 	pub inner: *mut nativeOutPoint,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
 	pub is_owned: bool,
 }
 
@@ -28,8 +34,9 @@ impl Drop for OutPoint {
 		}
 	}
 }
+/// Frees any resources used by the OutPoint, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn OutPoint_free(this_ptr: OutPoint) { }
+pub extern "C" fn OutPoint_free(this_obj: OutPoint) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 extern "C" fn OutPoint_free_void(this_ptr: *mut c_void) {
@@ -67,6 +74,7 @@ pub extern "C" fn OutPoint_get_index(this_ptr: &OutPoint) -> u16 {
 pub extern "C" fn OutPoint_set_index(this_ptr: &mut OutPoint, mut val: u16) {
 	unsafe { &mut *this_ptr.inner }.index = val;
 }
+/// Constructs a new OutPoint given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn OutPoint_new(mut txid_arg: crate::c_types::ThirtyTwoBytes, mut index_arg: u16) -> OutPoint {
@@ -90,6 +98,7 @@ pub(crate) extern "C" fn OutPoint_clone_void(this_ptr: *const c_void) -> *mut c_
 	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeOutPoint)).clone() })) as *mut c_void
 }
 #[no_mangle]
+/// Creates a copy of the OutPoint
 pub extern "C" fn OutPoint_clone(orig: &OutPoint) -> OutPoint {
 	orig.clone()
 }
@@ -102,6 +111,7 @@ pub extern "C" fn OutPoint_to_channel_id(this_arg: &OutPoint) -> crate::c_types:
 }
 
 #[no_mangle]
+/// Serialize the OutPoint object into a byte array which can be read by OutPoint_read
 pub extern "C" fn OutPoint_write(obj: &OutPoint) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
 }
@@ -110,6 +120,7 @@ pub(crate) extern "C" fn OutPoint_write_void(obj: *const c_void) -> crate::c_typ
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOutPoint) })
 }
 #[no_mangle]
+/// Read a OutPoint from a byte array, created by OutPoint_write
 pub extern "C" fn OutPoint_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_OutPointDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };

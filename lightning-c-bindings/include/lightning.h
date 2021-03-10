@@ -5842,7 +5842,7 @@ MUST_USE_RES struct LDKChannelHandshakeConfig ChannelHandshakeConfig_new(uint32_
 struct LDKChannelHandshakeConfig ChannelHandshakeConfig_clone(const struct LDKChannelHandshakeConfig *NONNULL_PTR orig);
 
 /**
- * Creates a "default" ChannelHandshakeConfig. See other documentaiton for details on what this implies.
+ * Creates a "default" ChannelHandshakeConfig. See struct and individual field documentaiton for details on which values are used.
  */
 MUST_USE_RES struct LDKChannelHandshakeConfig ChannelHandshakeConfig_default(void);
 
@@ -6048,7 +6048,7 @@ MUST_USE_RES struct LDKChannelHandshakeLimits ChannelHandshakeLimits_new(uint64_
 struct LDKChannelHandshakeLimits ChannelHandshakeLimits_clone(const struct LDKChannelHandshakeLimits *NONNULL_PTR orig);
 
 /**
- * Creates a "default" ChannelHandshakeLimits. See other documentaiton for details on what this implies.
+ * Creates a "default" ChannelHandshakeLimits. See struct and individual field documentaiton for details on which values are used.
  */
 MUST_USE_RES struct LDKChannelHandshakeLimits ChannelHandshakeLimits_default(void);
 
@@ -6146,7 +6146,7 @@ MUST_USE_RES struct LDKChannelConfig ChannelConfig_new(uint32_t fee_proportional
 struct LDKChannelConfig ChannelConfig_clone(const struct LDKChannelConfig *NONNULL_PTR orig);
 
 /**
- * Creates a "default" ChannelConfig. See other documentaiton for details on what this implies.
+ * Creates a "default" ChannelConfig. See struct and individual field documentaiton for details on which values are used.
  */
 MUST_USE_RES struct LDKChannelConfig ChannelConfig_default(void);
 
@@ -6206,7 +6206,7 @@ MUST_USE_RES struct LDKUserConfig UserConfig_new(struct LDKChannelHandshakeConfi
 struct LDKUserConfig UserConfig_clone(const struct LDKUserConfig *NONNULL_PTR orig);
 
 /**
- * Creates a "default" UserConfig. See other documentaiton for details on what this implies.
+ * Creates a "default" UserConfig. See struct and individual field documentaiton for details on which values are used.
  */
 MUST_USE_RES struct LDKUserConfig UserConfig_default(void);
 

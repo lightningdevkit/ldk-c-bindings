@@ -156,7 +156,7 @@ pub(crate) extern "C" fn ChannelHandshakeConfig_clone_void(this_ptr: *const c_vo
 pub extern "C" fn ChannelHandshakeConfig_clone(orig: &ChannelHandshakeConfig) -> ChannelHandshakeConfig {
 	orig.clone()
 }
-/// Creates a "default" ChannelHandshakeConfig. See other documentaiton for details on what this implies.
+/// Creates a "default" ChannelHandshakeConfig. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_default() -> ChannelHandshakeConfig {
@@ -449,7 +449,7 @@ pub(crate) extern "C" fn ChannelHandshakeLimits_clone_void(this_ptr: *const c_vo
 pub extern "C" fn ChannelHandshakeLimits_clone(orig: &ChannelHandshakeLimits) -> ChannelHandshakeLimits {
 	orig.clone()
 }
-/// Creates a "default" ChannelHandshakeLimits. See other documentaiton for details on what this implies.
+/// Creates a "default" ChannelHandshakeLimits. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_default() -> ChannelHandshakeLimits {
@@ -611,7 +611,7 @@ pub(crate) extern "C" fn ChannelConfig_clone_void(this_ptr: *const c_void) -> *m
 pub extern "C" fn ChannelConfig_clone(orig: &ChannelConfig) -> ChannelConfig {
 	orig.clone()
 }
-/// Creates a "default" ChannelConfig. See other documentaiton for details on what this implies.
+/// Creates a "default" ChannelConfig. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelConfig_default() -> ChannelConfig {
@@ -743,7 +743,7 @@ pub(crate) extern "C" fn UserConfig_clone_void(this_ptr: *const c_void) -> *mut 
 pub extern "C" fn UserConfig_clone(orig: &UserConfig) -> UserConfig {
 	orig.clone()
 }
-/// Creates a "default" UserConfig. See other documentaiton for details on what this implies.
+/// Creates a "default" UserConfig. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn UserConfig_default() -> UserConfig {

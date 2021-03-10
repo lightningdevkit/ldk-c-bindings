@@ -382,8 +382,8 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 			});
 		}
 	) );
-	writeln!(w, "/// Frees any resources associated with this object given its this_arg pointer.").unwrap();
-	writeln!(w, "/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.").unwrap();
+	writeln!(w, "\t/// Frees any resources associated with this object given its this_arg pointer.").unwrap();
+	writeln!(w, "\t/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.").unwrap();
 	writeln!(w, "\tpub free: Option<extern \"C\" fn(this_arg: *mut c_void)>,").unwrap();
 	generated_fields.push("free".to_owned());
 	writeln!(w, "}}").unwrap();

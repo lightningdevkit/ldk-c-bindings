@@ -1,3 +1,11 @@
+// This file is Copyright its original authors, visible in version control
+// history and in the source files from which this was generated.
+//
+// This file is licensed under the license available in the LICENSE or LICENSE.md
+// file in the root of this repository or, if no such file exists, the same
+// license as that which applies to the original source files from which this
+// source was automatically generated.
+
 //! Various user-configurable channel limits and settings which ChannelManager
 //! applies for you.
 
@@ -81,7 +89,7 @@ pub extern "C" fn ChannelHandshakeConfig_set_minimum_depth(this_ptr: &mut Channe
 /// case of an honest unilateral channel close, which implicitly decrease the economic value of
 /// our channel.
 ///
-/// Default value: BREAKDOWN_TIMEOUT (currently 144), we enforce it as a minimum at channel
+/// Default value: [`BREAKDOWN_TIMEOUT`] (currently 144), we enforce it as a minimum at channel
 /// opening so you can tweak config to ask for more security, not less.
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_get_our_to_self_delay(this_ptr: &ChannelHandshakeConfig) -> u16 {
@@ -98,7 +106,7 @@ pub extern "C" fn ChannelHandshakeConfig_get_our_to_self_delay(this_ptr: &Channe
 /// case of an honest unilateral channel close, which implicitly decrease the economic value of
 /// our channel.
 ///
-/// Default value: BREAKDOWN_TIMEOUT (currently 144), we enforce it as a minimum at channel
+/// Default value: [`BREAKDOWN_TIMEOUT`] (currently 144), we enforce it as a minimum at channel
 /// opening so you can tweak config to ask for more security, not less.
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_set_our_to_self_delay(this_ptr: &mut ChannelHandshakeConfig, mut val: u16) {

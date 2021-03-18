@@ -1,3 +1,11 @@
+// This file is Copyright its original authors, visible in version control
+// history and in the source files from which this was generated.
+//
+// This file is licensed under the license available in the LICENSE or LICENSE.md
+// file in the root of this repository or, if no such file exists, the same
+// license as that which applies to the original source files from which this
+// source was automatically generated.
+
 //! The top-level channel management and payment tracking stuff lives here.
 //!
 //! The ChannelManager is the main chunk of logic implementing the lightning protocol and is
@@ -189,6 +197,15 @@ pub extern "C" fn ChainParameters_new(mut network_arg: crate::bitcoin::network::
 		latest_height: latest_height_arg,
 	})), is_owned: true }
 }
+/// The amount of time in blocks we require our counterparty wait to claim their money (ie time
+/// between when we, or our watchtower, must check for them having broadcast a theft transaction).
+///
+/// This can be increased (but not decreased) through [`ChannelHandshakeConfig::our_to_self_delay`]
+///
+/// [`ChannelHandshakeConfig::our_to_self_delay`]: crate::util::config::ChannelHandshakeConfig::our_to_self_delay
+
+#[no_mangle]
+pub static BREAKDOWN_TIMEOUT: u16 = lightning::ln::channelmanager::BREAKDOWN_TIMEOUT;
 
 use lightning::ln::channelmanager::ChannelDetails as nativeChannelDetailsImport;
 type nativeChannelDetails = nativeChannelDetailsImport;
@@ -943,6 +960,7 @@ pub extern "C" fn ChannelManager_as_ChannelMessageHandler(this_arg: &ChannelMana
 		peer_disconnected: ChannelManager_ChannelMessageHandler_peer_disconnected,
 		peer_connected: ChannelManager_ChannelMessageHandler_peer_connected,
 		handle_channel_reestablish: ChannelManager_ChannelMessageHandler_handle_channel_reestablish,
+		handle_channel_update: ChannelManager_ChannelMessageHandler_handle_channel_update,
 		handle_error: ChannelManager_ChannelMessageHandler_handle_error,
 		MessageSendEventsProvider: crate::util::events::MessageSendEventsProvider {
 			this_arg: unsafe { (*this_arg).inner as *mut c_void },
@@ -996,6 +1014,9 @@ extern "C" fn ChannelManager_ChannelMessageHandler_handle_update_fee(this_arg: *
 }
 extern "C" fn ChannelManager_ChannelMessageHandler_handle_announcement_signatures(this_arg: *const c_void, mut counterparty_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::AnnouncementSignatures) {
 	<nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::handle_announcement_signatures(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &counterparty_node_id.into_rust(), unsafe { &*msg.inner })
+}
+extern "C" fn ChannelManager_ChannelMessageHandler_handle_channel_update(this_arg: *const c_void, mut counterparty_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ChannelUpdate) {
+	<nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_update(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &counterparty_node_id.into_rust(), unsafe { &*msg.inner })
 }
 extern "C" fn ChannelManager_ChannelMessageHandler_handle_channel_reestablish(this_arg: *const c_void, mut counterparty_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ChannelReestablish) {
 	<nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_reestablish(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &counterparty_node_id.into_rust(), unsafe { &*msg.inner })

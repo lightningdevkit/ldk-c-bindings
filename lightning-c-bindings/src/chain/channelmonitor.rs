@@ -1,3 +1,11 @@
+// This file is Copyright its original authors, visible in version control
+// history and in the source files from which this was generated.
+//
+// This file is licensed under the license available in the LICENSE or LICENSE.md
+// file in the root of this repository or, if no such file exists, the same
+// license as that which applies to the original source files from which this
+// source was automatically generated.
+
 //! The logic to monitor for on-chain transactions and create the relevant claim responses lives
 //! here.
 //!
@@ -10,8 +18,6 @@
 //! ChannelMonitors should do so). Thus, if you're building rust-lightning into an HSM or other
 //! security-domain-separated system design, you should consider having multiple paths for
 //! ChannelMonitors to get out of the HSM and onto monitoring devices.
-//!
-//! [`chain::Watch`]: ../trait.Watch.html
 
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
@@ -74,8 +80,6 @@ impl ChannelMonitorUpdate {
 /// The only instance where update_id values are not strictly increasing is the case where we
 /// allow post-force-close updates with a special update ID of [`CLOSED_CHANNEL_UPDATE_ID`]. See
 /// its docs for more details.
-///
-/// [`CLOSED_CHANNEL_UPDATE_ID`]: constant.CLOSED_CHANNEL_UPDATE_ID.html
 #[no_mangle]
 pub extern "C" fn ChannelMonitorUpdate_get_update_id(this_ptr: &ChannelMonitorUpdate) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.update_id;
@@ -92,8 +96,6 @@ pub extern "C" fn ChannelMonitorUpdate_get_update_id(this_ptr: &ChannelMonitorUp
 /// The only instance where update_id values are not strictly increasing is the case where we
 /// allow post-force-close updates with a special update ID of [`CLOSED_CHANNEL_UPDATE_ID`]. See
 /// its docs for more details.
-///
-/// [`CLOSED_CHANNEL_UPDATE_ID`]: constant.CLOSED_CHANNEL_UPDATE_ID.html
 #[no_mangle]
 pub extern "C" fn ChannelMonitorUpdate_set_update_id(this_ptr: &mut ChannelMonitorUpdate, mut val: u64) {
 	unsafe { &mut *this_ptr.inner }.update_id = val;
@@ -401,8 +403,6 @@ type nativeHTLCUpdate = nativeHTLCUpdateImport;
 /// Simple structure sent back by `chain::Watch` when an HTLC from a forward channel is detected on
 /// chain. Used to update the corresponding HTLC in the backward channel. Failing to pass the
 /// preimage claim backward will lead to loss of funds.
-///
-/// [`chain::Watch`]: ../trait.Watch.html
 #[must_use]
 #[repr(C)]
 pub struct HTLCUpdate {
@@ -597,8 +597,6 @@ pub extern "C" fn ChannelMonitor_load_outputs_to_watch(this_arg: &ChannelMonitor
 
 /// Get the list of HTLCs who's status has been updated on chain. This should be called by
 /// ChannelManager via [`chain::Watch::release_pending_monitor_events`].
-///
-/// [`chain::Watch::release_pending_monitor_events`]: ../trait.Watch.html#tymethod.release_pending_monitor_events
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_and_clear_pending_monitor_events(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_MonitorEventZ {
@@ -687,11 +685,8 @@ pub struct Persist {
 	/// stored channel data). Note that you **must** persist every new monitor to
 	/// disk. See the `Persist` trait documentation for more details.
 	///
-	/// See [`ChannelMonitor::serialize_for_disk`] for writing out a `ChannelMonitor`,
+	/// See [`ChannelMonitor::write`] for writing out a `ChannelMonitor`,
 	/// and [`ChannelMonitorUpdateErr`] for requirements when returning errors.
-	///
-	/// [`ChannelMonitor::serialize_for_disk`]: struct.ChannelMonitor.html#method.serialize_for_disk
-	/// [`ChannelMonitorUpdateErr`]: enum.ChannelMonitorUpdateErr.html
 	#[must_use]
 	pub persist_new_channel: extern "C" fn (this_arg: *const c_void, id: crate::chain::transaction::OutPoint, data: &crate::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
 	/// Update one channel's data. The provided `ChannelMonitor` has already
@@ -713,14 +708,9 @@ pub struct Persist {
 	/// them in batches. The size of each monitor grows `O(number of state updates)`
 	/// whereas updates are small and `O(1)`.
 	///
-	/// See [`ChannelMonitor::serialize_for_disk`] for writing out a `ChannelMonitor`,
+	/// See [`ChannelMonitor::write`] for writing out a `ChannelMonitor`,
 	/// [`ChannelMonitorUpdate::write`] for writing out an update, and
 	/// [`ChannelMonitorUpdateErr`] for requirements when returning errors.
-	///
-	/// [`ChannelMonitor::update_monitor`]: struct.ChannelMonitor.html#impl-1
-	/// [`ChannelMonitor::serialize_for_disk`]: struct.ChannelMonitor.html#method.serialize_for_disk
-	/// [`ChannelMonitorUpdate::write`]: struct.ChannelMonitorUpdate.html#method.write
-	/// [`ChannelMonitorUpdateErr`]: enum.ChannelMonitorUpdateErr.html
 	#[must_use]
 	pub update_persisted_channel: extern "C" fn (this_arg: *const c_void, id: crate::chain::transaction::OutPoint, update: &crate::chain::channelmonitor::ChannelMonitorUpdate, data: &crate::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
 	/// Frees any resources associated with this object given its this_arg pointer.

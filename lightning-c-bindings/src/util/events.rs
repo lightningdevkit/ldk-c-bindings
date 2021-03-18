@@ -1,3 +1,11 @@
+// This file is Copyright its original authors, visible in version control
+// history and in the source files from which this was generated.
+//
+// This file is licensed under the license available in the LICENSE or LICENSE.md
+// file in the root of this repository or, if no such file exists, the same
+// license as that which applies to the original source files from which this
+// source was automatically generated.
+
 //! Events are returned from various bits in the library which indicate some action must be taken
 //! by the client.
 //!
@@ -491,6 +499,14 @@ pub enum MessageSendEvent {
 		/// The query_short_channel_ids which should be sent.
 		msg: crate::ln::msgs::QueryShortChannelIds,
 	},
+	/// Sends a reply to a channel range query. This may be one of several SendReplyChannelRange events
+	/// emitted during processing of the query.
+	SendReplyChannelRange {
+		/// The node_id of this message recipient
+		node_id: crate::c_types::PublicKey,
+		/// The reply_channel_range which should be sent.
+		msg: crate::ln::msgs::ReplyChannelRange,
+	},
 }
 use lightning::util::events::MessageSendEvent as nativeMessageSendEvent;
 impl MessageSendEvent {
@@ -635,6 +651,14 @@ impl MessageSendEvent {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
+			MessageSendEvent::SendReplyChannelRange {ref node_id, ref msg, } => {
+				let mut node_id_nonref = (*node_id).clone();
+				let mut msg_nonref = (*msg).clone();
+				nativeMessageSendEvent::SendReplyChannelRange {
+					node_id: node_id_nonref.into_rust(),
+					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -741,6 +765,12 @@ impl MessageSendEvent {
 			},
 			MessageSendEvent::SendShortIdsQuery {mut node_id, mut msg, } => {
 				nativeMessageSendEvent::SendShortIdsQuery {
+					node_id: node_id.into_rust(),
+					msg: *unsafe { Box::from_raw(msg.take_inner()) },
+				}
+			},
+			MessageSendEvent::SendReplyChannelRange {mut node_id, mut msg, } => {
+				nativeMessageSendEvent::SendReplyChannelRange {
 					node_id: node_id.into_rust(),
 					msg: *unsafe { Box::from_raw(msg.take_inner()) },
 				}
@@ -888,6 +918,14 @@ impl MessageSendEvent {
 					msg: crate::ln::msgs::QueryShortChannelIds { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
+			nativeMessageSendEvent::SendReplyChannelRange {ref node_id, ref msg, } => {
+				let mut node_id_nonref = (*node_id).clone();
+				let mut msg_nonref = (*msg).clone();
+				MessageSendEvent::SendReplyChannelRange {
+					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
+					msg: crate::ln::msgs::ReplyChannelRange { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -996,6 +1034,12 @@ impl MessageSendEvent {
 				MessageSendEvent::SendShortIdsQuery {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
 					msg: crate::ln::msgs::QueryShortChannelIds { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+				}
+			},
+			nativeMessageSendEvent::SendReplyChannelRange {mut node_id, mut msg, } => {
+				MessageSendEvent::SendReplyChannelRange {
+					node_id: crate::c_types::PublicKey::from_rust(&node_id),
+					msg: crate::ln::msgs::ReplyChannelRange { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 		}

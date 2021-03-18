@@ -1,3 +1,11 @@
+// This file is Copyright its original authors, visible in version control
+// history and in the source files from which this was generated.
+//
+// This file is licensed under the license available in the LICENSE or LICENSE.md
+// file in the root of this repository or, if no such file exists, the same
+// license as that which applies to the original source files from which this
+// source was automatically generated.
+
 //! Structs and traits which allow other parts of rust-lightning to interact with the blockchain.
 
 use std::ffi::c_void;
@@ -10,8 +18,6 @@ pub mod channelmonitor;
 pub mod transaction;
 pub mod keysinterface;
 /// An error when accessing the chain via [`Access`].
-///
-/// [`Access`]: trait.Access.html
 #[must_use]
 #[derive(Clone)]
 #[repr(C)]
@@ -171,9 +177,9 @@ impl Drop for Listen {
 /// funds in the channel. See [`ChannelMonitorUpdateErr`] for more details about how to handle
 /// multiple instances.
 ///
-/// [`ChannelMonitor`]: channelmonitor/struct.ChannelMonitor.html
-/// [`ChannelMonitorUpdateErr`]: channelmonitor/enum.ChannelMonitorUpdateErr.html
-/// [`PermanentFailure`]: channelmonitor/enum.ChannelMonitorUpdateErr.html#variant.PermanentFailure
+/// [`ChannelMonitor`]: channelmonitor::ChannelMonitor
+/// [`ChannelMonitorUpdateErr`]: channelmonitor::ChannelMonitorUpdateErr
+/// [`PermanentFailure`]: channelmonitor::ChannelMonitorUpdateErr::PermanentFailure
 #[repr(C)]
 pub struct Watch {
 	/// An opaque pointer which is passed to your function implementations as an argument.
@@ -185,9 +191,9 @@ pub struct Watch {
 	/// with any spends of outputs returned by [`get_outputs_to_watch`]. In practice, this means
 	/// calling [`block_connected`] and [`block_disconnected`] on the monitor.
 	///
-	/// [`get_outputs_to_watch`]: channelmonitor/struct.ChannelMonitor.html#method.get_outputs_to_watch
-	/// [`block_connected`]: channelmonitor/struct.ChannelMonitor.html#method.block_connected
-	/// [`block_disconnected`]: channelmonitor/struct.ChannelMonitor.html#method.block_disconnected
+	/// [`get_outputs_to_watch`]: channelmonitor::ChannelMonitor::get_outputs_to_watch
+	/// [`block_connected`]: channelmonitor::ChannelMonitor::block_connected
+	/// [`block_disconnected`]: channelmonitor::ChannelMonitor::block_disconnected
 	#[must_use]
 	pub watch_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::chain::transaction::OutPoint, monitor: crate::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
 	/// Updates a channel identified by `funding_txo` by applying `update` to its monitor.
@@ -195,8 +201,8 @@ pub struct Watch {
 	/// Implementations must call [`update_monitor`] with the given update. See
 	/// [`ChannelMonitorUpdateErr`] for invariants around returning an error.
 	///
-	/// [`update_monitor`]: channelmonitor/struct.ChannelMonitor.html#method.update_monitor
-	/// [`ChannelMonitorUpdateErr`]: channelmonitor/enum.ChannelMonitorUpdateErr.html
+	/// [`update_monitor`]: channelmonitor::ChannelMonitor::update_monitor
+	/// [`ChannelMonitorUpdateErr`]: channelmonitor::ChannelMonitorUpdateErr
 	#[must_use]
 	pub update_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::chain::transaction::OutPoint, update: crate::chain::channelmonitor::ChannelMonitorUpdate) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
 	/// Returns any monitor events since the last call. Subsequent calls must only return new
@@ -261,11 +267,10 @@ impl Drop for Watch {
 ///
 /// Note that use as part of a [`Watch`] implementation involves reentrancy. Therefore, the `Filter`
 /// should not block on I/O. Implementations should instead queue the newly monitored data to be
-/// processed later. Then, in order to block until the data has been processed, any `Watch`
+/// processed later. Then, in order to block until the data has been processed, any [`Watch`]
 /// invocation that has called the `Filter` must return [`TemporaryFailure`].
 ///
-/// [`Watch`]: trait.Watch.html
-/// [`TemporaryFailure`]: channelmonitor/enum.ChannelMonitorUpdateErr.html#variant.TemporaryFailure
+/// [`TemporaryFailure`]: channelmonitor::ChannelMonitorUpdateErr::TemporaryFailure
 /// [BIP 157]: https://github.com/bitcoin/bips/blob/master/bip-0157.mediawiki
 /// [BIP 158]: https://github.com/bitcoin/bips/blob/master/bip-0158.mediawiki
 #[repr(C)]

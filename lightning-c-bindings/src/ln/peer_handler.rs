@@ -1,3 +1,11 @@
+// This file is Copyright its original authors, visible in version control
+// history and in the source files from which this was generated.
+//
+// This file is licensed under the license available in the LICENSE or LICENSE.md
+// file in the root of this repository or, if no such file exists, the same
+// license as that which applies to the original source files from which this
+// source was automatically generated.
+
 //! Top level peer message handling and socket handling logic lives here.
 //!
 //! Instead of actually servicing sockets ourselves we require that you implement the
@@ -312,6 +320,7 @@ pub extern "C" fn ErroringMessageHandler_as_ChannelMessageHandler(this_arg: &Err
 		peer_disconnected: ErroringMessageHandler_ChannelMessageHandler_peer_disconnected,
 		peer_connected: ErroringMessageHandler_ChannelMessageHandler_peer_connected,
 		handle_channel_reestablish: ErroringMessageHandler_ChannelMessageHandler_handle_channel_reestablish,
+		handle_channel_update: ErroringMessageHandler_ChannelMessageHandler_handle_channel_update,
 		handle_error: ErroringMessageHandler_ChannelMessageHandler_handle_error,
 		MessageSendEventsProvider: crate::util::events::MessageSendEventsProvider {
 			this_arg: unsafe { (*this_arg).inner as *mut c_void },
@@ -368,6 +377,9 @@ extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_announcement_s
 }
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_channel_reestablish(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ChannelReestablish) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_reestablish(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), unsafe { &*msg.inner })
+}
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_channel_update(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _msg: &crate::ln::msgs::ChannelUpdate) {
+	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_update(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), unsafe { &*_msg.inner })
 }
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_peer_disconnected(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _no_connection_possible: bool) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::peer_disconnected(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), _no_connection_possible)

@@ -1,3 +1,11 @@
+// This file is Copyright its original authors, visible in version control
+// history and in the source files from which this was generated.
+//
+// This file is licensed under the license available in the LICENSE or LICENSE.md
+// file in the root of this repository or, if no such file exists, the same
+// license as that which applies to the original source files from which this
+// source was automatically generated.
+
 //! Wire messages, traits representing wire message handlers, and a few error types live here.
 //!
 //! For a normal node you probably don't need to use anything here, however, if you wish to split a
@@ -3264,13 +3272,27 @@ pub extern "C" fn UnsignedChannelUpdate_get_flags(this_ptr: &UnsignedChannelUpda
 pub extern "C" fn UnsignedChannelUpdate_set_flags(this_ptr: &mut UnsignedChannelUpdate, mut val: u8) {
 	unsafe { &mut *this_ptr.inner }.flags = val;
 }
-/// The number of blocks to subtract from incoming HTLC cltv_expiry values
+/// The number of blocks such that if:
+/// `incoming_htlc.cltv_expiry < outgoing_htlc.cltv_expiry + cltv_expiry_delta`
+/// then we need to fail the HTLC backwards. When forwarding an HTLC, cltv_expiry_delta determines
+/// the outgoing HTLC's minimum cltv_expiry value -- so, if an incoming HTLC comes in with a
+/// cltv_expiry of 100000, and the node we're forwarding to has a cltv_expiry_delta value of 10,
+/// then we'll check that the outgoing HTLC's cltv_expiry value is at least 100010 before
+/// forwarding. Note that the HTLC sender is the one who originally sets this value when
+/// constructing the route.
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_cltv_expiry_delta(this_ptr: &UnsignedChannelUpdate) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.cltv_expiry_delta;
 	(*inner_val)
 }
-/// The number of blocks to subtract from incoming HTLC cltv_expiry values
+/// The number of blocks such that if:
+/// `incoming_htlc.cltv_expiry < outgoing_htlc.cltv_expiry + cltv_expiry_delta`
+/// then we need to fail the HTLC backwards. When forwarding an HTLC, cltv_expiry_delta determines
+/// the outgoing HTLC's minimum cltv_expiry value -- so, if an incoming HTLC comes in with a
+/// cltv_expiry of 100000, and the node we're forwarding to has a cltv_expiry_delta value of 10,
+/// then we'll check that the outgoing HTLC's cltv_expiry value is at least 100010 before
+/// forwarding. Note that the HTLC sender is the one who originally sets this value when
+/// constructing the route.
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_set_cltv_expiry_delta(this_ptr: &mut UnsignedChannelUpdate, mut val: u16) {
 	unsafe { &mut *this_ptr.inner }.cltv_expiry_delta = val;
@@ -4486,6 +4508,8 @@ pub struct ChannelMessageHandler {
 	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::Init),
 	/// Handle an incoming channel_reestablish message from the given peer.
 	pub handle_channel_reestablish: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ChannelReestablish),
+	/// Handle an incoming channel update from the given peer.
+	pub handle_channel_update: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ChannelUpdate),
 	/// Handle an incoming error message from the given peer.
 	pub handle_error: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ErrorMessage),
 /// Implementation of MessageSendEventsProvider for this object.
@@ -4557,6 +4581,9 @@ impl rustChannelMessageHandler for ChannelMessageHandler {
 	}
 	fn handle_channel_reestablish(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::ChannelReestablish) {
 		(self.handle_channel_reestablish)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::ln::msgs::ChannelReestablish { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
+	}
+	fn handle_channel_update(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::ChannelUpdate) {
+		(self.handle_channel_update)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::ln::msgs::ChannelUpdate { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
 	fn handle_error(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::ErrorMessage) {
 		(self.handle_error)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::ln::msgs::ErrorMessage { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
@@ -5177,6 +5204,14 @@ pub extern "C" fn ReplyShortChannelIdsEnd_write(obj: &ReplyShortChannelIdsEnd) -
 pub(crate) extern "C" fn ReplyShortChannelIdsEnd_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeReplyShortChannelIdsEnd) })
 }
+///\n\t * Calculates the overflow safe ending block height for the query.\n\t * Overflow returns `0xffffffff`, otherwise returns `first_blocknum + number_of_blocks`\n\t 
+#[must_use]
+#[no_mangle]
+pub extern "C" fn QueryChannelRange_end_blocknum(this_arg: &QueryChannelRange) -> u32 {
+	let mut ret = unsafe { &*this_arg.inner }.end_blocknum();
+	ret
+}
+
 #[no_mangle]
 /// Read a QueryChannelRange from a byte array, created by QueryChannelRange_write
 pub extern "C" fn QueryChannelRange_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_QueryChannelRangeDecodeErrorZ {

@@ -1,24 +1,26 @@
+// This file is Copyright its original authors, visible in version control
+// history and in the source files from which this was generated.
+//
+// This file is licensed under the license available in the LICENSE or LICENSE.md
+// file in the root of this repository or, if no such file exists, the same
+// license as that which applies to the original source files from which this
+// source was automatically generated.
+
 //! Logic to connect off-chain channel management with on-chain transaction monitoring.
 //!
 //! [`ChainMonitor`] is an implementation of [`chain::Watch`] used both to process blocks and to
 //! update [`ChannelMonitor`]s accordingly. If any on-chain events need further processing, it will
 //! make those available as [`MonitorEvent`]s to be consumed.
 //!
-//! `ChainMonitor` is parameterized by an optional chain source, which must implement the
+//! [`ChainMonitor`] is parameterized by an optional chain source, which must implement the
 //! [`chain::Filter`] trait. This provides a mechanism to signal new relevant outputs back to light
 //! clients, such that transactions spending those outputs are included in block data.
 //!
-//! `ChainMonitor` may be used directly to monitor channels locally or as a part of a distributed
-//! setup to monitor channels remotely. In the latter case, a custom `chain::Watch` implementation
+//! [`ChainMonitor`] may be used directly to monitor channels locally or as a part of a distributed
+//! setup to monitor channels remotely. In the latter case, a custom [`chain::Watch`] implementation
 //! would be responsible for routing each update to a remote server and for retrieving monitor
-//! events. The remote server would make use of `ChainMonitor` for block processing and for
-//! servicing `ChannelMonitor` updates from the client.
-//!
-//! [`ChainMonitor`]: struct.ChainMonitor.html
-//! [`chain::Filter`]: ../trait.Filter.html
-//! [`chain::Watch`]: ../trait.Watch.html
-//! [`ChannelMonitor`]: ../channelmonitor/struct.ChannelMonitor.html
-//! [`MonitorEvent`]: ../channelmonitor/enum.MonitorEvent.html
+//! events. The remote server would make use of [`ChainMonitor`] for block processing and for
+//! servicing [`ChannelMonitor`] updates from the client.
 
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
@@ -35,9 +37,8 @@ type nativeChainMonitor = nativeChainMonitorImport<crate::chain::keysinterface::
 /// or used independently to monitor channels remotely. See the [module-level documentation] for
 /// details.
 ///
-/// [`chain::Watch`]: ../trait.Watch.html
-/// [`ChannelManager`]: ../../ln/channelmanager/struct.ChannelManager.html
-/// [module-level documentation]: index.html
+/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
+/// [module-level documentation]: crate::chain::chainmonitor
 #[must_use]
 #[repr(C)]
 pub struct ChainMonitor {
@@ -87,10 +88,6 @@ impl ChainMonitor {
 /// calls must not exclude any transactions matching the new outputs nor any in-block
 /// descendants of such transactions. It is not necessary to re-fetch the block to obtain
 /// updated `txdata`.
-///
-/// [`ChannelMonitor::block_connected`]: ../channelmonitor/struct.ChannelMonitor.html#method.block_connected
-/// [`chain::Watch::release_pending_monitor_events`]: ../trait.Watch.html#tymethod.release_pending_monitor_events
-/// [`chain::Filter`]: ../trait.Filter.html
 #[no_mangle]
 pub extern "C" fn ChainMonitor_block_connected(this_arg: &ChainMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32) {
 	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
@@ -100,8 +97,6 @@ pub extern "C" fn ChainMonitor_block_connected(this_arg: &ChainMonitor, header: 
 /// Dispatches to per-channel monitors, which are responsible for updating their on-chain view
 /// of a channel based on the disconnected block. See [`ChannelMonitor::block_disconnected`] for
 /// details.
-///
-/// [`ChannelMonitor::block_disconnected`]: ../channelmonitor/struct.ChannelMonitor.html#method.block_disconnected
 #[no_mangle]
 pub extern "C" fn ChainMonitor_block_disconnected(this_arg: &ChainMonitor, header: *const [u8; 80], mut disconnected_height: u32) {
 	unsafe { &*this_arg.inner }.block_disconnected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), disconnected_height)
@@ -114,8 +109,6 @@ pub extern "C" fn ChainMonitor_block_disconnected(this_arg: &ChainMonitor, heade
 /// pre-filter blocks or only fetch blocks matching a compact filter. Otherwise, clients may
 /// always need to fetch full blocks absent another means for determining which blocks contain
 /// transactions relevant to the watched channels.
-///
-/// [`chain::Filter`]: ../trait.Filter.html
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChainMonitor_new(chain_source: *mut crate::chain::Filter, mut broadcaster: crate::chain::chaininterface::BroadcasterInterface, mut logger: crate::util::logger::Logger, mut feeest: crate::chain::chaininterface::FeeEstimator, mut persister: crate::chain::channelmonitor::Persist) -> ChainMonitor {

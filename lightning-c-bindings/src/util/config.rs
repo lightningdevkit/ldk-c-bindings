@@ -79,35 +79,41 @@ pub extern "C" fn ChannelHandshakeConfig_get_minimum_depth(this_ptr: &ChannelHan
 pub extern "C" fn ChannelHandshakeConfig_set_minimum_depth(this_ptr: &mut ChannelHandshakeConfig, mut val: u32) {
 	unsafe { &mut *this_ptr.inner }.minimum_depth = val;
 }
-/// Set to the amount of time we require our counterparty to wait to claim their money.
+/// Set to the number of blocks we require our counterparty to wait to claim their money (ie
+/// the number of blocks we have to punish our counterparty if they broadcast a revoked
+/// transaction).
 ///
-/// It's one of the main parameter of our security model. We (or one of our watchtowers) MUST
-/// be online to check for peer having broadcast a revoked transaction to steal our funds
-/// at least once every our_to_self_delay blocks.
+/// This is one of the main parameters of our security model. We (or one of our watchtowers) MUST
+/// be online to check for revoked transactions on-chain at least once every our_to_self_delay
+/// blocks (minus some margin to allow us enough time to broadcast and confirm a transaction,
+/// possibly with time in between to RBF the spending transaction).
 ///
 /// Meanwhile, asking for a too high delay, we bother peer to freeze funds for nothing in
 /// case of an honest unilateral channel close, which implicitly decrease the economic value of
 /// our channel.
 ///
-/// Default value: [`BREAKDOWN_TIMEOUT`] (currently 144), we enforce it as a minimum at channel
-/// opening so you can tweak config to ask for more security, not less.
+/// Default value: [`BREAKDOWN_TIMEOUT`], we enforce it as a minimum at channel opening so you
+/// can tweak config to ask for more security, not less.
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_get_our_to_self_delay(this_ptr: &ChannelHandshakeConfig) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.our_to_self_delay;
 	(*inner_val)
 }
-/// Set to the amount of time we require our counterparty to wait to claim their money.
+/// Set to the number of blocks we require our counterparty to wait to claim their money (ie
+/// the number of blocks we have to punish our counterparty if they broadcast a revoked
+/// transaction).
 ///
-/// It's one of the main parameter of our security model. We (or one of our watchtowers) MUST
-/// be online to check for peer having broadcast a revoked transaction to steal our funds
-/// at least once every our_to_self_delay blocks.
+/// This is one of the main parameters of our security model. We (or one of our watchtowers) MUST
+/// be online to check for revoked transactions on-chain at least once every our_to_self_delay
+/// blocks (minus some margin to allow us enough time to broadcast and confirm a transaction,
+/// possibly with time in between to RBF the spending transaction).
 ///
 /// Meanwhile, asking for a too high delay, we bother peer to freeze funds for nothing in
 /// case of an honest unilateral channel close, which implicitly decrease the economic value of
 /// our channel.
 ///
-/// Default value: [`BREAKDOWN_TIMEOUT`] (currently 144), we enforce it as a minimum at channel
-/// opening so you can tweak config to ask for more security, not less.
+/// Default value: [`BREAKDOWN_TIMEOUT`], we enforce it as a minimum at channel opening so you
+/// can tweak config to ask for more security, not less.
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_set_our_to_self_delay(this_ptr: &mut ChannelHandshakeConfig, mut val: u16) {
 	unsafe { &mut *this_ptr.inner }.our_to_self_delay = val;
@@ -528,6 +534,53 @@ pub extern "C" fn ChannelConfig_get_fee_proportional_millionths(this_ptr: &Chann
 pub extern "C" fn ChannelConfig_set_fee_proportional_millionths(this_ptr: &mut ChannelConfig, mut val: u32) {
 	unsafe { &mut *this_ptr.inner }.fee_proportional_millionths = val;
 }
+/// The difference in the CLTV value between incoming HTLCs and an outbound HTLC forwarded over
+/// the channel this config applies to.
+///
+/// This is analogous to [`ChannelHandshakeConfig::our_to_self_delay`] but applies to in-flight
+/// HTLC balance when a channel appears on-chain whereas
+/// [`ChannelHandshakeConfig::our_to_self_delay`] applies to the remaining
+/// (non-HTLC-encumbered) balance.
+///
+/// Thus, for HTLC-encumbered balances to be enforced on-chain when a channel is force-closed,
+/// we (or one of our watchtowers) MUST be online to check for broadcast of the current
+/// commitment transaction at least once per this many blocks (minus some margin to allow us
+/// enough time to broadcast and confirm a transaction, possibly with time in between to RBF
+/// the spending transaction).
+///
+/// Default value: 72 (12 hours at an average of 6 blocks/hour).
+/// Minimum value: [`MIN_CLTV_EXPIRY_DELTA`], any values less than this will be treated as
+///                [`MIN_CLTV_EXPIRY_DELTA`] instead.
+///
+/// [`MIN_CLTV_EXPIRY_DELTA`]: crate::ln::channelmanager::MIN_CLTV_EXPIRY_DELTA
+#[no_mangle]
+pub extern "C" fn ChannelConfig_get_cltv_expiry_delta(this_ptr: &ChannelConfig) -> u16 {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.cltv_expiry_delta;
+	(*inner_val)
+}
+/// The difference in the CLTV value between incoming HTLCs and an outbound HTLC forwarded over
+/// the channel this config applies to.
+///
+/// This is analogous to [`ChannelHandshakeConfig::our_to_self_delay`] but applies to in-flight
+/// HTLC balance when a channel appears on-chain whereas
+/// [`ChannelHandshakeConfig::our_to_self_delay`] applies to the remaining
+/// (non-HTLC-encumbered) balance.
+///
+/// Thus, for HTLC-encumbered balances to be enforced on-chain when a channel is force-closed,
+/// we (or one of our watchtowers) MUST be online to check for broadcast of the current
+/// commitment transaction at least once per this many blocks (minus some margin to allow us
+/// enough time to broadcast and confirm a transaction, possibly with time in between to RBF
+/// the spending transaction).
+///
+/// Default value: 72 (12 hours at an average of 6 blocks/hour).
+/// Minimum value: [`MIN_CLTV_EXPIRY_DELTA`], any values less than this will be treated as
+///                [`MIN_CLTV_EXPIRY_DELTA`] instead.
+///
+/// [`MIN_CLTV_EXPIRY_DELTA`]: crate::ln::channelmanager::MIN_CLTV_EXPIRY_DELTA
+#[no_mangle]
+pub extern "C" fn ChannelConfig_set_cltv_expiry_delta(this_ptr: &mut ChannelConfig, mut val: u16) {
+	unsafe { &mut *this_ptr.inner }.cltv_expiry_delta = val;
+}
 /// Set to announce the channel publicly and notify all nodes that they can route via this
 /// channel.
 ///
@@ -593,9 +646,10 @@ pub extern "C" fn ChannelConfig_set_commit_upfront_shutdown_pubkey(this_ptr: &mu
 /// Constructs a new ChannelConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelConfig_new(mut fee_proportional_millionths_arg: u32, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool) -> ChannelConfig {
+pub extern "C" fn ChannelConfig_new(mut fee_proportional_millionths_arg: u32, mut cltv_expiry_delta_arg: u16, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool) -> ChannelConfig {
 	ChannelConfig { inner: Box::into_raw(Box::new(nativeChannelConfig {
 		fee_proportional_millionths: fee_proportional_millionths_arg,
+		cltv_expiry_delta: cltv_expiry_delta_arg,
 		announced_channel: announced_channel_arg,
 		commit_upfront_shutdown_pubkey: commit_upfront_shutdown_pubkey_arg,
 	})), is_owned: true }

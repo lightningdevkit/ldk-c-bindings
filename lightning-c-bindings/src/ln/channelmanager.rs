@@ -206,6 +206,15 @@ pub extern "C" fn ChainParameters_new(mut network_arg: crate::bitcoin::network::
 
 #[no_mangle]
 pub static BREAKDOWN_TIMEOUT: u16 = lightning::ln::channelmanager::BREAKDOWN_TIMEOUT;
+/// The minimum number of blocks between an inbound HTLC's CLTV and the corresponding outbound
+/// HTLC's CLTV. The current default represents roughly six hours of blocks at six blocks/hour.
+///
+/// This can be increased (but not decreased) through [`ChannelConfig::cltv_expiry_delta`]
+///
+/// [`ChannelConfig::cltv_expiry_delta`]: crate::util::config::ChannelConfig::cltv_expiry_delta
+
+#[no_mangle]
+pub static MIN_CLTV_EXPIRY_DELTA: u16 = lightning::ln::channelmanager::MIN_CLTV_EXPIRY_DELTA;
 
 use lightning::ln::channelmanager::ChannelDetails as nativeChannelDetailsImport;
 type nativeChannelDetails = nativeChannelDetailsImport;

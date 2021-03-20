@@ -4959,6 +4959,8 @@ extern const uint64_t CLOSED_CHANNEL_UPDATE_ID;
 
 extern const uint16_t BREAKDOWN_TIMEOUT;
 
+extern const uint16_t MIN_CLTV_EXPIRY_DELTA;
+
 extern const uintptr_t REVOKEABLE_REDEEMSCRIPT_MAX_LENGTH;
 
 void Transaction_free(struct LDKTransaction _res);
@@ -5787,34 +5789,40 @@ uint32_t ChannelHandshakeConfig_get_minimum_depth(const struct LDKChannelHandsha
 void ChannelHandshakeConfig_set_minimum_depth(struct LDKChannelHandshakeConfig *NONNULL_PTR this_ptr, uint32_t val);
 
 /**
- * Set to the amount of time we require our counterparty to wait to claim their money.
+ * Set to the number of blocks we require our counterparty to wait to claim their money (ie
+ * the number of blocks we have to punish our counterparty if they broadcast a revoked
+ * transaction).
  *
- * It's one of the main parameter of our security model. We (or one of our watchtowers) MUST
- * be online to check for peer having broadcast a revoked transaction to steal our funds
- * at least once every our_to_self_delay blocks.
+ * This is one of the main parameters of our security model. We (or one of our watchtowers) MUST
+ * be online to check for revoked transactions on-chain at least once every our_to_self_delay
+ * blocks (minus some margin to allow us enough time to broadcast and confirm a transaction,
+ * possibly with time in between to RBF the spending transaction).
  *
  * Meanwhile, asking for a too high delay, we bother peer to freeze funds for nothing in
  * case of an honest unilateral channel close, which implicitly decrease the economic value of
  * our channel.
  *
- * Default value: [`BREAKDOWN_TIMEOUT`] (currently 144), we enforce it as a minimum at channel
- * opening so you can tweak config to ask for more security, not less.
+ * Default value: [`BREAKDOWN_TIMEOUT`], we enforce it as a minimum at channel opening so you
+ * can tweak config to ask for more security, not less.
  */
 uint16_t ChannelHandshakeConfig_get_our_to_self_delay(const struct LDKChannelHandshakeConfig *NONNULL_PTR this_ptr);
 
 /**
- * Set to the amount of time we require our counterparty to wait to claim their money.
+ * Set to the number of blocks we require our counterparty to wait to claim their money (ie
+ * the number of blocks we have to punish our counterparty if they broadcast a revoked
+ * transaction).
  *
- * It's one of the main parameter of our security model. We (or one of our watchtowers) MUST
- * be online to check for peer having broadcast a revoked transaction to steal our funds
- * at least once every our_to_self_delay blocks.
+ * This is one of the main parameters of our security model. We (or one of our watchtowers) MUST
+ * be online to check for revoked transactions on-chain at least once every our_to_self_delay
+ * blocks (minus some margin to allow us enough time to broadcast and confirm a transaction,
+ * possibly with time in between to RBF the spending transaction).
  *
  * Meanwhile, asking for a too high delay, we bother peer to freeze funds for nothing in
  * case of an honest unilateral channel close, which implicitly decrease the economic value of
  * our channel.
  *
- * Default value: [`BREAKDOWN_TIMEOUT`] (currently 144), we enforce it as a minimum at channel
- * opening so you can tweak config to ask for more security, not less.
+ * Default value: [`BREAKDOWN_TIMEOUT`], we enforce it as a minimum at channel opening so you
+ * can tweak config to ask for more security, not less.
  */
 void ChannelHandshakeConfig_set_our_to_self_delay(struct LDKChannelHandshakeConfig *NONNULL_PTR this_ptr, uint16_t val);
 
@@ -6085,6 +6093,52 @@ uint32_t ChannelConfig_get_fee_proportional_millionths(const struct LDKChannelCo
 void ChannelConfig_set_fee_proportional_millionths(struct LDKChannelConfig *NONNULL_PTR this_ptr, uint32_t val);
 
 /**
+ * The difference in the CLTV value between incoming HTLCs and an outbound HTLC forwarded over
+ * the channel this config applies to.
+ *
+ * This is analogous to [`ChannelHandshakeConfig::our_to_self_delay`] but applies to in-flight
+ * HTLC balance when a channel appears on-chain whereas
+ * [`ChannelHandshakeConfig::our_to_self_delay`] applies to the remaining
+ * (non-HTLC-encumbered) balance.
+ *
+ * Thus, for HTLC-encumbered balances to be enforced on-chain when a channel is force-closed,
+ * we (or one of our watchtowers) MUST be online to check for broadcast of the current
+ * commitment transaction at least once per this many blocks (minus some margin to allow us
+ * enough time to broadcast and confirm a transaction, possibly with time in between to RBF
+ * the spending transaction).
+ *
+ * Default value: 72 (12 hours at an average of 6 blocks/hour).
+ * Minimum value: [`MIN_CLTV_EXPIRY_DELTA`], any values less than this will be treated as
+ *                [`MIN_CLTV_EXPIRY_DELTA`] instead.
+ *
+ * [`MIN_CLTV_EXPIRY_DELTA`]: crate::ln::channelmanager::MIN_CLTV_EXPIRY_DELTA
+ */
+uint16_t ChannelConfig_get_cltv_expiry_delta(const struct LDKChannelConfig *NONNULL_PTR this_ptr);
+
+/**
+ * The difference in the CLTV value between incoming HTLCs and an outbound HTLC forwarded over
+ * the channel this config applies to.
+ *
+ * This is analogous to [`ChannelHandshakeConfig::our_to_self_delay`] but applies to in-flight
+ * HTLC balance when a channel appears on-chain whereas
+ * [`ChannelHandshakeConfig::our_to_self_delay`] applies to the remaining
+ * (non-HTLC-encumbered) balance.
+ *
+ * Thus, for HTLC-encumbered balances to be enforced on-chain when a channel is force-closed,
+ * we (or one of our watchtowers) MUST be online to check for broadcast of the current
+ * commitment transaction at least once per this many blocks (minus some margin to allow us
+ * enough time to broadcast and confirm a transaction, possibly with time in between to RBF
+ * the spending transaction).
+ *
+ * Default value: 72 (12 hours at an average of 6 blocks/hour).
+ * Minimum value: [`MIN_CLTV_EXPIRY_DELTA`], any values less than this will be treated as
+ *                [`MIN_CLTV_EXPIRY_DELTA`] instead.
+ *
+ * [`MIN_CLTV_EXPIRY_DELTA`]: crate::ln::channelmanager::MIN_CLTV_EXPIRY_DELTA
+ */
+void ChannelConfig_set_cltv_expiry_delta(struct LDKChannelConfig *NONNULL_PTR this_ptr, uint16_t val);
+
+/**
  * Set to announce the channel publicly and notify all nodes that they can route via this
  * channel.
  *
@@ -6147,7 +6201,7 @@ void ChannelConfig_set_commit_upfront_shutdown_pubkey(struct LDKChannelConfig *N
 /**
  * Constructs a new ChannelConfig given each field
  */
-MUST_USE_RES struct LDKChannelConfig ChannelConfig_new(uint32_t fee_proportional_millionths_arg, bool announced_channel_arg, bool commit_upfront_shutdown_pubkey_arg);
+MUST_USE_RES struct LDKChannelConfig ChannelConfig_new(uint32_t fee_proportional_millionths_arg, uint16_t cltv_expiry_delta_arg, bool announced_channel_arg, bool commit_upfront_shutdown_pubkey_arg);
 
 /**
  * Creates a copy of the ChannelConfig

@@ -49,15 +49,13 @@ const uint8_t valid_node_announcement[] = {
 // A simple block containing only one transaction (which is the channel-open transaction for the
 // channel we'll create). This was originally created by printing additional data in a simple
 // rust-lightning unit test.
-const uint8_t channel_open_header[80] = {
+const uint8_t channel_open_block[] = {
 	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0xa2, 0x47, 0xd2, 0xf8, 0xd4, 0xe0, 0x6a, 0x3f, 0xf9, 0x7a, 0x9a, 0x34,
 	0xbb, 0xa9, 0x96, 0xde, 0x63, 0x84, 0x5a, 0xce, 0xcf, 0x98, 0xb8, 0xbb, 0x75, 0x4c, 0x4f, 0x7d,
 	0xee, 0x4c, 0xa9, 0x5f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-const uint8_t channel_open_tx[] = {
+	0x01, // transaction count
 	0x02, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -74,19 +72,21 @@ const uint8_t channel_open_txid[] = {
 };
 
 // Two blocks built on top of channel_open_block:
-const uint8_t header_1[80] = {
-	0x01, 0x00, 0x00, 0x00, 0x65, 0x8e, 0xf1, 0x90, 0x88, 0xfa, 0x13, 0x9c, 0x6a, 0xea, 0xf7, 0xc1,
-	0x5a, 0xdd, 0x52, 0x4d, 0x3c, 0x48, 0x03, 0xb3, 0x9b, 0x25, 0x4f, 0x02, 0x79, 0x05, 0x90, 0xe0,
-	0xc4, 0x8d, 0xa0, 0x62, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+const uint8_t block_1[81] = {
+	0x01, 0x00, 0x00, 0x00, 0x0c, 0x7a, 0xc2, 0xdc, 0x08, 0xaf, 0x40, 0x7d, 0x58, 0x81, 0x9b, 0x44,
+	0xc7, 0xe0, 0x0f, 0x78, 0xc0, 0xd1, 0x01, 0xa2, 0x03, 0x16, 0x4a, 0x8d, 0x92, 0x66, 0x4e, 0xaf,
+	0x7f, 0xfc, 0x6e, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, // transaction count
 };
-const uint8_t header_2[80] = {
-	0x01, 0x00, 0x00, 0x00, 0xf2, 0x08, 0x87, 0x51, 0xcb, 0xb1, 0x1a, 0x51, 0x76, 0x01, 0x6c, 0x5d,
-	0x76, 0x26, 0x54, 0x6f, 0xd9, 0xbd, 0xa6, 0xa5, 0xe9, 0x4b, 0x21, 0x6e, 0xda, 0xa3, 0x64, 0x23,
-	0xcd, 0xf1, 0xe2, 0xe2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+const uint8_t block_2[81] = {
+	0x01, 0x00, 0x00, 0x00, 0x36, 0x0b, 0xf5, 0x46, 0x4a, 0xc7, 0x26, 0x4c, 0x4b, 0x36, 0xa6, 0x9d,
+	0x0e, 0xf0, 0x14, 0xfb, 0x8a, 0xcb, 0x20, 0x84, 0x18, 0xf3, 0xaa, 0x77, 0x32, 0x2d, 0xf7, 0x48,
+	0x62, 0x92, 0xb1, 0xb4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, // transaction count
 };
 
 const LDKThirtyTwoBytes payment_preimage_1 = {
@@ -137,7 +137,7 @@ struct NodeMonitors {
 	void ConnectBlock(const uint8_t (*header)[80], uint32_t height, LDKCVec_C2Tuple_usizeTransactionZZ tx_data, LDKBroadcasterInterface broadcast, LDKFeeEstimator fee_est) {
 		std::unique_lock<std::mutex> l(mut);
 		for (auto& mon : mons) {
-			LDK::CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ res = ChannelMonitor_block_connected(&mon.second, &header_2, tx_data, height, broadcast, fee_est, *logger);
+			LDK::CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ res = ChannelMonitor_block_connected(&mon.second, header, tx_data, height, broadcast, fee_est, *logger);
 		}
 	}
 };
@@ -288,6 +288,13 @@ public:
 };
 
 int main() {
+	uint8_t channel_open_header[80];
+	uint8_t header_1[80];
+	uint8_t header_2[80];
+	memcpy(channel_open_header, channel_open_block, 80);
+	memcpy(header_1, block_1, 80);
+	memcpy(header_2, block_2, 80);
+
 	LDKPublicKey null_pk;
 	memset(&null_pk, 0, sizeof(null_pk));
 
@@ -429,7 +436,7 @@ int main() {
 				assert(events->data[0].funding_generation_ready.user_channel_id == 42);
 				assert(events->data[0].funding_generation_ready.channel_value_satoshis == 40000);
 				assert(events->data[0].funding_generation_ready.output_script.datalen == 34);
-				assert(!memcmp(events->data[0].funding_generation_ready.output_script.data, channel_open_tx + 58, 34));
+				assert(!memcmp(events->data[0].funding_generation_ready.output_script.data, channel_open_block + 58 + 81, 34));
 				LDKThirtyTwoBytes txid;
 				for (int i = 0; i < 32; i++) { txid.data[i] = channel_open_txid[31-i]; }
 				LDK::OutPoint outp = OutPoint_new(txid, 0);
@@ -452,29 +459,27 @@ int main() {
 			std::this_thread::yield();
 		}
 
+		LDK::Listen listener1 = ChannelManager_as_Listen(&cm1);
+		listener1->block_connected(listener1->this_arg, LDKu8slice { .data = channel_open_block, .datalen = sizeof(channel_open_block) }, 1);
+
+		LDK::Listen listener2 = ChannelManager_as_Listen(&cm2);
+		listener2->block_connected(listener2->this_arg, LDKu8slice { .data = channel_open_block, .datalen = sizeof(channel_open_block) }, 1);
+
 		LDKCVec_C2Tuple_usizeTransactionZZ txdata { .data = (LDKC2Tuple_usizeTransactionZ*)malloc(sizeof(LDKC2Tuple_usizeTransactionZ)), .datalen = 1 };
-		*txdata.data = C2Tuple_usizeTransactionZ_new(0, LDKTransaction { .data = (uint8_t*)channel_open_tx, .datalen = sizeof(channel_open_tx), .data_is_owned = false });
-		ChannelManager_block_connected(&cm1, &channel_open_header, txdata, 1);
-
-		txdata = LDKCVec_C2Tuple_usizeTransactionZZ { .data = (LDKC2Tuple_usizeTransactionZ*)malloc(sizeof(LDKC2Tuple_usizeTransactionZ)), .datalen = 1 };
-		*txdata.data = C2Tuple_usizeTransactionZ_new(0, LDKTransaction { .data = (uint8_t*)channel_open_tx, .datalen = sizeof(channel_open_tx), .data_is_owned = false });
-		ChannelManager_block_connected(&cm2, &channel_open_header, txdata, 1);
-
-		txdata = LDKCVec_C2Tuple_usizeTransactionZZ { .data = (LDKC2Tuple_usizeTransactionZ*)malloc(sizeof(LDKC2Tuple_usizeTransactionZ)), .datalen = 1 };
-		*txdata.data = C2Tuple_usizeTransactionZ_new(0, LDKTransaction { .data = (uint8_t*)channel_open_tx, .datalen = sizeof(channel_open_tx), .data_is_owned = false });
+		*txdata.data = C2Tuple_usizeTransactionZ_new(0, LDKTransaction { .data = (uint8_t*)channel_open_block + 81, .datalen = sizeof(channel_open_block) - 81, .data_is_owned = false });
 		mons1.ConnectBlock(&channel_open_header, 1, txdata, broadcast, fee_est);
 
 		txdata = LDKCVec_C2Tuple_usizeTransactionZZ { .data = (LDKC2Tuple_usizeTransactionZ*)malloc(sizeof(LDKC2Tuple_usizeTransactionZ)), .datalen = 1 };
-		*txdata.data = C2Tuple_usizeTransactionZ_new(0, LDKTransaction { .data = (uint8_t*)channel_open_tx, .datalen = sizeof(channel_open_tx), .data_is_owned = false });
+		*txdata.data = C2Tuple_usizeTransactionZ_new(0, LDKTransaction { .data = (uint8_t*)channel_open_block + 81, .datalen = sizeof(channel_open_block) - 81, .data_is_owned = false });
 		mons2.ConnectBlock(&channel_open_header, 1, txdata, broadcast, fee_est);
 
-		ChannelManager_block_connected(&cm1, &header_1, LDKCVec_C2Tuple_usizeTransactionZZ { .data = NULL, .datalen = 0 }, 2);
-		ChannelManager_block_connected(&cm2, &header_1, LDKCVec_C2Tuple_usizeTransactionZZ { .data = NULL, .datalen = 0 }, 2);
+		listener1->block_connected(listener1->this_arg, LDKu8slice { .data = block_1, .datalen = sizeof(block_1) }, 2);
+		listener2->block_connected(listener2->this_arg, LDKu8slice { .data = block_1, .datalen = sizeof(block_1) }, 2);
 		mons1.ConnectBlock(&header_1, 2, LDKCVec_C2Tuple_usizeTransactionZZ { .data = NULL, .datalen = 0 }, broadcast, fee_est);
 		mons2.ConnectBlock(&header_1, 2, LDKCVec_C2Tuple_usizeTransactionZZ { .data = NULL, .datalen = 0 }, broadcast, fee_est);
 
-		ChannelManager_block_connected(&cm1, &header_2, LDKCVec_C2Tuple_usizeTransactionZZ { .data = NULL, .datalen = 0 }, 3);
-		ChannelManager_block_connected(&cm2, &header_2, LDKCVec_C2Tuple_usizeTransactionZZ { .data = NULL, .datalen = 0 }, 3);
+		listener1->block_connected(listener1->this_arg, LDKu8slice { .data = block_2, .datalen = sizeof(block_1) }, 3);
+		listener2->block_connected(listener2->this_arg, LDKu8slice { .data = block_2, .datalen = sizeof(block_1) }, 3);
 		mons1.ConnectBlock(&header_2, 3, LDKCVec_C2Tuple_usizeTransactionZZ { .data = NULL, .datalen = 0 }, broadcast, fee_est);
 		mons2.ConnectBlock(&header_2, 3, LDKCVec_C2Tuple_usizeTransactionZZ { .data = NULL, .datalen = 0 }, broadcast, fee_est);
 

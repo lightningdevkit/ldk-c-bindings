@@ -1,10 +1,17 @@
+// This file is Copyright its original authors, visible in version control
+// history and in the source files from which this was generated.
+//
+// This file is licensed under the license available in the LICENSE or LICENSE.md
+// file in the root of this repository or, if no such file exists, the same
+// license as that which applies to the original source files from which this
+// source was automatically generated.
+
 //! Feature flag definitions for the Lightning protocol according to [BOLT #9].
 //!
 //! Lightning nodes advertise a supported set of operation through feature flags. Features are
 //! applicable for a specific context as indicated in some [messages]. [`Features`] encapsulates
 //! behavior for specifying and checking feature flags for a particular context. Each feature is
-//! defined internally by a trait specifying the corresponding flags (i.e., even and odd bits). A
-//! [`Context`] is used to parameterize [`Features`] and defines which features it can support.
+//! defined internally by a trait specifying the corresponding flags (i.e., even and odd bits).
 //!
 //! Whether a feature is considered \"known\" or \"unknown\" is relative to the implementation, whereas
 //! the term \"supports\" is used in reference to a particular set of [`Features`]. That is, a node
@@ -12,9 +19,7 @@
 //! And the implementation can interpret a feature if the feature is known to it.
 //!
 //! [BOLT #9]: https://github.com/lightningnetwork/lightning-rfc/blob/master/09-features.md
-//! [messages]: ../msgs/index.html
-//! [`Features`]: struct.Features.html
-//! [`Context`]: sealed/trait.Context.html
+//! [messages]: crate::ln::msgs
 
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
@@ -284,9 +289,7 @@ pub extern "C" fn InitFeatures_empty() -> InitFeatures {
 	InitFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
 }
 
-/// Creates features known by the implementation as defined by [`T::KNOWN_FEATURE_FLAGS`].
-///
-/// [`T::KNOWN_FEATURE_FLAGS`]: sealed/trait.Context.html#associatedconstant.KNOWN_FEATURE_FLAGS
+/// Creates a Features with the bits set which are known by the implementation
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InitFeatures_known() -> InitFeatures {
@@ -302,9 +305,7 @@ pub extern "C" fn NodeFeatures_empty() -> NodeFeatures {
 	NodeFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
 }
 
-/// Creates features known by the implementation as defined by [`T::KNOWN_FEATURE_FLAGS`].
-///
-/// [`T::KNOWN_FEATURE_FLAGS`]: sealed/trait.Context.html#associatedconstant.KNOWN_FEATURE_FLAGS
+/// Creates a Features with the bits set which are known by the implementation
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NodeFeatures_known() -> NodeFeatures {
@@ -320,9 +321,7 @@ pub extern "C" fn ChannelFeatures_empty() -> ChannelFeatures {
 	ChannelFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
 }
 
-/// Creates features known by the implementation as defined by [`T::KNOWN_FEATURE_FLAGS`].
-///
-/// [`T::KNOWN_FEATURE_FLAGS`]: sealed/trait.Context.html#associatedconstant.KNOWN_FEATURE_FLAGS
+/// Creates a Features with the bits set which are known by the implementation
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelFeatures_known() -> ChannelFeatures {
@@ -338,9 +337,7 @@ pub extern "C" fn InvoiceFeatures_empty() -> InvoiceFeatures {
 	InvoiceFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
 }
 
-/// Creates features known by the implementation as defined by [`T::KNOWN_FEATURE_FLAGS`].
-///
-/// [`T::KNOWN_FEATURE_FLAGS`]: sealed/trait.Context.html#associatedconstant.KNOWN_FEATURE_FLAGS
+/// Creates a Features with the bits set which are known by the implementation
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InvoiceFeatures_known() -> InvoiceFeatures {

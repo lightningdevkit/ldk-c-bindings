@@ -1,3 +1,11 @@
+// This file is Copyright its original authors, visible in version control
+// history.
+//
+// This file is licensed under the Apache License, Version 2.0 <LICENSE-APACHE>
+// or the MIT license <LICENSE-MIT>, at your option.
+// You may not use this file except in accordance with one or both of these
+// licenses.
+
 //! Printing logic for basic blocks of Rust-mapped code - parts of functions and declarations but
 //! not the full mapping logic.
 

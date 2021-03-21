@@ -1,3 +1,11 @@
+// This file is Copyright its original authors, visible in version control
+// history.
+//
+// This file is licensed under the Apache License, Version 2.0 <LICENSE-APACHE>
+// or the MIT license <LICENSE-MIT>, at your option.
+// You may not use this file except in accordance with one or both of these
+// licenses.
+
 //! Converts a rust crate into a rust crate containing a number of C-exported wrapper functions and
 //! classes (which is exportable using cbindgen).
 //! In general, supports convering:
@@ -1341,6 +1349,15 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &mut CrateTypes
 		let _ = std::fs::create_dir((&new_file_path.as_ref() as &std::path::Path).parent().unwrap());
 		let mut out = std::fs::OpenOptions::new().write(true).create(true).truncate(true)
 			.open(new_file_path).expect("Unable to open new src file");
+
+		writeln!(out, "// This file is Copyright its original authors, visible in version control").unwrap();
+		writeln!(out, "// history and in the source files from which this was generated.").unwrap();
+		writeln!(out, "//").unwrap();
+		writeln!(out, "// This file is licensed under the license available in the LICENSE or LICENSE.md").unwrap();
+		writeln!(out, "// file in the root of this repository or, if no such file exists, the same").unwrap();
+		writeln!(out, "// license as that which applies to the original source files from which this").unwrap();
+		writeln!(out, "// source was automatically generated.").unwrap();
+		writeln!(out, "").unwrap();
 
 		writeln_docs(&mut out, &attrs, "");
 

@@ -50,9 +50,14 @@ else
 	sed -i 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH"'" }|' lightning-c-bindings/Cargo.toml
 fi
 
+# Set path to include our rustc wrapper as well as cbindgen
+PATH="$(pwd)/deterministic-build-wrappers:$PATH:~/.cargo/bin"
 # Now cd to lightning-c-bindings, build the generated bindings, and call cbindgen to build a C header file
-PATH="$PATH:~/.cargo/bin"
 cd lightning-c-bindings
+# Remap paths so that our builds are deterministic
+export RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo= -C target-cpu=generic"
+export CFLAGS="-ffile-prefix-map=$HOME/.cargo="
+
 cargo build
 cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1
 

@@ -1,0 +1,30 @@
+#!/bin/bash
+# rustc calculates a unique metadata tag to mangle symbols which includes the
+# actual path to the crate. This breaks our deterministic builds as we depend
+# on a copy of rust-lightning via a path. We insert this shim between cargo and
+# rustc and edit the metadata tag for rust-lightning.
+# While we could just set RUSTFLAGS="-C metadata=42", this would break if we
+# ever (indirectly) depend on multiple versions of the same crate.
+args=("$@")
+IS_LIGHTNING=false
+for ((i=0; i<"${#args[@]}"; ++i)); do
+    case ${args[i]} in
+        --crate-name)
+			if [ "${args[i+1]}" = "lightning" ]; then
+				IS_LIGHTNING=true
+			fi
+			;;
+    esac
+done
+for ((i=0; i<"${#args[@]}"; ++i)); do
+    case ${args[i]} in
+        metadata*)
+			if [ "$IS_LIGHTNING" = "true" ]; then
+				# Pick any random value for metadata, it doesn't matter
+				args[i]="metadata=42"
+			fi
+			;;
+    esac
+done
+
+/usr/bin/rustc "${args[@]}"

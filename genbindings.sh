@@ -50,9 +50,14 @@ else
 	sed -i 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH"'" }|' lightning-c-bindings/Cargo.toml
 fi
 
+# Set path to include our rustc wrapper as well as cbindgen
+PATH="$(pwd)/deterministic-build-wrappers:$PATH:~/.cargo/bin"
 # Now cd to lightning-c-bindings, build the generated bindings, and call cbindgen to build a C header file
-PATH="$PATH:~/.cargo/bin"
 cd lightning-c-bindings
+# Remap paths so that our builds are deterministic
+export RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo= -C target-cpu=generic"
+export CFLAGS="-ffile-prefix-map=$HOME/.cargo="
+
 cargo build
 cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1
 
@@ -76,14 +81,14 @@ fi
 
 # Finally, sanity-check the generated C and C++ bindings with demo apps:
 
-CFLAGS="-Wall -Wno-nullability-completeness -pthread"
+LOCAL_CFLAGS="-Wall -Wno-nullability-completeness -pthread"
 
 # Naively run the C demo app:
-gcc $CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl
+gcc $LOCAL_CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl
 ./a.out
 
 # And run the C++ demo app in valgrind to test memory model correctness and lack of leaks.
-g++ $CFLAGS -std=c++11 -Wall -g -pthread demo.cpp -Ltarget/debug/ -lldk -ldl
+g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread demo.cpp -Ltarget/debug/ -lldk -ldl
 if [ -x "`which valgrind`" ]; then
 	LD_LIBRARY_PATH=target/debug/ valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
 	echo
@@ -93,7 +98,7 @@ fi
 
 # Test a statically-linked C++ version, tracking the resulting binary size and runtime
 # across debug, LTO, and cross-language LTO builds (using the same compiler each time).
-clang++ $CFLAGS -std=c++11 demo.cpp target/debug/libldk.a -ldl
+clang++ $LOCAL_CFLAGS -std=c++11 demo.cpp target/debug/libldk.a -ldl
 strip ./a.out
 echo " C++ Bin size and runtime w/o optimization:"
 ls -lha a.out
@@ -114,11 +119,11 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" ]; then
 			set +e
 
 			# First the C demo app...
-			clang-$LLVM_V $CFLAGS -fsanitize=memory -fsanitize-memory-track-origins -g demo.c target/debug/libldk.a -ldl
+			clang-$LLVM_V $LOCAL_CFLAGS -fsanitize=memory -fsanitize-memory-track-origins -g demo.c target/debug/libldk.a -ldl
 			./a.out
 
 			# ...then the C++ demo app
-			clang++-$LLVM_V $CFLAGS -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g demo.cpp target/debug/libldk.a -ldl
+			clang++-$LLVM_V $LOCAL_CFLAGS -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g demo.cpp target/debug/libldk.a -ldl
 			./a.out >/dev/null
 
 			# restore exit-on-failure
@@ -184,11 +189,11 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "
 		mv Cargo.toml.bk Cargo.toml
 
 		# First the C demo app...
-		$CLANG $CFLAGS -fsanitize=address -g demo.c target/debug/libldk.a -ldl
+		$CLANG $LOCAL_CFLAGS -fsanitize=address -g demo.c target/debug/libldk.a -ldl
 		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out
 
 		# ...then the C++ demo app
-		$CLANGPP $CFLAGS -std=c++11 -fsanitize=address -g demo.cpp target/debug/libldk.a -ldl
+		$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g demo.cpp target/debug/libldk.a -ldl
 		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
 	else
 		echo "WARNING: Please install clang-$RUSTC_LLVM_V and clang++-$RUSTC_LLVM_V to build with address sanitizer"
@@ -197,20 +202,31 @@ else
 	echo "WARNING: Can't use address sanitizer on non-Linux, non-OSX non-x86 platforms"
 fi
 
+# Now build with LTO on on both C++ and rust, but without cross-language LTO:
+# Clear stale release build artifacts from previous runs
+cargo clean --release
+CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C lto
+clang++ $LOCAL_CFLAGS -std=c++11 -flto -O2 demo.cpp target/release/libldk.a -ldl
+
+if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
+	# If we can use cross-language LTO, use it for building C dependencies (i.e. libsecp256k1) as well
+	export CC="$CLANG"
+	export CFLAGS_wasm32_wasi="-target wasm32"
+fi
+
 if [ "$(rustc --print target-list | grep wasm32-wasi)" != "" ]; then
 	# Test to see if clang supports wasm32 as a target (which is needed to build rust-secp256k1)
 	echo "int main() {}" > genbindings_wasm_test_file.c
 	clang -nostdlib -o /dev/null --target=wasm32-wasi -Wl,--no-entry genbindings_wasm_test_file.c > /dev/null 2>&1 &&
 	# And if it does, build a WASM binary without capturing errors
 	cargo rustc -v --target=wasm32-wasi -- -C embed-bitcode=yes &&
+	# Now that we've done our last non-LTO build, turn on LTO in CFLAGS as well
+	export CFLAGS="$CFLAGS -flto" &&
 	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target=wasm32-wasi -- -C opt-level=s -C linker-plugin-lto -C lto ||
 	echo "Cannot build WASM lib as clang does not seem to support the wasm32-wasi target"
 	rm genbindings_wasm_test_file.c
 fi
 
-# Now build with LTO on on both C++ and rust, but without cross-language LTO:
-CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C lto
-clang++ $CFLAGS -std=c++11 -flto -O2 demo.cpp target/release/libldk.a -ldl
 strip ./a.out
 echo "C++ Bin size and runtime with only RL (LTO) optimized:"
 ls -lha a.out
@@ -222,8 +238,11 @@ if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
 	# or Ubuntu packages). This should work fine on Distros which do more involved
 	# packaging than simply shipping the rustup binaries (eg Debian should Just Work
 	# here).
+	export CFLAGS="$CFLAGS -flto"
+	# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
+	cargo clean --release
 	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C linker-plugin-lto -C lto -C link-arg=-fuse-ld=lld
-	$CLANGPP $CFLAGS -flto -fuse-ld=lld -O2 demo.cpp target/release/libldk.a -ldl
+	$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=lld -O2 demo.cpp target/release/libldk.a -ldl
 	strip ./a.out
 	echo "C++ Bin size and runtime with cross-language LTO:"
 	ls -lha a.out

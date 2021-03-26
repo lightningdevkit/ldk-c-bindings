@@ -373,8 +373,8 @@ int main() {
 
 		// Demo getting a channel key and check that its returning real pubkeys:
 		LDK::Sign chan_signer1 = keys_source1->get_channel_signer(keys_source1->this_arg, false, 42);
-		chan_signer1->set_pubkeys(&chan_signer1); // Make sure pubkeys is defined
-		LDKPublicKey payment_point = ChannelPublicKeys_get_payment_point(&chan_signer1->pubkeys);
+		chan_signer1->BaseSign.set_pubkeys(&chan_signer1->BaseSign); // Make sure pubkeys is defined
+		LDKPublicKey payment_point = ChannelPublicKeys_get_payment_point(&chan_signer1->BaseSign.pubkeys);
 		assert(memcmp(&payment_point, &null_pk, sizeof(null_pk)));
 
 		// Instantiate classes for node 2:
@@ -437,10 +437,10 @@ int main() {
 				assert(events->data[0].funding_generation_ready.channel_value_satoshis == 40000);
 				assert(events->data[0].funding_generation_ready.output_script.datalen == 34);
 				assert(!memcmp(events->data[0].funding_generation_ready.output_script.data, channel_open_block + 58 + 81, 34));
-				LDKThirtyTwoBytes txid;
-				for (int i = 0; i < 32; i++) { txid.data[i] = channel_open_txid[31-i]; }
-				LDK::OutPoint outp = OutPoint_new(txid, 0);
-				ChannelManager_funding_transaction_generated(&cm1, &events->data[0].funding_generation_ready.temporary_channel_id.data, std::move(outp));
+				LDKTransaction funding_transaction { .data = const_cast<uint8_t*>(channel_open_block + 81), .datalen = sizeof(channel_open_block) - 81, .data_is_owned = false };
+
+				LDK::CResult_NoneAPIErrorZ fund_res = ChannelManager_funding_transaction_generated(&cm1, &events->data[0].funding_generation_ready.temporary_channel_id.data, funding_transaction);
+				assert(fund_res->result_ok);
 				break;
 			}
 			std::this_thread::yield();
@@ -448,14 +448,9 @@ int main() {
 
 		// We observe when the funding signed messages have been exchanged by
 		// waiting for two monitors to be registered.
+		assert(num_txs_broadcasted == 0);
 		PeerManager_process_events(&net1);
-		while (true) {
-			LDK::CVec_EventZ events = ev1.get_and_clear_pending_events(ev1.this_arg);
-			if (events->datalen == 1) {
-				assert(events->data[0].tag == LDKEvent_FundingBroadcastSafe);
-				assert(events->data[0].funding_broadcast_safe.user_channel_id == 42);
-				break;
-			}
+		while (num_txs_broadcasted != 1) {
 			std::this_thread::yield();
 		}
 

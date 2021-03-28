@@ -1841,20 +1841,20 @@ public:
 	const LDKCResult_ChannelMonitorUpdateDecodeErrorZ* operator &() const { return &self; }
 	const LDKCResult_ChannelMonitorUpdateDecodeErrorZ* operator ->() const { return &self; }
 };
-class CResult_ReplyChannelRangeDecodeErrorZ {
+class COption_u64Z {
 private:
-	LDKCResult_ReplyChannelRangeDecodeErrorZ self;
+	LDKCOption_u64Z self;
 public:
-	CResult_ReplyChannelRangeDecodeErrorZ(const CResult_ReplyChannelRangeDecodeErrorZ&) = delete;
-	CResult_ReplyChannelRangeDecodeErrorZ(CResult_ReplyChannelRangeDecodeErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_ReplyChannelRangeDecodeErrorZ)); }
-	CResult_ReplyChannelRangeDecodeErrorZ(LDKCResult_ReplyChannelRangeDecodeErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_ReplyChannelRangeDecodeErrorZ)); }
-	operator LDKCResult_ReplyChannelRangeDecodeErrorZ() && { LDKCResult_ReplyChannelRangeDecodeErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_ReplyChannelRangeDecodeErrorZ)); return res; }
-	~CResult_ReplyChannelRangeDecodeErrorZ() { CResult_ReplyChannelRangeDecodeErrorZ_free(self); }
-	CResult_ReplyChannelRangeDecodeErrorZ& operator=(CResult_ReplyChannelRangeDecodeErrorZ&& o) { CResult_ReplyChannelRangeDecodeErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_ReplyChannelRangeDecodeErrorZ)); return *this; }
-	LDKCResult_ReplyChannelRangeDecodeErrorZ* operator &() { return &self; }
-	LDKCResult_ReplyChannelRangeDecodeErrorZ* operator ->() { return &self; }
-	const LDKCResult_ReplyChannelRangeDecodeErrorZ* operator &() const { return &self; }
-	const LDKCResult_ReplyChannelRangeDecodeErrorZ* operator ->() const { return &self; }
+	COption_u64Z(const COption_u64Z&) = delete;
+	COption_u64Z(COption_u64Z&& o) : self(o.self) { memset(&o, 0, sizeof(COption_u64Z)); }
+	COption_u64Z(LDKCOption_u64Z&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCOption_u64Z)); }
+	operator LDKCOption_u64Z() && { LDKCOption_u64Z res = self; memset(&self, 0, sizeof(LDKCOption_u64Z)); return res; }
+	~COption_u64Z() { COption_u64Z_free(self); }
+	COption_u64Z& operator=(COption_u64Z&& o) { COption_u64Z_free(self); self = o.self; memset(&o, 0, sizeof(COption_u64Z)); return *this; }
+	LDKCOption_u64Z* operator &() { return &self; }
+	LDKCOption_u64Z* operator ->() { return &self; }
+	const LDKCOption_u64Z* operator &() const { return &self; }
+	const LDKCOption_u64Z* operator ->() const { return &self; }
 };
 class CResult_TxOutAccessErrorZ {
 private:
@@ -1885,6 +1885,21 @@ public:
 	LDKCResult_UnsignedNodeAnnouncementDecodeErrorZ* operator ->() { return &self; }
 	const LDKCResult_UnsignedNodeAnnouncementDecodeErrorZ* operator &() const { return &self; }
 	const LDKCResult_UnsignedNodeAnnouncementDecodeErrorZ* operator ->() const { return &self; }
+};
+class CResult_ReplyChannelRangeDecodeErrorZ {
+private:
+	LDKCResult_ReplyChannelRangeDecodeErrorZ self;
+public:
+	CResult_ReplyChannelRangeDecodeErrorZ(const CResult_ReplyChannelRangeDecodeErrorZ&) = delete;
+	CResult_ReplyChannelRangeDecodeErrorZ(CResult_ReplyChannelRangeDecodeErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_ReplyChannelRangeDecodeErrorZ)); }
+	CResult_ReplyChannelRangeDecodeErrorZ(LDKCResult_ReplyChannelRangeDecodeErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_ReplyChannelRangeDecodeErrorZ)); }
+	operator LDKCResult_ReplyChannelRangeDecodeErrorZ() && { LDKCResult_ReplyChannelRangeDecodeErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_ReplyChannelRangeDecodeErrorZ)); return res; }
+	~CResult_ReplyChannelRangeDecodeErrorZ() { CResult_ReplyChannelRangeDecodeErrorZ_free(self); }
+	CResult_ReplyChannelRangeDecodeErrorZ& operator=(CResult_ReplyChannelRangeDecodeErrorZ&& o) { CResult_ReplyChannelRangeDecodeErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_ReplyChannelRangeDecodeErrorZ)); return *this; }
+	LDKCResult_ReplyChannelRangeDecodeErrorZ* operator &() { return &self; }
+	LDKCResult_ReplyChannelRangeDecodeErrorZ* operator ->() { return &self; }
+	const LDKCResult_ReplyChannelRangeDecodeErrorZ* operator &() const { return &self; }
+	const LDKCResult_ReplyChannelRangeDecodeErrorZ* operator ->() const { return &self; }
 };
 class CResult_GossipTimestampFilterDecodeErrorZ {
 private:
@@ -1945,6 +1960,21 @@ public:
 	LDKCVec_UpdateAddHTLCZ* operator ->() { return &self; }
 	const LDKCVec_UpdateAddHTLCZ* operator &() const { return &self; }
 	const LDKCVec_UpdateAddHTLCZ* operator ->() const { return &self; }
+};
+class COption_u32Z {
+private:
+	LDKCOption_u32Z self;
+public:
+	COption_u32Z(const COption_u32Z&) = delete;
+	COption_u32Z(COption_u32Z&& o) : self(o.self) { memset(&o, 0, sizeof(COption_u32Z)); }
+	COption_u32Z(LDKCOption_u32Z&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCOption_u32Z)); }
+	operator LDKCOption_u32Z() && { LDKCOption_u32Z res = self; memset(&self, 0, sizeof(LDKCOption_u32Z)); return res; }
+	~COption_u32Z() { COption_u32Z_free(self); }
+	COption_u32Z& operator=(COption_u32Z&& o) { COption_u32Z_free(self); self = o.self; memset(&o, 0, sizeof(COption_u32Z)); return *this; }
+	LDKCOption_u32Z* operator &() { return &self; }
+	LDKCOption_u32Z* operator ->() { return &self; }
+	const LDKCOption_u32Z* operator &() const { return &self; }
+	const LDKCOption_u32Z* operator ->() const { return &self; }
 };
 class CResult_InitFeaturesDecodeErrorZ {
 private:

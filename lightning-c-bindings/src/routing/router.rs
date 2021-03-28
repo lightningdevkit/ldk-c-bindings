@@ -358,6 +358,47 @@ pub extern "C" fn RouteHint_get_cltv_expiry_delta(this_ptr: &RouteHint) -> u16 {
 pub extern "C" fn RouteHint_set_cltv_expiry_delta(this_ptr: &mut RouteHint, mut val: u16) {
 	unsafe { &mut *this_ptr.inner }.cltv_expiry_delta = val;
 }
+/// The minimum value, in msat, which must be relayed to the next hop.
+#[no_mangle]
+pub extern "C" fn RouteHint_get_htlc_minimum_msat(this_ptr: &RouteHint) -> u64Option {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_minimum_msat;
+	let mut local_inner_val = if inner_val.is_none() { u64Option { value: 0, is_set: false } } else {  { u64Option { value: inner_val.unwrap(), is_set: true } } };
+	local_inner_val
+}
+/// The minimum value, in msat, which must be relayed to the next hop.
+#[no_mangle]
+pub extern "C" fn RouteHint_set_htlc_minimum_msat(this_ptr: &mut RouteHint, mut val: u64Option) {
+	let mut local_val = if val.is_set { Some( { val.value }) } else { None };
+	unsafe { &mut *this_ptr.inner }.htlc_minimum_msat = local_val;
+}
+/// The maximum value in msat available for routing with a single HTLC.
+#[no_mangle]
+pub extern "C" fn RouteHint_get_htlc_maximum_msat(this_ptr: &RouteHint) -> u64Option {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_maximum_msat;
+	let mut local_inner_val = if inner_val.is_none() { u64Option { value: 0, is_set: false } } else {  { u64Option { value: inner_val.unwrap(), is_set: true } } };
+	local_inner_val
+}
+/// The maximum value in msat available for routing with a single HTLC.
+#[no_mangle]
+pub extern "C" fn RouteHint_set_htlc_maximum_msat(this_ptr: &mut RouteHint, mut val: u64Option) {
+	let mut local_val = if val.is_set { Some( { val.value }) } else { None };
+	unsafe { &mut *this_ptr.inner }.htlc_maximum_msat = local_val;
+}
+/// Constructs a new RouteHint given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn RouteHint_new(mut src_node_id_arg: crate::c_types::PublicKey, mut short_channel_id_arg: u64, mut fees_arg: crate::routing::network_graph::RoutingFees, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: u64Option, mut htlc_maximum_msat_arg: u64Option) -> RouteHint {
+	let mut local_htlc_minimum_msat_arg = if htlc_minimum_msat_arg.is_set { Some( { htlc_minimum_msat_arg.value }) } else { None };
+	let mut local_htlc_maximum_msat_arg = if htlc_maximum_msat_arg.is_set { Some( { htlc_maximum_msat_arg.value }) } else { None };
+	RouteHint { inner: Box::into_raw(Box::new(nativeRouteHint {
+		src_node_id: src_node_id_arg.into_rust(),
+		short_channel_id: short_channel_id_arg,
+		fees: *unsafe { Box::from_raw(fees_arg.take_inner()) },
+		cltv_expiry_delta: cltv_expiry_delta_arg,
+		htlc_minimum_msat: local_htlc_minimum_msat_arg,
+		htlc_maximum_msat: local_htlc_maximum_msat_arg,
+	})), is_owned: true }
+}
 impl Clone for RouteHint {
 	fn clone(&self) -> Self {
 		Self {

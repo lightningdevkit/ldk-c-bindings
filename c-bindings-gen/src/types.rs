@@ -984,7 +984,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			},
 			"Option" => {
 				if let Some(syn::Type::Path(p)) = single_contained {
-					if self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)) {
+					let inner_path = self.resolve_path(&p.path, generics);
+					if self.is_primitive(&inner_path) {
+						return Some(("if ", vec![
+							(format!(".is_none() {{ {}Option {{ value: 0, is_set: false }} }} else {{ ", inner_path),
+							 format!("{}Option {{ value: {}.unwrap(), is_set: true }}", inner_path, var_access))
+							], " }"));
+					} else if self.c_type_has_inner_from_path(&inner_path) {
 						if is_ref {
 							return Some(("if ", vec![
 								(".is_none() { std::ptr::null() } else { ".to_owned(), format!("({}.as_ref().unwrap())", var_access))
@@ -1030,7 +1036,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			},
 			"Option" => {
 				if let Some(syn::Type::Path(p)) = single_contained {
-					if self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)) {
+					let inner_path = self.resolve_path(&p.path, generics);
+					if self.is_primitive(&inner_path) {
+						return Some(("if ", vec![(".is_set { Some(".to_string(), format!("{}.value", var_access))], ") } else { None }"))
+					} else if self.c_type_has_inner_from_path(&inner_path) {
 						if is_ref {
 							return Some(("if ", vec![(".inner.is_null() { None } else { Some((*".to_string(), format!("{}", var_access))], ").clone()) }"))
 						} else {
@@ -1944,9 +1953,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						if self.is_transparent_container(ident, is_ref) {
 							// We dont (yet) support primitives or containers inside transparent
 							// containers, so check for that first:
-							if self.is_primitive(&subtype) { return false; }
 							if self.is_known_container(&subtype, is_ref) { return false; }
-							if !in_type {
+							if self.is_primitive(&subtype) {
+								write!(w, "{}{}", subtype, ident).unwrap();
+							} else if !in_type {
 								if self.c_type_has_inner_from_path(&subtype) {
 									if !self.write_c_path_intern(w, &$p_arg.path, generics, is_ref, is_mut, ptr_for_ref) { return false; }
 								} else {

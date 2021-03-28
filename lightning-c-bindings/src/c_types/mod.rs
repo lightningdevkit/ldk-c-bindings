@@ -211,6 +211,17 @@ pub struct TenBytes { pub data: [u8; 10], }
 #[repr(C)]
 pub struct SixteenBytes { pub data: [u8; 16], }
 
+#[repr(C)]
+pub struct u64Option {
+	pub value: u64,
+	pub is_set: bool,
+}
+#[repr(C)]
+pub struct u32Option {
+	pub value: u32,
+	pub is_set: bool,
+}
+
 pub(crate) struct VecWriter(pub Vec<u8>);
 impl lightning::util::ser::Writer for VecWriter {
 	fn write_all(&mut self, buf: &[u8]) -> Result<(), ::std::io::Error> {

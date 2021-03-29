@@ -1,3 +1,6 @@
+//! This module contains standard C-mapped types for types not in the original crate.
+
+/// Auto-generated C-mapped types for templated containers
 pub mod derived;
 
 use bitcoin::Script as BitcoinScript;
@@ -12,7 +15,9 @@ use std::convert::TryInto; // Bindings need at least rustc 1.34
 
 #[derive(Clone)]
 #[repr(C)]
+/// Represents a valid secp256k1 public key serialized in "compressed form" as a 33 byte array.
 pub struct PublicKey {
+	/// The bytes of the public key
 	pub compressed_form: [u8; 33],
 }
 impl PublicKey {
@@ -29,7 +34,9 @@ impl PublicKey {
 }
 
 #[repr(C)]
+/// Represents a valid secp256k1 secret key serialized as a 32 byte array.
 pub struct SecretKey {
+	/// The bytes of the secret key
 	pub bytes: [u8; 32],
 }
 impl SecretKey {
@@ -46,7 +53,9 @@ impl SecretKey {
 
 #[repr(C)]
 #[derive(Clone)]
+/// Represents a secp256k1 signature serialized as two 32-byte numbers
 pub struct Signature {
+	/// The bytes of the signature in "compact" form
 	pub compact_form: [u8; 64],
 }
 impl Signature {
@@ -64,15 +73,25 @@ impl Signature {
 }
 
 #[repr(C)]
+/// Represents an error returned from libsecp256k1 during validation of some secp256k1 data
 pub enum Secp256k1Error {
+	/// Signature failed verification
 	IncorrectSignature,
+	/// Badly sized message ("messages" are actually fixed-sized digests; see the MESSAGE_SIZE constant)
 	InvalidMessage,
+	/// Bad public key
 	InvalidPublicKey,
+	/// Bad signature
 	InvalidSignature,
+	/// Bad secret key
 	InvalidSecretKey,
+	/// Bad recovery id
 	InvalidRecoveryId,
+	/// Invalid tweak for add_assign or mul_assign
 	InvalidTweak,
+	/// tweak_add_check failed on an xonly public key
 	TweakCheckFailed,
+	/// Didn't pass enough memory to context creation with preallocated memory
 	NotEnoughMemory,
 }
 impl Secp256k1Error {
@@ -106,9 +125,13 @@ impl Secp256k1Error {
 /// set. Similarly, while it may change in the future, all `Transaction`s you pass to Rust may have
 /// `data_is_owned` either set or unset at your discretion.
 pub struct Transaction {
+	/// The serialized transaction data.
+	///
 	/// This is non-const for your convenience, an object passed to Rust is never written to.
 	pub data: *mut u8,
+	/// The length of the serialized transaction
 	pub datalen: usize,
+	/// Whether the data pointed to by `data` should be freed or not.
 	pub data_is_owned: bool,
 }
 impl Transaction {
@@ -134,6 +157,7 @@ impl Drop for Transaction {
 	}
 }
 #[no_mangle]
+/// Frees the data buffer, if data_is_owned is set and datalen > 0.
 pub extern "C" fn Transaction_free(_res: Transaction) { }
 
 pub(crate) fn bitcoin_to_C_outpoint(outpoint: ::bitcoin::blockdata::transaction::OutPoint) -> crate::chain::transaction::OutPoint {
@@ -145,7 +169,9 @@ pub(crate) fn bitcoin_to_C_outpoint(outpoint: ::bitcoin::blockdata::transaction:
 /// A transaction output including a scriptPubKey and value.
 /// This type *does* own its own memory, so must be free'd appropriately.
 pub struct TxOut {
+	/// The script_pubkey in this output
 	pub script_pubkey: derived::CVec_u8Z,
+	/// The value, in satoshis, of this output
 	pub value: u64,
 }
 
@@ -164,13 +190,19 @@ impl TxOut {
 	}
 }
 #[no_mangle]
+/// Frees the data pointed to by script_pubkey.
 pub extern "C" fn TxOut_free(_res: TxOut) { }
 #[no_mangle]
+/// Creates a new TxOut which has the same data as `orig` but with a new script buffer.
 pub extern "C" fn TxOut_clone(orig: &TxOut) -> TxOut { orig.clone() }
 
 #[repr(C)]
+/// A "slice" referencing some byte array. This is simply a length-tagged pointer which does not
+/// own the memory pointed to by data.
 pub struct u8slice {
+	/// A pointer to the byte buffer
 	pub data: *const u8,
+	/// The number of bytes pointed to by `data`.
 	pub datalen: usize
 }
 impl u8slice {
@@ -191,6 +223,7 @@ impl u8slice {
 /// Arbitrary 32 bytes, which could represent one of a few different things. You probably want to
 /// look up the corresponding function in rust-lightning's docs.
 pub struct ThirtyTwoBytes {
+	/// The thirty-two bytes
 	pub data: [u8; 32],
 }
 impl ThirtyTwoBytes {
@@ -200,16 +233,20 @@ impl ThirtyTwoBytes {
 }
 
 #[repr(C)]
-pub struct ThreeBytes { pub data: [u8; 3], }
+/// A 3-byte byte array.
+pub struct ThreeBytes { /** The three bytes */ pub data: [u8; 3], }
 #[derive(Clone)]
 #[repr(C)]
-pub struct FourBytes { pub data: [u8; 4], }
+/// A 4-byte byte array.
+pub struct FourBytes { /** The four bytes */ pub data: [u8; 4], }
 #[derive(Clone)]
 #[repr(C)]
-pub struct TenBytes { pub data: [u8; 10], }
+/// A 10-byte byte array.
+pub struct TenBytes { /** The ten bytes */ pub data: [u8; 10], }
 #[derive(Clone)]
 #[repr(C)]
-pub struct SixteenBytes { pub data: [u8; 16], }
+/// A 16-byte byte array.
+pub struct SixteenBytes { /** The sixteen bytes */ pub data: [u8; 16], }
 
 pub(crate) struct VecWriter(pub Vec<u8>);
 impl lightning::util::ser::Writer for VecWriter {
@@ -238,7 +275,9 @@ pub(crate) fn deserialize_obj_arg<A, I: lightning::util::ser::ReadableArgs<A>>(s
 /// A Rust str object, ie a reference to a UTF8-valid string.
 /// This is *not* null-terminated so cannot be used directly as a C string!
 pub struct Str {
+	/// A pointer to the string's bytes, in UTF8 encoding
 	pub chars: *const u8,
+	/// The number of bytes (not characters!) pointed to by `chars`
 	pub len: usize
 }
 impl Into<Str> for &'static str {

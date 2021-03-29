@@ -792,6 +792,21 @@ public:
 	const LDKFilter* operator &() const { return &self; }
 	const LDKFilter* operator ->() const { return &self; }
 };
+class WatchedOutput {
+private:
+	LDKWatchedOutput self;
+public:
+	WatchedOutput(const WatchedOutput&) = delete;
+	WatchedOutput(WatchedOutput&& o) : self(o.self) { memset(&o, 0, sizeof(WatchedOutput)); }
+	WatchedOutput(LDKWatchedOutput&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKWatchedOutput)); }
+	operator LDKWatchedOutput() && { LDKWatchedOutput res = self; memset(&self, 0, sizeof(LDKWatchedOutput)); return res; }
+	~WatchedOutput() { WatchedOutput_free(self); }
+	WatchedOutput& operator=(WatchedOutput&& o) { WatchedOutput_free(self); self = o.self; memset(&o, 0, sizeof(WatchedOutput)); return *this; }
+	LDKWatchedOutput* operator &() { return &self; }
+	LDKWatchedOutput* operator ->() { return &self; }
+	const LDKWatchedOutput* operator &() const { return &self; }
+	const LDKWatchedOutput* operator ->() const { return &self; }
+};
 class BroadcasterInterface {
 private:
 	LDKBroadcasterInterface self;
@@ -1960,6 +1975,21 @@ public:
 	LDKCResult_CommitmentTransactionDecodeErrorZ* operator ->() { return &self; }
 	const LDKCResult_CommitmentTransactionDecodeErrorZ* operator &() const { return &self; }
 	const LDKCResult_CommitmentTransactionDecodeErrorZ* operator ->() const { return &self; }
+};
+class COption_C2Tuple_usizeTransactionZZ {
+private:
+	LDKCOption_C2Tuple_usizeTransactionZZ self;
+public:
+	COption_C2Tuple_usizeTransactionZZ(const COption_C2Tuple_usizeTransactionZZ&) = delete;
+	COption_C2Tuple_usizeTransactionZZ(COption_C2Tuple_usizeTransactionZZ&& o) : self(o.self) { memset(&o, 0, sizeof(COption_C2Tuple_usizeTransactionZZ)); }
+	COption_C2Tuple_usizeTransactionZZ(LDKCOption_C2Tuple_usizeTransactionZZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCOption_C2Tuple_usizeTransactionZZ)); }
+	operator LDKCOption_C2Tuple_usizeTransactionZZ() && { LDKCOption_C2Tuple_usizeTransactionZZ res = self; memset(&self, 0, sizeof(LDKCOption_C2Tuple_usizeTransactionZZ)); return res; }
+	~COption_C2Tuple_usizeTransactionZZ() { COption_C2Tuple_usizeTransactionZZ_free(self); }
+	COption_C2Tuple_usizeTransactionZZ& operator=(COption_C2Tuple_usizeTransactionZZ&& o) { COption_C2Tuple_usizeTransactionZZ_free(self); self = o.self; memset(&o, 0, sizeof(COption_C2Tuple_usizeTransactionZZ)); return *this; }
+	LDKCOption_C2Tuple_usizeTransactionZZ* operator &() { return &self; }
+	LDKCOption_C2Tuple_usizeTransactionZZ* operator ->() { return &self; }
+	const LDKCOption_C2Tuple_usizeTransactionZZ* operator &() const { return &self; }
+	const LDKCOption_C2Tuple_usizeTransactionZZ* operator ->() const { return &self; }
 };
 class CResult_TransactionNoneZ {
 private:

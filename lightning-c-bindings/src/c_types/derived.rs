@@ -3435,6 +3435,21 @@ impl Clone for CResult_TxOutAccessErrorZ {
 #[no_mangle]
 pub extern "C" fn CResult_TxOutAccessErrorZ_clone(orig: &CResult_TxOutAccessErrorZ) -> CResult_TxOutAccessErrorZ { orig.clone() }
 #[repr(C)]
+pub enum COption_C2Tuple_usizeTransactionZZ {
+	Some(crate::c_types::derived::C2Tuple_usizeTransactionZ),
+	None
+}
+impl COption_C2Tuple_usizeTransactionZZ {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> crate::c_types::derived::C2Tuple_usizeTransactionZ {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_free(_res: COption_C2Tuple_usizeTransactionZZ) { }
+#[repr(C)]
 pub union CResult_NoneAPIErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
 	pub result: *mut std::ffi::c_void,

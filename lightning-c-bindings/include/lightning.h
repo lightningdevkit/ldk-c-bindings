@@ -2816,6 +2816,24 @@ typedef struct LDKCResult_TxOutAccessErrorZ {
    bool result_ok;
 } LDKCResult_TxOutAccessErrorZ;
 
+typedef enum LDKCOption_C2Tuple_usizeTransactionZZ_Tag {
+   LDKCOption_C2Tuple_usizeTransactionZZ_Some,
+   LDKCOption_C2Tuple_usizeTransactionZZ_None,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKCOption_C2Tuple_usizeTransactionZZ_Sentinel,
+} LDKCOption_C2Tuple_usizeTransactionZZ_Tag;
+
+typedef struct LDKCOption_C2Tuple_usizeTransactionZZ {
+   LDKCOption_C2Tuple_usizeTransactionZZ_Tag tag;
+   union {
+      struct {
+         struct LDKC2Tuple_usizeTransactionZ some;
+      };
+   };
+} LDKCOption_C2Tuple_usizeTransactionZZ;
+
 /**
  * A Rust str object, ie a reference to a UTF8-valid string.
  * This is *not* null-terminated so cannot be used directly as a C string!
@@ -4277,6 +4295,36 @@ typedef struct LDKListen {
    void (*free)(void *this_arg);
 } LDKListen;
 
+
+
+/**
+ * A transaction output watched by a [`ChannelMonitor`] for spends on-chain.
+ *
+ * Used to convey to a [`Filter`] such an output with a given spending condition. Any transaction
+ * spending the output must be given to [`ChannelMonitor::block_connected`] either directly or via
+ * the return value of [`Filter::register_output`].
+ *
+ * If `block_hash` is `Some`, this indicates the output was created in the corresponding block and
+ * may have been spent there. See [`Filter::register_output`] for details.
+ *
+ * [`ChannelMonitor`]: channelmonitor::ChannelMonitor
+ * [`ChannelMonitor::block_connected`]: channelmonitor::ChannelMonitor::block_connected
+ */
+typedef struct MUST_USE_STRUCT LDKWatchedOutput {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeWatchedOutput *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKWatchedOutput;
+
 /**
  * The `Filter` trait defines behavior for indicating chain activity of interest pertaining to
  * channels.
@@ -4311,10 +4359,17 @@ typedef struct LDKFilter {
     */
    void (*register_tx)(const void *this_arg, const uint8_t (*txid)[32], struct LDKu8slice script_pubkey);
    /**
-    * Registers interest in spends of a transaction output identified by `outpoint` having
-    * `script_pubkey` as the spending condition.
+    * Registers interest in spends of a transaction output.
+    *
+    * Optionally, when `output.block_hash` is set, should return any transaction spending the
+    * output that is found in the corresponding block along with its index.
+    *
+    * This return value is useful for Electrum clients in order to supply in-block descendant
+    * transactions which otherwise were not included. This is not necessary for other clients if
+    * such descendant transactions were already included (e.g., when a BIP 157 client provides the
+    * full block).
     */
-   void (*register_output)(const void *this_arg, const struct LDKOutPoint *NONNULL_PTR outpoint, struct LDKu8slice script_pubkey);
+   struct LDKCOption_C2Tuple_usizeTransactionZZ (*register_output)(const void *this_arg, struct LDKWatchedOutput output);
    /**
     * Frees any resources associated with this object given its this_arg pointer.
     * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -5313,6 +5368,8 @@ void CResult_TxOutAccessErrorZ_free(struct LDKCResult_TxOutAccessErrorZ _res);
 
 struct LDKCResult_TxOutAccessErrorZ CResult_TxOutAccessErrorZ_clone(const struct LDKCResult_TxOutAccessErrorZ *NONNULL_PTR orig);
 
+void COption_C2Tuple_usizeTransactionZZ_free(struct LDKCOption_C2Tuple_usizeTransactionZZ _res);
+
 struct LDKCResult_NoneAPIErrorZ CResult_NoneAPIErrorZ_ok(void);
 
 struct LDKCResult_NoneAPIErrorZ CResult_NoneAPIErrorZ_err(struct LDKAPIError e);
@@ -6297,6 +6354,46 @@ void Watch_free(struct LDKWatch this_ptr);
  * Calls the free function if one is set
  */
 void Filter_free(struct LDKFilter this_ptr);
+
+/**
+ * Frees any resources used by the WatchedOutput, if is_owned is set and inner is non-NULL.
+ */
+void WatchedOutput_free(struct LDKWatchedOutput this_obj);
+
+/**
+ * First block where the transaction output may have been spent.
+ */
+struct LDKThirtyTwoBytes WatchedOutput_get_block_hash(const struct LDKWatchedOutput *NONNULL_PTR this_ptr);
+
+/**
+ * First block where the transaction output may have been spent.
+ */
+void WatchedOutput_set_block_hash(struct LDKWatchedOutput *NONNULL_PTR this_ptr, struct LDKThirtyTwoBytes val);
+
+/**
+ * Outpoint identifying the transaction output.
+ */
+struct LDKOutPoint WatchedOutput_get_outpoint(const struct LDKWatchedOutput *NONNULL_PTR this_ptr);
+
+/**
+ * Outpoint identifying the transaction output.
+ */
+void WatchedOutput_set_outpoint(struct LDKWatchedOutput *NONNULL_PTR this_ptr, struct LDKOutPoint val);
+
+/**
+ * Spending condition of the transaction output.
+ */
+struct LDKu8slice WatchedOutput_get_script_pubkey(const struct LDKWatchedOutput *NONNULL_PTR this_ptr);
+
+/**
+ * Spending condition of the transaction output.
+ */
+void WatchedOutput_set_script_pubkey(struct LDKWatchedOutput *NONNULL_PTR this_ptr, struct LDKCVec_u8Z val);
+
+/**
+ * Constructs a new WatchedOutput given each field
+ */
+MUST_USE_RES struct LDKWatchedOutput WatchedOutput_new(struct LDKThirtyTwoBytes block_hash_arg, struct LDKOutPoint outpoint_arg, struct LDKCVec_u8Z script_pubkey_arg);
 
 /**
  * Calls the free function if one is set

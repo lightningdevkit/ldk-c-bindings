@@ -316,6 +316,16 @@ pub fn write_option_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	writeln!(w, "}}").unwrap();
 
 	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "pub extern \"C\" fn {}_some(o: {}) -> {} {{", mangled_container, inner_type, mangled_container).unwrap();
+	writeln!(w, "\t{}::Some(o)", mangled_container).unwrap();
+	writeln!(w, "}}").unwrap();
+
+	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "pub extern \"C\" fn {}_none() -> {} {{", mangled_container, mangled_container).unwrap();
+	writeln!(w, "\t{}::None", mangled_container).unwrap();
+	writeln!(w, "}}").unwrap();
+
+	writeln!(w, "#[no_mangle]").unwrap();
 	writeln!(w, "pub extern \"C\" fn {}_free(_res: {}) {{ }}", mangled_container, mangled_container).unwrap();
 	if clonable {
 		writeln!(w, "#[no_mangle]").unwrap();

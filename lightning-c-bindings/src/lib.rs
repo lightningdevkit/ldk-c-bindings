@@ -25,8 +25,8 @@
 #![allow(unused_unsafe)]
 #![allow(unused_braces)]
 #![deny(missing_docs)]
-mod c_types;
-mod bitcoin;
+pub mod c_types;
+pub mod bitcoin;
 pub mod util;
 pub mod chain;
 pub mod ln;

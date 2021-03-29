@@ -978,7 +978,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			assert!(args.next().is_none());
 			match inner {
 				syn::Type::Reference(_) => true,
-				syn::Type::Path(_) => true,
+				syn::Type::Path(p) => {
+					if let Some(resolved) = self.maybe_resolve_path(&p.path, None) {
+						if self.is_primitive(&resolved) { false } else { true }
+					} else { true }
+				},
 				syn::Type::Tuple(_) => false,
 				_ => unimplemented!(),
 			}
@@ -1021,7 +1025,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			},
 			"Option" => {
 				if let Some(syn::Type::Path(p)) = single_contained {
-					if self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)) {
+					let inner_path = self.resolve_path(&p.path, generics);
+					if self.is_primitive(&inner_path) {
+						return Some(("if ", vec![
+							(format!(".is_none() {{ {}::COption_{}Z::None }} else {{ ", Self::generated_container_path(), inner_path),
+							 format!("{}::COption_{}Z::Some({}.unwrap())", Self::generated_container_path(), inner_path, var_access))
+							], " }", ContainerPrefixLocation::NoPrefix));
+					} else if self.c_type_has_inner_from_path(&inner_path) {
 						if is_ref {
 							return Some(("if ", vec![
 								(".is_none() { std::ptr::null() } else { ".to_owned(), format!("({}.as_ref().unwrap())", var_access))
@@ -1067,7 +1077,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			},
 			"Option" => {
 				if let Some(syn::Type::Path(p)) = single_contained {
-					if self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)) {
+					let inner_path = self.resolve_path(&p.path, generics);
+					if self.is_primitive(&inner_path) {
+						return Some(("if ", vec![(".is_some() { Some(".to_string(), format!("{}.take()", var_access))], ") } else { None }", ContainerPrefixLocation::NoPrefix))
+					} else if self.c_type_has_inner_from_path(&inner_path) {
 						if is_ref {
 							return Some(("if ", vec![(".inner.is_null() { None } else { Some((*".to_string(), format!("{}", var_access))], ").clone()) }", ContainerPrefixLocation::PerConv))
 						} else {
@@ -1911,12 +1924,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	// ******************************************************
 
 	fn write_template_generics<'b, W: std::io::Write>(&mut self, w: &mut W, args: &mut dyn Iterator<Item=&'b syn::Type>, generics: Option<&GenericTypes>, is_ref: bool) -> bool {
-		assert!(!is_ref); // We don't currently support outer reference types
 		for (idx, t) in args.enumerate() {
 			if idx != 0 {
 				write!(w, ", ").unwrap();
 			}
 			if let syn::Type::Reference(r_arg) = t {
+				assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
+
 				if !self.write_c_type_intern(w, &*r_arg.elem, generics, false, false, false) { return false; }
 
 				// While write_c_type_intern, above is correct, we don't want to blindly convert a
@@ -1927,7 +1941,17 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					assert!(self.crate_types.opaques.get(&resolved).is_some() ||
 							self.c_type_from_path(&resolved, true, true).is_some(), "Template generics should be opaque or have a predefined mapping");
 				} else { unimplemented!(); }
+			} else if let syn::Type::Path(p_arg) = t {
+				if let Some(resolved) = self.maybe_resolve_path(&p_arg.path, generics) {
+					if !self.is_primitive(&resolved) {
+						assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
+					}
+				} else {
+					assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
+				}
+				if !self.write_c_type_intern(w, t, generics, false, false, false) { return false; }
 			} else {
+				assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
 				if !self.write_c_type_intern(w, t, generics, false, false, false) { return false; }
 			}
 		}
@@ -2027,7 +2051,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				($p_arg: expr, $extra_write: expr) => {
 					if let Some(subtype) = self.maybe_resolve_path(&$p_arg.path, generics) {
 						if self.is_transparent_container(ident, is_ref, args.iter().map(|a| *a)) {
-							if self.is_primitive(&subtype) { return false; }
 							if !in_type {
 								if self.c_type_has_inner_from_path(&subtype) {
 									if !self.write_c_path_intern(w, &$p_arg.path, generics, is_ref, is_mut, ptr_for_ref) { return false; }

@@ -343,6 +343,14 @@ impl COption_u32Z {
 	}
 }
 #[no_mangle]
+pub extern "C" fn COption_u32Z_some(o: u32) -> COption_u32Z {
+	COption_u32Z::Some(o)
+}
+#[no_mangle]
+pub extern "C" fn COption_u32Z_none() -> COption_u32Z {
+	COption_u32Z::None
+}
+#[no_mangle]
 pub extern "C" fn COption_u32Z_free(_res: COption_u32Z) { }
 #[no_mangle]
 pub extern "C" fn COption_u32Z_clone(orig: &COption_u32Z) -> COption_u32Z { orig.clone() }
@@ -1896,6 +1904,14 @@ impl COption_u64Z {
 	#[allow(unused)] pub(crate) fn take(mut self) -> u64 {
 		if let Self::Some(v) = self { v } else { unreachable!() }
 	}
+}
+#[no_mangle]
+pub extern "C" fn COption_u64Z_some(o: u64) -> COption_u64Z {
+	COption_u64Z::Some(o)
+}
+#[no_mangle]
+pub extern "C" fn COption_u64Z_none() -> COption_u64Z {
+	COption_u64Z::None
 }
 #[no_mangle]
 pub extern "C" fn COption_u64Z_free(_res: COption_u64Z) { }
@@ -3482,6 +3498,14 @@ impl COption_C2Tuple_usizeTransactionZZ {
 	#[allow(unused)] pub(crate) fn take(mut self) -> crate::c_types::derived::C2Tuple_usizeTransactionZ {
 		if let Self::Some(v) = self { v } else { unreachable!() }
 	}
+}
+#[no_mangle]
+pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_some(o: crate::c_types::derived::C2Tuple_usizeTransactionZ) -> COption_C2Tuple_usizeTransactionZZ {
+	COption_C2Tuple_usizeTransactionZZ::Some(o)
+}
+#[no_mangle]
+pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_none() -> COption_C2Tuple_usizeTransactionZZ {
+	COption_C2Tuple_usizeTransactionZZ::None
 }
 #[no_mangle]
 pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_free(_res: COption_C2Tuple_usizeTransactionZZ) { }

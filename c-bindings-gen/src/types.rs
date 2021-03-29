@@ -577,6 +577,20 @@ enum EmptyValExpectedTy {
 	ReferenceAsPointer,
 }
 
+#[derive(PartialEq)]
+/// Describes the appropriate place to print a general type-conversion string when converting a
+/// container.
+enum ContainerPrefixLocation {
+	/// Prints a general type-conversion string prefix and suffix outside of the
+	/// container-conversion strings.
+	OutsideConv,
+	/// Prints a general type-conversion string prefix and suffix inside of the
+	/// container-conversion strings.
+	PerConv,
+	/// Does not print the usual type-conversion string prefix and suffix.
+	NoPrefix,
+}
+
 impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	pub fn new(orig_crate: &'a str, module_path: &'a str, types: ImportResolver<'a, 'c>, crate_types: &'a mut CrateTypes<'c>) -> Self {
 		Self { orig_crate, module_path, types, crate_types }
@@ -968,19 +982,19 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	fn to_c_conversion_container_new_var<'b>(&self, generics: Option<&GenericTypes>, full_path: &str, is_ref: bool, single_contained: Option<&syn::Type>, var_name: &syn::Ident, var_access: &str)
 			// Returns prefix + Vec<(prefix, var-name-to-inline-convert)> + suffix
 			// expecting one element in the vec per generic type, each of which is inline-converted
-			-> Option<(&'b str, Vec<(String, String)>, &'b str)> {
+			-> Option<(&'b str, Vec<(String, String)>, &'b str, ContainerPrefixLocation)> {
 		match full_path {
 			"Result" if !is_ref => {
 				Some(("match ",
 						vec![(" { Ok(mut o) => crate::c_types::CResultTempl::ok(".to_string(), "o".to_string()),
 							(").into(), Err(mut e) => crate::c_types::CResultTempl::err(".to_string(), "e".to_string())],
-						").into() }"))
+						").into() }", ContainerPrefixLocation::PerConv))
 			},
 			"Vec" if !is_ref => {
-				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }"))
+				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Slice" => {
-				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "**item".to_string())], "); }"))
+				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "**item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Option" => {
 				if let Some(syn::Type::Path(p)) = single_contained {
@@ -988,11 +1002,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						if is_ref {
 							return Some(("if ", vec![
 								(".is_none() { std::ptr::null() } else { ".to_owned(), format!("({}.as_ref().unwrap())", var_access))
-								], " }"));
+								], " }", ContainerPrefixLocation::OutsideConv));
 						} else {
 							return Some(("if ", vec![
 								(".is_none() { std::ptr::null_mut() } else { ".to_owned(), format!("({}.unwrap())", var_access))
-								], " }"));
+								], " }", ContainerPrefixLocation::OutsideConv));
 						}
 					}
 				}
@@ -1002,7 +1016,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					let s = String::from_utf8(v).unwrap();
 					return Some(("if ", vec![
 						(format!(".is_none() {{ {} }} else {{ ", s), format!("({}.unwrap())", var_access))
-						], " }"));
+						], " }", ContainerPrefixLocation::PerConv));
 				} else { unreachable!(); }
 			},
 			_ => None,
@@ -1014,27 +1028,27 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	fn from_c_conversion_container_new_var<'b>(&self, generics: Option<&GenericTypes>, full_path: &str, is_ref: bool, single_contained: Option<&syn::Type>, var_name: &syn::Ident, var_access: &str)
 			// Returns prefix + Vec<(prefix, var-name-to-inline-convert)> + suffix
 			// expecting one element in the vec per generic type, each of which is inline-converted
-			-> Option<(&'b str, Vec<(String, String)>, &'b str)> {
+			-> Option<(&'b str, Vec<(String, String)>, &'b str, ContainerPrefixLocation)> {
 		match full_path {
 			"Result" if !is_ref => {
 				Some(("match ",
 						vec![(".result_ok { true => Ok(".to_string(), format!("(*unsafe {{ Box::from_raw(<*mut _>::take_ptr(&mut {}.contents.result)) }})", var_access)),
 						     ("), false => Err(".to_string(), format!("(*unsafe {{ Box::from_raw(<*mut _>::take_ptr(&mut {}.contents.err)) }})", var_access))],
-						")}"))
-			},
-			"Vec"|"Slice" if !is_ref => {
-				Some(("Vec::new(); for mut item in ", vec![(format!(".into_rust().drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }"))
+						")}", ContainerPrefixLocation::PerConv))
 			},
 			"Slice" if is_ref => {
-				Some(("Vec::new(); for mut item in ", vec![(format!(".as_slice().iter() {{ local_{}.push(", var_name), "item".to_string())], "); }"))
+				Some(("Vec::new(); for mut item in ", vec![(format!(".as_slice().iter() {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
+			},
+			"Vec"|"Slice" => {
+				Some(("Vec::new(); for mut item in ", vec![(format!(".into_rust().drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Option" => {
 				if let Some(syn::Type::Path(p)) = single_contained {
 					if self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)) {
 						if is_ref {
-							return Some(("if ", vec![(".inner.is_null() { None } else { Some((*".to_string(), format!("{}", var_access))], ").clone()) }"))
+							return Some(("if ", vec![(".inner.is_null() { None } else { Some((*".to_string(), format!("{}", var_access))], ").clone()) }", ContainerPrefixLocation::PerConv))
 						} else {
-							return Some(("if ", vec![(".inner.is_null() { None } else { Some(".to_string(), format!("{}", var_access))], ") }"));
+							return Some(("if ", vec![(".inner.is_null() { None } else { Some(".to_string(), format!("{}", var_access))], ") }", ContainerPrefixLocation::PerConv));
 						}
 					}
 				}
@@ -1047,15 +1061,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						EmptyValExpectedTy::ReferenceAsPointer =>
 							return Some(("if ", vec![
 								(format!("{} {{ None }} else {{ Some(", s), format!("unsafe {{ &mut *{} }}", var_access))
-							], ") }")),
+							], ") }", ContainerPrefixLocation::NoPrefix)),
 						EmptyValExpectedTy::OwnedPointer =>
 							return Some(("if ", vec![
 								(format!("{} {{ None }} else {{ Some(", s), format!("unsafe {{ *Box::from_raw({}) }}", var_access))
-							], ") }")),
+							], ") }", ContainerPrefixLocation::NoPrefix)),
 						EmptyValExpectedTy::NonPointer =>
 							return Some(("if ", vec![
 								(format!("{} {{ None }} else {{ Some(", s), format!("{}", var_access))
-							], ") }")),
+							], ") }", ContainerPrefixLocation::PerConv)),
 					}
 				} else { unreachable!(); }
 			},
@@ -1563,7 +1577,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 	fn write_conversion_new_var_intern<'b, W: std::io::Write,
 		LP: Fn(&str, bool) -> Option<(&str, &str)>,
-		LC: Fn(&str, bool, Option<&syn::Type>, &syn::Ident, &str) ->  Option<(&'b str, Vec<(String, String)>, &'b str)>,
+		LC: Fn(&str, bool, Option<&syn::Type>, &syn::Ident, &str) ->  Option<(&'b str, Vec<(String, String)>, &'b str, ContainerPrefixLocation)>,
 		VP: Fn(&mut W, &syn::Type, Option<&GenericTypes>, bool, bool, bool),
 		VS: Fn(&mut W, &syn::Type, Option<&GenericTypes>, bool, bool, bool)>
 			(&self, w: &mut W, ident: &syn::Ident, var: &str, t: &syn::Type, generics: Option<&GenericTypes>,
@@ -1575,7 +1589,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// For slices (and Options), we refuse to directly map them as is_ref when they
 				// aren't opaque types containing an inner pointer. This is due to the fact that,
 				// in both cases, the actual higher-level type is non-is_ref.
-				let ty_has_inner = if self.is_transparent_container(&$container_type, is_ref) || $container_type == "Slice" {
+				let ty_has_inner = if $args_len == 1 {
 					let ty = $args_iter().next().unwrap();
 					if $container_type == "Slice" && to_c {
 						// "To C ptr_for_ref" means "return the regular object with is_owned
@@ -1599,7 +1613,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				let mut only_contained_type = None;
 				let mut only_contained_has_inner = false;
 				let mut contains_slice = false;
-				if $args_len == 1 && self.is_transparent_container(&$container_type, is_ref) {
+				if $args_len == 1 {
 					only_contained_has_inner = ty_has_inner;
 					let arg = $args_iter().next().unwrap();
 					if let syn::Type::Reference(t) = arg {
@@ -1609,16 +1623,19 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						} else if let syn::Type::Slice(_) = &*t.elem {
 							contains_slice = true;
 						} else { return false; }
-						needs_ref_map = true;
-					} else if let syn::Type::Path(_) = arg {
+						// If the inner element contains an inner pointer, we will just use that,
+						// avoiding the need to map elements to references. Otherwise we'll need to
+						// do an extra mapping step.
+						needs_ref_map = !only_contained_has_inner;
+					} else {
 						only_contained_type = Some(&arg);
-					} else { unimplemented!(); }
+					}
 				}
 
-				if let Some((prefix, conversions, suffix)) = container_lookup(&$container_type, is_ref && ty_has_inner, only_contained_type, ident, var) {
+				if let Some((prefix, conversions, suffix, prefix_location)) = container_lookup(&$container_type, is_ref && ty_has_inner, only_contained_type, ident, var) {
 					assert_eq!(conversions.len(), $args_len);
 					write!(w, "let mut local_{}{} = ", ident, if !to_c && needs_ref_map {"_base"} else { "" }).unwrap();
-					if only_contained_has_inner && to_c {
+					if prefix_location == ContainerPrefixLocation::OutsideConv {
 						var_prefix(w, $args_iter().next().unwrap(), generics, is_ref, ptr_for_ref, true);
 					}
 					write!(w, "{}{}", prefix, var).unwrap();
@@ -1635,24 +1652,23 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						let new_var = self.write_conversion_new_var_intern(w, &syn::Ident::new(&new_var_name, Span::call_site()),
 								&var_access, conv_ty, generics, contains_slice || (is_ref && ty_has_inner), ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix);
 						if new_var { write!(w, " ").unwrap(); }
-						if (!only_contained_has_inner || !to_c) && !contains_slice {
-							var_prefix(w, conv_ty, generics, is_ref && ty_has_inner, ptr_for_ref, false);
-						}
 
-						if !is_ref && !needs_ref_map && to_c && only_contained_has_inner {
+						if prefix_location == ContainerPrefixLocation::PerConv {
+							var_prefix(w, conv_ty, generics, is_ref && ty_has_inner, ptr_for_ref, false);
+						} else if !is_ref && !needs_ref_map && to_c && only_contained_has_inner {
 							write!(w, "Box::into_raw(Box::new(").unwrap();
 						}
+
 						write!(w, "{}{}", if contains_slice { "local_" } else { "" }, if new_var { new_var_name } else { var_access }).unwrap();
-						if (!only_contained_has_inner || !to_c) && !contains_slice {
+						if prefix_location == ContainerPrefixLocation::PerConv {
 							var_suffix(w, conv_ty, generics, is_ref && ty_has_inner, ptr_for_ref, false);
-						}
-						if !is_ref && !needs_ref_map && to_c && only_contained_has_inner {
+						} else if !is_ref && !needs_ref_map && to_c && only_contained_has_inner {
 							write!(w, "))").unwrap();
 						}
 						write!(w, " }}").unwrap();
 					}
 					write!(w, "{}", suffix).unwrap();
-					if only_contained_has_inner && to_c {
+					if prefix_location == ContainerPrefixLocation::OutsideConv {
 						var_suffix(w, $args_iter().next().unwrap(), generics, is_ref, ptr_for_ref, true);
 					}
 					write!(w, ";").unwrap();

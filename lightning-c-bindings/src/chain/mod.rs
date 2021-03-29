@@ -281,9 +281,17 @@ pub struct Filter {
 	/// Registers interest in a transaction with `txid` and having an output with `script_pubkey` as
 	/// a spending condition.
 	pub register_tx: extern "C" fn (this_arg: *const c_void, txid: *const [u8; 32], script_pubkey: crate::c_types::u8slice),
-	/// Registers interest in spends of a transaction output identified by `outpoint` having
-	/// `script_pubkey` as the spending condition.
-	pub register_output: extern "C" fn (this_arg: *const c_void, outpoint: &crate::chain::transaction::OutPoint, script_pubkey: crate::c_types::u8slice),
+	/// Registers interest in spends of a transaction output.
+	///
+	/// Optionally, when `output.block_hash` is set, should return any transaction spending the
+	/// output that is found in the corresponding block along with its index.
+	///
+	/// This return value is useful for Electrum clients in order to supply in-block descendant
+	/// transactions which otherwise were not included. This is not necessary for other clients if
+	/// such descendant transactions were already included (e.g., when a BIP 157 client provides the
+	/// full block).
+	#[must_use]
+	pub register_output: extern "C" fn (this_arg: *const c_void, output: crate::chain::WatchedOutput) -> crate::c_types::derived::COption_C2Tuple_usizeTransactionZZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -296,8 +304,10 @@ impl rustFilter for Filter {
 	fn register_tx(&self, txid: &bitcoin::hash_types::Txid, script_pubkey: &bitcoin::blockdata::script::Script) {
 		(self.register_tx)(self.this_arg, txid.as_inner(), crate::c_types::u8slice::from_slice(&script_pubkey[..]))
 	}
-	fn register_output(&self, outpoint: &lightning::chain::transaction::OutPoint, script_pubkey: &bitcoin::blockdata::script::Script) {
-		(self.register_output)(self.this_arg, &crate::chain::transaction::OutPoint { inner: unsafe { (outpoint as *const _) as *mut _ }, is_owned: false }, crate::c_types::u8slice::from_slice(&script_pubkey[..]))
+	fn register_output(&self, output: lightning::chain::WatchedOutput) -> Option<(usize, bitcoin::blockdata::transaction::Transaction)> {
+		let mut ret = (self.register_output)(self.this_arg, crate::chain::WatchedOutput { inner: Box::into_raw(Box::new(output)), is_owned: true });
+		let mut local_ret = if ret.is_some() { Some( { let (mut orig_ret_0_0, mut orig_ret_0_1) = ret.take().to_rust(); let mut local_ret_0 = (orig_ret_0_0, orig_ret_0_1.into_bitcoin()); local_ret_0 }) } else { None };
+		local_ret
 	}
 }
 
@@ -318,4 +328,105 @@ impl Drop for Filter {
 			f(self.this_arg);
 		}
 	}
+}
+
+use lightning::chain::WatchedOutput as nativeWatchedOutputImport;
+type nativeWatchedOutput = nativeWatchedOutputImport;
+
+/// A transaction output watched by a [`ChannelMonitor`] for spends on-chain.
+///
+/// Used to convey to a [`Filter`] such an output with a given spending condition. Any transaction
+/// spending the output must be given to [`ChannelMonitor::block_connected`] either directly or via
+/// the return value of [`Filter::register_output`].
+///
+/// If `block_hash` is `Some`, this indicates the output was created in the corresponding block and
+/// may have been spent there. See [`Filter::register_output`] for details.
+///
+/// [`ChannelMonitor`]: channelmonitor::ChannelMonitor
+/// [`ChannelMonitor::block_connected`]: channelmonitor::ChannelMonitor::block_connected
+#[must_use]
+#[repr(C)]
+pub struct WatchedOutput {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeWatchedOutput,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for WatchedOutput {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeWatchedOutput>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(self.inner) };
+		}
+	}
+}
+/// Frees any resources used by the WatchedOutput, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn WatchedOutput_free(this_obj: WatchedOutput) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+extern "C" fn WatchedOutput_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeWatchedOutput); }
+}
+#[allow(unused)]
+/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+impl WatchedOutput {
+	pub(crate) fn take_inner(mut self) -> *mut nativeWatchedOutput {
+		assert!(self.is_owned);
+		let ret = self.inner;
+		self.inner = std::ptr::null_mut();
+		ret
+	}
+}
+/// First block where the transaction output may have been spent.
+#[no_mangle]
+pub extern "C" fn WatchedOutput_get_block_hash(this_ptr: &WatchedOutput) -> crate::c_types::ThirtyTwoBytes {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.block_hash;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (inner_val.unwrap()).into_inner() } } };
+	local_inner_val
+}
+/// First block where the transaction output may have been spent.
+#[no_mangle]
+pub extern "C" fn WatchedOutput_set_block_hash(this_ptr: &mut WatchedOutput, mut val: crate::c_types::ThirtyTwoBytes) {
+	let mut local_val = if val.data == [0; 32] { None } else { Some( { ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap() }) };
+	unsafe { &mut *this_ptr.inner }.block_hash = local_val;
+}
+/// Outpoint identifying the transaction output.
+#[no_mangle]
+pub extern "C" fn WatchedOutput_get_outpoint(this_ptr: &WatchedOutput) -> crate::chain::transaction::OutPoint {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.outpoint;
+	crate::chain::transaction::OutPoint { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+}
+/// Outpoint identifying the transaction output.
+#[no_mangle]
+pub extern "C" fn WatchedOutput_set_outpoint(this_ptr: &mut WatchedOutput, mut val: crate::chain::transaction::OutPoint) {
+	unsafe { &mut *this_ptr.inner }.outpoint = *unsafe { Box::from_raw(val.take_inner()) };
+}
+/// Spending condition of the transaction output.
+#[no_mangle]
+pub extern "C" fn WatchedOutput_get_script_pubkey(this_ptr: &WatchedOutput) -> crate::c_types::u8slice {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.script_pubkey;
+	crate::c_types::u8slice::from_slice(&(*inner_val)[..])
+}
+/// Spending condition of the transaction output.
+#[no_mangle]
+pub extern "C" fn WatchedOutput_set_script_pubkey(this_ptr: &mut WatchedOutput, mut val: crate::c_types::derived::CVec_u8Z) {
+	unsafe { &mut *this_ptr.inner }.script_pubkey = ::bitcoin::blockdata::script::Script::from(val.into_rust());
+}
+/// Constructs a new WatchedOutput given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn WatchedOutput_new(mut block_hash_arg: crate::c_types::ThirtyTwoBytes, mut outpoint_arg: crate::chain::transaction::OutPoint, mut script_pubkey_arg: crate::c_types::derived::CVec_u8Z) -> WatchedOutput {
+	let mut local_block_hash_arg = if block_hash_arg.data == [0; 32] { None } else { Some( { ::bitcoin::hash_types::BlockHash::from_slice(&block_hash_arg.data[..]).unwrap() }) };
+	WatchedOutput { inner: Box::into_raw(Box::new(nativeWatchedOutput {
+		block_hash: local_block_hash_arg,
+		outpoint: *unsafe { Box::from_raw(outpoint_arg.take_inner()) },
+		script_pubkey: ::bitcoin::blockdata::script::Script::from(script_pubkey_arg.into_rust()),
+	})), is_owned: true }
 }

@@ -447,6 +447,19 @@ pub extern "C" fn DirectionalChannelInfo_get_htlc_minimum_msat(this_ptr: &Direct
 pub extern "C" fn DirectionalChannelInfo_set_htlc_minimum_msat(this_ptr: &mut DirectionalChannelInfo, mut val: u64) {
 	unsafe { &mut *this_ptr.inner }.htlc_minimum_msat = val;
 }
+/// The maximum value which may be relayed to the next hop via the channel.
+#[no_mangle]
+pub extern "C" fn DirectionalChannelInfo_get_htlc_maximum_msat(this_ptr: &DirectionalChannelInfo) -> crate::c_types::derived::COption_u64Z {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_maximum_msat;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(inner_val.unwrap()) } };
+	local_inner_val
+}
+/// The maximum value which may be relayed to the next hop via the channel.
+#[no_mangle]
+pub extern "C" fn DirectionalChannelInfo_set_htlc_maximum_msat(this_ptr: &mut DirectionalChannelInfo, mut val: crate::c_types::derived::COption_u64Z) {
+	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
+	unsafe { &mut *this_ptr.inner }.htlc_maximum_msat = local_val;
+}
 /// Fees charged when the channel is used for routing
 #[no_mangle]
 pub extern "C" fn DirectionalChannelInfo_get_fees(this_ptr: &DirectionalChannelInfo) -> crate::routing::network_graph::RoutingFees {
@@ -476,6 +489,22 @@ pub extern "C" fn DirectionalChannelInfo_get_last_update_message(this_ptr: &Dire
 pub extern "C" fn DirectionalChannelInfo_set_last_update_message(this_ptr: &mut DirectionalChannelInfo, mut val: crate::ln::msgs::ChannelUpdate) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *this_ptr.inner }.last_update_message = local_val;
+}
+/// Constructs a new DirectionalChannelInfo given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn DirectionalChannelInfo_new(mut last_update_arg: u32, mut enabled_arg: bool, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: u64, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z, mut fees_arg: crate::routing::network_graph::RoutingFees, mut last_update_message_arg: crate::ln::msgs::ChannelUpdate) -> DirectionalChannelInfo {
+	let mut local_htlc_maximum_msat_arg = if htlc_maximum_msat_arg.is_some() { Some( { htlc_maximum_msat_arg.take() }) } else { None };
+	let mut local_last_update_message_arg = if last_update_message_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(last_update_message_arg.take_inner()) } }) };
+	DirectionalChannelInfo { inner: Box::into_raw(Box::new(nativeDirectionalChannelInfo {
+		last_update: last_update_arg,
+		enabled: enabled_arg,
+		cltv_expiry_delta: cltv_expiry_delta_arg,
+		htlc_minimum_msat: htlc_minimum_msat_arg,
+		htlc_maximum_msat: local_htlc_maximum_msat_arg,
+		fees: *unsafe { Box::from_raw(fees_arg.take_inner()) },
+		last_update_message: local_last_update_message_arg,
+	})), is_owned: true }
 }
 impl Clone for DirectionalChannelInfo {
 	fn clone(&self) -> Self {
@@ -617,6 +646,19 @@ pub extern "C" fn ChannelInfo_set_two_to_one(this_ptr: &mut ChannelInfo, mut val
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *this_ptr.inner }.two_to_one = local_val;
 }
+/// The channel capacity as seen on-chain, if chain lookup is available.
+#[no_mangle]
+pub extern "C" fn ChannelInfo_get_capacity_sats(this_ptr: &ChannelInfo) -> crate::c_types::derived::COption_u64Z {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.capacity_sats;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(inner_val.unwrap()) } };
+	local_inner_val
+}
+/// The channel capacity as seen on-chain, if chain lookup is available.
+#[no_mangle]
+pub extern "C" fn ChannelInfo_set_capacity_sats(this_ptr: &mut ChannelInfo, mut val: crate::c_types::derived::COption_u64Z) {
+	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
+	unsafe { &mut *this_ptr.inner }.capacity_sats = local_val;
+}
 /// An initial announcement of the channel
 /// Mostly redundant with the data we store in fields explicitly.
 /// Everything else is useful only for sending out for initial routing sync.
@@ -635,6 +677,24 @@ pub extern "C" fn ChannelInfo_get_announcement_message(this_ptr: &ChannelInfo) -
 pub extern "C" fn ChannelInfo_set_announcement_message(this_ptr: &mut ChannelInfo, mut val: crate::ln::msgs::ChannelAnnouncement) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *this_ptr.inner }.announcement_message = local_val;
+}
+/// Constructs a new ChannelInfo given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelInfo_new(mut features_arg: crate::ln::features::ChannelFeatures, mut node_one_arg: crate::c_types::PublicKey, mut one_to_two_arg: crate::routing::network_graph::DirectionalChannelInfo, mut node_two_arg: crate::c_types::PublicKey, mut two_to_one_arg: crate::routing::network_graph::DirectionalChannelInfo, mut capacity_sats_arg: crate::c_types::derived::COption_u64Z, mut announcement_message_arg: crate::ln::msgs::ChannelAnnouncement) -> ChannelInfo {
+	let mut local_one_to_two_arg = if one_to_two_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(one_to_two_arg.take_inner()) } }) };
+	let mut local_two_to_one_arg = if two_to_one_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(two_to_one_arg.take_inner()) } }) };
+	let mut local_capacity_sats_arg = if capacity_sats_arg.is_some() { Some( { capacity_sats_arg.take() }) } else { None };
+	let mut local_announcement_message_arg = if announcement_message_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(announcement_message_arg.take_inner()) } }) };
+	ChannelInfo { inner: Box::into_raw(Box::new(nativeChannelInfo {
+		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
+		node_one: node_one_arg.into_rust(),
+		one_to_two: local_one_to_two_arg,
+		node_two: node_two_arg.into_rust(),
+		two_to_one: local_two_to_one_arg,
+		capacity_sats: local_capacity_sats_arg,
+		announcement_message: local_announcement_message_arg,
+	})), is_owned: true }
 }
 impl Clone for ChannelInfo {
 	fn clone(&self) -> Self {

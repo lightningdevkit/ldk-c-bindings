@@ -347,6 +347,24 @@ typedef struct LDKCResult_TxCreationKeysErrorZ {
    bool result_ok;
 } LDKCResult_TxCreationKeysErrorZ;
 
+typedef enum LDKCOption_u32Z_Tag {
+   LDKCOption_u32Z_Some,
+   LDKCOption_u32Z_None,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKCOption_u32Z_Sentinel,
+} LDKCOption_u32Z_Tag;
+
+typedef struct LDKCOption_u32Z {
+   LDKCOption_u32Z_Tag tag;
+   union {
+      struct {
+         uint32_t some;
+      };
+   };
+} LDKCOption_u32Z;
+
 
 
 /**
@@ -1682,6 +1700,24 @@ typedef struct LDKCResult_ChannelConfigDecodeErrorZ {
    bool result_ok;
 } LDKCResult_ChannelConfigDecodeErrorZ;
 
+typedef enum LDKCOption_u64Z_Tag {
+   LDKCOption_u64Z_Some,
+   LDKCOption_u64Z_None,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKCOption_u64Z_Sentinel,
+} LDKCOption_u64Z_Tag;
+
+typedef struct LDKCOption_u64Z {
+   LDKCOption_u64Z_Tag tag;
+   union {
+      struct {
+         uint64_t some;
+      };
+   };
+} LDKCOption_u64Z;
+
 
 
 /**
@@ -2815,6 +2851,24 @@ typedef struct LDKCResult_TxOutAccessErrorZ {
    union LDKCResult_TxOutAccessErrorZPtr contents;
    bool result_ok;
 } LDKCResult_TxOutAccessErrorZ;
+
+typedef enum LDKCOption_C2Tuple_usizeTransactionZZ_Tag {
+   LDKCOption_C2Tuple_usizeTransactionZZ_Some,
+   LDKCOption_C2Tuple_usizeTransactionZZ_None,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKCOption_C2Tuple_usizeTransactionZZ_Sentinel,
+} LDKCOption_C2Tuple_usizeTransactionZZ_Tag;
+
+typedef struct LDKCOption_C2Tuple_usizeTransactionZZ {
+   LDKCOption_C2Tuple_usizeTransactionZZ_Tag tag;
+   union {
+      struct {
+         struct LDKC2Tuple_usizeTransactionZ some;
+      };
+   };
+} LDKCOption_C2Tuple_usizeTransactionZZ;
 
 /**
  * A Rust str object, ie a reference to a UTF8-valid string.
@@ -4277,6 +4331,36 @@ typedef struct LDKListen {
    void (*free)(void *this_arg);
 } LDKListen;
 
+
+
+/**
+ * A transaction output watched by a [`ChannelMonitor`] for spends on-chain.
+ *
+ * Used to convey to a [`Filter`] such an output with a given spending condition. Any transaction
+ * spending the output must be given to [`ChannelMonitor::block_connected`] either directly or via
+ * the return value of [`Filter::register_output`].
+ *
+ * If `block_hash` is `Some`, this indicates the output was created in the corresponding block and
+ * may have been spent there. See [`Filter::register_output`] for details.
+ *
+ * [`ChannelMonitor`]: channelmonitor::ChannelMonitor
+ * [`ChannelMonitor::block_connected`]: channelmonitor::ChannelMonitor::block_connected
+ */
+typedef struct MUST_USE_STRUCT LDKWatchedOutput {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeWatchedOutput *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKWatchedOutput;
+
 /**
  * The `Filter` trait defines behavior for indicating chain activity of interest pertaining to
  * channels.
@@ -4311,10 +4395,17 @@ typedef struct LDKFilter {
     */
    void (*register_tx)(const void *this_arg, const uint8_t (*txid)[32], struct LDKu8slice script_pubkey);
    /**
-    * Registers interest in spends of a transaction output identified by `outpoint` having
-    * `script_pubkey` as the spending condition.
+    * Registers interest in spends of a transaction output.
+    *
+    * Optionally, when `output.block_hash` is set, should return any transaction spending the
+    * output that is found in the corresponding block along with its index.
+    *
+    * This return value is useful for Electrum clients in order to supply in-block descendant
+    * transactions which otherwise were not included. This is not necessary for other clients if
+    * such descendant transactions were already included (e.g., when a BIP 157 client provides the
+    * full block).
     */
-   void (*register_output)(const void *this_arg, const struct LDKOutPoint *NONNULL_PTR outpoint, struct LDKu8slice script_pubkey);
+   struct LDKCOption_C2Tuple_usizeTransactionZZ (*register_output)(const void *this_arg, struct LDKWatchedOutput output);
    /**
     * Frees any resources associated with this object given its this_arg pointer.
     * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -5003,6 +5094,14 @@ struct LDKCResult_TxCreationKeysErrorZ CResult_TxCreationKeysErrorZ_err(enum LDK
 
 void CResult_TxCreationKeysErrorZ_free(struct LDKCResult_TxCreationKeysErrorZ _res);
 
+struct LDKCOption_u32Z COption_u32Z_some(uint32_t o);
+
+struct LDKCOption_u32Z COption_u32Z_none(void);
+
+void COption_u32Z_free(struct LDKCOption_u32Z _res);
+
+struct LDKCOption_u32Z COption_u32Z_clone(const struct LDKCOption_u32Z *NONNULL_PTR orig);
+
 struct LDKCResult_HTLCOutputInCommitmentDecodeErrorZ CResult_HTLCOutputInCommitmentDecodeErrorZ_ok(struct LDKHTLCOutputInCommitment o);
 
 struct LDKCResult_HTLCOutputInCommitmentDecodeErrorZ CResult_HTLCOutputInCommitmentDecodeErrorZ_err(struct LDKDecodeError e);
@@ -5154,6 +5253,14 @@ struct LDKCResult_ChannelConfigDecodeErrorZ CResult_ChannelConfigDecodeErrorZ_er
 void CResult_ChannelConfigDecodeErrorZ_free(struct LDKCResult_ChannelConfigDecodeErrorZ _res);
 
 struct LDKCResult_ChannelConfigDecodeErrorZ CResult_ChannelConfigDecodeErrorZ_clone(const struct LDKCResult_ChannelConfigDecodeErrorZ *NONNULL_PTR orig);
+
+struct LDKCOption_u64Z COption_u64Z_some(uint64_t o);
+
+struct LDKCOption_u64Z COption_u64Z_none(void);
+
+void COption_u64Z_free(struct LDKCOption_u64Z _res);
+
+struct LDKCOption_u64Z COption_u64Z_clone(const struct LDKCOption_u64Z *NONNULL_PTR orig);
 
 struct LDKCResult_DirectionalChannelInfoDecodeErrorZ CResult_DirectionalChannelInfoDecodeErrorZ_ok(struct LDKDirectionalChannelInfo o);
 
@@ -5312,6 +5419,12 @@ struct LDKCResult_TxOutAccessErrorZ CResult_TxOutAccessErrorZ_err(enum LDKAccess
 void CResult_TxOutAccessErrorZ_free(struct LDKCResult_TxOutAccessErrorZ _res);
 
 struct LDKCResult_TxOutAccessErrorZ CResult_TxOutAccessErrorZ_clone(const struct LDKCResult_TxOutAccessErrorZ *NONNULL_PTR orig);
+
+struct LDKCOption_C2Tuple_usizeTransactionZZ COption_C2Tuple_usizeTransactionZZ_some(struct LDKC2Tuple_usizeTransactionZ o);
+
+struct LDKCOption_C2Tuple_usizeTransactionZZ COption_C2Tuple_usizeTransactionZZ_none(void);
+
+void COption_C2Tuple_usizeTransactionZZ_free(struct LDKCOption_C2Tuple_usizeTransactionZZ _res);
 
 struct LDKCResult_NoneAPIErrorZ CResult_NoneAPIErrorZ_ok(void);
 
@@ -6299,6 +6412,46 @@ void Watch_free(struct LDKWatch this_ptr);
 void Filter_free(struct LDKFilter this_ptr);
 
 /**
+ * Frees any resources used by the WatchedOutput, if is_owned is set and inner is non-NULL.
+ */
+void WatchedOutput_free(struct LDKWatchedOutput this_obj);
+
+/**
+ * First block where the transaction output may have been spent.
+ */
+struct LDKThirtyTwoBytes WatchedOutput_get_block_hash(const struct LDKWatchedOutput *NONNULL_PTR this_ptr);
+
+/**
+ * First block where the transaction output may have been spent.
+ */
+void WatchedOutput_set_block_hash(struct LDKWatchedOutput *NONNULL_PTR this_ptr, struct LDKThirtyTwoBytes val);
+
+/**
+ * Outpoint identifying the transaction output.
+ */
+struct LDKOutPoint WatchedOutput_get_outpoint(const struct LDKWatchedOutput *NONNULL_PTR this_ptr);
+
+/**
+ * Outpoint identifying the transaction output.
+ */
+void WatchedOutput_set_outpoint(struct LDKWatchedOutput *NONNULL_PTR this_ptr, struct LDKOutPoint val);
+
+/**
+ * Spending condition of the transaction output.
+ */
+struct LDKu8slice WatchedOutput_get_script_pubkey(const struct LDKWatchedOutput *NONNULL_PTR this_ptr);
+
+/**
+ * Spending condition of the transaction output.
+ */
+void WatchedOutput_set_script_pubkey(struct LDKWatchedOutput *NONNULL_PTR this_ptr, struct LDKCVec_u8Z val);
+
+/**
+ * Constructs a new WatchedOutput given each field
+ */
+MUST_USE_RES struct LDKWatchedOutput WatchedOutput_new(struct LDKThirtyTwoBytes block_hash_arg, struct LDKOutPoint outpoint_arg, struct LDKCVec_u8Z script_pubkey_arg);
+
+/**
  * Calls the free function if one is set
  */
 void BroadcasterInterface_free(struct LDKBroadcasterInterface this_ptr);
@@ -7064,6 +7217,18 @@ const uint8_t (*ChannelDetails_get_channel_id(const struct LDKChannelDetails *NO
  * lifetime of the channel.
  */
 void ChannelDetails_set_channel_id(struct LDKChannelDetails *NONNULL_PTR this_ptr, struct LDKThirtyTwoBytes val);
+
+/**
+ * The position of the funding transaction in the chain. None if the funding transaction has
+ * not yet been confirmed and the channel fully opened.
+ */
+struct LDKCOption_u64Z ChannelDetails_get_short_channel_id(const struct LDKChannelDetails *NONNULL_PTR this_ptr);
+
+/**
+ * The position of the funding transaction in the chain. None if the funding transaction has
+ * not yet been confirmed and the channel fully opened.
+ */
+void ChannelDetails_set_short_channel_id(struct LDKChannelDetails *NONNULL_PTR this_ptr, struct LDKCOption_u64Z val);
 
 /**
  * The node_id of our counterparty
@@ -10236,6 +10401,25 @@ const uint8_t (*HTLCOutputInCommitment_get_payment_hash(const struct LDKHTLCOutp
 void HTLCOutputInCommitment_set_payment_hash(struct LDKHTLCOutputInCommitment *NONNULL_PTR this_ptr, struct LDKThirtyTwoBytes val);
 
 /**
+ * The position within the commitment transactions' outputs. This may be None if the value is
+ * below the dust limit (in which case no output appears in the commitment transaction and the
+ * value is spent to additional transaction fees).
+ */
+struct LDKCOption_u32Z HTLCOutputInCommitment_get_transaction_output_index(const struct LDKHTLCOutputInCommitment *NONNULL_PTR this_ptr);
+
+/**
+ * The position within the commitment transactions' outputs. This may be None if the value is
+ * below the dust limit (in which case no output appears in the commitment transaction and the
+ * value is spent to additional transaction fees).
+ */
+void HTLCOutputInCommitment_set_transaction_output_index(struct LDKHTLCOutputInCommitment *NONNULL_PTR this_ptr, struct LDKCOption_u32Z val);
+
+/**
+ * Constructs a new HTLCOutputInCommitment given each field
+ */
+MUST_USE_RES struct LDKHTLCOutputInCommitment HTLCOutputInCommitment_new(bool offered_arg, uint64_t amount_msat_arg, uint32_t cltv_expiry_arg, struct LDKThirtyTwoBytes payment_hash_arg, struct LDKCOption_u32Z transaction_output_index_arg);
+
+/**
  * Creates a copy of the HTLCOutputInCommitment
  */
 struct LDKHTLCOutputInCommitment HTLCOutputInCommitment_clone(const struct LDKHTLCOutputInCommitment *NONNULL_PTR orig);
@@ -10930,6 +11114,31 @@ uint16_t RouteHint_get_cltv_expiry_delta(const struct LDKRouteHint *NONNULL_PTR 
 void RouteHint_set_cltv_expiry_delta(struct LDKRouteHint *NONNULL_PTR this_ptr, uint16_t val);
 
 /**
+ * The minimum value, in msat, which must be relayed to the next hop.
+ */
+struct LDKCOption_u64Z RouteHint_get_htlc_minimum_msat(const struct LDKRouteHint *NONNULL_PTR this_ptr);
+
+/**
+ * The minimum value, in msat, which must be relayed to the next hop.
+ */
+void RouteHint_set_htlc_minimum_msat(struct LDKRouteHint *NONNULL_PTR this_ptr, struct LDKCOption_u64Z val);
+
+/**
+ * The maximum value in msat available for routing with a single HTLC.
+ */
+struct LDKCOption_u64Z RouteHint_get_htlc_maximum_msat(const struct LDKRouteHint *NONNULL_PTR this_ptr);
+
+/**
+ * The maximum value in msat available for routing with a single HTLC.
+ */
+void RouteHint_set_htlc_maximum_msat(struct LDKRouteHint *NONNULL_PTR this_ptr, struct LDKCOption_u64Z val);
+
+/**
+ * Constructs a new RouteHint given each field
+ */
+MUST_USE_RES struct LDKRouteHint RouteHint_new(struct LDKPublicKey src_node_id_arg, uint64_t short_channel_id_arg, struct LDKRoutingFees fees_arg, uint16_t cltv_expiry_delta_arg, struct LDKCOption_u64Z htlc_minimum_msat_arg, struct LDKCOption_u64Z htlc_maximum_msat_arg);
+
+/**
  * Creates a copy of the RouteHint
  */
 struct LDKRouteHint RouteHint_clone(const struct LDKRouteHint *NONNULL_PTR orig);
@@ -11072,6 +11281,16 @@ uint64_t DirectionalChannelInfo_get_htlc_minimum_msat(const struct LDKDirectiona
 void DirectionalChannelInfo_set_htlc_minimum_msat(struct LDKDirectionalChannelInfo *NONNULL_PTR this_ptr, uint64_t val);
 
 /**
+ * The maximum value which may be relayed to the next hop via the channel.
+ */
+struct LDKCOption_u64Z DirectionalChannelInfo_get_htlc_maximum_msat(const struct LDKDirectionalChannelInfo *NONNULL_PTR this_ptr);
+
+/**
+ * The maximum value which may be relayed to the next hop via the channel.
+ */
+void DirectionalChannelInfo_set_htlc_maximum_msat(struct LDKDirectionalChannelInfo *NONNULL_PTR this_ptr, struct LDKCOption_u64Z val);
+
+/**
  * Fees charged when the channel is used for routing
  */
 struct LDKRoutingFees DirectionalChannelInfo_get_fees(const struct LDKDirectionalChannelInfo *NONNULL_PTR this_ptr);
@@ -11096,6 +11315,11 @@ struct LDKChannelUpdate DirectionalChannelInfo_get_last_update_message(const str
  * Not stored if contains excess data to prevent DoS.
  */
 void DirectionalChannelInfo_set_last_update_message(struct LDKDirectionalChannelInfo *NONNULL_PTR this_ptr, struct LDKChannelUpdate val);
+
+/**
+ * Constructs a new DirectionalChannelInfo given each field
+ */
+MUST_USE_RES struct LDKDirectionalChannelInfo DirectionalChannelInfo_new(uint32_t last_update_arg, bool enabled_arg, uint16_t cltv_expiry_delta_arg, uint64_t htlc_minimum_msat_arg, struct LDKCOption_u64Z htlc_maximum_msat_arg, struct LDKRoutingFees fees_arg, struct LDKChannelUpdate last_update_message_arg);
 
 /**
  * Creates a copy of the DirectionalChannelInfo
@@ -11168,6 +11392,16 @@ struct LDKDirectionalChannelInfo ChannelInfo_get_two_to_one(const struct LDKChan
 void ChannelInfo_set_two_to_one(struct LDKChannelInfo *NONNULL_PTR this_ptr, struct LDKDirectionalChannelInfo val);
 
 /**
+ * The channel capacity as seen on-chain, if chain lookup is available.
+ */
+struct LDKCOption_u64Z ChannelInfo_get_capacity_sats(const struct LDKChannelInfo *NONNULL_PTR this_ptr);
+
+/**
+ * The channel capacity as seen on-chain, if chain lookup is available.
+ */
+void ChannelInfo_set_capacity_sats(struct LDKChannelInfo *NONNULL_PTR this_ptr, struct LDKCOption_u64Z val);
+
+/**
  * An initial announcement of the channel
  * Mostly redundant with the data we store in fields explicitly.
  * Everything else is useful only for sending out for initial routing sync.
@@ -11182,6 +11416,11 @@ struct LDKChannelAnnouncement ChannelInfo_get_announcement_message(const struct 
  * Not stored if contains excess data to prevent DoS.
  */
 void ChannelInfo_set_announcement_message(struct LDKChannelInfo *NONNULL_PTR this_ptr, struct LDKChannelAnnouncement val);
+
+/**
+ * Constructs a new ChannelInfo given each field
+ */
+MUST_USE_RES struct LDKChannelInfo ChannelInfo_new(struct LDKChannelFeatures features_arg, struct LDKPublicKey node_one_arg, struct LDKDirectionalChannelInfo one_to_two_arg, struct LDKPublicKey node_two_arg, struct LDKDirectionalChannelInfo two_to_one_arg, struct LDKCOption_u64Z capacity_sats_arg, struct LDKChannelAnnouncement announcement_message_arg);
 
 /**
  * Creates a copy of the ChannelInfo

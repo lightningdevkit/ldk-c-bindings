@@ -85,6 +85,8 @@ struct nativeHTLCUpdateOpaque;
 typedef struct nativeHTLCUpdateOpaque LDKnativeHTLCUpdate;
 struct nativeChannelMonitorOpaque;
 typedef struct nativeChannelMonitorOpaque LDKnativeChannelMonitor;
+struct nativeWatchedOutputOpaque;
+typedef struct nativeWatchedOutputOpaque LDKnativeWatchedOutput;
 struct nativeChannelManagerOpaque;
 typedef struct nativeChannelManagerOpaque LDKnativeChannelManager;
 struct nativeChainParametersOpaque;

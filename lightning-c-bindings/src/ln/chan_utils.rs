@@ -535,6 +535,36 @@ pub extern "C" fn HTLCOutputInCommitment_get_payment_hash(this_ptr: &HTLCOutputI
 pub extern "C" fn HTLCOutputInCommitment_set_payment_hash(this_ptr: &mut HTLCOutputInCommitment, mut val: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &mut *this_ptr.inner }.payment_hash = ::lightning::ln::channelmanager::PaymentHash(val.data);
 }
+/// The position within the commitment transactions' outputs. This may be None if the value is
+/// below the dust limit (in which case no output appears in the commitment transaction and the
+/// value is spent to additional transaction fees).
+#[no_mangle]
+pub extern "C" fn HTLCOutputInCommitment_get_transaction_output_index(this_ptr: &HTLCOutputInCommitment) -> crate::c_types::derived::COption_u32Z {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.transaction_output_index;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u32Z::None } else {  { crate::c_types::derived::COption_u32Z::Some(inner_val.unwrap()) } };
+	local_inner_val
+}
+/// The position within the commitment transactions' outputs. This may be None if the value is
+/// below the dust limit (in which case no output appears in the commitment transaction and the
+/// value is spent to additional transaction fees).
+#[no_mangle]
+pub extern "C" fn HTLCOutputInCommitment_set_transaction_output_index(this_ptr: &mut HTLCOutputInCommitment, mut val: crate::c_types::derived::COption_u32Z) {
+	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
+	unsafe { &mut *this_ptr.inner }.transaction_output_index = local_val;
+}
+/// Constructs a new HTLCOutputInCommitment given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn HTLCOutputInCommitment_new(mut offered_arg: bool, mut amount_msat_arg: u64, mut cltv_expiry_arg: u32, mut payment_hash_arg: crate::c_types::ThirtyTwoBytes, mut transaction_output_index_arg: crate::c_types::derived::COption_u32Z) -> HTLCOutputInCommitment {
+	let mut local_transaction_output_index_arg = if transaction_output_index_arg.is_some() { Some( { transaction_output_index_arg.take() }) } else { None };
+	HTLCOutputInCommitment { inner: Box::into_raw(Box::new(nativeHTLCOutputInCommitment {
+		offered: offered_arg,
+		amount_msat: amount_msat_arg,
+		cltv_expiry: cltv_expiry_arg,
+		payment_hash: ::lightning::ln::channelmanager::PaymentHash(payment_hash_arg.data),
+		transaction_output_index: local_transaction_output_index_arg,
+	})), is_owned: true }
+}
 impl Clone for HTLCOutputInCommitment {
 	fn clone(&self) -> Self {
 		Self {

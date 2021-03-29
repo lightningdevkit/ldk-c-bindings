@@ -295,6 +295,44 @@ pub fn write_tuple_block<W: std::io::Write>(w: &mut W, mangled_container: &str, 
 	writeln!(w, "pub extern \"C\" fn {}_free(_res: {}) {{ }}", mangled_container, mangled_container).unwrap();
 }
 
+/// Writes out a C-callable concrete Option<A> struct and utility methods
+pub fn write_option_block<W: std::io::Write>(w: &mut W, mangled_container: &str, inner_type: &str, clonable: bool) {
+	writeln!(w, "#[repr(C)]").unwrap();
+	if clonable {
+		writeln!(w, "#[derive(Clone)]").unwrap();
+	}
+	writeln!(w, "pub enum {} {{", mangled_container).unwrap();
+	writeln!(w, "\tSome({}),", inner_type).unwrap();
+	writeln!(w, "\tNone").unwrap();
+	writeln!(w, "}}").unwrap();
+
+	writeln!(w, "impl {} {{", mangled_container).unwrap();
+	writeln!(w, "\t#[allow(unused)] pub(crate) fn is_some(&self) -> bool {{").unwrap();
+	writeln!(w, "\t\tif let Self::Some(_) = self {{ true }} else {{ false }}").unwrap();
+	writeln!(w, "\t}}").unwrap();
+	writeln!(w, "\t#[allow(unused)] pub(crate) fn take(mut self) -> {} {{", inner_type).unwrap();
+	writeln!(w, "\t\tif let Self::Some(v) = self {{ v }} else {{ unreachable!() }}").unwrap();
+	writeln!(w, "\t}}").unwrap();
+	writeln!(w, "}}").unwrap();
+
+	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "pub extern \"C\" fn {}_some(o: {}) -> {} {{", mangled_container, inner_type, mangled_container).unwrap();
+	writeln!(w, "\t{}::Some(o)", mangled_container).unwrap();
+	writeln!(w, "}}").unwrap();
+
+	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "pub extern \"C\" fn {}_none() -> {} {{", mangled_container, mangled_container).unwrap();
+	writeln!(w, "\t{}::None", mangled_container).unwrap();
+	writeln!(w, "}}").unwrap();
+
+	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "pub extern \"C\" fn {}_free(_res: {}) {{ }}", mangled_container, mangled_container).unwrap();
+	if clonable {
+		writeln!(w, "#[no_mangle]").unwrap();
+		writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{ orig.clone() }}", mangled_container, mangled_container, mangled_container).unwrap();
+	}
+}
+
 /// Prints the docs from a given attribute list unless its tagged no export
 pub fn writeln_docs<W: std::io::Write>(w: &mut W, attrs: &[syn::Attribute], prefix: &str) {
 	for attr in attrs.iter() {

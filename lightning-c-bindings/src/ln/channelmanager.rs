@@ -277,6 +277,21 @@ pub extern "C" fn ChannelDetails_get_channel_id(this_ptr: &ChannelDetails) -> *c
 pub extern "C" fn ChannelDetails_set_channel_id(this_ptr: &mut ChannelDetails, mut val: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &mut *this_ptr.inner }.channel_id = val.data;
 }
+/// The position of the funding transaction in the chain. None if the funding transaction has
+/// not yet been confirmed and the channel fully opened.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_get_short_channel_id(this_ptr: &ChannelDetails) -> crate::c_types::derived::COption_u64Z {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.short_channel_id;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(inner_val.unwrap()) } };
+	local_inner_val
+}
+/// The position of the funding transaction in the chain. None if the funding transaction has
+/// not yet been confirmed and the channel fully opened.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_set_short_channel_id(this_ptr: &mut ChannelDetails, mut val: crate::c_types::derived::COption_u64Z) {
+	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
+	unsafe { &mut *this_ptr.inner }.short_channel_id = local_val;
+}
 /// The node_id of our counterparty
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_remote_network_id(this_ptr: &ChannelDetails) -> crate::c_types::PublicKey {

@@ -329,6 +329,32 @@ impl From<crate::c_types::CResultTempl<crate::ln::chan_utils::TxCreationKeys, cr
 	}
 }
 #[repr(C)]
+#[derive(Clone)]
+pub enum COption_u32Z {
+	Some(u32),
+	None
+}
+impl COption_u32Z {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> u32 {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+pub extern "C" fn COption_u32Z_some(o: u32) -> COption_u32Z {
+	COption_u32Z::Some(o)
+}
+#[no_mangle]
+pub extern "C" fn COption_u32Z_none() -> COption_u32Z {
+	COption_u32Z::None
+}
+#[no_mangle]
+pub extern "C" fn COption_u32Z_free(_res: COption_u32Z) { }
+#[no_mangle]
+pub extern "C" fn COption_u32Z_clone(orig: &COption_u32Z) -> COption_u32Z { orig.clone() }
+#[repr(C)]
 pub union CResult_HTLCOutputInCommitmentDecodeErrorZPtr {
 	pub result: *mut crate::ln::chan_utils::HTLCOutputInCommitment,
 	pub err: *mut crate::ln::msgs::DecodeError,
@@ -1865,6 +1891,32 @@ impl Clone for CResult_ChannelConfigDecodeErrorZ {
 }
 #[no_mangle]
 pub extern "C" fn CResult_ChannelConfigDecodeErrorZ_clone(orig: &CResult_ChannelConfigDecodeErrorZ) -> CResult_ChannelConfigDecodeErrorZ { orig.clone() }
+#[repr(C)]
+#[derive(Clone)]
+pub enum COption_u64Z {
+	Some(u64),
+	None
+}
+impl COption_u64Z {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> u64 {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+pub extern "C" fn COption_u64Z_some(o: u64) -> COption_u64Z {
+	COption_u64Z::Some(o)
+}
+#[no_mangle]
+pub extern "C" fn COption_u64Z_none() -> COption_u64Z {
+	COption_u64Z::None
+}
+#[no_mangle]
+pub extern "C" fn COption_u64Z_free(_res: COption_u64Z) { }
+#[no_mangle]
+pub extern "C" fn COption_u64Z_clone(orig: &COption_u64Z) -> COption_u64Z { orig.clone() }
 #[repr(C)]
 pub union CResult_DirectionalChannelInfoDecodeErrorZPtr {
 	pub result: *mut crate::routing::network_graph::DirectionalChannelInfo,
@@ -3434,6 +3486,29 @@ impl Clone for CResult_TxOutAccessErrorZ {
 }
 #[no_mangle]
 pub extern "C" fn CResult_TxOutAccessErrorZ_clone(orig: &CResult_TxOutAccessErrorZ) -> CResult_TxOutAccessErrorZ { orig.clone() }
+#[repr(C)]
+pub enum COption_C2Tuple_usizeTransactionZZ {
+	Some(crate::c_types::derived::C2Tuple_usizeTransactionZ),
+	None
+}
+impl COption_C2Tuple_usizeTransactionZZ {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> crate::c_types::derived::C2Tuple_usizeTransactionZ {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_some(o: crate::c_types::derived::C2Tuple_usizeTransactionZ) -> COption_C2Tuple_usizeTransactionZZ {
+	COption_C2Tuple_usizeTransactionZZ::Some(o)
+}
+#[no_mangle]
+pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_none() -> COption_C2Tuple_usizeTransactionZZ {
+	COption_C2Tuple_usizeTransactionZZ::None
+}
+#[no_mangle]
+pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_free(_res: COption_C2Tuple_usizeTransactionZZ) { }
 #[repr(C)]
 pub union CResult_NoneAPIErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant

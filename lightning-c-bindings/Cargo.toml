@@ -18,7 +18,7 @@ crate-type = ["staticlib"
 bitcoin = "0.26"
 secp256k1 = { version = "0.20.1", features = ["global-context-less-secure"] }
 # Note that the following line is matched by genbindings to update the path
-lightning = { git = "https://git.bitcoin.ninja/rust-lightning", rev = "8a8c75a8fc96e5c8ed59e6d80a517bc59215b4d6" }
+lightning = { git = "https://git.bitcoin.ninja/rust-lightning", rev = "6fcac8bc65ed6d372e0b8c367e9934c754f99ff3" }
 
 [patch.crates-io]
 # Rust-Secp256k1 PR 279. Should be dropped once merged.

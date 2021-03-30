@@ -43,14 +43,19 @@ pub fn write_cpp_wrapper(cpp_header_file: &mut File, ty: &str, has_destructor: b
 /// Writes out a C-callable concrete Result<A, B> struct and utility methods
 pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str, ok_type: &str, err_type: &str, clonable: bool) {
 	writeln!(w, "#[repr(C)]").unwrap();
+	writeln!(w, "/// The contents of {}", mangled_container).unwrap();
 	writeln!(w, "pub union {}Ptr {{", mangled_container).unwrap();
 	if ok_type != "()" {
+		writeln!(w, "\t/// A pointer to the contents in the success state.").unwrap();
+		writeln!(w, "\t/// Reading from this pointer when `result_ok` is not set is undefined.").unwrap();
 		writeln!(w, "\tpub result: *mut {},", ok_type).unwrap();
 	} else {
 		writeln!(w, "\t/// Note that this value is always NULL, as there are no contents in the OK variant").unwrap();
 		writeln!(w, "\tpub result: *mut std::ffi::c_void,").unwrap();
 	}
 	if err_type != "()" {
+		writeln!(w, "\t/// A pointer to the contents in the error state.").unwrap();
+		writeln!(w, "\t/// Reading from this pointer when `result_ok` is set is undefined.").unwrap();
 		writeln!(w, "\tpub err: *mut {},", err_type).unwrap();
 	} else {
 		writeln!(w, "\t/// Note that this value is always NULL, as there are no contents in the Err variant").unwrap();
@@ -58,15 +63,23 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	}
 	writeln!(w, "}}").unwrap();
 	writeln!(w, "#[repr(C)]").unwrap();
+	writeln!(w, "/// A {} represents the result of a fallible operation,", mangled_container).unwrap();
+	writeln!(w, "/// containing a {} on success and a {} on failure.", ok_type, err_type).unwrap();
+	writeln!(w, "/// `result_ok` indicates the overall state, and the contents are provided via `contents`.").unwrap();
 	writeln!(w, "pub struct {} {{", mangled_container).unwrap();
+	writeln!(w, "\t/// The contents of this {}, accessible via either", mangled_container).unwrap();
+	writeln!(w, "\t/// `err` or `result` depending on the state of `result_ok`.").unwrap();
 	writeln!(w, "\tpub contents: {}Ptr,", mangled_container).unwrap();
+	writeln!(w, "\t/// Whether this {} represents a success state.", mangled_container).unwrap();
 	writeln!(w, "\tpub result_ok: bool,").unwrap();
 	writeln!(w, "}}").unwrap();
 
 	writeln!(w, "#[no_mangle]").unwrap();
 	if ok_type != "()" {
+		writeln!(w, "/// Creates a new {} in the success state.", mangled_container).unwrap();
 		writeln!(w, "pub extern \"C\" fn {}_ok(o: {}) -> {} {{", mangled_container, ok_type, mangled_container).unwrap();
 	} else {
+		writeln!(w, "/// Creates a new {} in the success state.", mangled_container).unwrap();
 		writeln!(w, "pub extern \"C\" fn {}_ok() -> {} {{", mangled_container, mangled_container).unwrap();
 	}
 	writeln!(w, "\t{} {{", mangled_container).unwrap();
@@ -83,8 +96,10 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 
 	writeln!(w, "#[no_mangle]").unwrap();
 	if err_type != "()" {
+		writeln!(w, "/// Creates a new {} in the error state.", mangled_container).unwrap();
 		writeln!(w, "pub extern \"C\" fn {}_err(e: {}) -> {} {{", mangled_container, err_type, mangled_container).unwrap();
 	} else {
+		writeln!(w, "/// Creates a new {} in the error state.", mangled_container).unwrap();
 		writeln!(w, "pub extern \"C\" fn {}_err() -> {} {{", mangled_container, mangled_container).unwrap();
 	}
 	writeln!(w, "\t{} {{", mangled_container).unwrap();
@@ -100,6 +115,7 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	writeln!(w, "}}").unwrap();
 
 	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "/// Frees any resources used by the {}.", mangled_container).unwrap();
 	writeln!(w, "pub extern \"C\" fn {}_free(_res: {}) {{ }}", mangled_container, mangled_container).unwrap();
 	writeln!(w, "impl Drop for {} {{", mangled_container).unwrap();
 	writeln!(w, "\tfn drop(&mut self) {{").unwrap();
@@ -176,6 +192,8 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 		writeln!(w, "\t}}").unwrap();
 		writeln!(w, "}}").unwrap();
 		writeln!(w, "#[no_mangle]").unwrap();
+		writeln!(w, "/// Creates a new {} which has the same data as `orig`", mangled_container).unwrap();
+		writeln!(w, "/// but with all dynamically-allocated buffers duplicated in new buffers.").unwrap();
 		writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{ orig.clone() }}", mangled_container, mangled_container, mangled_container).unwrap();
 	}
 }
@@ -183,8 +201,13 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 /// Writes out a C-callable concrete Vec<A> struct and utility methods
 pub fn write_vec_block<W: std::io::Write>(w: &mut W, mangled_container: &str, inner_type: &str, clonable: bool) {
 	writeln!(w, "#[repr(C)]").unwrap();
+	writeln!(w, "/// A dynamically-allocated array of {}s of arbitrary size.", inner_type).unwrap();
+	writeln!(w, "/// This corresponds to std::vector in C++").unwrap();
 	writeln!(w, "pub struct {} {{", mangled_container).unwrap();
+	writeln!(w, "\t/// The elements in the array.").unwrap();
+	writeln!(w, "\t/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().").unwrap();
 	writeln!(w, "\tpub data: *mut {},", inner_type).unwrap();
+	writeln!(w, "\t/// The number of elements pointed to by `data`.").unwrap();
 	writeln!(w, "\tpub datalen: usize").unwrap();
 	writeln!(w, "}}").unwrap();
 
@@ -210,6 +233,7 @@ pub fn write_vec_block<W: std::io::Write>(w: &mut W, mangled_container: &str, in
 	writeln!(w, "}}").unwrap();
 
 	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "/// Frees the buffer pointed to by `data` if `datalen` is non-0.").unwrap();
 	writeln!(w, "pub extern \"C\" fn {}_free(_res: {}) {{ }}", mangled_container, mangled_container).unwrap();
 	writeln!(w, "impl Drop for {} {{", mangled_container).unwrap();
 	writeln!(w, "\tfn drop(&mut self) {{").unwrap();
@@ -232,8 +256,10 @@ pub fn write_vec_block<W: std::io::Write>(w: &mut W, mangled_container: &str, in
 /// Writes out a C-callable concrete (A, B, ...) struct and utility methods
 pub fn write_tuple_block<W: std::io::Write>(w: &mut W, mangled_container: &str, types: &[String], clonable: bool) {
 	writeln!(w, "#[repr(C)]").unwrap();
+	writeln!(w, "/// A tuple of {} elements. See the individual fields for the types contained.", types.len()).unwrap();
 	writeln!(w, "pub struct {} {{", mangled_container).unwrap();
 	for (idx, ty) in types.iter().enumerate() {
+		writeln!(w, "\t/// The element at position {}", idx).unwrap();
 		writeln!(w, "\tpub {}: {},", ('a' as u8 + idx as u8) as char, ty).unwrap();
 	}
 	writeln!(w, "}}").unwrap();
@@ -275,9 +301,12 @@ pub fn write_tuple_block<W: std::io::Write>(w: &mut W, mangled_container: &str, 
 		writeln!(w, "\t}}").unwrap();
 		writeln!(w, "}}").unwrap();
 		writeln!(w, "#[no_mangle]").unwrap();
+		writeln!(w, "/// Creates a new tuple which has the same data as `orig`").unwrap();
+		writeln!(w, "/// but with all dynamically-allocated buffers duplicated in new buffers.").unwrap();
 		writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{ orig.clone() }}", mangled_container, mangled_container, mangled_container).unwrap();
 	}
 
+	writeln!(w, "/// Creates a new {} from the contained elements.", mangled_container).unwrap();
 	write!(w, "#[no_mangle]\npub extern \"C\" fn {}_new(", mangled_container).unwrap();
 	for (idx, gen) in types.iter().enumerate() {
 		write!(w, "{}{}: ", if idx != 0 { ", " } else { "" }, ('a' as u8 + idx as u8) as char).unwrap();
@@ -292,6 +321,7 @@ pub fn write_tuple_block<W: std::io::Write>(w: &mut W, mangled_container: &str, 
 	writeln!(w, "}}\n}}\n").unwrap();
 
 	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "/// Frees any resources used by the {}.", mangled_container).unwrap();
 	writeln!(w, "pub extern \"C\" fn {}_free(_res: {}) {{ }}", mangled_container, mangled_container).unwrap();
 }
 
@@ -301,8 +331,11 @@ pub fn write_option_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	if clonable {
 		writeln!(w, "#[derive(Clone)]").unwrap();
 	}
+	writeln!(w, "/// An enum which can either contain a {} or not", inner_type).unwrap();
 	writeln!(w, "pub enum {} {{", mangled_container).unwrap();
+	writeln!(w, "\t/// When we're in this state, this {} contains a {}", mangled_container, inner_type).unwrap();
 	writeln!(w, "\tSome({}),", inner_type).unwrap();
+	writeln!(w, "\t/// When we're in this state, this {} contains nothing", mangled_container).unwrap();
 	writeln!(w, "\tNone").unwrap();
 	writeln!(w, "}}").unwrap();
 
@@ -316,19 +349,24 @@ pub fn write_option_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	writeln!(w, "}}").unwrap();
 
 	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "/// Constructs a new {} containing a {}", mangled_container, inner_type).unwrap();
 	writeln!(w, "pub extern \"C\" fn {}_some(o: {}) -> {} {{", mangled_container, inner_type, mangled_container).unwrap();
 	writeln!(w, "\t{}::Some(o)", mangled_container).unwrap();
 	writeln!(w, "}}").unwrap();
 
 	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "/// Constructs a new {} containing nothing", mangled_container).unwrap();
 	writeln!(w, "pub extern \"C\" fn {}_none() -> {} {{", mangled_container, mangled_container).unwrap();
 	writeln!(w, "\t{}::None", mangled_container).unwrap();
 	writeln!(w, "}}").unwrap();
 
 	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "/// Frees any resources associated with the {}, if we are in the Some state", inner_type).unwrap();
 	writeln!(w, "pub extern \"C\" fn {}_free(_res: {}) {{ }}", mangled_container, mangled_container).unwrap();
 	if clonable {
 		writeln!(w, "#[no_mangle]").unwrap();
+		writeln!(w, "/// Creates a new {} which has the same data as `orig`", mangled_container).unwrap();
+		writeln!(w, "/// but with all dynamically-allocated buffers duplicated in new buffers.").unwrap();
 		writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{ orig.clone() }}", mangled_container, mangled_container, mangled_container).unwrap();
 	}
 }

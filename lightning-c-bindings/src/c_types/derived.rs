@@ -1,14 +1,26 @@
 #[repr(C)]
+/// The contents of CResult_SecretKeyErrorZ
 pub union CResult_SecretKeyErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::SecretKey,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::c_types::Secp256k1Error,
 }
 #[repr(C)]
+/// A CResult_SecretKeyErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::SecretKey on success and a crate::c_types::Secp256k1Error on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_SecretKeyErrorZ {
+	/// The contents of this CResult_SecretKeyErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_SecretKeyErrorZPtr,
+	/// Whether this CResult_SecretKeyErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_SecretKeyErrorZ in the success state.
 pub extern "C" fn CResult_SecretKeyErrorZ_ok(o: crate::c_types::SecretKey) -> CResult_SecretKeyErrorZ {
 	CResult_SecretKeyErrorZ {
 		contents: CResult_SecretKeyErrorZPtr {
@@ -18,6 +30,7 @@ pub extern "C" fn CResult_SecretKeyErrorZ_ok(o: crate::c_types::SecretKey) -> CR
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_SecretKeyErrorZ in the error state.
 pub extern "C" fn CResult_SecretKeyErrorZ_err(e: crate::c_types::Secp256k1Error) -> CResult_SecretKeyErrorZ {
 	CResult_SecretKeyErrorZ {
 		contents: CResult_SecretKeyErrorZPtr {
@@ -27,6 +40,7 @@ pub extern "C" fn CResult_SecretKeyErrorZ_err(e: crate::c_types::Secp256k1Error)
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_SecretKeyErrorZ.
 pub extern "C" fn CResult_SecretKeyErrorZ_free(_res: CResult_SecretKeyErrorZ) { }
 impl Drop for CResult_SecretKeyErrorZ {
 	fn drop(&mut self) {
@@ -59,16 +73,28 @@ impl From<crate::c_types::CResultTempl<crate::c_types::SecretKey, crate::c_types
 	}
 }
 #[repr(C)]
+/// The contents of CResult_PublicKeyErrorZ
 pub union CResult_PublicKeyErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::PublicKey,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::c_types::Secp256k1Error,
 }
 #[repr(C)]
+/// A CResult_PublicKeyErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::PublicKey on success and a crate::c_types::Secp256k1Error on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_PublicKeyErrorZ {
+	/// The contents of this CResult_PublicKeyErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_PublicKeyErrorZPtr,
+	/// Whether this CResult_PublicKeyErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_PublicKeyErrorZ in the success state.
 pub extern "C" fn CResult_PublicKeyErrorZ_ok(o: crate::c_types::PublicKey) -> CResult_PublicKeyErrorZ {
 	CResult_PublicKeyErrorZ {
 		contents: CResult_PublicKeyErrorZPtr {
@@ -78,6 +104,7 @@ pub extern "C" fn CResult_PublicKeyErrorZ_ok(o: crate::c_types::PublicKey) -> CR
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_PublicKeyErrorZ in the error state.
 pub extern "C" fn CResult_PublicKeyErrorZ_err(e: crate::c_types::Secp256k1Error) -> CResult_PublicKeyErrorZ {
 	CResult_PublicKeyErrorZ {
 		contents: CResult_PublicKeyErrorZPtr {
@@ -87,6 +114,7 @@ pub extern "C" fn CResult_PublicKeyErrorZ_err(e: crate::c_types::Secp256k1Error)
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_PublicKeyErrorZ.
 pub extern "C" fn CResult_PublicKeyErrorZ_free(_res: CResult_PublicKeyErrorZ) { }
 impl Drop for CResult_PublicKeyErrorZ {
 	fn drop(&mut self) {
@@ -119,16 +147,28 @@ impl From<crate::c_types::CResultTempl<crate::c_types::PublicKey, crate::c_types
 	}
 }
 #[repr(C)]
+/// The contents of CResult_TxCreationKeysDecodeErrorZ
 pub union CResult_TxCreationKeysDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::chan_utils::TxCreationKeys,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_TxCreationKeysDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::chan_utils::TxCreationKeys on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_TxCreationKeysDecodeErrorZ {
+	/// The contents of this CResult_TxCreationKeysDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_TxCreationKeysDecodeErrorZPtr,
+	/// Whether this CResult_TxCreationKeysDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_TxCreationKeysDecodeErrorZ in the success state.
 pub extern "C" fn CResult_TxCreationKeysDecodeErrorZ_ok(o: crate::ln::chan_utils::TxCreationKeys) -> CResult_TxCreationKeysDecodeErrorZ {
 	CResult_TxCreationKeysDecodeErrorZ {
 		contents: CResult_TxCreationKeysDecodeErrorZPtr {
@@ -138,6 +178,7 @@ pub extern "C" fn CResult_TxCreationKeysDecodeErrorZ_ok(o: crate::ln::chan_utils
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_TxCreationKeysDecodeErrorZ in the error state.
 pub extern "C" fn CResult_TxCreationKeysDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_TxCreationKeysDecodeErrorZ {
 	CResult_TxCreationKeysDecodeErrorZ {
 		contents: CResult_TxCreationKeysDecodeErrorZPtr {
@@ -147,6 +188,7 @@ pub extern "C" fn CResult_TxCreationKeysDecodeErrorZ_err(e: crate::ln::msgs::Dec
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_TxCreationKeysDecodeErrorZ.
 pub extern "C" fn CResult_TxCreationKeysDecodeErrorZ_free(_res: CResult_TxCreationKeysDecodeErrorZ) { }
 impl Drop for CResult_TxCreationKeysDecodeErrorZ {
 	fn drop(&mut self) {
@@ -192,18 +234,32 @@ impl Clone for CResult_TxCreationKeysDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_TxCreationKeysDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_TxCreationKeysDecodeErrorZ_clone(orig: &CResult_TxCreationKeysDecodeErrorZ) -> CResult_TxCreationKeysDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ChannelPublicKeysDecodeErrorZ
 pub union CResult_ChannelPublicKeysDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::chan_utils::ChannelPublicKeys,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ChannelPublicKeysDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::chan_utils::ChannelPublicKeys on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ChannelPublicKeysDecodeErrorZ {
+	/// The contents of this CResult_ChannelPublicKeysDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ChannelPublicKeysDecodeErrorZPtr,
+	/// Whether this CResult_ChannelPublicKeysDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelPublicKeysDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ChannelPublicKeysDecodeErrorZ_ok(o: crate::ln::chan_utils::ChannelPublicKeys) -> CResult_ChannelPublicKeysDecodeErrorZ {
 	CResult_ChannelPublicKeysDecodeErrorZ {
 		contents: CResult_ChannelPublicKeysDecodeErrorZPtr {
@@ -213,6 +269,7 @@ pub extern "C" fn CResult_ChannelPublicKeysDecodeErrorZ_ok(o: crate::ln::chan_ut
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelPublicKeysDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ChannelPublicKeysDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ChannelPublicKeysDecodeErrorZ {
 	CResult_ChannelPublicKeysDecodeErrorZ {
 		contents: CResult_ChannelPublicKeysDecodeErrorZPtr {
@@ -222,6 +279,7 @@ pub extern "C" fn CResult_ChannelPublicKeysDecodeErrorZ_err(e: crate::ln::msgs::
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ChannelPublicKeysDecodeErrorZ.
 pub extern "C" fn CResult_ChannelPublicKeysDecodeErrorZ_free(_res: CResult_ChannelPublicKeysDecodeErrorZ) { }
 impl Drop for CResult_ChannelPublicKeysDecodeErrorZ {
 	fn drop(&mut self) {
@@ -267,18 +325,32 @@ impl Clone for CResult_ChannelPublicKeysDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelPublicKeysDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ChannelPublicKeysDecodeErrorZ_clone(orig: &CResult_ChannelPublicKeysDecodeErrorZ) -> CResult_ChannelPublicKeysDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_TxCreationKeysErrorZ
 pub union CResult_TxCreationKeysErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::chan_utils::TxCreationKeys,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::c_types::Secp256k1Error,
 }
 #[repr(C)]
+/// A CResult_TxCreationKeysErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::chan_utils::TxCreationKeys on success and a crate::c_types::Secp256k1Error on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_TxCreationKeysErrorZ {
+	/// The contents of this CResult_TxCreationKeysErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_TxCreationKeysErrorZPtr,
+	/// Whether this CResult_TxCreationKeysErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_TxCreationKeysErrorZ in the success state.
 pub extern "C" fn CResult_TxCreationKeysErrorZ_ok(o: crate::ln::chan_utils::TxCreationKeys) -> CResult_TxCreationKeysErrorZ {
 	CResult_TxCreationKeysErrorZ {
 		contents: CResult_TxCreationKeysErrorZPtr {
@@ -288,6 +360,7 @@ pub extern "C" fn CResult_TxCreationKeysErrorZ_ok(o: crate::ln::chan_utils::TxCr
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_TxCreationKeysErrorZ in the error state.
 pub extern "C" fn CResult_TxCreationKeysErrorZ_err(e: crate::c_types::Secp256k1Error) -> CResult_TxCreationKeysErrorZ {
 	CResult_TxCreationKeysErrorZ {
 		contents: CResult_TxCreationKeysErrorZPtr {
@@ -297,6 +370,7 @@ pub extern "C" fn CResult_TxCreationKeysErrorZ_err(e: crate::c_types::Secp256k1E
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_TxCreationKeysErrorZ.
 pub extern "C" fn CResult_TxCreationKeysErrorZ_free(_res: CResult_TxCreationKeysErrorZ) { }
 impl Drop for CResult_TxCreationKeysErrorZ {
 	fn drop(&mut self) {
@@ -330,8 +404,11 @@ impl From<crate::c_types::CResultTempl<crate::ln::chan_utils::TxCreationKeys, cr
 }
 #[repr(C)]
 #[derive(Clone)]
+/// An enum which can either contain a u32 or not
 pub enum COption_u32Z {
+	/// When we're in this state, this COption_u32Z contains a u32
 	Some(u32),
+	/// When we're in this state, this COption_u32Z contains nothing
 	None
 }
 impl COption_u32Z {
@@ -343,28 +420,45 @@ impl COption_u32Z {
 	}
 }
 #[no_mangle]
+/// Constructs a new COption_u32Z containing a u32
 pub extern "C" fn COption_u32Z_some(o: u32) -> COption_u32Z {
 	COption_u32Z::Some(o)
 }
 #[no_mangle]
+/// Constructs a new COption_u32Z containing nothing
 pub extern "C" fn COption_u32Z_none() -> COption_u32Z {
 	COption_u32Z::None
 }
 #[no_mangle]
+/// Frees any resources associated with the u32, if we are in the Some state
 pub extern "C" fn COption_u32Z_free(_res: COption_u32Z) { }
 #[no_mangle]
+/// Creates a new COption_u32Z which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn COption_u32Z_clone(orig: &COption_u32Z) -> COption_u32Z { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_HTLCOutputInCommitmentDecodeErrorZ
 pub union CResult_HTLCOutputInCommitmentDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::chan_utils::HTLCOutputInCommitment,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_HTLCOutputInCommitmentDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::chan_utils::HTLCOutputInCommitment on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_HTLCOutputInCommitmentDecodeErrorZ {
+	/// The contents of this CResult_HTLCOutputInCommitmentDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_HTLCOutputInCommitmentDecodeErrorZPtr,
+	/// Whether this CResult_HTLCOutputInCommitmentDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_HTLCOutputInCommitmentDecodeErrorZ in the success state.
 pub extern "C" fn CResult_HTLCOutputInCommitmentDecodeErrorZ_ok(o: crate::ln::chan_utils::HTLCOutputInCommitment) -> CResult_HTLCOutputInCommitmentDecodeErrorZ {
 	CResult_HTLCOutputInCommitmentDecodeErrorZ {
 		contents: CResult_HTLCOutputInCommitmentDecodeErrorZPtr {
@@ -374,6 +468,7 @@ pub extern "C" fn CResult_HTLCOutputInCommitmentDecodeErrorZ_ok(o: crate::ln::ch
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_HTLCOutputInCommitmentDecodeErrorZ in the error state.
 pub extern "C" fn CResult_HTLCOutputInCommitmentDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_HTLCOutputInCommitmentDecodeErrorZ {
 	CResult_HTLCOutputInCommitmentDecodeErrorZ {
 		contents: CResult_HTLCOutputInCommitmentDecodeErrorZPtr {
@@ -383,6 +478,7 @@ pub extern "C" fn CResult_HTLCOutputInCommitmentDecodeErrorZ_err(e: crate::ln::m
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_HTLCOutputInCommitmentDecodeErrorZ.
 pub extern "C" fn CResult_HTLCOutputInCommitmentDecodeErrorZ_free(_res: CResult_HTLCOutputInCommitmentDecodeErrorZ) { }
 impl Drop for CResult_HTLCOutputInCommitmentDecodeErrorZ {
 	fn drop(&mut self) {
@@ -428,18 +524,32 @@ impl Clone for CResult_HTLCOutputInCommitmentDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_HTLCOutputInCommitmentDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_HTLCOutputInCommitmentDecodeErrorZ_clone(orig: &CResult_HTLCOutputInCommitmentDecodeErrorZ) -> CResult_HTLCOutputInCommitmentDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_CounterpartyChannelTransactionParametersDecodeErrorZ
 pub union CResult_CounterpartyChannelTransactionParametersDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::chan_utils::CounterpartyChannelTransactionParameters,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_CounterpartyChannelTransactionParametersDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::chan_utils::CounterpartyChannelTransactionParameters on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_CounterpartyChannelTransactionParametersDecodeErrorZ {
+	/// The contents of this CResult_CounterpartyChannelTransactionParametersDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_CounterpartyChannelTransactionParametersDecodeErrorZPtr,
+	/// Whether this CResult_CounterpartyChannelTransactionParametersDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_CounterpartyChannelTransactionParametersDecodeErrorZ in the success state.
 pub extern "C" fn CResult_CounterpartyChannelTransactionParametersDecodeErrorZ_ok(o: crate::ln::chan_utils::CounterpartyChannelTransactionParameters) -> CResult_CounterpartyChannelTransactionParametersDecodeErrorZ {
 	CResult_CounterpartyChannelTransactionParametersDecodeErrorZ {
 		contents: CResult_CounterpartyChannelTransactionParametersDecodeErrorZPtr {
@@ -449,6 +559,7 @@ pub extern "C" fn CResult_CounterpartyChannelTransactionParametersDecodeErrorZ_o
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CounterpartyChannelTransactionParametersDecodeErrorZ in the error state.
 pub extern "C" fn CResult_CounterpartyChannelTransactionParametersDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_CounterpartyChannelTransactionParametersDecodeErrorZ {
 	CResult_CounterpartyChannelTransactionParametersDecodeErrorZ {
 		contents: CResult_CounterpartyChannelTransactionParametersDecodeErrorZPtr {
@@ -458,6 +569,7 @@ pub extern "C" fn CResult_CounterpartyChannelTransactionParametersDecodeErrorZ_e
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_CounterpartyChannelTransactionParametersDecodeErrorZ.
 pub extern "C" fn CResult_CounterpartyChannelTransactionParametersDecodeErrorZ_free(_res: CResult_CounterpartyChannelTransactionParametersDecodeErrorZ) { }
 impl Drop for CResult_CounterpartyChannelTransactionParametersDecodeErrorZ {
 	fn drop(&mut self) {
@@ -503,18 +615,32 @@ impl Clone for CResult_CounterpartyChannelTransactionParametersDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CounterpartyChannelTransactionParametersDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_CounterpartyChannelTransactionParametersDecodeErrorZ_clone(orig: &CResult_CounterpartyChannelTransactionParametersDecodeErrorZ) -> CResult_CounterpartyChannelTransactionParametersDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ChannelTransactionParametersDecodeErrorZ
 pub union CResult_ChannelTransactionParametersDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::chan_utils::ChannelTransactionParameters,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ChannelTransactionParametersDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::chan_utils::ChannelTransactionParameters on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ChannelTransactionParametersDecodeErrorZ {
+	/// The contents of this CResult_ChannelTransactionParametersDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ChannelTransactionParametersDecodeErrorZPtr,
+	/// Whether this CResult_ChannelTransactionParametersDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelTransactionParametersDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ChannelTransactionParametersDecodeErrorZ_ok(o: crate::ln::chan_utils::ChannelTransactionParameters) -> CResult_ChannelTransactionParametersDecodeErrorZ {
 	CResult_ChannelTransactionParametersDecodeErrorZ {
 		contents: CResult_ChannelTransactionParametersDecodeErrorZPtr {
@@ -524,6 +650,7 @@ pub extern "C" fn CResult_ChannelTransactionParametersDecodeErrorZ_ok(o: crate::
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelTransactionParametersDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ChannelTransactionParametersDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ChannelTransactionParametersDecodeErrorZ {
 	CResult_ChannelTransactionParametersDecodeErrorZ {
 		contents: CResult_ChannelTransactionParametersDecodeErrorZPtr {
@@ -533,6 +660,7 @@ pub extern "C" fn CResult_ChannelTransactionParametersDecodeErrorZ_err(e: crate:
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ChannelTransactionParametersDecodeErrorZ.
 pub extern "C" fn CResult_ChannelTransactionParametersDecodeErrorZ_free(_res: CResult_ChannelTransactionParametersDecodeErrorZ) { }
 impl Drop for CResult_ChannelTransactionParametersDecodeErrorZ {
 	fn drop(&mut self) {
@@ -578,10 +706,17 @@ impl Clone for CResult_ChannelTransactionParametersDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelTransactionParametersDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ChannelTransactionParametersDecodeErrorZ_clone(orig: &CResult_ChannelTransactionParametersDecodeErrorZ) -> CResult_ChannelTransactionParametersDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::Signatures of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_SignatureZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::Signature,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_SignatureZ {
@@ -604,6 +739,7 @@ impl From<Vec<crate::c_types::Signature>> for CVec_SignatureZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_SignatureZ_free(_res: CVec_SignatureZ) { }
 impl Drop for CVec_SignatureZ {
 	fn drop(&mut self) {
@@ -620,16 +756,28 @@ impl Clone for CVec_SignatureZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_HolderCommitmentTransactionDecodeErrorZ
 pub union CResult_HolderCommitmentTransactionDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::chan_utils::HolderCommitmentTransaction,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_HolderCommitmentTransactionDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::chan_utils::HolderCommitmentTransaction on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_HolderCommitmentTransactionDecodeErrorZ {
+	/// The contents of this CResult_HolderCommitmentTransactionDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_HolderCommitmentTransactionDecodeErrorZPtr,
+	/// Whether this CResult_HolderCommitmentTransactionDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_HolderCommitmentTransactionDecodeErrorZ in the success state.
 pub extern "C" fn CResult_HolderCommitmentTransactionDecodeErrorZ_ok(o: crate::ln::chan_utils::HolderCommitmentTransaction) -> CResult_HolderCommitmentTransactionDecodeErrorZ {
 	CResult_HolderCommitmentTransactionDecodeErrorZ {
 		contents: CResult_HolderCommitmentTransactionDecodeErrorZPtr {
@@ -639,6 +787,7 @@ pub extern "C" fn CResult_HolderCommitmentTransactionDecodeErrorZ_ok(o: crate::l
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_HolderCommitmentTransactionDecodeErrorZ in the error state.
 pub extern "C" fn CResult_HolderCommitmentTransactionDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_HolderCommitmentTransactionDecodeErrorZ {
 	CResult_HolderCommitmentTransactionDecodeErrorZ {
 		contents: CResult_HolderCommitmentTransactionDecodeErrorZPtr {
@@ -648,6 +797,7 @@ pub extern "C" fn CResult_HolderCommitmentTransactionDecodeErrorZ_err(e: crate::
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_HolderCommitmentTransactionDecodeErrorZ.
 pub extern "C" fn CResult_HolderCommitmentTransactionDecodeErrorZ_free(_res: CResult_HolderCommitmentTransactionDecodeErrorZ) { }
 impl Drop for CResult_HolderCommitmentTransactionDecodeErrorZ {
 	fn drop(&mut self) {
@@ -693,18 +843,32 @@ impl Clone for CResult_HolderCommitmentTransactionDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_HolderCommitmentTransactionDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_HolderCommitmentTransactionDecodeErrorZ_clone(orig: &CResult_HolderCommitmentTransactionDecodeErrorZ) -> CResult_HolderCommitmentTransactionDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_BuiltCommitmentTransactionDecodeErrorZ
 pub union CResult_BuiltCommitmentTransactionDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::chan_utils::BuiltCommitmentTransaction,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_BuiltCommitmentTransactionDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::chan_utils::BuiltCommitmentTransaction on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_BuiltCommitmentTransactionDecodeErrorZ {
+	/// The contents of this CResult_BuiltCommitmentTransactionDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_BuiltCommitmentTransactionDecodeErrorZPtr,
+	/// Whether this CResult_BuiltCommitmentTransactionDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_BuiltCommitmentTransactionDecodeErrorZ in the success state.
 pub extern "C" fn CResult_BuiltCommitmentTransactionDecodeErrorZ_ok(o: crate::ln::chan_utils::BuiltCommitmentTransaction) -> CResult_BuiltCommitmentTransactionDecodeErrorZ {
 	CResult_BuiltCommitmentTransactionDecodeErrorZ {
 		contents: CResult_BuiltCommitmentTransactionDecodeErrorZPtr {
@@ -714,6 +878,7 @@ pub extern "C" fn CResult_BuiltCommitmentTransactionDecodeErrorZ_ok(o: crate::ln
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_BuiltCommitmentTransactionDecodeErrorZ in the error state.
 pub extern "C" fn CResult_BuiltCommitmentTransactionDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_BuiltCommitmentTransactionDecodeErrorZ {
 	CResult_BuiltCommitmentTransactionDecodeErrorZ {
 		contents: CResult_BuiltCommitmentTransactionDecodeErrorZPtr {
@@ -723,6 +888,7 @@ pub extern "C" fn CResult_BuiltCommitmentTransactionDecodeErrorZ_err(e: crate::l
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_BuiltCommitmentTransactionDecodeErrorZ.
 pub extern "C" fn CResult_BuiltCommitmentTransactionDecodeErrorZ_free(_res: CResult_BuiltCommitmentTransactionDecodeErrorZ) { }
 impl Drop for CResult_BuiltCommitmentTransactionDecodeErrorZ {
 	fn drop(&mut self) {
@@ -768,18 +934,32 @@ impl Clone for CResult_BuiltCommitmentTransactionDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_BuiltCommitmentTransactionDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_BuiltCommitmentTransactionDecodeErrorZ_clone(orig: &CResult_BuiltCommitmentTransactionDecodeErrorZ) -> CResult_BuiltCommitmentTransactionDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_CommitmentTransactionDecodeErrorZ
 pub union CResult_CommitmentTransactionDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::chan_utils::CommitmentTransaction,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_CommitmentTransactionDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::chan_utils::CommitmentTransaction on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_CommitmentTransactionDecodeErrorZ {
+	/// The contents of this CResult_CommitmentTransactionDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_CommitmentTransactionDecodeErrorZPtr,
+	/// Whether this CResult_CommitmentTransactionDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_CommitmentTransactionDecodeErrorZ in the success state.
 pub extern "C" fn CResult_CommitmentTransactionDecodeErrorZ_ok(o: crate::ln::chan_utils::CommitmentTransaction) -> CResult_CommitmentTransactionDecodeErrorZ {
 	CResult_CommitmentTransactionDecodeErrorZ {
 		contents: CResult_CommitmentTransactionDecodeErrorZPtr {
@@ -789,6 +969,7 @@ pub extern "C" fn CResult_CommitmentTransactionDecodeErrorZ_ok(o: crate::ln::cha
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CommitmentTransactionDecodeErrorZ in the error state.
 pub extern "C" fn CResult_CommitmentTransactionDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_CommitmentTransactionDecodeErrorZ {
 	CResult_CommitmentTransactionDecodeErrorZ {
 		contents: CResult_CommitmentTransactionDecodeErrorZPtr {
@@ -798,6 +979,7 @@ pub extern "C" fn CResult_CommitmentTransactionDecodeErrorZ_err(e: crate::ln::ms
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_CommitmentTransactionDecodeErrorZ.
 pub extern "C" fn CResult_CommitmentTransactionDecodeErrorZ_free(_res: CResult_CommitmentTransactionDecodeErrorZ) { }
 impl Drop for CResult_CommitmentTransactionDecodeErrorZ {
 	fn drop(&mut self) {
@@ -843,19 +1025,31 @@ impl Clone for CResult_CommitmentTransactionDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CommitmentTransactionDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_CommitmentTransactionDecodeErrorZ_clone(orig: &CResult_CommitmentTransactionDecodeErrorZ) -> CResult_CommitmentTransactionDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_TrustedCommitmentTransactionNoneZ
 pub union CResult_TrustedCommitmentTransactionNoneZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::chan_utils::TrustedCommitmentTransaction,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
 	pub err: *mut std::ffi::c_void,
 }
 #[repr(C)]
+/// A CResult_TrustedCommitmentTransactionNoneZ represents the result of a fallible operation,
+/// containing a crate::ln::chan_utils::TrustedCommitmentTransaction on success and a () on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_TrustedCommitmentTransactionNoneZ {
+	/// The contents of this CResult_TrustedCommitmentTransactionNoneZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_TrustedCommitmentTransactionNoneZPtr,
+	/// Whether this CResult_TrustedCommitmentTransactionNoneZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_TrustedCommitmentTransactionNoneZ in the success state.
 pub extern "C" fn CResult_TrustedCommitmentTransactionNoneZ_ok(o: crate::ln::chan_utils::TrustedCommitmentTransaction) -> CResult_TrustedCommitmentTransactionNoneZ {
 	CResult_TrustedCommitmentTransactionNoneZ {
 		contents: CResult_TrustedCommitmentTransactionNoneZPtr {
@@ -865,6 +1059,7 @@ pub extern "C" fn CResult_TrustedCommitmentTransactionNoneZ_ok(o: crate::ln::cha
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_TrustedCommitmentTransactionNoneZ in the error state.
 pub extern "C" fn CResult_TrustedCommitmentTransactionNoneZ_err() -> CResult_TrustedCommitmentTransactionNoneZ {
 	CResult_TrustedCommitmentTransactionNoneZ {
 		contents: CResult_TrustedCommitmentTransactionNoneZPtr {
@@ -874,6 +1069,7 @@ pub extern "C" fn CResult_TrustedCommitmentTransactionNoneZ_err() -> CResult_Tru
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_TrustedCommitmentTransactionNoneZ.
 pub extern "C" fn CResult_TrustedCommitmentTransactionNoneZ_free(_res: CResult_TrustedCommitmentTransactionNoneZ) { }
 impl Drop for CResult_TrustedCommitmentTransactionNoneZ {
 	fn drop(&mut self) {
@@ -903,17 +1099,27 @@ impl From<crate::c_types::CResultTempl<crate::ln::chan_utils::TrustedCommitmentT
 	}
 }
 #[repr(C)]
+/// The contents of CResult_CVec_SignatureZNoneZ
 pub union CResult_CVec_SignatureZNoneZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::derived::CVec_SignatureZ,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
 	pub err: *mut std::ffi::c_void,
 }
 #[repr(C)]
+/// A CResult_CVec_SignatureZNoneZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::CVec_SignatureZ on success and a () on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_CVec_SignatureZNoneZ {
+	/// The contents of this CResult_CVec_SignatureZNoneZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_CVec_SignatureZNoneZPtr,
+	/// Whether this CResult_CVec_SignatureZNoneZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_CVec_SignatureZNoneZ in the success state.
 pub extern "C" fn CResult_CVec_SignatureZNoneZ_ok(o: crate::c_types::derived::CVec_SignatureZ) -> CResult_CVec_SignatureZNoneZ {
 	CResult_CVec_SignatureZNoneZ {
 		contents: CResult_CVec_SignatureZNoneZPtr {
@@ -923,6 +1129,7 @@ pub extern "C" fn CResult_CVec_SignatureZNoneZ_ok(o: crate::c_types::derived::CV
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CVec_SignatureZNoneZ in the error state.
 pub extern "C" fn CResult_CVec_SignatureZNoneZ_err() -> CResult_CVec_SignatureZNoneZ {
 	CResult_CVec_SignatureZNoneZ {
 		contents: CResult_CVec_SignatureZNoneZPtr {
@@ -932,6 +1139,7 @@ pub extern "C" fn CResult_CVec_SignatureZNoneZ_err() -> CResult_CVec_SignatureZN
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_CVec_SignatureZNoneZ.
 pub extern "C" fn CResult_CVec_SignatureZNoneZ_free(_res: CResult_CVec_SignatureZNoneZ) { }
 impl Drop for CResult_CVec_SignatureZNoneZ {
 	fn drop(&mut self) {
@@ -974,10 +1182,17 @@ impl Clone for CResult_CVec_SignatureZNoneZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CVec_SignatureZNoneZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_CVec_SignatureZNoneZ_clone(orig: &CResult_CVec_SignatureZNoneZ) -> CResult_CVec_SignatureZNoneZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of crate::util::events::MessageSendEvents of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_MessageSendEventZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::util::events::MessageSendEvent,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_MessageSendEventZ {
@@ -1000,6 +1215,7 @@ impl From<Vec<crate::util::events::MessageSendEvent>> for CVec_MessageSendEventZ
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_MessageSendEventZ_free(_res: CVec_MessageSendEventZ) { }
 impl Drop for CVec_MessageSendEventZ {
 	fn drop(&mut self) {
@@ -1016,16 +1232,28 @@ impl Clone for CVec_MessageSendEventZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_boolLightningErrorZ
 pub union CResult_boolLightningErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut bool,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::LightningError,
 }
 #[repr(C)]
+/// A CResult_boolLightningErrorZ represents the result of a fallible operation,
+/// containing a bool on success and a crate::ln::msgs::LightningError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_boolLightningErrorZ {
+	/// The contents of this CResult_boolLightningErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_boolLightningErrorZPtr,
+	/// Whether this CResult_boolLightningErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_boolLightningErrorZ in the success state.
 pub extern "C" fn CResult_boolLightningErrorZ_ok(o: bool) -> CResult_boolLightningErrorZ {
 	CResult_boolLightningErrorZ {
 		contents: CResult_boolLightningErrorZPtr {
@@ -1035,6 +1263,7 @@ pub extern "C" fn CResult_boolLightningErrorZ_ok(o: bool) -> CResult_boolLightni
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_boolLightningErrorZ in the error state.
 pub extern "C" fn CResult_boolLightningErrorZ_err(e: crate::ln::msgs::LightningError) -> CResult_boolLightningErrorZ {
 	CResult_boolLightningErrorZ {
 		contents: CResult_boolLightningErrorZPtr {
@@ -1044,6 +1273,7 @@ pub extern "C" fn CResult_boolLightningErrorZ_err(e: crate::ln::msgs::LightningE
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_boolLightningErrorZ.
 pub extern "C" fn CResult_boolLightningErrorZ_free(_res: CResult_boolLightningErrorZ) { }
 impl Drop for CResult_boolLightningErrorZ {
 	fn drop(&mut self) {
@@ -1089,11 +1319,17 @@ impl Clone for CResult_boolLightningErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_boolLightningErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_boolLightningErrorZ_clone(orig: &CResult_boolLightningErrorZ) -> CResult_boolLightningErrorZ { orig.clone() }
 #[repr(C)]
+/// A tuple of 3 elements. See the individual fields for the types contained.
 pub struct C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ {
+	/// The element at position 0
 	pub a: crate::ln::msgs::ChannelAnnouncement,
+	/// The element at position 1
 	pub b: crate::ln::msgs::ChannelUpdate,
+	/// The element at position 2
 	pub c: crate::ln::msgs::ChannelUpdate,
 }
 impl From<(crate::ln::msgs::ChannelAnnouncement, crate::ln::msgs::ChannelUpdate, crate::ln::msgs::ChannelUpdate)> for C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ {
@@ -1120,17 +1356,26 @@ impl Clone for C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ {
 	}
 }
 #[no_mangle]
+/// Creates a new tuple which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ_clone(orig: &C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ) -> C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ { orig.clone() }
+/// Creates a new C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ_new(a: crate::ln::msgs::ChannelAnnouncement, b: crate::ln::msgs::ChannelUpdate, c: crate::ln::msgs::ChannelUpdate) -> C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ {
 	C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ { a, b, c, }
 }
 
 #[no_mangle]
+/// Frees any resources used by the C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ.
 pub extern "C" fn C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ_free(_res: C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ) { }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::derived::C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::derived::C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
@@ -1153,6 +1398,7 @@ impl From<Vec<crate::c_types::derived::C3Tuple_ChannelAnnouncementChannelUpdateC
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ_free(_res: CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ) { }
 impl Drop for CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
 	fn drop(&mut self) {
@@ -1169,8 +1415,13 @@ impl Clone for CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::ln::msgs::NodeAnnouncements of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_NodeAnnouncementZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::ln::msgs::NodeAnnouncement,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_NodeAnnouncementZ {
@@ -1193,6 +1444,7 @@ impl From<Vec<crate::ln::msgs::NodeAnnouncement>> for CVec_NodeAnnouncementZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_NodeAnnouncementZ_free(_res: CVec_NodeAnnouncementZ) { }
 impl Drop for CVec_NodeAnnouncementZ {
 	fn drop(&mut self) {
@@ -1209,17 +1461,27 @@ impl Clone for CVec_NodeAnnouncementZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_NoneLightningErrorZ
 pub union CResult_NoneLightningErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
 	pub result: *mut std::ffi::c_void,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::LightningError,
 }
 #[repr(C)]
+/// A CResult_NoneLightningErrorZ represents the result of a fallible operation,
+/// containing a () on success and a crate::ln::msgs::LightningError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NoneLightningErrorZ {
+	/// The contents of this CResult_NoneLightningErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NoneLightningErrorZPtr,
+	/// Whether this CResult_NoneLightningErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NoneLightningErrorZ in the success state.
 pub extern "C" fn CResult_NoneLightningErrorZ_ok() -> CResult_NoneLightningErrorZ {
 	CResult_NoneLightningErrorZ {
 		contents: CResult_NoneLightningErrorZPtr {
@@ -1229,6 +1491,7 @@ pub extern "C" fn CResult_NoneLightningErrorZ_ok() -> CResult_NoneLightningError
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NoneLightningErrorZ in the error state.
 pub extern "C" fn CResult_NoneLightningErrorZ_err(e: crate::ln::msgs::LightningError) -> CResult_NoneLightningErrorZ {
 	CResult_NoneLightningErrorZ {
 		contents: CResult_NoneLightningErrorZPtr {
@@ -1238,6 +1501,7 @@ pub extern "C" fn CResult_NoneLightningErrorZ_err(e: crate::ln::msgs::LightningE
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NoneLightningErrorZ.
 pub extern "C" fn CResult_NoneLightningErrorZ_free(_res: CResult_NoneLightningErrorZ) { }
 impl Drop for CResult_NoneLightningErrorZ {
 	fn drop(&mut self) {
@@ -1280,10 +1544,17 @@ impl Clone for CResult_NoneLightningErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NoneLightningErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NoneLightningErrorZ_clone(orig: &CResult_NoneLightningErrorZ) -> CResult_NoneLightningErrorZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::PublicKeys of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_PublicKeyZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::PublicKey,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_PublicKeyZ {
@@ -1306,6 +1577,7 @@ impl From<Vec<crate::c_types::PublicKey>> for CVec_PublicKeyZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_PublicKeyZ_free(_res: CVec_PublicKeyZ) { }
 impl Drop for CVec_PublicKeyZ {
 	fn drop(&mut self) {
@@ -1314,8 +1586,13 @@ impl Drop for CVec_PublicKeyZ {
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of u8s of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_u8Z {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut u8,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_u8Z {
@@ -1338,6 +1615,7 @@ impl From<Vec<u8>> for CVec_u8Z {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_u8Z_free(_res: CVec_u8Z) { }
 impl Drop for CVec_u8Z {
 	fn drop(&mut self) {
@@ -1354,16 +1632,28 @@ impl Clone for CVec_u8Z {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_CVec_u8ZPeerHandleErrorZ
 pub union CResult_CVec_u8ZPeerHandleErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::derived::CVec_u8Z,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::peer_handler::PeerHandleError,
 }
 #[repr(C)]
+/// A CResult_CVec_u8ZPeerHandleErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::CVec_u8Z on success and a crate::ln::peer_handler::PeerHandleError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_CVec_u8ZPeerHandleErrorZ {
+	/// The contents of this CResult_CVec_u8ZPeerHandleErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_CVec_u8ZPeerHandleErrorZPtr,
+	/// Whether this CResult_CVec_u8ZPeerHandleErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_CVec_u8ZPeerHandleErrorZ in the success state.
 pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_ok(o: crate::c_types::derived::CVec_u8Z) -> CResult_CVec_u8ZPeerHandleErrorZ {
 	CResult_CVec_u8ZPeerHandleErrorZ {
 		contents: CResult_CVec_u8ZPeerHandleErrorZPtr {
@@ -1373,6 +1663,7 @@ pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_ok(o: crate::c_types::derived
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CVec_u8ZPeerHandleErrorZ in the error state.
 pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_err(e: crate::ln::peer_handler::PeerHandleError) -> CResult_CVec_u8ZPeerHandleErrorZ {
 	CResult_CVec_u8ZPeerHandleErrorZ {
 		contents: CResult_CVec_u8ZPeerHandleErrorZPtr {
@@ -1382,6 +1673,7 @@ pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_err(e: crate::ln::peer_handle
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_CVec_u8ZPeerHandleErrorZ.
 pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_free(_res: CResult_CVec_u8ZPeerHandleErrorZ) { }
 impl Drop for CResult_CVec_u8ZPeerHandleErrorZ {
 	fn drop(&mut self) {
@@ -1427,19 +1719,31 @@ impl Clone for CResult_CVec_u8ZPeerHandleErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CVec_u8ZPeerHandleErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_clone(orig: &CResult_CVec_u8ZPeerHandleErrorZ) -> CResult_CVec_u8ZPeerHandleErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_NonePeerHandleErrorZ
 pub union CResult_NonePeerHandleErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
 	pub result: *mut std::ffi::c_void,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::peer_handler::PeerHandleError,
 }
 #[repr(C)]
+/// A CResult_NonePeerHandleErrorZ represents the result of a fallible operation,
+/// containing a () on success and a crate::ln::peer_handler::PeerHandleError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NonePeerHandleErrorZ {
+	/// The contents of this CResult_NonePeerHandleErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NonePeerHandleErrorZPtr,
+	/// Whether this CResult_NonePeerHandleErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NonePeerHandleErrorZ in the success state.
 pub extern "C" fn CResult_NonePeerHandleErrorZ_ok() -> CResult_NonePeerHandleErrorZ {
 	CResult_NonePeerHandleErrorZ {
 		contents: CResult_NonePeerHandleErrorZPtr {
@@ -1449,6 +1753,7 @@ pub extern "C" fn CResult_NonePeerHandleErrorZ_ok() -> CResult_NonePeerHandleErr
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NonePeerHandleErrorZ in the error state.
 pub extern "C" fn CResult_NonePeerHandleErrorZ_err(e: crate::ln::peer_handler::PeerHandleError) -> CResult_NonePeerHandleErrorZ {
 	CResult_NonePeerHandleErrorZ {
 		contents: CResult_NonePeerHandleErrorZPtr {
@@ -1458,6 +1763,7 @@ pub extern "C" fn CResult_NonePeerHandleErrorZ_err(e: crate::ln::peer_handler::P
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NonePeerHandleErrorZ.
 pub extern "C" fn CResult_NonePeerHandleErrorZ_free(_res: CResult_NonePeerHandleErrorZ) { }
 impl Drop for CResult_NonePeerHandleErrorZ {
 	fn drop(&mut self) {
@@ -1500,18 +1806,32 @@ impl Clone for CResult_NonePeerHandleErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NonePeerHandleErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NonePeerHandleErrorZ_clone(orig: &CResult_NonePeerHandleErrorZ) -> CResult_NonePeerHandleErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_boolPeerHandleErrorZ
 pub union CResult_boolPeerHandleErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut bool,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::peer_handler::PeerHandleError,
 }
 #[repr(C)]
+/// A CResult_boolPeerHandleErrorZ represents the result of a fallible operation,
+/// containing a bool on success and a crate::ln::peer_handler::PeerHandleError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_boolPeerHandleErrorZ {
+	/// The contents of this CResult_boolPeerHandleErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_boolPeerHandleErrorZPtr,
+	/// Whether this CResult_boolPeerHandleErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_boolPeerHandleErrorZ in the success state.
 pub extern "C" fn CResult_boolPeerHandleErrorZ_ok(o: bool) -> CResult_boolPeerHandleErrorZ {
 	CResult_boolPeerHandleErrorZ {
 		contents: CResult_boolPeerHandleErrorZPtr {
@@ -1521,6 +1841,7 @@ pub extern "C" fn CResult_boolPeerHandleErrorZ_ok(o: bool) -> CResult_boolPeerHa
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_boolPeerHandleErrorZ in the error state.
 pub extern "C" fn CResult_boolPeerHandleErrorZ_err(e: crate::ln::peer_handler::PeerHandleError) -> CResult_boolPeerHandleErrorZ {
 	CResult_boolPeerHandleErrorZ {
 		contents: CResult_boolPeerHandleErrorZPtr {
@@ -1530,6 +1851,7 @@ pub extern "C" fn CResult_boolPeerHandleErrorZ_err(e: crate::ln::peer_handler::P
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_boolPeerHandleErrorZ.
 pub extern "C" fn CResult_boolPeerHandleErrorZ_free(_res: CResult_boolPeerHandleErrorZ) { }
 impl Drop for CResult_boolPeerHandleErrorZ {
 	fn drop(&mut self) {
@@ -1575,18 +1897,32 @@ impl Clone for CResult_boolPeerHandleErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_boolPeerHandleErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_boolPeerHandleErrorZ_clone(orig: &CResult_boolPeerHandleErrorZ) -> CResult_boolPeerHandleErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_InitFeaturesDecodeErrorZ
 pub union CResult_InitFeaturesDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::features::InitFeatures,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_InitFeaturesDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::features::InitFeatures on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_InitFeaturesDecodeErrorZ {
+	/// The contents of this CResult_InitFeaturesDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_InitFeaturesDecodeErrorZPtr,
+	/// Whether this CResult_InitFeaturesDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_InitFeaturesDecodeErrorZ in the success state.
 pub extern "C" fn CResult_InitFeaturesDecodeErrorZ_ok(o: crate::ln::features::InitFeatures) -> CResult_InitFeaturesDecodeErrorZ {
 	CResult_InitFeaturesDecodeErrorZ {
 		contents: CResult_InitFeaturesDecodeErrorZPtr {
@@ -1596,6 +1932,7 @@ pub extern "C" fn CResult_InitFeaturesDecodeErrorZ_ok(o: crate::ln::features::In
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_InitFeaturesDecodeErrorZ in the error state.
 pub extern "C" fn CResult_InitFeaturesDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_InitFeaturesDecodeErrorZ {
 	CResult_InitFeaturesDecodeErrorZ {
 		contents: CResult_InitFeaturesDecodeErrorZPtr {
@@ -1605,6 +1942,7 @@ pub extern "C" fn CResult_InitFeaturesDecodeErrorZ_err(e: crate::ln::msgs::Decod
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_InitFeaturesDecodeErrorZ.
 pub extern "C" fn CResult_InitFeaturesDecodeErrorZ_free(_res: CResult_InitFeaturesDecodeErrorZ) { }
 impl Drop for CResult_InitFeaturesDecodeErrorZ {
 	fn drop(&mut self) {
@@ -1637,16 +1975,28 @@ impl From<crate::c_types::CResultTempl<crate::ln::features::InitFeatures, crate:
 	}
 }
 #[repr(C)]
+/// The contents of CResult_NodeFeaturesDecodeErrorZ
 pub union CResult_NodeFeaturesDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::features::NodeFeatures,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_NodeFeaturesDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::features::NodeFeatures on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NodeFeaturesDecodeErrorZ {
+	/// The contents of this CResult_NodeFeaturesDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NodeFeaturesDecodeErrorZPtr,
+	/// Whether this CResult_NodeFeaturesDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NodeFeaturesDecodeErrorZ in the success state.
 pub extern "C" fn CResult_NodeFeaturesDecodeErrorZ_ok(o: crate::ln::features::NodeFeatures) -> CResult_NodeFeaturesDecodeErrorZ {
 	CResult_NodeFeaturesDecodeErrorZ {
 		contents: CResult_NodeFeaturesDecodeErrorZPtr {
@@ -1656,6 +2006,7 @@ pub extern "C" fn CResult_NodeFeaturesDecodeErrorZ_ok(o: crate::ln::features::No
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NodeFeaturesDecodeErrorZ in the error state.
 pub extern "C" fn CResult_NodeFeaturesDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_NodeFeaturesDecodeErrorZ {
 	CResult_NodeFeaturesDecodeErrorZ {
 		contents: CResult_NodeFeaturesDecodeErrorZPtr {
@@ -1665,6 +2016,7 @@ pub extern "C" fn CResult_NodeFeaturesDecodeErrorZ_err(e: crate::ln::msgs::Decod
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NodeFeaturesDecodeErrorZ.
 pub extern "C" fn CResult_NodeFeaturesDecodeErrorZ_free(_res: CResult_NodeFeaturesDecodeErrorZ) { }
 impl Drop for CResult_NodeFeaturesDecodeErrorZ {
 	fn drop(&mut self) {
@@ -1697,16 +2049,28 @@ impl From<crate::c_types::CResultTempl<crate::ln::features::NodeFeatures, crate:
 	}
 }
 #[repr(C)]
+/// The contents of CResult_ChannelFeaturesDecodeErrorZ
 pub union CResult_ChannelFeaturesDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::features::ChannelFeatures,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ChannelFeaturesDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::features::ChannelFeatures on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ChannelFeaturesDecodeErrorZ {
+	/// The contents of this CResult_ChannelFeaturesDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ChannelFeaturesDecodeErrorZPtr,
+	/// Whether this CResult_ChannelFeaturesDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelFeaturesDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ChannelFeaturesDecodeErrorZ_ok(o: crate::ln::features::ChannelFeatures) -> CResult_ChannelFeaturesDecodeErrorZ {
 	CResult_ChannelFeaturesDecodeErrorZ {
 		contents: CResult_ChannelFeaturesDecodeErrorZPtr {
@@ -1716,6 +2080,7 @@ pub extern "C" fn CResult_ChannelFeaturesDecodeErrorZ_ok(o: crate::ln::features:
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelFeaturesDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ChannelFeaturesDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ChannelFeaturesDecodeErrorZ {
 	CResult_ChannelFeaturesDecodeErrorZ {
 		contents: CResult_ChannelFeaturesDecodeErrorZPtr {
@@ -1725,6 +2090,7 @@ pub extern "C" fn CResult_ChannelFeaturesDecodeErrorZ_err(e: crate::ln::msgs::De
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ChannelFeaturesDecodeErrorZ.
 pub extern "C" fn CResult_ChannelFeaturesDecodeErrorZ_free(_res: CResult_ChannelFeaturesDecodeErrorZ) { }
 impl Drop for CResult_ChannelFeaturesDecodeErrorZ {
 	fn drop(&mut self) {
@@ -1757,16 +2123,28 @@ impl From<crate::c_types::CResultTempl<crate::ln::features::ChannelFeatures, cra
 	}
 }
 #[repr(C)]
+/// The contents of CResult_InvoiceFeaturesDecodeErrorZ
 pub union CResult_InvoiceFeaturesDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::features::InvoiceFeatures,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_InvoiceFeaturesDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::features::InvoiceFeatures on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_InvoiceFeaturesDecodeErrorZ {
+	/// The contents of this CResult_InvoiceFeaturesDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_InvoiceFeaturesDecodeErrorZPtr,
+	/// Whether this CResult_InvoiceFeaturesDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_InvoiceFeaturesDecodeErrorZ in the success state.
 pub extern "C" fn CResult_InvoiceFeaturesDecodeErrorZ_ok(o: crate::ln::features::InvoiceFeatures) -> CResult_InvoiceFeaturesDecodeErrorZ {
 	CResult_InvoiceFeaturesDecodeErrorZ {
 		contents: CResult_InvoiceFeaturesDecodeErrorZPtr {
@@ -1776,6 +2154,7 @@ pub extern "C" fn CResult_InvoiceFeaturesDecodeErrorZ_ok(o: crate::ln::features:
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_InvoiceFeaturesDecodeErrorZ in the error state.
 pub extern "C" fn CResult_InvoiceFeaturesDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_InvoiceFeaturesDecodeErrorZ {
 	CResult_InvoiceFeaturesDecodeErrorZ {
 		contents: CResult_InvoiceFeaturesDecodeErrorZPtr {
@@ -1785,6 +2164,7 @@ pub extern "C" fn CResult_InvoiceFeaturesDecodeErrorZ_err(e: crate::ln::msgs::De
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_InvoiceFeaturesDecodeErrorZ.
 pub extern "C" fn CResult_InvoiceFeaturesDecodeErrorZ_free(_res: CResult_InvoiceFeaturesDecodeErrorZ) { }
 impl Drop for CResult_InvoiceFeaturesDecodeErrorZ {
 	fn drop(&mut self) {
@@ -1817,16 +2197,28 @@ impl From<crate::c_types::CResultTempl<crate::ln::features::InvoiceFeatures, cra
 	}
 }
 #[repr(C)]
+/// The contents of CResult_ChannelConfigDecodeErrorZ
 pub union CResult_ChannelConfigDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::util::config::ChannelConfig,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ChannelConfigDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::util::config::ChannelConfig on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ChannelConfigDecodeErrorZ {
+	/// The contents of this CResult_ChannelConfigDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ChannelConfigDecodeErrorZPtr,
+	/// Whether this CResult_ChannelConfigDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelConfigDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ChannelConfigDecodeErrorZ_ok(o: crate::util::config::ChannelConfig) -> CResult_ChannelConfigDecodeErrorZ {
 	CResult_ChannelConfigDecodeErrorZ {
 		contents: CResult_ChannelConfigDecodeErrorZPtr {
@@ -1836,6 +2228,7 @@ pub extern "C" fn CResult_ChannelConfigDecodeErrorZ_ok(o: crate::util::config::C
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelConfigDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ChannelConfigDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ChannelConfigDecodeErrorZ {
 	CResult_ChannelConfigDecodeErrorZ {
 		contents: CResult_ChannelConfigDecodeErrorZPtr {
@@ -1845,6 +2238,7 @@ pub extern "C" fn CResult_ChannelConfigDecodeErrorZ_err(e: crate::ln::msgs::Deco
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ChannelConfigDecodeErrorZ.
 pub extern "C" fn CResult_ChannelConfigDecodeErrorZ_free(_res: CResult_ChannelConfigDecodeErrorZ) { }
 impl Drop for CResult_ChannelConfigDecodeErrorZ {
 	fn drop(&mut self) {
@@ -1890,11 +2284,16 @@ impl Clone for CResult_ChannelConfigDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelConfigDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ChannelConfigDecodeErrorZ_clone(orig: &CResult_ChannelConfigDecodeErrorZ) -> CResult_ChannelConfigDecodeErrorZ { orig.clone() }
 #[repr(C)]
 #[derive(Clone)]
+/// An enum which can either contain a u64 or not
 pub enum COption_u64Z {
+	/// When we're in this state, this COption_u64Z contains a u64
 	Some(u64),
+	/// When we're in this state, this COption_u64Z contains nothing
 	None
 }
 impl COption_u64Z {
@@ -1906,28 +2305,45 @@ impl COption_u64Z {
 	}
 }
 #[no_mangle]
+/// Constructs a new COption_u64Z containing a u64
 pub extern "C" fn COption_u64Z_some(o: u64) -> COption_u64Z {
 	COption_u64Z::Some(o)
 }
 #[no_mangle]
+/// Constructs a new COption_u64Z containing nothing
 pub extern "C" fn COption_u64Z_none() -> COption_u64Z {
 	COption_u64Z::None
 }
 #[no_mangle]
+/// Frees any resources associated with the u64, if we are in the Some state
 pub extern "C" fn COption_u64Z_free(_res: COption_u64Z) { }
 #[no_mangle]
+/// Creates a new COption_u64Z which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn COption_u64Z_clone(orig: &COption_u64Z) -> COption_u64Z { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_DirectionalChannelInfoDecodeErrorZ
 pub union CResult_DirectionalChannelInfoDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::routing::network_graph::DirectionalChannelInfo,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_DirectionalChannelInfoDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::routing::network_graph::DirectionalChannelInfo on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_DirectionalChannelInfoDecodeErrorZ {
+	/// The contents of this CResult_DirectionalChannelInfoDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_DirectionalChannelInfoDecodeErrorZPtr,
+	/// Whether this CResult_DirectionalChannelInfoDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_DirectionalChannelInfoDecodeErrorZ in the success state.
 pub extern "C" fn CResult_DirectionalChannelInfoDecodeErrorZ_ok(o: crate::routing::network_graph::DirectionalChannelInfo) -> CResult_DirectionalChannelInfoDecodeErrorZ {
 	CResult_DirectionalChannelInfoDecodeErrorZ {
 		contents: CResult_DirectionalChannelInfoDecodeErrorZPtr {
@@ -1937,6 +2353,7 @@ pub extern "C" fn CResult_DirectionalChannelInfoDecodeErrorZ_ok(o: crate::routin
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_DirectionalChannelInfoDecodeErrorZ in the error state.
 pub extern "C" fn CResult_DirectionalChannelInfoDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_DirectionalChannelInfoDecodeErrorZ {
 	CResult_DirectionalChannelInfoDecodeErrorZ {
 		contents: CResult_DirectionalChannelInfoDecodeErrorZPtr {
@@ -1946,6 +2363,7 @@ pub extern "C" fn CResult_DirectionalChannelInfoDecodeErrorZ_err(e: crate::ln::m
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_DirectionalChannelInfoDecodeErrorZ.
 pub extern "C" fn CResult_DirectionalChannelInfoDecodeErrorZ_free(_res: CResult_DirectionalChannelInfoDecodeErrorZ) { }
 impl Drop for CResult_DirectionalChannelInfoDecodeErrorZ {
 	fn drop(&mut self) {
@@ -1991,18 +2409,32 @@ impl Clone for CResult_DirectionalChannelInfoDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_DirectionalChannelInfoDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_DirectionalChannelInfoDecodeErrorZ_clone(orig: &CResult_DirectionalChannelInfoDecodeErrorZ) -> CResult_DirectionalChannelInfoDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ChannelInfoDecodeErrorZ
 pub union CResult_ChannelInfoDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::routing::network_graph::ChannelInfo,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ChannelInfoDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::routing::network_graph::ChannelInfo on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ChannelInfoDecodeErrorZ {
+	/// The contents of this CResult_ChannelInfoDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ChannelInfoDecodeErrorZPtr,
+	/// Whether this CResult_ChannelInfoDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelInfoDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ChannelInfoDecodeErrorZ_ok(o: crate::routing::network_graph::ChannelInfo) -> CResult_ChannelInfoDecodeErrorZ {
 	CResult_ChannelInfoDecodeErrorZ {
 		contents: CResult_ChannelInfoDecodeErrorZPtr {
@@ -2012,6 +2444,7 @@ pub extern "C" fn CResult_ChannelInfoDecodeErrorZ_ok(o: crate::routing::network_
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelInfoDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ChannelInfoDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ChannelInfoDecodeErrorZ {
 	CResult_ChannelInfoDecodeErrorZ {
 		contents: CResult_ChannelInfoDecodeErrorZPtr {
@@ -2021,6 +2454,7 @@ pub extern "C" fn CResult_ChannelInfoDecodeErrorZ_err(e: crate::ln::msgs::Decode
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ChannelInfoDecodeErrorZ.
 pub extern "C" fn CResult_ChannelInfoDecodeErrorZ_free(_res: CResult_ChannelInfoDecodeErrorZ) { }
 impl Drop for CResult_ChannelInfoDecodeErrorZ {
 	fn drop(&mut self) {
@@ -2066,18 +2500,32 @@ impl Clone for CResult_ChannelInfoDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelInfoDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ChannelInfoDecodeErrorZ_clone(orig: &CResult_ChannelInfoDecodeErrorZ) -> CResult_ChannelInfoDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_RoutingFeesDecodeErrorZ
 pub union CResult_RoutingFeesDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::routing::network_graph::RoutingFees,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_RoutingFeesDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::routing::network_graph::RoutingFees on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_RoutingFeesDecodeErrorZ {
+	/// The contents of this CResult_RoutingFeesDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_RoutingFeesDecodeErrorZPtr,
+	/// Whether this CResult_RoutingFeesDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_RoutingFeesDecodeErrorZ in the success state.
 pub extern "C" fn CResult_RoutingFeesDecodeErrorZ_ok(o: crate::routing::network_graph::RoutingFees) -> CResult_RoutingFeesDecodeErrorZ {
 	CResult_RoutingFeesDecodeErrorZ {
 		contents: CResult_RoutingFeesDecodeErrorZPtr {
@@ -2087,6 +2535,7 @@ pub extern "C" fn CResult_RoutingFeesDecodeErrorZ_ok(o: crate::routing::network_
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_RoutingFeesDecodeErrorZ in the error state.
 pub extern "C" fn CResult_RoutingFeesDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_RoutingFeesDecodeErrorZ {
 	CResult_RoutingFeesDecodeErrorZ {
 		contents: CResult_RoutingFeesDecodeErrorZPtr {
@@ -2096,6 +2545,7 @@ pub extern "C" fn CResult_RoutingFeesDecodeErrorZ_err(e: crate::ln::msgs::Decode
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_RoutingFeesDecodeErrorZ.
 pub extern "C" fn CResult_RoutingFeesDecodeErrorZ_free(_res: CResult_RoutingFeesDecodeErrorZ) { }
 impl Drop for CResult_RoutingFeesDecodeErrorZ {
 	fn drop(&mut self) {
@@ -2141,10 +2591,17 @@ impl Clone for CResult_RoutingFeesDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_RoutingFeesDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_RoutingFeesDecodeErrorZ_clone(orig: &CResult_RoutingFeesDecodeErrorZ) -> CResult_RoutingFeesDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of crate::ln::msgs::NetAddresss of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_NetAddressZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::ln::msgs::NetAddress,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_NetAddressZ {
@@ -2167,6 +2624,7 @@ impl From<Vec<crate::ln::msgs::NetAddress>> for CVec_NetAddressZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_NetAddressZ_free(_res: CVec_NetAddressZ) { }
 impl Drop for CVec_NetAddressZ {
 	fn drop(&mut self) {
@@ -2183,16 +2641,28 @@ impl Clone for CVec_NetAddressZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_NodeAnnouncementInfoDecodeErrorZ
 pub union CResult_NodeAnnouncementInfoDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::routing::network_graph::NodeAnnouncementInfo,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_NodeAnnouncementInfoDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::routing::network_graph::NodeAnnouncementInfo on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NodeAnnouncementInfoDecodeErrorZ {
+	/// The contents of this CResult_NodeAnnouncementInfoDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NodeAnnouncementInfoDecodeErrorZPtr,
+	/// Whether this CResult_NodeAnnouncementInfoDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NodeAnnouncementInfoDecodeErrorZ in the success state.
 pub extern "C" fn CResult_NodeAnnouncementInfoDecodeErrorZ_ok(o: crate::routing::network_graph::NodeAnnouncementInfo) -> CResult_NodeAnnouncementInfoDecodeErrorZ {
 	CResult_NodeAnnouncementInfoDecodeErrorZ {
 		contents: CResult_NodeAnnouncementInfoDecodeErrorZPtr {
@@ -2202,6 +2672,7 @@ pub extern "C" fn CResult_NodeAnnouncementInfoDecodeErrorZ_ok(o: crate::routing:
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NodeAnnouncementInfoDecodeErrorZ in the error state.
 pub extern "C" fn CResult_NodeAnnouncementInfoDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_NodeAnnouncementInfoDecodeErrorZ {
 	CResult_NodeAnnouncementInfoDecodeErrorZ {
 		contents: CResult_NodeAnnouncementInfoDecodeErrorZPtr {
@@ -2211,6 +2682,7 @@ pub extern "C" fn CResult_NodeAnnouncementInfoDecodeErrorZ_err(e: crate::ln::msg
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NodeAnnouncementInfoDecodeErrorZ.
 pub extern "C" fn CResult_NodeAnnouncementInfoDecodeErrorZ_free(_res: CResult_NodeAnnouncementInfoDecodeErrorZ) { }
 impl Drop for CResult_NodeAnnouncementInfoDecodeErrorZ {
 	fn drop(&mut self) {
@@ -2256,10 +2728,17 @@ impl Clone for CResult_NodeAnnouncementInfoDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NodeAnnouncementInfoDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NodeAnnouncementInfoDecodeErrorZ_clone(orig: &CResult_NodeAnnouncementInfoDecodeErrorZ) -> CResult_NodeAnnouncementInfoDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of u64s of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_u64Z {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut u64,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_u64Z {
@@ -2282,6 +2761,7 @@ impl From<Vec<u64>> for CVec_u64Z {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_u64Z_free(_res: CVec_u64Z) { }
 impl Drop for CVec_u64Z {
 	fn drop(&mut self) {
@@ -2298,16 +2778,28 @@ impl Clone for CVec_u64Z {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_NodeInfoDecodeErrorZ
 pub union CResult_NodeInfoDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::routing::network_graph::NodeInfo,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_NodeInfoDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::routing::network_graph::NodeInfo on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NodeInfoDecodeErrorZ {
+	/// The contents of this CResult_NodeInfoDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NodeInfoDecodeErrorZPtr,
+	/// Whether this CResult_NodeInfoDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NodeInfoDecodeErrorZ in the success state.
 pub extern "C" fn CResult_NodeInfoDecodeErrorZ_ok(o: crate::routing::network_graph::NodeInfo) -> CResult_NodeInfoDecodeErrorZ {
 	CResult_NodeInfoDecodeErrorZ {
 		contents: CResult_NodeInfoDecodeErrorZPtr {
@@ -2317,6 +2809,7 @@ pub extern "C" fn CResult_NodeInfoDecodeErrorZ_ok(o: crate::routing::network_gra
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NodeInfoDecodeErrorZ in the error state.
 pub extern "C" fn CResult_NodeInfoDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_NodeInfoDecodeErrorZ {
 	CResult_NodeInfoDecodeErrorZ {
 		contents: CResult_NodeInfoDecodeErrorZPtr {
@@ -2326,6 +2819,7 @@ pub extern "C" fn CResult_NodeInfoDecodeErrorZ_err(e: crate::ln::msgs::DecodeErr
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NodeInfoDecodeErrorZ.
 pub extern "C" fn CResult_NodeInfoDecodeErrorZ_free(_res: CResult_NodeInfoDecodeErrorZ) { }
 impl Drop for CResult_NodeInfoDecodeErrorZ {
 	fn drop(&mut self) {
@@ -2371,18 +2865,32 @@ impl Clone for CResult_NodeInfoDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NodeInfoDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NodeInfoDecodeErrorZ_clone(orig: &CResult_NodeInfoDecodeErrorZ) -> CResult_NodeInfoDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_NetworkGraphDecodeErrorZ
 pub union CResult_NetworkGraphDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::routing::network_graph::NetworkGraph,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_NetworkGraphDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::routing::network_graph::NetworkGraph on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NetworkGraphDecodeErrorZ {
+	/// The contents of this CResult_NetworkGraphDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NetworkGraphDecodeErrorZPtr,
+	/// Whether this CResult_NetworkGraphDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NetworkGraphDecodeErrorZ in the success state.
 pub extern "C" fn CResult_NetworkGraphDecodeErrorZ_ok(o: crate::routing::network_graph::NetworkGraph) -> CResult_NetworkGraphDecodeErrorZ {
 	CResult_NetworkGraphDecodeErrorZ {
 		contents: CResult_NetworkGraphDecodeErrorZPtr {
@@ -2392,6 +2900,7 @@ pub extern "C" fn CResult_NetworkGraphDecodeErrorZ_ok(o: crate::routing::network
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NetworkGraphDecodeErrorZ in the error state.
 pub extern "C" fn CResult_NetworkGraphDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_NetworkGraphDecodeErrorZ {
 	CResult_NetworkGraphDecodeErrorZ {
 		contents: CResult_NetworkGraphDecodeErrorZPtr {
@@ -2401,6 +2910,7 @@ pub extern "C" fn CResult_NetworkGraphDecodeErrorZ_err(e: crate::ln::msgs::Decod
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NetworkGraphDecodeErrorZ.
 pub extern "C" fn CResult_NetworkGraphDecodeErrorZ_free(_res: CResult_NetworkGraphDecodeErrorZ) { }
 impl Drop for CResult_NetworkGraphDecodeErrorZ {
 	fn drop(&mut self) {
@@ -2446,10 +2956,15 @@ impl Clone for CResult_NetworkGraphDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NetworkGraphDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NetworkGraphDecodeErrorZ_clone(orig: &CResult_NetworkGraphDecodeErrorZ) -> CResult_NetworkGraphDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_usizeTransactionZ {
+	/// The element at position 0
 	pub a: usize,
+	/// The element at position 1
 	pub b: crate::c_types::Transaction,
 }
 impl From<(usize, crate::c_types::Transaction)> for C2Tuple_usizeTransactionZ {
@@ -2465,16 +2980,23 @@ impl C2Tuple_usizeTransactionZ {
 		(self.a, self.b)
 	}
 }
+/// Creates a new C2Tuple_usizeTransactionZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_usizeTransactionZ_new(a: usize, b: crate::c_types::Transaction) -> C2Tuple_usizeTransactionZ {
 	C2Tuple_usizeTransactionZ { a, b, }
 }
 
 #[no_mangle]
+/// Frees any resources used by the C2Tuple_usizeTransactionZ.
 pub extern "C" fn C2Tuple_usizeTransactionZ_free(_res: C2Tuple_usizeTransactionZ) { }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::derived::C2Tuple_usizeTransactionZs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_C2Tuple_usizeTransactionZZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::derived::C2Tuple_usizeTransactionZ,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_C2Tuple_usizeTransactionZZ {
@@ -2497,6 +3019,7 @@ impl From<Vec<crate::c_types::derived::C2Tuple_usizeTransactionZ>> for CVec_C2Tu
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_C2Tuple_usizeTransactionZZ_free(_res: CVec_C2Tuple_usizeTransactionZZ) { }
 impl Drop for CVec_C2Tuple_usizeTransactionZZ {
 	fn drop(&mut self) {
@@ -2505,17 +3028,27 @@ impl Drop for CVec_C2Tuple_usizeTransactionZZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_NoneChannelMonitorUpdateErrZ
 pub union CResult_NoneChannelMonitorUpdateErrZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
 	pub result: *mut std::ffi::c_void,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::chain::channelmonitor::ChannelMonitorUpdateErr,
 }
 #[repr(C)]
+/// A CResult_NoneChannelMonitorUpdateErrZ represents the result of a fallible operation,
+/// containing a () on success and a crate::chain::channelmonitor::ChannelMonitorUpdateErr on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NoneChannelMonitorUpdateErrZ {
+	/// The contents of this CResult_NoneChannelMonitorUpdateErrZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NoneChannelMonitorUpdateErrZPtr,
+	/// Whether this CResult_NoneChannelMonitorUpdateErrZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NoneChannelMonitorUpdateErrZ in the success state.
 pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_ok() -> CResult_NoneChannelMonitorUpdateErrZ {
 	CResult_NoneChannelMonitorUpdateErrZ {
 		contents: CResult_NoneChannelMonitorUpdateErrZPtr {
@@ -2525,6 +3058,7 @@ pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_ok() -> CResult_NoneChann
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NoneChannelMonitorUpdateErrZ in the error state.
 pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_err(e: crate::chain::channelmonitor::ChannelMonitorUpdateErr) -> CResult_NoneChannelMonitorUpdateErrZ {
 	CResult_NoneChannelMonitorUpdateErrZ {
 		contents: CResult_NoneChannelMonitorUpdateErrZPtr {
@@ -2534,6 +3068,7 @@ pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_err(e: crate::chain::chan
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NoneChannelMonitorUpdateErrZ.
 pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_free(_res: CResult_NoneChannelMonitorUpdateErrZ) { }
 impl Drop for CResult_NoneChannelMonitorUpdateErrZ {
 	fn drop(&mut self) {
@@ -2576,10 +3111,17 @@ impl Clone for CResult_NoneChannelMonitorUpdateErrZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NoneChannelMonitorUpdateErrZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_clone(orig: &CResult_NoneChannelMonitorUpdateErrZ) -> CResult_NoneChannelMonitorUpdateErrZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of crate::chain::channelmonitor::MonitorEvents of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_MonitorEventZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::chain::channelmonitor::MonitorEvent,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_MonitorEventZ {
@@ -2602,6 +3144,7 @@ impl From<Vec<crate::chain::channelmonitor::MonitorEvent>> for CVec_MonitorEvent
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_MonitorEventZ_free(_res: CVec_MonitorEventZ) { }
 impl Drop for CVec_MonitorEventZ {
 	fn drop(&mut self) {
@@ -2618,8 +3161,13 @@ impl Clone for CVec_MonitorEventZ {
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::util::events::Events of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_EventZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::util::events::Event,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_EventZ {
@@ -2642,6 +3190,7 @@ impl From<Vec<crate::util::events::Event>> for CVec_EventZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_EventZ_free(_res: CVec_EventZ) { }
 impl Drop for CVec_EventZ {
 	fn drop(&mut self) {
@@ -2658,16 +3207,28 @@ impl Clone for CVec_EventZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_OutPointDecodeErrorZ
 pub union CResult_OutPointDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::chain::transaction::OutPoint,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_OutPointDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::chain::transaction::OutPoint on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_OutPointDecodeErrorZ {
+	/// The contents of this CResult_OutPointDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_OutPointDecodeErrorZPtr,
+	/// Whether this CResult_OutPointDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_OutPointDecodeErrorZ in the success state.
 pub extern "C" fn CResult_OutPointDecodeErrorZ_ok(o: crate::chain::transaction::OutPoint) -> CResult_OutPointDecodeErrorZ {
 	CResult_OutPointDecodeErrorZ {
 		contents: CResult_OutPointDecodeErrorZPtr {
@@ -2677,6 +3238,7 @@ pub extern "C" fn CResult_OutPointDecodeErrorZ_ok(o: crate::chain::transaction::
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_OutPointDecodeErrorZ in the error state.
 pub extern "C" fn CResult_OutPointDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_OutPointDecodeErrorZ {
 	CResult_OutPointDecodeErrorZ {
 		contents: CResult_OutPointDecodeErrorZPtr {
@@ -2686,6 +3248,7 @@ pub extern "C" fn CResult_OutPointDecodeErrorZ_err(e: crate::ln::msgs::DecodeErr
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_OutPointDecodeErrorZ.
 pub extern "C" fn CResult_OutPointDecodeErrorZ_free(_res: CResult_OutPointDecodeErrorZ) { }
 impl Drop for CResult_OutPointDecodeErrorZ {
 	fn drop(&mut self) {
@@ -2731,18 +3294,32 @@ impl Clone for CResult_OutPointDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_OutPointDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_OutPointDecodeErrorZ_clone(orig: &CResult_OutPointDecodeErrorZ) -> CResult_OutPointDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ChannelMonitorUpdateDecodeErrorZ
 pub union CResult_ChannelMonitorUpdateDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::chain::channelmonitor::ChannelMonitorUpdate,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ChannelMonitorUpdateDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::chain::channelmonitor::ChannelMonitorUpdate on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ChannelMonitorUpdateDecodeErrorZ {
+	/// The contents of this CResult_ChannelMonitorUpdateDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ChannelMonitorUpdateDecodeErrorZPtr,
+	/// Whether this CResult_ChannelMonitorUpdateDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelMonitorUpdateDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_ok(o: crate::chain::channelmonitor::ChannelMonitorUpdate) -> CResult_ChannelMonitorUpdateDecodeErrorZ {
 	CResult_ChannelMonitorUpdateDecodeErrorZ {
 		contents: CResult_ChannelMonitorUpdateDecodeErrorZPtr {
@@ -2752,6 +3329,7 @@ pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_ok(o: crate::chain::c
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelMonitorUpdateDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ChannelMonitorUpdateDecodeErrorZ {
 	CResult_ChannelMonitorUpdateDecodeErrorZ {
 		contents: CResult_ChannelMonitorUpdateDecodeErrorZPtr {
@@ -2761,6 +3339,7 @@ pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_err(e: crate::ln::msg
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ChannelMonitorUpdateDecodeErrorZ.
 pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_free(_res: CResult_ChannelMonitorUpdateDecodeErrorZ) { }
 impl Drop for CResult_ChannelMonitorUpdateDecodeErrorZ {
 	fn drop(&mut self) {
@@ -2806,18 +3385,32 @@ impl Clone for CResult_ChannelMonitorUpdateDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelMonitorUpdateDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_clone(orig: &CResult_ChannelMonitorUpdateDecodeErrorZ) -> CResult_ChannelMonitorUpdateDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_HTLCUpdateDecodeErrorZ
 pub union CResult_HTLCUpdateDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::chain::channelmonitor::HTLCUpdate,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_HTLCUpdateDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::chain::channelmonitor::HTLCUpdate on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_HTLCUpdateDecodeErrorZ {
+	/// The contents of this CResult_HTLCUpdateDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_HTLCUpdateDecodeErrorZPtr,
+	/// Whether this CResult_HTLCUpdateDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_HTLCUpdateDecodeErrorZ in the success state.
 pub extern "C" fn CResult_HTLCUpdateDecodeErrorZ_ok(o: crate::chain::channelmonitor::HTLCUpdate) -> CResult_HTLCUpdateDecodeErrorZ {
 	CResult_HTLCUpdateDecodeErrorZ {
 		contents: CResult_HTLCUpdateDecodeErrorZPtr {
@@ -2827,6 +3420,7 @@ pub extern "C" fn CResult_HTLCUpdateDecodeErrorZ_ok(o: crate::chain::channelmoni
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_HTLCUpdateDecodeErrorZ in the error state.
 pub extern "C" fn CResult_HTLCUpdateDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_HTLCUpdateDecodeErrorZ {
 	CResult_HTLCUpdateDecodeErrorZ {
 		contents: CResult_HTLCUpdateDecodeErrorZPtr {
@@ -2836,6 +3430,7 @@ pub extern "C" fn CResult_HTLCUpdateDecodeErrorZ_err(e: crate::ln::msgs::DecodeE
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_HTLCUpdateDecodeErrorZ.
 pub extern "C" fn CResult_HTLCUpdateDecodeErrorZ_free(_res: CResult_HTLCUpdateDecodeErrorZ) { }
 impl Drop for CResult_HTLCUpdateDecodeErrorZ {
 	fn drop(&mut self) {
@@ -2881,19 +3476,31 @@ impl Clone for CResult_HTLCUpdateDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_HTLCUpdateDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_HTLCUpdateDecodeErrorZ_clone(orig: &CResult_HTLCUpdateDecodeErrorZ) -> CResult_HTLCUpdateDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_NoneMonitorUpdateErrorZ
 pub union CResult_NoneMonitorUpdateErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
 	pub result: *mut std::ffi::c_void,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::chain::channelmonitor::MonitorUpdateError,
 }
 #[repr(C)]
+/// A CResult_NoneMonitorUpdateErrorZ represents the result of a fallible operation,
+/// containing a () on success and a crate::chain::channelmonitor::MonitorUpdateError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NoneMonitorUpdateErrorZ {
+	/// The contents of this CResult_NoneMonitorUpdateErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NoneMonitorUpdateErrorZPtr,
+	/// Whether this CResult_NoneMonitorUpdateErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NoneMonitorUpdateErrorZ in the success state.
 pub extern "C" fn CResult_NoneMonitorUpdateErrorZ_ok() -> CResult_NoneMonitorUpdateErrorZ {
 	CResult_NoneMonitorUpdateErrorZ {
 		contents: CResult_NoneMonitorUpdateErrorZPtr {
@@ -2903,6 +3510,7 @@ pub extern "C" fn CResult_NoneMonitorUpdateErrorZ_ok() -> CResult_NoneMonitorUpd
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NoneMonitorUpdateErrorZ in the error state.
 pub extern "C" fn CResult_NoneMonitorUpdateErrorZ_err(e: crate::chain::channelmonitor::MonitorUpdateError) -> CResult_NoneMonitorUpdateErrorZ {
 	CResult_NoneMonitorUpdateErrorZ {
 		contents: CResult_NoneMonitorUpdateErrorZPtr {
@@ -2912,6 +3520,7 @@ pub extern "C" fn CResult_NoneMonitorUpdateErrorZ_err(e: crate::chain::channelmo
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NoneMonitorUpdateErrorZ.
 pub extern "C" fn CResult_NoneMonitorUpdateErrorZ_free(_res: CResult_NoneMonitorUpdateErrorZ) { }
 impl Drop for CResult_NoneMonitorUpdateErrorZ {
 	fn drop(&mut self) {
@@ -2954,10 +3563,15 @@ impl Clone for CResult_NoneMonitorUpdateErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NoneMonitorUpdateErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NoneMonitorUpdateErrorZ_clone(orig: &CResult_NoneMonitorUpdateErrorZ) -> CResult_NoneMonitorUpdateErrorZ { orig.clone() }
 #[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_OutPointScriptZ {
+	/// The element at position 0
 	pub a: crate::chain::transaction::OutPoint,
+	/// The element at position 1
 	pub b: crate::c_types::derived::CVec_u8Z,
 }
 impl From<(crate::chain::transaction::OutPoint, crate::c_types::derived::CVec_u8Z)> for C2Tuple_OutPointScriptZ {
@@ -2982,17 +3596,24 @@ impl Clone for C2Tuple_OutPointScriptZ {
 	}
 }
 #[no_mangle]
+/// Creates a new tuple which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn C2Tuple_OutPointScriptZ_clone(orig: &C2Tuple_OutPointScriptZ) -> C2Tuple_OutPointScriptZ { orig.clone() }
+/// Creates a new C2Tuple_OutPointScriptZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_OutPointScriptZ_new(a: crate::chain::transaction::OutPoint, b: crate::c_types::derived::CVec_u8Z) -> C2Tuple_OutPointScriptZ {
 	C2Tuple_OutPointScriptZ { a, b, }
 }
 
 #[no_mangle]
+/// Frees any resources used by the C2Tuple_OutPointScriptZ.
 pub extern "C" fn C2Tuple_OutPointScriptZ_free(_res: C2Tuple_OutPointScriptZ) { }
 #[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_u32ScriptZ {
+	/// The element at position 0
 	pub a: u32,
+	/// The element at position 1
 	pub b: crate::c_types::derived::CVec_u8Z,
 }
 impl From<(u32, crate::c_types::derived::CVec_u8Z)> for C2Tuple_u32ScriptZ {
@@ -3017,17 +3638,26 @@ impl Clone for C2Tuple_u32ScriptZ {
 	}
 }
 #[no_mangle]
+/// Creates a new tuple which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn C2Tuple_u32ScriptZ_clone(orig: &C2Tuple_u32ScriptZ) -> C2Tuple_u32ScriptZ { orig.clone() }
+/// Creates a new C2Tuple_u32ScriptZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_u32ScriptZ_new(a: u32, b: crate::c_types::derived::CVec_u8Z) -> C2Tuple_u32ScriptZ {
 	C2Tuple_u32ScriptZ { a, b, }
 }
 
 #[no_mangle]
+/// Frees any resources used by the C2Tuple_u32ScriptZ.
 pub extern "C" fn C2Tuple_u32ScriptZ_free(_res: C2Tuple_u32ScriptZ) { }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::derived::C2Tuple_u32ScriptZs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_C2Tuple_u32ScriptZZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::derived::C2Tuple_u32ScriptZ,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_C2Tuple_u32ScriptZZ {
@@ -3050,6 +3680,7 @@ impl From<Vec<crate::c_types::derived::C2Tuple_u32ScriptZ>> for CVec_C2Tuple_u32
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_C2Tuple_u32ScriptZZ_free(_res: CVec_C2Tuple_u32ScriptZZ) { }
 impl Drop for CVec_C2Tuple_u32ScriptZZ {
 	fn drop(&mut self) {
@@ -3066,8 +3697,11 @@ impl Clone for CVec_C2Tuple_u32ScriptZZ {
 	}
 }
 #[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
+	/// The element at position 0
 	pub a: crate::c_types::ThirtyTwoBytes,
+	/// The element at position 1
 	pub b: crate::c_types::derived::CVec_C2Tuple_u32ScriptZZ,
 }
 impl From<(crate::c_types::ThirtyTwoBytes, crate::c_types::derived::CVec_C2Tuple_u32ScriptZZ)> for C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
@@ -3083,16 +3717,23 @@ impl C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
 		(self.a, self.b)
 	}
 }
+/// Creates a new C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ_new(a: crate::c_types::ThirtyTwoBytes, b: crate::c_types::derived::CVec_C2Tuple_u32ScriptZZ) -> C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
 	C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ { a, b, }
 }
 
 #[no_mangle]
+/// Frees any resources used by the C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ.
 pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ_free(_res: C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ) { }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
@@ -3115,6 +3756,7 @@ impl From<Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ>> f
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ_free(_res: CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ) { }
 impl Drop for CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
 	fn drop(&mut self) {
@@ -3123,8 +3765,13 @@ impl Drop for CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::Transactions of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_TransactionZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::Transaction,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_TransactionZ {
@@ -3147,6 +3794,7 @@ impl From<Vec<crate::c_types::Transaction>> for CVec_TransactionZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_TransactionZ_free(_res: CVec_TransactionZ) { }
 impl Drop for CVec_TransactionZ {
 	fn drop(&mut self) {
@@ -3155,8 +3803,11 @@ impl Drop for CVec_TransactionZ {
 	}
 }
 #[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_u32TxOutZ {
+	/// The element at position 0
 	pub a: u32,
+	/// The element at position 1
 	pub b: crate::c_types::TxOut,
 }
 impl From<(u32, crate::c_types::TxOut)> for C2Tuple_u32TxOutZ {
@@ -3181,17 +3832,26 @@ impl Clone for C2Tuple_u32TxOutZ {
 	}
 }
 #[no_mangle]
+/// Creates a new tuple which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn C2Tuple_u32TxOutZ_clone(orig: &C2Tuple_u32TxOutZ) -> C2Tuple_u32TxOutZ { orig.clone() }
+/// Creates a new C2Tuple_u32TxOutZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_u32TxOutZ_new(a: u32, b: crate::c_types::TxOut) -> C2Tuple_u32TxOutZ {
 	C2Tuple_u32TxOutZ { a, b, }
 }
 
 #[no_mangle]
+/// Frees any resources used by the C2Tuple_u32TxOutZ.
 pub extern "C" fn C2Tuple_u32TxOutZ_free(_res: C2Tuple_u32TxOutZ) { }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::derived::C2Tuple_u32TxOutZs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_C2Tuple_u32TxOutZZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::derived::C2Tuple_u32TxOutZ,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_C2Tuple_u32TxOutZZ {
@@ -3214,6 +3874,7 @@ impl From<Vec<crate::c_types::derived::C2Tuple_u32TxOutZ>> for CVec_C2Tuple_u32T
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_C2Tuple_u32TxOutZZ_free(_res: CVec_C2Tuple_u32TxOutZZ) { }
 impl Drop for CVec_C2Tuple_u32TxOutZZ {
 	fn drop(&mut self) {
@@ -3230,8 +3891,11 @@ impl Clone for CVec_C2Tuple_u32TxOutZZ {
 	}
 }
 #[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ {
+	/// The element at position 0
 	pub a: crate::c_types::ThirtyTwoBytes,
+	/// The element at position 1
 	pub b: crate::c_types::derived::CVec_C2Tuple_u32TxOutZZ,
 }
 impl From<(crate::c_types::ThirtyTwoBytes, crate::c_types::derived::CVec_C2Tuple_u32TxOutZZ)> for C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ {
@@ -3247,16 +3911,23 @@ impl C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ {
 		(self.a, self.b)
 	}
 }
+/// Creates a new C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ_new(a: crate::c_types::ThirtyTwoBytes, b: crate::c_types::derived::CVec_C2Tuple_u32TxOutZZ) -> C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ {
 	C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ { a, b, }
 }
 
 #[no_mangle]
+/// Frees any resources used by the C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ.
 pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ_free(_res: C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ) { }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
@@ -3279,6 +3950,7 @@ impl From<Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ>> fo
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ_free(_res: CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ) { }
 impl Drop for CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
 	fn drop(&mut self) {
@@ -3287,8 +3959,11 @@ impl Drop for CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
 	}
 }
 #[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_BlockHashChannelMonitorZ {
+	/// The element at position 0
 	pub a: crate::c_types::ThirtyTwoBytes,
+	/// The element at position 1
 	pub b: crate::chain::channelmonitor::ChannelMonitor,
 }
 impl From<(crate::c_types::ThirtyTwoBytes, crate::chain::channelmonitor::ChannelMonitor)> for C2Tuple_BlockHashChannelMonitorZ {
@@ -3304,24 +3979,38 @@ impl C2Tuple_BlockHashChannelMonitorZ {
 		(self.a, self.b)
 	}
 }
+/// Creates a new C2Tuple_BlockHashChannelMonitorZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_BlockHashChannelMonitorZ_new(a: crate::c_types::ThirtyTwoBytes, b: crate::chain::channelmonitor::ChannelMonitor) -> C2Tuple_BlockHashChannelMonitorZ {
 	C2Tuple_BlockHashChannelMonitorZ { a, b, }
 }
 
 #[no_mangle]
+/// Frees any resources used by the C2Tuple_BlockHashChannelMonitorZ.
 pub extern "C" fn C2Tuple_BlockHashChannelMonitorZ_free(_res: C2Tuple_BlockHashChannelMonitorZ) { }
 #[repr(C)]
+/// The contents of CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ
 pub union CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
+	/// The contents of this CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZPtr,
+	/// Whether this CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ in the success state.
 pub extern "C" fn CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ_ok(o: crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ) -> CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
 	CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
 		contents: CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZPtr {
@@ -3331,6 +4020,7 @@ pub extern "C" fn CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ_ok(o: cra
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ in the error state.
 pub extern "C" fn CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
 	CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
 		contents: CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZPtr {
@@ -3340,6 +4030,7 @@ pub extern "C" fn CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ_err(e: cr
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ.
 pub extern "C" fn CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ_free(_res: CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ) { }
 impl Drop for CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
 	fn drop(&mut self) {
@@ -3372,8 +4063,13 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_BlockHas
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::chain::keysinterface::SpendableOutputDescriptors of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_SpendableOutputDescriptorZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::chain::keysinterface::SpendableOutputDescriptor,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_SpendableOutputDescriptorZ {
@@ -3396,6 +4092,7 @@ impl From<Vec<crate::chain::keysinterface::SpendableOutputDescriptor>> for CVec_
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_SpendableOutputDescriptorZ_free(_res: CVec_SpendableOutputDescriptorZ) { }
 impl Drop for CVec_SpendableOutputDescriptorZ {
 	fn drop(&mut self) {
@@ -3412,16 +4109,28 @@ impl Clone for CVec_SpendableOutputDescriptorZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_TxOutAccessErrorZ
 pub union CResult_TxOutAccessErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::TxOut,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::chain::AccessError,
 }
 #[repr(C)]
+/// A CResult_TxOutAccessErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::TxOut on success and a crate::chain::AccessError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_TxOutAccessErrorZ {
+	/// The contents of this CResult_TxOutAccessErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_TxOutAccessErrorZPtr,
+	/// Whether this CResult_TxOutAccessErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_TxOutAccessErrorZ in the success state.
 pub extern "C" fn CResult_TxOutAccessErrorZ_ok(o: crate::c_types::TxOut) -> CResult_TxOutAccessErrorZ {
 	CResult_TxOutAccessErrorZ {
 		contents: CResult_TxOutAccessErrorZPtr {
@@ -3431,6 +4140,7 @@ pub extern "C" fn CResult_TxOutAccessErrorZ_ok(o: crate::c_types::TxOut) -> CRes
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_TxOutAccessErrorZ in the error state.
 pub extern "C" fn CResult_TxOutAccessErrorZ_err(e: crate::chain::AccessError) -> CResult_TxOutAccessErrorZ {
 	CResult_TxOutAccessErrorZ {
 		contents: CResult_TxOutAccessErrorZPtr {
@@ -3440,6 +4150,7 @@ pub extern "C" fn CResult_TxOutAccessErrorZ_err(e: crate::chain::AccessError) ->
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_TxOutAccessErrorZ.
 pub extern "C" fn CResult_TxOutAccessErrorZ_free(_res: CResult_TxOutAccessErrorZ) { }
 impl Drop for CResult_TxOutAccessErrorZ {
 	fn drop(&mut self) {
@@ -3485,10 +4196,15 @@ impl Clone for CResult_TxOutAccessErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_TxOutAccessErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_TxOutAccessErrorZ_clone(orig: &CResult_TxOutAccessErrorZ) -> CResult_TxOutAccessErrorZ { orig.clone() }
 #[repr(C)]
+/// An enum which can either contain a crate::c_types::derived::C2Tuple_usizeTransactionZ or not
 pub enum COption_C2Tuple_usizeTransactionZZ {
+	/// When we're in this state, this COption_C2Tuple_usizeTransactionZZ contains a crate::c_types::derived::C2Tuple_usizeTransactionZ
 	Some(crate::c_types::derived::C2Tuple_usizeTransactionZ),
+	/// When we're in this state, this COption_C2Tuple_usizeTransactionZZ contains nothing
 	None
 }
 impl COption_C2Tuple_usizeTransactionZZ {
@@ -3500,27 +4216,40 @@ impl COption_C2Tuple_usizeTransactionZZ {
 	}
 }
 #[no_mangle]
+/// Constructs a new COption_C2Tuple_usizeTransactionZZ containing a crate::c_types::derived::C2Tuple_usizeTransactionZ
 pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_some(o: crate::c_types::derived::C2Tuple_usizeTransactionZ) -> COption_C2Tuple_usizeTransactionZZ {
 	COption_C2Tuple_usizeTransactionZZ::Some(o)
 }
 #[no_mangle]
+/// Constructs a new COption_C2Tuple_usizeTransactionZZ containing nothing
 pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_none() -> COption_C2Tuple_usizeTransactionZZ {
 	COption_C2Tuple_usizeTransactionZZ::None
 }
 #[no_mangle]
+/// Frees any resources associated with the crate::c_types::derived::C2Tuple_usizeTransactionZ, if we are in the Some state
 pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_free(_res: COption_C2Tuple_usizeTransactionZZ) { }
 #[repr(C)]
+/// The contents of CResult_NoneAPIErrorZ
 pub union CResult_NoneAPIErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
 	pub result: *mut std::ffi::c_void,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::util::errors::APIError,
 }
 #[repr(C)]
+/// A CResult_NoneAPIErrorZ represents the result of a fallible operation,
+/// containing a () on success and a crate::util::errors::APIError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NoneAPIErrorZ {
+	/// The contents of this CResult_NoneAPIErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NoneAPIErrorZPtr,
+	/// Whether this CResult_NoneAPIErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NoneAPIErrorZ in the success state.
 pub extern "C" fn CResult_NoneAPIErrorZ_ok() -> CResult_NoneAPIErrorZ {
 	CResult_NoneAPIErrorZ {
 		contents: CResult_NoneAPIErrorZPtr {
@@ -3530,6 +4259,7 @@ pub extern "C" fn CResult_NoneAPIErrorZ_ok() -> CResult_NoneAPIErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NoneAPIErrorZ in the error state.
 pub extern "C" fn CResult_NoneAPIErrorZ_err(e: crate::util::errors::APIError) -> CResult_NoneAPIErrorZ {
 	CResult_NoneAPIErrorZ {
 		contents: CResult_NoneAPIErrorZPtr {
@@ -3539,6 +4269,7 @@ pub extern "C" fn CResult_NoneAPIErrorZ_err(e: crate::util::errors::APIError) ->
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NoneAPIErrorZ.
 pub extern "C" fn CResult_NoneAPIErrorZ_free(_res: CResult_NoneAPIErrorZ) { }
 impl Drop for CResult_NoneAPIErrorZ {
 	fn drop(&mut self) {
@@ -3581,10 +4312,17 @@ impl Clone for CResult_NoneAPIErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NoneAPIErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NoneAPIErrorZ_clone(orig: &CResult_NoneAPIErrorZ) -> CResult_NoneAPIErrorZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::derived::CResult_NoneAPIErrorZs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_CResult_NoneAPIErrorZZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::derived::CResult_NoneAPIErrorZ,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_CResult_NoneAPIErrorZZ {
@@ -3607,6 +4345,7 @@ impl From<Vec<crate::c_types::derived::CResult_NoneAPIErrorZ>> for CVec_CResult_
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_CResult_NoneAPIErrorZZ_free(_res: CVec_CResult_NoneAPIErrorZZ) { }
 impl Drop for CVec_CResult_NoneAPIErrorZZ {
 	fn drop(&mut self) {
@@ -3623,8 +4362,13 @@ impl Clone for CVec_CResult_NoneAPIErrorZZ {
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::util::errors::APIErrors of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_APIErrorZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::util::errors::APIError,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_APIErrorZ {
@@ -3647,6 +4391,7 @@ impl From<Vec<crate::util::errors::APIError>> for CVec_APIErrorZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_APIErrorZ_free(_res: CVec_APIErrorZ) { }
 impl Drop for CVec_APIErrorZ {
 	fn drop(&mut self) {
@@ -3663,8 +4408,13 @@ impl Clone for CVec_APIErrorZ {
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::ln::channelmanager::ChannelDetailss of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_ChannelDetailsZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::ln::channelmanager::ChannelDetails,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_ChannelDetailsZ {
@@ -3687,6 +4437,7 @@ impl From<Vec<crate::ln::channelmanager::ChannelDetails>> for CVec_ChannelDetail
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_ChannelDetailsZ_free(_res: CVec_ChannelDetailsZ) { }
 impl Drop for CVec_ChannelDetailsZ {
 	fn drop(&mut self) {
@@ -3703,17 +4454,27 @@ impl Clone for CVec_ChannelDetailsZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_NonePaymentSendFailureZ
 pub union CResult_NonePaymentSendFailureZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
 	pub result: *mut std::ffi::c_void,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::channelmanager::PaymentSendFailure,
 }
 #[repr(C)]
+/// A CResult_NonePaymentSendFailureZ represents the result of a fallible operation,
+/// containing a () on success and a crate::ln::channelmanager::PaymentSendFailure on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NonePaymentSendFailureZ {
+	/// The contents of this CResult_NonePaymentSendFailureZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NonePaymentSendFailureZPtr,
+	/// Whether this CResult_NonePaymentSendFailureZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NonePaymentSendFailureZ in the success state.
 pub extern "C" fn CResult_NonePaymentSendFailureZ_ok() -> CResult_NonePaymentSendFailureZ {
 	CResult_NonePaymentSendFailureZ {
 		contents: CResult_NonePaymentSendFailureZPtr {
@@ -3723,6 +4484,7 @@ pub extern "C" fn CResult_NonePaymentSendFailureZ_ok() -> CResult_NonePaymentSen
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NonePaymentSendFailureZ in the error state.
 pub extern "C" fn CResult_NonePaymentSendFailureZ_err(e: crate::ln::channelmanager::PaymentSendFailure) -> CResult_NonePaymentSendFailureZ {
 	CResult_NonePaymentSendFailureZ {
 		contents: CResult_NonePaymentSendFailureZPtr {
@@ -3732,6 +4494,7 @@ pub extern "C" fn CResult_NonePaymentSendFailureZ_err(e: crate::ln::channelmanag
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NonePaymentSendFailureZ.
 pub extern "C" fn CResult_NonePaymentSendFailureZ_free(_res: CResult_NonePaymentSendFailureZ) { }
 impl Drop for CResult_NonePaymentSendFailureZ {
 	fn drop(&mut self) {
@@ -3774,10 +4537,17 @@ impl Clone for CResult_NonePaymentSendFailureZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NonePaymentSendFailureZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NonePaymentSendFailureZ_clone(orig: &CResult_NonePaymentSendFailureZ) -> CResult_NonePaymentSendFailureZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of crate::chain::channelmonitor::ChannelMonitors of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_ChannelMonitorZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::chain::channelmonitor::ChannelMonitor,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_ChannelMonitorZ {
@@ -3800,6 +4570,7 @@ impl From<Vec<crate::chain::channelmonitor::ChannelMonitor>> for CVec_ChannelMon
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_ChannelMonitorZ_free(_res: CVec_ChannelMonitorZ) { }
 impl Drop for CVec_ChannelMonitorZ {
 	fn drop(&mut self) {
@@ -3808,8 +4579,11 @@ impl Drop for CVec_ChannelMonitorZ {
 	}
 }
 #[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_BlockHashChannelManagerZ {
+	/// The element at position 0
 	pub a: crate::c_types::ThirtyTwoBytes,
+	/// The element at position 1
 	pub b: crate::ln::channelmanager::ChannelManager,
 }
 impl From<(crate::c_types::ThirtyTwoBytes, crate::ln::channelmanager::ChannelManager)> for C2Tuple_BlockHashChannelManagerZ {
@@ -3825,24 +4599,38 @@ impl C2Tuple_BlockHashChannelManagerZ {
 		(self.a, self.b)
 	}
 }
+/// Creates a new C2Tuple_BlockHashChannelManagerZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_BlockHashChannelManagerZ_new(a: crate::c_types::ThirtyTwoBytes, b: crate::ln::channelmanager::ChannelManager) -> C2Tuple_BlockHashChannelManagerZ {
 	C2Tuple_BlockHashChannelManagerZ { a, b, }
 }
 
 #[no_mangle]
+/// Frees any resources used by the C2Tuple_BlockHashChannelManagerZ.
 pub extern "C" fn C2Tuple_BlockHashChannelManagerZ_free(_res: C2Tuple_BlockHashChannelManagerZ) { }
 #[repr(C)]
+/// The contents of CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ
 pub union CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::derived::C2Tuple_BlockHashChannelManagerZ,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::C2Tuple_BlockHashChannelManagerZ on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ {
+	/// The contents of this CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZPtr,
+	/// Whether this CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ in the success state.
 pub extern "C" fn CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ_ok(o: crate::c_types::derived::C2Tuple_BlockHashChannelManagerZ) -> CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ {
 	CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ {
 		contents: CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZPtr {
@@ -3852,6 +4640,7 @@ pub extern "C" fn CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ_ok(o: cra
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ in the error state.
 pub extern "C" fn CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ {
 	CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ {
 		contents: CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZPtr {
@@ -3861,6 +4650,7 @@ pub extern "C" fn CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ_err(e: cr
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ.
 pub extern "C" fn CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ_free(_res: CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ) { }
 impl Drop for CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ {
 	fn drop(&mut self) {
@@ -3893,16 +4683,28 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_BlockHas
 	}
 }
 #[repr(C)]
+/// The contents of CResult_SpendableOutputDescriptorDecodeErrorZ
 pub union CResult_SpendableOutputDescriptorDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::chain::keysinterface::SpendableOutputDescriptor,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_SpendableOutputDescriptorDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::chain::keysinterface::SpendableOutputDescriptor on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_SpendableOutputDescriptorDecodeErrorZ {
+	/// The contents of this CResult_SpendableOutputDescriptorDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_SpendableOutputDescriptorDecodeErrorZPtr,
+	/// Whether this CResult_SpendableOutputDescriptorDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_SpendableOutputDescriptorDecodeErrorZ in the success state.
 pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_ok(o: crate::chain::keysinterface::SpendableOutputDescriptor) -> CResult_SpendableOutputDescriptorDecodeErrorZ {
 	CResult_SpendableOutputDescriptorDecodeErrorZ {
 		contents: CResult_SpendableOutputDescriptorDecodeErrorZPtr {
@@ -3912,6 +4714,7 @@ pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_ok(o: crate::cha
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_SpendableOutputDescriptorDecodeErrorZ in the error state.
 pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_SpendableOutputDescriptorDecodeErrorZ {
 	CResult_SpendableOutputDescriptorDecodeErrorZ {
 		contents: CResult_SpendableOutputDescriptorDecodeErrorZPtr {
@@ -3921,6 +4724,7 @@ pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_err(e: crate::ln
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_SpendableOutputDescriptorDecodeErrorZ.
 pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_free(_res: CResult_SpendableOutputDescriptorDecodeErrorZ) { }
 impl Drop for CResult_SpendableOutputDescriptorDecodeErrorZ {
 	fn drop(&mut self) {
@@ -3966,10 +4770,15 @@ impl Clone for CResult_SpendableOutputDescriptorDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_SpendableOutputDescriptorDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_clone(orig: &CResult_SpendableOutputDescriptorDecodeErrorZ) -> CResult_SpendableOutputDescriptorDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_SignatureCVec_SignatureZZ {
+	/// The element at position 0
 	pub a: crate::c_types::Signature,
+	/// The element at position 1
 	pub b: crate::c_types::derived::CVec_SignatureZ,
 }
 impl From<(crate::c_types::Signature, crate::c_types::derived::CVec_SignatureZ)> for C2Tuple_SignatureCVec_SignatureZZ {
@@ -3994,26 +4803,40 @@ impl Clone for C2Tuple_SignatureCVec_SignatureZZ {
 	}
 }
 #[no_mangle]
+/// Creates a new tuple which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn C2Tuple_SignatureCVec_SignatureZZ_clone(orig: &C2Tuple_SignatureCVec_SignatureZZ) -> C2Tuple_SignatureCVec_SignatureZZ { orig.clone() }
+/// Creates a new C2Tuple_SignatureCVec_SignatureZZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_SignatureCVec_SignatureZZ_new(a: crate::c_types::Signature, b: crate::c_types::derived::CVec_SignatureZ) -> C2Tuple_SignatureCVec_SignatureZZ {
 	C2Tuple_SignatureCVec_SignatureZZ { a, b, }
 }
 
 #[no_mangle]
+/// Frees any resources used by the C2Tuple_SignatureCVec_SignatureZZ.
 pub extern "C" fn C2Tuple_SignatureCVec_SignatureZZ_free(_res: C2Tuple_SignatureCVec_SignatureZZ) { }
 #[repr(C)]
+/// The contents of CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ
 pub union CResult_C2Tuple_SignatureCVec_SignatureZZNoneZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::derived::C2Tuple_SignatureCVec_SignatureZZ,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
 	pub err: *mut std::ffi::c_void,
 }
 #[repr(C)]
+/// A CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::C2Tuple_SignatureCVec_SignatureZZ on success and a () on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
+	/// The contents of this CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_C2Tuple_SignatureCVec_SignatureZZNoneZPtr,
+	/// Whether this CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ in the success state.
 pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_ok(o: crate::c_types::derived::C2Tuple_SignatureCVec_SignatureZZ) -> CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
 	CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
 		contents: CResult_C2Tuple_SignatureCVec_SignatureZZNoneZPtr {
@@ -4023,6 +4846,7 @@ pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_ok(o: crate::c_
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ in the error state.
 pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_err() -> CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
 	CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
 		contents: CResult_C2Tuple_SignatureCVec_SignatureZZNoneZPtr {
@@ -4032,6 +4856,7 @@ pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_err() -> CResul
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ.
 pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_free(_res: CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ) { }
 impl Drop for CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
 	fn drop(&mut self) {
@@ -4074,19 +4899,31 @@ impl Clone for CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_clone(orig: &CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ) -> CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_SignatureNoneZ
 pub union CResult_SignatureNoneZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::Signature,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
 	pub err: *mut std::ffi::c_void,
 }
 #[repr(C)]
+/// A CResult_SignatureNoneZ represents the result of a fallible operation,
+/// containing a crate::c_types::Signature on success and a () on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_SignatureNoneZ {
+	/// The contents of this CResult_SignatureNoneZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_SignatureNoneZPtr,
+	/// Whether this CResult_SignatureNoneZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_SignatureNoneZ in the success state.
 pub extern "C" fn CResult_SignatureNoneZ_ok(o: crate::c_types::Signature) -> CResult_SignatureNoneZ {
 	CResult_SignatureNoneZ {
 		contents: CResult_SignatureNoneZPtr {
@@ -4096,6 +4933,7 @@ pub extern "C" fn CResult_SignatureNoneZ_ok(o: crate::c_types::Signature) -> CRe
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_SignatureNoneZ in the error state.
 pub extern "C" fn CResult_SignatureNoneZ_err() -> CResult_SignatureNoneZ {
 	CResult_SignatureNoneZ {
 		contents: CResult_SignatureNoneZPtr {
@@ -4105,6 +4943,7 @@ pub extern "C" fn CResult_SignatureNoneZ_err() -> CResult_SignatureNoneZ {
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_SignatureNoneZ.
 pub extern "C" fn CResult_SignatureNoneZ_free(_res: CResult_SignatureNoneZ) { }
 impl Drop for CResult_SignatureNoneZ {
 	fn drop(&mut self) {
@@ -4147,18 +4986,32 @@ impl Clone for CResult_SignatureNoneZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_SignatureNoneZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_SignatureNoneZ_clone(orig: &CResult_SignatureNoneZ) -> CResult_SignatureNoneZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_SignDecodeErrorZ
 pub union CResult_SignDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::chain::keysinterface::Sign,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_SignDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::chain::keysinterface::Sign on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_SignDecodeErrorZ {
+	/// The contents of this CResult_SignDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_SignDecodeErrorZPtr,
+	/// Whether this CResult_SignDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_SignDecodeErrorZ in the success state.
 pub extern "C" fn CResult_SignDecodeErrorZ_ok(o: crate::chain::keysinterface::Sign) -> CResult_SignDecodeErrorZ {
 	CResult_SignDecodeErrorZ {
 		contents: CResult_SignDecodeErrorZPtr {
@@ -4168,6 +5021,7 @@ pub extern "C" fn CResult_SignDecodeErrorZ_ok(o: crate::chain::keysinterface::Si
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_SignDecodeErrorZ in the error state.
 pub extern "C" fn CResult_SignDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_SignDecodeErrorZ {
 	CResult_SignDecodeErrorZ {
 		contents: CResult_SignDecodeErrorZPtr {
@@ -4177,6 +5031,7 @@ pub extern "C" fn CResult_SignDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) 
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_SignDecodeErrorZ.
 pub extern "C" fn CResult_SignDecodeErrorZ_free(_res: CResult_SignDecodeErrorZ) { }
 impl Drop for CResult_SignDecodeErrorZ {
 	fn drop(&mut self) {
@@ -4222,10 +5077,17 @@ impl Clone for CResult_SignDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_SignDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_SignDecodeErrorZ_clone(orig: &CResult_SignDecodeErrorZ) -> CResult_SignDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::derived::CVec_u8Zs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_CVec_u8ZZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::derived::CVec_u8Z,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_CVec_u8ZZ {
@@ -4248,6 +5110,7 @@ impl From<Vec<crate::c_types::derived::CVec_u8Z>> for CVec_CVec_u8ZZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_CVec_u8ZZ_free(_res: CVec_CVec_u8ZZ) { }
 impl Drop for CVec_CVec_u8ZZ {
 	fn drop(&mut self) {
@@ -4264,17 +5127,27 @@ impl Clone for CVec_CVec_u8ZZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_CVec_CVec_u8ZZNoneZ
 pub union CResult_CVec_CVec_u8ZZNoneZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::derived::CVec_CVec_u8ZZ,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
 	pub err: *mut std::ffi::c_void,
 }
 #[repr(C)]
+/// A CResult_CVec_CVec_u8ZZNoneZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::CVec_CVec_u8ZZ on success and a () on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_CVec_CVec_u8ZZNoneZ {
+	/// The contents of this CResult_CVec_CVec_u8ZZNoneZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_CVec_CVec_u8ZZNoneZPtr,
+	/// Whether this CResult_CVec_CVec_u8ZZNoneZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_CVec_CVec_u8ZZNoneZ in the success state.
 pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_ok(o: crate::c_types::derived::CVec_CVec_u8ZZ) -> CResult_CVec_CVec_u8ZZNoneZ {
 	CResult_CVec_CVec_u8ZZNoneZ {
 		contents: CResult_CVec_CVec_u8ZZNoneZPtr {
@@ -4284,6 +5157,7 @@ pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_ok(o: crate::c_types::derived::CVe
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CVec_CVec_u8ZZNoneZ in the error state.
 pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_err() -> CResult_CVec_CVec_u8ZZNoneZ {
 	CResult_CVec_CVec_u8ZZNoneZ {
 		contents: CResult_CVec_CVec_u8ZZNoneZPtr {
@@ -4293,6 +5167,7 @@ pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_err() -> CResult_CVec_CVec_u8ZZNon
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_CVec_CVec_u8ZZNoneZ.
 pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_free(_res: CResult_CVec_CVec_u8ZZNoneZ) { }
 impl Drop for CResult_CVec_CVec_u8ZZNoneZ {
 	fn drop(&mut self) {
@@ -4335,18 +5210,32 @@ impl Clone for CResult_CVec_CVec_u8ZZNoneZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CVec_CVec_u8ZZNoneZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_clone(orig: &CResult_CVec_CVec_u8ZZNoneZ) -> CResult_CVec_CVec_u8ZZNoneZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_InMemorySignerDecodeErrorZ
 pub union CResult_InMemorySignerDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::chain::keysinterface::InMemorySigner,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_InMemorySignerDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::chain::keysinterface::InMemorySigner on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_InMemorySignerDecodeErrorZ {
+	/// The contents of this CResult_InMemorySignerDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_InMemorySignerDecodeErrorZPtr,
+	/// Whether this CResult_InMemorySignerDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_InMemorySignerDecodeErrorZ in the success state.
 pub extern "C" fn CResult_InMemorySignerDecodeErrorZ_ok(o: crate::chain::keysinterface::InMemorySigner) -> CResult_InMemorySignerDecodeErrorZ {
 	CResult_InMemorySignerDecodeErrorZ {
 		contents: CResult_InMemorySignerDecodeErrorZPtr {
@@ -4356,6 +5245,7 @@ pub extern "C" fn CResult_InMemorySignerDecodeErrorZ_ok(o: crate::chain::keysint
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_InMemorySignerDecodeErrorZ in the error state.
 pub extern "C" fn CResult_InMemorySignerDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_InMemorySignerDecodeErrorZ {
 	CResult_InMemorySignerDecodeErrorZ {
 		contents: CResult_InMemorySignerDecodeErrorZPtr {
@@ -4365,6 +5255,7 @@ pub extern "C" fn CResult_InMemorySignerDecodeErrorZ_err(e: crate::ln::msgs::Dec
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_InMemorySignerDecodeErrorZ.
 pub extern "C" fn CResult_InMemorySignerDecodeErrorZ_free(_res: CResult_InMemorySignerDecodeErrorZ) { }
 impl Drop for CResult_InMemorySignerDecodeErrorZ {
 	fn drop(&mut self) {
@@ -4410,10 +5301,17 @@ impl Clone for CResult_InMemorySignerDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_InMemorySignerDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_InMemorySignerDecodeErrorZ_clone(orig: &CResult_InMemorySignerDecodeErrorZ) -> CResult_InMemorySignerDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::TxOuts of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_TxOutZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::TxOut,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_TxOutZ {
@@ -4436,6 +5334,7 @@ impl From<Vec<crate::c_types::TxOut>> for CVec_TxOutZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_TxOutZ_free(_res: CVec_TxOutZ) { }
 impl Drop for CVec_TxOutZ {
 	fn drop(&mut self) {
@@ -4452,17 +5351,27 @@ impl Clone for CVec_TxOutZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_TransactionNoneZ
 pub union CResult_TransactionNoneZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::Transaction,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
 	pub err: *mut std::ffi::c_void,
 }
 #[repr(C)]
+/// A CResult_TransactionNoneZ represents the result of a fallible operation,
+/// containing a crate::c_types::Transaction on success and a () on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_TransactionNoneZ {
+	/// The contents of this CResult_TransactionNoneZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_TransactionNoneZPtr,
+	/// Whether this CResult_TransactionNoneZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_TransactionNoneZ in the success state.
 pub extern "C" fn CResult_TransactionNoneZ_ok(o: crate::c_types::Transaction) -> CResult_TransactionNoneZ {
 	CResult_TransactionNoneZ {
 		contents: CResult_TransactionNoneZPtr {
@@ -4472,6 +5381,7 @@ pub extern "C" fn CResult_TransactionNoneZ_ok(o: crate::c_types::Transaction) ->
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_TransactionNoneZ in the error state.
 pub extern "C" fn CResult_TransactionNoneZ_err() -> CResult_TransactionNoneZ {
 	CResult_TransactionNoneZ {
 		contents: CResult_TransactionNoneZPtr {
@@ -4481,6 +5391,7 @@ pub extern "C" fn CResult_TransactionNoneZ_err() -> CResult_TransactionNoneZ {
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_TransactionNoneZ.
 pub extern "C" fn CResult_TransactionNoneZ_free(_res: CResult_TransactionNoneZ) { }
 impl Drop for CResult_TransactionNoneZ {
 	fn drop(&mut self) {
@@ -4510,8 +5421,13 @@ impl From<crate::c_types::CResultTempl<crate::c_types::Transaction, u8>> for CRe
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::routing::router::RouteHops of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_RouteHopZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::routing::router::RouteHop,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_RouteHopZ {
@@ -4534,6 +5450,7 @@ impl From<Vec<crate::routing::router::RouteHop>> for CVec_RouteHopZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_RouteHopZ_free(_res: CVec_RouteHopZ) { }
 impl Drop for CVec_RouteHopZ {
 	fn drop(&mut self) {
@@ -4550,8 +5467,13 @@ impl Clone for CVec_RouteHopZ {
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::derived::CVec_RouteHopZs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_CVec_RouteHopZZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::derived::CVec_RouteHopZ,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_CVec_RouteHopZZ {
@@ -4574,6 +5496,7 @@ impl From<Vec<crate::c_types::derived::CVec_RouteHopZ>> for CVec_CVec_RouteHopZZ
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_CVec_RouteHopZZ_free(_res: CVec_CVec_RouteHopZZ) { }
 impl Drop for CVec_CVec_RouteHopZZ {
 	fn drop(&mut self) {
@@ -4590,16 +5513,28 @@ impl Clone for CVec_CVec_RouteHopZZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_RouteDecodeErrorZ
 pub union CResult_RouteDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::routing::router::Route,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_RouteDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::routing::router::Route on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_RouteDecodeErrorZ {
+	/// The contents of this CResult_RouteDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_RouteDecodeErrorZPtr,
+	/// Whether this CResult_RouteDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_RouteDecodeErrorZ in the success state.
 pub extern "C" fn CResult_RouteDecodeErrorZ_ok(o: crate::routing::router::Route) -> CResult_RouteDecodeErrorZ {
 	CResult_RouteDecodeErrorZ {
 		contents: CResult_RouteDecodeErrorZPtr {
@@ -4609,6 +5544,7 @@ pub extern "C" fn CResult_RouteDecodeErrorZ_ok(o: crate::routing::router::Route)
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_RouteDecodeErrorZ in the error state.
 pub extern "C" fn CResult_RouteDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_RouteDecodeErrorZ {
 	CResult_RouteDecodeErrorZ {
 		contents: CResult_RouteDecodeErrorZPtr {
@@ -4618,6 +5554,7 @@ pub extern "C" fn CResult_RouteDecodeErrorZ_err(e: crate::ln::msgs::DecodeError)
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_RouteDecodeErrorZ.
 pub extern "C" fn CResult_RouteDecodeErrorZ_free(_res: CResult_RouteDecodeErrorZ) { }
 impl Drop for CResult_RouteDecodeErrorZ {
 	fn drop(&mut self) {
@@ -4663,10 +5600,17 @@ impl Clone for CResult_RouteDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_RouteDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_RouteDecodeErrorZ_clone(orig: &CResult_RouteDecodeErrorZ) -> CResult_RouteDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of crate::routing::router::RouteHints of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_RouteHintZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::routing::router::RouteHint,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_RouteHintZ {
@@ -4689,6 +5633,7 @@ impl From<Vec<crate::routing::router::RouteHint>> for CVec_RouteHintZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_RouteHintZ_free(_res: CVec_RouteHintZ) { }
 impl Drop for CVec_RouteHintZ {
 	fn drop(&mut self) {
@@ -4705,16 +5650,28 @@ impl Clone for CVec_RouteHintZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_RouteLightningErrorZ
 pub union CResult_RouteLightningErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::routing::router::Route,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::LightningError,
 }
 #[repr(C)]
+/// A CResult_RouteLightningErrorZ represents the result of a fallible operation,
+/// containing a crate::routing::router::Route on success and a crate::ln::msgs::LightningError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_RouteLightningErrorZ {
+	/// The contents of this CResult_RouteLightningErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_RouteLightningErrorZPtr,
+	/// Whether this CResult_RouteLightningErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_RouteLightningErrorZ in the success state.
 pub extern "C" fn CResult_RouteLightningErrorZ_ok(o: crate::routing::router::Route) -> CResult_RouteLightningErrorZ {
 	CResult_RouteLightningErrorZ {
 		contents: CResult_RouteLightningErrorZPtr {
@@ -4724,6 +5681,7 @@ pub extern "C" fn CResult_RouteLightningErrorZ_ok(o: crate::routing::router::Rou
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_RouteLightningErrorZ in the error state.
 pub extern "C" fn CResult_RouteLightningErrorZ_err(e: crate::ln::msgs::LightningError) -> CResult_RouteLightningErrorZ {
 	CResult_RouteLightningErrorZ {
 		contents: CResult_RouteLightningErrorZPtr {
@@ -4733,6 +5691,7 @@ pub extern "C" fn CResult_RouteLightningErrorZ_err(e: crate::ln::msgs::Lightning
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_RouteLightningErrorZ.
 pub extern "C" fn CResult_RouteLightningErrorZ_free(_res: CResult_RouteLightningErrorZ) { }
 impl Drop for CResult_RouteLightningErrorZ {
 	fn drop(&mut self) {
@@ -4778,18 +5737,32 @@ impl Clone for CResult_RouteLightningErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_RouteLightningErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_RouteLightningErrorZ_clone(orig: &CResult_RouteLightningErrorZ) -> CResult_RouteLightningErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_NetAddressu8Z
 pub union CResult_NetAddressu8ZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::NetAddress,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut u8,
 }
 #[repr(C)]
+/// A CResult_NetAddressu8Z represents the result of a fallible operation,
+/// containing a crate::ln::msgs::NetAddress on success and a u8 on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NetAddressu8Z {
+	/// The contents of this CResult_NetAddressu8Z, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NetAddressu8ZPtr,
+	/// Whether this CResult_NetAddressu8Z represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NetAddressu8Z in the success state.
 pub extern "C" fn CResult_NetAddressu8Z_ok(o: crate::ln::msgs::NetAddress) -> CResult_NetAddressu8Z {
 	CResult_NetAddressu8Z {
 		contents: CResult_NetAddressu8ZPtr {
@@ -4799,6 +5772,7 @@ pub extern "C" fn CResult_NetAddressu8Z_ok(o: crate::ln::msgs::NetAddress) -> CR
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NetAddressu8Z in the error state.
 pub extern "C" fn CResult_NetAddressu8Z_err(e: u8) -> CResult_NetAddressu8Z {
 	CResult_NetAddressu8Z {
 		contents: CResult_NetAddressu8ZPtr {
@@ -4808,6 +5782,7 @@ pub extern "C" fn CResult_NetAddressu8Z_err(e: u8) -> CResult_NetAddressu8Z {
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NetAddressu8Z.
 pub extern "C" fn CResult_NetAddressu8Z_free(_res: CResult_NetAddressu8Z) { }
 impl Drop for CResult_NetAddressu8Z {
 	fn drop(&mut self) {
@@ -4853,18 +5828,32 @@ impl Clone for CResult_NetAddressu8Z {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NetAddressu8Z which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NetAddressu8Z_clone(orig: &CResult_NetAddressu8Z) -> CResult_NetAddressu8Z { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_CResult_NetAddressu8ZDecodeErrorZ
 pub union CResult_CResult_NetAddressu8ZDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::derived::CResult_NetAddressu8Z,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_CResult_NetAddressu8ZDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::CResult_NetAddressu8Z on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_CResult_NetAddressu8ZDecodeErrorZ {
+	/// The contents of this CResult_CResult_NetAddressu8ZDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_CResult_NetAddressu8ZDecodeErrorZPtr,
+	/// Whether this CResult_CResult_NetAddressu8ZDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_CResult_NetAddressu8ZDecodeErrorZ in the success state.
 pub extern "C" fn CResult_CResult_NetAddressu8ZDecodeErrorZ_ok(o: crate::c_types::derived::CResult_NetAddressu8Z) -> CResult_CResult_NetAddressu8ZDecodeErrorZ {
 	CResult_CResult_NetAddressu8ZDecodeErrorZ {
 		contents: CResult_CResult_NetAddressu8ZDecodeErrorZPtr {
@@ -4874,6 +5863,7 @@ pub extern "C" fn CResult_CResult_NetAddressu8ZDecodeErrorZ_ok(o: crate::c_types
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CResult_NetAddressu8ZDecodeErrorZ in the error state.
 pub extern "C" fn CResult_CResult_NetAddressu8ZDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_CResult_NetAddressu8ZDecodeErrorZ {
 	CResult_CResult_NetAddressu8ZDecodeErrorZ {
 		contents: CResult_CResult_NetAddressu8ZDecodeErrorZPtr {
@@ -4883,6 +5873,7 @@ pub extern "C" fn CResult_CResult_NetAddressu8ZDecodeErrorZ_err(e: crate::ln::ms
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_CResult_NetAddressu8ZDecodeErrorZ.
 pub extern "C" fn CResult_CResult_NetAddressu8ZDecodeErrorZ_free(_res: CResult_CResult_NetAddressu8ZDecodeErrorZ) { }
 impl Drop for CResult_CResult_NetAddressu8ZDecodeErrorZ {
 	fn drop(&mut self) {
@@ -4928,10 +5919,17 @@ impl Clone for CResult_CResult_NetAddressu8ZDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CResult_NetAddressu8ZDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_CResult_NetAddressu8ZDecodeErrorZ_clone(orig: &CResult_CResult_NetAddressu8ZDecodeErrorZ) -> CResult_CResult_NetAddressu8ZDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// A dynamically-allocated array of crate::ln::msgs::UpdateAddHTLCs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_UpdateAddHTLCZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::ln::msgs::UpdateAddHTLC,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_UpdateAddHTLCZ {
@@ -4954,6 +5952,7 @@ impl From<Vec<crate::ln::msgs::UpdateAddHTLC>> for CVec_UpdateAddHTLCZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_UpdateAddHTLCZ_free(_res: CVec_UpdateAddHTLCZ) { }
 impl Drop for CVec_UpdateAddHTLCZ {
 	fn drop(&mut self) {
@@ -4970,8 +5969,13 @@ impl Clone for CVec_UpdateAddHTLCZ {
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::ln::msgs::UpdateFulfillHTLCs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_UpdateFulfillHTLCZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::ln::msgs::UpdateFulfillHTLC,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_UpdateFulfillHTLCZ {
@@ -4994,6 +5998,7 @@ impl From<Vec<crate::ln::msgs::UpdateFulfillHTLC>> for CVec_UpdateFulfillHTLCZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_UpdateFulfillHTLCZ_free(_res: CVec_UpdateFulfillHTLCZ) { }
 impl Drop for CVec_UpdateFulfillHTLCZ {
 	fn drop(&mut self) {
@@ -5010,8 +6015,13 @@ impl Clone for CVec_UpdateFulfillHTLCZ {
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::ln::msgs::UpdateFailHTLCs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_UpdateFailHTLCZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::ln::msgs::UpdateFailHTLC,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_UpdateFailHTLCZ {
@@ -5034,6 +6044,7 @@ impl From<Vec<crate::ln::msgs::UpdateFailHTLC>> for CVec_UpdateFailHTLCZ {
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_UpdateFailHTLCZ_free(_res: CVec_UpdateFailHTLCZ) { }
 impl Drop for CVec_UpdateFailHTLCZ {
 	fn drop(&mut self) {
@@ -5050,8 +6061,13 @@ impl Clone for CVec_UpdateFailHTLCZ {
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::ln::msgs::UpdateFailMalformedHTLCs of arbitrary size.
+/// This corresponds to std::vector in C++
 pub struct CVec_UpdateFailMalformedHTLCZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::ln::msgs::UpdateFailMalformedHTLC,
+	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
 impl CVec_UpdateFailMalformedHTLCZ {
@@ -5074,6 +6090,7 @@ impl From<Vec<crate::ln::msgs::UpdateFailMalformedHTLC>> for CVec_UpdateFailMalf
 	}
 }
 #[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
 pub extern "C" fn CVec_UpdateFailMalformedHTLCZ_free(_res: CVec_UpdateFailMalformedHTLCZ) { }
 impl Drop for CVec_UpdateFailMalformedHTLCZ {
 	fn drop(&mut self) {
@@ -5090,16 +6107,28 @@ impl Clone for CVec_UpdateFailMalformedHTLCZ {
 	}
 }
 #[repr(C)]
+/// The contents of CResult_AcceptChannelDecodeErrorZ
 pub union CResult_AcceptChannelDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::AcceptChannel,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_AcceptChannelDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::AcceptChannel on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_AcceptChannelDecodeErrorZ {
+	/// The contents of this CResult_AcceptChannelDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_AcceptChannelDecodeErrorZPtr,
+	/// Whether this CResult_AcceptChannelDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_AcceptChannelDecodeErrorZ in the success state.
 pub extern "C" fn CResult_AcceptChannelDecodeErrorZ_ok(o: crate::ln::msgs::AcceptChannel) -> CResult_AcceptChannelDecodeErrorZ {
 	CResult_AcceptChannelDecodeErrorZ {
 		contents: CResult_AcceptChannelDecodeErrorZPtr {
@@ -5109,6 +6138,7 @@ pub extern "C" fn CResult_AcceptChannelDecodeErrorZ_ok(o: crate::ln::msgs::Accep
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_AcceptChannelDecodeErrorZ in the error state.
 pub extern "C" fn CResult_AcceptChannelDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_AcceptChannelDecodeErrorZ {
 	CResult_AcceptChannelDecodeErrorZ {
 		contents: CResult_AcceptChannelDecodeErrorZPtr {
@@ -5118,6 +6148,7 @@ pub extern "C" fn CResult_AcceptChannelDecodeErrorZ_err(e: crate::ln::msgs::Deco
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_AcceptChannelDecodeErrorZ.
 pub extern "C" fn CResult_AcceptChannelDecodeErrorZ_free(_res: CResult_AcceptChannelDecodeErrorZ) { }
 impl Drop for CResult_AcceptChannelDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5163,18 +6194,32 @@ impl Clone for CResult_AcceptChannelDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_AcceptChannelDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_AcceptChannelDecodeErrorZ_clone(orig: &CResult_AcceptChannelDecodeErrorZ) -> CResult_AcceptChannelDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_AnnouncementSignaturesDecodeErrorZ
 pub union CResult_AnnouncementSignaturesDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::AnnouncementSignatures,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_AnnouncementSignaturesDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::AnnouncementSignatures on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_AnnouncementSignaturesDecodeErrorZ {
+	/// The contents of this CResult_AnnouncementSignaturesDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_AnnouncementSignaturesDecodeErrorZPtr,
+	/// Whether this CResult_AnnouncementSignaturesDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_AnnouncementSignaturesDecodeErrorZ in the success state.
 pub extern "C" fn CResult_AnnouncementSignaturesDecodeErrorZ_ok(o: crate::ln::msgs::AnnouncementSignatures) -> CResult_AnnouncementSignaturesDecodeErrorZ {
 	CResult_AnnouncementSignaturesDecodeErrorZ {
 		contents: CResult_AnnouncementSignaturesDecodeErrorZPtr {
@@ -5184,6 +6229,7 @@ pub extern "C" fn CResult_AnnouncementSignaturesDecodeErrorZ_ok(o: crate::ln::ms
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_AnnouncementSignaturesDecodeErrorZ in the error state.
 pub extern "C" fn CResult_AnnouncementSignaturesDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_AnnouncementSignaturesDecodeErrorZ {
 	CResult_AnnouncementSignaturesDecodeErrorZ {
 		contents: CResult_AnnouncementSignaturesDecodeErrorZPtr {
@@ -5193,6 +6239,7 @@ pub extern "C" fn CResult_AnnouncementSignaturesDecodeErrorZ_err(e: crate::ln::m
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_AnnouncementSignaturesDecodeErrorZ.
 pub extern "C" fn CResult_AnnouncementSignaturesDecodeErrorZ_free(_res: CResult_AnnouncementSignaturesDecodeErrorZ) { }
 impl Drop for CResult_AnnouncementSignaturesDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5238,18 +6285,32 @@ impl Clone for CResult_AnnouncementSignaturesDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_AnnouncementSignaturesDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_AnnouncementSignaturesDecodeErrorZ_clone(orig: &CResult_AnnouncementSignaturesDecodeErrorZ) -> CResult_AnnouncementSignaturesDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ChannelReestablishDecodeErrorZ
 pub union CResult_ChannelReestablishDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::ChannelReestablish,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ChannelReestablishDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::ChannelReestablish on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ChannelReestablishDecodeErrorZ {
+	/// The contents of this CResult_ChannelReestablishDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ChannelReestablishDecodeErrorZPtr,
+	/// Whether this CResult_ChannelReestablishDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelReestablishDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ChannelReestablishDecodeErrorZ_ok(o: crate::ln::msgs::ChannelReestablish) -> CResult_ChannelReestablishDecodeErrorZ {
 	CResult_ChannelReestablishDecodeErrorZ {
 		contents: CResult_ChannelReestablishDecodeErrorZPtr {
@@ -5259,6 +6320,7 @@ pub extern "C" fn CResult_ChannelReestablishDecodeErrorZ_ok(o: crate::ln::msgs::
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelReestablishDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ChannelReestablishDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ChannelReestablishDecodeErrorZ {
 	CResult_ChannelReestablishDecodeErrorZ {
 		contents: CResult_ChannelReestablishDecodeErrorZPtr {
@@ -5268,6 +6330,7 @@ pub extern "C" fn CResult_ChannelReestablishDecodeErrorZ_err(e: crate::ln::msgs:
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ChannelReestablishDecodeErrorZ.
 pub extern "C" fn CResult_ChannelReestablishDecodeErrorZ_free(_res: CResult_ChannelReestablishDecodeErrorZ) { }
 impl Drop for CResult_ChannelReestablishDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5313,18 +6376,32 @@ impl Clone for CResult_ChannelReestablishDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelReestablishDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ChannelReestablishDecodeErrorZ_clone(orig: &CResult_ChannelReestablishDecodeErrorZ) -> CResult_ChannelReestablishDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ClosingSignedDecodeErrorZ
 pub union CResult_ClosingSignedDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::ClosingSigned,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ClosingSignedDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::ClosingSigned on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ClosingSignedDecodeErrorZ {
+	/// The contents of this CResult_ClosingSignedDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ClosingSignedDecodeErrorZPtr,
+	/// Whether this CResult_ClosingSignedDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ClosingSignedDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ClosingSignedDecodeErrorZ_ok(o: crate::ln::msgs::ClosingSigned) -> CResult_ClosingSignedDecodeErrorZ {
 	CResult_ClosingSignedDecodeErrorZ {
 		contents: CResult_ClosingSignedDecodeErrorZPtr {
@@ -5334,6 +6411,7 @@ pub extern "C" fn CResult_ClosingSignedDecodeErrorZ_ok(o: crate::ln::msgs::Closi
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ClosingSignedDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ClosingSignedDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ClosingSignedDecodeErrorZ {
 	CResult_ClosingSignedDecodeErrorZ {
 		contents: CResult_ClosingSignedDecodeErrorZPtr {
@@ -5343,6 +6421,7 @@ pub extern "C" fn CResult_ClosingSignedDecodeErrorZ_err(e: crate::ln::msgs::Deco
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ClosingSignedDecodeErrorZ.
 pub extern "C" fn CResult_ClosingSignedDecodeErrorZ_free(_res: CResult_ClosingSignedDecodeErrorZ) { }
 impl Drop for CResult_ClosingSignedDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5388,18 +6467,32 @@ impl Clone for CResult_ClosingSignedDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ClosingSignedDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ClosingSignedDecodeErrorZ_clone(orig: &CResult_ClosingSignedDecodeErrorZ) -> CResult_ClosingSignedDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_CommitmentSignedDecodeErrorZ
 pub union CResult_CommitmentSignedDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::CommitmentSigned,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_CommitmentSignedDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::CommitmentSigned on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_CommitmentSignedDecodeErrorZ {
+	/// The contents of this CResult_CommitmentSignedDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_CommitmentSignedDecodeErrorZPtr,
+	/// Whether this CResult_CommitmentSignedDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_CommitmentSignedDecodeErrorZ in the success state.
 pub extern "C" fn CResult_CommitmentSignedDecodeErrorZ_ok(o: crate::ln::msgs::CommitmentSigned) -> CResult_CommitmentSignedDecodeErrorZ {
 	CResult_CommitmentSignedDecodeErrorZ {
 		contents: CResult_CommitmentSignedDecodeErrorZPtr {
@@ -5409,6 +6502,7 @@ pub extern "C" fn CResult_CommitmentSignedDecodeErrorZ_ok(o: crate::ln::msgs::Co
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CommitmentSignedDecodeErrorZ in the error state.
 pub extern "C" fn CResult_CommitmentSignedDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_CommitmentSignedDecodeErrorZ {
 	CResult_CommitmentSignedDecodeErrorZ {
 		contents: CResult_CommitmentSignedDecodeErrorZPtr {
@@ -5418,6 +6512,7 @@ pub extern "C" fn CResult_CommitmentSignedDecodeErrorZ_err(e: crate::ln::msgs::D
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_CommitmentSignedDecodeErrorZ.
 pub extern "C" fn CResult_CommitmentSignedDecodeErrorZ_free(_res: CResult_CommitmentSignedDecodeErrorZ) { }
 impl Drop for CResult_CommitmentSignedDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5463,18 +6558,32 @@ impl Clone for CResult_CommitmentSignedDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_CommitmentSignedDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_CommitmentSignedDecodeErrorZ_clone(orig: &CResult_CommitmentSignedDecodeErrorZ) -> CResult_CommitmentSignedDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_FundingCreatedDecodeErrorZ
 pub union CResult_FundingCreatedDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::FundingCreated,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_FundingCreatedDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::FundingCreated on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_FundingCreatedDecodeErrorZ {
+	/// The contents of this CResult_FundingCreatedDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_FundingCreatedDecodeErrorZPtr,
+	/// Whether this CResult_FundingCreatedDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_FundingCreatedDecodeErrorZ in the success state.
 pub extern "C" fn CResult_FundingCreatedDecodeErrorZ_ok(o: crate::ln::msgs::FundingCreated) -> CResult_FundingCreatedDecodeErrorZ {
 	CResult_FundingCreatedDecodeErrorZ {
 		contents: CResult_FundingCreatedDecodeErrorZPtr {
@@ -5484,6 +6593,7 @@ pub extern "C" fn CResult_FundingCreatedDecodeErrorZ_ok(o: crate::ln::msgs::Fund
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_FundingCreatedDecodeErrorZ in the error state.
 pub extern "C" fn CResult_FundingCreatedDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_FundingCreatedDecodeErrorZ {
 	CResult_FundingCreatedDecodeErrorZ {
 		contents: CResult_FundingCreatedDecodeErrorZPtr {
@@ -5493,6 +6603,7 @@ pub extern "C" fn CResult_FundingCreatedDecodeErrorZ_err(e: crate::ln::msgs::Dec
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_FundingCreatedDecodeErrorZ.
 pub extern "C" fn CResult_FundingCreatedDecodeErrorZ_free(_res: CResult_FundingCreatedDecodeErrorZ) { }
 impl Drop for CResult_FundingCreatedDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5538,18 +6649,32 @@ impl Clone for CResult_FundingCreatedDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_FundingCreatedDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_FundingCreatedDecodeErrorZ_clone(orig: &CResult_FundingCreatedDecodeErrorZ) -> CResult_FundingCreatedDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_FundingSignedDecodeErrorZ
 pub union CResult_FundingSignedDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::FundingSigned,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_FundingSignedDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::FundingSigned on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_FundingSignedDecodeErrorZ {
+	/// The contents of this CResult_FundingSignedDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_FundingSignedDecodeErrorZPtr,
+	/// Whether this CResult_FundingSignedDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_FundingSignedDecodeErrorZ in the success state.
 pub extern "C" fn CResult_FundingSignedDecodeErrorZ_ok(o: crate::ln::msgs::FundingSigned) -> CResult_FundingSignedDecodeErrorZ {
 	CResult_FundingSignedDecodeErrorZ {
 		contents: CResult_FundingSignedDecodeErrorZPtr {
@@ -5559,6 +6684,7 @@ pub extern "C" fn CResult_FundingSignedDecodeErrorZ_ok(o: crate::ln::msgs::Fundi
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_FundingSignedDecodeErrorZ in the error state.
 pub extern "C" fn CResult_FundingSignedDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_FundingSignedDecodeErrorZ {
 	CResult_FundingSignedDecodeErrorZ {
 		contents: CResult_FundingSignedDecodeErrorZPtr {
@@ -5568,6 +6694,7 @@ pub extern "C" fn CResult_FundingSignedDecodeErrorZ_err(e: crate::ln::msgs::Deco
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_FundingSignedDecodeErrorZ.
 pub extern "C" fn CResult_FundingSignedDecodeErrorZ_free(_res: CResult_FundingSignedDecodeErrorZ) { }
 impl Drop for CResult_FundingSignedDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5613,18 +6740,32 @@ impl Clone for CResult_FundingSignedDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_FundingSignedDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_FundingSignedDecodeErrorZ_clone(orig: &CResult_FundingSignedDecodeErrorZ) -> CResult_FundingSignedDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_FundingLockedDecodeErrorZ
 pub union CResult_FundingLockedDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::FundingLocked,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_FundingLockedDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::FundingLocked on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_FundingLockedDecodeErrorZ {
+	/// The contents of this CResult_FundingLockedDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_FundingLockedDecodeErrorZPtr,
+	/// Whether this CResult_FundingLockedDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_FundingLockedDecodeErrorZ in the success state.
 pub extern "C" fn CResult_FundingLockedDecodeErrorZ_ok(o: crate::ln::msgs::FundingLocked) -> CResult_FundingLockedDecodeErrorZ {
 	CResult_FundingLockedDecodeErrorZ {
 		contents: CResult_FundingLockedDecodeErrorZPtr {
@@ -5634,6 +6775,7 @@ pub extern "C" fn CResult_FundingLockedDecodeErrorZ_ok(o: crate::ln::msgs::Fundi
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_FundingLockedDecodeErrorZ in the error state.
 pub extern "C" fn CResult_FundingLockedDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_FundingLockedDecodeErrorZ {
 	CResult_FundingLockedDecodeErrorZ {
 		contents: CResult_FundingLockedDecodeErrorZPtr {
@@ -5643,6 +6785,7 @@ pub extern "C" fn CResult_FundingLockedDecodeErrorZ_err(e: crate::ln::msgs::Deco
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_FundingLockedDecodeErrorZ.
 pub extern "C" fn CResult_FundingLockedDecodeErrorZ_free(_res: CResult_FundingLockedDecodeErrorZ) { }
 impl Drop for CResult_FundingLockedDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5688,18 +6831,32 @@ impl Clone for CResult_FundingLockedDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_FundingLockedDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_FundingLockedDecodeErrorZ_clone(orig: &CResult_FundingLockedDecodeErrorZ) -> CResult_FundingLockedDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_InitDecodeErrorZ
 pub union CResult_InitDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::Init,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_InitDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::Init on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_InitDecodeErrorZ {
+	/// The contents of this CResult_InitDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_InitDecodeErrorZPtr,
+	/// Whether this CResult_InitDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_InitDecodeErrorZ in the success state.
 pub extern "C" fn CResult_InitDecodeErrorZ_ok(o: crate::ln::msgs::Init) -> CResult_InitDecodeErrorZ {
 	CResult_InitDecodeErrorZ {
 		contents: CResult_InitDecodeErrorZPtr {
@@ -5709,6 +6866,7 @@ pub extern "C" fn CResult_InitDecodeErrorZ_ok(o: crate::ln::msgs::Init) -> CResu
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_InitDecodeErrorZ in the error state.
 pub extern "C" fn CResult_InitDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_InitDecodeErrorZ {
 	CResult_InitDecodeErrorZ {
 		contents: CResult_InitDecodeErrorZPtr {
@@ -5718,6 +6876,7 @@ pub extern "C" fn CResult_InitDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) 
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_InitDecodeErrorZ.
 pub extern "C" fn CResult_InitDecodeErrorZ_free(_res: CResult_InitDecodeErrorZ) { }
 impl Drop for CResult_InitDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5763,18 +6922,32 @@ impl Clone for CResult_InitDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_InitDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_InitDecodeErrorZ_clone(orig: &CResult_InitDecodeErrorZ) -> CResult_InitDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_OpenChannelDecodeErrorZ
 pub union CResult_OpenChannelDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::OpenChannel,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_OpenChannelDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::OpenChannel on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_OpenChannelDecodeErrorZ {
+	/// The contents of this CResult_OpenChannelDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_OpenChannelDecodeErrorZPtr,
+	/// Whether this CResult_OpenChannelDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_OpenChannelDecodeErrorZ in the success state.
 pub extern "C" fn CResult_OpenChannelDecodeErrorZ_ok(o: crate::ln::msgs::OpenChannel) -> CResult_OpenChannelDecodeErrorZ {
 	CResult_OpenChannelDecodeErrorZ {
 		contents: CResult_OpenChannelDecodeErrorZPtr {
@@ -5784,6 +6957,7 @@ pub extern "C" fn CResult_OpenChannelDecodeErrorZ_ok(o: crate::ln::msgs::OpenCha
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_OpenChannelDecodeErrorZ in the error state.
 pub extern "C" fn CResult_OpenChannelDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_OpenChannelDecodeErrorZ {
 	CResult_OpenChannelDecodeErrorZ {
 		contents: CResult_OpenChannelDecodeErrorZPtr {
@@ -5793,6 +6967,7 @@ pub extern "C" fn CResult_OpenChannelDecodeErrorZ_err(e: crate::ln::msgs::Decode
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_OpenChannelDecodeErrorZ.
 pub extern "C" fn CResult_OpenChannelDecodeErrorZ_free(_res: CResult_OpenChannelDecodeErrorZ) { }
 impl Drop for CResult_OpenChannelDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5838,18 +7013,32 @@ impl Clone for CResult_OpenChannelDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_OpenChannelDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_OpenChannelDecodeErrorZ_clone(orig: &CResult_OpenChannelDecodeErrorZ) -> CResult_OpenChannelDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_RevokeAndACKDecodeErrorZ
 pub union CResult_RevokeAndACKDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::RevokeAndACK,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_RevokeAndACKDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::RevokeAndACK on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_RevokeAndACKDecodeErrorZ {
+	/// The contents of this CResult_RevokeAndACKDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_RevokeAndACKDecodeErrorZPtr,
+	/// Whether this CResult_RevokeAndACKDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_RevokeAndACKDecodeErrorZ in the success state.
 pub extern "C" fn CResult_RevokeAndACKDecodeErrorZ_ok(o: crate::ln::msgs::RevokeAndACK) -> CResult_RevokeAndACKDecodeErrorZ {
 	CResult_RevokeAndACKDecodeErrorZ {
 		contents: CResult_RevokeAndACKDecodeErrorZPtr {
@@ -5859,6 +7048,7 @@ pub extern "C" fn CResult_RevokeAndACKDecodeErrorZ_ok(o: crate::ln::msgs::Revoke
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_RevokeAndACKDecodeErrorZ in the error state.
 pub extern "C" fn CResult_RevokeAndACKDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_RevokeAndACKDecodeErrorZ {
 	CResult_RevokeAndACKDecodeErrorZ {
 		contents: CResult_RevokeAndACKDecodeErrorZPtr {
@@ -5868,6 +7058,7 @@ pub extern "C" fn CResult_RevokeAndACKDecodeErrorZ_err(e: crate::ln::msgs::Decod
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_RevokeAndACKDecodeErrorZ.
 pub extern "C" fn CResult_RevokeAndACKDecodeErrorZ_free(_res: CResult_RevokeAndACKDecodeErrorZ) { }
 impl Drop for CResult_RevokeAndACKDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5913,18 +7104,32 @@ impl Clone for CResult_RevokeAndACKDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_RevokeAndACKDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_RevokeAndACKDecodeErrorZ_clone(orig: &CResult_RevokeAndACKDecodeErrorZ) -> CResult_RevokeAndACKDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ShutdownDecodeErrorZ
 pub union CResult_ShutdownDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::Shutdown,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ShutdownDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::Shutdown on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ShutdownDecodeErrorZ {
+	/// The contents of this CResult_ShutdownDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ShutdownDecodeErrorZPtr,
+	/// Whether this CResult_ShutdownDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ShutdownDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ShutdownDecodeErrorZ_ok(o: crate::ln::msgs::Shutdown) -> CResult_ShutdownDecodeErrorZ {
 	CResult_ShutdownDecodeErrorZ {
 		contents: CResult_ShutdownDecodeErrorZPtr {
@@ -5934,6 +7139,7 @@ pub extern "C" fn CResult_ShutdownDecodeErrorZ_ok(o: crate::ln::msgs::Shutdown) 
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ShutdownDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ShutdownDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ShutdownDecodeErrorZ {
 	CResult_ShutdownDecodeErrorZ {
 		contents: CResult_ShutdownDecodeErrorZPtr {
@@ -5943,6 +7149,7 @@ pub extern "C" fn CResult_ShutdownDecodeErrorZ_err(e: crate::ln::msgs::DecodeErr
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ShutdownDecodeErrorZ.
 pub extern "C" fn CResult_ShutdownDecodeErrorZ_free(_res: CResult_ShutdownDecodeErrorZ) { }
 impl Drop for CResult_ShutdownDecodeErrorZ {
 	fn drop(&mut self) {
@@ -5988,18 +7195,32 @@ impl Clone for CResult_ShutdownDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ShutdownDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ShutdownDecodeErrorZ_clone(orig: &CResult_ShutdownDecodeErrorZ) -> CResult_ShutdownDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_UpdateFailHTLCDecodeErrorZ
 pub union CResult_UpdateFailHTLCDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::UpdateFailHTLC,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_UpdateFailHTLCDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::UpdateFailHTLC on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_UpdateFailHTLCDecodeErrorZ {
+	/// The contents of this CResult_UpdateFailHTLCDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_UpdateFailHTLCDecodeErrorZPtr,
+	/// Whether this CResult_UpdateFailHTLCDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFailHTLCDecodeErrorZ in the success state.
 pub extern "C" fn CResult_UpdateFailHTLCDecodeErrorZ_ok(o: crate::ln::msgs::UpdateFailHTLC) -> CResult_UpdateFailHTLCDecodeErrorZ {
 	CResult_UpdateFailHTLCDecodeErrorZ {
 		contents: CResult_UpdateFailHTLCDecodeErrorZPtr {
@@ -6009,6 +7230,7 @@ pub extern "C" fn CResult_UpdateFailHTLCDecodeErrorZ_ok(o: crate::ln::msgs::Upda
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFailHTLCDecodeErrorZ in the error state.
 pub extern "C" fn CResult_UpdateFailHTLCDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_UpdateFailHTLCDecodeErrorZ {
 	CResult_UpdateFailHTLCDecodeErrorZ {
 		contents: CResult_UpdateFailHTLCDecodeErrorZPtr {
@@ -6018,6 +7240,7 @@ pub extern "C" fn CResult_UpdateFailHTLCDecodeErrorZ_err(e: crate::ln::msgs::Dec
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_UpdateFailHTLCDecodeErrorZ.
 pub extern "C" fn CResult_UpdateFailHTLCDecodeErrorZ_free(_res: CResult_UpdateFailHTLCDecodeErrorZ) { }
 impl Drop for CResult_UpdateFailHTLCDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6063,18 +7286,32 @@ impl Clone for CResult_UpdateFailHTLCDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFailHTLCDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_UpdateFailHTLCDecodeErrorZ_clone(orig: &CResult_UpdateFailHTLCDecodeErrorZ) -> CResult_UpdateFailHTLCDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_UpdateFailMalformedHTLCDecodeErrorZ
 pub union CResult_UpdateFailMalformedHTLCDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::UpdateFailMalformedHTLC,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_UpdateFailMalformedHTLCDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::UpdateFailMalformedHTLC on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_UpdateFailMalformedHTLCDecodeErrorZ {
+	/// The contents of this CResult_UpdateFailMalformedHTLCDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_UpdateFailMalformedHTLCDecodeErrorZPtr,
+	/// Whether this CResult_UpdateFailMalformedHTLCDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFailMalformedHTLCDecodeErrorZ in the success state.
 pub extern "C" fn CResult_UpdateFailMalformedHTLCDecodeErrorZ_ok(o: crate::ln::msgs::UpdateFailMalformedHTLC) -> CResult_UpdateFailMalformedHTLCDecodeErrorZ {
 	CResult_UpdateFailMalformedHTLCDecodeErrorZ {
 		contents: CResult_UpdateFailMalformedHTLCDecodeErrorZPtr {
@@ -6084,6 +7321,7 @@ pub extern "C" fn CResult_UpdateFailMalformedHTLCDecodeErrorZ_ok(o: crate::ln::m
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFailMalformedHTLCDecodeErrorZ in the error state.
 pub extern "C" fn CResult_UpdateFailMalformedHTLCDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_UpdateFailMalformedHTLCDecodeErrorZ {
 	CResult_UpdateFailMalformedHTLCDecodeErrorZ {
 		contents: CResult_UpdateFailMalformedHTLCDecodeErrorZPtr {
@@ -6093,6 +7331,7 @@ pub extern "C" fn CResult_UpdateFailMalformedHTLCDecodeErrorZ_err(e: crate::ln::
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_UpdateFailMalformedHTLCDecodeErrorZ.
 pub extern "C" fn CResult_UpdateFailMalformedHTLCDecodeErrorZ_free(_res: CResult_UpdateFailMalformedHTLCDecodeErrorZ) { }
 impl Drop for CResult_UpdateFailMalformedHTLCDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6138,18 +7377,32 @@ impl Clone for CResult_UpdateFailMalformedHTLCDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFailMalformedHTLCDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_UpdateFailMalformedHTLCDecodeErrorZ_clone(orig: &CResult_UpdateFailMalformedHTLCDecodeErrorZ) -> CResult_UpdateFailMalformedHTLCDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_UpdateFeeDecodeErrorZ
 pub union CResult_UpdateFeeDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::UpdateFee,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_UpdateFeeDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::UpdateFee on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_UpdateFeeDecodeErrorZ {
+	/// The contents of this CResult_UpdateFeeDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_UpdateFeeDecodeErrorZPtr,
+	/// Whether this CResult_UpdateFeeDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFeeDecodeErrorZ in the success state.
 pub extern "C" fn CResult_UpdateFeeDecodeErrorZ_ok(o: crate::ln::msgs::UpdateFee) -> CResult_UpdateFeeDecodeErrorZ {
 	CResult_UpdateFeeDecodeErrorZ {
 		contents: CResult_UpdateFeeDecodeErrorZPtr {
@@ -6159,6 +7412,7 @@ pub extern "C" fn CResult_UpdateFeeDecodeErrorZ_ok(o: crate::ln::msgs::UpdateFee
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFeeDecodeErrorZ in the error state.
 pub extern "C" fn CResult_UpdateFeeDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_UpdateFeeDecodeErrorZ {
 	CResult_UpdateFeeDecodeErrorZ {
 		contents: CResult_UpdateFeeDecodeErrorZPtr {
@@ -6168,6 +7422,7 @@ pub extern "C" fn CResult_UpdateFeeDecodeErrorZ_err(e: crate::ln::msgs::DecodeEr
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_UpdateFeeDecodeErrorZ.
 pub extern "C" fn CResult_UpdateFeeDecodeErrorZ_free(_res: CResult_UpdateFeeDecodeErrorZ) { }
 impl Drop for CResult_UpdateFeeDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6213,18 +7468,32 @@ impl Clone for CResult_UpdateFeeDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFeeDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_UpdateFeeDecodeErrorZ_clone(orig: &CResult_UpdateFeeDecodeErrorZ) -> CResult_UpdateFeeDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_UpdateFulfillHTLCDecodeErrorZ
 pub union CResult_UpdateFulfillHTLCDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::UpdateFulfillHTLC,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_UpdateFulfillHTLCDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::UpdateFulfillHTLC on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_UpdateFulfillHTLCDecodeErrorZ {
+	/// The contents of this CResult_UpdateFulfillHTLCDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_UpdateFulfillHTLCDecodeErrorZPtr,
+	/// Whether this CResult_UpdateFulfillHTLCDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFulfillHTLCDecodeErrorZ in the success state.
 pub extern "C" fn CResult_UpdateFulfillHTLCDecodeErrorZ_ok(o: crate::ln::msgs::UpdateFulfillHTLC) -> CResult_UpdateFulfillHTLCDecodeErrorZ {
 	CResult_UpdateFulfillHTLCDecodeErrorZ {
 		contents: CResult_UpdateFulfillHTLCDecodeErrorZPtr {
@@ -6234,6 +7503,7 @@ pub extern "C" fn CResult_UpdateFulfillHTLCDecodeErrorZ_ok(o: crate::ln::msgs::U
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFulfillHTLCDecodeErrorZ in the error state.
 pub extern "C" fn CResult_UpdateFulfillHTLCDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_UpdateFulfillHTLCDecodeErrorZ {
 	CResult_UpdateFulfillHTLCDecodeErrorZ {
 		contents: CResult_UpdateFulfillHTLCDecodeErrorZPtr {
@@ -6243,6 +7513,7 @@ pub extern "C" fn CResult_UpdateFulfillHTLCDecodeErrorZ_err(e: crate::ln::msgs::
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_UpdateFulfillHTLCDecodeErrorZ.
 pub extern "C" fn CResult_UpdateFulfillHTLCDecodeErrorZ_free(_res: CResult_UpdateFulfillHTLCDecodeErrorZ) { }
 impl Drop for CResult_UpdateFulfillHTLCDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6288,18 +7559,32 @@ impl Clone for CResult_UpdateFulfillHTLCDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateFulfillHTLCDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_UpdateFulfillHTLCDecodeErrorZ_clone(orig: &CResult_UpdateFulfillHTLCDecodeErrorZ) -> CResult_UpdateFulfillHTLCDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_UpdateAddHTLCDecodeErrorZ
 pub union CResult_UpdateAddHTLCDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::UpdateAddHTLC,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_UpdateAddHTLCDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::UpdateAddHTLC on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_UpdateAddHTLCDecodeErrorZ {
+	/// The contents of this CResult_UpdateAddHTLCDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_UpdateAddHTLCDecodeErrorZPtr,
+	/// Whether this CResult_UpdateAddHTLCDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateAddHTLCDecodeErrorZ in the success state.
 pub extern "C" fn CResult_UpdateAddHTLCDecodeErrorZ_ok(o: crate::ln::msgs::UpdateAddHTLC) -> CResult_UpdateAddHTLCDecodeErrorZ {
 	CResult_UpdateAddHTLCDecodeErrorZ {
 		contents: CResult_UpdateAddHTLCDecodeErrorZPtr {
@@ -6309,6 +7594,7 @@ pub extern "C" fn CResult_UpdateAddHTLCDecodeErrorZ_ok(o: crate::ln::msgs::Updat
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateAddHTLCDecodeErrorZ in the error state.
 pub extern "C" fn CResult_UpdateAddHTLCDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_UpdateAddHTLCDecodeErrorZ {
 	CResult_UpdateAddHTLCDecodeErrorZ {
 		contents: CResult_UpdateAddHTLCDecodeErrorZPtr {
@@ -6318,6 +7604,7 @@ pub extern "C" fn CResult_UpdateAddHTLCDecodeErrorZ_err(e: crate::ln::msgs::Deco
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_UpdateAddHTLCDecodeErrorZ.
 pub extern "C" fn CResult_UpdateAddHTLCDecodeErrorZ_free(_res: CResult_UpdateAddHTLCDecodeErrorZ) { }
 impl Drop for CResult_UpdateAddHTLCDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6363,18 +7650,32 @@ impl Clone for CResult_UpdateAddHTLCDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UpdateAddHTLCDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_UpdateAddHTLCDecodeErrorZ_clone(orig: &CResult_UpdateAddHTLCDecodeErrorZ) -> CResult_UpdateAddHTLCDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_PingDecodeErrorZ
 pub union CResult_PingDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::Ping,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_PingDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::Ping on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_PingDecodeErrorZ {
+	/// The contents of this CResult_PingDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_PingDecodeErrorZPtr,
+	/// Whether this CResult_PingDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_PingDecodeErrorZ in the success state.
 pub extern "C" fn CResult_PingDecodeErrorZ_ok(o: crate::ln::msgs::Ping) -> CResult_PingDecodeErrorZ {
 	CResult_PingDecodeErrorZ {
 		contents: CResult_PingDecodeErrorZPtr {
@@ -6384,6 +7685,7 @@ pub extern "C" fn CResult_PingDecodeErrorZ_ok(o: crate::ln::msgs::Ping) -> CResu
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_PingDecodeErrorZ in the error state.
 pub extern "C" fn CResult_PingDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_PingDecodeErrorZ {
 	CResult_PingDecodeErrorZ {
 		contents: CResult_PingDecodeErrorZPtr {
@@ -6393,6 +7695,7 @@ pub extern "C" fn CResult_PingDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) 
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_PingDecodeErrorZ.
 pub extern "C" fn CResult_PingDecodeErrorZ_free(_res: CResult_PingDecodeErrorZ) { }
 impl Drop for CResult_PingDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6438,18 +7741,32 @@ impl Clone for CResult_PingDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_PingDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_PingDecodeErrorZ_clone(orig: &CResult_PingDecodeErrorZ) -> CResult_PingDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_PongDecodeErrorZ
 pub union CResult_PongDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::Pong,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_PongDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::Pong on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_PongDecodeErrorZ {
+	/// The contents of this CResult_PongDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_PongDecodeErrorZPtr,
+	/// Whether this CResult_PongDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_PongDecodeErrorZ in the success state.
 pub extern "C" fn CResult_PongDecodeErrorZ_ok(o: crate::ln::msgs::Pong) -> CResult_PongDecodeErrorZ {
 	CResult_PongDecodeErrorZ {
 		contents: CResult_PongDecodeErrorZPtr {
@@ -6459,6 +7776,7 @@ pub extern "C" fn CResult_PongDecodeErrorZ_ok(o: crate::ln::msgs::Pong) -> CResu
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_PongDecodeErrorZ in the error state.
 pub extern "C" fn CResult_PongDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_PongDecodeErrorZ {
 	CResult_PongDecodeErrorZ {
 		contents: CResult_PongDecodeErrorZPtr {
@@ -6468,6 +7786,7 @@ pub extern "C" fn CResult_PongDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) 
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_PongDecodeErrorZ.
 pub extern "C" fn CResult_PongDecodeErrorZ_free(_res: CResult_PongDecodeErrorZ) { }
 impl Drop for CResult_PongDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6513,18 +7832,32 @@ impl Clone for CResult_PongDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_PongDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_PongDecodeErrorZ_clone(orig: &CResult_PongDecodeErrorZ) -> CResult_PongDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_UnsignedChannelAnnouncementDecodeErrorZ
 pub union CResult_UnsignedChannelAnnouncementDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::UnsignedChannelAnnouncement,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_UnsignedChannelAnnouncementDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::UnsignedChannelAnnouncement on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_UnsignedChannelAnnouncementDecodeErrorZ {
+	/// The contents of this CResult_UnsignedChannelAnnouncementDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_UnsignedChannelAnnouncementDecodeErrorZPtr,
+	/// Whether this CResult_UnsignedChannelAnnouncementDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_UnsignedChannelAnnouncementDecodeErrorZ in the success state.
 pub extern "C" fn CResult_UnsignedChannelAnnouncementDecodeErrorZ_ok(o: crate::ln::msgs::UnsignedChannelAnnouncement) -> CResult_UnsignedChannelAnnouncementDecodeErrorZ {
 	CResult_UnsignedChannelAnnouncementDecodeErrorZ {
 		contents: CResult_UnsignedChannelAnnouncementDecodeErrorZPtr {
@@ -6534,6 +7867,7 @@ pub extern "C" fn CResult_UnsignedChannelAnnouncementDecodeErrorZ_ok(o: crate::l
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UnsignedChannelAnnouncementDecodeErrorZ in the error state.
 pub extern "C" fn CResult_UnsignedChannelAnnouncementDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_UnsignedChannelAnnouncementDecodeErrorZ {
 	CResult_UnsignedChannelAnnouncementDecodeErrorZ {
 		contents: CResult_UnsignedChannelAnnouncementDecodeErrorZPtr {
@@ -6543,6 +7877,7 @@ pub extern "C" fn CResult_UnsignedChannelAnnouncementDecodeErrorZ_err(e: crate::
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_UnsignedChannelAnnouncementDecodeErrorZ.
 pub extern "C" fn CResult_UnsignedChannelAnnouncementDecodeErrorZ_free(_res: CResult_UnsignedChannelAnnouncementDecodeErrorZ) { }
 impl Drop for CResult_UnsignedChannelAnnouncementDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6588,18 +7923,32 @@ impl Clone for CResult_UnsignedChannelAnnouncementDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UnsignedChannelAnnouncementDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_UnsignedChannelAnnouncementDecodeErrorZ_clone(orig: &CResult_UnsignedChannelAnnouncementDecodeErrorZ) -> CResult_UnsignedChannelAnnouncementDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ChannelAnnouncementDecodeErrorZ
 pub union CResult_ChannelAnnouncementDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::ChannelAnnouncement,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ChannelAnnouncementDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::ChannelAnnouncement on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ChannelAnnouncementDecodeErrorZ {
+	/// The contents of this CResult_ChannelAnnouncementDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ChannelAnnouncementDecodeErrorZPtr,
+	/// Whether this CResult_ChannelAnnouncementDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelAnnouncementDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ChannelAnnouncementDecodeErrorZ_ok(o: crate::ln::msgs::ChannelAnnouncement) -> CResult_ChannelAnnouncementDecodeErrorZ {
 	CResult_ChannelAnnouncementDecodeErrorZ {
 		contents: CResult_ChannelAnnouncementDecodeErrorZPtr {
@@ -6609,6 +7958,7 @@ pub extern "C" fn CResult_ChannelAnnouncementDecodeErrorZ_ok(o: crate::ln::msgs:
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelAnnouncementDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ChannelAnnouncementDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ChannelAnnouncementDecodeErrorZ {
 	CResult_ChannelAnnouncementDecodeErrorZ {
 		contents: CResult_ChannelAnnouncementDecodeErrorZPtr {
@@ -6618,6 +7968,7 @@ pub extern "C" fn CResult_ChannelAnnouncementDecodeErrorZ_err(e: crate::ln::msgs
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ChannelAnnouncementDecodeErrorZ.
 pub extern "C" fn CResult_ChannelAnnouncementDecodeErrorZ_free(_res: CResult_ChannelAnnouncementDecodeErrorZ) { }
 impl Drop for CResult_ChannelAnnouncementDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6663,18 +8014,32 @@ impl Clone for CResult_ChannelAnnouncementDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelAnnouncementDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ChannelAnnouncementDecodeErrorZ_clone(orig: &CResult_ChannelAnnouncementDecodeErrorZ) -> CResult_ChannelAnnouncementDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_UnsignedChannelUpdateDecodeErrorZ
 pub union CResult_UnsignedChannelUpdateDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::UnsignedChannelUpdate,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_UnsignedChannelUpdateDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::UnsignedChannelUpdate on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_UnsignedChannelUpdateDecodeErrorZ {
+	/// The contents of this CResult_UnsignedChannelUpdateDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_UnsignedChannelUpdateDecodeErrorZPtr,
+	/// Whether this CResult_UnsignedChannelUpdateDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_UnsignedChannelUpdateDecodeErrorZ in the success state.
 pub extern "C" fn CResult_UnsignedChannelUpdateDecodeErrorZ_ok(o: crate::ln::msgs::UnsignedChannelUpdate) -> CResult_UnsignedChannelUpdateDecodeErrorZ {
 	CResult_UnsignedChannelUpdateDecodeErrorZ {
 		contents: CResult_UnsignedChannelUpdateDecodeErrorZPtr {
@@ -6684,6 +8049,7 @@ pub extern "C" fn CResult_UnsignedChannelUpdateDecodeErrorZ_ok(o: crate::ln::msg
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UnsignedChannelUpdateDecodeErrorZ in the error state.
 pub extern "C" fn CResult_UnsignedChannelUpdateDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_UnsignedChannelUpdateDecodeErrorZ {
 	CResult_UnsignedChannelUpdateDecodeErrorZ {
 		contents: CResult_UnsignedChannelUpdateDecodeErrorZPtr {
@@ -6693,6 +8059,7 @@ pub extern "C" fn CResult_UnsignedChannelUpdateDecodeErrorZ_err(e: crate::ln::ms
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_UnsignedChannelUpdateDecodeErrorZ.
 pub extern "C" fn CResult_UnsignedChannelUpdateDecodeErrorZ_free(_res: CResult_UnsignedChannelUpdateDecodeErrorZ) { }
 impl Drop for CResult_UnsignedChannelUpdateDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6738,18 +8105,32 @@ impl Clone for CResult_UnsignedChannelUpdateDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UnsignedChannelUpdateDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_UnsignedChannelUpdateDecodeErrorZ_clone(orig: &CResult_UnsignedChannelUpdateDecodeErrorZ) -> CResult_UnsignedChannelUpdateDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ChannelUpdateDecodeErrorZ
 pub union CResult_ChannelUpdateDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::ChannelUpdate,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ChannelUpdateDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::ChannelUpdate on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ChannelUpdateDecodeErrorZ {
+	/// The contents of this CResult_ChannelUpdateDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ChannelUpdateDecodeErrorZPtr,
+	/// Whether this CResult_ChannelUpdateDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelUpdateDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ChannelUpdateDecodeErrorZ_ok(o: crate::ln::msgs::ChannelUpdate) -> CResult_ChannelUpdateDecodeErrorZ {
 	CResult_ChannelUpdateDecodeErrorZ {
 		contents: CResult_ChannelUpdateDecodeErrorZPtr {
@@ -6759,6 +8140,7 @@ pub extern "C" fn CResult_ChannelUpdateDecodeErrorZ_ok(o: crate::ln::msgs::Chann
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelUpdateDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ChannelUpdateDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ChannelUpdateDecodeErrorZ {
 	CResult_ChannelUpdateDecodeErrorZ {
 		contents: CResult_ChannelUpdateDecodeErrorZPtr {
@@ -6768,6 +8150,7 @@ pub extern "C" fn CResult_ChannelUpdateDecodeErrorZ_err(e: crate::ln::msgs::Deco
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ChannelUpdateDecodeErrorZ.
 pub extern "C" fn CResult_ChannelUpdateDecodeErrorZ_free(_res: CResult_ChannelUpdateDecodeErrorZ) { }
 impl Drop for CResult_ChannelUpdateDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6813,18 +8196,32 @@ impl Clone for CResult_ChannelUpdateDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ChannelUpdateDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ChannelUpdateDecodeErrorZ_clone(orig: &CResult_ChannelUpdateDecodeErrorZ) -> CResult_ChannelUpdateDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ErrorMessageDecodeErrorZ
 pub union CResult_ErrorMessageDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::ErrorMessage,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ErrorMessageDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::ErrorMessage on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ErrorMessageDecodeErrorZ {
+	/// The contents of this CResult_ErrorMessageDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ErrorMessageDecodeErrorZPtr,
+	/// Whether this CResult_ErrorMessageDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ErrorMessageDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ErrorMessageDecodeErrorZ_ok(o: crate::ln::msgs::ErrorMessage) -> CResult_ErrorMessageDecodeErrorZ {
 	CResult_ErrorMessageDecodeErrorZ {
 		contents: CResult_ErrorMessageDecodeErrorZPtr {
@@ -6834,6 +8231,7 @@ pub extern "C" fn CResult_ErrorMessageDecodeErrorZ_ok(o: crate::ln::msgs::ErrorM
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ErrorMessageDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ErrorMessageDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ErrorMessageDecodeErrorZ {
 	CResult_ErrorMessageDecodeErrorZ {
 		contents: CResult_ErrorMessageDecodeErrorZPtr {
@@ -6843,6 +8241,7 @@ pub extern "C" fn CResult_ErrorMessageDecodeErrorZ_err(e: crate::ln::msgs::Decod
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ErrorMessageDecodeErrorZ.
 pub extern "C" fn CResult_ErrorMessageDecodeErrorZ_free(_res: CResult_ErrorMessageDecodeErrorZ) { }
 impl Drop for CResult_ErrorMessageDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6888,18 +8287,32 @@ impl Clone for CResult_ErrorMessageDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ErrorMessageDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ErrorMessageDecodeErrorZ_clone(orig: &CResult_ErrorMessageDecodeErrorZ) -> CResult_ErrorMessageDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_UnsignedNodeAnnouncementDecodeErrorZ
 pub union CResult_UnsignedNodeAnnouncementDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::UnsignedNodeAnnouncement,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_UnsignedNodeAnnouncementDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::UnsignedNodeAnnouncement on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_UnsignedNodeAnnouncementDecodeErrorZ {
+	/// The contents of this CResult_UnsignedNodeAnnouncementDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_UnsignedNodeAnnouncementDecodeErrorZPtr,
+	/// Whether this CResult_UnsignedNodeAnnouncementDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_UnsignedNodeAnnouncementDecodeErrorZ in the success state.
 pub extern "C" fn CResult_UnsignedNodeAnnouncementDecodeErrorZ_ok(o: crate::ln::msgs::UnsignedNodeAnnouncement) -> CResult_UnsignedNodeAnnouncementDecodeErrorZ {
 	CResult_UnsignedNodeAnnouncementDecodeErrorZ {
 		contents: CResult_UnsignedNodeAnnouncementDecodeErrorZPtr {
@@ -6909,6 +8322,7 @@ pub extern "C" fn CResult_UnsignedNodeAnnouncementDecodeErrorZ_ok(o: crate::ln::
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UnsignedNodeAnnouncementDecodeErrorZ in the error state.
 pub extern "C" fn CResult_UnsignedNodeAnnouncementDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_UnsignedNodeAnnouncementDecodeErrorZ {
 	CResult_UnsignedNodeAnnouncementDecodeErrorZ {
 		contents: CResult_UnsignedNodeAnnouncementDecodeErrorZPtr {
@@ -6918,6 +8332,7 @@ pub extern "C" fn CResult_UnsignedNodeAnnouncementDecodeErrorZ_err(e: crate::ln:
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_UnsignedNodeAnnouncementDecodeErrorZ.
 pub extern "C" fn CResult_UnsignedNodeAnnouncementDecodeErrorZ_free(_res: CResult_UnsignedNodeAnnouncementDecodeErrorZ) { }
 impl Drop for CResult_UnsignedNodeAnnouncementDecodeErrorZ {
 	fn drop(&mut self) {
@@ -6963,18 +8378,32 @@ impl Clone for CResult_UnsignedNodeAnnouncementDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_UnsignedNodeAnnouncementDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_UnsignedNodeAnnouncementDecodeErrorZ_clone(orig: &CResult_UnsignedNodeAnnouncementDecodeErrorZ) -> CResult_UnsignedNodeAnnouncementDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_NodeAnnouncementDecodeErrorZ
 pub union CResult_NodeAnnouncementDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::NodeAnnouncement,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_NodeAnnouncementDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::NodeAnnouncement on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_NodeAnnouncementDecodeErrorZ {
+	/// The contents of this CResult_NodeAnnouncementDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_NodeAnnouncementDecodeErrorZPtr,
+	/// Whether this CResult_NodeAnnouncementDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_NodeAnnouncementDecodeErrorZ in the success state.
 pub extern "C" fn CResult_NodeAnnouncementDecodeErrorZ_ok(o: crate::ln::msgs::NodeAnnouncement) -> CResult_NodeAnnouncementDecodeErrorZ {
 	CResult_NodeAnnouncementDecodeErrorZ {
 		contents: CResult_NodeAnnouncementDecodeErrorZPtr {
@@ -6984,6 +8413,7 @@ pub extern "C" fn CResult_NodeAnnouncementDecodeErrorZ_ok(o: crate::ln::msgs::No
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NodeAnnouncementDecodeErrorZ in the error state.
 pub extern "C" fn CResult_NodeAnnouncementDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_NodeAnnouncementDecodeErrorZ {
 	CResult_NodeAnnouncementDecodeErrorZ {
 		contents: CResult_NodeAnnouncementDecodeErrorZPtr {
@@ -6993,6 +8423,7 @@ pub extern "C" fn CResult_NodeAnnouncementDecodeErrorZ_err(e: crate::ln::msgs::D
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_NodeAnnouncementDecodeErrorZ.
 pub extern "C" fn CResult_NodeAnnouncementDecodeErrorZ_free(_res: CResult_NodeAnnouncementDecodeErrorZ) { }
 impl Drop for CResult_NodeAnnouncementDecodeErrorZ {
 	fn drop(&mut self) {
@@ -7038,18 +8469,32 @@ impl Clone for CResult_NodeAnnouncementDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_NodeAnnouncementDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NodeAnnouncementDecodeErrorZ_clone(orig: &CResult_NodeAnnouncementDecodeErrorZ) -> CResult_NodeAnnouncementDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_QueryShortChannelIdsDecodeErrorZ
 pub union CResult_QueryShortChannelIdsDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::QueryShortChannelIds,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_QueryShortChannelIdsDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::QueryShortChannelIds on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_QueryShortChannelIdsDecodeErrorZ {
+	/// The contents of this CResult_QueryShortChannelIdsDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_QueryShortChannelIdsDecodeErrorZPtr,
+	/// Whether this CResult_QueryShortChannelIdsDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_QueryShortChannelIdsDecodeErrorZ in the success state.
 pub extern "C" fn CResult_QueryShortChannelIdsDecodeErrorZ_ok(o: crate::ln::msgs::QueryShortChannelIds) -> CResult_QueryShortChannelIdsDecodeErrorZ {
 	CResult_QueryShortChannelIdsDecodeErrorZ {
 		contents: CResult_QueryShortChannelIdsDecodeErrorZPtr {
@@ -7059,6 +8504,7 @@ pub extern "C" fn CResult_QueryShortChannelIdsDecodeErrorZ_ok(o: crate::ln::msgs
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_QueryShortChannelIdsDecodeErrorZ in the error state.
 pub extern "C" fn CResult_QueryShortChannelIdsDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_QueryShortChannelIdsDecodeErrorZ {
 	CResult_QueryShortChannelIdsDecodeErrorZ {
 		contents: CResult_QueryShortChannelIdsDecodeErrorZPtr {
@@ -7068,6 +8514,7 @@ pub extern "C" fn CResult_QueryShortChannelIdsDecodeErrorZ_err(e: crate::ln::msg
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_QueryShortChannelIdsDecodeErrorZ.
 pub extern "C" fn CResult_QueryShortChannelIdsDecodeErrorZ_free(_res: CResult_QueryShortChannelIdsDecodeErrorZ) { }
 impl Drop for CResult_QueryShortChannelIdsDecodeErrorZ {
 	fn drop(&mut self) {
@@ -7113,18 +8560,32 @@ impl Clone for CResult_QueryShortChannelIdsDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_QueryShortChannelIdsDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_QueryShortChannelIdsDecodeErrorZ_clone(orig: &CResult_QueryShortChannelIdsDecodeErrorZ) -> CResult_QueryShortChannelIdsDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ReplyShortChannelIdsEndDecodeErrorZ
 pub union CResult_ReplyShortChannelIdsEndDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::ReplyShortChannelIdsEnd,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ReplyShortChannelIdsEndDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::ReplyShortChannelIdsEnd on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ReplyShortChannelIdsEndDecodeErrorZ {
+	/// The contents of this CResult_ReplyShortChannelIdsEndDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ReplyShortChannelIdsEndDecodeErrorZPtr,
+	/// Whether this CResult_ReplyShortChannelIdsEndDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ReplyShortChannelIdsEndDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ReplyShortChannelIdsEndDecodeErrorZ_ok(o: crate::ln::msgs::ReplyShortChannelIdsEnd) -> CResult_ReplyShortChannelIdsEndDecodeErrorZ {
 	CResult_ReplyShortChannelIdsEndDecodeErrorZ {
 		contents: CResult_ReplyShortChannelIdsEndDecodeErrorZPtr {
@@ -7134,6 +8595,7 @@ pub extern "C" fn CResult_ReplyShortChannelIdsEndDecodeErrorZ_ok(o: crate::ln::m
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ReplyShortChannelIdsEndDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ReplyShortChannelIdsEndDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ReplyShortChannelIdsEndDecodeErrorZ {
 	CResult_ReplyShortChannelIdsEndDecodeErrorZ {
 		contents: CResult_ReplyShortChannelIdsEndDecodeErrorZPtr {
@@ -7143,6 +8605,7 @@ pub extern "C" fn CResult_ReplyShortChannelIdsEndDecodeErrorZ_err(e: crate::ln::
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ReplyShortChannelIdsEndDecodeErrorZ.
 pub extern "C" fn CResult_ReplyShortChannelIdsEndDecodeErrorZ_free(_res: CResult_ReplyShortChannelIdsEndDecodeErrorZ) { }
 impl Drop for CResult_ReplyShortChannelIdsEndDecodeErrorZ {
 	fn drop(&mut self) {
@@ -7188,18 +8651,32 @@ impl Clone for CResult_ReplyShortChannelIdsEndDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ReplyShortChannelIdsEndDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ReplyShortChannelIdsEndDecodeErrorZ_clone(orig: &CResult_ReplyShortChannelIdsEndDecodeErrorZ) -> CResult_ReplyShortChannelIdsEndDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_QueryChannelRangeDecodeErrorZ
 pub union CResult_QueryChannelRangeDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::QueryChannelRange,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_QueryChannelRangeDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::QueryChannelRange on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_QueryChannelRangeDecodeErrorZ {
+	/// The contents of this CResult_QueryChannelRangeDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_QueryChannelRangeDecodeErrorZPtr,
+	/// Whether this CResult_QueryChannelRangeDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_QueryChannelRangeDecodeErrorZ in the success state.
 pub extern "C" fn CResult_QueryChannelRangeDecodeErrorZ_ok(o: crate::ln::msgs::QueryChannelRange) -> CResult_QueryChannelRangeDecodeErrorZ {
 	CResult_QueryChannelRangeDecodeErrorZ {
 		contents: CResult_QueryChannelRangeDecodeErrorZPtr {
@@ -7209,6 +8686,7 @@ pub extern "C" fn CResult_QueryChannelRangeDecodeErrorZ_ok(o: crate::ln::msgs::Q
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_QueryChannelRangeDecodeErrorZ in the error state.
 pub extern "C" fn CResult_QueryChannelRangeDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_QueryChannelRangeDecodeErrorZ {
 	CResult_QueryChannelRangeDecodeErrorZ {
 		contents: CResult_QueryChannelRangeDecodeErrorZPtr {
@@ -7218,6 +8696,7 @@ pub extern "C" fn CResult_QueryChannelRangeDecodeErrorZ_err(e: crate::ln::msgs::
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_QueryChannelRangeDecodeErrorZ.
 pub extern "C" fn CResult_QueryChannelRangeDecodeErrorZ_free(_res: CResult_QueryChannelRangeDecodeErrorZ) { }
 impl Drop for CResult_QueryChannelRangeDecodeErrorZ {
 	fn drop(&mut self) {
@@ -7263,18 +8742,32 @@ impl Clone for CResult_QueryChannelRangeDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_QueryChannelRangeDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_QueryChannelRangeDecodeErrorZ_clone(orig: &CResult_QueryChannelRangeDecodeErrorZ) -> CResult_QueryChannelRangeDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ReplyChannelRangeDecodeErrorZ
 pub union CResult_ReplyChannelRangeDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::ReplyChannelRange,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_ReplyChannelRangeDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::ReplyChannelRange on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_ReplyChannelRangeDecodeErrorZ {
+	/// The contents of this CResult_ReplyChannelRangeDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_ReplyChannelRangeDecodeErrorZPtr,
+	/// Whether this CResult_ReplyChannelRangeDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_ReplyChannelRangeDecodeErrorZ in the success state.
 pub extern "C" fn CResult_ReplyChannelRangeDecodeErrorZ_ok(o: crate::ln::msgs::ReplyChannelRange) -> CResult_ReplyChannelRangeDecodeErrorZ {
 	CResult_ReplyChannelRangeDecodeErrorZ {
 		contents: CResult_ReplyChannelRangeDecodeErrorZPtr {
@@ -7284,6 +8777,7 @@ pub extern "C" fn CResult_ReplyChannelRangeDecodeErrorZ_ok(o: crate::ln::msgs::R
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ReplyChannelRangeDecodeErrorZ in the error state.
 pub extern "C" fn CResult_ReplyChannelRangeDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_ReplyChannelRangeDecodeErrorZ {
 	CResult_ReplyChannelRangeDecodeErrorZ {
 		contents: CResult_ReplyChannelRangeDecodeErrorZPtr {
@@ -7293,6 +8787,7 @@ pub extern "C" fn CResult_ReplyChannelRangeDecodeErrorZ_err(e: crate::ln::msgs::
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_ReplyChannelRangeDecodeErrorZ.
 pub extern "C" fn CResult_ReplyChannelRangeDecodeErrorZ_free(_res: CResult_ReplyChannelRangeDecodeErrorZ) { }
 impl Drop for CResult_ReplyChannelRangeDecodeErrorZ {
 	fn drop(&mut self) {
@@ -7338,18 +8833,32 @@ impl Clone for CResult_ReplyChannelRangeDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_ReplyChannelRangeDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ReplyChannelRangeDecodeErrorZ_clone(orig: &CResult_ReplyChannelRangeDecodeErrorZ) -> CResult_ReplyChannelRangeDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_GossipTimestampFilterDecodeErrorZ
 pub union CResult_GossipTimestampFilterDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::ln::msgs::GossipTimestampFilter,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::ln::msgs::DecodeError,
 }
 #[repr(C)]
+/// A CResult_GossipTimestampFilterDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::ln::msgs::GossipTimestampFilter on success and a crate::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
 pub struct CResult_GossipTimestampFilterDecodeErrorZ {
+	/// The contents of this CResult_GossipTimestampFilterDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
 	pub contents: CResult_GossipTimestampFilterDecodeErrorZPtr,
+	/// Whether this CResult_GossipTimestampFilterDecodeErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
+/// Creates a new CResult_GossipTimestampFilterDecodeErrorZ in the success state.
 pub extern "C" fn CResult_GossipTimestampFilterDecodeErrorZ_ok(o: crate::ln::msgs::GossipTimestampFilter) -> CResult_GossipTimestampFilterDecodeErrorZ {
 	CResult_GossipTimestampFilterDecodeErrorZ {
 		contents: CResult_GossipTimestampFilterDecodeErrorZPtr {
@@ -7359,6 +8868,7 @@ pub extern "C" fn CResult_GossipTimestampFilterDecodeErrorZ_ok(o: crate::ln::msg
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_GossipTimestampFilterDecodeErrorZ in the error state.
 pub extern "C" fn CResult_GossipTimestampFilterDecodeErrorZ_err(e: crate::ln::msgs::DecodeError) -> CResult_GossipTimestampFilterDecodeErrorZ {
 	CResult_GossipTimestampFilterDecodeErrorZ {
 		contents: CResult_GossipTimestampFilterDecodeErrorZPtr {
@@ -7368,6 +8878,7 @@ pub extern "C" fn CResult_GossipTimestampFilterDecodeErrorZ_err(e: crate::ln::ms
 	}
 }
 #[no_mangle]
+/// Frees any resources used by the CResult_GossipTimestampFilterDecodeErrorZ.
 pub extern "C" fn CResult_GossipTimestampFilterDecodeErrorZ_free(_res: CResult_GossipTimestampFilterDecodeErrorZ) { }
 impl Drop for CResult_GossipTimestampFilterDecodeErrorZ {
 	fn drop(&mut self) {
@@ -7413,4 +8924,6 @@ impl Clone for CResult_GossipTimestampFilterDecodeErrorZ {
 	}
 }
 #[no_mangle]
+/// Creates a new CResult_GossipTimestampFilterDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_GossipTimestampFilterDecodeErrorZ_clone(orig: &CResult_GossipTimestampFilterDecodeErrorZ) -> CResult_GossipTimestampFilterDecodeErrorZ { orig.clone() }

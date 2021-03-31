@@ -941,6 +941,18 @@ pub extern "C" fn ChannelManager_block_disconnected(this_arg: &ChannelManager, h
 	unsafe { &*this_arg.inner }.block_disconnected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap())
 }
 
+/// Blocks until ChannelManager needs to be persisted or a timeout is reached. It returns a bool
+/// indicating whether persistence is necessary. Only one listener on
+/// `await_persistable_update` or `await_persistable_update_timeout` is guaranteed to be woken
+/// up.
+/// Note that the feature `allow_wallclock_use` must be enabled to use this function.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_await_persistable_update_timeout(this_arg: &ChannelManager, mut max_wait: u64) -> bool {
+	let mut ret = unsafe { &*this_arg.inner }.await_persistable_update_timeout(std::time::Duration::from_secs(max_wait));
+	ret
+}
+
 /// Blocks until ChannelManager needs to be persisted. Only one listener on
 /// `await_persistable_update` or `await_persistable_update_timeout` is guaranteed to be woken
 /// up.

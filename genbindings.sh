@@ -3,9 +3,15 @@
 set -e
 set -x
 
-if [ ! -d "$1/lightning" ]; then
-	echo "USAGE: $0 path-to-rust-lightning"
+if [ ! -d "$1/lightning" -o "$2" != "true" -a "$2" != "false" ]; then
+	echo "USAGE: $0 path-to-rust-lightning allow-std"
+	echo "allow-std must be either 'true' or 'false' to indicate if we should be built relying on time and pthread support"
 	exit 1
+fi
+
+if [ "$2" = "true" ]; then
+	FEATURES_ARGS='--features=allow_wallclock_use'
+	FEATURES='"allow_wallclock_use"'
 fi
 
 # On reasonable systems, we can use realpath here, but OSX is a diva with 20-year-old software.
@@ -38,16 +44,16 @@ OUT_CPP="$(pwd)/lightning-c-bindings/include/lightningpp.hpp"
 BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
 pushd "$LIGHTNING_PATH"
-RUSTC_BOOTSTRAP=1 cargo rustc --profile=check -- -Zunstable-options --pretty=expanded |
+RUSTC_BOOTSTRAP=1 cargo rustc $FEATURES_ARGS --profile=check -- -Zunstable-options --pretty=expanded |
 	RUST_BACKTRACE=1 "$BIN" "$OUT/" lightning "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
 popd
 
 HOST_PLATFORM="$(rustc --version --verbose | grep "host:")"
 if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 	# OSX sed is for some reason not compatible with GNU sed
-	sed -i '' 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH"'" }|' lightning-c-bindings/Cargo.toml
+	sed -i '' 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH"'", features = ['"$FEATURES"'] }|' lightning-c-bindings/Cargo.toml
 else
-	sed -i 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH"'" }|' lightning-c-bindings/Cargo.toml
+	sed -i 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH"'", features = ['"$FEATURES"'] }|' lightning-c-bindings/Cargo.toml
 fi
 
 # Set path to include our rustc wrapper as well as cbindgen

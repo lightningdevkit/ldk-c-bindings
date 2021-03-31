@@ -82,12 +82,21 @@ pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
 							if i == "any" {
 								// #[cfg(any(test, feature = ""))]
 								if let TokenTree::Group(g) = iter.next().unwrap() {
-									if let TokenTree::Ident(i) = g.stream().into_iter().next().unwrap() {
-										if i == "test" || i == "feature" {
-											// If its cfg(feature(...)) we assume its test-only
-											return ExportStatus::TestOnly;
+									let mut all_test = true;
+									for token in g.stream().into_iter() {
+										if let TokenTree::Ident(i) = token {
+											match format!("{}", i).as_str() {
+												"test" => {},
+												"feature" => {},
+												_ => all_test = false,
+											}
+										} else if let TokenTree::Literal(lit) = token {
+											if format!("{}", lit) != "fuzztarget" {
+												all_test = false;
+											}
 										}
 									}
+									if all_test { return ExportStatus::TestOnly; }
 								}
 							} else if i == "test" || i == "feature" {
 								// If its cfg(feature(...)) we assume its test-only

@@ -25,8 +25,10 @@ jobs:
         run: cargo install --force cbindgen
       - name: Checkout Rust-Lightning git
         run: git clone https://github.com/rust-bitcoin/rust-lightning
+      - name: Rebuild bindings without std, and check the sample app builds + links
+        run: ./genbindings.sh ./rust-lightning false
       - name: Rebuild bindings, and check the sample app builds + links
-        run: ./genbindings.sh ./rust-lightning
+        run: ./genbindings.sh ./rust-lightning true
       - name: Check that the latest bindings are in git
         run: |
           git checkout lightning-c-bindings/Cargo.toml # genbindings edits this to update the path

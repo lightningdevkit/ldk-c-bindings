@@ -11192,6 +11192,15 @@ void ChannelManager_block_connected(const struct LDKChannelManager *NONNULL_PTR 
 void ChannelManager_block_disconnected(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*header)[80]);
 
 /**
+ * Blocks until ChannelManager needs to be persisted or a timeout is reached. It returns a bool
+ * indicating whether persistence is necessary. Only one listener on
+ * `await_persistable_update` or `await_persistable_update_timeout` is guaranteed to be woken
+ * up.
+ * Note that the feature `allow_wallclock_use` must be enabled to use this function.
+ */
+MUST_USE_RES bool ChannelManager_await_persistable_update_timeout(const struct LDKChannelManager *NONNULL_PTR this_arg, uint64_t max_wait);
+
+/**
  * Blocks until ChannelManager needs to be persisted. Only one listener on
  * `await_persistable_update` or `await_persistable_update_timeout` is guaranteed to be woken
  * up.

@@ -513,7 +513,10 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			let remaining: String = seg_iter.map(|seg| {
 				format!("::{}", seg.ident)
 			}).collect();
-			if let Some((imp, _)) = self.imports.get(&first_seg.ident) {
+			let first_seg_str = format!("{}", first_seg.ident);
+			if first_seg_str == "std" {
+				Some(first_seg_str + &remaining)
+			} else if let Some((imp, _)) = self.imports.get(&first_seg.ident) {
 				if remaining != "" {
 					Some(imp.clone() + &remaining)
 				} else {
@@ -775,6 +778,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" if is_ref => Some("crate::c_types::Str"),
 
 			"std::time::Duration" => Some("u64"),
+			"std::io::Error" => Some("crate::c_types::IOError"),
 
 			"bitcoin::secp256k1::key::PublicKey" => Some("crate::c_types::PublicKey"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature"),
@@ -967,6 +971,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" => Some(""),
 
 			"std::time::Duration" => Some(""),
+			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
 
 			"bitcoin::secp256k1::key::PublicKey" => Some("crate::c_types::PublicKey::from_rust(&"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature::from_rust(&"),
@@ -1025,6 +1030,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" if is_ref => Some(".as_str().into()"),
 
 			"std::time::Duration" => Some(".as_secs()"),
+			"std::io::Error" if !is_ref => Some(")"),
 
 			"bitcoin::secp256k1::key::PublicKey" => Some(")"),
 			"bitcoin::secp256k1::Signature" => Some(")"),

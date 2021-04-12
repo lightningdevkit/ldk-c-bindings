@@ -24,7 +24,7 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::process;
 
-use proc_macro2::{TokenTree, TokenStream, Span};
+use proc_macro2::Span;
 
 mod types;
 mod blocks;
@@ -34,38 +34,6 @@ use blocks::*;
 // *************************************
 // *** Manually-expanded conversions ***
 // *************************************
-
-/// Because we don't expand macros, any code that we need to generated based on their contents has
-/// to be completely manual. In this case its all just serialization, so its not too hard.
-fn convert_macro<W: std::io::Write>(w: &mut W, macro_path: &syn::Path, stream: &TokenStream, types: &TypeResolver) {
-	assert_eq!(macro_path.segments.len(), 1);
-	match &format!("{}", macro_path.segments.iter().next().unwrap().ident) as &str {
-		"impl_writeable" | "impl_writeable_len_match" => {
-			let struct_for = if let TokenTree::Ident(i) = stream.clone().into_iter().next().unwrap() { i } else { unimplemented!(); };
-			if let Some(s) = types.maybe_resolve_ident(&struct_for) {
-				if !types.crate_types.opaques.get(&s).is_some() { return; }
-				writeln!(w, "#[no_mangle]").unwrap();
-				writeln!(w, "/// Serialize the {} into a byte array which can be read by {}_read", struct_for, struct_for).unwrap();
-				writeln!(w, "pub extern \"C\" fn {}_write(obj: &{}) -> crate::c_types::derived::CVec_u8Z {{", struct_for, struct_for).unwrap();
-				writeln!(w, "\tcrate::c_types::serialize_obj(unsafe {{ &(*(*obj).inner) }})").unwrap();
-				writeln!(w, "}}").unwrap();
-				writeln!(w, "#[no_mangle]").unwrap();
-				writeln!(w, "pub(crate) extern \"C\" fn {}_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {{", struct_for).unwrap();
-				writeln!(w, "\tcrate::c_types::serialize_obj(unsafe {{ &*(obj as *const native{}) }})", struct_for).unwrap();
-				writeln!(w, "}}").unwrap();
-				writeln!(w, "#[no_mangle]").unwrap();
-				writeln!(w, "/// Read a {} from a byte array, created by {}_write", struct_for, struct_for).unwrap();
-				writeln!(w, "pub extern \"C\" fn {}_read(ser: crate::c_types::u8slice) -> {} {{", struct_for, struct_for).unwrap();
-				writeln!(w, "\tif let Ok(res) = crate::c_types::deserialize_obj(ser) {{").unwrap();
-				writeln!(w, "\t\t{} {{ inner: Box::into_raw(Box::new(res)), is_owned: true }}", struct_for).unwrap();
-				writeln!(w, "\t}} else {{").unwrap();
-				writeln!(w, "\t\t{} {{ inner: std::ptr::null_mut(), is_owned: true }}", struct_for).unwrap();
-				writeln!(w, "\t}}\n}}").unwrap();
-			}
-		},
-		_ => {},
-	}
-}
 
 /// Convert "impl trait_path for for_ty { .. }" for manually-mapped types (ie (de)serialization)
 fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path, for_ty: &syn::Type, types: &mut TypeResolver, generics: &GenericTypes) {
@@ -211,14 +179,9 @@ fn write_trait_impl_field_assign<W: std::io::Write>(w: &mut W, trait_path: &str,
 }
 
 /// Write out the impl block for a defined trait struct which has a supertrait
-fn do_write_impl_trait<W: std::io::Write>(w: &mut W, trait_path: &str, trait_name: &syn::Ident, for_obj: &str) {
+fn do_write_impl_trait<W: std::io::Write>(w: &mut W, trait_path: &str, _trait_name: &syn::Ident, for_obj: &str) {
+eprintln!("{}", trait_path);
 	match trait_path {
-		"util::events::MessageSendEventsProvider" => {
-			writeln!(w, "impl lightning::{} for {} {{", trait_path, for_obj).unwrap();
-			writeln!(w, "\tfn get_and_clear_pending_msg_events(&self) -> Vec<lightning::util::events::MessageSendEvent> {{").unwrap();
-			writeln!(w, "\t\t<crate::{} as lightning::{}>::get_and_clear_pending_msg_events(&self.{})", trait_path, trait_path, trait_name).unwrap();
-			writeln!(w, "\t}}\n}}").unwrap();
-		},
 		"util::ser::Writeable" => {
 			writeln!(w, "impl lightning::{} for {} {{", trait_path, for_obj).unwrap();
 			writeln!(w, "\tfn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), ::std::io::Error> {{").unwrap();
@@ -1501,11 +1464,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &mut CrateTypes
 						writeln_fn(&mut out, &f, &mut type_resolver);
 					}
 				},
-				syn::Item::Macro(m) => {
-					if m.ident.is_none() { // If its not a macro definition
-						convert_macro(&mut out, &m.mac.path, &m.mac.tokens, &type_resolver);
-					}
-				},
+				syn::Item::Macro(_) => {},
 				syn::Item::Verbatim(_) => {},
 				syn::Item::ExternCrate(_) => {},
 				_ => unimplemented!(),

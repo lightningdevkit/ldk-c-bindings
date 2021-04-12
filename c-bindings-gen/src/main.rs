@@ -267,8 +267,8 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				}
 				if m.default.is_some() { unimplemented!(); }
 
-				gen_types.push_ctx();
-				assert!(gen_types.learn_generics(&m.sig.generics, types));
+				let mut meth_gen_types = gen_types.push_ctx();
+				assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
 
 				writeln_docs(w, &m.attrs, "\t");
 
@@ -286,7 +286,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						// called when the trait method is called which allows updating on the fly.
 						write!(w, "\tpub {}: ", m.sig.ident).unwrap();
 						generated_fields.push((format!("{}", m.sig.ident), true));
-						types.write_c_type(w, &*r.elem, Some(&gen_types), false);
+						types.write_c_type(w, &*r.elem, Some(&meth_gen_types), false);
 						writeln!(w, ",").unwrap();
 						writeln!(w, "\t/// Fill in the {} field as a reference to it will be given to Rust after this returns", m.sig.ident).unwrap();
 						writeln!(w, "\t/// Note that this takes a pointer to this object, not the this_ptr like other methods do").unwrap();
@@ -298,7 +298,6 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						// which does not compile since Thing is not defined before it is used.
 						writeln!(extra_headers, "struct LDK{};", trait_name).unwrap();
 						writeln!(extra_headers, "typedef struct LDK{} LDK{};", trait_name, trait_name).unwrap();
-						gen_types.pop_ctx();
 						continue;
 					}
 					// Sadly, this currently doesn't do what we want, but it should be easy to get
@@ -308,10 +307,8 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 
 				write!(w, "\tpub {}: extern \"C\" fn (", m.sig.ident).unwrap();
 				generated_fields.push((format!("{}", m.sig.ident), true));
-				write_method_params(w, &m.sig, "c_void", types, Some(&gen_types), true, false);
+				write_method_params(w, &m.sig, "c_void", types, Some(&meth_gen_types), true, false);
 				writeln!(w, ",").unwrap();
-
-				gen_types.pop_ctx();
 			},
 			&syn::TraitItem::Type(_) => {},
 			_ => unimplemented!(),
@@ -381,10 +378,10 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 								m.sig.abi.is_some() || m.sig.variadic.is_some() {
 							unimplemented!();
 						}
-						gen_types.push_ctx();
-						assert!(gen_types.learn_generics(&m.sig.generics, types));
+						let mut meth_gen_types = gen_types.push_ctx();
+						assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
 						write!(w, "\tfn {}", m.sig.ident).unwrap();
-						types.write_rust_generic_param(w, Some(&gen_types), m.sig.generics.params.iter());
+						types.write_rust_generic_param(w, Some(&meth_gen_types), m.sig.generics.params.iter());
 						write!(w, "(").unwrap();
 						for inp in m.sig.inputs.iter() {
 							match inp {
@@ -408,11 +405,11 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 													ident.mutability.is_some() || ident.subpat.is_some() {
 												unimplemented!();
 											}
-											write!(w, ", {}{}: ", if types.skip_arg(&*arg.ty, Some(&gen_types)) { "_" } else { "" }, ident.ident).unwrap();
+											write!(w, ", {}{}: ", if types.skip_arg(&*arg.ty, Some(&meth_gen_types)) { "_" } else { "" }, ident.ident).unwrap();
 										}
 										_ => unimplemented!(),
 									}
-									types.write_rust_type(w, Some(&gen_types), &*arg.ty);
+									types.write_rust_type(w, Some(&meth_gen_types), &*arg.ty);
 								}
 							}
 						}
@@ -420,7 +417,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						match &m.sig.output {
 							syn::ReturnType::Type(_, rtype) => {
 								write!(w, " -> ").unwrap();
-								types.write_rust_type(w, Some(&gen_types), &*rtype)
+								types.write_rust_type(w, Some(&meth_gen_types), &*rtype)
 							},
 							_ => {},
 						}
@@ -437,20 +434,18 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 								writeln!(w, "if let Some(f) = self{}.set_{} {{", $impl_accessor, m.sig.ident).unwrap();
 								writeln!(w, "\t\t\t(f)(&self{});", $impl_accessor).unwrap();
 								write!(w, "\t\t}}\n\t\t").unwrap();
-								types.write_from_c_conversion_to_ref_prefix(w, &*r.elem, Some(&gen_types));
+								types.write_from_c_conversion_to_ref_prefix(w, &*r.elem, Some(&meth_gen_types));
 								write!(w, "self{}.{}", $impl_accessor, m.sig.ident).unwrap();
-								types.write_from_c_conversion_to_ref_suffix(w, &*r.elem, Some(&gen_types));
+								types.write_from_c_conversion_to_ref_suffix(w, &*r.elem, Some(&meth_gen_types));
 								writeln!(w, "\n\t}}").unwrap();
-								gen_types.pop_ctx();
 								continue;
 							}
 						}
-						write_method_var_decl_body(w, &m.sig, "\t", types, Some(&gen_types), true);
+						write_method_var_decl_body(w, &m.sig, "\t", types, Some(&meth_gen_types), true);
 						write!(w, "(self{}.{})(", $impl_accessor, m.sig.ident).unwrap();
-						write_method_call_params(w, &m.sig, "\t", types, Some(&gen_types), "", true);
+						write_method_call_params(w, &m.sig, "\t", types, Some(&meth_gen_types), "", true);
 
 						writeln!(w, "\n\t}}").unwrap();
-						gen_types.pop_ctx();
 					},
 					&syn::TraitItem::Type(ref t) => {
 						if t.default.is_some() || t.generics.lt_token.is_some() { unimplemented!(); }
@@ -866,11 +861,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									writeln!(w, "#[must_use]").unwrap();
 								}
 								write!(w, "extern \"C\" fn {}_{}_{}(", ident, $trait.ident, $m.sig.ident).unwrap();
-								gen_types.push_ctx();
-								assert!(gen_types.learn_generics(&$m.sig.generics, types));
-								write_method_params(w, &$m.sig, "c_void", types, Some(&gen_types), true, true);
+								let mut meth_gen_types = gen_types.push_ctx();
+								assert!(meth_gen_types.learn_generics(&$m.sig.generics, types));
+								write_method_params(w, &$m.sig, "c_void", types, Some(&meth_gen_types), true, true);
 								write!(w, " {{\n\t").unwrap();
-								write_method_var_decl_body(w, &$m.sig, "", types, Some(&gen_types), false);
+								write_method_var_decl_body(w, &$m.sig, "", types, Some(&meth_gen_types), false);
 								let mut takes_self = false;
 								for inp in $m.sig.inputs.iter() {
 									if let syn::FnArg::Receiver(_) = inp {
@@ -900,8 +895,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									},
 									_ => {},
 								}
-								write_method_call_params(w, &$m.sig, "", types, Some(&gen_types), &real_type, false);
-								gen_types.pop_ctx();
+								write_method_call_params(w, &$m.sig, "", types, Some(&meth_gen_types), &real_type, false);
 								write!(w, "\n}}\n").unwrap();
 								if let syn::ReturnType::Type(_, rtype) = &$m.sig.output {
 									if let syn::Type::Reference(r) = &**rtype {
@@ -910,7 +904,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										writeln!(w, "\t// This is a bit race-y in the general case, but for our specific use-cases today, we're safe").unwrap();
 										writeln!(w, "\t// Specifically, we must ensure that the first time we're called it can never be in parallel").unwrap();
 										write!(w, "\tif ").unwrap();
-										types.write_empty_rust_val_check(Some(&gen_types), w, &*r.elem, &format!("trait_self_arg.{}", $m.sig.ident));
+										types.write_empty_rust_val_check(Some(&meth_gen_types), w, &*r.elem, &format!("trait_self_arg.{}", $m.sig.ident));
 										writeln!(w, " {{").unwrap();
 										writeln!(w, "\t\tunsafe {{ &mut *(trait_self_arg as *const {}  as *mut {}) }}.{} = {}_{}_{}(trait_self_arg.this_arg);", $trait.ident, $trait.ident, $m.sig.ident, ident, $trait.ident, $m.sig.ident).unwrap();
 										writeln!(w, "\t}}").unwrap();
@@ -1003,11 +997,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										DeclType::StructImported => format!("{}", ident),
 										_ => unimplemented!(),
 									};
-									gen_types.push_ctx();
-									assert!(gen_types.learn_generics(&m.sig.generics, types));
-									write_method_params(w, &m.sig, &ret_type, types, Some(&gen_types), false, true);
+									let mut meth_gen_types = gen_types.push_ctx();
+									assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
+									write_method_params(w, &m.sig, &ret_type, types, Some(&meth_gen_types), false, true);
 									write!(w, " {{\n\t").unwrap();
-									write_method_var_decl_body(w, &m.sig, "", types, Some(&gen_types), false);
+									write_method_var_decl_body(w, &m.sig, "", types, Some(&meth_gen_types), false);
 									let mut takes_self = false;
 									let mut takes_mut_self = false;
 									for inp in m.sig.inputs.iter() {
@@ -1023,8 +1017,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									} else {
 										write!(w, "{}::{}::{}(", types.orig_crate, resolved_path, m.sig.ident).unwrap();
 									}
-									write_method_call_params(w, &m.sig, "", types, Some(&gen_types), &ret_type, false);
-									gen_types.pop_ctx();
+									write_method_call_params(w, &m.sig, "", types, Some(&meth_gen_types), &ret_type, false);
 									writeln!(w, "\n}}\n").unwrap();
 								}
 							},

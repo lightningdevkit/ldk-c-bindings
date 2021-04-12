@@ -160,23 +160,21 @@ pub fn is_enum_opaque(e: &syn::ItemEnum) -> bool {
 /// It maps both direct types as well as Deref<Target = X>, mapping them via the provided
 /// TypeResolver's resolve_path function (ie traits map to the concrete jump table, structs to the
 /// concrete C container struct, etc).
-pub struct GenericTypes<'a> {
-	typed_generics: Vec<HashMap<&'a syn::Ident, (String, Option<&'a syn::Path>)>>,
+#[must_use]
+pub struct GenericTypes<'a, 'b> {
+	parent: Option<&'b GenericTypes<'b, 'b>>,
+	typed_generics: HashMap<&'a syn::Ident, (String, Option<&'a syn::Path>)>,
 }
-impl<'a> GenericTypes<'a> {
+impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 	pub fn new() -> Self {
-		Self { typed_generics: vec![HashMap::new()], }
+		Self { parent: None, typed_generics: HashMap::new(), }
 	}
 
 	/// push a new context onto the stack, allowing for a new set of generics to be learned which
 	/// will override any lower contexts, but which will still fall back to resoltion via lower
 	/// contexts.
-	pub fn push_ctx(&mut self) {
-		self.typed_generics.push(HashMap::new());
-	}
-	/// pop the latest context off the stack.
-	pub fn pop_ctx(&mut self) {
-		self.typed_generics.pop();
+	pub fn push_ctx<'c>(&'c self) -> GenericTypes<'a, 'c> {
+		GenericTypes { parent: Some(self), typed_generics: HashMap::new(), }
 	}
 
 	/// Learn the generics in generics in the current context, given a TypeResolver.
@@ -202,7 +200,7 @@ impl<'a> GenericTypes<'a> {
 									path = "crate::".to_string() + &path;
 									Some(&trait_bound.path)
 								} else { None };
-								self.typed_generics.last_mut().unwrap().insert(&type_param.ident, (path, new_ident));
+								self.typed_generics.insert(&type_param.ident, (path, new_ident));
 							} else { return false; }
 						}
 					}
@@ -218,7 +216,7 @@ impl<'a> GenericTypes<'a> {
 						if p.qself.is_some() { return false; }
 						if p.path.leading_colon.is_some() { return false; }
 						let mut p_iter = p.path.segments.iter();
-						if let Some(gen) = self.typed_generics.last_mut().unwrap().get_mut(&p_iter.next().unwrap().ident) {
+						if let Some(gen) = self.typed_generics.get_mut(&p_iter.next().unwrap().ident) {
 							if gen.0 != "std::ops::Deref" { return false; }
 							if &format!("{}", p_iter.next().unwrap().ident) != "Target" { return false; }
 
@@ -237,7 +235,7 @@ impl<'a> GenericTypes<'a> {
 				}
 			}
 		}
-		for (_, (_, ident)) in self.typed_generics.last().unwrap().iter() {
+		for (_, (_, ident)) in self.typed_generics.iter() {
 			if ident.is_none() { return false; }
 		}
 		true
@@ -263,7 +261,7 @@ impl<'a> GenericTypes<'a> {
 									path = "crate::".to_string() + &path;
 									Some(&tr.path)
 								} else { None };
-								self.typed_generics.last_mut().unwrap().insert(&t.ident, (path, new_ident));
+								self.typed_generics.insert(&t.ident, (path, new_ident));
 							} else { unimplemented!(); }
 						},
 						_ => unimplemented!(),
@@ -277,21 +275,21 @@ impl<'a> GenericTypes<'a> {
 
 	/// Attempt to resolve an Ident as a generic parameter and return the full path.
 	pub fn maybe_resolve_ident<'b>(&'b self, ident: &syn::Ident) -> Option<&'b String> {
-		for gen in self.typed_generics.iter().rev() {
-			if let Some(res) = gen.get(ident).map(|(a, _)| a) {
-				return Some(res);
-			}
+		if let Some(res) = self.typed_generics.get(ident).map(|(a, _)| a) {
+			return Some(res);
 		}
-		None
+		if let Some(parent) = self.parent {
+			parent.maybe_resolve_ident(ident)
+		} else {
+			None
+		}
 	}
 	/// Attempt to resolve a Path as a generic parameter and return the full path. as both a string
 	/// and syn::Path.
 	pub fn maybe_resolve_path<'b>(&'b self, path: &syn::Path) -> Option<(&'b String, &'a syn::Path)> {
 		if let Some(ident) = path.get_ident() {
-			for gen in self.typed_generics.iter().rev() {
-				if let Some(res) = gen.get(ident).map(|(a, b)| (a, b.unwrap())) {
-					return Some(res);
-				}
+			if let Some(res) = self.typed_generics.get(ident).map(|(a, b)| (a, b.unwrap())) {
+				return Some(res);
 			}
 		} else {
 			// Associated types are usually specified as "Self::Generic", so we check for that
@@ -299,14 +297,16 @@ impl<'a> GenericTypes<'a> {
 			let mut it = path.segments.iter();
 			if path.segments.len() == 2 && format!("{}", it.next().unwrap().ident) == "Self" {
 				let ident = &it.next().unwrap().ident;
-				for gen in self.typed_generics.iter().rev() {
-					if let Some(res) = gen.get(ident).map(|(a, b)| (a, b.unwrap())) {
-						return Some(res);
-					}
+				if let Some(res) = self.typed_generics.get(ident).map(|(a, b)| (a, b.unwrap())) {
+					return Some(res);
 				}
 			}
 		}
-		None
+		if let Some(parent) = self.parent {
+			parent.maybe_resolve_path(path)
+		} else {
+			None
+		}
 	}
 }
 

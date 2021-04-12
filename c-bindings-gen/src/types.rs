@@ -194,6 +194,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 							assert_simple_bound(&trait_bound);
 							if let Some(mut path) = types.maybe_resolve_path(&trait_bound.path, None) {
 								if types.skip_path(&path) { continue; }
+								if path == "Sized" { continue; }
 								if non_lifetimes_processed { return false; }
 								non_lifetimes_processed = true;
 								let new_ident = if path != "std::ops::Deref" {
@@ -223,6 +224,9 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 							let mut non_lifetimes_processed = false;
 							for bound in t.bounds.iter() {
 								if let syn::TypeParamBound::Trait(trait_bound) = bound {
+									if let Some(id) = trait_bound.path.get_ident() {
+										if format!("{}", id) == "Sized" { continue; }
+									}
 									if non_lifetimes_processed { return false; }
 									non_lifetimes_processed = true;
 									assert_simple_bound(&trait_bound);

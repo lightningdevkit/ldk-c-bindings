@@ -55,7 +55,7 @@ else
 fi
 echo "}" >> /tmp/lightning-crate-source.txt
 
-cat /tmp/lightning-crate-source.txt | RUST_BACKTRACE=1 "$BIN" "$OUT/" lightning "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
+cat /tmp/lightning-crate-source.txt | RUST_BACKTRACE=1 "$BIN" "$OUT/" "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
 popd
 
 if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then

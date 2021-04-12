@@ -1300,8 +1300,9 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 /// Do the Real Work of mapping an original file to C-callable wrappers. Creates a new file at
 /// `out_path` and fills it with wrapper structs/functions to allow calling the things in the AST
 /// at `module` from C.
-fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>, out_dir: &str, orig_crate: &str, header_file: &mut File, cpp_header_file: &mut File) {
+fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>, out_dir: &str, header_file: &mut File, cpp_header_file: &mut File) {
 	for (module, astmod) in libast.modules.iter() {
+		let orig_crate = module.splitn(2, "::").next().unwrap();
 		let ASTModule { ref attrs, ref items, ref submods } = astmod;
 		assert_eq!(export_status(&attrs), ExportStatus::Export);
 
@@ -1454,10 +1455,11 @@ fn walk_private_mod<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, modul
 }
 
 /// Walk the FullLibraryAST, deciding how things will be mapped and adding tracking to CrateTypes.
-fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, crate_types: &mut CrateTypes<'a>) {
+fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a>) {
 	for (module, astmod) in ast_storage.modules.iter() {
 		let ASTModule { ref attrs, ref items, submods: _ } = astmod;
 		assert_eq!(export_status(&attrs), ExportStatus::Export);
+		let orig_crate = module.splitn(2, "::").next().unwrap();
 		let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, module, items);
 
 		for item in items.iter() {
@@ -1573,17 +1575,17 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, crate_types: 
 
 fn main() {
 	let args: Vec<String> = env::args().collect();
-	if args.len() != 6 {
-		eprintln!("Usage: target/dir source_crate_name derived_templates.rs extra/includes.h extra/cpp/includes.hpp");
+	if args.len() != 5 {
+		eprintln!("Usage: target/dir derived_templates.rs extra/includes.h extra/cpp/includes.hpp");
 		process::exit(1);
 	}
 
 	let mut derived_templates = std::fs::OpenOptions::new().write(true).create(true).truncate(true)
-		.open(&args[3]).expect("Unable to open new header file");
+		.open(&args[2]).expect("Unable to open new header file");
 	let mut header_file = std::fs::OpenOptions::new().write(true).create(true).truncate(true)
-		.open(&args[4]).expect("Unable to open new header file");
+		.open(&args[3]).expect("Unable to open new header file");
 	let mut cpp_header_file = std::fs::OpenOptions::new().write(true).create(true).truncate(true)
-		.open(&args[5]).expect("Unable to open new header file");
+		.open(&args[4]).expect("Unable to open new header file");
 
 	writeln!(header_file, "#if defined(__GNUC__)").unwrap();
 	writeln!(header_file, "#define MUST_USE_STRUCT __attribute__((warn_unused))").unwrap();
@@ -1609,10 +1611,10 @@ fn main() {
 	// ...then walk the ASTs tracking what types we will map, and how, so that we can resolve them
 	// when parsing other file ASTs...
 	let mut libtypes = CrateTypes::new(&mut derived_templates, &libast);
-	walk_ast(&libast, &args[2], &mut libtypes);
+	walk_ast(&libast, &mut libtypes);
 
 	// ... finally, do the actual file conversion/mapping, writing out types as we go.
-	convert_file(&libast, &libtypes, &args[1], &args[2], &mut header_file, &mut cpp_header_file);
+	convert_file(&libast, &libtypes, &args[1], &mut header_file, &mut cpp_header_file);
 
 	// For container templates which we created while walking the crate, make sure we add C++
 	// mapped types so that C++ users can utilize the auto-destructors available.

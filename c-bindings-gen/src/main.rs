@@ -18,7 +18,7 @@
 //! It also generates relevant memory-management functions and free-standing functions with
 //! parameters mapped.
 
-use std::collections::{HashMap, hash_map, HashSet};
+use std::collections::{HashMap, hash_map};
 use std::env;
 use std::fs::File;
 use std::io::{Read, Write};
@@ -1297,57 +1297,11 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 // ********************************
 // *** File/Crate Walking Logic ***
 // ********************************
-/// A public module
-struct ASTModule {
-	pub attrs: Vec<syn::Attribute>,
-	pub items: Vec<syn::Item>,
-	pub submods: Vec<String>,
-}
-/// A struct containing the syn::File AST for each file in the crate.
-struct FullLibraryAST {
-	modules: HashMap<String, ASTModule, NonRandomHash>,
-}
-impl FullLibraryAST {
-	fn load_module(&mut self, module: String, attrs: Vec<syn::Attribute>, mut items: Vec<syn::Item>) {
-		let mut non_mod_items = Vec::with_capacity(items.len());
-		let mut submods = Vec::with_capacity(items.len());
-		for item in items.drain(..) {
-			match item {
-				syn::Item::Mod(m) if m.content.is_some() => {
-					if export_status(&m.attrs) == ExportStatus::Export {
-						if let syn::Visibility::Public(_) = m.vis {
-							let modident = format!("{}", m.ident);
-							let modname = if module != "" {
-								module.clone() + "::" + &modident
-							} else {
-								modident.clone()
-							};
-							self.load_module(modname, m.attrs, m.content.unwrap().1);
-							submods.push(modident);
-						} else {
-							non_mod_items.push(syn::Item::Mod(m));
-						}
-					}
-				},
-				syn::Item::Mod(_) => panic!("--pretty=expanded output should never have non-body modules"),
-				_ => { non_mod_items.push(item); }
-			}
-		}
-		self.modules.insert(module, ASTModule { attrs, items: non_mod_items, submods });
-	}
-
-	pub fn load_lib(lib: syn::File) -> Self {
-		assert_eq!(export_status(&lib.attrs), ExportStatus::Export);
-		let mut res = Self { modules: HashMap::default() };
-		res.load_module("".to_owned(), lib.attrs, lib.items);
-		res
-	}
-}
 
 /// Do the Real Work of mapping an original file to C-callable wrappers. Creates a new file at
 /// `out_path` and fills it with wrapper structs/functions to allow calling the things in the AST
 /// at `module` from C.
-fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a>, out_dir: &str, orig_crate: &str, header_file: &mut File, cpp_header_file: &mut File) {
+fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>, out_dir: &str, orig_crate: &str, header_file: &mut File, cpp_header_file: &mut File) {
 	for (module, astmod) in libast.modules.iter() {
 		let ASTModule { ref attrs, ref items, ref submods } = astmod;
 		assert_eq!(export_status(&attrs), ExportStatus::Export);
@@ -1527,7 +1481,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						let trait_path = format!("{}::{}", module, t.ident);
 						walk_supertraits!(t, None, (
 							("Clone", _) => {
-								crate_types.clonable_types.insert("crate::".to_owned() + &trait_path);
+								crate_types.set_clonable("crate::".to_owned() + &trait_path);
 							},
 							(_, _) => {}
 						) );
@@ -1596,7 +1550,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						if let Some(trait_path) = i.trait_.as_ref() {
 							if path_matches_nongeneric(&trait_path.1, &["core", "clone", "Clone"]) {
 								if let Some(full_path) = import_resolver.maybe_resolve_path(&p.path, None) {
-									crate_types.clonable_types.insert("crate::".to_owned() + &full_path);
+									crate_types.set_clonable("crate::".to_owned() + &full_path);
 								}
 							}
 							if let Some(tp) = import_resolver.maybe_resolve_path(&trait_path.1, None) {
@@ -1654,18 +1608,15 @@ fn main() {
 
 	// ...then walk the ASTs tracking what types we will map, and how, so that we can resolve them
 	// when parsing other file ASTs...
-	let mut libtypes = CrateTypes { traits: HashMap::new(), opaques: HashMap::new(), mirrored_enums: HashMap::new(),
-		type_aliases: HashMap::new(), reverse_alias_map: HashMap::new(), templates_defined: HashMap::default(),
-		template_file: &mut derived_templates,
-		clonable_types: HashSet::new(), trait_impls: HashMap::new() };
+	let mut libtypes = CrateTypes::new(&mut derived_templates, &libast);
 	walk_ast(&libast, &mut libtypes);
 
 	// ... finally, do the actual file conversion/mapping, writing out types as we go.
-	convert_file(&libast, &mut libtypes, &args[1], &args[2], &mut header_file, &mut cpp_header_file);
+	convert_file(&libast, &libtypes, &args[1], &args[2], &mut header_file, &mut cpp_header_file);
 
 	// For container templates which we created while walking the crate, make sure we add C++
 	// mapped types so that C++ users can utilize the auto-destructors available.
-	for (ty, has_destructor) in libtypes.templates_defined.iter() {
+	for (ty, has_destructor) in libtypes.templates_defined.borrow().iter() {
 		write_cpp_wrapper(&mut cpp_header_file, ty, *has_destructor);
 	}
 	writeln!(cpp_header_file, "}}").unwrap();

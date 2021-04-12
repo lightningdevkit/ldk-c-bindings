@@ -6,6 +6,7 @@
 // You may not use this file except in accordance with one or both of these
 // licenses.
 
+use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::Write;
@@ -539,6 +540,53 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 #[allow(deprecated)]
 pub type NonRandomHash = hash::BuildHasherDefault<hash::SipHasher>;
 
+/// A public module
+pub struct ASTModule {
+	pub attrs: Vec<syn::Attribute>,
+	pub items: Vec<syn::Item>,
+	pub submods: Vec<String>,
+}
+/// A struct containing the syn::File AST for each file in the crate.
+pub struct FullLibraryAST {
+	pub modules: HashMap<String, ASTModule, NonRandomHash>,
+}
+impl FullLibraryAST {
+	fn load_module(&mut self, module: String, attrs: Vec<syn::Attribute>, mut items: Vec<syn::Item>) {
+		let mut non_mod_items = Vec::with_capacity(items.len());
+		let mut submods = Vec::with_capacity(items.len());
+		for item in items.drain(..) {
+			match item {
+				syn::Item::Mod(m) if m.content.is_some() => {
+					if export_status(&m.attrs) == ExportStatus::Export {
+						if let syn::Visibility::Public(_) = m.vis {
+							let modident = format!("{}", m.ident);
+							let modname = if module != "" {
+								module.clone() + "::" + &modident
+							} else {
+								modident.clone()
+							};
+							self.load_module(modname, m.attrs, m.content.unwrap().1);
+							submods.push(modident);
+						} else {
+							non_mod_items.push(syn::Item::Mod(m));
+						}
+					}
+				},
+				syn::Item::Mod(_) => panic!("--pretty=expanded output should never have non-body modules"),
+				_ => { non_mod_items.push(item); }
+			}
+		}
+		self.modules.insert(module, ASTModule { attrs, items: non_mod_items, submods });
+	}
+
+	pub fn load_lib(lib: syn::File) -> Self {
+		assert_eq!(export_status(&lib.attrs), ExportStatus::Export);
+		let mut res = Self { modules: HashMap::default() };
+		res.load_module("".to_owned(), lib.attrs, lib.items);
+		res
+	}
+}
+
 /// Top-level struct tracking everything which has been defined while walking the crate.
 pub struct CrateTypes<'a> {
 	/// This may contain structs or enums, but only when either is mapped as
@@ -556,14 +604,38 @@ pub struct CrateTypes<'a> {
 	/// exists.
 	///
 	/// This is used at the end of processing to make C++ wrapper classes
-	pub templates_defined: HashMap<String, bool, NonRandomHash>,
+	pub templates_defined: RefCell<HashMap<String, bool, NonRandomHash>>,
 	/// The output file for any created template container types, written to as we find new
 	/// template containers which need to be defined.
-	pub template_file: &'a mut File,
+	template_file: RefCell<&'a mut File>,
 	/// Set of containers which are clonable
-	pub clonable_types: HashSet<String>,
+	clonable_types: RefCell<HashSet<String>>,
 	/// Key impls Value
 	pub trait_impls: HashMap<String, Vec<String>>,
+	/// The full set of modules in the crate(s)
+	pub lib_ast: &'a FullLibraryAST,
+}
+
+impl<'a> CrateTypes<'a> {
+	pub fn new(template_file: &'a mut File, libast: &'a FullLibraryAST) -> Self {
+		CrateTypes {
+			opaques: HashMap::new(), mirrored_enums: HashMap::new(), traits: HashMap::new(),
+			type_aliases: HashMap::new(), reverse_alias_map: HashMap::new(),
+			templates_defined: RefCell::new(HashMap::default()),
+			clonable_types: RefCell::new(HashSet::new()), trait_impls: HashMap::new(),
+			template_file: RefCell::new(template_file), lib_ast: &libast,
+		}
+	}
+	pub fn set_clonable(&self, object: String) {
+		self.clonable_types.borrow_mut().insert(object);
+	}
+	pub fn is_clonable(&self, object: &str) -> bool {
+		self.clonable_types.borrow().contains(object)
+	}
+	pub fn write_new_template(&self, mangled_container: String, has_destructor: bool, created_container: &[u8]) {
+		self.template_file.borrow_mut().write(created_container).unwrap();
+		self.templates_defined.borrow_mut().insert(mangled_container, has_destructor);
+	}
 }
 
 /// A struct which tracks resolving rust types into C-mapped equivalents, exists for one specific
@@ -571,7 +643,7 @@ pub struct CrateTypes<'a> {
 pub struct TypeResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
 	pub orig_crate: &'mod_lifetime str,
 	pub module_path: &'mod_lifetime str,
-	pub crate_types: &'mod_lifetime mut CrateTypes<'crate_lft>,
+	pub crate_types: &'mod_lifetime CrateTypes<'crate_lft>,
 	types: ImportResolver<'mod_lifetime, 'crate_lft>,
 }
 
@@ -601,7 +673,7 @@ enum ContainerPrefixLocation {
 }
 
 impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
-	pub fn new(orig_crate: &'a str, module_path: &'a str, types: ImportResolver<'a, 'c>, crate_types: &'a mut CrateTypes<'c>) -> Self {
+	pub fn new(orig_crate: &'a str, module_path: &'a str, types: ImportResolver<'a, 'c>, crate_types: &'a CrateTypes<'c>) -> Self {
 		Self { orig_crate, module_path, types, crate_types }
 	}
 
@@ -636,7 +708,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 	pub fn is_clonable(&self, ty: &str) -> bool {
-		if self.crate_types.clonable_types.contains(ty) { return true; }
+		if self.crate_types.is_clonable(ty) { return true; }
 		if self.is_primitive(ty) { return true; }
 		match ty {
 			"()" => true,
@@ -1932,7 +2004,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	// *** C Container Type Equivalent and alias Printing ***
 	// ******************************************************
 
-	fn write_template_generics<'b, W: std::io::Write>(&mut self, w: &mut W, args: &mut dyn Iterator<Item=&'b syn::Type>, generics: Option<&GenericTypes>, is_ref: bool) -> bool {
+	fn write_template_generics<'b, W: std::io::Write>(&self, w: &mut W, args: &mut dyn Iterator<Item=&'b syn::Type>, generics: Option<&GenericTypes>, is_ref: bool) -> bool {
 		for (idx, t) in args.enumerate() {
 			if idx != 0 {
 				write!(w, ", ").unwrap();
@@ -1966,8 +2038,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 		true
 	}
-	fn check_create_container(&mut self, mangled_container: String, container_type: &str, args: Vec<&syn::Type>, generics: Option<&GenericTypes>, is_ref: bool) -> bool {
-		if !self.crate_types.templates_defined.get(&mangled_container).is_some() {
+	fn check_create_container(&self, mangled_container: String, container_type: &str, args: Vec<&syn::Type>, generics: Option<&GenericTypes>, is_ref: bool) -> bool {
+		if !self.crate_types.templates_defined.borrow().get(&mangled_container).is_some() {
 			let mut created_container: Vec<u8> = Vec::new();
 
 			if container_type == "Result" {
@@ -1998,7 +2070,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				let is_clonable = self.is_clonable(&ok_str) && self.is_clonable(&err_str);
 				write_result_block(&mut created_container, &mangled_container, &ok_str, &err_str, is_clonable);
 				if is_clonable {
-					self.crate_types.clonable_types.insert(Self::generated_container_path().to_owned() + "::" + &mangled_container);
+					self.crate_types.set_clonable(Self::generated_container_path().to_owned() + "::" + &mangled_container);
 				}
 			} else if container_type == "Vec" {
 				let mut a_ty: Vec<u8> = Vec::new();
@@ -2007,7 +2079,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				let is_clonable = self.is_clonable(&ty);
 				write_vec_block(&mut created_container, &mangled_container, &ty, is_clonable);
 				if is_clonable {
-					self.crate_types.clonable_types.insert(Self::generated_container_path().to_owned() + "::" + &mangled_container);
+					self.crate_types.set_clonable(Self::generated_container_path().to_owned() + "::" + &mangled_container);
 				}
 			} else if container_type.ends_with("Tuple") {
 				let mut tuple_args = Vec::new();
@@ -2023,7 +2095,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				}
 				write_tuple_block(&mut created_container, &mangled_container, &tuple_args, is_clonable);
 				if is_clonable {
-					self.crate_types.clonable_types.insert(Self::generated_container_path().to_owned() + "::" + &mangled_container);
+					self.crate_types.set_clonable(Self::generated_container_path().to_owned() + "::" + &mangled_container);
 				}
 			} else if container_type == "Option" {
 				let mut a_ty: Vec<u8> = Vec::new();
@@ -2032,14 +2104,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				let is_clonable = self.is_clonable(&ty);
 				write_option_block(&mut created_container, &mangled_container, &ty, is_clonable);
 				if is_clonable {
-					self.crate_types.clonable_types.insert(Self::generated_container_path().to_owned() + "::" + &mangled_container);
+					self.crate_types.set_clonable(Self::generated_container_path().to_owned() + "::" + &mangled_container);
 				}
 			} else {
 				unreachable!();
 			}
-			self.crate_types.templates_defined.insert(mangled_container.clone(), true);
-
-			self.crate_types.template_file.write(&created_container).unwrap();
+			self.crate_types.write_new_template(mangled_container.clone(), true, &created_container);
 		}
 		true
 	}
@@ -2049,7 +2119,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		} else { unimplemented!(); }
 	}
 	fn write_c_mangled_container_path_intern<W: std::io::Write>
-			(&mut self, w: &mut W, args: Vec<&syn::Type>, generics: Option<&GenericTypes>, ident: &str, is_ref: bool, is_mut: bool, ptr_for_ref: bool, in_type: bool) -> bool {
+			(&self, w: &mut W, args: Vec<&syn::Type>, generics: Option<&GenericTypes>, ident: &str, is_ref: bool, is_mut: bool, ptr_for_ref: bool, in_type: bool) -> bool {
 		let mut mangled_type: Vec<u8> = Vec::new();
 		if !self.is_transparent_container(ident, is_ref, args.iter().map(|a| *a)) {
 			write!(w, "C{}_", ident).unwrap();
@@ -2161,7 +2231,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		// Make sure the type is actually defined:
 		self.check_create_container(String::from_utf8(mangled_type).unwrap(), ident, args, generics, is_ref)
 	}
-	fn write_c_mangled_container_path<W: std::io::Write>(&mut self, w: &mut W, args: Vec<&syn::Type>, generics: Option<&GenericTypes>, ident: &str, is_ref: bool, is_mut: bool, ptr_for_ref: bool) -> bool {
+	fn write_c_mangled_container_path<W: std::io::Write>(&self, w: &mut W, args: Vec<&syn::Type>, generics: Option<&GenericTypes>, ident: &str, is_ref: bool, is_mut: bool, ptr_for_ref: bool) -> bool {
 		if !self.is_transparent_container(ident, is_ref, args.iter().map(|a| *a)) {
 			write!(w, "{}::", Self::generated_container_path()).unwrap();
 		}
@@ -2204,7 +2274,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			false
 		}
 	}
-	fn write_c_type_intern<W: std::io::Write>(&mut self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, is_mut: bool, ptr_for_ref: bool) -> bool {
+	fn write_c_type_intern<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, is_mut: bool, ptr_for_ref: bool) -> bool {
 		match t {
 			syn::Type::Path(p) => {
 				if p.qself.is_some() {
@@ -2295,14 +2365,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			_ => false,
 		}
 	}
-	pub fn write_c_type<W: std::io::Write>(&mut self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool) {
+	pub fn write_c_type<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool) {
 		assert!(self.write_c_type_intern(w, t, generics, false, false, ptr_for_ref));
 	}
-	pub fn understood_c_path(&mut self, p: &syn::Path) -> bool {
+	pub fn understood_c_path(&self, p: &syn::Path) -> bool {
 		if p.leading_colon.is_some() { return false; }
 		self.write_c_path_intern(&mut std::io::sink(), p, None, false, false, false)
 	}
-	pub fn understood_c_type(&mut self, t: &syn::Type, generics: Option<&GenericTypes>) -> bool {
+	pub fn understood_c_type(&self, t: &syn::Type, generics: Option<&GenericTypes>) -> bool {
 		self.write_c_type_intern(&mut std::io::sink(), t, generics, false, false, false)
 	}
 }

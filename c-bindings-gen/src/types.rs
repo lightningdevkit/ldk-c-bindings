@@ -321,33 +321,46 @@ pub enum DeclType<'a> {
 }
 
 pub struct ImportResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
+	crate_name: &'mod_lifetime str,
+	dependencies: &'mod_lifetime HashSet<syn::Ident>,
 	module_path: &'mod_lifetime str,
 	imports: HashMap<syn::Ident, (String, syn::Path)>,
 	declared: HashMap<syn::Ident, DeclType<'crate_lft>>,
 	priv_modules: HashSet<syn::Ident>,
 }
 impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'crate_lft> {
-	fn process_use_intern(imports: &mut HashMap<syn::Ident, (String, syn::Path)>, u: &syn::UseTree, partial_path: &str, mut path: syn::punctuated::Punctuated<syn::PathSegment, syn::token::Colon2>) {
+	fn process_use_intern(crate_name: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>,
+			u: &syn::UseTree, partial_path: &str, mut path: syn::punctuated::Punctuated<syn::PathSegment, syn::token::Colon2>) {
+
+		let new_path;
+		macro_rules! push_path {
+			($ident: expr, $path_suffix: expr) => {
+				if partial_path == "" && !dependencies.contains(&$ident) {
+					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
+					path.push(syn::PathSegment { ident: syn::Ident::new(crate_name, Span::call_site()), arguments: syn::PathArguments::None });
+				} else {
+					new_path = format!("{}{}{}", partial_path, $ident, $path_suffix);
+				}
+				path.push(syn::PathSegment { ident: $ident.clone(), arguments: syn::PathArguments::None });
+			}
+		}
 		match u {
 			syn::UseTree::Path(p) => {
-				let new_path = format!("{}{}::", partial_path, p.ident);
-				path.push(syn::PathSegment { ident: p.ident.clone(), arguments: syn::PathArguments::None });
-				Self::process_use_intern(imports, &p.tree, &new_path, path);
+				push_path!(p.ident, "::");
+				Self::process_use_intern(crate_name, dependencies, imports, &p.tree, &new_path, path);
 			},
 			syn::UseTree::Name(n) => {
-				let full_path = format!("{}{}", partial_path, n.ident);
-				path.push(syn::PathSegment { ident: n.ident.clone(), arguments: syn::PathArguments::None });
-				imports.insert(n.ident.clone(), (full_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
+				push_path!(n.ident, "");
+				imports.insert(n.ident.clone(), (new_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
 			},
 			syn::UseTree::Group(g) => {
 				for i in g.items.iter() {
-					Self::process_use_intern(imports, i, partial_path, path.clone());
+					Self::process_use_intern(crate_name, dependencies, imports, i, partial_path, path.clone());
 				}
 			},
 			syn::UseTree::Rename(r) => {
-				let full_path = format!("{}{}", partial_path, r.ident);
-				path.push(syn::PathSegment { ident: r.ident.clone(), arguments: syn::PathArguments::None });
-				imports.insert(r.rename.clone(), (full_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
+				push_path!(r.ident, "");
+				imports.insert(r.rename.clone(), (new_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
 			},
 			syn::UseTree::Glob(_) => {
 				eprintln!("Ignoring * use for {} - this may result in resolution failures", partial_path);
@@ -355,24 +368,24 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		}
 	}
 
-	fn process_use(imports: &mut HashMap<syn::Ident, (String, syn::Path)>, u: &syn::ItemUse) {
+	fn process_use(crate_name: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>, u: &syn::ItemUse) {
 		if let syn::Visibility::Public(_) = u.vis {
 			// We actually only use these for #[cfg(fuzztarget)]
 			eprintln!("Ignoring pub(use) tree!");
 			return;
 		}
 		if u.leading_colon.is_some() { eprintln!("Ignoring leading-colon use!"); return; }
-		Self::process_use_intern(imports, &u.tree, "", syn::punctuated::Punctuated::new());
+		Self::process_use_intern(crate_name, dependencies, imports, &u.tree, "", syn::punctuated::Punctuated::new());
 	}
 
 	fn insert_primitive(imports: &mut HashMap<syn::Ident, (String, syn::Path)>, id: &str) {
 		let ident = syn::Ident::new(id, Span::call_site());
 		let mut path = syn::punctuated::Punctuated::new();
 		path.push(syn::PathSegment { ident: ident.clone(), arguments: syn::PathArguments::None });
-		imports.insert(ident, (id.to_owned(), syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
+		imports.insert(ident, (id.to_owned(), syn::Path { leading_colon: None, segments: path }));
 	}
 
-	pub fn new(module_path: &'mod_lifetime str, contents: &'crate_lft [syn::Item]) -> Self {
+	pub fn new(crate_name: &'mod_lifetime str, dependencies: &'mod_lifetime HashSet<syn::Ident>, module_path: &'mod_lifetime str, contents: &'crate_lft [syn::Item]) -> Self {
 		let mut imports = HashMap::new();
 		// Add primitives to the "imports" list:
 		Self::insert_primitive(&mut imports, "bool");
@@ -395,7 +408,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 
 		for item in contents.iter() {
 			match item {
-				syn::Item::Use(u) => Self::process_use(&mut imports, &u),
+				syn::Item::Use(u) => Self::process_use(crate_name, dependencies, &mut imports, &u),
 				syn::Item::Struct(s) => {
 					if let syn::Visibility::Public(_) = s.vis {
 						match export_status(&s.attrs) {
@@ -438,7 +451,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			}
 		}
 
-		Self { module_path, imports, declared, priv_modules }
+		Self { crate_name, dependencies, module_path, imports, declared, priv_modules }
 	}
 
 	pub fn get_declared_type(&self, ident: &syn::Ident) -> Option<&DeclType<'crate_lft>> {
@@ -476,9 +489,14 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		} else { p_arg };
 
 		if p.leading_colon.is_some() {
-			Some(p.segments.iter().enumerate().map(|(idx, seg)| {
+			let mut res: String = p.segments.iter().enumerate().map(|(idx, seg)| {
 				format!("{}{}", if idx == 0 { "" } else { "::" }, seg.ident)
-			}).collect())
+			}).collect();
+			let firstseg = p.segments.iter().next().unwrap();
+			if !self.dependencies.contains(&firstseg.ident) {
+				res = self.crate_name.to_owned() + "::" + &res;
+			}
+			Some(res)
 		} else if let Some(id) = p.get_ident() {
 			self.maybe_resolve_ident(id)
 		} else {
@@ -555,6 +573,7 @@ pub struct ASTModule {
 /// A struct containing the syn::File AST for each file in the crate.
 pub struct FullLibraryAST {
 	pub modules: HashMap<String, ASTModule, NonRandomHash>,
+	pub dependencies: HashSet<syn::Ident>,
 }
 impl FullLibraryAST {
 	fn load_module(&mut self, module: String, attrs: Vec<syn::Attribute>, mut items: Vec<syn::Item>) {
@@ -579,6 +598,11 @@ impl FullLibraryAST {
 					}
 				},
 				syn::Item::Mod(_) => panic!("--pretty=expanded output should never have non-body modules"),
+				syn::Item::ExternCrate(c) => {
+					if export_status(&c.attrs) == ExportStatus::Export {
+						self.dependencies.insert(c.ident);
+					}
+				},
 				_ => { non_mod_items.push(item); }
 			}
 		}
@@ -587,7 +611,7 @@ impl FullLibraryAST {
 
 	pub fn load_lib(lib: syn::File) -> Self {
 		assert_eq!(export_status(&lib.attrs), ExportStatus::Export);
-		let mut res = Self { modules: HashMap::default() };
+		let mut res = Self { modules: HashMap::default(), dependencies: HashSet::new() };
 		res.load_module("".to_owned(), lib.attrs, lib.items);
 		res
 	}
@@ -647,7 +671,6 @@ impl<'a> CrateTypes<'a> {
 /// A struct which tracks resolving rust types into C-mapped equivalents, exists for one specific
 /// module but contains a reference to the overall CrateTypes tracking.
 pub struct TypeResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
-	pub orig_crate: &'mod_lifetime str,
 	pub module_path: &'mod_lifetime str,
 	pub crate_types: &'mod_lifetime CrateTypes<'crate_lft>,
 	types: ImportResolver<'mod_lifetime, 'crate_lft>,
@@ -679,8 +702,8 @@ enum ContainerPrefixLocation {
 }
 
 impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
-	pub fn new(orig_crate: &'a str, module_path: &'a str, types: ImportResolver<'a, 'c>, crate_types: &'a CrateTypes<'c>) -> Self {
-		Self { orig_crate, module_path, types, crate_types }
+	pub fn new(module_path: &'a str, types: ImportResolver<'a, 'c>, crate_types: &'a CrateTypes<'c>) -> Self {
+		Self { module_path, types, crate_types }
 	}
 
 	// *************************************************
@@ -756,7 +779,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::Error" if !is_ref => Some("crate::c_types::Secp256k1Error"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
-			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::chain::transaction::OutPoint"),
+			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
 			"bitcoin::blockdata::transaction::Transaction" => Some("crate::c_types::Transaction"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut"),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network"),
@@ -769,15 +792,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::BlockHash" if is_ref  => Some("*const [u8; 32]"),
 			"bitcoin::hash_types::BlockHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"ln::channelmanager::PaymentHash" if is_ref => Some("*const [u8; 32]"),
-			"ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"ln::channelmanager::PaymentPreimage" if is_ref => Some("*const [u8; 32]"),
-			"ln::channelmanager::PaymentPreimage" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"ln::channelmanager::PaymentSecret" if is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"ln::channelmanager::PaymentSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("*const [u8; 32]"),
+			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some("*const [u8; 32]"),
+			"lightning::ln::channelmanager::PaymentPreimage" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"lightning::ln::channelmanager::PaymentSecret" if is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"lightning::ln::channelmanager::PaymentSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 
 			// Override the default since Records contain an fmt with a lifetime:
-			"util::logger::Record" => Some("*const std::os::raw::c_char"),
+			"lightning::util::logger::Record" => Some("*const std::os::raw::c_char"),
 
 			_ => None,
 		}
@@ -832,11 +855,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if is_ref => Some("&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*"),
 			"bitcoin::hash_types::Txid" if !is_ref => Some("::bitcoin::hash_types::Txid::from_slice(&"),
 			"bitcoin::hash_types::BlockHash" => Some("::bitcoin::hash_types::BlockHash::from_slice(&"),
-			"ln::channelmanager::PaymentHash" if !is_ref => Some("::lightning::ln::channelmanager::PaymentHash("),
-			"ln::channelmanager::PaymentHash" if is_ref => Some("&::lightning::ln::channelmanager::PaymentHash(unsafe { *"),
-			"ln::channelmanager::PaymentPreimage" if !is_ref => Some("::lightning::ln::channelmanager::PaymentPreimage("),
-			"ln::channelmanager::PaymentPreimage" if is_ref => Some("&::lightning::ln::channelmanager::PaymentPreimage(unsafe { *"),
-			"ln::channelmanager::PaymentSecret" => Some("::lightning::ln::channelmanager::PaymentSecret("),
+			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("::lightning::ln::channelmanager::PaymentHash("),
+			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("&::lightning::ln::channelmanager::PaymentHash(unsafe { *"),
+			"lightning::ln::channelmanager::PaymentPreimage" if !is_ref => Some("::lightning::ln::channelmanager::PaymentPreimage("),
+			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some("&::lightning::ln::channelmanager::PaymentPreimage(unsafe { *"),
+			"lightning::ln::channelmanager::PaymentSecret" => Some("::lightning::ln::channelmanager::PaymentSecret("),
 
 			// List of traits we map (possibly during processing of other files):
 			"crate::util::logger::Logger" => Some(""),
@@ -884,11 +907,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if is_ref => Some(" }[..]).unwrap()"),
 			"bitcoin::hash_types::Txid" => Some(".data[..]).unwrap()"),
 			"bitcoin::hash_types::BlockHash" if !is_ref => Some(".data[..]).unwrap()"),
-			"ln::channelmanager::PaymentHash" if !is_ref => Some(".data)"),
-			"ln::channelmanager::PaymentHash" if is_ref => Some(" })"),
-			"ln::channelmanager::PaymentPreimage" if !is_ref => Some(".data)"),
-			"ln::channelmanager::PaymentPreimage" if is_ref => Some(" })"),
-			"ln::channelmanager::PaymentSecret" => Some(".data)"),
+			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some(".data)"),
+			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some(" })"),
+			"lightning::ln::channelmanager::PaymentPreimage" if !is_ref => Some(".data)"),
+			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some(" })"),
+			"lightning::ln::channelmanager::PaymentSecret" => Some(".data)"),
 
 			// List of traits we map (possibly during processing of other files):
 			"crate::util::logger::Logger" => Some(""),
@@ -913,7 +936,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			// Override the default since Records contain an fmt with a lifetime:
 			// TODO: We should include the other record fields
-			"util::logger::Record" => Some(("std::ffi::CString::new(format!(\"{}\", ", ".args)).unwrap()")),
+			"lightning::util::logger::Record" => Some(("std::ffi::CString::new(format!(\"{}\", ", ".args)).unwrap()")),
 			_ => None,
 		}.map(|s| s.to_owned())
 	}
@@ -962,14 +985,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::BlockHash" if is_ref => Some(""),
 			"bitcoin::hash_types::BlockHash" => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"ln::channelmanager::PaymentHash" if is_ref => Some("&"),
-			"ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"ln::channelmanager::PaymentPreimage" if is_ref => Some("&"),
-			"ln::channelmanager::PaymentPreimage" => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"ln::channelmanager::PaymentSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
+			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("&"),
+			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
+			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some("&"),
+			"lightning::ln::channelmanager::PaymentPreimage" => Some("crate::c_types::ThirtyTwoBytes { data: "),
+			"lightning::ln::channelmanager::PaymentSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			// Override the default since Records contain an fmt with a lifetime:
-			"util::logger::Record" => Some("local_"),
+			"lightning::util::logger::Record" => Some("local_"),
 
 			_ => None,
 		}.map(|s| s.to_owned())
@@ -1020,14 +1043,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::BlockHash" if is_ref => Some(".as_inner()"),
 			"bitcoin::hash_types::BlockHash" => Some(".into_inner() }"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
-			"ln::channelmanager::PaymentHash" if is_ref => Some(".0"),
-			"ln::channelmanager::PaymentHash" => Some(".0 }"),
-			"ln::channelmanager::PaymentPreimage" if is_ref => Some(".0"),
-			"ln::channelmanager::PaymentPreimage" => Some(".0 }"),
-			"ln::channelmanager::PaymentSecret" if !is_ref => Some(".0 }"),
+			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some(".0"),
+			"lightning::ln::channelmanager::PaymentHash" => Some(".0 }"),
+			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some(".0"),
+			"lightning::ln::channelmanager::PaymentPreimage" => Some(".0 }"),
+			"lightning::ln::channelmanager::PaymentSecret" if !is_ref => Some(".0 }"),
 
 			// Override the default since Records contain an fmt with a lifetime:
-			"util::logger::Record" => Some(".as_ptr()"),
+			"lightning::util::logger::Record" => Some(".as_ptr()"),
 
 			_ => None,
 		}.map(|s| s.to_owned())
@@ -1035,7 +1058,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 	fn empty_val_check_suffix_from_path(&self, full_path: &str) -> Option<&str> {
 		match full_path {
-			"ln::channelmanager::PaymentSecret" => Some(".data == [0; 32]"),
+			"lightning::ln::channelmanager::PaymentSecret" => Some(".data == [0; 32]"),
 			"bitcoin::secp256k1::key::PublicKey" => Some(".is_null()"),
 			"bitcoin::secp256k1::Signature" => Some(".is_null()"),
 			_ => None
@@ -1264,7 +1287,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// If we're printing a generic argument, it needs to reference the crate, otherwise
 				// the original crate:
 				} else if self.maybe_resolve_path(&path, None).as_ref() == Some(&resolved) {
-					write!(w, "{}::{}", self.orig_crate, resolved).unwrap();
+					write!(w, "{}", resolved).unwrap();
 				} else {
 					write!(w, "crate::{}", resolved).unwrap();
 				}

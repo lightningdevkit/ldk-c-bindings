@@ -32,7 +32,7 @@ mv lightning-c-bindings/src/bitcoin ./
 
 rm -rf lightning-c-bindings/src
 
-mkdir -p lightning-c-bindings/src/c_types/
+mkdir -p lightning-c-bindings/src/{c_types,lightning}
 mv ./mod.rs lightning-c-bindings/src/c_types/
 mv ./bitcoin lightning-c-bindings/src/
 
@@ -44,11 +44,20 @@ OUT_CPP="$(pwd)/lightning-c-bindings/include/lightningpp.hpp"
 BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
 pushd "$LIGHTNING_PATH"
-RUSTC_BOOTSTRAP=1 cargo rustc $FEATURES_ARGS --profile=check -- -Zunstable-options --pretty=expanded |
-	RUST_BACKTRACE=1 "$BIN" "$OUT/" lightning "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
-popd
+RUSTC_BOOTSTRAP=1 cargo rustc $FEATURES_ARGS --profile=check -- -Zunstable-options --pretty=expanded > /tmp/lightning-crate-source.txt
 
 HOST_PLATFORM="$(rustc --version --verbose | grep "host:")"
+if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+	# OSX sed is for some reason not compatible with GNU sed
+	sed -E -i '' 's/#!\[crate_name = "(.*)"\]/pub mod \1 {/' /tmp/lightning-crate-source.txt
+else
+	sed -E -i 's/#!\[crate_name = "(.*)"\]/pub mod \1 {/' /tmp/lightning-crate-source.txt
+fi
+echo "}" >> /tmp/lightning-crate-source.txt
+
+cat /tmp/lightning-crate-source.txt | RUST_BACKTRACE=1 "$BIN" "$OUT/" lightning "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
+popd
+
 if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 	# OSX sed is for some reason not compatible with GNU sed
 	sed -i '' 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH"'", features = ['"$FEATURES"'] }|' lightning-c-bindings/Cargo.toml

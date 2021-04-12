@@ -58,7 +58,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 		}
 
 		match &t as &str {
-			"util::ser::Writeable" => {
+			"lightning::util::ser::Writeable" => {
 				writeln!(w, "#[no_mangle]").unwrap();
 				writeln!(w, "/// Serialize the {} object into a byte array which can be read by {}_read", for_obj, for_obj).unwrap();
 				writeln!(w, "pub extern \"C\" fn {}_write(obj: &{}) -> crate::c_types::derived::CVec_u8Z {{", for_obj, full_obj_path).unwrap();
@@ -82,7 +82,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 					writeln!(w, "}}").unwrap();
 				}
 			},
-			"util::ser::Readable"|"util::ser::ReadableArgs" => {
+			"lightning::util::ser::Readable"|"lightning::util::ser::ReadableArgs" => {
 				// Create the Result<Object, DecodeError> syn::Type
 				let mut err_segs = syn::punctuated::Punctuated::new();
 				err_segs.push(syn::PathSegment { ident: syn::Ident::new("ln", Span::call_site()), arguments: syn::PathArguments::None });
@@ -110,7 +110,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 				write!(w, "pub extern \"C\" fn {}_read(ser: crate::c_types::u8slice", for_obj).unwrap();
 
 				let mut arg_conv = Vec::new();
-				if t == "util::ser::ReadableArgs" {
+				if t == "lightning::util::ser::ReadableArgs" {
 					write!(w, ", arg: ").unwrap();
 					assert!(trait_path.leading_colon.is_none());
 					let args_seg = trait_path.segments.iter().last().unwrap();
@@ -133,7 +133,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 				types.write_c_type(w, &res_ty, Some(generics), false);
 				writeln!(w, " {{").unwrap();
 
-				if t == "util::ser::ReadableArgs" {
+				if t == "lightning::util::ser::ReadableArgs" {
 					w.write(&arg_conv).unwrap();
 					write!(w, ";\n\tlet res: ").unwrap();
 					// At least in one case we need type annotations here, so provide them.
@@ -162,7 +162,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 /// single function (eg for serialization).
 fn convert_trait_impl_field(trait_path: &str) -> (&'static str, String, &'static str) {
 	match trait_path {
-		"util::ser::Writeable" => ("Serialize the object into a byte array", "write".to_owned(), "crate::c_types::derived::CVec_u8Z"),
+		"lightning::util::ser::Writeable" => ("Serialize the object into a byte array", "write".to_owned(), "crate::c_types::derived::CVec_u8Z"),
 		_ => unimplemented!(),
 	}
 }
@@ -171,7 +171,7 @@ fn convert_trait_impl_field(trait_path: &str) -> (&'static str, String, &'static
 /// `for_obj` which implements the the trait at `trait_path`.
 fn write_trait_impl_field_assign<W: std::io::Write>(w: &mut W, trait_path: &str, for_obj: &syn::Ident) {
 	match trait_path {
-		"util::ser::Writeable" => {
+		"lightning::util::ser::Writeable" => {
 			writeln!(w, "\t\twrite: {}_write_void,", for_obj).unwrap();
 		},
 		_ => unimplemented!(),
@@ -182,8 +182,8 @@ fn write_trait_impl_field_assign<W: std::io::Write>(w: &mut W, trait_path: &str,
 fn do_write_impl_trait<W: std::io::Write>(w: &mut W, trait_path: &str, _trait_name: &syn::Ident, for_obj: &str) {
 eprintln!("{}", trait_path);
 	match trait_path {
-		"util::ser::Writeable" => {
-			writeln!(w, "impl lightning::{} for {} {{", trait_path, for_obj).unwrap();
+		"lightning::util::ser::Writeable" => {
+			writeln!(w, "impl {} for {} {{", trait_path, for_obj).unwrap();
 			writeln!(w, "\tfn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), ::std::io::Error> {{").unwrap();
 			writeln!(w, "\t\tlet vec = (self.write)(self.this_arg);").unwrap();
 			writeln!(w, "\t\tw.write_all(vec.as_slice())").unwrap();
@@ -503,9 +503,10 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				let mut module_iter = s.rsplitn(2, "::");
 				module_iter.next().unwrap();
 				let supertrait_module = module_iter.next().unwrap();
-				let imports = ImportResolver::new(supertrait_module, &types.crate_types.lib_ast.modules.get(supertrait_module).unwrap().items);
-				let resolver = TypeResolver::new("lightning", &supertrait_module, imports, types.crate_types); // TODO: Drop hard-coded crate name here
-				writeln!(w, "impl lightning::{} for {} {{", s, trait_name).unwrap(); // TODO: Drop hard-coded crate name here
+				let imports = ImportResolver::new(supertrait_module.splitn(2, "::").next().unwrap(), &types.crate_types.lib_ast.dependencies,
+					supertrait_module, &types.crate_types.lib_ast.modules.get(supertrait_module).unwrap().items);
+				let resolver = TypeResolver::new(&supertrait_module, imports, types.crate_types);
+				writeln!(w, "impl {} for {} {{", s, trait_name).unwrap();
 				impl_trait_for_c!(supertrait, format!(".{}", i), &resolver);
 				writeln!(w, "}}").unwrap();
 				walk_supertraits!(supertrait, Some(&types), (
@@ -520,7 +521,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	) );
 
 	// Finally, implement the original Rust trait for the newly created mapped trait.
-	writeln!(w, "\nuse {}::{}::{} as rust{};", types.orig_crate, types.module_path, t.ident, trait_name).unwrap();
+	writeln!(w, "\nuse {}::{} as rust{};", types.module_path, t.ident, trait_name).unwrap();
 	write!(w, "impl rust{}", t.ident).unwrap();
 	maybe_write_generics(w, &t.generics, types, false);
 	writeln!(w, " for {} {{", trait_name).unwrap();
@@ -550,7 +551,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	// If we directly read the original type by its original name, cbindgen hits
 	// https://github.com/eqrion/cbindgen/issues/286 Thus, instead, we import it as a temporary
 	// name and then reference it by that name, which works around the issue.
-	write!(w, "\nuse {}::{}::{} as native{}Import;\ntype native{} = native{}Import", types.orig_crate, types.module_path, ident, ident, ident, ident).unwrap();
+	write!(w, "\nuse {}::{} as native{}Import;\ntype native{} = native{}Import", types.module_path, ident, ident, ident, ident).unwrap();
 	maybe_write_generics(w, &generics, &types, true);
 	writeln!(w, ";\n").unwrap();
 	writeln!(extra_headers, "struct native{}Opaque;\ntypedef struct native{}Opaque LDKnative{};", ident, ident, ident).unwrap();
@@ -884,9 +885,9 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									t_gen_args += "_"
 								}
 								if takes_self {
-									write!(w, "<native{} as {}::{}<{}>>::{}(unsafe {{ &mut *(this_arg as *mut native{}) }}, ", ident, types.orig_crate, $trait_path, t_gen_args, $m.sig.ident, ident).unwrap();
+									write!(w, "<native{} as {}<{}>>::{}(unsafe {{ &mut *(this_arg as *mut native{}) }}, ", ident, $trait_path, t_gen_args, $m.sig.ident, ident).unwrap();
 								} else {
-									write!(w, "<native{} as {}::{}<{}>>::{}(", ident, types.orig_crate, $trait_path, t_gen_args, $m.sig.ident).unwrap();
+									write!(w, "<native{} as {}<{}>>::{}(", ident, $trait_path, t_gen_args, $m.sig.ident).unwrap();
 								}
 
 								let mut real_type = "".to_string();
@@ -1020,7 +1021,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									} else if takes_self {
 										write!(w, "unsafe {{ &*this_arg.inner }}.{}(", m.sig.ident).unwrap();
 									} else {
-										write!(w, "{}::{}::{}(", types.orig_crate, resolved_path, m.sig.ident).unwrap();
+										write!(w, "{}::{}(", resolved_path, m.sig.ident).unwrap();
 									}
 									write_method_call_params(w, &m.sig, "", types, Some(&meth_gen_types), &ret_type, false);
 									writeln!(w, "\n}}\n").unwrap();
@@ -1146,7 +1147,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 		if var.discriminant.is_some() { unimplemented!(); }
 		writeln!(w, ",").unwrap();
 	}
-	writeln!(w, "}}\nuse {}::{}::{} as native{};\nimpl {} {{", types.orig_crate, types.module_path, e.ident, e.ident, e.ident).unwrap();
+	writeln!(w, "}}\nuse {}::{} as native{};\nimpl {} {{", types.module_path, e.ident, e.ident, e.ident).unwrap();
 
 	macro_rules! write_conv {
 		($fn_sig: expr, $to_c: expr, $ref: expr) => {
@@ -1287,7 +1288,7 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 	write_method_params(w, &f.sig, "", types, Some(&gen_types), false, true);
 	write!(w, " {{\n\t").unwrap();
 	write_method_var_decl_body(w, &f.sig, "", types, Some(&gen_types), false);
-	write!(w, "{}::{}::{}(", types.orig_crate, types.module_path, f.sig.ident).unwrap();
+	write!(w, "{}::{}(", types.module_path, f.sig.ident).unwrap();
 	write_method_call_params(w, &f.sig, "", types, Some(&gen_types), "", false);
 	writeln!(w, "\n}}\n").unwrap();
 }
@@ -1329,6 +1330,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 		if module == "" {
 			// Special-case the top-level lib.rs with various lint allows and a pointer to the c_types
 			// and bitcoin hand-written modules.
+			writeln!(out, "//! C Bindings").unwrap();
 			writeln!(out, "#![allow(unknown_lints)]").unwrap();
 			writeln!(out, "#![allow(non_camel_case_types)]").unwrap();
 			writeln!(out, "#![allow(non_snake_case)]").unwrap();
@@ -1351,8 +1353,8 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 
 		eprintln!("Converting {} entries...", module);
 
-		let import_resolver = ImportResolver::new(module, items);
-		let mut type_resolver = TypeResolver::new(orig_crate, module, import_resolver, crate_types);
+		let import_resolver = ImportResolver::new(orig_crate, &libast.dependencies, module, items);
+		let mut type_resolver = TypeResolver::new(module, import_resolver, crate_types);
 
 		for item in items.iter() {
 			match item {
@@ -1385,7 +1387,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 							if type_resolver.is_primitive(&resolved_path) {
 								writeln_docs(&mut out, &c.attrs, "");
 								writeln!(out, "\n#[no_mangle]").unwrap();
-								writeln!(out, "pub static {}: {} = {}::{}::{};", c.ident, resolved_path, orig_crate, module, c.ident).unwrap();
+								writeln!(out, "pub static {}: {} = {}::{};", c.ident, resolved_path, module, c.ident).unwrap();
 							}
 						}
 					}
@@ -1427,11 +1429,11 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 	}
 }
 
-fn walk_private_mod<'a>(module: String, items: &'a syn::ItemMod, crate_types: &mut CrateTypes<'a>) {
-	let import_resolver = ImportResolver::new(&module, &items.content.as_ref().unwrap().1);
+fn walk_private_mod<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, module: String, items: &'a syn::ItemMod, crate_types: &mut CrateTypes<'a>) {
+	let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, &module, &items.content.as_ref().unwrap().1);
 	for item in items.content.as_ref().unwrap().1.iter() {
 		match item {
-			syn::Item::Mod(m) => walk_private_mod(format!("{}::{}", module, m.ident), m, crate_types),
+			syn::Item::Mod(m) => walk_private_mod(ast_storage, orig_crate, format!("{}::{}", module, m.ident), m, crate_types),
 			syn::Item::Impl(i) => {
 				if let &syn::Type::Path(ref p) = &*i.self_ty {
 					if let Some(trait_path) = i.trait_.as_ref() {
@@ -1452,11 +1454,11 @@ fn walk_private_mod<'a>(module: String, items: &'a syn::ItemMod, crate_types: &m
 }
 
 /// Walk the FullLibraryAST, deciding how things will be mapped and adding tracking to CrateTypes.
-fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a>) {
+fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, crate_types: &mut CrateTypes<'a>) {
 	for (module, astmod) in ast_storage.modules.iter() {
 		let ASTModule { ref attrs, ref items, submods: _ } = astmod;
 		assert_eq!(export_status(&attrs), ExportStatus::Export);
-		let import_resolver = ImportResolver::new(module, items);
+		let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, module, items);
 
 		for item in items.iter() {
 			match item {
@@ -1562,7 +1564,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						}
 					}
 				},
-				syn::Item::Mod(m) => walk_private_mod(format!("{}::{}", module, m.ident), m, crate_types),
+				syn::Item::Mod(m) => walk_private_mod(ast_storage, orig_crate, format!("{}::{}", module, m.ident), m, crate_types),
 				_ => {},
 			}
 		}
@@ -1607,7 +1609,7 @@ fn main() {
 	// ...then walk the ASTs tracking what types we will map, and how, so that we can resolve them
 	// when parsing other file ASTs...
 	let mut libtypes = CrateTypes::new(&mut derived_templates, &libast);
-	walk_ast(&libast, &mut libtypes);
+	walk_ast(&libast, &args[2], &mut libtypes);
 
 	// ... finally, do the actual file conversion/mapping, writing out types as we go.
 	convert_file(&libast, &libtypes, &args[1], &args[2], &mut header_file, &mut cpp_header_file);

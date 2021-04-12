@@ -368,7 +368,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "}}").unwrap();
 
 	macro_rules! impl_trait_for_c {
-		($t: expr, $impl_accessor: expr) => {
+		($t: expr, $impl_accessor: expr, $type_resolver: expr) => {
 			for item in $t.items.iter() {
 				match item {
 					syn::TraitItem::Method(m) => {
@@ -379,9 +379,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 							unimplemented!();
 						}
 						let mut meth_gen_types = gen_types.push_ctx();
-						assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
+						assert!(meth_gen_types.learn_generics(&m.sig.generics, $type_resolver));
 						write!(w, "\tfn {}", m.sig.ident).unwrap();
-						types.write_rust_generic_param(w, Some(&meth_gen_types), m.sig.generics.params.iter());
+						$type_resolver.write_rust_generic_param(w, Some(&meth_gen_types), m.sig.generics.params.iter());
 						write!(w, "(").unwrap();
 						for inp in m.sig.inputs.iter() {
 							match inp {
@@ -405,11 +405,11 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 													ident.mutability.is_some() || ident.subpat.is_some() {
 												unimplemented!();
 											}
-											write!(w, ", {}{}: ", if types.skip_arg(&*arg.ty, Some(&meth_gen_types)) { "_" } else { "" }, ident.ident).unwrap();
+											write!(w, ", {}{}: ", if $type_resolver.skip_arg(&*arg.ty, Some(&meth_gen_types)) { "_" } else { "" }, ident.ident).unwrap();
 										}
 										_ => unimplemented!(),
 									}
-									types.write_rust_type(w, Some(&meth_gen_types), &*arg.ty);
+									$type_resolver.write_rust_type(w, Some(&meth_gen_types), &*arg.ty);
 								}
 							}
 						}
@@ -417,7 +417,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						match &m.sig.output {
 							syn::ReturnType::Type(_, rtype) => {
 								write!(w, " -> ").unwrap();
-								types.write_rust_type(w, Some(&meth_gen_types), &*rtype)
+								$type_resolver.write_rust_type(w, Some(&meth_gen_types), &*rtype)
 							},
 							_ => {},
 						}
@@ -434,16 +434,16 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 								writeln!(w, "if let Some(f) = self{}.set_{} {{", $impl_accessor, m.sig.ident).unwrap();
 								writeln!(w, "\t\t\t(f)(&self{});", $impl_accessor).unwrap();
 								write!(w, "\t\t}}\n\t\t").unwrap();
-								types.write_from_c_conversion_to_ref_prefix(w, &*r.elem, Some(&meth_gen_types));
+								$type_resolver.write_from_c_conversion_to_ref_prefix(w, &*r.elem, Some(&meth_gen_types));
 								write!(w, "self{}.{}", $impl_accessor, m.sig.ident).unwrap();
-								types.write_from_c_conversion_to_ref_suffix(w, &*r.elem, Some(&meth_gen_types));
+								$type_resolver.write_from_c_conversion_to_ref_suffix(w, &*r.elem, Some(&meth_gen_types));
 								writeln!(w, "\n\t}}").unwrap();
 								continue;
 							}
 						}
-						write_method_var_decl_body(w, &m.sig, "\t", types, Some(&meth_gen_types), true);
+						write_method_var_decl_body(w, &m.sig, "\t", $type_resolver, Some(&meth_gen_types), true);
 						write!(w, "(self{}.{})(", $impl_accessor, m.sig.ident).unwrap();
-						write_method_call_params(w, &m.sig, "\t", types, Some(&meth_gen_types), "", true);
+						write_method_call_params(w, &m.sig, "\t", $type_resolver, Some(&meth_gen_types), "", true);
 
 						writeln!(w, "\n\t}}").unwrap();
 					},
@@ -452,7 +452,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						let mut bounds_iter = t.bounds.iter();
 						match bounds_iter.next().unwrap() {
 							syn::TypeParamBound::Trait(tr) => {
-								writeln!(w, "\ttype {} = crate::{};", t.ident, types.resolve_path(&tr.path, Some(&gen_types))).unwrap();
+								writeln!(w, "\ttype {} = crate::{};", t.ident, $type_resolver.resolve_path(&tr.path, Some(&gen_types))).unwrap();
 							},
 							_ => unimplemented!(),
 						}
@@ -500,8 +500,13 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		},
 		(s, i) => {
 			if let Some(supertrait) = types.crate_types.traits.get(s) {
+				let mut module_iter = s.rsplitn(2, "::");
+				module_iter.next().unwrap();
+				let supertrait_module = module_iter.next().unwrap();
+				let imports = ImportResolver::new(supertrait_module, &types.crate_types.lib_ast.modules.get(supertrait_module).unwrap().items);
+				let resolver = TypeResolver::new("lightning", &supertrait_module, imports, types.crate_types); // TODO: Drop hard-coded crate name here
 				writeln!(w, "impl lightning::{} for {} {{", s, trait_name).unwrap(); // TODO: Drop hard-coded crate name here
-				impl_trait_for_c!(supertrait, format!(".{}", i));
+				impl_trait_for_c!(supertrait, format!(".{}", i), &resolver);
 				writeln!(w, "}}").unwrap();
 				walk_supertraits!(supertrait, Some(&types), (
 					("Send", _) => writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap(),
@@ -519,7 +524,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	write!(w, "impl rust{}", t.ident).unwrap();
 	maybe_write_generics(w, &t.generics, types, false);
 	writeln!(w, " for {} {{", trait_name).unwrap();
-	impl_trait_for_c!(t, "");
+	impl_trait_for_c!(t, "", types);
 	writeln!(w, "}}\n").unwrap();
 	writeln!(w, "// We're essentially a pointer already, or at least a set of pointers, so allow us to be used").unwrap();
 	writeln!(w, "// directly as a Deref trait in higher-level structs:").unwrap();

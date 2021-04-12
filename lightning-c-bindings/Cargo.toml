@@ -22,7 +22,7 @@ lightning = { git = "https://git.bitcoin.ninja/rust-lightning", rev = "8088e4ba1
 
 [patch.crates-io]
 # Rust-Secp256k1 PR 279. Should be dropped once merged.
-secp256k1 = { git = 'https://github.com/TheBlueMatt/rust-secp256k1', rev = '15a0d4195a20355f6b1e8f54c84eba56abc15cbd' }
+secp256k1 = { git = 'https://github.com/TheBlueMatt/rust-secp256k1', rev = '50bf9e48ca0f0d267c41e729520a2673ecfaa84f' }
 
 # Always force panic=abort, further options are set in the genbindings.sh build script
 [profile.dev]

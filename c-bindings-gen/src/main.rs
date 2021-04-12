@@ -289,7 +289,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "\t/// An opaque pointer which is passed to your function implementations as an argument.").unwrap();
 	writeln!(w, "\t/// This has no meaning in the LDK, and can be NULL or any other value.").unwrap();
 	writeln!(w, "\tpub this_arg: *mut c_void,").unwrap();
-	let mut generated_fields = Vec::new(); // Every field's name except this_arg, used in Clone generation
+	let mut generated_fields = Vec::new(); // Every field's (name, is_clonable) except this_arg, used in Clone generation
 	for item in t.items.iter() {
 		match item {
 			&syn::TraitItem::Method(ref m) => {
@@ -322,14 +322,14 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						// happen) as well as provide an Option<>al function pointer which is
 						// called when the trait method is called which allows updating on the fly.
 						write!(w, "\tpub {}: ", m.sig.ident).unwrap();
-						generated_fields.push(format!("{}", m.sig.ident));
+						generated_fields.push((format!("{}", m.sig.ident), true));
 						types.write_c_type(w, &*r.elem, Some(&gen_types), false);
 						writeln!(w, ",").unwrap();
 						writeln!(w, "\t/// Fill in the {} field as a reference to it will be given to Rust after this returns", m.sig.ident).unwrap();
 						writeln!(w, "\t/// Note that this takes a pointer to this object, not the this_ptr like other methods do").unwrap();
 						writeln!(w, "\t/// This function pointer may be NULL if {} is filled in when this object is created and never needs updating.", m.sig.ident).unwrap();
 						writeln!(w, "\tpub set_{}: Option<extern \"C\" fn(&{})>,", m.sig.ident, trait_name).unwrap();
-						generated_fields.push(format!("set_{}", m.sig.ident));
+						generated_fields.push((format!("set_{}", m.sig.ident), true));
 						// Note that cbindgen will now generate
 						// typedef struct Thing {..., set_thing: (const Thing*), ...} Thing;
 						// which does not compile since Thing is not defined before it is used.
@@ -344,7 +344,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				}
 
 				write!(w, "\tpub {}: extern \"C\" fn (", m.sig.ident).unwrap();
-				generated_fields.push(format!("{}", m.sig.ident));
+				generated_fields.push((format!("{}", m.sig.ident), true));
 				write_method_params(w, &m.sig, "c_void", types, Some(&gen_types), true, false);
 				writeln!(w, ",").unwrap();
 
@@ -355,25 +355,30 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		}
 	}
 	// Add functions which may be required for supertrait implementations.
+	let mut requires_clone = false;
+	walk_supertraits!(t, Some(&types), (
+		("Clone", _) => requires_clone = true,
+		(_, _) => {}
+	) );
 	walk_supertraits!(t, Some(&types), (
 		("Clone", _) => {
 			writeln!(w, "\t/// Creates a copy of the object pointed to by this_arg, for a copy of this {}.", trait_name).unwrap();
 			writeln!(w, "\t/// Note that the ultimate copy of the {} will have all function pointers the same as the original.", trait_name).unwrap();
 			writeln!(w, "\t/// May be NULL if no action needs to be taken, the this_arg pointer will be copied into the new {}.", trait_name).unwrap();
 			writeln!(w, "\tpub clone: Option<extern \"C\" fn (this_arg: *const c_void) -> *mut c_void>,").unwrap();
-			generated_fields.push("clone".to_owned());
+			generated_fields.push(("clone".to_owned(), true));
 		},
 		("std::cmp::Eq", _) => {
 			writeln!(w, "\t/// Checks if two objects are equal given this object's this_arg pointer and another object.").unwrap();
 			writeln!(w, "\tpub eq: extern \"C\" fn (this_arg: *const c_void, other_arg: &{}) -> bool,", trait_name).unwrap();
 			writeln!(extra_headers, "typedef struct LDK{} LDK{};", trait_name, trait_name).unwrap();
-			generated_fields.push("eq".to_owned());
+			generated_fields.push(("eq".to_owned(), true));
 		},
 		("std::hash::Hash", _) => {
 			writeln!(w, "\t/// Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.").unwrap();
 			writeln!(w, "\t/// This is used, for example, for inclusion of this object in a hash map.").unwrap();
 			writeln!(w, "\tpub hash: extern \"C\" fn (this_arg: *const c_void) -> u64,").unwrap();
-			generated_fields.push("hash".to_owned());
+			generated_fields.push(("hash".to_owned(), true));
 		},
 		("Send", _) => {}, ("Sync", _) => {},
 		(s, i) => {
@@ -381,20 +386,127 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				let (docs, name, ret) = convert_trait_impl_field(s);
 				writeln!(w, "\t/// {}", docs).unwrap();
 				writeln!(w, "\tpub {}: extern \"C\" fn (this_arg: *const c_void) -> {},", name, ret).unwrap();
-				name
+				(name, true) // Assume clonable
 			} else {
 				// For in-crate supertraits, just store a C-mapped copy of the supertrait as a member.
-				writeln!(w, "/// Implementation of {} for this object.", i).unwrap();
+				writeln!(w, "\t/// Implementation of {} for this object.", i).unwrap();
 				writeln!(w, "\tpub {}: crate::{},", i, s).unwrap();
-				format!("{}", i)
+				let is_clonable = types.is_clonable(s);
+				if !is_clonable && requires_clone {
+					writeln!(w, "\t/// Creates a copy of the {}, for a copy of this {}.", i, trait_name).unwrap();
+					writeln!(w, "\t/// Because {} doesn't natively support copying itself, you have to provide a full copy implementation here.", i).unwrap();
+					writeln!(w, "\tpub {}_clone: extern \"C\" fn (orig_{}: &{}) -> {},", i, i, i, i).unwrap();
+				}
+				(format!("{}", i), is_clonable)
 			});
 		}
 	) );
 	writeln!(w, "\t/// Frees any resources associated with this object given its this_arg pointer.").unwrap();
 	writeln!(w, "\t/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.").unwrap();
 	writeln!(w, "\tpub free: Option<extern \"C\" fn(this_arg: *mut c_void)>,").unwrap();
-	generated_fields.push("free".to_owned());
+	generated_fields.push(("free".to_owned(), true));
 	writeln!(w, "}}").unwrap();
+
+	macro_rules! impl_trait_for_c {
+		($t: expr, $impl_accessor: expr) => {
+			for item in $t.items.iter() {
+				match item {
+					syn::TraitItem::Method(m) => {
+						if let ExportStatus::TestOnly = export_status(&m.attrs) { continue; }
+						if m.default.is_some() { unimplemented!(); }
+						if m.sig.constness.is_some() || m.sig.asyncness.is_some() || m.sig.unsafety.is_some() ||
+								m.sig.abi.is_some() || m.sig.variadic.is_some() {
+							unimplemented!();
+						}
+						gen_types.push_ctx();
+						assert!(gen_types.learn_generics(&m.sig.generics, types));
+						write!(w, "\tfn {}", m.sig.ident).unwrap();
+						types.write_rust_generic_param(w, Some(&gen_types), m.sig.generics.params.iter());
+						write!(w, "(").unwrap();
+						for inp in m.sig.inputs.iter() {
+							match inp {
+								syn::FnArg::Receiver(recv) => {
+									if !recv.attrs.is_empty() || recv.reference.is_none() { unimplemented!(); }
+									write!(w, "&").unwrap();
+									if let Some(lft) = &recv.reference.as_ref().unwrap().1 {
+										write!(w, "'{} ", lft.ident).unwrap();
+									}
+									if recv.mutability.is_some() {
+										write!(w, "mut self").unwrap();
+									} else {
+										write!(w, "self").unwrap();
+									}
+								},
+								syn::FnArg::Typed(arg) => {
+									if !arg.attrs.is_empty() { unimplemented!(); }
+									match &*arg.pat {
+										syn::Pat::Ident(ident) => {
+											if !ident.attrs.is_empty() || ident.by_ref.is_some() ||
+													ident.mutability.is_some() || ident.subpat.is_some() {
+												unimplemented!();
+											}
+											write!(w, ", {}{}: ", if types.skip_arg(&*arg.ty, Some(&gen_types)) { "_" } else { "" }, ident.ident).unwrap();
+										}
+										_ => unimplemented!(),
+									}
+									types.write_rust_type(w, Some(&gen_types), &*arg.ty);
+								}
+							}
+						}
+						write!(w, ")").unwrap();
+						match &m.sig.output {
+							syn::ReturnType::Type(_, rtype) => {
+								write!(w, " -> ").unwrap();
+								types.write_rust_type(w, Some(&gen_types), &*rtype)
+							},
+							_ => {},
+						}
+						write!(w, " {{\n\t\t").unwrap();
+						match export_status(&m.attrs) {
+							ExportStatus::NoExport => {
+								unimplemented!();
+							},
+							_ => {},
+						}
+						if let syn::ReturnType::Type(_, rtype) = &m.sig.output {
+							if let syn::Type::Reference(r) = &**rtype {
+								assert_eq!(m.sig.inputs.len(), 1); // Must only take self!
+								writeln!(w, "if let Some(f) = self{}.set_{} {{", $impl_accessor, m.sig.ident).unwrap();
+								writeln!(w, "\t\t\t(f)(&self{});", $impl_accessor).unwrap();
+								write!(w, "\t\t}}\n\t\t").unwrap();
+								types.write_from_c_conversion_to_ref_prefix(w, &*r.elem, Some(&gen_types));
+								write!(w, "self{}.{}", $impl_accessor, m.sig.ident).unwrap();
+								types.write_from_c_conversion_to_ref_suffix(w, &*r.elem, Some(&gen_types));
+								writeln!(w, "\n\t}}").unwrap();
+								gen_types.pop_ctx();
+								continue;
+							}
+						}
+						write_method_var_decl_body(w, &m.sig, "\t", types, Some(&gen_types), true);
+						write!(w, "(self{}.{})(", $impl_accessor, m.sig.ident).unwrap();
+						write_method_call_params(w, &m.sig, "\t", types, Some(&gen_types), "", true);
+
+						writeln!(w, "\n\t}}").unwrap();
+						gen_types.pop_ctx();
+					},
+					&syn::TraitItem::Type(ref t) => {
+						if t.default.is_some() || t.generics.lt_token.is_some() { unimplemented!(); }
+						let mut bounds_iter = t.bounds.iter();
+						match bounds_iter.next().unwrap() {
+							syn::TypeParamBound::Trait(tr) => {
+								writeln!(w, "\ttype {} = crate::{};", t.ident, types.resolve_path(&tr.path, Some(&gen_types))).unwrap();
+							},
+							_ => unimplemented!(),
+						}
+						if bounds_iter.next().is_some() { unimplemented!(); }
+					},
+					_ => unimplemented!(),
+				}
+			}
+		}
+	}
+
+
 	// Implement supertraits for the C-mapped struct.
 	walk_supertraits!(t, Some(&types), (
 		("Send", _) => writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap(),
@@ -414,8 +526,13 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 			writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", trait_name, trait_name, trait_name).unwrap();
 			writeln!(w, "\t{} {{", trait_name).unwrap();
 			writeln!(w, "\t\tthis_arg: if let Some(f) = orig.clone {{ (f)(orig.this_arg) }} else {{ orig.this_arg }},").unwrap();
-			for field in generated_fields.iter() {
-				writeln!(w, "\t\t{}: orig.{}.clone(),", field, field).unwrap();
+			for (field, clonable) in generated_fields.iter() {
+				if *clonable {
+					writeln!(w, "\t\t{}: Clone::clone(&orig.{}),", field, field).unwrap();
+				} else {
+					writeln!(w, "\t\t{}: (orig.{}_clone)(&orig.{}),", field, field, field).unwrap();
+					writeln!(w, "\t\t{}_clone: orig.{}_clone,", field, field).unwrap();
+				}
 			}
 			writeln!(w, "\t}}\n}}").unwrap();
 			writeln!(w, "impl Clone for {} {{", trait_name).unwrap();
@@ -424,7 +541,18 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 			writeln!(w, "\t}}\n}}").unwrap();
 		},
 		(s, i) => {
-			do_write_impl_trait(w, s, i, &trait_name);
+			if let Some(supertrait) = types.crate_types.traits.get(s) {
+				writeln!(w, "impl lightning::{} for {} {{", s, trait_name).unwrap(); // TODO: Drop hard-coded crate name here
+				impl_trait_for_c!(supertrait, format!(".{}", i));
+				writeln!(w, "}}").unwrap();
+				walk_supertraits!(supertrait, Some(&types), (
+					("Send", _) => writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap(),
+					("Sync", _) => writeln!(w, "unsafe impl Sync for {} {{}}", trait_name).unwrap(),
+					_ => unimplemented!()
+				) );
+			} else {
+				do_write_impl_trait(w, s, i, &trait_name);
+			}
 		}
 	) );
 
@@ -433,100 +561,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	write!(w, "impl rust{}", t.ident).unwrap();
 	maybe_write_generics(w, &t.generics, types, false);
 	writeln!(w, " for {} {{", trait_name).unwrap();
-	for item in t.items.iter() {
-		match item {
-			syn::TraitItem::Method(m) => {
-				if let ExportStatus::TestOnly = export_status(&m.attrs) { continue; }
-				if m.default.is_some() { unimplemented!(); }
-				if m.sig.constness.is_some() || m.sig.asyncness.is_some() || m.sig.unsafety.is_some() ||
-						m.sig.abi.is_some() || m.sig.variadic.is_some() {
-					unimplemented!();
-				}
-				gen_types.push_ctx();
-				assert!(gen_types.learn_generics(&m.sig.generics, types));
-				write!(w, "\tfn {}", m.sig.ident).unwrap();
-				types.write_rust_generic_param(w, Some(&gen_types), m.sig.generics.params.iter());
-				write!(w, "(").unwrap();
-				for inp in m.sig.inputs.iter() {
-					match inp {
-						syn::FnArg::Receiver(recv) => {
-							if !recv.attrs.is_empty() || recv.reference.is_none() { unimplemented!(); }
-							write!(w, "&").unwrap();
-							if let Some(lft) = &recv.reference.as_ref().unwrap().1 {
-								write!(w, "'{} ", lft.ident).unwrap();
-							}
-							if recv.mutability.is_some() {
-								write!(w, "mut self").unwrap();
-							} else {
-								write!(w, "self").unwrap();
-							}
-						},
-						syn::FnArg::Typed(arg) => {
-							if !arg.attrs.is_empty() { unimplemented!(); }
-							match &*arg.pat {
-								syn::Pat::Ident(ident) => {
-									if !ident.attrs.is_empty() || ident.by_ref.is_some() ||
-											ident.mutability.is_some() || ident.subpat.is_some() {
-										unimplemented!();
-									}
-									write!(w, ", {}{}: ", if types.skip_arg(&*arg.ty, Some(&gen_types)) { "_" } else { "" }, ident.ident).unwrap();
-								}
-								_ => unimplemented!(),
-							}
-							types.write_rust_type(w, Some(&gen_types), &*arg.ty);
-						}
-					}
-				}
-				write!(w, ")").unwrap();
-				match &m.sig.output {
-					syn::ReturnType::Type(_, rtype) => {
-						write!(w, " -> ").unwrap();
-						types.write_rust_type(w, Some(&gen_types), &*rtype)
-					},
-					_ => {},
-				}
-				write!(w, " {{\n\t\t").unwrap();
-				match export_status(&m.attrs) {
-					ExportStatus::NoExport => {
-						unimplemented!();
-					},
-					_ => {},
-				}
-				if let syn::ReturnType::Type(_, rtype) = &m.sig.output {
-					if let syn::Type::Reference(r) = &**rtype {
-						assert_eq!(m.sig.inputs.len(), 1); // Must only take self!
-						writeln!(w, "if let Some(f) = self.set_{} {{", m.sig.ident).unwrap();
-						writeln!(w, "\t\t\t(f)(self);").unwrap();
-						write!(w, "\t\t}}\n\t\t").unwrap();
-						types.write_from_c_conversion_to_ref_prefix(w, &*r.elem, Some(&gen_types));
-						write!(w, "self.{}", m.sig.ident).unwrap();
-						types.write_from_c_conversion_to_ref_suffix(w, &*r.elem, Some(&gen_types));
-						writeln!(w, "\n\t}}").unwrap();
-						gen_types.pop_ctx();
-						continue;
-					}
-				}
-				write_method_var_decl_body(w, &m.sig, "\t", types, Some(&gen_types), true);
-				write!(w, "(self.{})(", m.sig.ident).unwrap();
-				write_method_call_params(w, &m.sig, "\t", types, Some(&gen_types), "", true);
-
-				writeln!(w, "\n\t}}").unwrap();
-				gen_types.pop_ctx();
-			},
-			&syn::TraitItem::Type(ref t) => {
-				if t.default.is_some() || t.generics.lt_token.is_some() { unimplemented!(); }
-				let mut bounds_iter = t.bounds.iter();
-				match bounds_iter.next().unwrap() {
-					syn::TypeParamBound::Trait(tr) => {
-						writeln!(w, "\ttype {} = crate::{};", t.ident, types.resolve_path(&tr.path, Some(&gen_types))).unwrap();
-					},
-					_ => unimplemented!(),
-				}
-				if bounds_iter.next().is_some() { unimplemented!(); }
-			},
-			_ => unimplemented!(),
-		}
-	}
+	impl_trait_for_c!(t, "");
 	writeln!(w, "}}\n").unwrap();
 	writeln!(w, "// We're essentially a pointer already, or at least a set of pointers, so allow us to be used").unwrap();
 	writeln!(w, "// directly as a Deref trait in higher-level structs:").unwrap();
@@ -819,6 +854,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 								_ => {},
 							}
 						}
+						let mut requires_clone = false;
+						walk_supertraits!(trait_obj, Some(&types), (
+							("Clone", _) => requires_clone = true,
+							(_, _) => {}
+						) );
 						walk_supertraits!(trait_obj, Some(&types), (
 							("Clone", _) => {
 								writeln!(w, "\t\tclone: Some({}_clone_void),", ident).unwrap();
@@ -839,6 +879,9 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										}
 									}
 									write!(w, "\t\t}},\n").unwrap();
+									if !types.is_clonable(s) && requires_clone {
+										writeln!(w, "\t\t{}_clone: {}_{}_clone,", t, ident, t).unwrap();
+									}
 								} else {
 									write_trait_impl_field_assign(w, s, ident);
 								}
@@ -924,15 +967,22 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							}
 						}
 						walk_supertraits!(trait_obj, Some(&types), (
-							(s, _) => {
-								if let Some(supertrait_obj) = types.crate_types.traits.get(s).cloned() {
-									for item in supertrait_obj.items.iter() {
-										match item {
-											syn::TraitItem::Method(m) => {
-												impl_meth!(m, s, supertrait_obj, "\t");
-											},
-											_ => {},
+							(s, t) => {
+								if let Some(supertrait_obj) = types.crate_types.traits.get(s) {
+									if !types.is_clonable(s) && requires_clone {
+										writeln!(w, "extern \"C\" fn {}_{}_clone(orig: &crate::{}) -> crate::{} {{", ident, t, s, s).unwrap();
+										writeln!(w, "\tcrate::{} {{", s).unwrap();
+										writeln!(w, "\t\tthis_arg: orig.this_arg,").unwrap();
+										writeln!(w, "\t\tfree: None,").unwrap();
+										for item in supertrait_obj.items.iter() {
+											match item {
+												syn::TraitItem::Method(m) => {
+													write_meth!(m, supertrait_obj, "");
+												},
+												_ => {},
+											}
 										}
+										write!(w, "\t}}\n}}\n").unwrap();
 									}
 								}
 							}

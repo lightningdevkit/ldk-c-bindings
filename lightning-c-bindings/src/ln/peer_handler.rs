@@ -130,7 +130,7 @@ pub extern "C" fn IgnoringMessageHandler_as_RoutingMessageHandler(this_arg: &Ign
 		MessageSendEventsProvider: crate::util::events::MessageSendEventsProvider {
 			this_arg: unsafe { (*this_arg).inner as *mut c_void },
 			free: None,
-			get_and_clear_pending_msg_events: IgnoringMessageHandler_RoutingMessageHandler_get_and_clear_pending_msg_events,
+			get_and_clear_pending_msg_events: IgnoringMessageHandler_MessageSendEventsProvider_get_and_clear_pending_msg_events,
 		},
 	}
 }
@@ -195,12 +195,6 @@ extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_query_short_ch
 	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_query_short_channel_ids(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &_their_node_id.into_rust(), *unsafe { Box::from_raw(_msg.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { 0u8 /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::LightningError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_ret
-}
-#[must_use]
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_get_and_clear_pending_msg_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_MessageSendEventZ {
-	let mut ret = <nativeIgnoringMessageHandler as lightning::util::events::MessageSendEventsProvider<>>::get_and_clear_pending_msg_events(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::util::events::MessageSendEvent::native_into(item) }); };
-	local_ret.into()
 }
 
 
@@ -325,7 +319,7 @@ pub extern "C" fn ErroringMessageHandler_as_ChannelMessageHandler(this_arg: &Err
 		MessageSendEventsProvider: crate::util::events::MessageSendEventsProvider {
 			this_arg: unsafe { (*this_arg).inner as *mut c_void },
 			free: None,
-			get_and_clear_pending_msg_events: ErroringMessageHandler_ChannelMessageHandler_get_and_clear_pending_msg_events,
+			get_and_clear_pending_msg_events: ErroringMessageHandler_MessageSendEventsProvider_get_and_clear_pending_msg_events,
 		},
 	}
 }
@@ -389,12 +383,6 @@ extern "C" fn ErroringMessageHandler_ChannelMessageHandler_peer_connected(this_a
 }
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_error(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _msg: &crate::ln::msgs::ErrorMessage) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_error(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), unsafe { &*_msg.inner })
-}
-#[must_use]
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_get_and_clear_pending_msg_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_MessageSendEventZ {
-	let mut ret = <nativeErroringMessageHandler as lightning::util::events::MessageSendEventsProvider<>>::get_and_clear_pending_msg_events(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::util::events::MessageSendEvent::native_into(item) }); };
-	local_ret.into()
 }
 
 
@@ -540,12 +528,12 @@ impl std::hash::Hash for SocketDescriptor {
 pub extern "C" fn SocketDescriptor_clone(orig: &SocketDescriptor) -> SocketDescriptor {
 	SocketDescriptor {
 		this_arg: if let Some(f) = orig.clone { (f)(orig.this_arg) } else { orig.this_arg },
-		send_data: orig.send_data.clone(),
-		disconnect_socket: orig.disconnect_socket.clone(),
-		eq: orig.eq.clone(),
-		hash: orig.hash.clone(),
-		clone: orig.clone.clone(),
-		free: orig.free.clone(),
+		send_data: Clone::clone(&orig.send_data),
+		disconnect_socket: Clone::clone(&orig.disconnect_socket),
+		eq: Clone::clone(&orig.eq),
+		hash: Clone::clone(&orig.hash),
+		clone: Clone::clone(&orig.clone),
+		free: Clone::clone(&orig.free),
 	}
 }
 impl Clone for SocketDescriptor {

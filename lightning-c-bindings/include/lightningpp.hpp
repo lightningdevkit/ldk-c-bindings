@@ -971,6 +971,21 @@ public:
 	const LDKSpendableOutputDescriptor* operator &() const { return &self; }
 	const LDKSpendableOutputDescriptor* operator ->() const { return &self; }
 };
+class BaseSign {
+private:
+	LDKBaseSign self;
+public:
+	BaseSign(const BaseSign&) = delete;
+	BaseSign(BaseSign&& o) : self(o.self) { memset(&o, 0, sizeof(BaseSign)); }
+	BaseSign(LDKBaseSign&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKBaseSign)); }
+	operator LDKBaseSign() && { LDKBaseSign res = self; memset(&self, 0, sizeof(LDKBaseSign)); return res; }
+	~BaseSign() { BaseSign_free(self); }
+	BaseSign& operator=(BaseSign&& o) { BaseSign_free(self); self = o.self; memset(&o, 0, sizeof(BaseSign)); return *this; }
+	LDKBaseSign* operator &() { return &self; }
+	LDKBaseSign* operator ->() { return &self; }
+	const LDKBaseSign* operator &() const { return &self; }
+	const LDKBaseSign* operator ->() const { return &self; }
+};
 class Sign {
 private:
 	LDKSign self;

@@ -4512,7 +4512,7 @@ pub struct ChannelMessageHandler {
 	pub handle_channel_update: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ChannelUpdate),
 	/// Handle an incoming error message from the given peer.
 	pub handle_error: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ErrorMessage),
-/// Implementation of MessageSendEventsProvider for this object.
+	/// Implementation of MessageSendEventsProvider for this object.
 	pub MessageSendEventsProvider: crate::util::events::MessageSendEventsProvider,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -4520,7 +4520,9 @@ pub struct ChannelMessageHandler {
 }
 impl lightning::util::events::MessageSendEventsProvider for ChannelMessageHandler {
 	fn get_and_clear_pending_msg_events(&self) -> Vec<lightning::util::events::MessageSendEvent> {
-		<crate::util::events::MessageSendEventsProvider as lightning::util::events::MessageSendEventsProvider>::get_and_clear_pending_msg_events(&self.MessageSendEventsProvider)
+		let mut ret = (self.MessageSendEventsProvider.get_and_clear_pending_msg_events)(self.this_arg);
+		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { item.into_native() }); };
+		local_ret
 	}
 }
 unsafe impl Send for ChannelMessageHandler {}
@@ -4668,7 +4670,7 @@ pub struct RoutingMessageHandler {
 	/// list of short_channel_ids.
 	#[must_use]
 	pub handle_query_short_channel_ids: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: crate::ln::msgs::QueryShortChannelIds) -> crate::c_types::derived::CResult_NoneLightningErrorZ,
-/// Implementation of MessageSendEventsProvider for this object.
+	/// Implementation of MessageSendEventsProvider for this object.
 	pub MessageSendEventsProvider: crate::util::events::MessageSendEventsProvider,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -4678,7 +4680,9 @@ unsafe impl Send for RoutingMessageHandler {}
 unsafe impl Sync for RoutingMessageHandler {}
 impl lightning::util::events::MessageSendEventsProvider for RoutingMessageHandler {
 	fn get_and_clear_pending_msg_events(&self) -> Vec<lightning::util::events::MessageSendEvent> {
-		<crate::util::events::MessageSendEventsProvider as lightning::util::events::MessageSendEventsProvider>::get_and_clear_pending_msg_events(&self.MessageSendEventsProvider)
+		let mut ret = (self.MessageSendEventsProvider.get_and_clear_pending_msg_events)(self.this_arg);
+		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { item.into_native() }); };
+		local_ret
 	}
 }
 

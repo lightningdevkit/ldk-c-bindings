@@ -42,16 +42,6 @@ pub enum Event {
 		/// The value passed in to ChannelManager::create_channel
 		user_channel_id: u64,
 	},
-	/// Used to indicate that the client may now broadcast the funding transaction it created for a
-	/// channel. Broadcasting such a transaction prior to this event may lead to our counterparty
-	/// trivially stealing all funds in the funding transaction!
-	FundingBroadcastSafe {
-		/// The output, which was passed to ChannelManager::funding_transaction_generated, which is
-		/// now safe to broadcast.
-		funding_txo: crate::chain::transaction::OutPoint,
-		/// The value passed in to ChannelManager::create_channel
-		user_channel_id: u64,
-	},
 	/// Indicates we've received money! Just gotta dig out that payment preimage and feed it to
 	/// ChannelManager::claim_funds to get it....
 	/// Note that if the preimage is not known or the amount paid is incorrect, you should call
@@ -137,14 +127,6 @@ impl Event {
 					user_channel_id: user_channel_id_nonref,
 				}
 			},
-			Event::FundingBroadcastSafe {ref funding_txo, ref user_channel_id, } => {
-				let mut funding_txo_nonref = (*funding_txo).clone();
-				let mut user_channel_id_nonref = (*user_channel_id).clone();
-				nativeEvent::FundingBroadcastSafe {
-					funding_txo: *unsafe { Box::from_raw(funding_txo_nonref.take_inner()) },
-					user_channel_id: user_channel_id_nonref,
-				}
-			},
 			Event::PaymentReceived {ref payment_hash, ref payment_secret, ref amt, } => {
 				let mut payment_hash_nonref = (*payment_hash).clone();
 				let mut payment_secret_nonref = (*payment_secret).clone();
@@ -196,12 +178,6 @@ impl Event {
 					user_channel_id: user_channel_id,
 				}
 			},
-			Event::FundingBroadcastSafe {mut funding_txo, mut user_channel_id, } => {
-				nativeEvent::FundingBroadcastSafe {
-					funding_txo: *unsafe { Box::from_raw(funding_txo.take_inner()) },
-					user_channel_id: user_channel_id,
-				}
-			},
 			Event::PaymentReceived {mut payment_hash, mut payment_secret, mut amt, } => {
 				let mut local_payment_secret = if payment_secret.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentSecret(payment_secret.data) }) };
 				nativeEvent::PaymentReceived {
@@ -246,14 +222,6 @@ impl Event {
 					temporary_channel_id: crate::c_types::ThirtyTwoBytes { data: temporary_channel_id_nonref },
 					channel_value_satoshis: channel_value_satoshis_nonref,
 					output_script: output_script_nonref.into_bytes().into(),
-					user_channel_id: user_channel_id_nonref,
-				}
-			},
-			nativeEvent::FundingBroadcastSafe {ref funding_txo, ref user_channel_id, } => {
-				let mut funding_txo_nonref = (*funding_txo).clone();
-				let mut user_channel_id_nonref = (*user_channel_id).clone();
-				Event::FundingBroadcastSafe {
-					funding_txo: crate::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(funding_txo_nonref)), is_owned: true },
 					user_channel_id: user_channel_id_nonref,
 				}
 			},
@@ -305,12 +273,6 @@ impl Event {
 					temporary_channel_id: crate::c_types::ThirtyTwoBytes { data: temporary_channel_id },
 					channel_value_satoshis: channel_value_satoshis,
 					output_script: output_script.into_bytes().into(),
-					user_channel_id: user_channel_id,
-				}
-			},
-			nativeEvent::FundingBroadcastSafe {mut funding_txo, mut user_channel_id, } => {
-				Event::FundingBroadcastSafe {
-					funding_txo: crate::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(funding_txo)), is_owned: true },
 					user_channel_id: user_channel_id,
 				}
 			},

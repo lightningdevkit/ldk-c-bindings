@@ -8526,6 +8526,188 @@ impl From<crate::c_types::CResultTempl<crate::c_types::Transaction, u8>> for CRe
 	}
 }
 #[repr(C)]
+/// The contents of CResult_NoneErrorZ
+pub union CResult_NoneErrorZPtr {
+	/// Note that this value is always NULL, as there are no contents in the OK variant
+	pub result: *mut std::ffi::c_void,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::c_types::IOError,
+}
+#[repr(C)]
+/// A CResult_NoneErrorZ represents the result of a fallible operation,
+/// containing a () on success and a crate::c_types::IOError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_NoneErrorZ {
+	/// The contents of this CResult_NoneErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_NoneErrorZPtr,
+	/// Whether this CResult_NoneErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_NoneErrorZ in the success state.
+pub extern "C" fn CResult_NoneErrorZ_ok() -> CResult_NoneErrorZ {
+	CResult_NoneErrorZ {
+		contents: CResult_NoneErrorZPtr {
+			result: std::ptr::null_mut(),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_NoneErrorZ in the error state.
+pub extern "C" fn CResult_NoneErrorZ_err(e: crate::c_types::IOError) -> CResult_NoneErrorZ {
+	CResult_NoneErrorZ {
+		contents: CResult_NoneErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_NoneErrorZ.
+pub extern "C" fn CResult_NoneErrorZ_free(_res: CResult_NoneErrorZ) { }
+impl Drop for CResult_NoneErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<u8, crate::c_types::IOError>> for CResult_NoneErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<u8, crate::c_types::IOError>) -> Self {
+		let contents = if o.result_ok {
+			let _ = unsafe { Box::from_raw(o.contents.result) };
+			o.contents.result = std::ptr::null_mut();
+			CResult_NoneErrorZPtr { result: std::ptr::null_mut() }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_NoneErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+#[repr(C)]
+/// A dynamically-allocated array of crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZs of arbitrary size.
+/// This corresponds to std::vector in C++
+pub struct CVec_C2Tuple_BlockHashChannelMonitorZZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+	pub data: *mut crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ,
+	/// The number of elements pointed to by `data`.
+	pub datalen: usize
+}
+impl CVec_C2Tuple_BlockHashChannelMonitorZZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ> {
+		if self.datalen == 0 { return Vec::new(); }
+		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = std::ptr::null_mut();
+		self.datalen = 0;
+		ret
+	}
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ] {
+		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+	}
+}
+impl From<Vec<crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ>> for CVec_C2Tuple_BlockHashChannelMonitorZZ {
+	fn from(v: Vec<crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ>) -> Self {
+		let datalen = v.len();
+		let data = Box::into_raw(v.into_boxed_slice());
+		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
+	}
+}
+#[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
+pub extern "C" fn CVec_C2Tuple_BlockHashChannelMonitorZZ_free(_res: CVec_C2Tuple_BlockHashChannelMonitorZZ) { }
+impl Drop for CVec_C2Tuple_BlockHashChannelMonitorZZ {
+	fn drop(&mut self) {
+		if self.datalen == 0 { return; }
+		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+	}
+}
+#[repr(C)]
+/// The contents of CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ
+pub union CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::c_types::derived::CVec_C2Tuple_BlockHashChannelMonitorZZ,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::c_types::IOError,
+}
+#[repr(C)]
+/// A CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::CVec_C2Tuple_BlockHashChannelMonitorZZ on success and a crate::c_types::IOError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
+	/// The contents of this CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZPtr,
+	/// Whether this CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ in the success state.
+pub extern "C" fn CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ_ok(o: crate::c_types::derived::CVec_C2Tuple_BlockHashChannelMonitorZZ) -> CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
+	CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
+		contents: CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ in the error state.
+pub extern "C" fn CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ_err(e: crate::c_types::IOError) -> CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
+	CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
+		contents: CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ.
+pub extern "C" fn CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ_free(_res: CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ) { }
+impl Drop for CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::c_types::derived::CVec_C2Tuple_BlockHashChannelMonitorZZ, crate::c_types::IOError>> for CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::CVec_C2Tuple_BlockHashChannelMonitorZZ, crate::c_types::IOError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+#[repr(C)]
 /// The contents of CResult_NoneAPIErrorZ
 pub union CResult_NoneAPIErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant

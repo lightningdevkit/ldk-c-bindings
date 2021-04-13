@@ -20,3 +20,4 @@
 pub mod c_types;
 pub mod bitcoin;
 pub mod lightning;
+pub mod lightning_persister;

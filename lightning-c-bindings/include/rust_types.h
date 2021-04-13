@@ -173,6 +173,8 @@ struct nativeKeysManagerOpaque;
 typedef struct nativeKeysManagerOpaque LDKnativeKeysManager;
 struct nativeChainMonitorOpaque;
 typedef struct nativeChainMonitorOpaque LDKnativeChainMonitor;
+struct nativeFilesystemPersisterOpaque;
+typedef struct nativeFilesystemPersisterOpaque LDKnativeFilesystemPersister;
 struct nativeChannelManagerOpaque;
 typedef struct nativeChannelManagerOpaque LDKnativeChannelManager;
 struct nativeChainParametersOpaque;

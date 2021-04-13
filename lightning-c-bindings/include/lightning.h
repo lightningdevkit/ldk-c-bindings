@@ -121,6 +121,34 @@ typedef enum LDKConfirmationTarget {
 } LDKConfirmationTarget;
 
 /**
+ * Represents an IO Error. Note that some information is lost in the conversion from Rust.
+ */
+typedef enum LDKIOError {
+   LDKIOError_NotFound,
+   LDKIOError_PermissionDenied,
+   LDKIOError_ConnectionRefused,
+   LDKIOError_ConnectionReset,
+   LDKIOError_ConnectionAborted,
+   LDKIOError_NotConnected,
+   LDKIOError_AddrInUse,
+   LDKIOError_AddrNotAvailable,
+   LDKIOError_BrokenPipe,
+   LDKIOError_AlreadyExists,
+   LDKIOError_WouldBlock,
+   LDKIOError_InvalidInput,
+   LDKIOError_InvalidData,
+   LDKIOError_TimedOut,
+   LDKIOError_WriteZero,
+   LDKIOError_Interrupted,
+   LDKIOError_Other,
+   LDKIOError_UnexpectedEof,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKIOError_Sentinel,
+} LDKIOError;
+
+/**
  * An enum representing the available verbosity levels of the logger.
  */
 typedef enum LDKLevel {
@@ -5982,6 +6010,87 @@ typedef struct LDKCResult_TransactionNoneZ {
 } LDKCResult_TransactionNoneZ;
 
 /**
+ * The contents of CResult_NoneErrorZ
+ */
+typedef union LDKCResult_NoneErrorZPtr {
+   /**
+    * Note that this value is always NULL, as there are no contents in the OK variant
+    */
+   void *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   enum LDKIOError *err;
+} LDKCResult_NoneErrorZPtr;
+
+/**
+ * A CResult_NoneErrorZ represents the result of a fallible operation,
+ * containing a () on success and a crate::c_types::IOError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_NoneErrorZ {
+   /**
+    * The contents of this CResult_NoneErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_NoneErrorZPtr contents;
+   /**
+    * Whether this CResult_NoneErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_NoneErrorZ;
+
+/**
+ * A dynamically-allocated array of crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZs of arbitrary size.
+ * This corresponds to std::vector in C++
+ */
+typedef struct LDKCVec_C2Tuple_BlockHashChannelMonitorZZ {
+   /**
+    * The elements in the array.
+    * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+    */
+   struct LDKC2Tuple_BlockHashChannelMonitorZ *data;
+   /**
+    * The number of elements pointed to by `data`.
+    */
+   uintptr_t datalen;
+} LDKCVec_C2Tuple_BlockHashChannelMonitorZZ;
+
+/**
+ * The contents of CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ
+ */
+typedef union LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKCVec_C2Tuple_BlockHashChannelMonitorZZ *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   enum LDKIOError *err;
+} LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZPtr;
+
+/**
+ * A CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ represents the result of a fallible operation,
+ * containing a crate::c_types::derived::CVec_C2Tuple_BlockHashChannelMonitorZZ on success and a crate::c_types::IOError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
+   /**
+    * The contents of this CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZPtr contents;
+   /**
+    * Whether this CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ;
+
+/**
  * A Rust str object, ie a reference to a UTF8-valid string.
  * This is *not* null-terminated so cannot be used directly as a C string!
  */
@@ -7472,6 +7581,37 @@ typedef struct MUST_USE_STRUCT LDKNetGraphMsgHandler {
     */
    bool is_owned;
 } LDKNetGraphMsgHandler;
+
+
+
+/**
+ * FilesystemPersister persists channel data on disk, where each channel's
+ * data is stored in a file named after its funding outpoint.
+ *
+ * Warning: this module does the best it can with calls to persist data, but it
+ * can only guarantee that the data is passed to the drive. It is up to the
+ * drive manufacturers to do the actual persistence properly, which they often
+ * don't (especially on consumer-grade hardware). Therefore, it is up to the
+ * user to validate their entire storage stack, to ensure the writes are
+ * persistent.
+ * Corollary: especially when dealing with larger amounts of money, it is best
+ * practice to have multiple channel data backups and not rely only on one
+ * FilesystemPersister.
+ */
+typedef struct MUST_USE_STRUCT LDKFilesystemPersister {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeFilesystemPersister *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKFilesystemPersister;
 
 extern const uintptr_t MAX_BUF_SIZE;
 
@@ -9382,6 +9522,41 @@ struct LDKCResult_TransactionNoneZ CResult_TransactionNoneZ_err(void);
  * Frees any resources used by the CResult_TransactionNoneZ.
  */
 void CResult_TransactionNoneZ_free(struct LDKCResult_TransactionNoneZ _res);
+
+/**
+ * Creates a new CResult_NoneErrorZ in the success state.
+ */
+struct LDKCResult_NoneErrorZ CResult_NoneErrorZ_ok(void);
+
+/**
+ * Creates a new CResult_NoneErrorZ in the error state.
+ */
+struct LDKCResult_NoneErrorZ CResult_NoneErrorZ_err(enum LDKIOError e);
+
+/**
+ * Frees any resources used by the CResult_NoneErrorZ.
+ */
+void CResult_NoneErrorZ_free(struct LDKCResult_NoneErrorZ _res);
+
+/**
+ * Frees the buffer pointed to by `data` if `datalen` is non-0.
+ */
+void CVec_C2Tuple_BlockHashChannelMonitorZZ_free(struct LDKCVec_C2Tuple_BlockHashChannelMonitorZZ _res);
+
+/**
+ * Creates a new CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ in the success state.
+ */
+struct LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ_ok(struct LDKCVec_C2Tuple_BlockHashChannelMonitorZZ o);
+
+/**
+ * Creates a new CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ in the error state.
+ */
+struct LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ_err(enum LDKIOError e);
+
+/**
+ * Frees any resources used by the CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ.
+ */
+void CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ_free(struct LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ _res);
 
 /**
  * Creates a new CResult_NoneAPIErrorZ in the success state.
@@ -15583,5 +15758,38 @@ MUST_USE_RES struct LDKCResult_NoneLightningErrorZ NetworkGraph_update_channel(s
  * associated signatures here we cannot relay the channel update to any of our peers.
  */
 MUST_USE_RES struct LDKCResult_NoneLightningErrorZ NetworkGraph_update_channel_unsigned(struct LDKNetworkGraph *NONNULL_PTR this_arg, const struct LDKUnsignedChannelUpdate *NONNULL_PTR msg);
+
+/**
+ * Frees any resources used by the FilesystemPersister, if is_owned is set and inner is non-NULL.
+ */
+void FilesystemPersister_free(struct LDKFilesystemPersister this_obj);
+
+/**
+ * Initialize a new FilesystemPersister and set the path to the individual channels'
+ * files.
+ */
+MUST_USE_RES struct LDKFilesystemPersister FilesystemPersister_new(struct LDKCVec_u8Z path_to_channel_data);
+
+/**
+ * Get the directory which was provided when this persister was initialized.
+ */
+MUST_USE_RES struct LDKCVec_u8Z FilesystemPersister_get_data_dir(const struct LDKFilesystemPersister *NONNULL_PTR this_arg);
+
+/**
+ * Writes the provided `ChannelManager` to the path provided at `FilesystemPersister`
+ * initialization, within a file called \"manager\".
+ */
+MUST_USE_RES struct LDKCResult_NoneErrorZ FilesystemPersister_persist_manager(struct LDKCVec_u8Z data_dir, const struct LDKChannelManager *NONNULL_PTR manager);
+
+/**
+ * Read `ChannelMonitor`s from disk.
+ */
+MUST_USE_RES struct LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ FilesystemPersister_read_channelmonitors(const struct LDKFilesystemPersister *NONNULL_PTR this_arg, struct LDKKeysInterface keys_manager);
+
+/**
+ * Constructs a new Persist which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned Persist must be freed before this_arg is
+ */
+struct LDKPersist FilesystemPersister_as_Persist(const struct LDKFilesystemPersister *NONNULL_PTR this_arg);
 
 /* Text to put at the end of the generated file */

@@ -3202,12 +3202,6 @@ typedef enum LDKEvent_Tag {
     */
    LDKEvent_FundingGenerationReady,
    /**
-    * Used to indicate that the client may now broadcast the funding transaction it created for a
-    * channel. Broadcasting such a transaction prior to this event may lead to our counterparty
-    * trivially stealing all funds in the funding transaction!
-    */
-   LDKEvent_FundingBroadcastSafe,
-   /**
     * Indicates we've received money! Just gotta dig out that payment preimage and feed it to
     * ChannelManager::claim_funds to get it....
     * Note that if the preimage is not known or the amount paid is incorrect, you should call
@@ -3271,18 +3265,6 @@ typedef struct LDKEvent_LDKFundingGenerationReady_Body {
     */
    uint64_t user_channel_id;
 } LDKEvent_LDKFundingGenerationReady_Body;
-
-typedef struct LDKEvent_LDKFundingBroadcastSafe_Body {
-   /**
-    * The output, which was passed to ChannelManager::funding_transaction_generated, which is
-    * now safe to broadcast.
-    */
-   struct LDKOutPoint funding_txo;
-   /**
-    * The value passed in to ChannelManager::create_channel
-    */
-   uint64_t user_channel_id;
-} LDKEvent_LDKFundingBroadcastSafe_Body;
 
 typedef struct LDKEvent_LDKPaymentReceived_Body {
    /**
@@ -3352,7 +3334,6 @@ typedef struct MUST_USE_STRUCT LDKEvent {
    LDKEvent_Tag tag;
    union {
       LDKEvent_LDKFundingGenerationReady_Body funding_generation_ready;
-      LDKEvent_LDKFundingBroadcastSafe_Body funding_broadcast_safe;
       LDKEvent_LDKPaymentReceived_Body payment_received;
       LDKEvent_LDKPaymentSent_Body payment_sent;
       LDKEvent_LDKPaymentFailed_Body payment_failed;
@@ -3820,7 +3801,7 @@ typedef struct MUST_USE_STRUCT LDKUnsignedChannelAnnouncement {
  * to act, as liveness and breach reply correctness are always going to be hard requirements
  * of LN security model, orthogonal of key management issues.
  */
-typedef struct LDKSign {
+typedef struct LDKBaseSign {
    /**
     * An opaque pointer which is passed to your function implementations as an argument.
     * This has no meaning in the LDK, and can be NULL or any other value.
@@ -3852,7 +3833,7 @@ typedef struct LDKSign {
     * Note that this takes a pointer to this object, not the this_ptr like other methods do
     * This function pointer may be NULL if pubkeys is filled in when this object is created and never needs updating.
     */
-   void (*set_pubkeys)(const struct LDKSign*NONNULL_PTR );
+   void (*set_pubkeys)(const struct LDKBaseSign*NONNULL_PTR );
    /**
     * Gets an arbitrary identifier describing the set of keys which are provided back to you in
     * some SpendableOutputDescriptor types. This should be sufficient to identify this
@@ -3950,15 +3931,44 @@ typedef struct LDKSign {
     */
    void (*ready_channel)(void *this_arg, const struct LDKChannelTransactionParameters *NONNULL_PTR channel_parameters);
    /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
+   void (*free)(void *this_arg);
+} LDKBaseSign;
+
+/**
+ * A cloneable signer.
+ *
+ * Although we require signers to be cloneable, it may be useful for developers to be able to use
+ * signers in an un-sized way, for example as `dyn BaseSign`. Therefore we separate the Clone trait,
+ * which implies Sized, into this derived trait.
+ */
+typedef struct LDKSign {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
+   void *this_arg;
+   /**
+    * Implementation of BaseSign for this object.
+    */
+   struct LDKBaseSign BaseSign;
+   /**
+    * Creates a copy of the BaseSign, for a copy of this Sign.
+    * Because BaseSign doesn't natively support copying itself, you have to provide a full copy implementation here.
+    */
+   struct LDKBaseSign (*BaseSign_clone)(const struct LDKBaseSign *NONNULL_PTR orig_BaseSign);
+   /**
+    * Serialize the object into a byte array
+    */
+   struct LDKCVec_u8Z (*write)(const void *this_arg);
+   /**
     * Creates a copy of the object pointed to by this_arg, for a copy of this Sign.
     * Note that the ultimate copy of the Sign will have all function pointers the same as the original.
     * May be NULL if no action needs to be taken, the this_arg pointer will be copied into the new Sign.
     */
    void *(*clone)(const void *this_arg);
-   /**
-    * Serialize the object into a byte array
-    */
-   struct LDKCVec_u8Z (*write)(const void *this_arg);
    /**
     * Frees any resources associated with this object given its this_arg pointer.
     * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -10532,6 +10542,11 @@ struct LDKCVec_u8Z SpendableOutputDescriptor_write(const struct LDKSpendableOutp
 struct LDKCResult_SpendableOutputDescriptorDecodeErrorZ SpendableOutputDescriptor_read(struct LDKu8slice ser);
 
 /**
+ * Calls the free function if one is set
+ */
+void BaseSign_free(struct LDKBaseSign this_ptr);
+
+/**
  * Creates a copy of a Sign
  */
 struct LDKSign Sign_clone(const struct LDKSign *NONNULL_PTR orig);
@@ -10681,6 +10696,12 @@ MUST_USE_RES struct LDKCResult_CVec_CVec_u8ZZNoneZ InMemorySigner_sign_counterpa
  * sequence set to `descriptor.to_self_delay`.
  */
 MUST_USE_RES struct LDKCResult_CVec_CVec_u8ZZNoneZ InMemorySigner_sign_dynamic_p2wsh_input(const struct LDKInMemorySigner *NONNULL_PTR this_arg, struct LDKTransaction spend_tx, uintptr_t input_idx, const struct LDKDelayedPaymentOutputDescriptor *NONNULL_PTR descriptor);
+
+/**
+ * Constructs a new BaseSign which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned BaseSign must be freed before this_arg is
+ */
+struct LDKBaseSign InMemorySigner_as_BaseSign(const struct LDKInMemorySigner *NONNULL_PTR this_arg);
 
 /**
  * Constructs a new Sign which calls the relevant methods on this_arg.
@@ -10962,10 +10983,11 @@ MUST_USE_RES struct LDKChannelManager ChannelManager_new(struct LDKFeeEstimator 
 /**
  * Creates a new outbound channel to the given remote node and with the given value.
  *
- * user_id will be provided back as user_channel_id in FundingGenerationReady and
- * FundingBroadcastSafe events to allow tracking of which events correspond with which
- * create_channel call. Note that user_channel_id defaults to 0 for inbound channels, so you
- * may wish to avoid using 0 for user_id here.
+ * user_id will be provided back as user_channel_id in FundingGenerationReady events to allow
+ * tracking of which events correspond with which create_channel call. Note that the
+ * user_channel_id defaults to 0 for inbound channels, so you may wish to avoid using 0 for
+ * user_id here. user_id has no meaning inside of LDK, it is simply copied to events and
+ * otherwise ignored.
  *
  * If successful, will generate a SendOpenChannel message event, so you should probably poll
  * PeerManager::process_events afterwards.
@@ -11057,15 +11079,24 @@ MUST_USE_RES struct LDKCResult_NonePaymentSendFailureZ ChannelManager_send_payme
 /**
  * Call this upon creation of a funding transaction for the given channel.
  *
- * Note that ALL inputs in the transaction pointed to by funding_txo MUST spend SegWit outputs
- * or your counterparty can steal your funds!
+ * Returns an [`APIError::APIMisuseError`] if the funding_transaction spent non-SegWit outputs
+ * or if no output was found which matches the parameters in [`Event::FundingGenerationReady`].
  *
  * Panics if a funding transaction has already been provided for this channel.
  *
- * May panic if the funding_txo is duplicative with some other channel (note that this should
- * be trivially prevented by using unique funding transaction keys per-channel).
+ * May panic if the output found in the funding transaction is duplicative with some other
+ * channel (note that this should be trivially prevented by using unique funding transaction
+ * keys per-channel).
+ *
+ * Do NOT broadcast the funding transaction yourself. When we have safely received our
+ * counterparty's signature the funding transaction will automatically be broadcast via the
+ * [`BroadcasterInterface`] provided when this `ChannelManager` was constructed.
+ *
+ * Note that this includes RBF or similar transaction replacement strategies - lightning does
+ * not currently support replacing a funding transaction on an existing channel. Instead,
+ * create a new channel with a conflicting funding transaction.
  */
-void ChannelManager_funding_transaction_generated(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*temporary_channel_id)[32], struct LDKOutPoint funding_txo);
+MUST_USE_RES struct LDKCResult_NoneAPIErrorZ ChannelManager_funding_transaction_generated(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*temporary_channel_id)[32], struct LDKTransaction funding_transaction);
 
 /**
  * Generates a signed node_announcement from the given arguments and creates a
@@ -11179,17 +11210,42 @@ struct LDKEventsProvider ChannelManager_as_EventsProvider(const struct LDKChanne
 struct LDKListen ChannelManager_as_Listen(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
 /**
- * Updates channel state based on transactions seen in a connected block.
+ * Updates channel state to take note of transactions which were confirmed in the given block
+ * at the given height.
+ *
+ * Note that you must still call (or have called) [`update_best_block`] with the block
+ * information which is included here.
+ *
+ * This method may be called before or after [`update_best_block`] for a given block's
+ * transaction data and may be called multiple times with additional transaction data for a
+ * given block.
+ *
+ * This method may be called for a previous block after an [`update_best_block`] call has
+ * been made for a later block, however it must *not* be called with transaction data from a
+ * block which is no longer in the best chain (ie where [`update_best_block`] has already
+ * been informed about a blockchain reorganization which no longer includes the block which
+ * corresponds to `header`).
+ *
+ * [`update_best_block`]: `Self::update_best_block`
  */
-void ChannelManager_block_connected(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*header)[80], struct LDKCVec_C2Tuple_usizeTransactionZZ txdata, uint32_t height);
+void ChannelManager_transactions_confirmed(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t height, struct LDKCVec_C2Tuple_usizeTransactionZZ txdata);
 
 /**
- * Updates channel state based on a disconnected block.
+ * Updates channel state with the current best blockchain tip. You should attempt to call this
+ * quickly after a new block becomes available, however if multiple new blocks become
+ * available at the same time, only a single `update_best_block()` call needs to be made.
  *
- * If necessary, the channel may be force-closed without letting the counterparty participate
- * in the shutdown.
+ * This method should also be called immediately after any block disconnections, once at the
+ * reorganization fork point, and once with the new chain tip. Calling this method at the
+ * blockchain reorganization fork point ensures we learn when a funding transaction which was
+ * previously confirmed is reorganized out of the blockchain, ensuring we do not continue to
+ * accept payments which cannot be enforced on-chain.
+ *
+ * In both the block-connection and block-disconnection case, this method may be called either
+ * once per block connected or disconnected, or simply at the fork point and new tip(s),
+ * skipping any intermediary blocks.
  */
-void ChannelManager_block_disconnected(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*header)[80]);
+void ChannelManager_update_best_block(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t height);
 
 /**
  * Blocks until ChannelManager needs to be persisted or a timeout is reached. It returns a bool

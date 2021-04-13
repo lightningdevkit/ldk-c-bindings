@@ -597,10 +597,11 @@ pub extern "C" fn ChannelManager_new(mut fee_est: crate::chain::chaininterface::
 
 /// Creates a new outbound channel to the given remote node and with the given value.
 ///
-/// user_id will be provided back as user_channel_id in FundingGenerationReady and
-/// FundingBroadcastSafe events to allow tracking of which events correspond with which
-/// create_channel call. Note that user_channel_id defaults to 0 for inbound channels, so you
-/// may wish to avoid using 0 for user_id here.
+/// user_id will be provided back as user_channel_id in FundingGenerationReady events to allow
+/// tracking of which events correspond with which create_channel call. Note that the
+/// user_channel_id defaults to 0 for inbound channels, so you may wish to avoid using 0 for
+/// user_id here. user_id has no meaning inside of LDK, it is simply copied to events and
+/// otherwise ignored.
 ///
 /// If successful, will generate a SendOpenChannel message event, so you should probably poll
 /// PeerManager::process_events afterwards.
@@ -719,16 +720,28 @@ pub extern "C" fn ChannelManager_send_payment(this_arg: &ChannelManager, route: 
 
 /// Call this upon creation of a funding transaction for the given channel.
 ///
-/// Note that ALL inputs in the transaction pointed to by funding_txo MUST spend SegWit outputs
-/// or your counterparty can steal your funds!
+/// Returns an [`APIError::APIMisuseError`] if the funding_transaction spent non-SegWit outputs
+/// or if no output was found which matches the parameters in [`Event::FundingGenerationReady`].
 ///
 /// Panics if a funding transaction has already been provided for this channel.
 ///
-/// May panic if the funding_txo is duplicative with some other channel (note that this should
-/// be trivially prevented by using unique funding transaction keys per-channel).
+/// May panic if the output found in the funding transaction is duplicative with some other
+/// channel (note that this should be trivially prevented by using unique funding transaction
+/// keys per-channel).
+///
+/// Do NOT broadcast the funding transaction yourself. When we have safely received our
+/// counterparty's signature the funding transaction will automatically be broadcast via the
+/// [`BroadcasterInterface`] provided when this `ChannelManager` was constructed.
+///
+/// Note that this includes RBF or similar transaction replacement strategies - lightning does
+/// not currently support replacing a funding transaction on an existing channel. Instead,
+/// create a new channel with a conflicting funding transaction.
+#[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_funding_transaction_generated(this_arg: &ChannelManager, temporary_channel_id: *const [u8; 32], mut funding_txo: crate::chain::transaction::OutPoint) {
-	unsafe { &*this_arg.inner }.funding_transaction_generated(unsafe { &*temporary_channel_id}, *unsafe { Box::from_raw(funding_txo.take_inner()) })
+pub extern "C" fn ChannelManager_funding_transaction_generated(this_arg: &ChannelManager, temporary_channel_id: *const [u8; 32], mut funding_transaction: crate::c_types::Transaction) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
+	let mut ret = unsafe { &*this_arg.inner }.funding_transaction_generated(unsafe { &*temporary_channel_id}, funding_transaction.into_bitcoin());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { 0u8 /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::util::errors::APIError::native_into(e) }).into() };
+	local_ret
 }
 
 /// Generates a signed node_announcement from the given arguments and creates a
@@ -921,24 +934,49 @@ pub extern "C" fn ChannelManager_as_Listen(this_arg: &ChannelManager) -> crate::
 extern "C" fn ChannelManager_Listen_block_connected(this_arg: *const c_void, mut block: crate::c_types::u8slice, mut height: u32) {
 	<nativeChannelManager as lightning::chain::Listen<>>::block_connected(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &::bitcoin::consensus::encode::deserialize(block.to_slice()).unwrap(), height)
 }
-extern "C" fn ChannelManager_Listen_block_disconnected(this_arg: *const c_void, header: *const [u8; 80], mut _height: u32) {
-	<nativeChannelManager as lightning::chain::Listen<>>::block_disconnected(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), _height)
+extern "C" fn ChannelManager_Listen_block_disconnected(this_arg: *const c_void, header: *const [u8; 80], mut height: u32) {
+	<nativeChannelManager as lightning::chain::Listen<>>::block_disconnected(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height)
 }
 
-/// Updates channel state based on transactions seen in a connected block.
-#[no_mangle]
-pub extern "C" fn ChannelManager_block_connected(this_arg: &ChannelManager, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32) {
-	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
-	unsafe { &*this_arg.inner }.block_connected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height)
-}
-
-/// Updates channel state based on a disconnected block.
+/// Updates channel state to take note of transactions which were confirmed in the given block
+/// at the given height.
 ///
-/// If necessary, the channel may be force-closed without letting the counterparty participate
-/// in the shutdown.
+/// Note that you must still call (or have called) [`update_best_block`] with the block
+/// information which is included here.
+///
+/// This method may be called before or after [`update_best_block`] for a given block's
+/// transaction data and may be called multiple times with additional transaction data for a
+/// given block.
+///
+/// This method may be called for a previous block after an [`update_best_block`] call has
+/// been made for a later block, however it must *not* be called with transaction data from a
+/// block which is no longer in the best chain (ie where [`update_best_block`] has already
+/// been informed about a blockchain reorganization which no longer includes the block which
+/// corresponds to `header`).
+///
+/// [`update_best_block`]: `Self::update_best_block`
 #[no_mangle]
-pub extern "C" fn ChannelManager_block_disconnected(this_arg: &ChannelManager, header: *const [u8; 80]) {
-	unsafe { &*this_arg.inner }.block_disconnected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap())
+pub extern "C" fn ChannelManager_transactions_confirmed(this_arg: &ChannelManager, header: *const [u8; 80], mut height: u32, mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ) {
+	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
+	unsafe { &*this_arg.inner }.transactions_confirmed(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..])
+}
+
+/// Updates channel state with the current best blockchain tip. You should attempt to call this
+/// quickly after a new block becomes available, however if multiple new blocks become
+/// available at the same time, only a single `update_best_block()` call needs to be made.
+///
+/// This method should also be called immediately after any block disconnections, once at the
+/// reorganization fork point, and once with the new chain tip. Calling this method at the
+/// blockchain reorganization fork point ensures we learn when a funding transaction which was
+/// previously confirmed is reorganized out of the blockchain, ensuring we do not continue to
+/// accept payments which cannot be enforced on-chain.
+///
+/// In both the block-connection and block-disconnection case, this method may be called either
+/// once per block connected or disconnected, or simply at the fork point and new tip(s),
+/// skipping any intermediary blocks.
+#[no_mangle]
+pub extern "C" fn ChannelManager_update_best_block(this_arg: &ChannelManager, header: *const [u8; 80], mut height: u32) {
+	unsafe { &*this_arg.inner }.update_best_block(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height)
 }
 
 /// Blocks until ChannelManager needs to be persisted or a timeout is reached. It returns a bool
@@ -1001,7 +1039,7 @@ pub extern "C" fn ChannelManager_as_ChannelMessageHandler(this_arg: &ChannelMana
 		MessageSendEventsProvider: crate::util::events::MessageSendEventsProvider {
 			this_arg: unsafe { (*this_arg).inner as *mut c_void },
 			free: None,
-			get_and_clear_pending_msg_events: ChannelManager_ChannelMessageHandler_get_and_clear_pending_msg_events,
+			get_and_clear_pending_msg_events: ChannelManager_MessageSendEventsProvider_get_and_clear_pending_msg_events,
 		},
 	}
 }
@@ -1065,12 +1103,6 @@ extern "C" fn ChannelManager_ChannelMessageHandler_peer_connected(this_arg: *con
 }
 extern "C" fn ChannelManager_ChannelMessageHandler_handle_error(this_arg: *const c_void, mut counterparty_node_id: crate::c_types::PublicKey, msg: &crate::ln::msgs::ErrorMessage) {
 	<nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::handle_error(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &counterparty_node_id.into_rust(), unsafe { &*msg.inner })
-}
-#[must_use]
-extern "C" fn ChannelManager_ChannelMessageHandler_get_and_clear_pending_msg_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_MessageSendEventZ {
-	let mut ret = <nativeChannelManager as lightning::util::events::MessageSendEventsProvider<>>::get_and_clear_pending_msg_events(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::util::events::MessageSendEvent::native_into(item) }); };
-	local_ret.into()
 }
 
 #[no_mangle]

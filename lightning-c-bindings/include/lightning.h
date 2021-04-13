@@ -2918,6 +2918,22 @@ typedef struct LDKCVec_C2Tuple_usizeTransactionZZ {
 } LDKCVec_C2Tuple_usizeTransactionZZ;
 
 /**
+ * A dynamically-allocated array of crate::c_types::ThirtyTwoBytess of arbitrary size.
+ * This corresponds to std::vector in C++
+ */
+typedef struct LDKCVec_TxidZ {
+   /**
+    * The elements in the array.
+    * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+    */
+   struct LDKThirtyTwoBytes *data;
+   /**
+    * The number of elements pointed to by `data`.
+    */
+   uintptr_t datalen;
+} LDKCVec_TxidZ;
+
+/**
  * The contents of CResult_NoneChannelMonitorUpdateErrZ
  */
 typedef union LDKCResult_NoneChannelMonitorUpdateErrZPtr {
@@ -3672,7 +3688,7 @@ typedef struct LDKC2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ {
  * A dynamically-allocated array of crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZs of arbitrary size.
  * This corresponds to std::vector in C++
  */
-typedef struct LDKCVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
+typedef struct LDKCVec_TransactionOutputsZ {
    /**
     * The elements in the array.
     * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
@@ -3682,7 +3698,7 @@ typedef struct LDKCVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
     * The number of elements pointed to by `data`.
     */
    uintptr_t datalen;
-} LDKCVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ;
+} LDKCVec_TransactionOutputsZ;
 
 /**
  * A tuple of 2 elements. See the individual fields for the types contained.
@@ -4703,7 +4719,7 @@ typedef struct LDKLogger {
  * ChannelUpdate messages informing peers that the channel is temporarily disabled. To avoid
  * spam due to quick disconnection/reconnection, updates are not sent until the channel has been
  * offline for a full minute. In order to track this, you must call
- * timer_chan_freshness_every_min roughly once per minute, though it doesn't have to be perfect.
+ * timer_tick_occurred roughly once per minute, though it doesn't have to be perfect.
  *
  * Rather than using a plain ChannelManager, it is preferable to use either a SimpleArcChannelManager
  * a SimpleRefChannelManager, for conciseness. See their documentation for more details, but
@@ -6942,6 +6958,26 @@ typedef struct MUST_USE_STRUCT LDKChainParameters {
    bool is_owned;
 } LDKChainParameters;
 
+
+
+/**
+ * The best known block as identified by its hash and height.
+ */
+typedef struct MUST_USE_STRUCT LDKBestBlock {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeBestBlock *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKBestBlock;
+
 /**
  * A 3-byte byte array.
  */
@@ -8139,6 +8175,11 @@ void C2Tuple_usizeTransactionZ_free(struct LDKC2Tuple_usizeTransactionZ _res);
 void CVec_C2Tuple_usizeTransactionZZ_free(struct LDKCVec_C2Tuple_usizeTransactionZZ _res);
 
 /**
+ * Frees the buffer pointed to by `data` if `datalen` is non-0.
+ */
+void CVec_TxidZ_free(struct LDKCVec_TxidZ _res);
+
+/**
  * Creates a new CResult_NoneChannelMonitorUpdateErrZ in the success state.
  */
 struct LDKCResult_NoneChannelMonitorUpdateErrZ CResult_NoneChannelMonitorUpdateErrZ_ok(void);
@@ -8344,7 +8385,7 @@ void C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ_free(struct LDKC2Tuple_TxidCVec_C2Tupl
 /**
  * Frees the buffer pointed to by `data` if `datalen` is non-0.
  */
-void CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ_free(struct LDKCVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ _res);
+void CVec_TransactionOutputsZ_free(struct LDKCVec_TransactionOutputsZ _res);
 
 /**
  * Creates a new C2Tuple_BlockHashChannelMonitorZ from the contained elements.
@@ -10104,10 +10145,63 @@ void ChainMonitor_block_connected(const struct LDKChainMonitor *NONNULL_PTR this
 
 /**
  * Dispatches to per-channel monitors, which are responsible for updating their on-chain view
+ * of a channel and reacting accordingly to newly confirmed transactions. For details, see
+ * [`ChannelMonitor::transactions_confirmed`].
+ *
+ * Used instead of [`block_connected`] by clients that are notified of transactions rather than
+ * blocks. May be called before or after [`update_best_block`] for transactions in the
+ * corresponding block. See [`update_best_block`] for further calling expectations.
+ *
+ * [`block_connected`]: Self::block_connected
+ * [`update_best_block`]: Self::update_best_block
+ */
+void ChainMonitor_transactions_confirmed(const struct LDKChainMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], struct LDKCVec_C2Tuple_usizeTransactionZZ txdata, uint32_t height);
+
+/**
+ * Dispatches to per-channel monitors, which are responsible for updating their on-chain view
+ * of a channel and reacting accordingly based on the new chain tip. For details, see
+ * [`ChannelMonitor::update_best_block`].
+ *
+ * Used instead of [`block_connected`] by clients that are notified of transactions rather than
+ * blocks. May be called before or after [`transactions_confirmed`] for the corresponding
+ * block.
+ *
+ * Must be called after new blocks become available for the most recent block. Intermediary
+ * blocks, however, may be safely skipped. In the event of a chain re-organization, this only
+ * needs to be called for the most recent block assuming `transaction_unconfirmed` is called
+ * for any affected transactions.
+ *
+ * [`block_connected`]: Self::block_connected
+ * [`transactions_confirmed`]: Self::transactions_confirmed
+ * [`transaction_unconfirmed`]: Self::transaction_unconfirmed
+ */
+void ChainMonitor_update_best_block(const struct LDKChainMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t height);
+
+/**
+ * Dispatches to per-channel monitors, which are responsible for updating their on-chain view
  * of a channel based on the disconnected block. See [`ChannelMonitor::block_disconnected`] for
  * details.
  */
 void ChainMonitor_block_disconnected(const struct LDKChainMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t disconnected_height);
+
+/**
+ * Dispatches to per-channel monitors, which are responsible for updating their on-chain view
+ * of a channel based on transactions unconfirmed as a result of a chain reorganization. See
+ * [`ChannelMonitor::transaction_unconfirmed`] for details.
+ *
+ * Used instead of [`block_disconnected`] by clients that are notified of transactions rather
+ * than blocks. May be called before or after [`update_best_block`] for transactions in the
+ * corresponding block. See [`update_best_block`] for further calling expectations.
+ *
+ * [`block_disconnected`]: Self::block_disconnected
+ * [`update_best_block`]: Self::update_best_block
+ */
+void ChainMonitor_transaction_unconfirmed(const struct LDKChainMonitor *NONNULL_PTR this_arg, const uint8_t (*txid)[32]);
+
+/**
+ * Returns the set of txids that should be monitored for re-organization out of the chain.
+ */
+MUST_USE_RES struct LDKCVec_TxidZ ChainMonitor_get_relevant_txids(const struct LDKChainMonitor *NONNULL_PTR this_arg);
 
 /**
  * Creates a new `ChainMonitor` used to watch on-chain activity pertaining to channels.
@@ -10311,13 +10405,62 @@ MUST_USE_RES struct LDKCVec_TransactionZ ChannelMonitor_get_latest_holder_commit
  *
  * [`get_outputs_to_watch`]: #method.get_outputs_to_watch
  */
-MUST_USE_RES struct LDKCVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ ChannelMonitor_block_connected(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], struct LDKCVec_C2Tuple_usizeTransactionZZ txdata, uint32_t height, struct LDKBroadcasterInterface broadcaster, struct LDKFeeEstimator fee_estimator, struct LDKLogger logger);
+MUST_USE_RES struct LDKCVec_TransactionOutputsZ ChannelMonitor_block_connected(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], struct LDKCVec_C2Tuple_usizeTransactionZZ txdata, uint32_t height, struct LDKBroadcasterInterface broadcaster, struct LDKFeeEstimator fee_estimator, struct LDKLogger logger);
 
 /**
  * Determines if the disconnected block contained any transactions of interest and updates
  * appropriately.
  */
 void ChannelMonitor_block_disconnected(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t height, struct LDKBroadcasterInterface broadcaster, struct LDKFeeEstimator fee_estimator, struct LDKLogger logger);
+
+/**
+ * Processes transactions confirmed in a block with the given header and height, returning new
+ * outputs to watch. See [`block_connected`] for details.
+ *
+ * Used instead of [`block_connected`] by clients that are notified of transactions rather than
+ * blocks. May be called before or after [`update_best_block`] for transactions in the
+ * corresponding block. See [`update_best_block`] for further calling expectations.
+ *
+ * [`block_connected`]: Self::block_connected
+ * [`update_best_block`]: Self::update_best_block
+ */
+MUST_USE_RES struct LDKCVec_TransactionOutputsZ ChannelMonitor_transactions_confirmed(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], struct LDKCVec_C2Tuple_usizeTransactionZZ txdata, uint32_t height, struct LDKBroadcasterInterface broadcaster, struct LDKFeeEstimator fee_estimator, struct LDKLogger logger);
+
+/**
+ * Processes a transaction that was reorganized out of the chain.
+ *
+ * Used instead of [`block_disconnected`] by clients that are notified of transactions rather
+ * than blocks. May be called before or after [`update_best_block`] for transactions in the
+ * corresponding block. See [`update_best_block`] for further calling expectations.
+ *
+ * [`block_disconnected`]: Self::block_disconnected
+ * [`update_best_block`]: Self::update_best_block
+ */
+void ChannelMonitor_transaction_unconfirmed(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const uint8_t (*txid)[32], struct LDKBroadcasterInterface broadcaster, struct LDKFeeEstimator fee_estimator, struct LDKLogger logger);
+
+/**
+ * Updates the monitor with the current best chain tip, returning new outputs to watch. See
+ * [`block_connected`] for details.
+ *
+ * Used instead of [`block_connected`] by clients that are notified of transactions rather than
+ * blocks. May be called before or after [`transactions_confirmed`] for the corresponding
+ * block.
+ *
+ * Must be called after new blocks become available for the most recent block. Intermediary
+ * blocks, however, may be safely skipped. In the event of a chain re-organization, this only
+ * needs to be called for the most recent block assuming `transaction_unconfirmed` is called
+ * for any affected transactions.
+ *
+ * [`block_connected`]: Self::block_connected
+ * [`transactions_confirmed`]: Self::transactions_confirmed
+ * [`transaction_unconfirmed`]: Self::transaction_unconfirmed
+ */
+MUST_USE_RES struct LDKCVec_TransactionOutputsZ ChannelMonitor_update_best_block(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t height, struct LDKBroadcasterInterface broadcaster, struct LDKFeeEstimator fee_estimator, struct LDKLogger logger);
+
+/**
+ * Returns the set of txids that should be monitored for re-organization out of the chain.
+ */
+MUST_USE_RES struct LDKCVec_TxidZ ChannelMonitor_get_relevant_txids(const struct LDKChannelMonitor *NONNULL_PTR this_arg);
 
 /**
  * Calls the free function if one is set
@@ -10798,33 +10941,53 @@ enum LDKNetwork ChainParameters_get_network(const struct LDKChainParameters *NON
 void ChainParameters_set_network(struct LDKChainParameters *NONNULL_PTR this_ptr, enum LDKNetwork val);
 
 /**
- * The hash of the latest block successfully connected.
- */
-const uint8_t (*ChainParameters_get_latest_hash(const struct LDKChainParameters *NONNULL_PTR this_ptr))[32];
-
-/**
- * The hash of the latest block successfully connected.
- */
-void ChainParameters_set_latest_hash(struct LDKChainParameters *NONNULL_PTR this_ptr, struct LDKThirtyTwoBytes val);
-
-/**
- * The height of the latest block successfully connected.
+ * The hash and height of the latest block successfully connected.
  *
  * Used to track on-chain channel funding outputs and send payments with reliable timelocks.
  */
-uintptr_t ChainParameters_get_latest_height(const struct LDKChainParameters *NONNULL_PTR this_ptr);
+struct LDKBestBlock ChainParameters_get_best_block(const struct LDKChainParameters *NONNULL_PTR this_ptr);
 
 /**
- * The height of the latest block successfully connected.
+ * The hash and height of the latest block successfully connected.
  *
  * Used to track on-chain channel funding outputs and send payments with reliable timelocks.
  */
-void ChainParameters_set_latest_height(struct LDKChainParameters *NONNULL_PTR this_ptr, uintptr_t val);
+void ChainParameters_set_best_block(struct LDKChainParameters *NONNULL_PTR this_ptr, struct LDKBestBlock val);
 
 /**
  * Constructs a new ChainParameters given each field
  */
-MUST_USE_RES struct LDKChainParameters ChainParameters_new(enum LDKNetwork network_arg, struct LDKThirtyTwoBytes latest_hash_arg, uintptr_t latest_height_arg);
+MUST_USE_RES struct LDKChainParameters ChainParameters_new(enum LDKNetwork network_arg, struct LDKBestBlock best_block_arg);
+
+/**
+ * Frees any resources used by the BestBlock, if is_owned is set and inner is non-NULL.
+ */
+void BestBlock_free(struct LDKBestBlock this_obj);
+
+/**
+ * Creates a copy of the BestBlock
+ */
+struct LDKBestBlock BestBlock_clone(const struct LDKBestBlock *NONNULL_PTR orig);
+
+/**
+ * Returns the best block from the genesis of the given network.
+ */
+MUST_USE_RES struct LDKBestBlock BestBlock_from_genesis(enum LDKNetwork network);
+
+/**
+ * Returns the best block as identified by the given block hash and height.
+ */
+MUST_USE_RES struct LDKBestBlock BestBlock_new(struct LDKThirtyTwoBytes block_hash, uint32_t height);
+
+/**
+ * Returns the best block hash.
+ */
+MUST_USE_RES struct LDKThirtyTwoBytes BestBlock_block_hash(const struct LDKBestBlock *NONNULL_PTR this_arg);
+
+/**
+ * Returns the best block height.
+ */
+MUST_USE_RES uint32_t BestBlock_height(const struct LDKBestBlock *NONNULL_PTR this_arg);
 
 /**
  * Frees any resources used by the ChannelDetails, if is_owned is set and inner is non-NULL.
@@ -10981,6 +11144,11 @@ struct LDKPaymentSendFailure PaymentSendFailure_clone(const struct LDKPaymentSen
 MUST_USE_RES struct LDKChannelManager ChannelManager_new(struct LDKFeeEstimator fee_est, struct LDKWatch chain_monitor, struct LDKBroadcasterInterface tx_broadcaster, struct LDKLogger logger, struct LDKKeysInterface keys_manager, struct LDKUserConfig config, struct LDKChainParameters params);
 
 /**
+ * Gets the current configuration applied to all new channels,  as
+ */
+MUST_USE_RES struct LDKUserConfig ChannelManager_get_current_default_configuration(const struct LDKChannelManager *NONNULL_PTR this_arg);
+
+/**
  * Creates a new outbound channel to the given remote node and with the given value.
  *
  * user_id will be provided back as user_channel_id in FundingGenerationReady events to allow
@@ -11132,7 +11300,7 @@ void ChannelManager_process_pending_htlc_forwards(const struct LDKChannelManager
  *
  * Note that in some rare cases this may generate a `chain::Watch::update_channel` call.
  */
-void ChannelManager_timer_chan_freshness_every_min(const struct LDKChannelManager *NONNULL_PTR this_arg);
+void ChannelManager_timer_tick_occurred(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
 /**
  * Indicates that the preimage for payment_hash is unknown or the received amount is incorrect
@@ -11246,6 +11414,47 @@ void ChannelManager_transactions_confirmed(const struct LDKChannelManager *NONNU
  * skipping any intermediary blocks.
  */
 void ChannelManager_update_best_block(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t height);
+
+/**
+ * Gets the set of txids which should be monitored for their confirmation state.
+ *
+ * If you're providing information about reorganizations via [`transaction_unconfirmed`], this
+ * is the set of transactions which you may need to call [`transaction_unconfirmed`] for.
+ *
+ * This may be useful to poll to determine the set of transactions which must be registered
+ * with an Electrum server or for which an Electrum server needs to be polled to determine
+ * transaction confirmation state.
+ *
+ * This may update after any [`transactions_confirmed`] or [`block_connected`] call.
+ *
+ * Note that this is NOT the set of transactions which must be included in calls to
+ * [`transactions_confirmed`] if they are confirmed, but a small subset of it.
+ *
+ * [`transactions_confirmed`]: Self::transactions_confirmed
+ * [`transaction_unconfirmed`]: Self::transaction_unconfirmed
+ * [`block_connected`]: chain::Listen::block_connected
+ */
+MUST_USE_RES struct LDKCVec_TxidZ ChannelManager_get_relevant_txids(const struct LDKChannelManager *NONNULL_PTR this_arg);
+
+/**
+ * Marks a transaction as having been reorganized out of the blockchain.
+ *
+ * If a transaction is included in [`get_relevant_txids`], and is no longer in the main branch
+ * of the blockchain, this function should be called to indicate that the transaction should
+ * be considered reorganized out.
+ *
+ * Once this is called, the given transaction will no longer appear on [`get_relevant_txids`],
+ * though this may be called repeatedly for a given transaction without issue.
+ *
+ * Note that if the transaction is confirmed on the main chain in a different block (indicated
+ * via a call to [`transactions_confirmed`]), it may re-appear in [`get_relevant_txids`], thus
+ * be very wary of race-conditions wherein the final state of a transaction indicated via
+ * these APIs is not the same as its state on the blockchain.
+ *
+ * [`transactions_confirmed`]: Self::transactions_confirmed
+ * [`get_relevant_txids`]: Self::get_relevant_txids
+ */
+void ChannelManager_transaction_unconfirmed(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*txid)[32]);
 
 /**
  * Blocks until ChannelManager needs to be persisted or a timeout is reached. It returns a bool

@@ -54,7 +54,7 @@ type nativeChannelManager = nativeChannelManagerImport<crate::chain::keysinterfa
 /// ChannelUpdate messages informing peers that the channel is temporarily disabled. To avoid
 /// spam due to quick disconnection/reconnection, updates are not sent until the channel has been
 /// offline for a full minute. In order to track this, you must call
-/// timer_chan_freshness_every_min roughly once per minute, though it doesn't have to be perfect.
+/// timer_tick_occurred roughly once per minute, though it doesn't have to be perfect.
 ///
 /// Rather than using a plain ChannelManager, it is preferable to use either a SimpleArcChannelManager
 /// a SimpleRefChannelManager, for conciseness. See their documentation for more details, but
@@ -161,42 +161,126 @@ pub extern "C" fn ChainParameters_get_network(this_ptr: &ChainParameters) -> cra
 pub extern "C" fn ChainParameters_set_network(this_ptr: &mut ChainParameters, mut val: crate::bitcoin::network::Network) {
 	unsafe { &mut *this_ptr.inner }.network = val.into_bitcoin();
 }
-/// The hash of the latest block successfully connected.
-#[no_mangle]
-pub extern "C" fn ChainParameters_get_latest_hash(this_ptr: &ChainParameters) -> *const [u8; 32] {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.latest_hash;
-	(*inner_val).as_inner()
-}
-/// The hash of the latest block successfully connected.
-#[no_mangle]
-pub extern "C" fn ChainParameters_set_latest_hash(this_ptr: &mut ChainParameters, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *this_ptr.inner }.latest_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
-}
-/// The height of the latest block successfully connected.
+/// The hash and height of the latest block successfully connected.
 ///
 /// Used to track on-chain channel funding outputs and send payments with reliable timelocks.
 #[no_mangle]
-pub extern "C" fn ChainParameters_get_latest_height(this_ptr: &ChainParameters) -> usize {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.latest_height;
-	(*inner_val)
+pub extern "C" fn ChainParameters_get_best_block(this_ptr: &ChainParameters) -> crate::ln::channelmanager::BestBlock {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.best_block;
+	crate::ln::channelmanager::BestBlock { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
 }
-/// The height of the latest block successfully connected.
+/// The hash and height of the latest block successfully connected.
 ///
 /// Used to track on-chain channel funding outputs and send payments with reliable timelocks.
 #[no_mangle]
-pub extern "C" fn ChainParameters_set_latest_height(this_ptr: &mut ChainParameters, mut val: usize) {
-	unsafe { &mut *this_ptr.inner }.latest_height = val;
+pub extern "C" fn ChainParameters_set_best_block(this_ptr: &mut ChainParameters, mut val: crate::ln::channelmanager::BestBlock) {
+	unsafe { &mut *this_ptr.inner }.best_block = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Constructs a new ChainParameters given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChainParameters_new(mut network_arg: crate::bitcoin::network::Network, mut latest_hash_arg: crate::c_types::ThirtyTwoBytes, mut latest_height_arg: usize) -> ChainParameters {
+pub extern "C" fn ChainParameters_new(mut network_arg: crate::bitcoin::network::Network, mut best_block_arg: crate::ln::channelmanager::BestBlock) -> ChainParameters {
 	ChainParameters { inner: Box::into_raw(Box::new(nativeChainParameters {
 		network: network_arg.into_bitcoin(),
-		latest_hash: ::bitcoin::hash_types::BlockHash::from_slice(&latest_hash_arg.data[..]).unwrap(),
-		latest_height: latest_height_arg,
+		best_block: *unsafe { Box::from_raw(best_block_arg.take_inner()) },
 	})), is_owned: true }
 }
+
+use lightning::ln::channelmanager::BestBlock as nativeBestBlockImport;
+type nativeBestBlock = nativeBestBlockImport;
+
+/// The best known block as identified by its hash and height.
+#[must_use]
+#[repr(C)]
+pub struct BestBlock {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeBestBlock,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for BestBlock {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeBestBlock>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(self.inner) };
+		}
+	}
+}
+/// Frees any resources used by the BestBlock, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn BestBlock_free(this_obj: BestBlock) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+extern "C" fn BestBlock_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBestBlock); }
+}
+#[allow(unused)]
+/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+impl BestBlock {
+	pub(crate) fn take_inner(mut self) -> *mut nativeBestBlock {
+		assert!(self.is_owned);
+		let ret = self.inner;
+		self.inner = std::ptr::null_mut();
+		ret
+	}
+}
+impl Clone for BestBlock {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeBestBlock>::is_null(self.inner) { std::ptr::null_mut() } else {
+				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn BestBlock_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBestBlock)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the BestBlock
+pub extern "C" fn BestBlock_clone(orig: &BestBlock) -> BestBlock {
+	orig.clone()
+}
+/// Returns the best block from the genesis of the given network.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BestBlock_from_genesis(mut network: crate::bitcoin::network::Network) -> BestBlock {
+	let mut ret = lightning::ln::channelmanager::BestBlock::from_genesis(network.into_bitcoin());
+	BestBlock { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+}
+
+/// Returns the best block as identified by the given block hash and height.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BestBlock_new(mut block_hash: crate::c_types::ThirtyTwoBytes, mut height: u32) -> BestBlock {
+	let mut ret = lightning::ln::channelmanager::BestBlock::new(::bitcoin::hash_types::BlockHash::from_slice(&block_hash.data[..]).unwrap(), height);
+	BestBlock { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+}
+
+/// Returns the best block hash.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BestBlock_block_hash(this_arg: &BestBlock) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*this_arg.inner }.block_hash();
+	crate::c_types::ThirtyTwoBytes { data: ret.into_inner() }
+}
+
+/// Returns the best block height.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BestBlock_height(this_arg: &BestBlock) -> u32 {
+	let mut ret = unsafe { &*this_arg.inner }.height();
+	ret
+}
+
 /// The amount of time in blocks we require our counterparty wait to claim their money (ie time
 /// between when we, or our watchtower, must check for them having broadcast a theft transaction).
 ///
@@ -595,6 +679,14 @@ pub extern "C" fn ChannelManager_new(mut fee_est: crate::chain::chaininterface::
 	ChannelManager { inner: Box::into_raw(Box::new(ret)), is_owned: true }
 }
 
+/// Gets the current configuration applied to all new channels,  as
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_get_current_default_configuration(this_arg: &ChannelManager) -> crate::util::config::UserConfig {
+	let mut ret = unsafe { &*this_arg.inner }.get_current_default_configuration();
+	crate::util::config::UserConfig { inner: unsafe { ( (&(*ret) as *const _) as *mut _) }, is_owned: false }
+}
+
 /// Creates a new outbound channel to the given remote node and with the given value.
 ///
 /// user_id will be provided back as user_channel_id in FundingGenerationReady events to allow
@@ -780,8 +872,8 @@ pub extern "C" fn ChannelManager_process_pending_htlc_forwards(this_arg: &Channe
 ///
 /// Note that in some rare cases this may generate a `chain::Watch::update_channel` call.
 #[no_mangle]
-pub extern "C" fn ChannelManager_timer_chan_freshness_every_min(this_arg: &ChannelManager) {
-	unsafe { &*this_arg.inner }.timer_chan_freshness_every_min()
+pub extern "C" fn ChannelManager_timer_tick_occurred(this_arg: &ChannelManager) {
+	unsafe { &*this_arg.inner }.timer_tick_occurred()
 }
 
 /// Indicates that the preimage for payment_hash is unknown or the received amount is incorrect
@@ -977,6 +1069,52 @@ pub extern "C" fn ChannelManager_transactions_confirmed(this_arg: &ChannelManage
 #[no_mangle]
 pub extern "C" fn ChannelManager_update_best_block(this_arg: &ChannelManager, header: *const [u8; 80], mut height: u32) {
 	unsafe { &*this_arg.inner }.update_best_block(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height)
+}
+
+/// Gets the set of txids which should be monitored for their confirmation state.
+///
+/// If you're providing information about reorganizations via [`transaction_unconfirmed`], this
+/// is the set of transactions which you may need to call [`transaction_unconfirmed`] for.
+///
+/// This may be useful to poll to determine the set of transactions which must be registered
+/// with an Electrum server or for which an Electrum server needs to be polled to determine
+/// transaction confirmation state.
+///
+/// This may update after any [`transactions_confirmed`] or [`block_connected`] call.
+///
+/// Note that this is NOT the set of transactions which must be included in calls to
+/// [`transactions_confirmed`] if they are confirmed, but a small subset of it.
+///
+/// [`transactions_confirmed`]: Self::transactions_confirmed
+/// [`transaction_unconfirmed`]: Self::transaction_unconfirmed
+/// [`block_connected`]: chain::Listen::block_connected
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_get_relevant_txids(this_arg: &ChannelManager) -> crate::c_types::derived::CVec_TxidZ {
+	let mut ret = unsafe { &*this_arg.inner }.get_relevant_txids();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.into_inner() } }); };
+	local_ret.into()
+}
+
+/// Marks a transaction as having been reorganized out of the blockchain.
+///
+/// If a transaction is included in [`get_relevant_txids`], and is no longer in the main branch
+/// of the blockchain, this function should be called to indicate that the transaction should
+/// be considered reorganized out.
+///
+/// Once this is called, the given transaction will no longer appear on [`get_relevant_txids`],
+/// though this may be called repeatedly for a given transaction without issue.
+///
+/// Note that if the transaction is confirmed on the main chain in a different block (indicated
+/// via a call to [`transactions_confirmed`]), it may re-appear in [`get_relevant_txids`], thus
+/// be very wary of race-conditions wherein the final state of a transaction indicated via
+/// these APIs is not the same as its state on the blockchain.
+///
+/// [`transactions_confirmed`]: Self::transactions_confirmed
+/// [`get_relevant_txids`]: Self::get_relevant_txids
+#[no_mangle]
+pub extern "C" fn ChannelManager_transaction_unconfirmed(this_arg: &ChannelManager, txid: *const [u8; 32]) {
+	unsafe { &*this_arg.inner }.transaction_unconfirmed(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*txid }[..]).unwrap())
 }
 
 /// Blocks until ChannelManager needs to be persisted or a timeout is reached. It returns a bool

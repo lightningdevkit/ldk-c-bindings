@@ -198,6 +198,28 @@ impl IOError {
 			_ => IOError::Other,
 		}
 	}
+	pub(crate) fn to_rust(&self) -> std::io::Error {
+		std::io::Error::new(match self {
+			IOError::NotFound => std::io::ErrorKind::NotFound,
+			IOError::PermissionDenied => std::io::ErrorKind::PermissionDenied,
+			IOError::ConnectionRefused => std::io::ErrorKind::ConnectionRefused,
+			IOError::ConnectionReset => std::io::ErrorKind::ConnectionReset,
+			IOError::ConnectionAborted => std::io::ErrorKind::ConnectionAborted,
+			IOError::NotConnected => std::io::ErrorKind::NotConnected,
+			IOError::AddrInUse => std::io::ErrorKind::AddrInUse,
+			IOError::AddrNotAvailable => std::io::ErrorKind::AddrNotAvailable,
+			IOError::BrokenPipe => std::io::ErrorKind::BrokenPipe,
+			IOError::AlreadyExists => std::io::ErrorKind::AlreadyExists,
+			IOError::WouldBlock => std::io::ErrorKind::WouldBlock,
+			IOError::InvalidInput => std::io::ErrorKind::InvalidInput,
+			IOError::InvalidData => std::io::ErrorKind::InvalidData,
+			IOError::TimedOut => std::io::ErrorKind::TimedOut,
+			IOError::WriteZero => std::io::ErrorKind::WriteZero,
+			IOError::Interrupted => std::io::ErrorKind::Interrupted,
+			IOError::Other => std::io::ErrorKind::Other,
+			IOError::UnexpectedEof => std::io::ErrorKind::UnexpectedEof,
+		}, "")
+	}
 }
 
 #[repr(C)]

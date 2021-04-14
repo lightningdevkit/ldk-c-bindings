@@ -950,6 +950,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"str" if is_ref => Some(""),
 			"alloc::string::String"|"String" => Some(""),
+			"std::io::Error" if !is_ref => Some(""),
 			// Note that we'll panic for String if is_ref, as we only have non-owned memory, we
 			// cannot create a &String.
 
@@ -1016,6 +1017,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"str" if is_ref => Some(".into_str()"),
 			"alloc::string::String"|"String" => Some(".into_string()"),
+			"std::io::Error" if !is_ref => Some(".to_rust()"),
 
 			"std::time::Duration"|"core::time::Duration" => Some(")"),
 			"std::time::SystemTime" => Some("))"),

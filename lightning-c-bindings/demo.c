@@ -74,7 +74,7 @@ int main() {
 	LDKUserConfig config = UserConfig_default();
 	LDKThirtyTwoBytes chain_tip;
 	memset(&chain_tip, 0, 32);
-	LDKChainParameters chain = ChainParameters_new(net, chain_tip, 0);
+	LDKChainParameters chain = ChainParameters_new(net, BestBlock_new(chain_tip, 0));
 	LDKChannelManager cm = ChannelManager_new(fee_est, mon, broadcast, logger, keys_source, config, chain);
 
 	LDKCVec_ChannelDetailsZ channels = ChannelManager_list_channels(&cm);

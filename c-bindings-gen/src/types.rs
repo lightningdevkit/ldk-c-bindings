@@ -413,10 +413,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 							else { process_alias = false; }
 						}
 						if process_alias {
-							match &*t.ty {
-								syn::Type::Path(_) => { declared.insert(t.ident.clone(), DeclType::StructImported); },
-								_ => {},
-							}
+							declared.insert(t.ident.clone(), DeclType::StructImported);
 						}
 					}
 				},

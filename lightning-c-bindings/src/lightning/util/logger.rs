@@ -90,9 +90,9 @@ pub extern "C" fn Level_clone(orig: &Level) -> Level {
 /// Returns the most verbose logging level.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Level_max() -> crate::util::logger::Level {
+pub extern "C" fn Level_max() -> crate::lightning::util::logger::Level {
 	let mut ret = lightning::util::logger::Level::max();
-	crate::util::logger::Level::native_into(ret)
+	crate::lightning::util::logger::Level::native_into(ret)
 }
 
 /// A trait encapsulating the operations required of a logger

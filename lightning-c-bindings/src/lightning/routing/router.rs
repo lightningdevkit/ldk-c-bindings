@@ -74,14 +74,14 @@ pub extern "C" fn RouteHop_set_pubkey(this_ptr: &mut RouteHop, mut val: crate::c
 /// The node_announcement features of the node at this hop. For the last hop, these may be
 /// amended to match the features present in the invoice this node generated.
 #[no_mangle]
-pub extern "C" fn RouteHop_get_node_features(this_ptr: &RouteHop) -> crate::ln::features::NodeFeatures {
+pub extern "C" fn RouteHop_get_node_features(this_ptr: &RouteHop) -> crate::lightning::ln::features::NodeFeatures {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.node_features;
-	crate::ln::features::NodeFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::NodeFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
 }
 /// The node_announcement features of the node at this hop. For the last hop, these may be
 /// amended to match the features present in the invoice this node generated.
 #[no_mangle]
-pub extern "C" fn RouteHop_set_node_features(this_ptr: &mut RouteHop, mut val: crate::ln::features::NodeFeatures) {
+pub extern "C" fn RouteHop_set_node_features(this_ptr: &mut RouteHop, mut val: crate::lightning::ln::features::NodeFeatures) {
 	unsafe { &mut *this_ptr.inner }.node_features = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// The channel that should be used from the previous hop to reach this node.
@@ -98,14 +98,14 @@ pub extern "C" fn RouteHop_set_short_channel_id(this_ptr: &mut RouteHop, mut val
 /// The channel_announcement features of the channel that should be used from the previous hop
 /// to reach this node.
 #[no_mangle]
-pub extern "C" fn RouteHop_get_channel_features(this_ptr: &RouteHop) -> crate::ln::features::ChannelFeatures {
+pub extern "C" fn RouteHop_get_channel_features(this_ptr: &RouteHop) -> crate::lightning::ln::features::ChannelFeatures {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_features;
-	crate::ln::features::ChannelFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::ChannelFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
 }
 /// The channel_announcement features of the channel that should be used from the previous hop
 /// to reach this node.
 #[no_mangle]
-pub extern "C" fn RouteHop_set_channel_features(this_ptr: &mut RouteHop, mut val: crate::ln::features::ChannelFeatures) {
+pub extern "C" fn RouteHop_set_channel_features(this_ptr: &mut RouteHop, mut val: crate::lightning::ln::features::ChannelFeatures) {
 	unsafe { &mut *this_ptr.inner }.channel_features = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// The fee taken on this hop (for paying for the use of the *next* channel in the path).
@@ -139,7 +139,7 @@ pub extern "C" fn RouteHop_set_cltv_expiry_delta(this_ptr: &mut RouteHop, mut va
 /// Constructs a new RouteHop given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RouteHop_new(mut pubkey_arg: crate::c_types::PublicKey, mut node_features_arg: crate::ln::features::NodeFeatures, mut short_channel_id_arg: u64, mut channel_features_arg: crate::ln::features::ChannelFeatures, mut fee_msat_arg: u64, mut cltv_expiry_delta_arg: u32) -> RouteHop {
+pub extern "C" fn RouteHop_new(mut pubkey_arg: crate::c_types::PublicKey, mut node_features_arg: crate::lightning::ln::features::NodeFeatures, mut short_channel_id_arg: u64, mut channel_features_arg: crate::lightning::ln::features::ChannelFeatures, mut fee_msat_arg: u64, mut cltv_expiry_delta_arg: u32) -> RouteHop {
 	RouteHop { inner: Box::into_raw(Box::new(nativeRouteHop {
 		pubkey: pubkey_arg.into_rust(),
 		node_features: *unsafe { Box::from_raw(node_features_arg.take_inner()) },
@@ -266,7 +266,7 @@ pub(crate) extern "C" fn Route_write_void(obj: *const c_void) -> crate::c_types:
 /// Read a Route from a byte array, created by Route_write
 pub extern "C" fn Route_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::routing::router::Route { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 
@@ -338,13 +338,13 @@ pub extern "C" fn RouteHint_set_short_channel_id(this_ptr: &mut RouteHint, mut v
 }
 /// The fees which must be paid to use this channel
 #[no_mangle]
-pub extern "C" fn RouteHint_get_fees(this_ptr: &RouteHint) -> crate::routing::network_graph::RoutingFees {
+pub extern "C" fn RouteHint_get_fees(this_ptr: &RouteHint) -> crate::lightning::routing::network_graph::RoutingFees {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fees;
-	crate::routing::network_graph::RoutingFees { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
 }
 /// The fees which must be paid to use this channel
 #[no_mangle]
-pub extern "C" fn RouteHint_set_fees(this_ptr: &mut RouteHint, mut val: crate::routing::network_graph::RoutingFees) {
+pub extern "C" fn RouteHint_set_fees(this_ptr: &mut RouteHint, mut val: crate::lightning::routing::network_graph::RoutingFees) {
 	unsafe { &mut *this_ptr.inner }.fees = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// The difference in CLTV values between this node and the next node.
@@ -387,7 +387,7 @@ pub extern "C" fn RouteHint_set_htlc_maximum_msat(this_ptr: &mut RouteHint, mut 
 /// Constructs a new RouteHint given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RouteHint_new(mut src_node_id_arg: crate::c_types::PublicKey, mut short_channel_id_arg: u64, mut fees_arg: crate::routing::network_graph::RoutingFees, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: crate::c_types::derived::COption_u64Z, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z) -> RouteHint {
+pub extern "C" fn RouteHint_new(mut src_node_id_arg: crate::c_types::PublicKey, mut short_channel_id_arg: u64, mut fees_arg: crate::lightning::routing::network_graph::RoutingFees, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: crate::c_types::derived::COption_u64Z, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z) -> RouteHint {
 	let mut local_htlc_minimum_msat_arg = if htlc_minimum_msat_arg.is_some() { Some( { htlc_minimum_msat_arg.take() }) } else { None };
 	let mut local_htlc_maximum_msat_arg = if htlc_maximum_msat_arg.is_some() { Some( { htlc_maximum_msat_arg.take() }) } else { None };
 	RouteHint { inner: Box::into_raw(Box::new(nativeRouteHint {
@@ -438,12 +438,12 @@ pub extern "C" fn RouteHint_clone(orig: &RouteHint) -> RouteHint {
 /// equal), however the enabled/disabled bit on such channels as well as the
 /// htlc_minimum_msat/htlc_maximum_msat *are* checked as they may change based on the receiving node.
 #[no_mangle]
-pub extern "C" fn get_route(mut our_node_id: crate::c_types::PublicKey, network: &crate::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, mut payee_features: crate::ln::features::InvoiceFeatures, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::util::logger::Logger) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+pub extern "C" fn get_route(mut our_node_id: crate::c_types::PublicKey, network: &crate::lightning::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, mut payee_features: crate::lightning::ln::features::InvoiceFeatures, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
 	let mut local_payee_features = if payee_features.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(payee_features.take_inner()) } }) };
 	let mut local_first_hops_base = if first_hops == std::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { unsafe { &*item.inner } }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
 	let mut local_last_hops = Vec::new(); for mut item in last_hops.as_slice().iter() { local_last_hops.push( { unsafe { &*item.inner } }); };
 	let mut ret = lightning::routing::router::get_route(&our_node_id.into_rust(), unsafe { &*network.inner }, &payee.into_rust(), local_payee_features, local_first_hops, &local_last_hops[..], final_value_msat, final_cltv, logger);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::routing::router::Route { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::LightningError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_ret
 }
 

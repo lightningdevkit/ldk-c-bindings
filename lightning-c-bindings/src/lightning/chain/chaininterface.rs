@@ -129,7 +129,7 @@ pub struct FeeEstimator {
 	///  * satoshis-per-byte * 250
 	///  * ceil(satoshis-per-kbyte / 4)
 	#[must_use]
-	pub get_est_sat_per_1000_weight: extern "C" fn (this_arg: *const c_void, confirmation_target: crate::chain::chaininterface::ConfirmationTarget) -> u32,
+	pub get_est_sat_per_1000_weight: extern "C" fn (this_arg: *const c_void, confirmation_target: crate::lightning::chain::chaininterface::ConfirmationTarget) -> u32,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -140,7 +140,7 @@ unsafe impl Send for FeeEstimator {}
 use lightning::chain::chaininterface::FeeEstimator as rustFeeEstimator;
 impl rustFeeEstimator for FeeEstimator {
 	fn get_est_sat_per_1000_weight(&self, confirmation_target: lightning::chain::chaininterface::ConfirmationTarget) -> u32 {
-		let mut ret = (self.get_est_sat_per_1000_weight)(self.this_arg, crate::chain::chaininterface::ConfirmationTarget::native_into(confirmation_target));
+		let mut ret = (self.get_est_sat_per_1000_weight)(self.this_arg, crate::lightning::chain::chaininterface::ConfirmationTarget::native_into(confirmation_target));
 		ret
 	}
 }

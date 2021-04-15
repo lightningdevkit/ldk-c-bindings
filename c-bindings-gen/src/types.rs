@@ -507,11 +507,20 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 	pub fn resolve_imported_refs(&self, mut ty: syn::Type) -> syn::Type {
 		match &mut ty {
 			syn::Type::Path(p) => {
-				if let Some(ident) = p.path.get_ident() {
-					if let Some((_, newpath)) = self.imports.get(ident) {
-						p.path = newpath.clone();
+eprintln!("rir {:?}", p);
+				if p.path.segments.len() != 1 { unimplemented!(); }
+				let mut args = p.path.segments[0].arguments.clone();
+				if let syn::PathArguments::AngleBracketed(ref mut generics) = &mut args {
+					for arg in generics.args.iter_mut() {
+						if let syn::GenericArgument::Type(ref mut t) = arg {
+							*t = self.resolve_imported_refs(t.clone());
+						}
 					}
-				} else { unimplemented!(); }
+				}
+				if let Some((_, newpath)) = self.imports.get(single_ident_generic_path_to_ident(&p.path).unwrap()) {
+					p.path = newpath.clone();
+				}
+				p.path.segments[0].arguments = args;
 			},
 			syn::Type::Reference(r) => {
 				r.elem = Box::new(self.resolve_imported_refs((*r.elem).clone()));

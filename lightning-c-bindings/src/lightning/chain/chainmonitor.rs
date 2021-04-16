@@ -28,7 +28,7 @@ use crate::c_types::*;
 
 
 use lightning::chain::chainmonitor::ChainMonitor as nativeChainMonitorImport;
-type nativeChainMonitor = nativeChainMonitorImport<crate::chain::keysinterface::Sign, crate::chain::Filter, crate::chain::chaininterface::BroadcasterInterface, crate::chain::chaininterface::FeeEstimator, crate::util::logger::Logger, crate::chain::channelmonitor::Persist>;
+type nativeChainMonitor = nativeChainMonitorImport<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Filter, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger, crate::lightning::chain::channelmonitor::Persist>;
 
 /// An implementation of [`chain::Watch`] for monitoring channels.
 ///
@@ -172,13 +172,13 @@ pub extern "C" fn ChainMonitor_get_relevant_txids(this_arg: &ChainMonitor) -> cr
 /// transactions relevant to the watched channels.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChainMonitor_new(chain_source: *mut crate::chain::Filter, mut broadcaster: crate::chain::chaininterface::BroadcasterInterface, mut logger: crate::util::logger::Logger, mut feeest: crate::chain::chaininterface::FeeEstimator, mut persister: crate::chain::channelmonitor::Persist) -> ChainMonitor {
+pub extern "C" fn ChainMonitor_new(chain_source: *mut crate::lightning::chain::Filter, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut logger: crate::lightning::util::logger::Logger, mut feeest: crate::lightning::chain::chaininterface::FeeEstimator, mut persister: crate::lightning::chain::channelmonitor::Persist) -> ChainMonitor {
 	let mut local_chain_source = if chain_source == std::ptr::null_mut() { None } else { Some( { unsafe { *Box::from_raw(chain_source) } }) };
 	let mut ret = lightning::chain::chainmonitor::ChainMonitor::new(local_chain_source, broadcaster, logger, feeest, persister);
 	ChainMonitor { inner: Box::into_raw(Box::new(ret)), is_owned: true }
 }
 
-impl From<nativeChainMonitor> for crate::chain::Watch {
+impl From<nativeChainMonitor> for crate::lightning::chain::Watch {
 	fn from(obj: nativeChainMonitor) -> Self {
 		let mut rust_obj = ChainMonitor { inner: Box::into_raw(Box::new(obj)), is_owned: true };
 		let mut ret = ChainMonitor_as_Watch(&rust_obj);
@@ -191,8 +191,8 @@ impl From<nativeChainMonitor> for crate::chain::Watch {
 /// Constructs a new Watch which calls the relevant methods on this_arg.
 /// This copies the `inner` pointer in this_arg and thus the returned Watch must be freed before this_arg is
 #[no_mangle]
-pub extern "C" fn ChainMonitor_as_Watch(this_arg: &ChainMonitor) -> crate::chain::Watch {
-	crate::chain::Watch {
+pub extern "C" fn ChainMonitor_as_Watch(this_arg: &ChainMonitor) -> crate::lightning::chain::Watch {
+	crate::lightning::chain::Watch {
 		this_arg: unsafe { (*this_arg).inner as *mut c_void },
 		free: None,
 		watch_channel: ChainMonitor_Watch_watch_channel,
@@ -202,25 +202,25 @@ pub extern "C" fn ChainMonitor_as_Watch(this_arg: &ChainMonitor) -> crate::chain
 }
 
 #[must_use]
-extern "C" fn ChainMonitor_Watch_watch_channel(this_arg: *const c_void, mut funding_outpoint: crate::chain::transaction::OutPoint, mut monitor: crate::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
+extern "C" fn ChainMonitor_Watch_watch_channel(this_arg: *const c_void, mut funding_outpoint: crate::lightning::chain::transaction::OutPoint, mut monitor: crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
 	let mut ret = <nativeChainMonitor as lightning::chain::Watch<_>>::watch_channel(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, *unsafe { Box::from_raw(funding_outpoint.take_inner()) }, *unsafe { Box::from_raw(monitor.take_inner()) });
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { 0u8 /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::chain::channelmonitor::ChannelMonitorUpdateErr::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { 0u8 /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdateErr::native_into(e) }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn ChainMonitor_Watch_update_channel(this_arg: *const c_void, mut funding_txo: crate::chain::transaction::OutPoint, mut update: crate::chain::channelmonitor::ChannelMonitorUpdate) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
+extern "C" fn ChainMonitor_Watch_update_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, mut update: crate::lightning::chain::channelmonitor::ChannelMonitorUpdate) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
 	let mut ret = <nativeChainMonitor as lightning::chain::Watch<_>>::update_channel(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, *unsafe { Box::from_raw(update.take_inner()) });
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { 0u8 /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::chain::channelmonitor::ChannelMonitorUpdateErr::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { 0u8 /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdateErr::native_into(e) }).into() };
 	local_ret
 }
 #[must_use]
 extern "C" fn ChainMonitor_Watch_release_pending_monitor_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_MonitorEventZ {
 	let mut ret = <nativeChainMonitor as lightning::chain::Watch<_>>::release_pending_monitor_events(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::chain::channelmonitor::MonitorEvent::native_into(item) }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::chain::channelmonitor::MonitorEvent::native_into(item) }); };
 	local_ret.into()
 }
 
-impl From<nativeChainMonitor> for crate::util::events::EventsProvider {
+impl From<nativeChainMonitor> for crate::lightning::util::events::EventsProvider {
 	fn from(obj: nativeChainMonitor) -> Self {
 		let mut rust_obj = ChainMonitor { inner: Box::into_raw(Box::new(obj)), is_owned: true };
 		let mut ret = ChainMonitor_as_EventsProvider(&rust_obj);
@@ -233,8 +233,8 @@ impl From<nativeChainMonitor> for crate::util::events::EventsProvider {
 /// Constructs a new EventsProvider which calls the relevant methods on this_arg.
 /// This copies the `inner` pointer in this_arg and thus the returned EventsProvider must be freed before this_arg is
 #[no_mangle]
-pub extern "C" fn ChainMonitor_as_EventsProvider(this_arg: &ChainMonitor) -> crate::util::events::EventsProvider {
-	crate::util::events::EventsProvider {
+pub extern "C" fn ChainMonitor_as_EventsProvider(this_arg: &ChainMonitor) -> crate::lightning::util::events::EventsProvider {
+	crate::lightning::util::events::EventsProvider {
 		this_arg: unsafe { (*this_arg).inner as *mut c_void },
 		free: None,
 		get_and_clear_pending_events: ChainMonitor_EventsProvider_get_and_clear_pending_events,
@@ -244,7 +244,7 @@ pub extern "C" fn ChainMonitor_as_EventsProvider(this_arg: &ChainMonitor) -> cra
 #[must_use]
 extern "C" fn ChainMonitor_EventsProvider_get_and_clear_pending_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_EventZ {
 	let mut ret = <nativeChainMonitor as lightning::util::events::EventsProvider<>>::get_and_clear_pending_events(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::util::events::Event::native_into(item) }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::util::events::Event::native_into(item) }); };
 	local_ret.into()
 }
 

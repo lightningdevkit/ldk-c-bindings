@@ -131,6 +131,6 @@ pub(crate) extern "C" fn OutPoint_write_void(obj: *const c_void) -> crate::c_typ
 /// Read a OutPoint from a byte array, created by OutPoint_write
 pub extern "C" fn OutPoint_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_OutPointDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }

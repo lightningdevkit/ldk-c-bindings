@@ -692,7 +692,7 @@ pub(crate) extern "C" fn ChannelConfig_write_void(obj: *const c_void) -> crate::
 /// Read a ChannelConfig from a byte array, created by ChannelConfig_write
 pub extern "C" fn ChannelConfig_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelConfigDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::util::config::ChannelConfig { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::util::config::ChannelConfig { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 
@@ -745,41 +745,41 @@ impl UserConfig {
 }
 /// Channel config that we propose to our counterparty.
 #[no_mangle]
-pub extern "C" fn UserConfig_get_own_channel_config(this_ptr: &UserConfig) -> crate::util::config::ChannelHandshakeConfig {
+pub extern "C" fn UserConfig_get_own_channel_config(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelHandshakeConfig {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.own_channel_config;
-	crate::util::config::ChannelHandshakeConfig { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::util::config::ChannelHandshakeConfig { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
 }
 /// Channel config that we propose to our counterparty.
 #[no_mangle]
-pub extern "C" fn UserConfig_set_own_channel_config(this_ptr: &mut UserConfig, mut val: crate::util::config::ChannelHandshakeConfig) {
+pub extern "C" fn UserConfig_set_own_channel_config(this_ptr: &mut UserConfig, mut val: crate::lightning::util::config::ChannelHandshakeConfig) {
 	unsafe { &mut *this_ptr.inner }.own_channel_config = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Limits applied to our counterparty's proposed channel config settings.
 #[no_mangle]
-pub extern "C" fn UserConfig_get_peer_channel_config_limits(this_ptr: &UserConfig) -> crate::util::config::ChannelHandshakeLimits {
+pub extern "C" fn UserConfig_get_peer_channel_config_limits(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelHandshakeLimits {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.peer_channel_config_limits;
-	crate::util::config::ChannelHandshakeLimits { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::util::config::ChannelHandshakeLimits { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
 }
 /// Limits applied to our counterparty's proposed channel config settings.
 #[no_mangle]
-pub extern "C" fn UserConfig_set_peer_channel_config_limits(this_ptr: &mut UserConfig, mut val: crate::util::config::ChannelHandshakeLimits) {
+pub extern "C" fn UserConfig_set_peer_channel_config_limits(this_ptr: &mut UserConfig, mut val: crate::lightning::util::config::ChannelHandshakeLimits) {
 	unsafe { &mut *this_ptr.inner }.peer_channel_config_limits = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Channel config which affects behavior during channel lifetime.
 #[no_mangle]
-pub extern "C" fn UserConfig_get_channel_options(this_ptr: &UserConfig) -> crate::util::config::ChannelConfig {
+pub extern "C" fn UserConfig_get_channel_options(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelConfig {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_options;
-	crate::util::config::ChannelConfig { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::util::config::ChannelConfig { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
 }
 /// Channel config which affects behavior during channel lifetime.
 #[no_mangle]
-pub extern "C" fn UserConfig_set_channel_options(this_ptr: &mut UserConfig, mut val: crate::util::config::ChannelConfig) {
+pub extern "C" fn UserConfig_set_channel_options(this_ptr: &mut UserConfig, mut val: crate::lightning::util::config::ChannelConfig) {
 	unsafe { &mut *this_ptr.inner }.channel_options = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Constructs a new UserConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn UserConfig_new(mut own_channel_config_arg: crate::util::config::ChannelHandshakeConfig, mut peer_channel_config_limits_arg: crate::util::config::ChannelHandshakeLimits, mut channel_options_arg: crate::util::config::ChannelConfig) -> UserConfig {
+pub extern "C" fn UserConfig_new(mut own_channel_config_arg: crate::lightning::util::config::ChannelHandshakeConfig, mut peer_channel_config_limits_arg: crate::lightning::util::config::ChannelHandshakeLimits, mut channel_options_arg: crate::lightning::util::config::ChannelConfig) -> UserConfig {
 	UserConfig { inner: Box::into_raw(Box::new(nativeUserConfig {
 		own_channel_config: *unsafe { Box::from_raw(own_channel_config_arg.take_inner()) },
 		peer_channel_config_limits: *unsafe { Box::from_raw(peer_channel_config_limits_arg.take_inner()) },

@@ -258,7 +258,7 @@ impl Event {
 			},
 			nativeEvent::SpendableOutputs {ref outputs, } => {
 				let mut outputs_nonref = (*outputs).clone();
-				let mut local_outputs_nonref = Vec::new(); for mut item in outputs_nonref.drain(..) { local_outputs_nonref.push( { crate::chain::keysinterface::SpendableOutputDescriptor::native_into(item) }); };
+				let mut local_outputs_nonref = Vec::new(); for mut item in outputs_nonref.drain(..) { local_outputs_nonref.push( { crate::lightning::chain::keysinterface::SpendableOutputDescriptor::native_into(item) }); };
 				Event::SpendableOutputs {
 					outputs: local_outputs_nonref.into(),
 				}
@@ -301,7 +301,7 @@ impl Event {
 				}
 			},
 			nativeEvent::SpendableOutputs {mut outputs, } => {
-				let mut local_outputs = Vec::new(); for mut item in outputs.drain(..) { local_outputs.push( { crate::chain::keysinterface::SpendableOutputDescriptor::native_into(item) }); };
+				let mut local_outputs = Vec::new(); for mut item in outputs.drain(..) { local_outputs.push( { crate::lightning::chain::keysinterface::SpendableOutputDescriptor::native_into(item) }); };
 				Event::SpendableOutputs {
 					outputs: local_outputs.into(),
 				}
@@ -335,7 +335,7 @@ pub enum MessageSendEvent {
 		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
 		/// The message which should be sent.
-		msg: crate::ln::msgs::AcceptChannel,
+		msg: crate::lightning::ln::msgs::AcceptChannel,
 	},
 	/// Used to indicate that we've initiated a channel open and should send the open_channel
 	/// message provided to the given peer.
@@ -343,35 +343,35 @@ pub enum MessageSendEvent {
 		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
 		/// The message which should be sent.
-		msg: crate::ln::msgs::OpenChannel,
+		msg: crate::lightning::ln::msgs::OpenChannel,
 	},
 	/// Used to indicate that a funding_created message should be sent to the peer with the given node_id.
 	SendFundingCreated {
 		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
 		/// The message which should be sent.
-		msg: crate::ln::msgs::FundingCreated,
+		msg: crate::lightning::ln::msgs::FundingCreated,
 	},
 	/// Used to indicate that a funding_signed message should be sent to the peer with the given node_id.
 	SendFundingSigned {
 		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
 		/// The message which should be sent.
-		msg: crate::ln::msgs::FundingSigned,
+		msg: crate::lightning::ln::msgs::FundingSigned,
 	},
 	/// Used to indicate that a funding_locked message should be sent to the peer with the given node_id.
 	SendFundingLocked {
 		/// The node_id of the node which should receive these message(s)
 		node_id: crate::c_types::PublicKey,
 		/// The funding_locked message which should be sent.
-		msg: crate::ln::msgs::FundingLocked,
+		msg: crate::lightning::ln::msgs::FundingLocked,
 	},
 	/// Used to indicate that an announcement_signatures message should be sent to the peer with the given node_id.
 	SendAnnouncementSignatures {
 		/// The node_id of the node which should receive these message(s)
 		node_id: crate::c_types::PublicKey,
 		/// The announcement_signatures message which should be sent.
-		msg: crate::ln::msgs::AnnouncementSignatures,
+		msg: crate::lightning::ln::msgs::AnnouncementSignatures,
 	},
 	/// Used to indicate that a series of HTLC update messages, as well as a commitment_signed
 	/// message should be sent to the peer with the given node_id.
@@ -379,35 +379,35 @@ pub enum MessageSendEvent {
 		/// The node_id of the node which should receive these message(s)
 		node_id: crate::c_types::PublicKey,
 		/// The update messages which should be sent. ALL messages in the struct should be sent!
-		updates: crate::ln::msgs::CommitmentUpdate,
+		updates: crate::lightning::ln::msgs::CommitmentUpdate,
 	},
 	/// Used to indicate that a revoke_and_ack message should be sent to the peer with the given node_id.
 	SendRevokeAndACK {
 		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
 		/// The message which should be sent.
-		msg: crate::ln::msgs::RevokeAndACK,
+		msg: crate::lightning::ln::msgs::RevokeAndACK,
 	},
 	/// Used to indicate that a closing_signed message should be sent to the peer with the given node_id.
 	SendClosingSigned {
 		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
 		/// The message which should be sent.
-		msg: crate::ln::msgs::ClosingSigned,
+		msg: crate::lightning::ln::msgs::ClosingSigned,
 	},
 	/// Used to indicate that a shutdown message should be sent to the peer with the given node_id.
 	SendShutdown {
 		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
 		/// The message which should be sent.
-		msg: crate::ln::msgs::Shutdown,
+		msg: crate::lightning::ln::msgs::Shutdown,
 	},
 	/// Used to indicate that a channel_reestablish message should be sent to the peer with the given node_id.
 	SendChannelReestablish {
 		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
 		/// The message which should be sent.
-		msg: crate::ln::msgs::ChannelReestablish,
+		msg: crate::lightning::ln::msgs::ChannelReestablish,
 	},
 	/// Used to indicate that a channel_announcement and channel_update should be broadcast to all
 	/// peers (except the peer with node_id either msg.contents.node_id_1 or msg.contents.node_id_2).
@@ -419,39 +419,39 @@ pub enum MessageSendEvent {
 	/// through or to us.
 	BroadcastChannelAnnouncement {
 		/// The channel_announcement which should be sent.
-		msg: crate::ln::msgs::ChannelAnnouncement,
+		msg: crate::lightning::ln::msgs::ChannelAnnouncement,
 		/// The followup channel_update which should be sent.
-		update_msg: crate::ln::msgs::ChannelUpdate,
+		update_msg: crate::lightning::ln::msgs::ChannelUpdate,
 	},
 	/// Used to indicate that a node_announcement should be broadcast to all peers.
 	BroadcastNodeAnnouncement {
 		/// The node_announcement which should be sent.
-		msg: crate::ln::msgs::NodeAnnouncement,
+		msg: crate::lightning::ln::msgs::NodeAnnouncement,
 	},
 	/// Used to indicate that a channel_update should be broadcast to all peers.
 	BroadcastChannelUpdate {
 		/// The channel_update which should be sent.
-		msg: crate::ln::msgs::ChannelUpdate,
+		msg: crate::lightning::ln::msgs::ChannelUpdate,
 	},
 	/// Broadcast an error downstream to be handled
 	HandleError {
 		/// The node_id of the node which should receive this message
 		node_id: crate::c_types::PublicKey,
 		/// The action which should be taken.
-		action: crate::ln::msgs::ErrorAction,
+		action: crate::lightning::ln::msgs::ErrorAction,
 	},
 	/// When a payment fails we may receive updates back from the hop where it failed. In such
 	/// cases this event is generated so that we can inform the network graph of this information.
 	PaymentFailureNetworkUpdate {
 		/// The channel/node update which should be sent to NetGraphMsgHandler
-		update: crate::ln::msgs::HTLCFailChannelUpdate,
+		update: crate::lightning::ln::msgs::HTLCFailChannelUpdate,
 	},
 	/// Query a peer for channels with funding transaction UTXOs in a block range.
 	SendChannelRangeQuery {
 		/// The node_id of this message recipient
 		node_id: crate::c_types::PublicKey,
 		/// The query_channel_range which should be sent.
-		msg: crate::ln::msgs::QueryChannelRange,
+		msg: crate::lightning::ln::msgs::QueryChannelRange,
 	},
 	/// Request routing gossip messages from a peer for a list of channels identified by
 	/// their short_channel_ids.
@@ -459,7 +459,7 @@ pub enum MessageSendEvent {
 		/// The node_id of this message recipient
 		node_id: crate::c_types::PublicKey,
 		/// The query_short_channel_ids which should be sent.
-		msg: crate::ln::msgs::QueryShortChannelIds,
+		msg: crate::lightning::ln::msgs::QueryShortChannelIds,
 	},
 	/// Sends a reply to a channel range query. This may be one of several SendReplyChannelRange events
 	/// emitted during processing of the query.
@@ -467,7 +467,7 @@ pub enum MessageSendEvent {
 		/// The node_id of this message recipient
 		node_id: crate::c_types::PublicKey,
 		/// The reply_channel_range which should be sent.
-		msg: crate::ln::msgs::ReplyChannelRange,
+		msg: crate::lightning::ln::msgs::ReplyChannelRange,
 	},
 }
 use lightning::util::events::MessageSendEvent as nativeMessageSendEvent;
@@ -747,7 +747,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendAcceptChannel {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::AcceptChannel { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::AcceptChannel { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendOpenChannel {ref node_id, ref msg, } => {
@@ -755,7 +755,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendOpenChannel {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::OpenChannel { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::OpenChannel { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingCreated {ref node_id, ref msg, } => {
@@ -763,7 +763,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendFundingCreated {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::FundingCreated { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingCreated { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingSigned {ref node_id, ref msg, } => {
@@ -771,7 +771,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendFundingSigned {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::FundingSigned { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingSigned { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingLocked {ref node_id, ref msg, } => {
@@ -779,7 +779,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendFundingLocked {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::FundingLocked { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingLocked { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendAnnouncementSignatures {ref node_id, ref msg, } => {
@@ -787,7 +787,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendAnnouncementSignatures {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::AnnouncementSignatures { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::AnnouncementSignatures { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::UpdateHTLCs {ref node_id, ref updates, } => {
@@ -795,7 +795,7 @@ impl MessageSendEvent {
 				let mut updates_nonref = (*updates).clone();
 				MessageSendEvent::UpdateHTLCs {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					updates: crate::ln::msgs::CommitmentUpdate { inner: Box::into_raw(Box::new(updates_nonref)), is_owned: true },
+					updates: crate::lightning::ln::msgs::CommitmentUpdate { inner: Box::into_raw(Box::new(updates_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendRevokeAndACK {ref node_id, ref msg, } => {
@@ -803,7 +803,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendRevokeAndACK {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::RevokeAndACK { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::RevokeAndACK { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendClosingSigned {ref node_id, ref msg, } => {
@@ -811,7 +811,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendClosingSigned {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::ClosingSigned { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ClosingSigned { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendShutdown {ref node_id, ref msg, } => {
@@ -819,7 +819,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendShutdown {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::Shutdown { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::Shutdown { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendChannelReestablish {ref node_id, ref msg, } => {
@@ -827,27 +827,27 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendChannelReestablish {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::ChannelReestablish { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelReestablish { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelAnnouncement {ref msg, ref update_msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				let mut update_msg_nonref = (*update_msg).clone();
 				MessageSendEvent::BroadcastChannelAnnouncement {
-					msg: crate::ln::msgs::ChannelAnnouncement { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
-					update_msg: crate::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(update_msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					update_msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(update_msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastNodeAnnouncement {ref msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::BroadcastNodeAnnouncement {
-					msg: crate::ln::msgs::NodeAnnouncement { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::NodeAnnouncement { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelUpdate {ref msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::BroadcastChannelUpdate {
-					msg: crate::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::HandleError {ref node_id, ref action, } => {
@@ -855,13 +855,13 @@ impl MessageSendEvent {
 				let mut action_nonref = (*action).clone();
 				MessageSendEvent::HandleError {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					action: crate::ln::msgs::ErrorAction::native_into(action_nonref),
+					action: crate::lightning::ln::msgs::ErrorAction::native_into(action_nonref),
 				}
 			},
 			nativeMessageSendEvent::PaymentFailureNetworkUpdate {ref update, } => {
 				let mut update_nonref = (*update).clone();
 				MessageSendEvent::PaymentFailureNetworkUpdate {
-					update: crate::ln::msgs::HTLCFailChannelUpdate::native_into(update_nonref),
+					update: crate::lightning::ln::msgs::HTLCFailChannelUpdate::native_into(update_nonref),
 				}
 			},
 			nativeMessageSendEvent::SendChannelRangeQuery {ref node_id, ref msg, } => {
@@ -869,7 +869,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendChannelRangeQuery {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::QueryChannelRange { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::QueryChannelRange { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendShortIdsQuery {ref node_id, ref msg, } => {
@@ -877,7 +877,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendShortIdsQuery {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::QueryShortChannelIds { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::QueryShortChannelIds { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendReplyChannelRange {ref node_id, ref msg, } => {
@@ -885,7 +885,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendReplyChannelRange {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::ln::msgs::ReplyChannelRange { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ReplyChannelRange { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
 		}
@@ -896,112 +896,112 @@ impl MessageSendEvent {
 			nativeMessageSendEvent::SendAcceptChannel {mut node_id, mut msg, } => {
 				MessageSendEvent::SendAcceptChannel {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::AcceptChannel { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::AcceptChannel { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendOpenChannel {mut node_id, mut msg, } => {
 				MessageSendEvent::SendOpenChannel {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::OpenChannel { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::OpenChannel { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingCreated {mut node_id, mut msg, } => {
 				MessageSendEvent::SendFundingCreated {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::FundingCreated { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingCreated { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingSigned {mut node_id, mut msg, } => {
 				MessageSendEvent::SendFundingSigned {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::FundingSigned { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingSigned { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingLocked {mut node_id, mut msg, } => {
 				MessageSendEvent::SendFundingLocked {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::FundingLocked { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingLocked { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendAnnouncementSignatures {mut node_id, mut msg, } => {
 				MessageSendEvent::SendAnnouncementSignatures {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::AnnouncementSignatures { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::AnnouncementSignatures { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::UpdateHTLCs {mut node_id, mut updates, } => {
 				MessageSendEvent::UpdateHTLCs {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					updates: crate::ln::msgs::CommitmentUpdate { inner: Box::into_raw(Box::new(updates)), is_owned: true },
+					updates: crate::lightning::ln::msgs::CommitmentUpdate { inner: Box::into_raw(Box::new(updates)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendRevokeAndACK {mut node_id, mut msg, } => {
 				MessageSendEvent::SendRevokeAndACK {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::RevokeAndACK { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::RevokeAndACK { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendClosingSigned {mut node_id, mut msg, } => {
 				MessageSendEvent::SendClosingSigned {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::ClosingSigned { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ClosingSigned { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendShutdown {mut node_id, mut msg, } => {
 				MessageSendEvent::SendShutdown {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::Shutdown { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::Shutdown { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendChannelReestablish {mut node_id, mut msg, } => {
 				MessageSendEvent::SendChannelReestablish {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::ChannelReestablish { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelReestablish { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelAnnouncement {mut msg, mut update_msg, } => {
 				MessageSendEvent::BroadcastChannelAnnouncement {
-					msg: crate::ln::msgs::ChannelAnnouncement { inner: Box::into_raw(Box::new(msg)), is_owned: true },
-					update_msg: crate::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(update_msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					update_msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(update_msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastNodeAnnouncement {mut msg, } => {
 				MessageSendEvent::BroadcastNodeAnnouncement {
-					msg: crate::ln::msgs::NodeAnnouncement { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::NodeAnnouncement { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelUpdate {mut msg, } => {
 				MessageSendEvent::BroadcastChannelUpdate {
-					msg: crate::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::HandleError {mut node_id, mut action, } => {
 				MessageSendEvent::HandleError {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					action: crate::ln::msgs::ErrorAction::native_into(action),
+					action: crate::lightning::ln::msgs::ErrorAction::native_into(action),
 				}
 			},
 			nativeMessageSendEvent::PaymentFailureNetworkUpdate {mut update, } => {
 				MessageSendEvent::PaymentFailureNetworkUpdate {
-					update: crate::ln::msgs::HTLCFailChannelUpdate::native_into(update),
+					update: crate::lightning::ln::msgs::HTLCFailChannelUpdate::native_into(update),
 				}
 			},
 			nativeMessageSendEvent::SendChannelRangeQuery {mut node_id, mut msg, } => {
 				MessageSendEvent::SendChannelRangeQuery {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::QueryChannelRange { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::QueryChannelRange { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendShortIdsQuery {mut node_id, mut msg, } => {
 				MessageSendEvent::SendShortIdsQuery {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::QueryShortChannelIds { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::QueryShortChannelIds { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendReplyChannelRange {mut node_id, mut msg, } => {
 				MessageSendEvent::SendReplyChannelRange {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::ln::msgs::ReplyChannelRange { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ReplyChannelRange { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},
 		}

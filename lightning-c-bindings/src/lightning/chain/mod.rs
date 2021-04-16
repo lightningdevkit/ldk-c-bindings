@@ -195,7 +195,7 @@ pub struct Watch {
 	/// [`block_connected`]: channelmonitor::ChannelMonitor::block_connected
 	/// [`block_disconnected`]: channelmonitor::ChannelMonitor::block_disconnected
 	#[must_use]
-	pub watch_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::chain::transaction::OutPoint, monitor: crate::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
+	pub watch_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::lightning::chain::transaction::OutPoint, monitor: crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
 	/// Updates a channel identified by `funding_txo` by applying `update` to its monitor.
 	///
 	/// Implementations must call [`update_monitor`] with the given update. See
@@ -204,7 +204,7 @@ pub struct Watch {
 	/// [`update_monitor`]: channelmonitor::ChannelMonitor::update_monitor
 	/// [`ChannelMonitorUpdateErr`]: channelmonitor::ChannelMonitorUpdateErr
 	#[must_use]
-	pub update_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::chain::transaction::OutPoint, update: crate::chain::channelmonitor::ChannelMonitorUpdate) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
+	pub update_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::lightning::chain::transaction::OutPoint, update: crate::lightning::chain::channelmonitor::ChannelMonitorUpdate) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
 	/// Returns any monitor events since the last call. Subsequent calls must only return new
 	/// events.
 	#[must_use]
@@ -217,14 +217,14 @@ unsafe impl Send for Watch {}
 unsafe impl Sync for Watch {}
 
 use lightning::chain::Watch as rustWatch;
-impl rustWatch<crate::chain::keysinterface::Sign> for Watch {
-	fn watch_channel(&self, funding_txo: lightning::chain::transaction::OutPoint, monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
-		let mut ret = (self.watch_channel)(self.this_arg, crate::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(funding_txo)), is_owned: true }, crate::chain::channelmonitor::ChannelMonitor { inner: Box::into_raw(Box::new(monitor)), is_owned: true });
+impl rustWatch<crate::lightning::chain::keysinterface::Sign> for Watch {
+	fn watch_channel(&self, funding_txo: lightning::chain::transaction::OutPoint, monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
+		let mut ret = (self.watch_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(funding_txo)), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: Box::into_raw(Box::new(monitor)), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
 	fn update_channel(&self, funding_txo: lightning::chain::transaction::OutPoint, update: lightning::chain::channelmonitor::ChannelMonitorUpdate) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
-		let mut ret = (self.update_channel)(self.this_arg, crate::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(funding_txo)), is_owned: true }, crate::chain::channelmonitor::ChannelMonitorUpdate { inner: Box::into_raw(Box::new(update)), is_owned: true });
+		let mut ret = (self.update_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(funding_txo)), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: Box::into_raw(Box::new(update)), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
@@ -291,7 +291,7 @@ pub struct Filter {
 	/// such descendant transactions were already included (e.g., when a BIP 157 client provides the
 	/// full block).
 	#[must_use]
-	pub register_output: extern "C" fn (this_arg: *const c_void, output: crate::chain::WatchedOutput) -> crate::c_types::derived::COption_C2Tuple_usizeTransactionZZ,
+	pub register_output: extern "C" fn (this_arg: *const c_void, output: crate::lightning::chain::WatchedOutput) -> crate::c_types::derived::COption_C2Tuple_usizeTransactionZZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -305,7 +305,7 @@ impl rustFilter for Filter {
 		(self.register_tx)(self.this_arg, txid.as_inner(), crate::c_types::u8slice::from_slice(&script_pubkey[..]))
 	}
 	fn register_output(&self, output: lightning::chain::WatchedOutput) -> Option<(usize, bitcoin::blockdata::transaction::Transaction)> {
-		let mut ret = (self.register_output)(self.this_arg, crate::chain::WatchedOutput { inner: Box::into_raw(Box::new(output)), is_owned: true });
+		let mut ret = (self.register_output)(self.this_arg, crate::lightning::chain::WatchedOutput { inner: Box::into_raw(Box::new(output)), is_owned: true });
 		let mut local_ret = if ret.is_some() { Some( { let (mut orig_ret_0_0, mut orig_ret_0_1) = ret.take().to_rust(); let mut local_ret_0 = (orig_ret_0_0, orig_ret_0_1.into_bitcoin()); local_ret_0 }) } else { None };
 		local_ret
 	}
@@ -399,13 +399,13 @@ pub extern "C" fn WatchedOutput_set_block_hash(this_ptr: &mut WatchedOutput, mut
 }
 /// Outpoint identifying the transaction output.
 #[no_mangle]
-pub extern "C" fn WatchedOutput_get_outpoint(this_ptr: &WatchedOutput) -> crate::chain::transaction::OutPoint {
+pub extern "C" fn WatchedOutput_get_outpoint(this_ptr: &WatchedOutput) -> crate::lightning::chain::transaction::OutPoint {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.outpoint;
-	crate::chain::transaction::OutPoint { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
 }
 /// Outpoint identifying the transaction output.
 #[no_mangle]
-pub extern "C" fn WatchedOutput_set_outpoint(this_ptr: &mut WatchedOutput, mut val: crate::chain::transaction::OutPoint) {
+pub extern "C" fn WatchedOutput_set_outpoint(this_ptr: &mut WatchedOutput, mut val: crate::lightning::chain::transaction::OutPoint) {
 	unsafe { &mut *this_ptr.inner }.outpoint = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Spending condition of the transaction output.
@@ -422,7 +422,7 @@ pub extern "C" fn WatchedOutput_set_script_pubkey(this_ptr: &mut WatchedOutput, 
 /// Constructs a new WatchedOutput given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn WatchedOutput_new(mut block_hash_arg: crate::c_types::ThirtyTwoBytes, mut outpoint_arg: crate::chain::transaction::OutPoint, mut script_pubkey_arg: crate::c_types::derived::CVec_u8Z) -> WatchedOutput {
+pub extern "C" fn WatchedOutput_new(mut block_hash_arg: crate::c_types::ThirtyTwoBytes, mut outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut script_pubkey_arg: crate::c_types::derived::CVec_u8Z) -> WatchedOutput {
 	let mut local_block_hash_arg = if block_hash_arg.data == [0; 32] { None } else { Some( { ::bitcoin::hash_types::BlockHash::from_slice(&block_hash_arg.data[..]).unwrap() }) };
 	WatchedOutput { inner: Box::into_raw(Box::new(nativeWatchedOutput {
 		block_hash: local_block_hash_arg,

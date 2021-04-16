@@ -16,7 +16,7 @@ fi
 
 # On reasonable systems, we can use realpath here, but OSX is a diva with 20-year-old software.
 ORIG_PWD="$(pwd)"
-cd "$1/lightning"
+cd "$1"
 LIGHTNING_PATH="$(pwd)"
 cd "$ORIG_PWD"
 
@@ -32,7 +32,7 @@ mv lightning-c-bindings/src/bitcoin ./
 
 rm -rf lightning-c-bindings/src
 
-mkdir -p lightning-c-bindings/src/c_types/
+mkdir -p lightning-c-bindings/src/{c_types,lightning}
 mv ./mod.rs lightning-c-bindings/src/c_types/
 mv ./bitcoin lightning-c-bindings/src/
 
@@ -43,17 +43,44 @@ OUT_F="$(pwd)/lightning-c-bindings/include/rust_types.h"
 OUT_CPP="$(pwd)/lightning-c-bindings/include/lightningpp.hpp"
 BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
-pushd "$LIGHTNING_PATH"
-RUSTC_BOOTSTRAP=1 cargo rustc $FEATURES_ARGS --profile=check -- -Zunstable-options --pretty=expanded |
-	RUST_BACKTRACE=1 "$BIN" "$OUT/" lightning "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
+pushd "$LIGHTNING_PATH/lightning"
+RUSTC_BOOTSTRAP=1 cargo rustc $FEATURES_ARGS --profile=check -- -Zunstable-options --pretty=expanded > /tmp/lightning-crate-source.txt
 popd
 
 HOST_PLATFORM="$(rustc --version --verbose | grep "host:")"
 if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 	# OSX sed is for some reason not compatible with GNU sed
-	sed -i '' 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH"'", features = ['"$FEATURES"'] }|' lightning-c-bindings/Cargo.toml
+	sed -E -i '' 's/#!\[crate_name = "(.*)"\]/pub mod \1 {/' /tmp/lightning-crate-source.txt
 else
-	sed -i 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH"'", features = ['"$FEATURES"'] }|' lightning-c-bindings/Cargo.toml
+	sed -E -i 's/#!\[crate_name = "(.*)"\]/pub mod \1 {/' /tmp/lightning-crate-source.txt
+fi
+echo "}" >> /tmp/lightning-crate-source.txt
+
+if [ "$2" = "true" ]; then
+	pushd "$LIGHTNING_PATH/lightning-persister"
+	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check -- -Zunstable-options --pretty=expanded > /tmp/lightning-persist-crate-source.txt
+	popd
+	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+		sed -i".original" '1i\
+pub mod lightning_persister {
+' /tmp/lightning-persist-crate-source.txt
+	else
+		sed -i '1ipub mod lightning_persister {\n' /tmp/lightning-persist-crate-source.txt
+	fi
+	echo "}" >> /tmp/lightning-persist-crate-source.txt
+	cat /tmp/lightning-persist-crate-source.txt >> /tmp/lightning-crate-source.txt
+	rm /tmp/lightning-persist-crate-source.txt
+fi
+
+cat /tmp/lightning-crate-source.txt | RUST_BACKTRACE=1 "$BIN" "$OUT/" "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
+
+if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+	# OSX sed is for some reason not compatible with GNU sed
+	sed -i '' 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH/lightning"'", features = ['"$FEATURES"'] }|' lightning-c-bindings/Cargo.toml
+	sed -E -i '' 's|lightning-(.*) = \{ .*|lightning-\1 = \{ path = "'"$LIGHTNING_PATH"'/lightning-\1" }|' lightning-c-bindings/Cargo.toml
+else
+	sed -i 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH/lightning"'", features = ['"$FEATURES"'] }|' lightning-c-bindings/Cargo.toml
+	sed -E -i 's|lightning-(.*) = \{ .*|lightning-\1 = \{ path = "'"$LIGHTNING_PATH"'/lightning-\1" }|' lightning-c-bindings/Cargo.toml
 fi
 
 # Set path to include our rustc wrapper as well as cbindgen

@@ -111,6 +111,55 @@ impl Secp256k1Error {
 }
 
 #[repr(C)]
+#[allow(missing_docs)] // If there's no docs upstream, that's good enough for us
+/// Represents an IO Error. Note that some information is lost in the conversion from Rust.
+pub enum IOError {
+	NotFound,
+	PermissionDenied,
+	ConnectionRefused,
+	ConnectionReset,
+	ConnectionAborted,
+	NotConnected,
+	AddrInUse,
+	AddrNotAvailable,
+	BrokenPipe,
+	AlreadyExists,
+	WouldBlock,
+	InvalidInput,
+	InvalidData,
+	TimedOut,
+	WriteZero,
+	Interrupted,
+	Other,
+	UnexpectedEof,
+}
+impl IOError {
+	pub(crate) fn from_rust(err: std::io::Error) -> Self {
+		match err.kind() {
+			std::io::ErrorKind::NotFound => IOError::NotFound,
+			std::io::ErrorKind::PermissionDenied => IOError::PermissionDenied,
+			std::io::ErrorKind::ConnectionRefused => IOError::ConnectionRefused,
+			std::io::ErrorKind::ConnectionReset => IOError::ConnectionReset,
+			std::io::ErrorKind::ConnectionAborted => IOError::ConnectionAborted,
+			std::io::ErrorKind::NotConnected => IOError::NotConnected,
+			std::io::ErrorKind::AddrInUse => IOError::AddrInUse,
+			std::io::ErrorKind::AddrNotAvailable => IOError::AddrNotAvailable,
+			std::io::ErrorKind::BrokenPipe => IOError::BrokenPipe,
+			std::io::ErrorKind::AlreadyExists => IOError::AlreadyExists,
+			std::io::ErrorKind::WouldBlock => IOError::WouldBlock,
+			std::io::ErrorKind::InvalidInput => IOError::InvalidInput,
+			std::io::ErrorKind::InvalidData => IOError::InvalidData,
+			std::io::ErrorKind::TimedOut => IOError::TimedOut,
+			std::io::ErrorKind::WriteZero => IOError::WriteZero,
+			std::io::ErrorKind::Interrupted => IOError::Interrupted,
+			std::io::ErrorKind::Other => IOError::Other,
+			std::io::ErrorKind::UnexpectedEof => IOError::UnexpectedEof,
+			_ => IOError::Other,
+		}
+	}
+}
+
+#[repr(C)]
 /// A serialized transaction, in (pointer, length) form.
 ///
 /// This type optionally owns its own memory, and thus the semantics around access change based on
@@ -160,8 +209,8 @@ impl Drop for Transaction {
 /// Frees the data buffer, if data_is_owned is set and datalen > 0.
 pub extern "C" fn Transaction_free(_res: Transaction) { }
 
-pub(crate) fn bitcoin_to_C_outpoint(outpoint: ::bitcoin::blockdata::transaction::OutPoint) -> crate::chain::transaction::OutPoint {
-	crate::chain::transaction::OutPoint_new(ThirtyTwoBytes { data: outpoint.txid.into_inner() }, outpoint.vout.try_into().unwrap())
+pub(crate) fn bitcoin_to_C_outpoint(outpoint: ::bitcoin::blockdata::transaction::OutPoint) -> crate::lightning::chain::transaction::OutPoint {
+	crate::lightning::chain::transaction::OutPoint_new(ThirtyTwoBytes { data: outpoint.txid.into_inner() }, outpoint.vout.try_into().unwrap())
 }
 
 #[repr(C)]

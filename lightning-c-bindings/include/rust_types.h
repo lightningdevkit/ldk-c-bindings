@@ -91,6 +91,8 @@ struct nativeChannelManagerOpaque;
 typedef struct nativeChannelManagerOpaque LDKnativeChannelManager;
 struct nativeChainParametersOpaque;
 typedef struct nativeChainParametersOpaque LDKnativeChainParameters;
+struct nativeBestBlockOpaque;
+typedef struct nativeBestBlockOpaque LDKnativeBestBlock;
 struct nativeChannelDetailsOpaque;
 typedef struct nativeChannelDetailsOpaque LDKnativeChannelDetails;
 struct nativeChannelManagerReadArgsOpaque;

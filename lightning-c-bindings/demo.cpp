@@ -137,7 +137,7 @@ struct NodeMonitors {
 	void ConnectBlock(const uint8_t (*header)[80], uint32_t height, LDKCVec_C2Tuple_usizeTransactionZZ tx_data, LDKBroadcasterInterface broadcast, LDKFeeEstimator fee_est) {
 		std::unique_lock<std::mutex> l(mut);
 		for (auto& mon : mons) {
-			LDK::CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ res = ChannelMonitor_block_connected(&mon.second, header, tx_data, height, broadcast, fee_est, *logger);
+			LDK::CVec_TransactionOutputsZ res = ChannelMonitor_block_connected(&mon.second, header, tx_data, height, broadcast, fee_est, *logger);
 		}
 	}
 };
@@ -361,7 +361,7 @@ int main() {
 		LDK::KeysInterface keys_source1 = KeysManager_as_KeysInterface(&keys1);
 		node_secret1 = keys_source1->get_node_secret(keys_source1->this_arg);
 
-		LDK::ChannelManager cm1 = ChannelManager_new(fee_est, mon1, broadcast, logger1, KeysManager_as_KeysInterface(&keys1), UserConfig_default(), ChainParameters_new(network, chain_tip, 0));
+		LDK::ChannelManager cm1 = ChannelManager_new(fee_est, mon1, broadcast, logger1, KeysManager_as_KeysInterface(&keys1), UserConfig_default(), ChainParameters_new(network, BestBlock_new(chain_tip, 0)));
 
 		LDK::CVec_ChannelDetailsZ channels = ChannelManager_list_channels(&cm1);
 		assert(channels->datalen == 0);
@@ -388,7 +388,7 @@ int main() {
 		LDK::UserConfig config2 = UserConfig_default();
 		UserConfig_set_own_channel_config(&config2, std::move(handshake_config2));
 
-		LDK::ChannelManager cm2 = ChannelManager_new(fee_est, mon2, broadcast, logger2, KeysManager_as_KeysInterface(&keys2), std::move(config2), ChainParameters_new(network, chain_tip, 0));
+		LDK::ChannelManager cm2 = ChannelManager_new(fee_est, mon2, broadcast, logger2, KeysManager_as_KeysInterface(&keys2), std::move(config2), ChainParameters_new(network, BestBlock_new(chain_tip, 0)));
 
 		LDK::CVec_ChannelDetailsZ channels2 = ChannelManager_list_channels(&cm2);
 		assert(channels2->datalen == 0);

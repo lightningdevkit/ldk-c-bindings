@@ -649,7 +649,7 @@ pub extern "C" fn ChannelMonitor_get_latest_holder_commitment_txn(this_arg: &Cha
 /// [`get_outputs_to_watch`]: #method.get_outputs_to_watch
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_block_connected(this_arg: &ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::chain::chaininterface::FeeEstimator, mut logger: crate::util::logger::Logger) -> crate::c_types::derived::CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
+pub extern "C" fn ChannelMonitor_block_connected(this_arg: &ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::chain::chaininterface::FeeEstimator, mut logger: crate::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
 	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
 	let mut ret = unsafe { &*this_arg.inner }.block_connected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height, broadcaster, fee_estimator, logger);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
@@ -661,6 +661,69 @@ pub extern "C" fn ChannelMonitor_block_connected(this_arg: &ChannelMonitor, head
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_block_disconnected(this_arg: &ChannelMonitor, header: *const [u8; 80], mut height: u32, mut broadcaster: crate::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::chain::chaininterface::FeeEstimator, mut logger: crate::util::logger::Logger) {
 	unsafe { &*this_arg.inner }.block_disconnected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, broadcaster, fee_estimator, logger)
+}
+
+/// Processes transactions confirmed in a block with the given header and height, returning new
+/// outputs to watch. See [`block_connected`] for details.
+///
+/// Used instead of [`block_connected`] by clients that are notified of transactions rather than
+/// blocks. May be called before or after [`update_best_block`] for transactions in the
+/// corresponding block. See [`update_best_block`] for further calling expectations. 
+///
+/// [`block_connected`]: Self::block_connected
+/// [`update_best_block`]: Self::update_best_block
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelMonitor_transactions_confirmed(this_arg: &ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::chain::chaininterface::FeeEstimator, mut logger: crate::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
+	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
+	let mut ret = unsafe { &*this_arg.inner }.transactions_confirmed(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height, broadcaster, fee_estimator, logger);
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
+	local_ret.into()
+}
+
+/// Processes a transaction that was reorganized out of the chain.
+///
+/// Used instead of [`block_disconnected`] by clients that are notified of transactions rather
+/// than blocks. May be called before or after [`update_best_block`] for transactions in the
+/// corresponding block. See [`update_best_block`] for further calling expectations.
+///
+/// [`block_disconnected`]: Self::block_disconnected
+/// [`update_best_block`]: Self::update_best_block
+#[no_mangle]
+pub extern "C" fn ChannelMonitor_transaction_unconfirmed(this_arg: &ChannelMonitor, txid: *const [u8; 32], mut broadcaster: crate::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::chain::chaininterface::FeeEstimator, mut logger: crate::util::logger::Logger) {
+	unsafe { &*this_arg.inner }.transaction_unconfirmed(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*txid }[..]).unwrap(), broadcaster, fee_estimator, logger)
+}
+
+/// Updates the monitor with the current best chain tip, returning new outputs to watch. See
+/// [`block_connected`] for details.
+///
+/// Used instead of [`block_connected`] by clients that are notified of transactions rather than
+/// blocks. May be called before or after [`transactions_confirmed`] for the corresponding
+/// block.
+///
+/// Must be called after new blocks become available for the most recent block. Intermediary
+/// blocks, however, may be safely skipped. In the event of a chain re-organization, this only
+/// needs to be called for the most recent block assuming `transaction_unconfirmed` is called
+/// for any affected transactions.
+///
+/// [`block_connected`]: Self::block_connected
+/// [`transactions_confirmed`]: Self::transactions_confirmed
+/// [`transaction_unconfirmed`]: Self::transaction_unconfirmed
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelMonitor_update_best_block(this_arg: &ChannelMonitor, header: *const [u8; 80], mut height: u32, mut broadcaster: crate::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::chain::chaininterface::FeeEstimator, mut logger: crate::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
+	let mut ret = unsafe { &*this_arg.inner }.update_best_block(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, broadcaster, fee_estimator, logger);
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
+	local_ret.into()
+}
+
+/// Returns the set of txids that should be monitored for re-organization out of the chain.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_TxidZ {
+	let mut ret = unsafe { &*this_arg.inner }.get_relevant_txids();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.into_inner() } }); };
+	local_ret.into()
 }
 
 /// `Persist` defines behavior for persisting channel monitors: this could mean

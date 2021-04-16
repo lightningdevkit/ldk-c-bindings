@@ -3028,6 +3028,44 @@ impl Drop for CVec_C2Tuple_usizeTransactionZZ {
 	}
 }
 #[repr(C)]
+/// A dynamically-allocated array of crate::c_types::ThirtyTwoBytess of arbitrary size.
+/// This corresponds to std::vector in C++
+pub struct CVec_TxidZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+	pub data: *mut crate::c_types::ThirtyTwoBytes,
+	/// The number of elements pointed to by `data`.
+	pub datalen: usize
+}
+impl CVec_TxidZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::ThirtyTwoBytes> {
+		if self.datalen == 0 { return Vec::new(); }
+		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = std::ptr::null_mut();
+		self.datalen = 0;
+		ret
+	}
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::ThirtyTwoBytes] {
+		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+	}
+}
+impl From<Vec<crate::c_types::ThirtyTwoBytes>> for CVec_TxidZ {
+	fn from(v: Vec<crate::c_types::ThirtyTwoBytes>) -> Self {
+		let datalen = v.len();
+		let data = Box::into_raw(v.into_boxed_slice());
+		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
+	}
+}
+#[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
+pub extern "C" fn CVec_TxidZ_free(_res: CVec_TxidZ) { }
+impl Drop for CVec_TxidZ {
+	fn drop(&mut self) {
+		if self.datalen == 0 { return; }
+		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+	}
+}
+#[repr(C)]
 /// The contents of CResult_NoneChannelMonitorUpdateErrZ
 pub union CResult_NoneChannelMonitorUpdateErrZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
@@ -3923,14 +3961,14 @@ pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ_free(_res: C2Tuple_TxidCV
 #[repr(C)]
 /// A dynamically-allocated array of crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZs of arbitrary size.
 /// This corresponds to std::vector in C++
-pub struct CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
+pub struct CVec_TransactionOutputsZ {
 	/// The elements in the array.
 	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
 	pub data: *mut crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ,
 	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
-impl CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
+impl CVec_TransactionOutputsZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ> {
 		if self.datalen == 0 { return Vec::new(); }
 		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
@@ -3942,7 +3980,7 @@ impl CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
 		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
-impl From<Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ>> for CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
+impl From<Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ>> for CVec_TransactionOutputsZ {
 	fn from(v: Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ>) -> Self {
 		let datalen = v.len();
 		let data = Box::into_raw(v.into_boxed_slice());
@@ -3951,8 +3989,8 @@ impl From<Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ>> fo
 }
 #[no_mangle]
 /// Frees the buffer pointed to by `data` if `datalen` is non-0.
-pub extern "C" fn CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ_free(_res: CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ) { }
-impl Drop for CVec_C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZZ {
+pub extern "C" fn CVec_TransactionOutputsZ_free(_res: CVec_TransactionOutputsZ) { }
+impl Drop for CVec_TransactionOutputsZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
 		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };

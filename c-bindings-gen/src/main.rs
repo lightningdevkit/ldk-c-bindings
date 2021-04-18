@@ -225,7 +225,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	}
 	writeln_docs(w, &t.attrs, "");
 
-	let mut gen_types = GenericTypes::new();
+	let mut gen_types = GenericTypes::new(None);
 	assert!(gen_types.learn_generics(&t.generics, types));
 	gen_types.learn_associated_types(&t, types);
 
@@ -579,7 +579,10 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 	writeln_opaque(w, &s.ident, struct_name, &s.generics, &s.attrs, types, extra_headers, cpp_headers);
 
 	if let syn::Fields::Named(fields) = &s.fields {
-		let mut gen_types = GenericTypes::new();
+		let mut self_path_segs = syn::punctuated::Punctuated::new();
+		self_path_segs.push(s.ident.clone().into());
+		let self_path = syn::Path { leading_colon: None, segments: self_path_segs};
+		let mut gen_types = GenericTypes::new(Some((types.resolve_path(&self_path, None), &self_path)));
 		assert!(gen_types.learn_generics(&s.generics, types));
 
 		let mut all_fields_settable = true;
@@ -674,7 +677,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 
 	if let syn::Type::Tuple(_) = &*i.self_ty {
 		if types.understood_c_type(&*i.self_ty, None) {
-			let mut gen_types = GenericTypes::new();
+			let mut gen_types = GenericTypes::new(None);
 			if !gen_types.learn_generics(&i.generics, types) {
 				eprintln!("Not implementing anything for `impl (..)` due to not understood generics");
 				return;
@@ -701,7 +704,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 		if p.qself.is_some() { unimplemented!(); }
 		if let Some(ident) = single_ident_generic_path_to_ident(&p.path) {
 			if let Some(resolved_path) = types.maybe_resolve_non_ignored_ident(&ident) {
-				let mut gen_types = GenericTypes::new();
+				let mut gen_types = GenericTypes::new(Some((resolved_path.clone(), &p.path)));
 				if !gen_types.learn_generics(&i.generics, types) {
 					eprintln!("Not implementing anything for impl {} due to not understood generics", ident);
 					return;
@@ -1270,7 +1273,7 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 	}
 	writeln_docs(w, &f.attrs, "");
 
-	let mut gen_types = GenericTypes::new();
+	let mut gen_types = GenericTypes::new(None);
 	if !gen_types.learn_generics(&f.sig.generics, types) { return; }
 
 	write!(w, "#[no_mangle]\npub extern \"C\" fn {}(", f.sig.ident).unwrap();

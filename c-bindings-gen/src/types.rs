@@ -164,19 +164,20 @@ pub fn is_enum_opaque(e: &syn::ItemEnum) -> bool {
 /// concrete C container struct, etc).
 #[must_use]
 pub struct GenericTypes<'a, 'b> {
+	self_ty: Option<(String, &'a syn::Path)>,
 	parent: Option<&'b GenericTypes<'b, 'b>>,
 	typed_generics: HashMap<&'a syn::Ident, (String, Option<&'a syn::Path>)>,
 }
 impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
-	pub fn new() -> Self {
-		Self { parent: None, typed_generics: HashMap::new(), }
+	pub fn new(self_ty: Option<(String, &'a syn::Path)>) -> Self {
+		Self { self_ty, parent: None, typed_generics: HashMap::new(), }
 	}
 
 	/// push a new context onto the stack, allowing for a new set of generics to be learned which
 	/// will override any lower contexts, but which will still fall back to resoltion via lower
 	/// contexts.
 	pub fn push_ctx<'c>(&'c self) -> GenericTypes<'a, 'c> {
-		GenericTypes { parent: Some(self), typed_generics: HashMap::new(), }
+		GenericTypes { self_ty: None, parent: Some(self), typed_generics: HashMap::new(), }
 	}
 
 	/// Learn the generics in generics in the current context, given a TypeResolver.
@@ -281,6 +282,11 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 
 	/// Attempt to resolve an Ident as a generic parameter and return the full path.
 	pub fn maybe_resolve_ident<'b>(&'b self, ident: &syn::Ident) -> Option<&'b String> {
+		if let Some(ty) = &self.self_ty {
+			if format!("{}", ident) == "Self" {
+				return Some(&ty.0);
+			}
+		}
 		if let Some(res) = self.typed_generics.get(ident).map(|(a, _)| a) {
 			return Some(res);
 		}
@@ -294,6 +300,11 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 	/// and syn::Path.
 	pub fn maybe_resolve_path<'b>(&'b self, path: &syn::Path) -> Option<(&'b String, &'a syn::Path)> {
 		if let Some(ident) = path.get_ident() {
+			if let Some(ty) = &self.self_ty {
+				if format!("{}", ident) == "Self" {
+					return Some((&ty.0, ty.1));
+				}
+			}
 			if let Some(res) = self.typed_generics.get(ident).map(|(a, b)| (a, b.unwrap())) {
 				return Some(res);
 			}

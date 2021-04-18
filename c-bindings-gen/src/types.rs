@@ -627,6 +627,13 @@ impl FullLibraryAST {
 	}
 }
 
+/// List of manually-generated types which are clonable
+fn initial_clonable_types() -> HashSet<String> {
+	let mut res = HashSet::new();
+	res.insert("crate::c_types::u5".to_owned());
+	res
+}
+
 /// Top-level struct tracking everything which has been defined while walking the crate.
 pub struct CrateTypes<'a> {
 	/// This may contain structs or enums, but only when either is mapped as
@@ -662,7 +669,7 @@ impl<'a> CrateTypes<'a> {
 			opaques: HashMap::new(), mirrored_enums: HashMap::new(), traits: HashMap::new(),
 			type_aliases: HashMap::new(), reverse_alias_map: HashMap::new(),
 			templates_defined: RefCell::new(HashMap::default()),
-			clonable_types: RefCell::new(HashSet::new()), trait_impls: HashMap::new(),
+			clonable_types: RefCell::new(initial_clonable_types()), trait_impls: HashMap::new(),
 			template_file: RefCell::new(template_file), lib_ast: &libast,
 		}
 	}
@@ -771,6 +778,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// for arrays are different (https://github.com/eqrion/cbindgen/issues/528)
 
 			"[u8; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"[u8; 20]" if !is_ref => Some("crate::c_types::TwentyBytes"),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::SixteenBytes"),
 			"[u8; 10]" if !is_ref => Some("crate::c_types::TenBytes"),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes"),
@@ -782,6 +790,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration" => Some("u64"),
 			"std::io::Error" => Some("crate::c_types::IOError"),
+
+			"bech32::u5" => Some("crate::c_types::u5"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey"),
@@ -836,6 +846,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"[u8; 32]" if is_ref => Some("unsafe { &*"),
 			"[u8; 32]" if !is_ref => Some(""),
+			"[u8; 20]" if !is_ref => Some(""),
 			"[u8; 16]" if !is_ref => Some(""),
 			"[u8; 10]" if !is_ref => Some(""),
 			"[u8; 4]" if !is_ref => Some(""),
@@ -850,6 +861,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// cannot create a &String.
 
 			"std::time::Duration" => Some("std::time::Duration::from_secs("),
+
+			"bech32::u5" => Some(""),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				if is_ref => Some("&"),
@@ -897,6 +910,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"[u8; 32]" if is_ref => Some("}"),
 			"[u8; 32]" if !is_ref => Some(".data"),
+			"[u8; 20]" if !is_ref => Some(".data"),
 			"[u8; 16]" if !is_ref => Some(".data"),
 			"[u8; 10]" if !is_ref => Some(".data"),
 			"[u8; 4]" if !is_ref => Some(".data"),
@@ -909,6 +923,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" if !is_ref => Some(".into_rust()).unwrap()"),
 
 			"std::time::Duration" => Some(")"),
+
+			"bech32::u5" => Some(".into()"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(".into_rust()"),
@@ -971,6 +987,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"[u8; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"[u8; 32]" if is_ref => Some(""),
+			"[u8; 20]" if !is_ref => Some("crate::c_types::TwentyBytes { data: "),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::SixteenBytes { data: "),
 			"[u8; 10]" if !is_ref => Some("crate::c_types::TenBytes { data: "),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes { data: "),
@@ -984,6 +1001,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
+
+			"bech32::u5" => Some(""),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey::from_rust(&"),
@@ -1035,6 +1054,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"[u8; 32]" if !is_ref => Some(" }"),
 			"[u8; 32]" if is_ref => Some(""),
+			"[u8; 20]" if !is_ref => Some(" }"),
 			"[u8; 16]" if !is_ref => Some(" }"),
 			"[u8; 10]" if !is_ref => Some(" }"),
 			"[u8; 4]" if !is_ref => Some(" }"),
@@ -1049,6 +1069,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration" => Some(".as_secs()"),
 			"std::io::Error" if !is_ref => Some(")"),
+
+			"bech32::u5" => Some(".into()"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(")"),

@@ -9,8 +9,22 @@ use bitcoin::secp256k1::key::PublicKey as SecpPublicKey;
 use bitcoin::secp256k1::key::SecretKey as SecpSecretKey;
 use bitcoin::secp256k1::Signature as SecpSignature;
 use bitcoin::secp256k1::Error as SecpError;
+use bitcoin::bech32;
 
 use std::convert::TryInto; // Bindings need at least rustc 1.34
+
+/// Integer in the range `0..32`
+#[derive(PartialEq, Eq, Copy, Clone)]
+#[allow(non_camel_case_types)]
+#[repr(C)]
+pub struct u5(u8);
+
+impl From<bech32::u5> for u5 {
+	fn from(o: bech32::u5) -> Self { Self(o.to_u8()) }
+}
+impl Into<bech32::u5> for u5 {
+	fn into(self) -> bech32::u5 { bech32::u5::try_from_u8(self.0).expect("u5 objects must be in the range 0..32") }
+}
 
 #[derive(Clone)]
 #[repr(C)]
@@ -296,6 +310,10 @@ pub struct TenBytes { /** The ten bytes */ pub data: [u8; 10], }
 #[repr(C)]
 /// A 16-byte byte array.
 pub struct SixteenBytes { /** The sixteen bytes */ pub data: [u8; 16], }
+#[derive(Clone)]
+#[repr(C)]
+/// A 20-byte byte array.
+pub struct TwentyBytes { /** The twenty bytes */ pub data: [u8; 20], }
 
 pub(crate) struct VecWriter(pub Vec<u8>);
 impl lightning::util::ser::Writer for VecWriter {

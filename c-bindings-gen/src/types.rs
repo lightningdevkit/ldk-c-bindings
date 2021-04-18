@@ -783,14 +783,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration" => Some("u64"),
 			"std::io::Error" => Some("crate::c_types::IOError"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref  => Some("*const [u8; 32]"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some("crate::c_types::SecretKey"),
-			"bitcoin::secp256k1::Error" if !is_ref => Some("crate::c_types::Secp256k1Error"),
+			"bitcoin::secp256k1::Error"|"secp256k1::Error"
+				if !is_ref => Some("crate::c_types::Secp256k1Error"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
@@ -801,10 +802,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::block::Block" if is_ref  => Some("crate::c_types::u8slice"),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid" if is_ref  => Some("*const [u8; 32]"),
-			"bitcoin::hash_types::Txid" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"bitcoin::hash_types::BlockHash" if is_ref  => Some("*const [u8; 32]"),
-			"bitcoin::hash_types::BlockHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if is_ref  => Some("*const [u8; 32]"),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("*const [u8; 32]"),
 			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
@@ -850,9 +851,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration" => Some("std::time::Duration::from_secs("),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				if is_ref => Some("&"),
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(""),
 			"bitcoin::secp256k1::Signature" if is_ref => Some("&"),
 			"bitcoin::secp256k1::Signature" => Some(""),
@@ -909,7 +910,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration" => Some(")"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(".into_rust()"),
 			"bitcoin::secp256k1::Signature" => Some(".into_rust()"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
@@ -984,14 +985,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey::from_rust(&"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature::from_rust(&"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref => Some(""),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
-			"bitcoin::secp256k1::Error" if !is_ref => Some("crate::c_types::Secp256k1Error::from_rust("),
+			"bitcoin::secp256k1::Error"|"secp256k1::Error"
+				if !is_ref => Some("crate::c_types::Secp256k1Error::from_rust("),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
 			"bitcoin::blockdata::transaction::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
@@ -1005,9 +1007,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid" if is_ref => Some(""),
-			"bitcoin::hash_types::BlockHash" if is_ref => Some(""),
-			"bitcoin::hash_types::BlockHash" => Some("crate::c_types::ThirtyTwoBytes { data: "),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if is_ref => Some(""),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("&"),
 			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
@@ -1047,14 +1050,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration" => Some(".as_secs()"),
 			"std::io::Error" if !is_ref => Some(")"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(")"),
 			"bitcoin::secp256k1::Signature" => Some(")"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some(")"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref => Some(".as_ref()"),
-			"bitcoin::secp256k1::Error" if !is_ref => Some(")"),
+			"bitcoin::secp256k1::Error"|"secp256k1::Error"
+				if !is_ref => Some(")"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),
 			"bitcoin::blockdata::transaction::Transaction" => Some(")"),
@@ -1067,9 +1071,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if !is_ref => Some(".into_inner() }"),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid" if is_ref => Some(".as_inner()"),
-			"bitcoin::hash_types::BlockHash" if is_ref => Some(".as_inner()"),
-			"bitcoin::hash_types::BlockHash" => Some(".into_inner() }"),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if is_ref => Some(".as_inner()"),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if !is_ref => Some(".into_inner() }"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
 			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some(".0"),
 			"lightning::ln::channelmanager::PaymentHash" => Some(".0 }"),
@@ -1087,7 +1092,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	fn empty_val_check_suffix_from_path(&self, full_path: &str) -> Option<&str> {
 		match full_path {
 			"lightning::ln::channelmanager::PaymentSecret" => Some(".data == [0; 32]"),
-			"bitcoin::secp256k1::key::PublicKey" => Some(".is_null()"),
+			"secp256k1::key::PublicKey"|"bitcoin::secp256k1::key::PublicKey" => Some(".is_null()"),
 			"bitcoin::secp256k1::Signature" => Some(".is_null()"),
 			_ => None
 		}

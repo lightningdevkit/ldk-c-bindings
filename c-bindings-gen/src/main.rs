@@ -993,12 +993,20 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 											if r.mutability.is_some() { takes_mut_self = true; }
 										}
 									}
-									if takes_mut_self {
-										write!(w, "unsafe {{ &mut (*(this_arg.inner as *mut native{})) }}.{}(", ident, m.sig.ident).unwrap();
-									} else if takes_self {
-										write!(w, "unsafe {{ &*this_arg.inner }}.{}(", m.sig.ident).unwrap();
-									} else {
+									if !takes_mut_self && !takes_self {
 										write!(w, "{}::{}(", resolved_path, m.sig.ident).unwrap();
+									} else {
+										match &declared_type {
+											DeclType::MirroredEnum => write!(w, "this_arg.to_native().{}(", m.sig.ident).unwrap(),
+											DeclType::StructImported => {
+												if takes_mut_self {
+													write!(w, "unsafe {{ &mut (*(this_arg.inner as *mut native{})) }}.{}(", ident, m.sig.ident).unwrap();
+												} else {
+													write!(w, "unsafe {{ &*this_arg.inner }}.{}(", m.sig.ident).unwrap();
+												}
+											},
+											_ => unimplemented!(),
+										}
 									}
 									write_method_call_params(w, &m.sig, "", types, Some(&meth_gen_types), &ret_type, false);
 									writeln!(w, "\n}}\n").unwrap();

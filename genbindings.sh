@@ -9,11 +9,6 @@ if [ ! -d "$1/lightning" -o "$2" != "true" -a "$2" != "false" ]; then
 	exit 1
 fi
 
-if [ "$2" = "true" ]; then
-	FEATURES_ARGS='--features=allow_wallclock_use'
-	FEATURES='"allow_wallclock_use"'
-fi
-
 # On reasonable systems, we can use realpath here, but OSX is a diva with 20-year-old software.
 ORIG_PWD="$(pwd)"
 cd "$1"
@@ -43,45 +38,50 @@ OUT_F="$(pwd)/lightning-c-bindings/include/rust_types.h"
 OUT_CPP="$(pwd)/lightning-c-bindings/include/lightningpp.hpp"
 BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
-pushd "$LIGHTNING_PATH/lightning"
-RUSTC_BOOTSTRAP=1 cargo rustc $FEATURES_ARGS --profile=check -- -Zunstable-options --pretty=expanded > /tmp/lightning-crate-source.txt
-popd
-
 HOST_PLATFORM="$(rustc --version --verbose | grep "host:")"
-if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
-	# OSX sed is for some reason not compatible with GNU sed
-	sed -E -i '' 's/#!\[crate_name = "(.*)"\]/pub mod \1 {/' /tmp/lightning-crate-source.txt
-else
-	sed -E -i 's/#!\[crate_name = "(.*)"\]/pub mod \1 {/' /tmp/lightning-crate-source.txt
-fi
-echo "}" >> /tmp/lightning-crate-source.txt
 
-if [ "$2" = "true" ]; then
-	pushd "$LIGHTNING_PATH/lightning-persister"
-	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check -- -Zunstable-options --pretty=expanded > /tmp/lightning-persist-crate-source.txt
+function add_crate() {
+	pushd "$LIGHTNING_PATH/$1"
+	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check $3 -- -Zunstable-options --pretty=expanded > /tmp/$1-crate-source.txt
 	popd
 	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
-		sed -i".original" '1i\
-pub mod lightning_persister {
-' /tmp/lightning-persist-crate-source.txt
+		sed -i".original" "1i\\
+pub mod $2 {
+" /tmp/$1-crate-source.txt
 	else
-		sed -i '1ipub mod lightning_persister {\n' /tmp/lightning-persist-crate-source.txt
+		sed -i "1ipub mod $2 {\n" /tmp/$1-crate-source.txt
 	fi
-	echo "}" >> /tmp/lightning-persist-crate-source.txt
-	cat /tmp/lightning-persist-crate-source.txt >> /tmp/lightning-crate-source.txt
-	rm /tmp/lightning-persist-crate-source.txt
-fi
+	echo "}" >> /tmp/$1-crate-source.txt
+	cat /tmp/$1-crate-source.txt >> /tmp/crate-source.txt
+	rm /tmp/$1-crate-source.txt
+	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+		# OSX sed is for some reason not compatible with GNU sed
+		sed -E -i '' 's|#?'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'" '"$4"' }|' lightning-c-bindings/Cargo.toml
+	else
+		sed -E -i 's|#?'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'" '"$4"' }|' lightning-c-bindings/Cargo.toml
+	fi
+}
 
-cat /tmp/lightning-crate-source.txt | RUST_BACKTRACE=1 "$BIN" "$OUT/" "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
+function drop_crate() {
+	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+		# OSX sed is for some reason not compatible with GNU sed
+		sed -E -i '' 's|'$1' = \{ (.*)|#'$1' = \{ \1|' lightning-c-bindings/Cargo.toml
+	else
+		sed -E -i 's|'$1' = \{ (.*)|#'$1' = \{ \1|' lightning-c-bindings/Cargo.toml
+	fi
+}
 
-if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
-	# OSX sed is for some reason not compatible with GNU sed
-	sed -i '' 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH/lightning"'", features = ['"$FEATURES"'] }|' lightning-c-bindings/Cargo.toml
-	sed -E -i '' 's|lightning-(.*) = \{ .*|lightning-\1 = \{ path = "'"$LIGHTNING_PATH"'/lightning-\1" }|' lightning-c-bindings/Cargo.toml
+echo > /tmp/crate-source.txt
+if [ "$2" = "true" ]; then
+	add_crate lightning lightning --features=allow_wallclock_use ', features = ["allow_wallclock_use"]'
+	add_crate "lightning-persister" "lightning_persister"
 else
-	sed -i 's|lightning = { .*|lightning = { path = "'"$LIGHTNING_PATH/lightning"'", features = ['"$FEATURES"'] }|' lightning-c-bindings/Cargo.toml
-	sed -E -i 's|lightning-(.*) = \{ .*|lightning-\1 = \{ path = "'"$LIGHTNING_PATH"'/lightning-\1" }|' lightning-c-bindings/Cargo.toml
+	add_crate lightning lightning
+	drop_crate "lightning-persister"
 fi
+add_crate "lightning-invoice" "lightning_invoice"
+
+cat /tmp/crate-source.txt | RUST_BACKTRACE=1 "$BIN" "$OUT/" "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
 
 # Set path to include our rustc wrapper as well as cbindgen
 PATH="$(pwd)/deterministic-build-wrappers:$PATH:~/.cargo/bin"

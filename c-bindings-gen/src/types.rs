@@ -1158,6 +1158,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"Vec" if !is_ref => {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
+			"Vec" => {
+				// We should only get here if the single contained has an inner
+				assert!(self.c_type_has_inner(single_contained.unwrap()));
+				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "*item".to_string())], "); }", ContainerPrefixLocation::PerConv))
+			},
 			"Slice" => {
 				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "*item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
@@ -1271,8 +1276,18 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		self.types.get_declared_type(ident)
 	}
 	/// Returns true if the object at the given path is mapped as X { inner: *mut origX, .. }.
-	pub fn c_type_has_inner_from_path(&self, full_path: &str) -> bool{
+	pub fn c_type_has_inner_from_path(&self, full_path: &str) -> bool {
 		self.crate_types.opaques.get(full_path).is_some()
+	}
+	/// Returns true if the object at the given path is mapped as X { inner: *mut origX, .. }.
+	pub fn c_type_has_inner(&self, ty: &syn::Type) -> bool {
+		match ty {
+			syn::Type::Path(p) => {
+				let full_path = self.resolve_path(&p.path, None);
+				self.c_type_has_inner_from_path(&full_path)
+			},
+			_ => false,
+		}
 	}
 
 	pub fn maybe_resolve_ident(&self, id: &syn::Ident) -> Option<String> {

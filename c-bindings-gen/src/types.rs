@@ -517,9 +517,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				format!("::{}", seg.ident)
 			}).collect();
 			let first_seg_str = format!("{}", first_seg.ident);
-			if first_seg_str == "std" {
-				Some(first_seg_str + &remaining)
-			} else if let Some((imp, _)) = self.imports.get(&first_seg.ident) {
+			if let Some((imp, _)) = self.imports.get(&first_seg.ident) {
 				if remaining != "" {
 					Some(imp.clone() + &remaining)
 				} else {
@@ -527,6 +525,8 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				}
 			} else if let Some(_) = self.priv_modules.get(&first_seg.ident) {
 				Some(format!("{}::{}{}", self.module_path, first_seg.ident, remaining))
+			} else if first_seg_str == "std" || self.dependencies.contains(&first_seg.ident) {
+				Some(first_seg_str + &remaining)
 			} else { None }
 		}
 	}

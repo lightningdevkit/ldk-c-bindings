@@ -987,10 +987,12 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									write_method_var_decl_body(w, &m.sig, "", types, Some(&meth_gen_types), false);
 									let mut takes_self = false;
 									let mut takes_mut_self = false;
+									let mut takes_owned_self = false;
 									for inp in m.sig.inputs.iter() {
 										if let syn::FnArg::Receiver(r) = inp {
 											takes_self = true;
 											if r.mutability.is_some() { takes_mut_self = true; }
+											if r.reference.is_none() { takes_owned_self = true; }
 										}
 									}
 									if !takes_mut_self && !takes_self {
@@ -999,7 +1001,9 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										match &declared_type {
 											DeclType::MirroredEnum => write!(w, "this_arg.to_native().{}(", m.sig.ident).unwrap(),
 											DeclType::StructImported => {
-												if takes_mut_self {
+												if takes_owned_self {
+													write!(w, "(*unsafe {{ Box::from_raw(this_arg.take_inner()) }}).{}(", m.sig.ident).unwrap();
+												} else if takes_mut_self {
 													write!(w, "unsafe {{ &mut (*(this_arg.inner as *mut native{})) }}.{}(", ident, m.sig.ident).unwrap();
 												} else {
 													write!(w, "unsafe {{ &*this_arg.inner }}.{}(", m.sig.ident).unwrap();

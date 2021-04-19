@@ -346,13 +346,22 @@ pub struct ImportResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
 	priv_modules: HashSet<syn::Ident>,
 }
 impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'crate_lft> {
-	fn process_use_intern(crate_name: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>,
+	fn process_use_intern(crate_name: &str, module_path: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>,
 			u: &syn::UseTree, partial_path: &str, mut path: syn::punctuated::Punctuated<syn::PathSegment, syn::token::Colon2>) {
 
 		let new_path;
 		macro_rules! push_path {
 			($ident: expr, $path_suffix: expr) => {
-				if partial_path == "" && !dependencies.contains(&$ident) {
+				if partial_path == "" && format!("{}", $ident) == "super" {
+					let mut mod_iter = module_path.rsplitn(2, "::");
+					mod_iter.next().unwrap();
+					let super_mod = mod_iter.next().unwrap();
+					new_path = format!("{}{}", super_mod, $path_suffix);
+					assert_eq!(path.len(), 0);
+					for module in super_mod.split("::") {
+						path.push(syn::PathSegment { ident: syn::Ident::new(module, Span::call_site()), arguments: syn::PathArguments::None });
+					}
+				} else if partial_path == "" && !dependencies.contains(&$ident) {
 					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
 					let crate_name_ident = format_ident!("{}", crate_name);
 					path.push(parse_quote!(#crate_name_ident));
@@ -366,7 +375,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		match u {
 			syn::UseTree::Path(p) => {
 				push_path!(p.ident, "::");
-				Self::process_use_intern(crate_name, dependencies, imports, &p.tree, &new_path, path);
+				Self::process_use_intern(crate_name, module_path, dependencies, imports, &p.tree, &new_path, path);
 			},
 			syn::UseTree::Name(n) => {
 				push_path!(n.ident, "");
@@ -374,7 +383,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			},
 			syn::UseTree::Group(g) => {
 				for i in g.items.iter() {
-					Self::process_use_intern(crate_name, dependencies, imports, i, partial_path, path.clone());
+					Self::process_use_intern(crate_name, module_path, dependencies, imports, i, partial_path, path.clone());
 				}
 			},
 			syn::UseTree::Rename(r) => {
@@ -387,14 +396,14 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		}
 	}
 
-	fn process_use(crate_name: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>, u: &syn::ItemUse) {
+	fn process_use(crate_name: &str, module_path: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>, u: &syn::ItemUse) {
 		if let syn::Visibility::Public(_) = u.vis {
 			// We actually only use these for #[cfg(fuzztarget)]
 			eprintln!("Ignoring pub(use) tree!");
 			return;
 		}
 		if u.leading_colon.is_some() { eprintln!("Ignoring leading-colon use!"); return; }
-		Self::process_use_intern(crate_name, dependencies, imports, &u.tree, "", syn::punctuated::Punctuated::new());
+		Self::process_use_intern(crate_name, module_path, dependencies, imports, &u.tree, "", syn::punctuated::Punctuated::new());
 	}
 
 	fn insert_primitive(imports: &mut HashMap<syn::Ident, (String, syn::Path)>, id: &str) {
@@ -404,6 +413,9 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 	}
 
 	pub fn new(crate_name: &'mod_lifetime str, dependencies: &'mod_lifetime HashSet<syn::Ident>, module_path: &'mod_lifetime str, contents: &'crate_lft [syn::Item]) -> Self {
+		Self::from_borrowed_items(crate_name, dependencies, module_path, &contents.iter().map(|a| a).collect::<Vec<_>>())
+	}
+	pub fn from_borrowed_items(crate_name: &'mod_lifetime str, dependencies: &'mod_lifetime HashSet<syn::Ident>, module_path: &'mod_lifetime str, contents: &[&'crate_lft syn::Item]) -> Self {
 		let mut imports = HashMap::new();
 		// Add primitives to the "imports" list:
 		Self::insert_primitive(&mut imports, "bool");
@@ -426,7 +438,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 
 		for item in contents.iter() {
 			match item {
-				syn::Item::Use(u) => Self::process_use(crate_name, dependencies, &mut imports, &u),
+				syn::Item::Use(u) => Self::process_use(crate_name, module_path, dependencies, &mut imports, &u),
 				syn::Item::Struct(s) => {
 					if let syn::Visibility::Public(_) = s.vis {
 						match export_status(&s.attrs) {
@@ -536,7 +548,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				}
 			} else if let Some(_) = self.priv_modules.get(&first_seg.ident) {
 				Some(format!("{}::{}{}", self.module_path, first_seg.ident, remaining))
-			} else if first_seg_str == "std" || self.dependencies.contains(&first_seg.ident) {
+			} else if first_seg_str == "std" || first_seg_str == "core" || self.dependencies.contains(&first_seg.ident) {
 				Some(first_seg_str + &remaining)
 			} else { None }
 		}

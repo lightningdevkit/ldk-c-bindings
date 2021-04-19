@@ -338,18 +338,20 @@ pub(crate) fn deserialize_obj_arg<A, I: lightning::util::ser::ReadableArgs<A>>(s
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 /// A Rust str object, ie a reference to a UTF8-valid string.
 /// This is *not* null-terminated so cannot be used directly as a C string!
 pub struct Str {
 	/// A pointer to the string's bytes, in UTF8 encoding
 	pub chars: *const u8,
 	/// The number of bytes (not characters!) pointed to by `chars`
-	pub len: usize
+	pub len: usize,
+	/// Whether the data pointed to by `chars` should be freed or not.
+	pub chars_is_owned: bool,
 }
 impl Into<Str> for &'static str {
 	fn into(self) -> Str {
-		Str { chars: self.as_ptr(), len: self.len() }
+		Str { chars: self.as_ptr(), len: self.len(), chars_is_owned: false }
 	}
 }
 impl Into<&'static str> for Str {
@@ -358,6 +360,23 @@ impl Into<&'static str> for Str {
 		std::str::from_utf8(unsafe { std::slice::from_raw_parts(self.chars, self.len) }).unwrap()
 	}
 }
+impl Into<Str> for String {
+	fn into(self) -> Str {
+		let s = Box::leak(self.into_boxed_str());
+		Str { chars: s.as_ptr(), len: s.len(), chars_is_owned: true }
+	}
+}
+
+impl Drop for Str {
+	fn drop(&mut self) {
+		if self.chars_is_owned && self.len != 0 {
+			let _ = derived::CVec_u8Z { data: self.chars as *mut u8, datalen: self.len };
+		}
+	}
+}
+#[no_mangle]
+/// Frees the data buffer, if chars_is_owned is set and len > 0.
+pub extern "C" fn Str_free(_res: Str) { }
 
 // Note that the C++ headers memset(0) all the Templ types to avoid deallocation!
 // Thus, they must gracefully handle being completely null in _free.

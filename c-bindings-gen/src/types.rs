@@ -2351,6 +2351,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 		self.write_c_mangled_container_path_intern(w, args, generics, ident, is_ref, is_mut, ptr_for_ref, false)
 	}
+	pub fn get_c_mangled_container_type(&self, args: Vec<&syn::Type>, generics: Option<&GenericTypes>, template_name: &str) -> Option<String> {
+		let mut out = Vec::new();
+		if !self.write_c_mangled_container_path(&mut out, args, generics, template_name, false, false, false) {
+			return None;
+		}
+		Some(String::from_utf8(out).unwrap())
+	}
 
 	// **********************************
 	// *** C Type Equivalent Printing ***

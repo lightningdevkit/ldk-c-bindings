@@ -33,6 +33,8 @@ mod blocks;
 use types::*;
 use blocks::*;
 
+const DEFAULT_IMPORTS: &'static str = "\nuse std::str::FromStr;\nuse std::ffi::c_void;\nuse bitcoin::hashes::Hash;\nuse crate::c_types::*;\n";
+
 // *************************************
 // *** Manually-expanded conversions ***
 // *************************************
@@ -957,6 +959,30 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", ident, ident, ident).unwrap();
 						writeln!(w, "\torig.clone()").unwrap();
 						writeln!(w, "}}").unwrap();
+					} else if path_matches_nongeneric(&trait_path.1, &["FromStr"]) {
+						if let Some(container) = types.get_c_mangled_container_type(
+								vec![&*i.self_ty, &syn::Type::Tuple(syn::TypeTuple { paren_token: Default::default(), elems: syn::punctuated::Punctuated::new() })],
+								Some(&gen_types), "Result") {
+							writeln!(w, "#[no_mangle]").unwrap();
+							writeln!(w, "/// Read a {} object from a string", ident).unwrap();
+							writeln!(w, "pub extern \"C\" fn {}_from_str(s: crate::c_types::Str) -> {} {{", ident, container).unwrap();
+							writeln!(w, "\tmatch {}::from_str(s.into()) {{", resolved_path).unwrap();
+							writeln!(w, "\t\tOk(r) => {{").unwrap();
+							let new_var = types.write_to_c_conversion_new_var(w, &syn::Ident::new("r", Span::call_site()), &*i.self_ty, Some(&gen_types), false);
+							write!(w, "\t\t\tcrate::c_types::CResultTempl::ok(\n\t\t\t\t").unwrap();
+							types.write_to_c_conversion_inline_prefix(w, &*i.self_ty, Some(&gen_types), false);
+							write!(w, "{}r", if new_var { "local_" } else { "" }).unwrap();
+							types.write_to_c_conversion_inline_suffix(w, &*i.self_ty, Some(&gen_types), false);
+							writeln!(w, "\n\t\t\t)\n\t\t}},").unwrap();
+							writeln!(w, "\t\tErr(e) => crate::c_types::CResultTempl::err(0u8),").unwrap();
+							writeln!(w, "\t}}.into()\n}}").unwrap();
+						}
+					} else if path_matches_nongeneric(&trait_path.1, &["Display"]) {
+						writeln!(w, "#[no_mangle]").unwrap();
+						writeln!(w, "/// Get the string representation of a {} object", ident).unwrap();
+						writeln!(w, "pub extern \"C\" fn {}_to_str(o: &{}) -> Str {{", ident, resolved_path).unwrap();
+						writeln!(w, "\tformat!(\"{{}}\", o).into()").unwrap();
+						writeln!(w, "}}").unwrap();
 					} else {
 						//XXX: implement for other things like ToString
 						// If we have no generics, try a manual implementation:
@@ -1289,6 +1315,35 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 // *** File/Crate Walking Logic ***
 // ********************************
 
+fn convert_priv_mod<'a, 'b: 'a, W: std::io::Write>(w: &mut W, libast: &'b FullLibraryAST, crate_types: &CrateTypes<'b>, out_dir: &str, mod_path: &str, module: &'b syn::ItemMod) {
+	// We want to ignore all items declared in this module (as they are not pub), but we still need
+	// to give the ImportResolver any use statements, so we copy them here.
+	let mut use_items = Vec::new();
+	for item in module.content.as_ref().unwrap().1.iter() {
+		if let syn::Item::Use(_) = item {
+			use_items.push(item);
+		}
+	}
+	let import_resolver = ImportResolver::from_borrowed_items(mod_path.splitn(2, "::").next().unwrap(), &libast.dependencies, mod_path, &use_items);
+	let mut types = TypeResolver::new(mod_path, import_resolver, crate_types);
+
+	writeln!(w, "mod {} {{\n{}", module.ident, DEFAULT_IMPORTS).unwrap();
+	for item in module.content.as_ref().unwrap().1.iter() {
+		match item {
+			syn::Item::Mod(m) => convert_priv_mod(w, libast, crate_types, out_dir, &format!("{}::{}", mod_path, module.ident), m),
+			syn::Item::Impl(i) => {
+				if let &syn::Type::Path(ref p) = &*i.self_ty {
+					if p.path.get_ident().is_some() {
+						writeln_impl(w, i, &mut types);
+					}
+				}
+			},
+			_ => {},
+		}
+	}
+	writeln!(w, "}}").unwrap();
+}
+
 /// Do the Real Work of mapping an original file to C-callable wrappers. Creates a new file at
 /// `out_path` and fills it with wrapper structs/functions to allow calling the things in the AST
 /// at `module` from C.
@@ -1337,7 +1392,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 			writeln!(out, "pub mod c_types;").unwrap();
 			writeln!(out, "pub mod bitcoin;").unwrap();
 		} else {
-			writeln!(out, "\nuse std::ffi::c_void;\nuse bitcoin::hashes::Hash;\nuse crate::c_types::*;\n").unwrap();
+			writeln!(out, "{}", DEFAULT_IMPORTS).unwrap();
 		}
 
 		for m in submods {
@@ -1371,7 +1426,9 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 						writeln_trait(&mut out, &t, &mut type_resolver, header_file, cpp_header_file);
 					}
 				},
-				syn::Item::Mod(_) => {}, // We don't have to do anything - the top loop handles these.
+				syn::Item::Mod(m) => {
+					convert_priv_mod(&mut out, libast, crate_types, out_dir, &format!("{}::{}", module, m.ident), m);
+				},
 				syn::Item::Const(c) => {
 					// Re-export any primitive-type constants.
 					if let syn::Visibility::Public(_) = c.vis {

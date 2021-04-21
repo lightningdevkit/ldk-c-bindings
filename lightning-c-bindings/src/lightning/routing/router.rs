@@ -270,18 +270,18 @@ pub extern "C" fn Route_read(ser: crate::c_types::u8slice) -> crate::c_types::de
 	local_res
 }
 
-use lightning::routing::router::RouteHint as nativeRouteHintImport;
-type nativeRouteHint = nativeRouteHintImport;
+use lightning::routing::router::RouteHintHop as nativeRouteHintHopImport;
+type nativeRouteHintHop = nativeRouteHintHopImport;
 
 /// A channel descriptor which provides a last-hop route to get_route
 #[must_use]
 #[repr(C)]
-pub struct RouteHint {
+pub struct RouteHintHop {
 	/// A pointer to the opaque Rust object.
 
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeRouteHint,
+	pub inner: *mut nativeRouteHintHop,
 	/// Indicates that this is the only struct which contains the same pointer.
 
 	/// Rust functions which take ownership of an object provided via an argument require
@@ -289,25 +289,25 @@ pub struct RouteHint {
 	pub is_owned: bool,
 }
 
-impl Drop for RouteHint {
+impl Drop for RouteHintHop {
 	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeRouteHint>::is_null(self.inner) {
+		if self.is_owned && !<*mut nativeRouteHintHop>::is_null(self.inner) {
 			let _ = unsafe { Box::from_raw(self.inner) };
 		}
 	}
 }
-/// Frees any resources used by the RouteHint, if is_owned is set and inner is non-NULL.
+/// Frees any resources used by the RouteHintHop, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn RouteHint_free(this_obj: RouteHint) { }
+pub extern "C" fn RouteHintHop_free(this_obj: RouteHintHop) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn RouteHint_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRouteHint); }
+extern "C" fn RouteHintHop_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRouteHintHop); }
 }
 #[allow(unused)]
 /// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-impl RouteHint {
-	pub(crate) fn take_inner(mut self) -> *mut nativeRouteHint {
+impl RouteHintHop {
+	pub(crate) fn take_inner(mut self) -> *mut nativeRouteHintHop {
 		assert!(self.is_owned);
 		let ret = self.inner;
 		self.inner = std::ptr::null_mut();
@@ -316,81 +316,81 @@ impl RouteHint {
 }
 /// The node_id of the non-target end of the route
 #[no_mangle]
-pub extern "C" fn RouteHint_get_src_node_id(this_ptr: &RouteHint) -> crate::c_types::PublicKey {
+pub extern "C" fn RouteHintHop_get_src_node_id(this_ptr: &RouteHintHop) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.src_node_id;
 	crate::c_types::PublicKey::from_rust(&(*inner_val))
 }
 /// The node_id of the non-target end of the route
 #[no_mangle]
-pub extern "C" fn RouteHint_set_src_node_id(this_ptr: &mut RouteHint, mut val: crate::c_types::PublicKey) {
+pub extern "C" fn RouteHintHop_set_src_node_id(this_ptr: &mut RouteHintHop, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *this_ptr.inner }.src_node_id = val.into_rust();
 }
 /// The short_channel_id of this channel
 #[no_mangle]
-pub extern "C" fn RouteHint_get_short_channel_id(this_ptr: &RouteHint) -> u64 {
+pub extern "C" fn RouteHintHop_get_short_channel_id(this_ptr: &RouteHintHop) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.short_channel_id;
 	(*inner_val)
 }
 /// The short_channel_id of this channel
 #[no_mangle]
-pub extern "C" fn RouteHint_set_short_channel_id(this_ptr: &mut RouteHint, mut val: u64) {
+pub extern "C" fn RouteHintHop_set_short_channel_id(this_ptr: &mut RouteHintHop, mut val: u64) {
 	unsafe { &mut *this_ptr.inner }.short_channel_id = val;
 }
 /// The fees which must be paid to use this channel
 #[no_mangle]
-pub extern "C" fn RouteHint_get_fees(this_ptr: &RouteHint) -> crate::lightning::routing::network_graph::RoutingFees {
+pub extern "C" fn RouteHintHop_get_fees(this_ptr: &RouteHintHop) -> crate::lightning::routing::network_graph::RoutingFees {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fees;
 	crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
 }
 /// The fees which must be paid to use this channel
 #[no_mangle]
-pub extern "C" fn RouteHint_set_fees(this_ptr: &mut RouteHint, mut val: crate::lightning::routing::network_graph::RoutingFees) {
+pub extern "C" fn RouteHintHop_set_fees(this_ptr: &mut RouteHintHop, mut val: crate::lightning::routing::network_graph::RoutingFees) {
 	unsafe { &mut *this_ptr.inner }.fees = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// The difference in CLTV values between this node and the next node.
 #[no_mangle]
-pub extern "C" fn RouteHint_get_cltv_expiry_delta(this_ptr: &RouteHint) -> u16 {
+pub extern "C" fn RouteHintHop_get_cltv_expiry_delta(this_ptr: &RouteHintHop) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.cltv_expiry_delta;
 	(*inner_val)
 }
 /// The difference in CLTV values between this node and the next node.
 #[no_mangle]
-pub extern "C" fn RouteHint_set_cltv_expiry_delta(this_ptr: &mut RouteHint, mut val: u16) {
+pub extern "C" fn RouteHintHop_set_cltv_expiry_delta(this_ptr: &mut RouteHintHop, mut val: u16) {
 	unsafe { &mut *this_ptr.inner }.cltv_expiry_delta = val;
 }
 /// The minimum value, in msat, which must be relayed to the next hop.
 #[no_mangle]
-pub extern "C" fn RouteHint_get_htlc_minimum_msat(this_ptr: &RouteHint) -> crate::c_types::derived::COption_u64Z {
+pub extern "C" fn RouteHintHop_get_htlc_minimum_msat(this_ptr: &RouteHintHop) -> crate::c_types::derived::COption_u64Z {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_minimum_msat;
 	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(inner_val.unwrap()) } };
 	local_inner_val
 }
 /// The minimum value, in msat, which must be relayed to the next hop.
 #[no_mangle]
-pub extern "C" fn RouteHint_set_htlc_minimum_msat(this_ptr: &mut RouteHint, mut val: crate::c_types::derived::COption_u64Z) {
+pub extern "C" fn RouteHintHop_set_htlc_minimum_msat(this_ptr: &mut RouteHintHop, mut val: crate::c_types::derived::COption_u64Z) {
 	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
 	unsafe { &mut *this_ptr.inner }.htlc_minimum_msat = local_val;
 }
 /// The maximum value in msat available for routing with a single HTLC.
 #[no_mangle]
-pub extern "C" fn RouteHint_get_htlc_maximum_msat(this_ptr: &RouteHint) -> crate::c_types::derived::COption_u64Z {
+pub extern "C" fn RouteHintHop_get_htlc_maximum_msat(this_ptr: &RouteHintHop) -> crate::c_types::derived::COption_u64Z {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_maximum_msat;
 	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(inner_val.unwrap()) } };
 	local_inner_val
 }
 /// The maximum value in msat available for routing with a single HTLC.
 #[no_mangle]
-pub extern "C" fn RouteHint_set_htlc_maximum_msat(this_ptr: &mut RouteHint, mut val: crate::c_types::derived::COption_u64Z) {
+pub extern "C" fn RouteHintHop_set_htlc_maximum_msat(this_ptr: &mut RouteHintHop, mut val: crate::c_types::derived::COption_u64Z) {
 	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
 	unsafe { &mut *this_ptr.inner }.htlc_maximum_msat = local_val;
 }
-/// Constructs a new RouteHint given each field
+/// Constructs a new RouteHintHop given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RouteHint_new(mut src_node_id_arg: crate::c_types::PublicKey, mut short_channel_id_arg: u64, mut fees_arg: crate::lightning::routing::network_graph::RoutingFees, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: crate::c_types::derived::COption_u64Z, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z) -> RouteHint {
+pub extern "C" fn RouteHintHop_new(mut src_node_id_arg: crate::c_types::PublicKey, mut short_channel_id_arg: u64, mut fees_arg: crate::lightning::routing::network_graph::RoutingFees, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: crate::c_types::derived::COption_u64Z, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z) -> RouteHintHop {
 	let mut local_htlc_minimum_msat_arg = if htlc_minimum_msat_arg.is_some() { Some( { htlc_minimum_msat_arg.take() }) } else { None };
 	let mut local_htlc_maximum_msat_arg = if htlc_maximum_msat_arg.is_some() { Some( { htlc_maximum_msat_arg.take() }) } else { None };
-	RouteHint { inner: Box::into_raw(Box::new(nativeRouteHint {
+	RouteHintHop { inner: Box::into_raw(Box::new(nativeRouteHintHop {
 		src_node_id: src_node_id_arg.into_rust(),
 		short_channel_id: short_channel_id_arg,
 		fees: *unsafe { Box::from_raw(fees_arg.take_inner()) },
@@ -399,10 +399,10 @@ pub extern "C" fn RouteHint_new(mut src_node_id_arg: crate::c_types::PublicKey, 
 		htlc_maximum_msat: local_htlc_maximum_msat_arg,
 	})), is_owned: true }
 }
-impl Clone for RouteHint {
+impl Clone for RouteHintHop {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRouteHint>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRouteHintHop>::is_null(self.inner) { std::ptr::null_mut() } else {
 				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
 			is_owned: true,
 		}
@@ -410,12 +410,12 @@ impl Clone for RouteHint {
 }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn RouteHint_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRouteHint)).clone() })) as *mut c_void
+pub(crate) extern "C" fn RouteHintHop_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRouteHintHop)).clone() })) as *mut c_void
 }
 #[no_mangle]
-/// Creates a copy of the RouteHint
-pub extern "C" fn RouteHint_clone(orig: &RouteHint) -> RouteHint {
+/// Creates a copy of the RouteHintHop
+pub extern "C" fn RouteHintHop_clone(orig: &RouteHintHop) -> RouteHintHop {
 	orig.clone()
 }
 /// Gets a route from us (payer) to the given target node (payee).
@@ -438,7 +438,7 @@ pub extern "C" fn RouteHint_clone(orig: &RouteHint) -> RouteHint {
 /// equal), however the enabled/disabled bit on such channels as well as the
 /// htlc_minimum_msat/htlc_maximum_msat *are* checked as they may change based on the receiving node.
 #[no_mangle]
-pub extern "C" fn get_route(mut our_node_id: crate::c_types::PublicKey, network: &crate::lightning::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, mut payee_features: crate::lightning::ln::features::InvoiceFeatures, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+pub extern "C" fn get_route(mut our_node_id: crate::c_types::PublicKey, network: &crate::lightning::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, mut payee_features: crate::lightning::ln::features::InvoiceFeatures, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintHopZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
 	let mut local_payee_features = if payee_features.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(payee_features.take_inner()) } }) };
 	let mut local_first_hops_base = if first_hops == std::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { unsafe { &*item.inner } }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
 	let mut local_last_hops = Vec::new(); for mut item in last_hops.as_slice().iter() { local_last_hops.push( { unsafe { &*item.inner } }); };

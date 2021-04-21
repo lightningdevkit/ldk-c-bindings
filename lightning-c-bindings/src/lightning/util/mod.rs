@@ -15,5 +15,6 @@ use crate::c_types::*;
 pub mod events;
 pub mod errors;
 pub mod ser;
+pub mod message_signing;
 pub mod logger;
 pub mod config;

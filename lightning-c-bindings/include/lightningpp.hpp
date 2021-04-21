@@ -374,20 +374,20 @@ public:
 	const LDKRoute* operator &() const { return &self; }
 	const LDKRoute* operator ->() const { return &self; }
 };
-class RouteHint {
+class RouteHintHop {
 private:
-	LDKRouteHint self;
+	LDKRouteHintHop self;
 public:
-	RouteHint(const RouteHint&) = delete;
-	RouteHint(RouteHint&& o) : self(o.self) { memset(&o, 0, sizeof(RouteHint)); }
-	RouteHint(LDKRouteHint&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKRouteHint)); }
-	operator LDKRouteHint() && { LDKRouteHint res = self; memset(&self, 0, sizeof(LDKRouteHint)); return res; }
-	~RouteHint() { RouteHint_free(self); }
-	RouteHint& operator=(RouteHint&& o) { RouteHint_free(self); self = o.self; memset(&o, 0, sizeof(RouteHint)); return *this; }
-	LDKRouteHint* operator &() { return &self; }
-	LDKRouteHint* operator ->() { return &self; }
-	const LDKRouteHint* operator &() const { return &self; }
-	const LDKRouteHint* operator ->() const { return &self; }
+	RouteHintHop(const RouteHintHop&) = delete;
+	RouteHintHop(RouteHintHop&& o) : self(o.self) { memset(&o, 0, sizeof(RouteHintHop)); }
+	RouteHintHop(LDKRouteHintHop&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKRouteHintHop)); }
+	operator LDKRouteHintHop() && { LDKRouteHintHop res = self; memset(&self, 0, sizeof(LDKRouteHintHop)); return res; }
+	~RouteHintHop() { RouteHintHop_free(self); }
+	RouteHintHop& operator=(RouteHintHop&& o) { RouteHintHop_free(self); self = o.self; memset(&o, 0, sizeof(RouteHintHop)); return *this; }
+	LDKRouteHintHop* operator &() { return &self; }
+	LDKRouteHintHop* operator ->() { return &self; }
+	const LDKRouteHintHop* operator &() const { return &self; }
+	const LDKRouteHintHop* operator ->() const { return &self; }
 };
 class IgnoringMessageHandler {
 private:
@@ -2621,6 +2621,21 @@ public:
 	const LDKC2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ* operator &() const { return &self; }
 	const LDKC2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ* operator ->() const { return &self; }
 };
+class CVec_RouteHintHopZ {
+private:
+	LDKCVec_RouteHintHopZ self;
+public:
+	CVec_RouteHintHopZ(const CVec_RouteHintHopZ&) = delete;
+	CVec_RouteHintHopZ(CVec_RouteHintHopZ&& o) : self(o.self) { memset(&o, 0, sizeof(CVec_RouteHintHopZ)); }
+	CVec_RouteHintHopZ(LDKCVec_RouteHintHopZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCVec_RouteHintHopZ)); }
+	operator LDKCVec_RouteHintHopZ() && { LDKCVec_RouteHintHopZ res = self; memset(&self, 0, sizeof(LDKCVec_RouteHintHopZ)); return res; }
+	~CVec_RouteHintHopZ() { CVec_RouteHintHopZ_free(self); }
+	CVec_RouteHintHopZ& operator=(CVec_RouteHintHopZ&& o) { CVec_RouteHintHopZ_free(self); self = o.self; memset(&o, 0, sizeof(CVec_RouteHintHopZ)); return *this; }
+	LDKCVec_RouteHintHopZ* operator &() { return &self; }
+	LDKCVec_RouteHintHopZ* operator ->() { return &self; }
+	const LDKCVec_RouteHintHopZ* operator &() const { return &self; }
+	const LDKCVec_RouteHintHopZ* operator ->() const { return &self; }
+};
 class CResult_InitDecodeErrorZ {
 private:
 	LDKCResult_InitDecodeErrorZ self;
@@ -2936,6 +2951,21 @@ public:
 	const LDKCVec_u64Z* operator &() const { return &self; }
 	const LDKCVec_u64Z* operator ->() const { return &self; }
 };
+class CResult_StringErrorZ {
+private:
+	LDKCResult_StringErrorZ self;
+public:
+	CResult_StringErrorZ(const CResult_StringErrorZ&) = delete;
+	CResult_StringErrorZ(CResult_StringErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_StringErrorZ)); }
+	CResult_StringErrorZ(LDKCResult_StringErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_StringErrorZ)); }
+	operator LDKCResult_StringErrorZ() && { LDKCResult_StringErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_StringErrorZ)); return res; }
+	~CResult_StringErrorZ() { CResult_StringErrorZ_free(self); }
+	CResult_StringErrorZ& operator=(CResult_StringErrorZ&& o) { CResult_StringErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_StringErrorZ)); return *this; }
+	LDKCResult_StringErrorZ* operator &() { return &self; }
+	LDKCResult_StringErrorZ* operator ->() { return &self; }
+	const LDKCResult_StringErrorZ* operator &() const { return &self; }
+	const LDKCResult_StringErrorZ* operator ->() const { return &self; }
+};
 class CResult_NoneErrorZ {
 private:
 	LDKCResult_NoneErrorZ self;
@@ -2965,21 +2995,6 @@ public:
 	LDKC2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ* operator ->() { return &self; }
 	const LDKC2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ* operator &() const { return &self; }
 	const LDKC2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ* operator ->() const { return &self; }
-};
-class CVec_RouteHintZ {
-private:
-	LDKCVec_RouteHintZ self;
-public:
-	CVec_RouteHintZ(const CVec_RouteHintZ&) = delete;
-	CVec_RouteHintZ(CVec_RouteHintZ&& o) : self(o.self) { memset(&o, 0, sizeof(CVec_RouteHintZ)); }
-	CVec_RouteHintZ(LDKCVec_RouteHintZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCVec_RouteHintZ)); }
-	operator LDKCVec_RouteHintZ() && { LDKCVec_RouteHintZ res = self; memset(&self, 0, sizeof(LDKCVec_RouteHintZ)); return res; }
-	~CVec_RouteHintZ() { CVec_RouteHintZ_free(self); }
-	CVec_RouteHintZ& operator=(CVec_RouteHintZ&& o) { CVec_RouteHintZ_free(self); self = o.self; memset(&o, 0, sizeof(CVec_RouteHintZ)); return *this; }
-	LDKCVec_RouteHintZ* operator &() { return &self; }
-	LDKCVec_RouteHintZ* operator ->() { return &self; }
-	const LDKCVec_RouteHintZ* operator &() const { return &self; }
-	const LDKCVec_RouteHintZ* operator ->() const { return &self; }
 };
 class CVec_CVec_RouteHopZZ {
 private:

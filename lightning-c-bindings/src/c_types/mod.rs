@@ -3,7 +3,6 @@
 /// Auto-generated C-mapped types for templated containers
 pub mod derived;
 
-use bitcoin::Script as BitcoinScript;
 use bitcoin::Transaction as BitcoinTransaction;
 use bitcoin::hashes::Hash;
 use bitcoin::secp256k1::key::PublicKey as SecpPublicKey;

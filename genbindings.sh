@@ -271,7 +271,11 @@ if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
 	# or Ubuntu packages). This should work fine on Distros which do more involved
 	# packaging than simply shipping the rustup binaries (eg Debian should Just Work
 	# here).
-	export CFLAGS="$CFLAGS -flto"
+	# The cc-rs crate tries to force -fdata-sections and -ffunction-sections on, which
+	# breaks -fembed-bitcode, so we turn off cc-rs' default flags and specify exactly
+	# what we want here.
+	export CFLAGS="$CFLAGS -O3 -fPIC -fembed-bitcode"
+	export CRATE_CC_NO_DEFAULTS=true
 	# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 	cargo clean --release
 	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C linker-plugin-lto -C lto -C link-arg=-fuse-ld=lld

@@ -247,7 +247,7 @@ if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
 	export CFLAGS_wasm32_wasi="-target wasm32"
 fi
 
-if [ "$(rustc --print target-list | grep wasm32-wasi)" != "" ]; then
+if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]; then
 	# Test to see if clang supports wasm32 as a target (which is needed to build rust-secp256k1)
 	echo "int main() {}" > genbindings_wasm_test_file.c
 	clang -nostdlib -o /dev/null --target=wasm32-wasi -Wl,--no-entry genbindings_wasm_test_file.c > /dev/null 2>&1 &&

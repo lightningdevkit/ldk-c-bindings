@@ -1368,6 +1368,80 @@ impl Clone for CResult_CVec_SignatureZNoneZ {
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_CVec_SignatureZNoneZ_clone(orig: &CResult_CVec_SignatureZNoneZ) -> CResult_CVec_SignatureZNoneZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_StringErrorZ
+pub union CResult_StringErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::c_types::derived::CVec_u8Z,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::c_types::Secp256k1Error,
+}
+#[repr(C)]
+/// A CResult_StringErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::CVec_u8Z on success and a crate::c_types::Secp256k1Error on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_StringErrorZ {
+	/// The contents of this CResult_StringErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_StringErrorZPtr,
+	/// Whether this CResult_StringErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_StringErrorZ in the success state.
+pub extern "C" fn CResult_StringErrorZ_ok(o: crate::c_types::derived::CVec_u8Z) -> CResult_StringErrorZ {
+	CResult_StringErrorZ {
+		contents: CResult_StringErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_StringErrorZ in the error state.
+pub extern "C" fn CResult_StringErrorZ_err(e: crate::c_types::Secp256k1Error) -> CResult_StringErrorZ {
+	CResult_StringErrorZ {
+		contents: CResult_StringErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_StringErrorZ.
+pub extern "C" fn CResult_StringErrorZ_free(_res: CResult_StringErrorZ) { }
+impl Drop for CResult_StringErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::c_types::derived::CVec_u8Z, crate::c_types::Secp256k1Error>> for CResult_StringErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::CVec_u8Z, crate::c_types::Secp256k1Error>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_StringErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_StringErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+#[repr(C)]
 /// The contents of CResult_ChannelMonitorUpdateDecodeErrorZ
 pub union CResult_ChannelMonitorUpdateDecodeErrorZPtr {
 	/// A pointer to the contents in the success state.
@@ -2649,29 +2723,29 @@ impl Clone for CVec_ChannelDetailsZ {
 	}
 }
 #[repr(C)]
-/// A dynamically-allocated array of crate::lightning::routing::router::RouteHints of arbitrary size.
+/// A dynamically-allocated array of crate::lightning::routing::router::RouteHintHops of arbitrary size.
 /// This corresponds to std::vector in C++
-pub struct CVec_RouteHintZ {
+pub struct CVec_RouteHintHopZ {
 	/// The elements in the array.
 	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
-	pub data: *mut crate::lightning::routing::router::RouteHint,
+	pub data: *mut crate::lightning::routing::router::RouteHintHop,
 	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
-impl CVec_RouteHintZ {
-	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::routing::router::RouteHint> {
+impl CVec_RouteHintHopZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::routing::router::RouteHintHop> {
 		if self.datalen == 0 { return Vec::new(); }
 		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
 		self.data = std::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
-	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::routing::router::RouteHint] {
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::routing::router::RouteHintHop] {
 		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
-impl From<Vec<crate::lightning::routing::router::RouteHint>> for CVec_RouteHintZ {
-	fn from(v: Vec<crate::lightning::routing::router::RouteHint>) -> Self {
+impl From<Vec<crate::lightning::routing::router::RouteHintHop>> for CVec_RouteHintHopZ {
+	fn from(v: Vec<crate::lightning::routing::router::RouteHintHop>) -> Self {
 		let datalen = v.len();
 		let data = Box::into_raw(v.into_boxed_slice());
 		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
@@ -2679,14 +2753,14 @@ impl From<Vec<crate::lightning::routing::router::RouteHint>> for CVec_RouteHintZ
 }
 #[no_mangle]
 /// Frees the buffer pointed to by `data` if `datalen` is non-0.
-pub extern "C" fn CVec_RouteHintZ_free(_res: CVec_RouteHintZ) { }
-impl Drop for CVec_RouteHintZ {
+pub extern "C" fn CVec_RouteHintHopZ_free(_res: CVec_RouteHintHopZ) { }
+impl Drop for CVec_RouteHintHopZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
 		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
-impl Clone for CVec_RouteHintZ {
+impl Clone for CVec_RouteHintHopZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }

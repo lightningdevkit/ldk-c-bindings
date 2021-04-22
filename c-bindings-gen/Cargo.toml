@@ -9,6 +9,10 @@ syn = { version = "1", features = ["full", "extra-traits"] }
 proc-macro2 = "1"
 
 [profile.release]
+incremental = true
+codegen-units = 256
+opt-level = 2
+lto = false
 debug = true
 
 # We're not in the workspace as we're just a binary code generator:

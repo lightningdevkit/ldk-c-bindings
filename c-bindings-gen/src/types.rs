@@ -780,10 +780,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration" => Some("u64"),
 			"std::io::Error" => Some("crate::c_types::IOError"),
 
-			"bitcoin::secp256k1::key::PublicKey" => Some("crate::c_types::PublicKey"),
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+				=> Some("crate::c_types::PublicKey"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature"),
-			"bitcoin::secp256k1::key::SecretKey" if is_ref  => Some("*const [u8; 32]"),
-			"bitcoin::secp256k1::key::SecretKey" if !is_ref => Some("crate::c_types::SecretKey"),
+			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
+				if is_ref  => Some("*const [u8; 32]"),
+			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
+				if !is_ref => Some("crate::c_types::SecretKey"),
 			"bitcoin::secp256k1::Error" if !is_ref => Some("crate::c_types::Secp256k1Error"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
@@ -844,12 +847,16 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration" => Some("std::time::Duration::from_secs("),
 
-			"bitcoin::secp256k1::key::PublicKey" if is_ref => Some("&"),
-			"bitcoin::secp256k1::key::PublicKey" => Some(""),
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+				if is_ref => Some("&"),
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+				=> Some(""),
 			"bitcoin::secp256k1::Signature" if is_ref => Some("&"),
 			"bitcoin::secp256k1::Signature" => Some(""),
-			"bitcoin::secp256k1::key::SecretKey" if is_ref => Some("&::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *"),
-			"bitcoin::secp256k1::key::SecretKey" if !is_ref => Some(""),
+			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
+				if is_ref => Some("&::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *"),
+			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
+				if !is_ref => Some(""),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("&::bitcoin::blockdata::script::Script::from(Vec::from("),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("::bitcoin::blockdata::script::Script::from("),
 			"bitcoin::blockdata::transaction::Transaction" if is_ref => Some("&"),
@@ -899,10 +906,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration" => Some(")"),
 
-			"bitcoin::secp256k1::key::PublicKey" => Some(".into_rust()"),
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+				=> Some(".into_rust()"),
 			"bitcoin::secp256k1::Signature" => Some(".into_rust()"),
-			"bitcoin::secp256k1::key::SecretKey" if !is_ref => Some(".into_rust()"),
-			"bitcoin::secp256k1::key::SecretKey" if is_ref => Some("}[..]).unwrap()"),
+			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
+				if !is_ref => Some(".into_rust()"),
+			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
+				if is_ref => Some("}[..]).unwrap()"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some(".to_slice()))"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_rust())"),
 			"bitcoin::blockdata::transaction::Transaction" => Some(".into_bitcoin()"),
@@ -973,10 +983,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
 
-			"bitcoin::secp256k1::key::PublicKey" => Some("crate::c_types::PublicKey::from_rust(&"),
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+				=> Some("crate::c_types::PublicKey::from_rust(&"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature::from_rust(&"),
-			"bitcoin::secp256k1::key::SecretKey" if is_ref  => Some(""),
-			"bitcoin::secp256k1::key::SecretKey" if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
+			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
+				if is_ref => Some(""),
+			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
+				if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
 			"bitcoin::secp256k1::Error" if !is_ref => Some("crate::c_types::Secp256k1Error::from_rust("),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
@@ -1032,10 +1045,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration" => Some(".as_secs()"),
 			"std::io::Error" if !is_ref => Some(")"),
 
-			"bitcoin::secp256k1::key::PublicKey" => Some(")"),
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+				=> Some(")"),
 			"bitcoin::secp256k1::Signature" => Some(")"),
-			"bitcoin::secp256k1::key::SecretKey" if !is_ref => Some(")"),
-			"bitcoin::secp256k1::key::SecretKey" if is_ref => Some(".as_ref()"),
+			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
+				if !is_ref => Some(")"),
+			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
+				if is_ref => Some(".as_ref()"),
 			"bitcoin::secp256k1::Error" if !is_ref => Some(")"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),

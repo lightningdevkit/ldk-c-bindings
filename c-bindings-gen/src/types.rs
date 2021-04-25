@@ -949,8 +949,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8]" if is_ref => Some(("crate::c_types::u8slice::from_slice(", ")")),
 			"[usize]" if is_ref => Some(("crate::c_types::usizeslice::from_slice(", ")")),
 
-			"bitcoin::blockdata::transaction::Transaction" if is_ref => Some(("::bitcoin::consensus::encode::serialize(", ")")),
-			"bitcoin::blockdata::transaction::Transaction" if !is_ref => Some(("::bitcoin::consensus::encode::serialize(&", ")")),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some(("{ let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(", ")); s }")),
 			"bitcoin::blockdata::block::Block" if is_ref => Some(("::bitcoin::consensus::encode::serialize(", ")")),
 			"bitcoin::hash_types::Txid" => None,
@@ -996,7 +994,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::Error" if !is_ref => Some("crate::c_types::Secp256k1Error::from_rust("),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
-			"bitcoin::blockdata::transaction::Transaction" => Some("crate::c_types::Transaction::from_vec(local_"),
+			"bitcoin::blockdata::transaction::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
+			"bitcoin::blockdata::transaction::Transaction" => Some("crate::c_types::Transaction::from_bitcoin(&"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::bitcoin_to_C_outpoint("),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network::from_bitcoin("),

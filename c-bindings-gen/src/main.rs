@@ -25,6 +25,7 @@ use std::io::{Read, Write};
 use std::process;
 
 use proc_macro2::Span;
+use syn::parse_quote;
 
 mod types;
 mod blocks;
@@ -63,9 +64,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 				writeln!(w, "/// Serialize the {} object into a byte array which can be read by {}_read", for_obj, for_obj).unwrap();
 				writeln!(w, "pub extern \"C\" fn {}_write(obj: &{}) -> crate::c_types::derived::CVec_u8Z {{", for_obj, full_obj_path).unwrap();
 
-				let ref_type = syn::Type::Reference(syn::TypeReference {
-					and_token: syn::Token!(&)(Span::call_site()), lifetime: None, mutability: None,
-					elem: Box::new(for_ty.clone()) });
+				let ref_type: syn::Type = syn::parse_quote!(&#for_ty);
 				assert!(!types.write_from_c_conversion_new_var(w, &syn::Ident::new("obj", Span::call_site()), &ref_type, Some(generics)));
 
 				write!(w, "\tcrate::c_types::serialize_obj(").unwrap();
@@ -84,26 +83,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 			},
 			"lightning::util::ser::Readable"|"lightning::util::ser::ReadableArgs" => {
 				// Create the Result<Object, DecodeError> syn::Type
-				let mut err_segs = syn::punctuated::Punctuated::new();
-				err_segs.push(syn::PathSegment { ident: syn::Ident::new("ln", Span::call_site()), arguments: syn::PathArguments::None });
-				err_segs.push(syn::PathSegment { ident: syn::Ident::new("msgs", Span::call_site()), arguments: syn::PathArguments::None });
-				err_segs.push(syn::PathSegment { ident: syn::Ident::new("DecodeError", Span::call_site()), arguments: syn::PathArguments::None });
-				let mut args = syn::punctuated::Punctuated::new();
-				args.push(syn::GenericArgument::Type(for_ty.clone()));
-				args.push(syn::GenericArgument::Type(syn::Type::Path(syn::TypePath {
-					qself: None, path: syn::Path {
-						leading_colon: Some(syn::Token![::](Span::call_site())), segments: err_segs,
-					}
-				})));
-				let mut res_segs = syn::punctuated::Punctuated::new();
-				res_segs.push(syn::PathSegment {
-					ident: syn::Ident::new("Result", Span::call_site()),
-					arguments: syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
-						colon2_token: None, lt_token: syn::Token![<](Span::call_site()), args, gt_token: syn::Token![>](Span::call_site()),
-					})
-				});
-				let res_ty = syn::Type::Path(syn::TypePath { qself: None, path: syn::Path {
-					leading_colon: None, segments: res_segs } });
+				let res_ty: syn::Type = parse_quote!(Result<#for_ty, ::ln::msgs::DecodeError>);
 
 				writeln!(w, "#[no_mangle]").unwrap();
 				writeln!(w, "/// Read a {} from a byte array, created by {}_write", for_obj, for_obj).unwrap();

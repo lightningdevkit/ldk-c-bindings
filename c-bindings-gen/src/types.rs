@@ -15,6 +15,7 @@ use std::hash;
 use crate::blocks::*;
 
 use proc_macro2::{TokenTree, Span};
+use syn::parse_quote;
 
 // The following utils are used purely to build our known types maps - they break down all the
 // types we need to resolve to include the given object, and no more.
@@ -1457,15 +1458,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				let tail_str = split.next().unwrap();
 				assert!(split.next().is_none());
 				let len = &tail_str[..tail_str.len() - 1];
-				Some(syn::Type::Array(syn::TypeArray {
-						bracket_token: syn::token::Bracket { span: Span::call_site() },
-						elem: Box::new(syn::Type::Path(syn::TypePath {
-							qself: None,
-							path: syn::Path::from(syn::PathSegment::from(syn::Ident::new("u8", Span::call_site()))),
-						})),
-						semi_token: syn::Token!(;)(Span::call_site()),
-						len: syn::Expr::Lit(syn::ExprLit { attrs: Vec::new(), lit: syn::Lit::Int(syn::LitInt::new(len, Span::call_site())) }),
-					}))
+				Some(parse_quote!([u8; #len]))
 			} else { None }
 		} else { None }
 	}
@@ -2397,15 +2390,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						self.check_create_container(mangled_container, "Vec", vec![&*r.elem], generics, false)
 					} else { false }
 				} else if let syn::Type::Tuple(_) = &*s.elem {
-					let mut args = syn::punctuated::Punctuated::new();
+					let mut args = syn::punctuated::Punctuated::<_, syn::token::Comma>::new();
 					args.push(syn::GenericArgument::Type((*s.elem).clone()));
 					let mut segments = syn::punctuated::Punctuated::new();
-					segments.push(syn::PathSegment {
-						ident: syn::Ident::new("Vec", Span::call_site()),
-						arguments: syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
-							colon2_token: None, lt_token: syn::Token![<](Span::call_site()), args, gt_token: syn::Token![>](Span::call_site()),
-						})
-					});
+					segments.push(parse_quote!(Vec<#args>));
 					self.write_c_type_intern(w, &syn::Type::Path(syn::TypePath { qself: None, path: syn::Path { leading_colon: None, segments } }), generics, false, is_mut, ptr_for_ref)
 				} else { false }
 			},

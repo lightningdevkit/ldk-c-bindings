@@ -7,6 +7,7 @@ edition = "2018"
 [dependencies]
 syn = { version = "1", features = ["full", "extra-traits"] }
 proc-macro2 = "1"
+quote = "1"
 
 [profile.release]
 incremental = true

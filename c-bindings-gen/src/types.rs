@@ -15,6 +15,8 @@ use std::hash;
 use crate::blocks::*;
 
 use proc_macro2::{TokenTree, Span};
+use quote::format_ident;
+use syn::parse_quote;
 
 // The following utils are used purely to build our known types maps - they break down all the
 // types we need to resolve to include the given object, and no more.
@@ -341,11 +343,13 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			($ident: expr, $path_suffix: expr) => {
 				if partial_path == "" && !dependencies.contains(&$ident) {
 					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
-					path.push(syn::PathSegment { ident: syn::Ident::new(crate_name, Span::call_site()), arguments: syn::PathArguments::None });
+					let crate_name_ident = format_ident!("{}", crate_name);
+					path.push(parse_quote!(#crate_name_ident));
 				} else {
 					new_path = format!("{}{}{}", partial_path, $ident, $path_suffix);
 				}
-				path.push(syn::PathSegment { ident: $ident.clone(), arguments: syn::PathArguments::None });
+				let ident = &$ident;
+				path.push(parse_quote!(#ident));
 			}
 		}
 		match u {
@@ -383,10 +387,9 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 	}
 
 	fn insert_primitive(imports: &mut HashMap<syn::Ident, (String, syn::Path)>, id: &str) {
-		let ident = syn::Ident::new(id, Span::call_site());
-		let mut path = syn::punctuated::Punctuated::new();
-		path.push(syn::PathSegment { ident: ident.clone(), arguments: syn::PathArguments::None });
-		imports.insert(ident, (id.to_owned(), syn::Path { leading_colon: None, segments: path }));
+		let ident = format_ident!("{}", id);
+		let path = parse_quote!(#ident);
+		imports.insert(ident, (id.to_owned(), path));
 	}
 
 	pub fn new(crate_name: &'mod_lifetime str, dependencies: &'mod_lifetime HashSet<syn::Ident>, module_path: &'mod_lifetime str, contents: &'crate_lft [syn::Item]) -> Self {
@@ -1457,15 +1460,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				let tail_str = split.next().unwrap();
 				assert!(split.next().is_none());
 				let len = &tail_str[..tail_str.len() - 1];
-				Some(syn::Type::Array(syn::TypeArray {
-						bracket_token: syn::token::Bracket { span: Span::call_site() },
-						elem: Box::new(syn::Type::Path(syn::TypePath {
-							qself: None,
-							path: syn::Path::from(syn::PathSegment::from(syn::Ident::new("u8", Span::call_site()))),
-						})),
-						semi_token: syn::Token!(;)(Span::call_site()),
-						len: syn::Expr::Lit(syn::ExprLit { attrs: Vec::new(), lit: syn::Lit::Int(syn::LitInt::new(len, Span::call_site())) }),
-					}))
+				Some(parse_quote!([u8; #len]))
 			} else { None }
 		} else { None }
 	}
@@ -1858,7 +1853,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 						write!(w, "{} {{ ", pfx).unwrap();
 						let new_var_name = format!("{}_{}", ident, idx);
-						let new_var = self.write_conversion_new_var_intern(w, &syn::Ident::new(&new_var_name, Span::call_site()),
+						let new_var = self.write_conversion_new_var_intern(w, &format_ident!("{}", new_var_name),
 								&var_access, conv_ty, generics, contains_slice || (is_ref && ty_has_inner), ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix);
 						if new_var { write!(w, " ").unwrap(); }
 
@@ -1983,7 +1978,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					for (idx, elem) in t.elems.iter().enumerate() {
 						if let syn::Type::Path(p) = elem {
 							let v_name = format!("orig_{}_{}", ident, idx);
-							let tuple_elem_ident = syn::Ident::new(&v_name, Span::call_site());
+							let tuple_elem_ident = format_ident!("{}", &v_name);
 							if self.write_conversion_new_var_intern(w, &tuple_elem_ident, &v_name, elem, generics,
 									false, ptr_for_ref, to_c,
 									path_lookup, container_lookup, var_prefix, var_suffix) {
@@ -2397,15 +2392,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						self.check_create_container(mangled_container, "Vec", vec![&*r.elem], generics, false)
 					} else { false }
 				} else if let syn::Type::Tuple(_) = &*s.elem {
-					let mut args = syn::punctuated::Punctuated::new();
+					let mut args = syn::punctuated::Punctuated::<_, syn::token::Comma>::new();
 					args.push(syn::GenericArgument::Type((*s.elem).clone()));
 					let mut segments = syn::punctuated::Punctuated::new();
-					segments.push(syn::PathSegment {
-						ident: syn::Ident::new("Vec", Span::call_site()),
-						arguments: syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
-							colon2_token: None, lt_token: syn::Token![<](Span::call_site()), args, gt_token: syn::Token![>](Span::call_site()),
-						})
-					});
+					segments.push(parse_quote!(Vec<#args>));
 					self.write_c_type_intern(w, &syn::Type::Path(syn::TypePath { qself: None, path: syn::Path { leading_colon: None, segments } }), generics, false, is_mut, ptr_for_ref)
 				} else { false }
 			},

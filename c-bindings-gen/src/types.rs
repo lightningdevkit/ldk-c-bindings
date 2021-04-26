@@ -1159,7 +1159,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Slice" => {
-				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "**item".to_string())], "); }", ContainerPrefixLocation::PerConv))
+				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "*item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Option" => {
 				if let Some(syn::Type::Path(p)) = single_contained {

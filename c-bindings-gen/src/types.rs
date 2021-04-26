@@ -971,11 +971,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"Option" => Some("local_"),
 
 			"[u8; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"[u8; 32]" if is_ref => Some("&"),
+			"[u8; 32]" if is_ref => Some(""),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::SixteenBytes { data: "),
 			"[u8; 10]" if !is_ref => Some("crate::c_types::TenBytes { data: "),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes { data: "),
-			"[u8; 3]" if is_ref => Some("&"),
+			"[u8; 3]" if is_ref => Some(""),
 
 			"[u8]" if is_ref => Some("local_"),
 			"[usize]" if is_ref => Some("local_"),
@@ -1583,6 +1583,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				let resolved_path = self.resolve_path(&p.path, generics);
 				if let Some(aliased_type) = self.crate_types.type_aliases.get(&resolved_path) {
 					return self.write_conversion_inline_intern(w, aliased_type, None, is_ref, is_mut, ptr_for_ref, tupleconv, prefix, sliceconv, path_lookup, decl_lookup);
+				} else if self.is_primitive(&resolved_path) {
+					if is_ref && prefix {
+						write!(w, "*").unwrap();
+					}
 				} else if let Some(c_type) = path_lookup(&resolved_path, is_ref, ptr_for_ref) {
 					write!(w, "{}", c_type).unwrap();
 				} else if self.crate_types.opaques.get(&resolved_path).is_some() {
@@ -1664,20 +1668,20 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				|a, b, c| self.to_c_conversion_inline_prefix_from_path(a, b, c),
 				|w, decl_type, decl_path, is_ref, _is_mut| {
 					match decl_type {
-						DeclType::MirroredEnum if is_ref && ptr_for_ref => write!(w, "crate::{}::from_native(&", decl_path).unwrap(),
-						DeclType::MirroredEnum if is_ref => write!(w, "&crate::{}::from_native(&", decl_path).unwrap(),
+						DeclType::MirroredEnum if is_ref && ptr_for_ref => write!(w, "crate::{}::from_native(", decl_path).unwrap(),
+						DeclType::MirroredEnum if is_ref => write!(w, "&crate::{}::from_native(", decl_path).unwrap(),
 						DeclType::MirroredEnum => write!(w, "crate::{}::native_into(", decl_path).unwrap(),
 						DeclType::EnumIgnored|DeclType::StructImported if is_ref && ptr_for_ref && from_ptr =>
 							write!(w, "crate::{} {{ inner: unsafe {{ (", decl_path).unwrap(),
 						DeclType::EnumIgnored|DeclType::StructImported if is_ref && ptr_for_ref =>
-							write!(w, "crate::{} {{ inner: unsafe {{ ( (&(", decl_path).unwrap(),
+							write!(w, "crate::{} {{ inner: unsafe {{ ( (&(*", decl_path).unwrap(),
 						DeclType::EnumIgnored|DeclType::StructImported if is_ref =>
 							write!(w, "&crate::{} {{ inner: unsafe {{ (", decl_path).unwrap(),
 						DeclType::EnumIgnored|DeclType::StructImported if !is_ref && from_ptr =>
 							write!(w, "crate::{} {{ inner: ", decl_path).unwrap(),
 						DeclType::EnumIgnored|DeclType::StructImported if !is_ref =>
 							write!(w, "crate::{} {{ inner: Box::into_raw(Box::new(", decl_path).unwrap(),
-						DeclType::Trait(_) if is_ref => write!(w, "&").unwrap(),
+						DeclType::Trait(_) if is_ref => write!(w, "").unwrap(),
 						DeclType::Trait(_) if !is_ref => {},
 						_ => panic!("{:?}", decl_path),
 					}

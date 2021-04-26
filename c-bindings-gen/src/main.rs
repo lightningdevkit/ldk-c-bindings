@@ -606,11 +606,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 						let local_var = types.write_to_c_conversion_new_var(w, &format_ident!("inner_val"), &ref_type, Some(&gen_types), true);
 						if local_var { write!(w, "\n\t").unwrap(); }
 						types.write_to_c_conversion_inline_prefix(w, &ref_type, Some(&gen_types), true);
-						if local_var {
-							write!(w, "inner_val").unwrap();
-						} else {
-							write!(w, "(*inner_val)").unwrap();
-						}
+						write!(w, "inner_val").unwrap();
 						types.write_to_c_conversion_inline_suffix(w, &ref_type, Some(&gen_types), true);
 						writeln!(w, "\n}}").unwrap();
 					}

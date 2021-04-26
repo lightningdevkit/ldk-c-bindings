@@ -567,6 +567,21 @@ public:
 	const LDKListen* operator &() const { return &self; }
 	const LDKListen* operator ->() const { return &self; }
 };
+class Confirm {
+private:
+	LDKConfirm self;
+public:
+	Confirm(const Confirm&) = delete;
+	Confirm(Confirm&& o) : self(o.self) { memset(&o, 0, sizeof(Confirm)); }
+	Confirm(LDKConfirm&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKConfirm)); }
+	operator LDKConfirm() && { LDKConfirm res = self; memset(&self, 0, sizeof(LDKConfirm)); return res; }
+	~Confirm() { Confirm_free(self); }
+	Confirm& operator=(Confirm&& o) { Confirm_free(self); self = o.self; memset(&o, 0, sizeof(Confirm)); return *this; }
+	LDKConfirm* operator &() { return &self; }
+	LDKConfirm* operator ->() { return &self; }
+	const LDKConfirm* operator &() const { return &self; }
+	const LDKConfirm* operator ->() const { return &self; }
+};
 class Watch {
 private:
 	LDKWatch self;

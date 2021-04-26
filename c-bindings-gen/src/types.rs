@@ -949,8 +949,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8]" if is_ref => Some(("crate::c_types::u8slice::from_slice(", ")")),
 			"[usize]" if is_ref => Some(("crate::c_types::usizeslice::from_slice(", ")")),
 
-			"bitcoin::blockdata::transaction::Transaction" if is_ref => Some(("::bitcoin::consensus::encode::serialize(", ")")),
-			"bitcoin::blockdata::transaction::Transaction" if !is_ref => Some(("::bitcoin::consensus::encode::serialize(&", ")")),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some(("{ let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(", ")); s }")),
 			"bitcoin::blockdata::block::Block" if is_ref => Some(("::bitcoin::consensus::encode::serialize(", ")")),
 			"bitcoin::hash_types::Txid" => None,
@@ -971,11 +969,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"Option" => Some("local_"),
 
 			"[u8; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"[u8; 32]" if is_ref => Some("&"),
+			"[u8; 32]" if is_ref => Some(""),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::SixteenBytes { data: "),
 			"[u8; 10]" if !is_ref => Some("crate::c_types::TenBytes { data: "),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes { data: "),
-			"[u8; 3]" if is_ref => Some("&"),
+			"[u8; 3]" if is_ref => Some(""),
 
 			"[u8]" if is_ref => Some("local_"),
 			"[usize]" if is_ref => Some("local_"),
@@ -996,7 +994,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::Error" if !is_ref => Some("crate::c_types::Secp256k1Error::from_rust("),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
-			"bitcoin::blockdata::transaction::Transaction" => Some("crate::c_types::Transaction::from_vec(local_"),
+			"bitcoin::blockdata::transaction::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
+			"bitcoin::blockdata::transaction::Transaction" => Some("crate::c_types::Transaction::from_bitcoin(&"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::bitcoin_to_C_outpoint("),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network::from_bitcoin("),
@@ -1160,7 +1159,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Slice" => {
-				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "**item".to_string())], "); }", ContainerPrefixLocation::PerConv))
+				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "*item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Option" => {
 				if let Some(syn::Type::Path(p)) = single_contained {
@@ -1459,7 +1458,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				split.next().unwrap();
 				let tail_str = split.next().unwrap();
 				assert!(split.next().is_none());
-				let len = &tail_str[..tail_str.len() - 1];
+				let len = usize::from_str_radix(&tail_str[..tail_str.len() - 1], 10).unwrap();
 				Some(parse_quote!([u8; #len]))
 			} else { None }
 		} else { None }
@@ -1567,7 +1566,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 
 	fn write_conversion_inline_intern<W: std::io::Write,
-			LP: Fn(&str, bool, bool) -> Option<String>, DL: Fn(&mut W, &DeclType, &str, bool, bool), SC: Fn(bool) -> &'static str>
+			LP: Fn(&str, bool, bool) -> Option<String>, DL: Fn(&mut W, &DeclType, &str, bool, bool), SC: Fn(bool, Option<&str>) -> String>
 			(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, is_mut: bool, ptr_for_ref: bool,
 			 tupleconv: &str, prefix: bool, sliceconv: SC, path_lookup: LP, decl_lookup: DL) {
 		match t {
@@ -1583,6 +1582,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				let resolved_path = self.resolve_path(&p.path, generics);
 				if let Some(aliased_type) = self.crate_types.type_aliases.get(&resolved_path) {
 					return self.write_conversion_inline_intern(w, aliased_type, None, is_ref, is_mut, ptr_for_ref, tupleconv, prefix, sliceconv, path_lookup, decl_lookup);
+				} else if self.is_primitive(&resolved_path) {
+					if is_ref && prefix {
+						write!(w, "*").unwrap();
+					}
 				} else if let Some(c_type) = path_lookup(&resolved_path, is_ref, ptr_for_ref) {
 					write!(w, "{}", c_type).unwrap();
 				} else if self.crate_types.opaques.get(&resolved_path).is_some() {
@@ -1615,12 +1618,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					write!(w, "{}", path_lookup("[u8]", is_ref, ptr_for_ref).unwrap()).unwrap();
 				} else if let syn::Type::Reference(r) = &*s.elem {
 					if let syn::Type::Path(p) = &*r.elem {
-						write!(w, "{}", sliceconv(self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)))).unwrap();
+						write!(w, "{}", sliceconv(self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)), None)).unwrap();
 					} else { unimplemented!(); }
 				} else if let syn::Type::Tuple(t) = &*s.elem {
 					assert!(!t.elems.is_empty());
 					if prefix {
-						write!(w, "&local_").unwrap();
+						write!(w, "{}", sliceconv(false, None)).unwrap();
 					} else {
 						let mut needs_map = false;
 						for e in t.elems.iter() {
@@ -1629,19 +1632,23 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							}
 						}
 						if needs_map {
-							write!(w, ".iter().map(|(").unwrap();
+							let mut map_str = Vec::new();
+							write!(&mut map_str, ".map(|(").unwrap();
 							for i in 0..t.elems.len() {
-								write!(w, "{}{}", if i != 0 { ", " } else { "" }, ('a' as u8 + i as u8) as char).unwrap();
+								write!(&mut map_str, "{}{}", if i != 0 { ", " } else { "" }, ('a' as u8 + i as u8) as char).unwrap();
 							}
-							write!(w, ")| (").unwrap();
+							write!(&mut map_str, ")| (").unwrap();
 							for (idx, e) in t.elems.iter().enumerate() {
 								if let syn::Type::Reference(_) = e {
-									write!(w, "{}{}", if idx != 0 { ", " } else { "" }, (idx as u8 + 'a' as u8) as char).unwrap();
+									write!(&mut map_str, "{}{}", if idx != 0 { ", " } else { "" }, (idx as u8 + 'a' as u8) as char).unwrap();
 								} else if let syn::Type::Path(_) = e {
-									write!(w, "{}*{}", if idx != 0 { ", " } else { "" }, (idx as u8 + 'a' as u8) as char).unwrap();
+									write!(&mut map_str, "{}*{}", if idx != 0 { ", " } else { "" }, (idx as u8 + 'a' as u8) as char).unwrap();
 								} else { unimplemented!(); }
 							}
-							write!(w, ")).collect::<Vec<_>>()[..]").unwrap();
+							write!(&mut map_str, "))").unwrap();
+							write!(w, "{}", sliceconv(false, Some(&String::from_utf8(map_str).unwrap()))).unwrap();
+						} else {
+							write!(w, "{}", sliceconv(false, None)).unwrap();
 						}
 					}
 				} else { unimplemented!(); }
@@ -1660,24 +1667,24 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 
 	fn write_to_c_conversion_inline_prefix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool, from_ptr: bool) {
-		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "0u8 /*", true, |_| "local_",
+		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "0u8 /*", true, |_, _| "local_".to_owned(),
 				|a, b, c| self.to_c_conversion_inline_prefix_from_path(a, b, c),
 				|w, decl_type, decl_path, is_ref, _is_mut| {
 					match decl_type {
-						DeclType::MirroredEnum if is_ref && ptr_for_ref => write!(w, "crate::{}::from_native(&", decl_path).unwrap(),
-						DeclType::MirroredEnum if is_ref => write!(w, "&crate::{}::from_native(&", decl_path).unwrap(),
+						DeclType::MirroredEnum if is_ref && ptr_for_ref => write!(w, "crate::{}::from_native(", decl_path).unwrap(),
+						DeclType::MirroredEnum if is_ref => write!(w, "&crate::{}::from_native(", decl_path).unwrap(),
 						DeclType::MirroredEnum => write!(w, "crate::{}::native_into(", decl_path).unwrap(),
 						DeclType::EnumIgnored|DeclType::StructImported if is_ref && ptr_for_ref && from_ptr =>
 							write!(w, "crate::{} {{ inner: unsafe {{ (", decl_path).unwrap(),
 						DeclType::EnumIgnored|DeclType::StructImported if is_ref && ptr_for_ref =>
-							write!(w, "crate::{} {{ inner: unsafe {{ ( (&(", decl_path).unwrap(),
+							write!(w, "crate::{} {{ inner: unsafe {{ ( (&(*", decl_path).unwrap(),
 						DeclType::EnumIgnored|DeclType::StructImported if is_ref =>
 							write!(w, "&crate::{} {{ inner: unsafe {{ (", decl_path).unwrap(),
 						DeclType::EnumIgnored|DeclType::StructImported if !is_ref && from_ptr =>
 							write!(w, "crate::{} {{ inner: ", decl_path).unwrap(),
 						DeclType::EnumIgnored|DeclType::StructImported if !is_ref =>
 							write!(w, "crate::{} {{ inner: Box::into_raw(Box::new(", decl_path).unwrap(),
-						DeclType::Trait(_) if is_ref => write!(w, "&").unwrap(),
+						DeclType::Trait(_) if is_ref => write!(w, "").unwrap(),
 						DeclType::Trait(_) if !is_ref => {},
 						_ => panic!("{:?}", decl_path),
 					}
@@ -1687,7 +1694,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		self.write_to_c_conversion_inline_prefix_inner(w, t, generics, false, ptr_for_ref, false);
 	}
 	fn write_to_c_conversion_inline_suffix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool, from_ptr: bool) {
-		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "*/", false, |_| ".into()",
+		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "*/", false, |_, _| ".into()".to_owned(),
 				|a, b, c| self.to_c_conversion_inline_suffix_from_path(a, b, c),
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
 					DeclType::MirroredEnum => write!(w, ")").unwrap(),
@@ -1716,7 +1723,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 
 	fn write_from_c_conversion_prefix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool) {
-		self.write_conversion_inline_intern(w, t, generics, is_ref, false, false, "() /*", true, |_| "&local_",
+		self.write_conversion_inline_intern(w, t, generics, is_ref, false, false, "() /*", true, |_, _| "&local_".to_owned(),
 				|a, b, _c| self.from_c_conversion_prefix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, is_mut| match decl_type {
 					DeclType::StructImported if is_ref && ptr_for_ref => write!(w, "unsafe {{ &*(*").unwrap(),
@@ -1734,9 +1741,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 	fn write_from_c_conversion_suffix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool) {
 		self.write_conversion_inline_intern(w, t, generics, is_ref, false, false, "*/", false,
-				|has_inner| match has_inner {
-					false => ".iter().collect::<Vec<_>>()[..]",
-					true => "[..]",
+				|has_inner, map_str_opt| match (has_inner, map_str_opt) {
+					(false, Some(map_str)) => format!(".iter(){}.collect::<Vec<_>>()[..]", map_str),
+					(false, None) => ".iter().collect::<Vec<_>>()[..]".to_owned(),
+					(true, None) => "[..]".to_owned(),
+					(true, Some(_)) => unreachable!(),
 				},
 				|a, b, _c| self.from_c_conversion_suffix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
@@ -1755,7 +1764,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	// Note that compared to the above conversion functions, the following two are generally
 	// significantly undertested:
 	pub fn write_from_c_conversion_to_ref_prefix<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>) {
-		self.write_conversion_inline_intern(w, t, generics, false, false, false, "() /*", true, |_| "&local_",
+		self.write_conversion_inline_intern(w, t, generics, false, false, false, "() /*", true, |_, _| "&local_".to_owned(),
 				|a, b, _c| {
 					if let Some(conv) = self.from_c_conversion_prefix_from_path(a, b) {
 						Some(format!("&{}", conv))
@@ -1768,9 +1777,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 	pub fn write_from_c_conversion_to_ref_suffix<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>) {
 		self.write_conversion_inline_intern(w, t, generics, false, false, false, "*/", false,
-				|has_inner| match has_inner {
-					false => ".iter().collect::<Vec<_>>()[..]",
-					true => "[..]",
+				|has_inner, map_str_opt| match (has_inner, map_str_opt) {
+					(false, Some(map_str)) => format!(".iter(){}.collect::<Vec<_>>()[..]", map_str),
+					(false, None) => ".iter().collect::<Vec<_>>()[..]".to_owned(),
+					(true, None) => "[..]".to_owned(),
+					(true, Some(_)) => unreachable!(),
 				},
 				|a, b, _c| self.from_c_conversion_suffix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {

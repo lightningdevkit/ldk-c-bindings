@@ -64,7 +64,7 @@ impl RouteHop {
 #[no_mangle]
 pub extern "C" fn RouteHop_get_pubkey(this_ptr: &RouteHop) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.pubkey;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The node_id of the node at this hop.
 #[no_mangle]
@@ -76,7 +76,7 @@ pub extern "C" fn RouteHop_set_pubkey(this_ptr: &mut RouteHop, mut val: crate::c
 #[no_mangle]
 pub extern "C" fn RouteHop_get_node_features(this_ptr: &RouteHop) -> crate::lightning::ln::features::NodeFeatures {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.node_features;
-	crate::lightning::ln::features::NodeFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::NodeFeatures { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The node_announcement features of the node at this hop. For the last hop, these may be
 /// amended to match the features present in the invoice this node generated.
@@ -88,7 +88,7 @@ pub extern "C" fn RouteHop_set_node_features(this_ptr: &mut RouteHop, mut val: c
 #[no_mangle]
 pub extern "C" fn RouteHop_get_short_channel_id(this_ptr: &RouteHop) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.short_channel_id;
-	(*inner_val)
+	*inner_val
 }
 /// The channel that should be used from the previous hop to reach this node.
 #[no_mangle]
@@ -100,7 +100,7 @@ pub extern "C" fn RouteHop_set_short_channel_id(this_ptr: &mut RouteHop, mut val
 #[no_mangle]
 pub extern "C" fn RouteHop_get_channel_features(this_ptr: &RouteHop) -> crate::lightning::ln::features::ChannelFeatures {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_features;
-	crate::lightning::ln::features::ChannelFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::ChannelFeatures { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The channel_announcement features of the channel that should be used from the previous hop
 /// to reach this node.
@@ -114,7 +114,7 @@ pub extern "C" fn RouteHop_set_channel_features(this_ptr: &mut RouteHop, mut val
 #[no_mangle]
 pub extern "C" fn RouteHop_get_fee_msat(this_ptr: &RouteHop) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fee_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The fee taken on this hop (for paying for the use of the *next* channel in the path).
 /// For the last hop, this should be the full value of the payment (might be more than
@@ -128,7 +128,7 @@ pub extern "C" fn RouteHop_set_fee_msat(this_ptr: &mut RouteHop, mut val: u64) {
 #[no_mangle]
 pub extern "C" fn RouteHop_get_cltv_expiry_delta(this_ptr: &RouteHop) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.cltv_expiry_delta;
-	(*inner_val)
+	*inner_val
 }
 /// The CLTV delta added for this hop. For the last hop, this should be the full CLTV value
 /// expected at the destination, in excess of the current block height.
@@ -318,7 +318,7 @@ impl RouteHintHop {
 #[no_mangle]
 pub extern "C" fn RouteHintHop_get_src_node_id(this_ptr: &RouteHintHop) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.src_node_id;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The node_id of the non-target end of the route
 #[no_mangle]
@@ -329,7 +329,7 @@ pub extern "C" fn RouteHintHop_set_src_node_id(this_ptr: &mut RouteHintHop, mut 
 #[no_mangle]
 pub extern "C" fn RouteHintHop_get_short_channel_id(this_ptr: &RouteHintHop) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.short_channel_id;
-	(*inner_val)
+	*inner_val
 }
 /// The short_channel_id of this channel
 #[no_mangle]
@@ -340,7 +340,7 @@ pub extern "C" fn RouteHintHop_set_short_channel_id(this_ptr: &mut RouteHintHop,
 #[no_mangle]
 pub extern "C" fn RouteHintHop_get_fees(this_ptr: &RouteHintHop) -> crate::lightning::routing::network_graph::RoutingFees {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fees;
-	crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The fees which must be paid to use this channel
 #[no_mangle]
@@ -351,7 +351,7 @@ pub extern "C" fn RouteHintHop_set_fees(this_ptr: &mut RouteHintHop, mut val: cr
 #[no_mangle]
 pub extern "C" fn RouteHintHop_get_cltv_expiry_delta(this_ptr: &RouteHintHop) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.cltv_expiry_delta;
-	(*inner_val)
+	*inner_val
 }
 /// The difference in CLTV values between this node and the next node.
 #[no_mangle]

@@ -140,7 +140,7 @@ impl Init {
 #[no_mangle]
 pub extern "C" fn Init_get_features(this_ptr: &Init) -> crate::lightning::ln::features::InitFeatures {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.features;
-	crate::lightning::ln::features::InitFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::InitFeatures { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The relevant features which the sender supports
 #[no_mangle]
@@ -223,7 +223,7 @@ impl ErrorMessage {
 #[no_mangle]
 pub extern "C" fn ErrorMessage_get_channel_id(this_ptr: &ErrorMessage) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID involved in the error
 #[no_mangle]
@@ -237,7 +237,7 @@ pub extern "C" fn ErrorMessage_set_channel_id(this_ptr: &mut ErrorMessage, mut v
 #[no_mangle]
 pub extern "C" fn ErrorMessage_get_data(this_ptr: &ErrorMessage) -> crate::c_types::Str {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.data;
-	(*inner_val).as_str().into()
+	inner_val.as_str().into()
 }
 /// A possibly human-readable error description.
 /// The string should be sanitized before it is used (e.g. emitted to logs
@@ -324,7 +324,7 @@ impl Ping {
 #[no_mangle]
 pub extern "C" fn Ping_get_ponglen(this_ptr: &Ping) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.ponglen;
-	(*inner_val)
+	*inner_val
 }
 /// The desired response length
 #[no_mangle]
@@ -336,7 +336,7 @@ pub extern "C" fn Ping_set_ponglen(this_ptr: &mut Ping, mut val: u16) {
 #[no_mangle]
 pub extern "C" fn Ping_get_byteslen(this_ptr: &Ping) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.byteslen;
-	(*inner_val)
+	*inner_val
 }
 /// The ping packet size.
 /// This field is not sent on the wire. byteslen zeros are sent.
@@ -422,7 +422,7 @@ impl Pong {
 #[no_mangle]
 pub extern "C" fn Pong_get_byteslen(this_ptr: &Pong) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.byteslen;
-	(*inner_val)
+	*inner_val
 }
 /// The pong packet size.
 /// This field is not sent on the wire. byteslen zeros are sent.
@@ -506,7 +506,7 @@ impl OpenChannel {
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_chain_hash(this_ptr: &OpenChannel) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.chain_hash;
-	(*inner_val).as_inner()
+	inner_val.as_inner()
 }
 /// The genesis hash of the blockchain where the channel is to be opened
 #[no_mangle]
@@ -517,7 +517,7 @@ pub extern "C" fn OpenChannel_set_chain_hash(this_ptr: &mut OpenChannel, mut val
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_temporary_channel_id(this_ptr: &OpenChannel) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.temporary_channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// A temporary channel ID, until the funding outpoint is announced
 #[no_mangle]
@@ -528,7 +528,7 @@ pub extern "C" fn OpenChannel_set_temporary_channel_id(this_ptr: &mut OpenChanne
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_funding_satoshis(this_ptr: &OpenChannel) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.funding_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// The channel value
 #[no_mangle]
@@ -539,7 +539,7 @@ pub extern "C" fn OpenChannel_set_funding_satoshis(this_ptr: &mut OpenChannel, m
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_push_msat(this_ptr: &OpenChannel) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.push_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The amount to push to the counterparty as part of the open, in milli-satoshi
 #[no_mangle]
@@ -550,7 +550,7 @@ pub extern "C" fn OpenChannel_set_push_msat(this_ptr: &mut OpenChannel, mut val:
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_dust_limit_satoshis(this_ptr: &OpenChannel) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.dust_limit_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// The threshold below which outputs on transactions broadcast by sender will be omitted
 #[no_mangle]
@@ -561,7 +561,7 @@ pub extern "C" fn OpenChannel_set_dust_limit_satoshis(this_ptr: &mut OpenChannel
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_max_htlc_value_in_flight_msat(this_ptr: &OpenChannel) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.max_htlc_value_in_flight_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The maximum inbound HTLC value in flight towards sender, in milli-satoshi
 #[no_mangle]
@@ -572,7 +572,7 @@ pub extern "C" fn OpenChannel_set_max_htlc_value_in_flight_msat(this_ptr: &mut O
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_channel_reserve_satoshis(this_ptr: &OpenChannel) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_reserve_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// The minimum value unencumbered by HTLCs for the counterparty to keep in the channel
 #[no_mangle]
@@ -583,7 +583,7 @@ pub extern "C" fn OpenChannel_set_channel_reserve_satoshis(this_ptr: &mut OpenCh
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_htlc_minimum_msat(this_ptr: &OpenChannel) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_minimum_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The minimum HTLC size incoming to sender, in milli-satoshi
 #[no_mangle]
@@ -594,7 +594,7 @@ pub extern "C" fn OpenChannel_set_htlc_minimum_msat(this_ptr: &mut OpenChannel, 
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_feerate_per_kw(this_ptr: &OpenChannel) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.feerate_per_kw;
-	(*inner_val)
+	*inner_val
 }
 /// The feerate per 1000-weight of sender generated transactions, until updated by update_fee
 #[no_mangle]
@@ -605,7 +605,7 @@ pub extern "C" fn OpenChannel_set_feerate_per_kw(this_ptr: &mut OpenChannel, mut
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_to_self_delay(this_ptr: &OpenChannel) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.to_self_delay;
-	(*inner_val)
+	*inner_val
 }
 /// The number of blocks which the counterparty will have to wait to claim on-chain funds if they broadcast a commitment transaction
 #[no_mangle]
@@ -616,7 +616,7 @@ pub extern "C" fn OpenChannel_set_to_self_delay(this_ptr: &mut OpenChannel, mut 
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_max_accepted_htlcs(this_ptr: &OpenChannel) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.max_accepted_htlcs;
-	(*inner_val)
+	*inner_val
 }
 /// The maximum number of inbound HTLCs towards sender
 #[no_mangle]
@@ -627,7 +627,7 @@ pub extern "C" fn OpenChannel_set_max_accepted_htlcs(this_ptr: &mut OpenChannel,
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_funding_pubkey(this_ptr: &OpenChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.funding_pubkey;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The sender's key controlling the funding transaction
 #[no_mangle]
@@ -638,7 +638,7 @@ pub extern "C" fn OpenChannel_set_funding_pubkey(this_ptr: &mut OpenChannel, mut
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_revocation_basepoint(this_ptr: &OpenChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.revocation_basepoint;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// Used to derive a revocation key for transactions broadcast by counterparty
 #[no_mangle]
@@ -649,7 +649,7 @@ pub extern "C" fn OpenChannel_set_revocation_basepoint(this_ptr: &mut OpenChanne
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_payment_point(this_ptr: &OpenChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.payment_point;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// A payment key to sender for transactions broadcast by counterparty
 #[no_mangle]
@@ -660,7 +660,7 @@ pub extern "C" fn OpenChannel_set_payment_point(this_ptr: &mut OpenChannel, mut 
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_delayed_payment_basepoint(this_ptr: &OpenChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.delayed_payment_basepoint;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// Used to derive a payment key to sender for transactions broadcast by sender
 #[no_mangle]
@@ -671,7 +671,7 @@ pub extern "C" fn OpenChannel_set_delayed_payment_basepoint(this_ptr: &mut OpenC
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_htlc_basepoint(this_ptr: &OpenChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_basepoint;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// Used to derive an HTLC payment key to sender
 #[no_mangle]
@@ -682,7 +682,7 @@ pub extern "C" fn OpenChannel_set_htlc_basepoint(this_ptr: &mut OpenChannel, mut
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_first_per_commitment_point(this_ptr: &OpenChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.first_per_commitment_point;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The first to-be-broadcast-by-sender transaction's per commitment point
 #[no_mangle]
@@ -693,7 +693,7 @@ pub extern "C" fn OpenChannel_set_first_per_commitment_point(this_ptr: &mut Open
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_channel_flags(this_ptr: &OpenChannel) -> u8 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_flags;
-	(*inner_val)
+	*inner_val
 }
 /// Channel flags
 #[no_mangle]
@@ -768,7 +768,7 @@ impl AcceptChannel {
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_temporary_channel_id(this_ptr: &AcceptChannel) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.temporary_channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// A temporary channel ID, until the funding outpoint is announced
 #[no_mangle]
@@ -779,7 +779,7 @@ pub extern "C" fn AcceptChannel_set_temporary_channel_id(this_ptr: &mut AcceptCh
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_dust_limit_satoshis(this_ptr: &AcceptChannel) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.dust_limit_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// The threshold below which outputs on transactions broadcast by sender will be omitted
 #[no_mangle]
@@ -790,7 +790,7 @@ pub extern "C" fn AcceptChannel_set_dust_limit_satoshis(this_ptr: &mut AcceptCha
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_max_htlc_value_in_flight_msat(this_ptr: &AcceptChannel) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.max_htlc_value_in_flight_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The maximum inbound HTLC value in flight towards sender, in milli-satoshi
 #[no_mangle]
@@ -801,7 +801,7 @@ pub extern "C" fn AcceptChannel_set_max_htlc_value_in_flight_msat(this_ptr: &mut
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_channel_reserve_satoshis(this_ptr: &AcceptChannel) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_reserve_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// The minimum value unencumbered by HTLCs for the counterparty to keep in the channel
 #[no_mangle]
@@ -812,7 +812,7 @@ pub extern "C" fn AcceptChannel_set_channel_reserve_satoshis(this_ptr: &mut Acce
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_htlc_minimum_msat(this_ptr: &AcceptChannel) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_minimum_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The minimum HTLC size incoming to sender, in milli-satoshi
 #[no_mangle]
@@ -823,7 +823,7 @@ pub extern "C" fn AcceptChannel_set_htlc_minimum_msat(this_ptr: &mut AcceptChann
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_minimum_depth(this_ptr: &AcceptChannel) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.minimum_depth;
-	(*inner_val)
+	*inner_val
 }
 /// Minimum depth of the funding transaction before the channel is considered open
 #[no_mangle]
@@ -834,7 +834,7 @@ pub extern "C" fn AcceptChannel_set_minimum_depth(this_ptr: &mut AcceptChannel, 
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_to_self_delay(this_ptr: &AcceptChannel) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.to_self_delay;
-	(*inner_val)
+	*inner_val
 }
 /// The number of blocks which the counterparty will have to wait to claim on-chain funds if they broadcast a commitment transaction
 #[no_mangle]
@@ -845,7 +845,7 @@ pub extern "C" fn AcceptChannel_set_to_self_delay(this_ptr: &mut AcceptChannel, 
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_max_accepted_htlcs(this_ptr: &AcceptChannel) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.max_accepted_htlcs;
-	(*inner_val)
+	*inner_val
 }
 /// The maximum number of inbound HTLCs towards sender
 #[no_mangle]
@@ -856,7 +856,7 @@ pub extern "C" fn AcceptChannel_set_max_accepted_htlcs(this_ptr: &mut AcceptChan
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_funding_pubkey(this_ptr: &AcceptChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.funding_pubkey;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The sender's key controlling the funding transaction
 #[no_mangle]
@@ -867,7 +867,7 @@ pub extern "C" fn AcceptChannel_set_funding_pubkey(this_ptr: &mut AcceptChannel,
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_revocation_basepoint(this_ptr: &AcceptChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.revocation_basepoint;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// Used to derive a revocation key for transactions broadcast by counterparty
 #[no_mangle]
@@ -878,7 +878,7 @@ pub extern "C" fn AcceptChannel_set_revocation_basepoint(this_ptr: &mut AcceptCh
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_payment_point(this_ptr: &AcceptChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.payment_point;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// A payment key to sender for transactions broadcast by counterparty
 #[no_mangle]
@@ -889,7 +889,7 @@ pub extern "C" fn AcceptChannel_set_payment_point(this_ptr: &mut AcceptChannel, 
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_delayed_payment_basepoint(this_ptr: &AcceptChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.delayed_payment_basepoint;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// Used to derive a payment key to sender for transactions broadcast by sender
 #[no_mangle]
@@ -900,7 +900,7 @@ pub extern "C" fn AcceptChannel_set_delayed_payment_basepoint(this_ptr: &mut Acc
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_htlc_basepoint(this_ptr: &AcceptChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_basepoint;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// Used to derive an HTLC payment key to sender for transactions broadcast by counterparty
 #[no_mangle]
@@ -911,7 +911,7 @@ pub extern "C" fn AcceptChannel_set_htlc_basepoint(this_ptr: &mut AcceptChannel,
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_first_per_commitment_point(this_ptr: &AcceptChannel) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.first_per_commitment_point;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The first to-be-broadcast-by-sender transaction's per commitment point
 #[no_mangle]
@@ -986,7 +986,7 @@ impl FundingCreated {
 #[no_mangle]
 pub extern "C" fn FundingCreated_get_temporary_channel_id(this_ptr: &FundingCreated) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.temporary_channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// A temporary channel ID, until the funding is established
 #[no_mangle]
@@ -997,7 +997,7 @@ pub extern "C" fn FundingCreated_set_temporary_channel_id(this_ptr: &mut Funding
 #[no_mangle]
 pub extern "C" fn FundingCreated_get_funding_txid(this_ptr: &FundingCreated) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.funding_txid;
-	(*inner_val).as_inner()
+	inner_val.as_inner()
 }
 /// The funding transaction ID
 #[no_mangle]
@@ -1008,7 +1008,7 @@ pub extern "C" fn FundingCreated_set_funding_txid(this_ptr: &mut FundingCreated,
 #[no_mangle]
 pub extern "C" fn FundingCreated_get_funding_output_index(this_ptr: &FundingCreated) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.funding_output_index;
-	(*inner_val)
+	*inner_val
 }
 /// The specific output index funding this channel
 #[no_mangle]
@@ -1019,7 +1019,7 @@ pub extern "C" fn FundingCreated_set_funding_output_index(this_ptr: &mut Funding
 #[no_mangle]
 pub extern "C" fn FundingCreated_get_signature(this_ptr: &FundingCreated) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.signature;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// The signature of the channel initiator (funder) on the funding transaction
 #[no_mangle]
@@ -1105,7 +1105,7 @@ impl FundingSigned {
 #[no_mangle]
 pub extern "C" fn FundingSigned_get_channel_id(this_ptr: &FundingSigned) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -1116,7 +1116,7 @@ pub extern "C" fn FundingSigned_set_channel_id(this_ptr: &mut FundingSigned, mut
 #[no_mangle]
 pub extern "C" fn FundingSigned_get_signature(this_ptr: &FundingSigned) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.signature;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// The signature of the channel acceptor (fundee) on the funding transaction
 #[no_mangle]
@@ -1200,7 +1200,7 @@ impl FundingLocked {
 #[no_mangle]
 pub extern "C" fn FundingLocked_get_channel_id(this_ptr: &FundingLocked) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -1211,7 +1211,7 @@ pub extern "C" fn FundingLocked_set_channel_id(this_ptr: &mut FundingLocked, mut
 #[no_mangle]
 pub extern "C" fn FundingLocked_get_next_per_commitment_point(this_ptr: &FundingLocked) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.next_per_commitment_point;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The per-commitment point of the second commitment transaction
 #[no_mangle]
@@ -1295,7 +1295,7 @@ impl Shutdown {
 #[no_mangle]
 pub extern "C" fn Shutdown_get_channel_id(this_ptr: &Shutdown) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -1307,7 +1307,7 @@ pub extern "C" fn Shutdown_set_channel_id(this_ptr: &mut Shutdown, mut val: crat
 #[no_mangle]
 pub extern "C" fn Shutdown_get_scriptpubkey(this_ptr: &Shutdown) -> crate::c_types::u8slice {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.scriptpubkey;
-	crate::c_types::u8slice::from_slice(&(*inner_val)[..])
+	crate::c_types::u8slice::from_slice(&inner_val[..])
 }
 /// The destination of this peer's funds on closing.
 /// Must be in one of these forms: p2pkh, p2sh, p2wpkh, p2wsh.
@@ -1392,7 +1392,7 @@ impl ClosingSigned {
 #[no_mangle]
 pub extern "C" fn ClosingSigned_get_channel_id(this_ptr: &ClosingSigned) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -1403,7 +1403,7 @@ pub extern "C" fn ClosingSigned_set_channel_id(this_ptr: &mut ClosingSigned, mut
 #[no_mangle]
 pub extern "C" fn ClosingSigned_get_fee_satoshis(this_ptr: &ClosingSigned) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fee_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// The proposed total fee for the closing transaction
 #[no_mangle]
@@ -1414,7 +1414,7 @@ pub extern "C" fn ClosingSigned_set_fee_satoshis(this_ptr: &mut ClosingSigned, m
 #[no_mangle]
 pub extern "C" fn ClosingSigned_get_signature(this_ptr: &ClosingSigned) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.signature;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// A signature on the closing transaction
 #[no_mangle]
@@ -1499,7 +1499,7 @@ impl UpdateAddHTLC {
 #[no_mangle]
 pub extern "C" fn UpdateAddHTLC_get_channel_id(this_ptr: &UpdateAddHTLC) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -1510,7 +1510,7 @@ pub extern "C" fn UpdateAddHTLC_set_channel_id(this_ptr: &mut UpdateAddHTLC, mut
 #[no_mangle]
 pub extern "C" fn UpdateAddHTLC_get_htlc_id(this_ptr: &UpdateAddHTLC) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_id;
-	(*inner_val)
+	*inner_val
 }
 /// The HTLC ID
 #[no_mangle]
@@ -1521,7 +1521,7 @@ pub extern "C" fn UpdateAddHTLC_set_htlc_id(this_ptr: &mut UpdateAddHTLC, mut va
 #[no_mangle]
 pub extern "C" fn UpdateAddHTLC_get_amount_msat(this_ptr: &UpdateAddHTLC) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.amount_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The HTLC value in milli-satoshi
 #[no_mangle]
@@ -1532,7 +1532,7 @@ pub extern "C" fn UpdateAddHTLC_set_amount_msat(this_ptr: &mut UpdateAddHTLC, mu
 #[no_mangle]
 pub extern "C" fn UpdateAddHTLC_get_payment_hash(this_ptr: &UpdateAddHTLC) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.payment_hash;
-	&(*inner_val).0
+	&inner_val.0
 }
 /// The payment hash, the pre-image of which controls HTLC redemption
 #[no_mangle]
@@ -1543,7 +1543,7 @@ pub extern "C" fn UpdateAddHTLC_set_payment_hash(this_ptr: &mut UpdateAddHTLC, m
 #[no_mangle]
 pub extern "C" fn UpdateAddHTLC_get_cltv_expiry(this_ptr: &UpdateAddHTLC) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.cltv_expiry;
-	(*inner_val)
+	*inner_val
 }
 /// The expiry height of the HTLC
 #[no_mangle]
@@ -1618,7 +1618,7 @@ impl UpdateFulfillHTLC {
 #[no_mangle]
 pub extern "C" fn UpdateFulfillHTLC_get_channel_id(this_ptr: &UpdateFulfillHTLC) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -1629,7 +1629,7 @@ pub extern "C" fn UpdateFulfillHTLC_set_channel_id(this_ptr: &mut UpdateFulfillH
 #[no_mangle]
 pub extern "C" fn UpdateFulfillHTLC_get_htlc_id(this_ptr: &UpdateFulfillHTLC) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_id;
-	(*inner_val)
+	*inner_val
 }
 /// The HTLC ID
 #[no_mangle]
@@ -1640,7 +1640,7 @@ pub extern "C" fn UpdateFulfillHTLC_set_htlc_id(this_ptr: &mut UpdateFulfillHTLC
 #[no_mangle]
 pub extern "C" fn UpdateFulfillHTLC_get_payment_preimage(this_ptr: &UpdateFulfillHTLC) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.payment_preimage;
-	&(*inner_val).0
+	&inner_val.0
 }
 /// The pre-image of the payment hash, allowing HTLC redemption
 #[no_mangle]
@@ -1725,7 +1725,7 @@ impl UpdateFailHTLC {
 #[no_mangle]
 pub extern "C" fn UpdateFailHTLC_get_channel_id(this_ptr: &UpdateFailHTLC) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -1736,7 +1736,7 @@ pub extern "C" fn UpdateFailHTLC_set_channel_id(this_ptr: &mut UpdateFailHTLC, m
 #[no_mangle]
 pub extern "C" fn UpdateFailHTLC_get_htlc_id(this_ptr: &UpdateFailHTLC) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_id;
-	(*inner_val)
+	*inner_val
 }
 /// The HTLC ID
 #[no_mangle]
@@ -1811,7 +1811,7 @@ impl UpdateFailMalformedHTLC {
 #[no_mangle]
 pub extern "C" fn UpdateFailMalformedHTLC_get_channel_id(this_ptr: &UpdateFailMalformedHTLC) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -1822,7 +1822,7 @@ pub extern "C" fn UpdateFailMalformedHTLC_set_channel_id(this_ptr: &mut UpdateFa
 #[no_mangle]
 pub extern "C" fn UpdateFailMalformedHTLC_get_htlc_id(this_ptr: &UpdateFailMalformedHTLC) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_id;
-	(*inner_val)
+	*inner_val
 }
 /// The HTLC ID
 #[no_mangle]
@@ -1833,7 +1833,7 @@ pub extern "C" fn UpdateFailMalformedHTLC_set_htlc_id(this_ptr: &mut UpdateFailM
 #[no_mangle]
 pub extern "C" fn UpdateFailMalformedHTLC_get_failure_code(this_ptr: &UpdateFailMalformedHTLC) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.failure_code;
-	(*inner_val)
+	*inner_val
 }
 /// The failure code
 #[no_mangle]
@@ -1908,7 +1908,7 @@ impl CommitmentSigned {
 #[no_mangle]
 pub extern "C" fn CommitmentSigned_get_channel_id(this_ptr: &CommitmentSigned) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -1919,7 +1919,7 @@ pub extern "C" fn CommitmentSigned_set_channel_id(this_ptr: &mut CommitmentSigne
 #[no_mangle]
 pub extern "C" fn CommitmentSigned_get_signature(this_ptr: &CommitmentSigned) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.signature;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// A signature on the commitment transaction
 #[no_mangle]
@@ -2011,7 +2011,7 @@ impl RevokeAndACK {
 #[no_mangle]
 pub extern "C" fn RevokeAndACK_get_channel_id(this_ptr: &RevokeAndACK) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -2022,7 +2022,7 @@ pub extern "C" fn RevokeAndACK_set_channel_id(this_ptr: &mut RevokeAndACK, mut v
 #[no_mangle]
 pub extern "C" fn RevokeAndACK_get_per_commitment_secret(this_ptr: &RevokeAndACK) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.per_commitment_secret;
-	&(*inner_val)
+	inner_val
 }
 /// The secret corresponding to the per-commitment point
 #[no_mangle]
@@ -2033,7 +2033,7 @@ pub extern "C" fn RevokeAndACK_set_per_commitment_secret(this_ptr: &mut RevokeAn
 #[no_mangle]
 pub extern "C" fn RevokeAndACK_get_next_per_commitment_point(this_ptr: &RevokeAndACK) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.next_per_commitment_point;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The next sender-broadcast commitment transaction's per-commitment point
 #[no_mangle]
@@ -2118,7 +2118,7 @@ impl UpdateFee {
 #[no_mangle]
 pub extern "C" fn UpdateFee_get_channel_id(this_ptr: &UpdateFee) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -2129,7 +2129,7 @@ pub extern "C" fn UpdateFee_set_channel_id(this_ptr: &mut UpdateFee, mut val: cr
 #[no_mangle]
 pub extern "C" fn UpdateFee_get_feerate_per_kw(this_ptr: &UpdateFee) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.feerate_per_kw;
-	(*inner_val)
+	*inner_val
 }
 /// Fee rate per 1000-weight of the transaction
 #[no_mangle]
@@ -2217,7 +2217,7 @@ impl DataLossProtect {
 #[no_mangle]
 pub extern "C" fn DataLossProtect_get_your_last_per_commitment_secret(this_ptr: &DataLossProtect) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.your_last_per_commitment_secret;
-	&(*inner_val)
+	inner_val
 }
 /// Proof that the sender knows the per-commitment secret of a specific commitment transaction
 /// belonging to the recipient
@@ -2229,7 +2229,7 @@ pub extern "C" fn DataLossProtect_set_your_last_per_commitment_secret(this_ptr: 
 #[no_mangle]
 pub extern "C" fn DataLossProtect_get_my_current_per_commitment_point(this_ptr: &DataLossProtect) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.my_current_per_commitment_point;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The sender's per-commitment point for their current commitment transaction
 #[no_mangle]
@@ -2313,7 +2313,7 @@ impl ChannelReestablish {
 #[no_mangle]
 pub extern "C" fn ChannelReestablish_get_channel_id(this_ptr: &ChannelReestablish) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -2324,7 +2324,7 @@ pub extern "C" fn ChannelReestablish_set_channel_id(this_ptr: &mut ChannelReesta
 #[no_mangle]
 pub extern "C" fn ChannelReestablish_get_next_local_commitment_number(this_ptr: &ChannelReestablish) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.next_local_commitment_number;
-	(*inner_val)
+	*inner_val
 }
 /// The next commitment number for the sender
 #[no_mangle]
@@ -2335,7 +2335,7 @@ pub extern "C" fn ChannelReestablish_set_next_local_commitment_number(this_ptr: 
 #[no_mangle]
 pub extern "C" fn ChannelReestablish_get_next_remote_commitment_number(this_ptr: &ChannelReestablish) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.next_remote_commitment_number;
-	(*inner_val)
+	*inner_val
 }
 /// The next commitment number for the recipient
 #[no_mangle]
@@ -2410,7 +2410,7 @@ impl AnnouncementSignatures {
 #[no_mangle]
 pub extern "C" fn AnnouncementSignatures_get_channel_id(this_ptr: &AnnouncementSignatures) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel ID
 #[no_mangle]
@@ -2421,7 +2421,7 @@ pub extern "C" fn AnnouncementSignatures_set_channel_id(this_ptr: &mut Announcem
 #[no_mangle]
 pub extern "C" fn AnnouncementSignatures_get_short_channel_id(this_ptr: &AnnouncementSignatures) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.short_channel_id;
-	(*inner_val)
+	*inner_val
 }
 /// The short channel ID
 #[no_mangle]
@@ -2432,7 +2432,7 @@ pub extern "C" fn AnnouncementSignatures_set_short_channel_id(this_ptr: &mut Ann
 #[no_mangle]
 pub extern "C" fn AnnouncementSignatures_get_node_signature(this_ptr: &AnnouncementSignatures) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.node_signature;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// A signature by the node key
 #[no_mangle]
@@ -2443,7 +2443,7 @@ pub extern "C" fn AnnouncementSignatures_set_node_signature(this_ptr: &mut Annou
 #[no_mangle]
 pub extern "C" fn AnnouncementSignatures_get_bitcoin_signature(this_ptr: &AnnouncementSignatures) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.bitcoin_signature;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// A signature by the funding key
 #[no_mangle]
@@ -2736,7 +2736,7 @@ impl UnsignedNodeAnnouncement {
 #[no_mangle]
 pub extern "C" fn UnsignedNodeAnnouncement_get_features(this_ptr: &UnsignedNodeAnnouncement) -> crate::lightning::ln::features::NodeFeatures {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.features;
-	crate::lightning::ln::features::NodeFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::NodeFeatures { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The advertised features
 #[no_mangle]
@@ -2747,7 +2747,7 @@ pub extern "C" fn UnsignedNodeAnnouncement_set_features(this_ptr: &mut UnsignedN
 #[no_mangle]
 pub extern "C" fn UnsignedNodeAnnouncement_get_timestamp(this_ptr: &UnsignedNodeAnnouncement) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.timestamp;
-	(*inner_val)
+	*inner_val
 }
 /// A strictly monotonic announcement counter, with gaps allowed
 #[no_mangle]
@@ -2759,7 +2759,7 @@ pub extern "C" fn UnsignedNodeAnnouncement_set_timestamp(this_ptr: &mut Unsigned
 #[no_mangle]
 pub extern "C" fn UnsignedNodeAnnouncement_get_node_id(this_ptr: &UnsignedNodeAnnouncement) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.node_id;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The node_id this announcement originated from (don't rebroadcast the node_announcement back
 /// to this node).
@@ -2771,7 +2771,7 @@ pub extern "C" fn UnsignedNodeAnnouncement_set_node_id(this_ptr: &mut UnsignedNo
 #[no_mangle]
 pub extern "C" fn UnsignedNodeAnnouncement_get_rgb(this_ptr: &UnsignedNodeAnnouncement) -> *const [u8; 3] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.rgb;
-	&(*inner_val)
+	inner_val
 }
 /// An RGB color for UI purposes
 #[no_mangle]
@@ -2783,7 +2783,7 @@ pub extern "C" fn UnsignedNodeAnnouncement_set_rgb(this_ptr: &mut UnsignedNodeAn
 #[no_mangle]
 pub extern "C" fn UnsignedNodeAnnouncement_get_alias(this_ptr: &UnsignedNodeAnnouncement) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.alias;
-	&(*inner_val)
+	inner_val
 }
 /// An alias, for UI purposes.  This should be sanitized before use.  There is no guarantee
 /// of uniqueness.
@@ -2865,7 +2865,7 @@ impl NodeAnnouncement {
 #[no_mangle]
 pub extern "C" fn NodeAnnouncement_get_signature(this_ptr: &NodeAnnouncement) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.signature;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// The signature by the node key
 #[no_mangle]
@@ -2876,7 +2876,7 @@ pub extern "C" fn NodeAnnouncement_set_signature(this_ptr: &mut NodeAnnouncement
 #[no_mangle]
 pub extern "C" fn NodeAnnouncement_get_contents(this_ptr: &NodeAnnouncement) -> crate::lightning::ln::msgs::UnsignedNodeAnnouncement {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.contents;
-	crate::lightning::ln::msgs::UnsignedNodeAnnouncement { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::msgs::UnsignedNodeAnnouncement { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The actual content of the announcement
 #[no_mangle]
@@ -2960,7 +2960,7 @@ impl UnsignedChannelAnnouncement {
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_get_features(this_ptr: &UnsignedChannelAnnouncement) -> crate::lightning::ln::features::ChannelFeatures {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.features;
-	crate::lightning::ln::features::ChannelFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::ChannelFeatures { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The advertised channel features
 #[no_mangle]
@@ -2971,7 +2971,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_set_features(this_ptr: &mut Unsign
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_get_chain_hash(this_ptr: &UnsignedChannelAnnouncement) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.chain_hash;
-	(*inner_val).as_inner()
+	inner_val.as_inner()
 }
 /// The genesis hash of the blockchain where the channel is to be opened
 #[no_mangle]
@@ -2982,7 +2982,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_set_chain_hash(this_ptr: &mut Unsi
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_get_short_channel_id(this_ptr: &UnsignedChannelAnnouncement) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.short_channel_id;
-	(*inner_val)
+	*inner_val
 }
 /// The short channel ID
 #[no_mangle]
@@ -2993,7 +2993,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_set_short_channel_id(this_ptr: &mu
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_get_node_id_1(this_ptr: &UnsignedChannelAnnouncement) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.node_id_1;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// One of the two node_ids which are endpoints of this channel
 #[no_mangle]
@@ -3004,7 +3004,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_set_node_id_1(this_ptr: &mut Unsig
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_get_node_id_2(this_ptr: &UnsignedChannelAnnouncement) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.node_id_2;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The other of the two node_ids which are endpoints of this channel
 #[no_mangle]
@@ -3015,7 +3015,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_set_node_id_2(this_ptr: &mut Unsig
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_get_bitcoin_key_1(this_ptr: &UnsignedChannelAnnouncement) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.bitcoin_key_1;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The funding key for the first node
 #[no_mangle]
@@ -3026,7 +3026,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_set_bitcoin_key_1(this_ptr: &mut U
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_get_bitcoin_key_2(this_ptr: &UnsignedChannelAnnouncement) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.bitcoin_key_2;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The funding key for the second node
 #[no_mangle]
@@ -3101,7 +3101,7 @@ impl ChannelAnnouncement {
 #[no_mangle]
 pub extern "C" fn ChannelAnnouncement_get_node_signature_1(this_ptr: &ChannelAnnouncement) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.node_signature_1;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// Authentication of the announcement by the first public node
 #[no_mangle]
@@ -3112,7 +3112,7 @@ pub extern "C" fn ChannelAnnouncement_set_node_signature_1(this_ptr: &mut Channe
 #[no_mangle]
 pub extern "C" fn ChannelAnnouncement_get_node_signature_2(this_ptr: &ChannelAnnouncement) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.node_signature_2;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// Authentication of the announcement by the second public node
 #[no_mangle]
@@ -3123,7 +3123,7 @@ pub extern "C" fn ChannelAnnouncement_set_node_signature_2(this_ptr: &mut Channe
 #[no_mangle]
 pub extern "C" fn ChannelAnnouncement_get_bitcoin_signature_1(this_ptr: &ChannelAnnouncement) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.bitcoin_signature_1;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// Proof of funding UTXO ownership by the first public node
 #[no_mangle]
@@ -3134,7 +3134,7 @@ pub extern "C" fn ChannelAnnouncement_set_bitcoin_signature_1(this_ptr: &mut Cha
 #[no_mangle]
 pub extern "C" fn ChannelAnnouncement_get_bitcoin_signature_2(this_ptr: &ChannelAnnouncement) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.bitcoin_signature_2;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// Proof of funding UTXO ownership by the second public node
 #[no_mangle]
@@ -3145,7 +3145,7 @@ pub extern "C" fn ChannelAnnouncement_set_bitcoin_signature_2(this_ptr: &mut Cha
 #[no_mangle]
 pub extern "C" fn ChannelAnnouncement_get_contents(this_ptr: &ChannelAnnouncement) -> crate::lightning::ln::msgs::UnsignedChannelAnnouncement {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.contents;
-	crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The actual announcement
 #[no_mangle]
@@ -3232,7 +3232,7 @@ impl UnsignedChannelUpdate {
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_chain_hash(this_ptr: &UnsignedChannelUpdate) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.chain_hash;
-	(*inner_val).as_inner()
+	inner_val.as_inner()
 }
 /// The genesis hash of the blockchain where the channel is to be opened
 #[no_mangle]
@@ -3243,7 +3243,7 @@ pub extern "C" fn UnsignedChannelUpdate_set_chain_hash(this_ptr: &mut UnsignedCh
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_short_channel_id(this_ptr: &UnsignedChannelUpdate) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.short_channel_id;
-	(*inner_val)
+	*inner_val
 }
 /// The short channel ID
 #[no_mangle]
@@ -3254,7 +3254,7 @@ pub extern "C" fn UnsignedChannelUpdate_set_short_channel_id(this_ptr: &mut Unsi
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_timestamp(this_ptr: &UnsignedChannelUpdate) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.timestamp;
-	(*inner_val)
+	*inner_val
 }
 /// A strictly monotonic announcement counter, with gaps allowed, specific to this channel
 #[no_mangle]
@@ -3265,7 +3265,7 @@ pub extern "C" fn UnsignedChannelUpdate_set_timestamp(this_ptr: &mut UnsignedCha
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_flags(this_ptr: &UnsignedChannelUpdate) -> u8 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.flags;
-	(*inner_val)
+	*inner_val
 }
 /// Channel flags
 #[no_mangle]
@@ -3283,7 +3283,7 @@ pub extern "C" fn UnsignedChannelUpdate_set_flags(this_ptr: &mut UnsignedChannel
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_cltv_expiry_delta(this_ptr: &UnsignedChannelUpdate) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.cltv_expiry_delta;
-	(*inner_val)
+	*inner_val
 }
 /// The number of blocks such that if:
 /// `incoming_htlc.cltv_expiry < outgoing_htlc.cltv_expiry + cltv_expiry_delta`
@@ -3301,7 +3301,7 @@ pub extern "C" fn UnsignedChannelUpdate_set_cltv_expiry_delta(this_ptr: &mut Uns
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_htlc_minimum_msat(this_ptr: &UnsignedChannelUpdate) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_minimum_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The minimum HTLC size incoming to sender, in milli-satoshi
 #[no_mangle]
@@ -3312,7 +3312,7 @@ pub extern "C" fn UnsignedChannelUpdate_set_htlc_minimum_msat(this_ptr: &mut Uns
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_fee_base_msat(this_ptr: &UnsignedChannelUpdate) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fee_base_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The base HTLC fee charged by sender, in milli-satoshi
 #[no_mangle]
@@ -3323,7 +3323,7 @@ pub extern "C" fn UnsignedChannelUpdate_set_fee_base_msat(this_ptr: &mut Unsigne
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_fee_proportional_millionths(this_ptr: &UnsignedChannelUpdate) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fee_proportional_millionths;
-	(*inner_val)
+	*inner_val
 }
 /// The amount to fee multiplier, in micro-satoshi
 #[no_mangle]
@@ -3398,7 +3398,7 @@ impl ChannelUpdate {
 #[no_mangle]
 pub extern "C" fn ChannelUpdate_get_signature(this_ptr: &ChannelUpdate) -> crate::c_types::Signature {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.signature;
-	crate::c_types::Signature::from_rust(&(*inner_val))
+	crate::c_types::Signature::from_rust(&inner_val)
 }
 /// A signature of the channel update
 #[no_mangle]
@@ -3409,7 +3409,7 @@ pub extern "C" fn ChannelUpdate_set_signature(this_ptr: &mut ChannelUpdate, mut 
 #[no_mangle]
 pub extern "C" fn ChannelUpdate_get_contents(this_ptr: &ChannelUpdate) -> crate::lightning::ln::msgs::UnsignedChannelUpdate {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.contents;
-	crate::lightning::ln::msgs::UnsignedChannelUpdate { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::msgs::UnsignedChannelUpdate { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The actual channel update
 #[no_mangle]
@@ -3496,7 +3496,7 @@ impl QueryChannelRange {
 #[no_mangle]
 pub extern "C" fn QueryChannelRange_get_chain_hash(this_ptr: &QueryChannelRange) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.chain_hash;
-	(*inner_val).as_inner()
+	inner_val.as_inner()
 }
 /// The genesis hash of the blockchain being queried
 #[no_mangle]
@@ -3507,7 +3507,7 @@ pub extern "C" fn QueryChannelRange_set_chain_hash(this_ptr: &mut QueryChannelRa
 #[no_mangle]
 pub extern "C" fn QueryChannelRange_get_first_blocknum(this_ptr: &QueryChannelRange) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.first_blocknum;
-	(*inner_val)
+	*inner_val
 }
 /// The height of the first block for the channel UTXOs being queried
 #[no_mangle]
@@ -3518,7 +3518,7 @@ pub extern "C" fn QueryChannelRange_set_first_blocknum(this_ptr: &mut QueryChann
 #[no_mangle]
 pub extern "C" fn QueryChannelRange_get_number_of_blocks(this_ptr: &QueryChannelRange) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.number_of_blocks;
-	(*inner_val)
+	*inner_val
 }
 /// The number of blocks to include in the query results
 #[no_mangle]
@@ -3609,7 +3609,7 @@ impl ReplyChannelRange {
 #[no_mangle]
 pub extern "C" fn ReplyChannelRange_get_chain_hash(this_ptr: &ReplyChannelRange) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.chain_hash;
-	(*inner_val).as_inner()
+	inner_val.as_inner()
 }
 /// The genesis hash of the blockchain being queried
 #[no_mangle]
@@ -3620,7 +3620,7 @@ pub extern "C" fn ReplyChannelRange_set_chain_hash(this_ptr: &mut ReplyChannelRa
 #[no_mangle]
 pub extern "C" fn ReplyChannelRange_get_first_blocknum(this_ptr: &ReplyChannelRange) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.first_blocknum;
-	(*inner_val)
+	*inner_val
 }
 /// The height of the first block in the range of the reply
 #[no_mangle]
@@ -3631,7 +3631,7 @@ pub extern "C" fn ReplyChannelRange_set_first_blocknum(this_ptr: &mut ReplyChann
 #[no_mangle]
 pub extern "C" fn ReplyChannelRange_get_number_of_blocks(this_ptr: &ReplyChannelRange) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.number_of_blocks;
-	(*inner_val)
+	*inner_val
 }
 /// The number of blocks included in the range of the reply
 #[no_mangle]
@@ -3642,7 +3642,7 @@ pub extern "C" fn ReplyChannelRange_set_number_of_blocks(this_ptr: &mut ReplyCha
 #[no_mangle]
 pub extern "C" fn ReplyChannelRange_get_sync_complete(this_ptr: &ReplyChannelRange) -> bool {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.sync_complete;
-	(*inner_val)
+	*inner_val
 }
 /// True when this is the final reply for a query
 #[no_mangle]
@@ -3743,7 +3743,7 @@ impl QueryShortChannelIds {
 #[no_mangle]
 pub extern "C" fn QueryShortChannelIds_get_chain_hash(this_ptr: &QueryShortChannelIds) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.chain_hash;
-	(*inner_val).as_inner()
+	inner_val.as_inner()
 }
 /// The genesis hash of the blockchain being queried
 #[no_mangle]
@@ -3837,7 +3837,7 @@ impl ReplyShortChannelIdsEnd {
 #[no_mangle]
 pub extern "C" fn ReplyShortChannelIdsEnd_get_chain_hash(this_ptr: &ReplyShortChannelIdsEnd) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.chain_hash;
-	(*inner_val).as_inner()
+	inner_val.as_inner()
 }
 /// The genesis hash of the blockchain that was queried
 #[no_mangle]
@@ -3849,7 +3849,7 @@ pub extern "C" fn ReplyShortChannelIdsEnd_set_chain_hash(this_ptr: &mut ReplySho
 #[no_mangle]
 pub extern "C" fn ReplyShortChannelIdsEnd_get_full_information(this_ptr: &ReplyShortChannelIdsEnd) -> bool {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.full_information;
-	(*inner_val)
+	*inner_val
 }
 /// Indicates if the query recipient maintains up-to-date channel
 /// information for the chain_hash
@@ -3936,7 +3936,7 @@ impl GossipTimestampFilter {
 #[no_mangle]
 pub extern "C" fn GossipTimestampFilter_get_chain_hash(this_ptr: &GossipTimestampFilter) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.chain_hash;
-	(*inner_val).as_inner()
+	inner_val.as_inner()
 }
 /// The genesis hash of the blockchain for channel and node information
 #[no_mangle]
@@ -3947,7 +3947,7 @@ pub extern "C" fn GossipTimestampFilter_set_chain_hash(this_ptr: &mut GossipTime
 #[no_mangle]
 pub extern "C" fn GossipTimestampFilter_get_first_timestamp(this_ptr: &GossipTimestampFilter) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.first_timestamp;
-	(*inner_val)
+	*inner_val
 }
 /// The starting unix timestamp
 #[no_mangle]
@@ -3958,7 +3958,7 @@ pub extern "C" fn GossipTimestampFilter_set_first_timestamp(this_ptr: &mut Gossi
 #[no_mangle]
 pub extern "C" fn GossipTimestampFilter_get_timestamp_range(this_ptr: &GossipTimestampFilter) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.timestamp_range;
-	(*inner_val)
+	*inner_val
 }
 /// The range of information in seconds
 #[no_mangle]
@@ -4144,7 +4144,7 @@ impl LightningError {
 #[no_mangle]
 pub extern "C" fn LightningError_get_err(this_ptr: &LightningError) -> crate::c_types::Str {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.err;
-	(*inner_val).as_str().into()
+	inner_val.as_str().into()
 }
 /// A human-readable message describing the error
 #[no_mangle]
@@ -4155,7 +4155,7 @@ pub extern "C" fn LightningError_set_err(this_ptr: &mut LightningError, mut val:
 #[no_mangle]
 pub extern "C" fn LightningError_get_action(this_ptr: &LightningError) -> crate::lightning::ln::msgs::ErrorAction {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.action;
-	crate::lightning::ln::msgs::ErrorAction::from_native(&(*inner_val))
+	crate::lightning::ln::msgs::ErrorAction::from_native(inner_val)
 }
 /// The action which should be taken against the offending peer.
 #[no_mangle]
@@ -4277,7 +4277,7 @@ pub extern "C" fn CommitmentUpdate_set_update_fee(this_ptr: &mut CommitmentUpdat
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_commitment_signed(this_ptr: &CommitmentUpdate) -> crate::lightning::ln::msgs::CommitmentSigned {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.commitment_signed;
-	crate::lightning::ln::msgs::CommitmentSigned { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::msgs::CommitmentSigned { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// Finally, the commitment_signed message which should be sent
 #[no_mangle]
@@ -4704,7 +4704,7 @@ impl rustRoutingMessageHandler for RoutingMessageHandler {
 		local_ret
 	}
 	fn handle_htlc_fail_channel_update(&self, update: &lightning::ln::msgs::HTLCFailChannelUpdate) {
-		(self.handle_htlc_fail_channel_update)(self.this_arg, &crate::lightning::ln::msgs::HTLCFailChannelUpdate::from_native(&update))
+		(self.handle_htlc_fail_channel_update)(self.this_arg, &crate::lightning::ln::msgs::HTLCFailChannelUpdate::from_native(update))
 	}
 	fn get_next_channel_announcements(&self, starting_point: u64, batch_amount: u8) -> Vec<(lightning::ln::msgs::ChannelAnnouncement, Option<lightning::ln::msgs::ChannelUpdate>, Option<lightning::ln::msgs::ChannelUpdate>)> {
 		let mut ret = (self.get_next_channel_announcements)(self.this_arg, starting_point, batch_amount);

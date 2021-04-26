@@ -187,9 +187,10 @@ impl Transaction {
 		if self.datalen == 0 { panic!("0-length buffer can never represent a valid Transaction"); }
 		::bitcoin::consensus::encode::deserialize(unsafe { std::slice::from_raw_parts(self.data, self.datalen) }).unwrap()
 	}
-	pub(crate) fn from_vec(v: Vec<u8>) -> Self {
-		let datalen = v.len();
-		let data = Box::into_raw(v.into_boxed_slice());
+	pub(crate) fn from_bitcoin(btc: &BitcoinTransaction) -> Self {
+		let vec = ::bitcoin::consensus::encode::serialize(btc);
+		let datalen = vec.len();
+		let data = Box::into_raw(vec.into_boxed_slice());
 		Self {
 			data: unsafe { (*data).as_mut_ptr() },
 			datalen,

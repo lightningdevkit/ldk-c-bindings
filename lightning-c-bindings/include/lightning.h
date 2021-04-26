@@ -6853,10 +6853,13 @@ typedef struct LDKAccess {
 } LDKAccess;
 
 /**
- * The `Listen` trait is used to be notified of when blocks have been connected or disconnected
- * from the chain.
+ * The `Listen` trait is used to notify when blocks have been connected or disconnected from the
+ * chain.
  *
- * Useful when needing to replay chain data upon startup or as new chain events occur.
+ * Useful when needing to replay chain data upon startup or as new chain events occur. Clients
+ * sourcing chain data using a block-oriented API should prefer this interface over [`Confirm`].
+ * Such clients fetch the entire header chain whereas clients using [`Confirm`] only fetch headers
+ * when needed.
  */
 typedef struct LDKListen {
    /**
@@ -6878,6 +6881,103 @@ typedef struct LDKListen {
     */
    void (*free)(void *this_arg);
 } LDKListen;
+
+/**
+ * The `Confirm` trait is used to notify when transactions have been confirmed on chain or
+ * unconfirmed during a chain reorganization.
+ *
+ * Clients sourcing chain data using a transaction-oriented API should prefer this interface over
+ * [`Listen`]. For instance, an Electrum client may implement [`Filter`] by subscribing to activity
+ * related to registered transactions and outputs. Upon notification, it would pass along the
+ * matching transactions using this interface.
+ *
+ * # Use
+ *
+ * The intended use is as follows:
+ * - Call [`transactions_confirmed`] to process any on-chain activity of interest.
+ * - Call [`transaction_unconfirmed`] to process any transaction returned by [`get_relevant_txids`]
+ *   that has been reorganized out of the chain.
+ * - Call [`best_block_updated`] whenever a new chain tip becomes available.
+ *
+ * # Order
+ *
+ * Clients must call these methods in chain order. Specifically:
+ * - Transactions confirmed in a block must be given before transactions confirmed in a later
+ *   block.
+ * - Dependent transactions within the same block must be given in topological order, possibly in
+ *   separate calls.
+ * - Unconfirmed transactions must be given after the original confirmations and before any
+ *   reconfirmation.
+ *
+ * See individual method documentation for further details.
+ *
+ * [`transactions_confirmed`]: Self::transactions_confirmed
+ * [`transaction_unconfirmed`]: Self::transaction_unconfirmed
+ * [`best_block_updated`]: Self::best_block_updated
+ * [`get_relevant_txids`]: Self::get_relevant_txids
+ */
+typedef struct LDKConfirm {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
+   void *this_arg;
+   /**
+    * Processes transactions confirmed in a block with a given header and height.
+    *
+    * Should be called for any transactions registered by [`Filter::register_tx`] or any
+    * transactions spending an output registered by [`Filter::register_output`]. Such transactions
+    * appearing in the same block do not need to be included in the same call; instead, multiple
+    * calls with additional transactions may be made so long as they are made in [chain order].
+    *
+    * May be called before or after [`best_block_updated`] for the corresponding block. However,
+    * in the event of a chain reorganization, it must not be called with a `header` that is no
+    * longer in the chain as of the last call to [`best_block_updated`].
+    *
+    * [chain order]: Self#order
+    * [`best_block_updated`]: Self::best_block_updated
+    */
+   void (*transactions_confirmed)(const void *this_arg, const uint8_t (*header)[80], struct LDKCVec_C2Tuple_usizeTransactionZZ txdata, uint32_t height);
+   /**
+    * Processes a transaction that is no longer confirmed as result of a chain reorganization.
+    *
+    * Should be called for any transaction returned by [`get_relevant_txids`] if it has been
+    * reorganized out of the best chain. Once called, the given transaction should not be returned
+    * by [`get_relevant_txids`] unless it has been reconfirmed via [`transactions_confirmed`].
+    *
+    * [`get_relevant_txids`]: Self::get_relevant_txids
+    * [`transactions_confirmed`]: Self::transactions_confirmed
+    */
+   void (*transaction_unconfirmed)(const void *this_arg, const uint8_t (*txid)[32]);
+   /**
+    * Processes an update to the best header connected at the given height.
+    *
+    * Should be called when a new header is available but may be skipped for intermediary blocks
+    * if they become available at the same time.
+    */
+   void (*best_block_updated)(const void *this_arg, const uint8_t (*header)[80], uint32_t height);
+   /**
+    * Returns transactions that should be monitored for reorganization out of the chain.
+    *
+    * Should include any transactions passed to [`transactions_confirmed`] that have insufficient
+    * confirmations to be safe from a chain reorganization. Should not include any transactions
+    * passed to [`transaction_unconfirmed`] unless later reconfirmed.
+    *
+    * May be called to determine the subset of transactions that must still be monitored for
+    * reorganization. Will be idempotent between calls but may change as a result of calls to the
+    * other interface methods. Thus, this is useful to determine which transactions may need to be
+    * given to [`transaction_unconfirmed`].
+    *
+    * [`transactions_confirmed`]: Self::transactions_confirmed
+    * [`transaction_unconfirmed`]: Self::transaction_unconfirmed
+    */
+   struct LDKCVec_TxidZ (*get_relevant_txids)(const void *this_arg);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
+   void (*free)(void *this_arg);
+} LDKConfirm;
 
 
 
@@ -10293,6 +10393,11 @@ void Listen_free(struct LDKListen this_ptr);
 /**
  * Calls the free function if one is set
  */
+void Confirm_free(struct LDKConfirm this_ptr);
+
+/**
+ * Calls the free function if one is set
+ */
 void Watch_free(struct LDKWatch this_ptr);
 
 /**
@@ -10359,79 +10464,6 @@ void FeeEstimator_free(struct LDKFeeEstimator this_ptr);
  * Frees any resources used by the ChainMonitor, if is_owned is set and inner is non-NULL.
  */
 void ChainMonitor_free(struct LDKChainMonitor this_obj);
-
-/**
- * Dispatches to per-channel monitors, which are responsible for updating their on-chain view
- * of a channel and reacting accordingly based on transactions in the connected block. See
- * [`ChannelMonitor::block_connected`] for details. Any HTLCs that were resolved on chain will
- * be returned by [`chain::Watch::release_pending_monitor_events`].
- *
- * Calls back to [`chain::Filter`] if any monitor indicated new outputs to watch. Subsequent
- * calls must not exclude any transactions matching the new outputs nor any in-block
- * descendants of such transactions. It is not necessary to re-fetch the block to obtain
- * updated `txdata`.
- */
-void ChainMonitor_block_connected(const struct LDKChainMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], struct LDKCVec_C2Tuple_usizeTransactionZZ txdata, uint32_t height);
-
-/**
- * Dispatches to per-channel monitors, which are responsible for updating their on-chain view
- * of a channel and reacting accordingly to newly confirmed transactions. For details, see
- * [`ChannelMonitor::transactions_confirmed`].
- *
- * Used instead of [`block_connected`] by clients that are notified of transactions rather than
- * blocks. May be called before or after [`update_best_block`] for transactions in the
- * corresponding block. See [`update_best_block`] for further calling expectations.
- *
- * [`block_connected`]: Self::block_connected
- * [`update_best_block`]: Self::update_best_block
- */
-void ChainMonitor_transactions_confirmed(const struct LDKChainMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], struct LDKCVec_C2Tuple_usizeTransactionZZ txdata, uint32_t height);
-
-/**
- * Dispatches to per-channel monitors, which are responsible for updating their on-chain view
- * of a channel and reacting accordingly based on the new chain tip. For details, see
- * [`ChannelMonitor::update_best_block`].
- *
- * Used instead of [`block_connected`] by clients that are notified of transactions rather than
- * blocks. May be called before or after [`transactions_confirmed`] for the corresponding
- * block.
- *
- * Must be called after new blocks become available for the most recent block. Intermediary
- * blocks, however, may be safely skipped. In the event of a chain re-organization, this only
- * needs to be called for the most recent block assuming `transaction_unconfirmed` is called
- * for any affected transactions.
- *
- * [`block_connected`]: Self::block_connected
- * [`transactions_confirmed`]: Self::transactions_confirmed
- * [`transaction_unconfirmed`]: Self::transaction_unconfirmed
- */
-void ChainMonitor_update_best_block(const struct LDKChainMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t height);
-
-/**
- * Dispatches to per-channel monitors, which are responsible for updating their on-chain view
- * of a channel based on the disconnected block. See [`ChannelMonitor::block_disconnected`] for
- * details.
- */
-void ChainMonitor_block_disconnected(const struct LDKChainMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t disconnected_height);
-
-/**
- * Dispatches to per-channel monitors, which are responsible for updating their on-chain view
- * of a channel based on transactions unconfirmed as a result of a chain reorganization. See
- * [`ChannelMonitor::transaction_unconfirmed`] for details.
- *
- * Used instead of [`block_disconnected`] by clients that are notified of transactions rather
- * than blocks. May be called before or after [`update_best_block`] for transactions in the
- * corresponding block. See [`update_best_block`] for further calling expectations.
- *
- * [`block_disconnected`]: Self::block_disconnected
- * [`update_best_block`]: Self::update_best_block
- */
-void ChainMonitor_transaction_unconfirmed(const struct LDKChainMonitor *NONNULL_PTR this_arg, const uint8_t (*txid)[32]);
-
-/**
- * Returns the set of txids that should be monitored for re-organization out of the chain.
- */
-MUST_USE_RES struct LDKCVec_TxidZ ChainMonitor_get_relevant_txids(const struct LDKChainMonitor *NONNULL_PTR this_arg);
 
 /**
  * Creates a new `ChainMonitor` used to watch on-chain activity pertaining to channels.
@@ -10648,11 +10680,9 @@ void ChannelMonitor_block_disconnected(const struct LDKChannelMonitor *NONNULL_P
  * outputs to watch. See [`block_connected`] for details.
  *
  * Used instead of [`block_connected`] by clients that are notified of transactions rather than
- * blocks. May be called before or after [`update_best_block`] for transactions in the
- * corresponding block. See [`update_best_block`] for further calling expectations.
+ * blocks. See [`chain::Confirm`] for calling expectations.
  *
  * [`block_connected`]: Self::block_connected
- * [`update_best_block`]: Self::update_best_block
  */
 MUST_USE_RES struct LDKCVec_TransactionOutputsZ ChannelMonitor_transactions_confirmed(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], struct LDKCVec_C2Tuple_usizeTransactionZZ txdata, uint32_t height, struct LDKBroadcasterInterface broadcaster, struct LDKFeeEstimator fee_estimator, struct LDKLogger logger);
 
@@ -10660,11 +10690,9 @@ MUST_USE_RES struct LDKCVec_TransactionOutputsZ ChannelMonitor_transactions_conf
  * Processes a transaction that was reorganized out of the chain.
  *
  * Used instead of [`block_disconnected`] by clients that are notified of transactions rather
- * than blocks. May be called before or after [`update_best_block`] for transactions in the
- * corresponding block. See [`update_best_block`] for further calling expectations.
+ * than blocks. See [`chain::Confirm`] for calling expectations.
  *
  * [`block_disconnected`]: Self::block_disconnected
- * [`update_best_block`]: Self::update_best_block
  */
 void ChannelMonitor_transaction_unconfirmed(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const uint8_t (*txid)[32], struct LDKBroadcasterInterface broadcaster, struct LDKFeeEstimator fee_estimator, struct LDKLogger logger);
 
@@ -10673,19 +10701,11 @@ void ChannelMonitor_transaction_unconfirmed(const struct LDKChannelMonitor *NONN
  * [`block_connected`] for details.
  *
  * Used instead of [`block_connected`] by clients that are notified of transactions rather than
- * blocks. May be called before or after [`transactions_confirmed`] for the corresponding
- * block.
- *
- * Must be called after new blocks become available for the most recent block. Intermediary
- * blocks, however, may be safely skipped. In the event of a chain re-organization, this only
- * needs to be called for the most recent block assuming `transaction_unconfirmed` is called
- * for any affected transactions.
+ * blocks. See [`chain::Confirm`] for calling expectations.
  *
  * [`block_connected`]: Self::block_connected
- * [`transactions_confirmed`]: Self::transactions_confirmed
- * [`transaction_unconfirmed`]: Self::transaction_unconfirmed
  */
-MUST_USE_RES struct LDKCVec_TransactionOutputsZ ChannelMonitor_update_best_block(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t height, struct LDKBroadcasterInterface broadcaster, struct LDKFeeEstimator fee_estimator, struct LDKLogger logger);
+MUST_USE_RES struct LDKCVec_TransactionOutputsZ ChannelMonitor_best_block_updated(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t height, struct LDKBroadcasterInterface broadcaster, struct LDKFeeEstimator fee_estimator, struct LDKLogger logger);
 
 /**
  * Returns the set of txids that should be monitored for re-organization out of the chain.
@@ -11608,83 +11628,10 @@ struct LDKEventsProvider ChannelManager_as_EventsProvider(const struct LDKChanne
 struct LDKListen ChannelManager_as_Listen(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
 /**
- * Updates channel state to take note of transactions which were confirmed in the given block
- * at the given height.
- *
- * Note that you must still call (or have called) [`update_best_block`] with the block
- * information which is included here.
- *
- * This method may be called before or after [`update_best_block`] for a given block's
- * transaction data and may be called multiple times with additional transaction data for a
- * given block.
- *
- * This method may be called for a previous block after an [`update_best_block`] call has
- * been made for a later block, however it must *not* be called with transaction data from a
- * block which is no longer in the best chain (ie where [`update_best_block`] has already
- * been informed about a blockchain reorganization which no longer includes the block which
- * corresponds to `header`).
- *
- * [`update_best_block`]: `Self::update_best_block`
+ * Constructs a new Confirm which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned Confirm must be freed before this_arg is
  */
-void ChannelManager_transactions_confirmed(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t height, struct LDKCVec_C2Tuple_usizeTransactionZZ txdata);
-
-/**
- * Updates channel state with the current best blockchain tip. You should attempt to call this
- * quickly after a new block becomes available, however if multiple new blocks become
- * available at the same time, only a single `update_best_block()` call needs to be made.
- *
- * This method should also be called immediately after any block disconnections, once at the
- * reorganization fork point, and once with the new chain tip. Calling this method at the
- * blockchain reorganization fork point ensures we learn when a funding transaction which was
- * previously confirmed is reorganized out of the blockchain, ensuring we do not continue to
- * accept payments which cannot be enforced on-chain.
- *
- * In both the block-connection and block-disconnection case, this method may be called either
- * once per block connected or disconnected, or simply at the fork point and new tip(s),
- * skipping any intermediary blocks.
- */
-void ChannelManager_update_best_block(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*header)[80], uint32_t height);
-
-/**
- * Gets the set of txids which should be monitored for their confirmation state.
- *
- * If you're providing information about reorganizations via [`transaction_unconfirmed`], this
- * is the set of transactions which you may need to call [`transaction_unconfirmed`] for.
- *
- * This may be useful to poll to determine the set of transactions which must be registered
- * with an Electrum server or for which an Electrum server needs to be polled to determine
- * transaction confirmation state.
- *
- * This may update after any [`transactions_confirmed`] or [`block_connected`] call.
- *
- * Note that this is NOT the set of transactions which must be included in calls to
- * [`transactions_confirmed`] if they are confirmed, but a small subset of it.
- *
- * [`transactions_confirmed`]: Self::transactions_confirmed
- * [`transaction_unconfirmed`]: Self::transaction_unconfirmed
- * [`block_connected`]: chain::Listen::block_connected
- */
-MUST_USE_RES struct LDKCVec_TxidZ ChannelManager_get_relevant_txids(const struct LDKChannelManager *NONNULL_PTR this_arg);
-
-/**
- * Marks a transaction as having been reorganized out of the blockchain.
- *
- * If a transaction is included in [`get_relevant_txids`], and is no longer in the main branch
- * of the blockchain, this function should be called to indicate that the transaction should
- * be considered reorganized out.
- *
- * Once this is called, the given transaction will no longer appear on [`get_relevant_txids`],
- * though this may be called repeatedly for a given transaction without issue.
- *
- * Note that if the transaction is confirmed on the main chain in a different block (indicated
- * via a call to [`transactions_confirmed`]), it may re-appear in [`get_relevant_txids`], thus
- * be very wary of race-conditions wherein the final state of a transaction indicated via
- * these APIs is not the same as its state on the blockchain.
- *
- * [`transactions_confirmed`]: Self::transactions_confirmed
- * [`get_relevant_txids`]: Self::get_relevant_txids
- */
-void ChannelManager_transaction_unconfirmed(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*txid)[32]);
+struct LDKConfirm ChannelManager_as_Confirm(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
 /**
  * Blocks until ChannelManager needs to be persisted or a timeout is reached. It returns a bool

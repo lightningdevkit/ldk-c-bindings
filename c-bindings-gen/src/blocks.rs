@@ -488,12 +488,7 @@ pub fn write_method_params<W: std::io::Write>(w: &mut W, sig: &syn::Signature, t
 					return;
 				}
 			}
-			if let syn::Type::Reference(r) = &**rtype {
-				// We can't return a reference, cause we allocate things on the stack.
-				types.write_c_type(w, &*r.elem, generics, true);
-			} else {
-				types.write_c_type(w, &*rtype, generics, true);
-			}
+			types.write_c_type(w, &*rtype, generics, true);
 		},
 		_ => {},
 	}
@@ -634,13 +629,12 @@ pub fn write_method_call_params<W: std::io::Write>(w: &mut W, sig: &syn::Signatu
 				write!(w, "ret").unwrap();
 				types.write_from_c_conversion_suffix(w, &*rtype, generics);
 			} else {
-				let ret_returned = if let syn::Type::Reference(_) = &**rtype { true } else { false };
 				let new_var = types.write_to_c_conversion_new_var(w, &format_ident!("ret"), &rtype, generics, true);
 				if new_var {
 					write!(w, "\n\t{}", extra_indent).unwrap();
 				}
 				types.write_to_c_conversion_inline_prefix(w, &rtype, generics, true);
-				write!(w, "{}ret", if ret_returned && !new_var { "*" } else { "" }).unwrap();
+				write!(w, "ret").unwrap();
 				types.write_to_c_conversion_inline_suffix(w, &rtype, generics, true);
 			}
 		}

@@ -400,7 +400,7 @@ impl DirectionalChannelInfo {
 #[no_mangle]
 pub extern "C" fn DirectionalChannelInfo_get_last_update(this_ptr: &DirectionalChannelInfo) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.last_update;
-	(*inner_val)
+	*inner_val
 }
 /// When the last update to the channel direction was issued.
 /// Value is opaque, as set in the announcement.
@@ -412,7 +412,7 @@ pub extern "C" fn DirectionalChannelInfo_set_last_update(this_ptr: &mut Directio
 #[no_mangle]
 pub extern "C" fn DirectionalChannelInfo_get_enabled(this_ptr: &DirectionalChannelInfo) -> bool {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.enabled;
-	(*inner_val)
+	*inner_val
 }
 /// Whether the channel can be currently used for payments (in this one direction).
 #[no_mangle]
@@ -423,7 +423,7 @@ pub extern "C" fn DirectionalChannelInfo_set_enabled(this_ptr: &mut DirectionalC
 #[no_mangle]
 pub extern "C" fn DirectionalChannelInfo_get_cltv_expiry_delta(this_ptr: &DirectionalChannelInfo) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.cltv_expiry_delta;
-	(*inner_val)
+	*inner_val
 }
 /// The difference in CLTV values that you must have when routing through this channel.
 #[no_mangle]
@@ -434,7 +434,7 @@ pub extern "C" fn DirectionalChannelInfo_set_cltv_expiry_delta(this_ptr: &mut Di
 #[no_mangle]
 pub extern "C" fn DirectionalChannelInfo_get_htlc_minimum_msat(this_ptr: &DirectionalChannelInfo) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_minimum_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The minimum value, which must be relayed to the next hop via the channel
 #[no_mangle]
@@ -458,7 +458,7 @@ pub extern "C" fn DirectionalChannelInfo_set_htlc_maximum_msat(this_ptr: &mut Di
 #[no_mangle]
 pub extern "C" fn DirectionalChannelInfo_get_fees(this_ptr: &DirectionalChannelInfo) -> crate::lightning::routing::network_graph::RoutingFees {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fees;
-	crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// Fees charged when the channel is used for routing
 #[no_mangle]
@@ -585,7 +585,7 @@ impl ChannelInfo {
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_features(this_ptr: &ChannelInfo) -> crate::lightning::ln::features::ChannelFeatures {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.features;
-	crate::lightning::ln::features::ChannelFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::ChannelFeatures { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// Protocol features of a channel communicated during its announcement
 #[no_mangle]
@@ -596,7 +596,7 @@ pub extern "C" fn ChannelInfo_set_features(this_ptr: &mut ChannelInfo, mut val: 
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_node_one(this_ptr: &ChannelInfo) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.node_one;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// Source node of the first direction of a channel
 #[no_mangle]
@@ -620,7 +620,7 @@ pub extern "C" fn ChannelInfo_set_one_to_two(this_ptr: &mut ChannelInfo, mut val
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_node_two(this_ptr: &ChannelInfo) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.node_two;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// Source node of the second direction of a channel
 #[no_mangle]
@@ -774,7 +774,7 @@ impl RoutingFees {
 #[no_mangle]
 pub extern "C" fn RoutingFees_get_base_msat(this_ptr: &RoutingFees) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.base_msat;
-	(*inner_val)
+	*inner_val
 }
 /// Flat routing fee in satoshis
 #[no_mangle]
@@ -786,7 +786,7 @@ pub extern "C" fn RoutingFees_set_base_msat(this_ptr: &mut RoutingFees, mut val:
 #[no_mangle]
 pub extern "C" fn RoutingFees_get_proportional_millionths(this_ptr: &RoutingFees) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.proportional_millionths;
-	(*inner_val)
+	*inner_val
 }
 /// Liquidity-based routing fee in millionths of a routed amount.
 /// In other words, 10000 is 1%.
@@ -887,7 +887,7 @@ impl NodeAnnouncementInfo {
 #[no_mangle]
 pub extern "C" fn NodeAnnouncementInfo_get_features(this_ptr: &NodeAnnouncementInfo) -> crate::lightning::ln::features::NodeFeatures {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.features;
-	crate::lightning::ln::features::NodeFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::NodeFeatures { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// Protocol features the node announced support for
 #[no_mangle]
@@ -899,7 +899,7 @@ pub extern "C" fn NodeAnnouncementInfo_set_features(this_ptr: &mut NodeAnnouncem
 #[no_mangle]
 pub extern "C" fn NodeAnnouncementInfo_get_last_update(this_ptr: &NodeAnnouncementInfo) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.last_update;
-	(*inner_val)
+	*inner_val
 }
 /// When the last known update to the node state was issued.
 /// Value is opaque, as set in the announcement.
@@ -911,7 +911,7 @@ pub extern "C" fn NodeAnnouncementInfo_set_last_update(this_ptr: &mut NodeAnnoun
 #[no_mangle]
 pub extern "C" fn NodeAnnouncementInfo_get_rgb(this_ptr: &NodeAnnouncementInfo) -> *const [u8; 3] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.rgb;
-	&(*inner_val)
+	inner_val
 }
 /// Color assigned to the node
 #[no_mangle]
@@ -924,7 +924,7 @@ pub extern "C" fn NodeAnnouncementInfo_set_rgb(this_ptr: &mut NodeAnnouncementIn
 #[no_mangle]
 pub extern "C" fn NodeAnnouncementInfo_get_alias(this_ptr: &NodeAnnouncementInfo) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.alias;
-	&(*inner_val)
+	inner_val
 }
 /// Moniker assigned to the node.
 /// May be invalid or malicious (eg control chars),

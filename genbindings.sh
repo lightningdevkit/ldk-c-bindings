@@ -87,9 +87,16 @@ fi
 PATH="$(pwd)/deterministic-build-wrappers:$PATH:~/.cargo/bin"
 # Now cd to lightning-c-bindings, build the generated bindings, and call cbindgen to build a C header file
 cd lightning-c-bindings
+
 # Remap paths so that our builds are deterministic
 export RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo= -C target-cpu=generic"
+
+# If the C compiler supports it, also set -ffile-prefix-map
+echo "int main() {}" > genbindings_path_map_test_file.c
+clang -o /dev/null -ffile-prefix-map=$HOME/.cargo= genbindings_path_map_test_file.c > /dev/null 2>&1 &&
+# Now that we've done our last non-LTO build, turn on LTO in CFLAGS as well
 export CFLAGS="-ffile-prefix-map=$HOME/.cargo="
+rm genbindings_path_map_test_file.c
 
 cargo build
 cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1

@@ -1486,20 +1486,17 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						if process_alias {
 							match &*t.ty {
 								syn::Type::Path(p) => {
+									let t_ident = &t.ident;
+
 									// If its a path with no generics, assume we don't map the aliased type and map it opaque
-									let mut segments = syn::punctuated::Punctuated::new();
-									segments.push(syn::PathSegment {
-										ident: t.ident.clone(),
-										arguments: syn::PathArguments::None,
-									});
-									let path_obj = syn::Path { leading_colon: None, segments };
+									let path_obj = parse_quote!(#t_ident);
 									let args_obj = p.path.segments.last().unwrap().arguments.clone();
 									match crate_types.reverse_alias_map.entry(import_resolver.maybe_resolve_path(&p.path, None).unwrap()) {
 										hash_map::Entry::Occupied(mut e) => { e.get_mut().push((path_obj, args_obj)); },
 										hash_map::Entry::Vacant(e) => { e.insert(vec![(path_obj, args_obj)]); },
 									}
 
-									crate_types.opaques.insert(type_path.clone(), &t.ident);
+									crate_types.opaques.insert(type_path, t_ident);
 								},
 								_ => {
 									crate_types.type_aliases.insert(type_path, import_resolver.resolve_imported_refs((*t.ty).clone()));

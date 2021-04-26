@@ -343,11 +343,13 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			($ident: expr, $path_suffix: expr) => {
 				if partial_path == "" && !dependencies.contains(&$ident) {
 					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
-					path.push(syn::PathSegment { ident: format_ident!("{}", crate_name), arguments: syn::PathArguments::None });
+					let crate_name_ident = format_ident!("{}", crate_name);
+					path.push(parse_quote!(#crate_name_ident));
 				} else {
 					new_path = format!("{}{}{}", partial_path, $ident, $path_suffix);
 				}
-				path.push(syn::PathSegment { ident: $ident.clone(), arguments: syn::PathArguments::None });
+				let ident = &$ident;
+				path.push(parse_quote!(#ident));
 			}
 		}
 		match u {
@@ -386,9 +388,8 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 
 	fn insert_primitive(imports: &mut HashMap<syn::Ident, (String, syn::Path)>, id: &str) {
 		let ident = format_ident!("{}", id);
-		let mut path = syn::punctuated::Punctuated::new();
-		path.push(syn::PathSegment { ident: ident.clone(), arguments: syn::PathArguments::None });
-		imports.insert(ident, (id.to_owned(), syn::Path { leading_colon: None, segments: path }));
+		let path = parse_quote!(#ident);
+		imports.insert(ident, (id.to_owned(), path));
 	}
 
 	pub fn new(crate_name: &'mod_lifetime str, dependencies: &'mod_lifetime HashSet<syn::Ident>, module_path: &'mod_lifetime str, contents: &'crate_lft [syn::Item]) -> Self {

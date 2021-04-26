@@ -1566,7 +1566,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 
 	fn write_conversion_inline_intern<W: std::io::Write,
-			LP: Fn(&str, bool, bool) -> Option<String>, DL: Fn(&mut W, &DeclType, &str, bool, bool), SC: Fn(bool) -> &'static str>
+			LP: Fn(&str, bool, bool) -> Option<String>, DL: Fn(&mut W, &DeclType, &str, bool, bool), SC: Fn(bool, Option<&str>) -> String>
 			(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, is_mut: bool, ptr_for_ref: bool,
 			 tupleconv: &str, prefix: bool, sliceconv: SC, path_lookup: LP, decl_lookup: DL) {
 		match t {
@@ -1618,12 +1618,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					write!(w, "{}", path_lookup("[u8]", is_ref, ptr_for_ref).unwrap()).unwrap();
 				} else if let syn::Type::Reference(r) = &*s.elem {
 					if let syn::Type::Path(p) = &*r.elem {
-						write!(w, "{}", sliceconv(self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)))).unwrap();
+						write!(w, "{}", sliceconv(self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)), None)).unwrap();
 					} else { unimplemented!(); }
 				} else if let syn::Type::Tuple(t) = &*s.elem {
 					assert!(!t.elems.is_empty());
 					if prefix {
-						write!(w, "&local_").unwrap();
+						write!(w, "{}", sliceconv(false, None)).unwrap();
 					} else {
 						let mut needs_map = false;
 						for e in t.elems.iter() {
@@ -1632,19 +1632,23 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							}
 						}
 						if needs_map {
-							write!(w, ".iter().map(|(").unwrap();
+							let mut map_str = Vec::new();
+							write!(&mut map_str, ".map(|(").unwrap();
 							for i in 0..t.elems.len() {
-								write!(w, "{}{}", if i != 0 { ", " } else { "" }, ('a' as u8 + i as u8) as char).unwrap();
+								write!(&mut map_str, "{}{}", if i != 0 { ", " } else { "" }, ('a' as u8 + i as u8) as char).unwrap();
 							}
-							write!(w, ")| (").unwrap();
+							write!(&mut map_str, ")| (").unwrap();
 							for (idx, e) in t.elems.iter().enumerate() {
 								if let syn::Type::Reference(_) = e {
-									write!(w, "{}{}", if idx != 0 { ", " } else { "" }, (idx as u8 + 'a' as u8) as char).unwrap();
+									write!(&mut map_str, "{}{}", if idx != 0 { ", " } else { "" }, (idx as u8 + 'a' as u8) as char).unwrap();
 								} else if let syn::Type::Path(_) = e {
-									write!(w, "{}*{}", if idx != 0 { ", " } else { "" }, (idx as u8 + 'a' as u8) as char).unwrap();
+									write!(&mut map_str, "{}*{}", if idx != 0 { ", " } else { "" }, (idx as u8 + 'a' as u8) as char).unwrap();
 								} else { unimplemented!(); }
 							}
-							write!(w, ")).collect::<Vec<_>>()[..]").unwrap();
+							write!(&mut map_str, "))").unwrap();
+							write!(w, "{}", sliceconv(false, Some(&String::from_utf8(map_str).unwrap()))).unwrap();
+						} else {
+							write!(w, "{}", sliceconv(false, None)).unwrap();
 						}
 					}
 				} else { unimplemented!(); }
@@ -1663,7 +1667,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 
 	fn write_to_c_conversion_inline_prefix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool, from_ptr: bool) {
-		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "0u8 /*", true, |_| "local_",
+		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "0u8 /*", true, |_, _| "local_".to_owned(),
 				|a, b, c| self.to_c_conversion_inline_prefix_from_path(a, b, c),
 				|w, decl_type, decl_path, is_ref, _is_mut| {
 					match decl_type {
@@ -1690,7 +1694,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		self.write_to_c_conversion_inline_prefix_inner(w, t, generics, false, ptr_for_ref, false);
 	}
 	fn write_to_c_conversion_inline_suffix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool, from_ptr: bool) {
-		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "*/", false, |_| ".into()",
+		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "*/", false, |_, _| ".into()".to_owned(),
 				|a, b, c| self.to_c_conversion_inline_suffix_from_path(a, b, c),
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
 					DeclType::MirroredEnum => write!(w, ")").unwrap(),
@@ -1719,7 +1723,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 
 	fn write_from_c_conversion_prefix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool) {
-		self.write_conversion_inline_intern(w, t, generics, is_ref, false, false, "() /*", true, |_| "&local_",
+		self.write_conversion_inline_intern(w, t, generics, is_ref, false, false, "() /*", true, |_, _| "&local_".to_owned(),
 				|a, b, _c| self.from_c_conversion_prefix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, is_mut| match decl_type {
 					DeclType::StructImported if is_ref && ptr_for_ref => write!(w, "unsafe {{ &*(*").unwrap(),
@@ -1737,9 +1741,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 	fn write_from_c_conversion_suffix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool) {
 		self.write_conversion_inline_intern(w, t, generics, is_ref, false, false, "*/", false,
-				|has_inner| match has_inner {
-					false => ".iter().collect::<Vec<_>>()[..]",
-					true => "[..]",
+				|has_inner, map_str_opt| match (has_inner, map_str_opt) {
+					(false, Some(map_str)) => format!(".iter(){}.collect::<Vec<_>>()[..]", map_str),
+					(false, None) => ".iter().collect::<Vec<_>>()[..]".to_owned(),
+					(true, None) => "[..]".to_owned(),
+					(true, Some(_)) => unreachable!(),
 				},
 				|a, b, _c| self.from_c_conversion_suffix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
@@ -1758,7 +1764,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	// Note that compared to the above conversion functions, the following two are generally
 	// significantly undertested:
 	pub fn write_from_c_conversion_to_ref_prefix<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>) {
-		self.write_conversion_inline_intern(w, t, generics, false, false, false, "() /*", true, |_| "&local_",
+		self.write_conversion_inline_intern(w, t, generics, false, false, false, "() /*", true, |_, _| "&local_".to_owned(),
 				|a, b, _c| {
 					if let Some(conv) = self.from_c_conversion_prefix_from_path(a, b) {
 						Some(format!("&{}", conv))
@@ -1771,9 +1777,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 	pub fn write_from_c_conversion_to_ref_suffix<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>) {
 		self.write_conversion_inline_intern(w, t, generics, false, false, false, "*/", false,
-				|has_inner| match has_inner {
-					false => ".iter().collect::<Vec<_>>()[..]",
-					true => "[..]",
+				|has_inner, map_str_opt| match (has_inner, map_str_opt) {
+					(false, Some(map_str)) => format!(".iter(){}.collect::<Vec<_>>()[..]", map_str),
+					(false, None) => ".iter().collect::<Vec<_>>()[..]".to_owned(),
+					(true, None) => "[..]".to_owned(),
+					(true, Some(_)) => unreachable!(),
 				},
 				|a, b, _c| self.from_c_conversion_suffix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {

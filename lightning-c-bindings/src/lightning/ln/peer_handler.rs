@@ -435,7 +435,7 @@ impl MessageHandler {
 #[no_mangle]
 pub extern "C" fn MessageHandler_get_chan_handler(this_ptr: &MessageHandler) -> *const crate::lightning::ln::msgs::ChannelMessageHandler {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.chan_handler;
-	&(*inner_val)
+	inner_val
 }
 /// A message handler which handles messages specific to channels. Usually this is just a
 /// ChannelManager object or a ErroringMessageHandler.
@@ -448,7 +448,7 @@ pub extern "C" fn MessageHandler_set_chan_handler(this_ptr: &mut MessageHandler,
 #[no_mangle]
 pub extern "C" fn MessageHandler_get_route_handler(this_ptr: &MessageHandler) -> *const crate::lightning::ln::msgs::RoutingMessageHandler {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.route_handler;
-	&(*inner_val)
+	inner_val
 }
 /// A message handler which handles messages updating our knowledge of the network channel
 /// graph. Usually this is just a NetGraphMsgHandlerMonitor object or an IgnoringMessageHandler.
@@ -624,7 +624,7 @@ impl PeerHandleError {
 #[no_mangle]
 pub extern "C" fn PeerHandleError_get_no_connection_possible(this_ptr: &PeerHandleError) -> bool {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.no_connection_possible;
-	(*inner_val)
+	*inner_val
 }
 /// Used to indicate that we probably can't make any future connections to this peer, implying
 /// we should go ahead and force-close any channels we have with it.

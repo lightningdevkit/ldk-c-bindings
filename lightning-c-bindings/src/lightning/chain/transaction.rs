@@ -64,7 +64,7 @@ impl OutPoint {
 #[no_mangle]
 pub extern "C" fn OutPoint_get_txid(this_ptr: &OutPoint) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.txid;
-	(*inner_val).as_inner()
+	inner_val.as_inner()
 }
 /// The referenced transaction's txid.
 #[no_mangle]
@@ -75,7 +75,7 @@ pub extern "C" fn OutPoint_set_txid(this_ptr: &mut OutPoint, mut val: crate::c_t
 #[no_mangle]
 pub extern "C" fn OutPoint_get_index(this_ptr: &OutPoint) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.index;
-	(*inner_val)
+	*inner_val
 }
 /// The index of the referenced output in its transaction's vout.
 #[no_mangle]

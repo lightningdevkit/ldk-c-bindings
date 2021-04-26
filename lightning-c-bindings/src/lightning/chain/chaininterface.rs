@@ -34,8 +34,7 @@ unsafe impl Send for BroadcasterInterface {}
 use lightning::chain::chaininterface::BroadcasterInterface as rustBroadcasterInterface;
 impl rustBroadcasterInterface for BroadcasterInterface {
 	fn broadcast_transaction(&self, tx: &bitcoin::blockdata::transaction::Transaction) {
-		let mut local_tx = ::bitcoin::consensus::encode::serialize(tx);
-		(self.broadcast_transaction)(self.this_arg, crate::c_types::Transaction::from_vec(local_tx))
+		(self.broadcast_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(tx))
 	}
 }
 

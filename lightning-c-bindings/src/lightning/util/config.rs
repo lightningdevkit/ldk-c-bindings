@@ -68,7 +68,7 @@ impl ChannelHandshakeConfig {
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_get_minimum_depth(this_ptr: &ChannelHandshakeConfig) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.minimum_depth;
-	(*inner_val)
+	*inner_val
 }
 /// Confirmations we will wait for before considering the channel locked in.
 /// Applied only for inbound channels (see ChannelHandshakeLimits::max_minimum_depth for the
@@ -97,7 +97,7 @@ pub extern "C" fn ChannelHandshakeConfig_set_minimum_depth(this_ptr: &mut Channe
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_get_our_to_self_delay(this_ptr: &ChannelHandshakeConfig) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.our_to_self_delay;
-	(*inner_val)
+	*inner_val
 }
 /// Set to the number of blocks we require our counterparty to wait to claim their money (ie
 /// the number of blocks we have to punish our counterparty if they broadcast a revoked
@@ -128,7 +128,7 @@ pub extern "C" fn ChannelHandshakeConfig_set_our_to_self_delay(this_ptr: &mut Ch
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_get_our_htlc_minimum_msat(this_ptr: &ChannelHandshakeConfig) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.our_htlc_minimum_msat;
-	(*inner_val)
+	*inner_val
 }
 /// Set to the smallest value HTLC we will accept to process.
 ///
@@ -238,7 +238,7 @@ impl ChannelHandshakeLimits {
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_min_funding_satoshis(this_ptr: &ChannelHandshakeLimits) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.min_funding_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// Minimum allowed satoshis when a channel is funded, this is supplied by the sender and so
 /// only applies to inbound channels.
@@ -255,7 +255,7 @@ pub extern "C" fn ChannelHandshakeLimits_set_min_funding_satoshis(this_ptr: &mut
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_max_htlc_minimum_msat(this_ptr: &ChannelHandshakeLimits) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.max_htlc_minimum_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The remote node sets a limit on the minimum size of HTLCs we can send to them. This allows
 /// you to limit the maximum minimum-size they can require.
@@ -272,7 +272,7 @@ pub extern "C" fn ChannelHandshakeLimits_set_max_htlc_minimum_msat(this_ptr: &mu
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_min_max_htlc_value_in_flight_msat(this_ptr: &ChannelHandshakeLimits) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.min_max_htlc_value_in_flight_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The remote node sets a limit on the maximum value of pending HTLCs to them at any given
 /// time to limit their funds exposure to HTLCs. This allows you to set a minimum such value.
@@ -290,7 +290,7 @@ pub extern "C" fn ChannelHandshakeLimits_set_min_max_htlc_value_in_flight_msat(t
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_max_channel_reserve_satoshis(this_ptr: &ChannelHandshakeLimits) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.max_channel_reserve_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// The remote node will require we keep a certain amount in direct payment to ourselves at all
 /// time, ensuring that we are able to be punished if we broadcast an old state. This allows to
@@ -308,7 +308,7 @@ pub extern "C" fn ChannelHandshakeLimits_set_max_channel_reserve_satoshis(this_p
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_min_max_accepted_htlcs(this_ptr: &ChannelHandshakeLimits) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.min_max_accepted_htlcs;
-	(*inner_val)
+	*inner_val
 }
 /// The remote node sets a limit on the maximum number of pending HTLCs to them at any given
 /// time. This allows you to set a minimum such value.
@@ -330,7 +330,7 @@ pub extern "C" fn ChannelHandshakeLimits_set_min_max_accepted_htlcs(this_ptr: &m
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_min_dust_limit_satoshis(this_ptr: &ChannelHandshakeLimits) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.min_dust_limit_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// Outputs below a certain value will not be added to on-chain transactions. The dust value is
 /// required to always be higher than this value so this only applies to HTLC outputs (and
@@ -353,7 +353,7 @@ pub extern "C" fn ChannelHandshakeLimits_set_min_dust_limit_satoshis(this_ptr: &
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_max_dust_limit_satoshis(this_ptr: &ChannelHandshakeLimits) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.max_dust_limit_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// Maximum allowed threshold above which outputs will not be generated in their commitment
 /// transactions.
@@ -373,7 +373,7 @@ pub extern "C" fn ChannelHandshakeLimits_set_max_dust_limit_satoshis(this_ptr: &
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_max_minimum_depth(this_ptr: &ChannelHandshakeLimits) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.max_minimum_depth;
-	(*inner_val)
+	*inner_val
 }
 /// Before a channel is usable the funding transaction will need to be confirmed by at least a
 /// certain number of blocks, specified by the node which is not the funder (as the funder can
@@ -393,7 +393,7 @@ pub extern "C" fn ChannelHandshakeLimits_set_max_minimum_depth(this_ptr: &mut Ch
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_force_announced_channel_preference(this_ptr: &ChannelHandshakeLimits) -> bool {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.force_announced_channel_preference;
-	(*inner_val)
+	*inner_val
 }
 /// Set to force the incoming channel to match our announced channel preference in
 /// ChannelConfig.
@@ -414,7 +414,7 @@ pub extern "C" fn ChannelHandshakeLimits_set_force_announced_channel_preference(
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_their_to_self_delay(this_ptr: &ChannelHandshakeLimits) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.their_to_self_delay;
-	(*inner_val)
+	*inner_val
 }
 /// Set to the amount of time we're willing to wait to claim money back to us.
 ///
@@ -523,7 +523,7 @@ impl ChannelConfig {
 #[no_mangle]
 pub extern "C" fn ChannelConfig_get_fee_proportional_millionths(this_ptr: &ChannelConfig) -> u32 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fee_proportional_millionths;
-	(*inner_val)
+	*inner_val
 }
 /// Amount (in millionths of a satoshi) the channel will charge per transferred satoshi.
 /// This may be allowed to change at runtime in a later update, however doing so must result in
@@ -556,7 +556,7 @@ pub extern "C" fn ChannelConfig_set_fee_proportional_millionths(this_ptr: &mut C
 #[no_mangle]
 pub extern "C" fn ChannelConfig_get_cltv_expiry_delta(this_ptr: &ChannelConfig) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.cltv_expiry_delta;
-	(*inner_val)
+	*inner_val
 }
 /// The difference in the CLTV value between incoming HTLCs and an outbound HTLC forwarded over
 /// the channel this config applies to.
@@ -595,7 +595,7 @@ pub extern "C" fn ChannelConfig_set_cltv_expiry_delta(this_ptr: &mut ChannelConf
 #[no_mangle]
 pub extern "C" fn ChannelConfig_get_announced_channel(this_ptr: &ChannelConfig) -> bool {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.announced_channel;
-	(*inner_val)
+	*inner_val
 }
 /// Set to announce the channel publicly and notify all nodes that they can route via this
 /// channel.
@@ -626,7 +626,7 @@ pub extern "C" fn ChannelConfig_set_announced_channel(this_ptr: &mut ChannelConf
 #[no_mangle]
 pub extern "C" fn ChannelConfig_get_commit_upfront_shutdown_pubkey(this_ptr: &ChannelConfig) -> bool {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.commit_upfront_shutdown_pubkey;
-	(*inner_val)
+	*inner_val
 }
 /// When set, we commit to an upfront shutdown_pubkey at channel open. If our counterparty
 /// supports it, they will then enforce the mutual-close output to us matches what we provided
@@ -747,7 +747,7 @@ impl UserConfig {
 #[no_mangle]
 pub extern "C" fn UserConfig_get_own_channel_config(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelHandshakeConfig {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.own_channel_config;
-	crate::lightning::util::config::ChannelHandshakeConfig { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::util::config::ChannelHandshakeConfig { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// Channel config that we propose to our counterparty.
 #[no_mangle]
@@ -758,7 +758,7 @@ pub extern "C" fn UserConfig_set_own_channel_config(this_ptr: &mut UserConfig, m
 #[no_mangle]
 pub extern "C" fn UserConfig_get_peer_channel_config_limits(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelHandshakeLimits {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.peer_channel_config_limits;
-	crate::lightning::util::config::ChannelHandshakeLimits { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::util::config::ChannelHandshakeLimits { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// Limits applied to our counterparty's proposed channel config settings.
 #[no_mangle]
@@ -769,7 +769,7 @@ pub extern "C" fn UserConfig_set_peer_channel_config_limits(this_ptr: &mut UserC
 #[no_mangle]
 pub extern "C" fn UserConfig_get_channel_options(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelConfig {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_options;
-	crate::lightning::util::config::ChannelConfig { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::util::config::ChannelConfig { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// Channel config which affects behavior during channel lifetime.
 #[no_mangle]

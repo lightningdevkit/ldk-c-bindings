@@ -154,7 +154,7 @@ impl ChainParameters {
 #[no_mangle]
 pub extern "C" fn ChainParameters_get_network(this_ptr: &ChainParameters) -> crate::bitcoin::network::Network {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.network;
-	crate::bitcoin::network::Network::from_bitcoin((*inner_val))
+	crate::bitcoin::network::Network::from_bitcoin(inner_val)
 }
 /// The network for determining the `chain_hash` in Lightning messages.
 #[no_mangle]
@@ -167,7 +167,7 @@ pub extern "C" fn ChainParameters_set_network(this_ptr: &mut ChainParameters, mu
 #[no_mangle]
 pub extern "C" fn ChainParameters_get_best_block(this_ptr: &ChainParameters) -> crate::lightning::ln::channelmanager::BestBlock {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.best_block;
-	crate::lightning::ln::channelmanager::BestBlock { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::channelmanager::BestBlock { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The hash and height of the latest block successfully connected.
 ///
@@ -351,7 +351,7 @@ impl ChannelDetails {
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_channel_id(this_ptr: &ChannelDetails) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_id;
-	&(*inner_val)
+	inner_val
 }
 /// The channel's ID (prior to funding transaction generation, this is a random 32 bytes,
 /// thereafter this is the txid of the funding transaction xor the funding transaction output).
@@ -380,7 +380,7 @@ pub extern "C" fn ChannelDetails_set_short_channel_id(this_ptr: &mut ChannelDeta
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_remote_network_id(this_ptr: &ChannelDetails) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.remote_network_id;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The node_id of our counterparty
 #[no_mangle]
@@ -393,7 +393,7 @@ pub extern "C" fn ChannelDetails_set_remote_network_id(this_ptr: &mut ChannelDet
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_counterparty_features(this_ptr: &ChannelDetails) -> crate::lightning::ln::features::InitFeatures {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.counterparty_features;
-	crate::lightning::ln::features::InitFeatures { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::InitFeatures { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The Features the channel counterparty provided upon last connection.
 /// Useful for routing as it is the most up-to-date copy of the counterparty's features and
@@ -406,7 +406,7 @@ pub extern "C" fn ChannelDetails_set_counterparty_features(this_ptr: &mut Channe
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_channel_value_satoshis(this_ptr: &ChannelDetails) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_value_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// The value, in satoshis, of this channel as appears in the funding output
 #[no_mangle]
@@ -417,7 +417,7 @@ pub extern "C" fn ChannelDetails_set_channel_value_satoshis(this_ptr: &mut Chann
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_user_id(this_ptr: &ChannelDetails) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.user_id;
-	(*inner_val)
+	*inner_val
 }
 /// The user_id passed in to create_channel, or 0 if the channel was inbound.
 #[no_mangle]
@@ -431,7 +431,7 @@ pub extern "C" fn ChannelDetails_set_user_id(this_ptr: &mut ChannelDetails, mut 
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_outbound_capacity_msat(this_ptr: &ChannelDetails) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.outbound_capacity_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The available outbound capacity for sending HTLCs to the remote peer. This does not include
 /// any pending HTLCs which are not yet fully resolved (and, thus, who's balance is not
@@ -449,7 +449,7 @@ pub extern "C" fn ChannelDetails_set_outbound_capacity_msat(this_ptr: &mut Chann
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_inbound_capacity_msat(this_ptr: &ChannelDetails) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.inbound_capacity_msat;
-	(*inner_val)
+	*inner_val
 }
 /// The available inbound capacity for the remote peer to send HTLCs to us. This does not
 /// include any pending HTLCs which are not yet fully resolved (and, thus, who's balance is not
@@ -465,7 +465,7 @@ pub extern "C" fn ChannelDetails_set_inbound_capacity_msat(this_ptr: &mut Channe
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_is_live(this_ptr: &ChannelDetails) -> bool {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.is_live;
-	(*inner_val)
+	*inner_val
 }
 /// True if the channel is (a) confirmed and funding_locked messages have been exchanged, (b)
 /// the peer is connected, and (c) no monitor update failure is pending resolution.
@@ -1030,91 +1030,45 @@ extern "C" fn ChannelManager_Listen_block_disconnected(this_arg: *const c_void, 
 	<nativeChannelManager as lightning::chain::Listen<>>::block_disconnected(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height)
 }
 
-/// Updates channel state to take note of transactions which were confirmed in the given block
-/// at the given height.
-///
-/// Note that you must still call (or have called) [`update_best_block`] with the block
-/// information which is included here.
-///
-/// This method may be called before or after [`update_best_block`] for a given block's
-/// transaction data and may be called multiple times with additional transaction data for a
-/// given block.
-///
-/// This method may be called for a previous block after an [`update_best_block`] call has
-/// been made for a later block, however it must *not* be called with transaction data from a
-/// block which is no longer in the best chain (ie where [`update_best_block`] has already
-/// been informed about a blockchain reorganization which no longer includes the block which
-/// corresponds to `header`).
-///
-/// [`update_best_block`]: `Self::update_best_block`
+impl From<nativeChannelManager> for crate::lightning::chain::Confirm {
+	fn from(obj: nativeChannelManager) -> Self {
+		let mut rust_obj = ChannelManager { inner: Box::into_raw(Box::new(obj)), is_owned: true };
+		let mut ret = ChannelManager_as_Confirm(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
+		rust_obj.inner = std::ptr::null_mut();
+		ret.free = Some(ChannelManager_free_void);
+		ret
+	}
+}
+/// Constructs a new Confirm which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned Confirm must be freed before this_arg is
 #[no_mangle]
-pub extern "C" fn ChannelManager_transactions_confirmed(this_arg: &ChannelManager, header: *const [u8; 80], mut height: u32, mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ) {
+pub extern "C" fn ChannelManager_as_Confirm(this_arg: &ChannelManager) -> crate::lightning::chain::Confirm {
+	crate::lightning::chain::Confirm {
+		this_arg: unsafe { (*this_arg).inner as *mut c_void },
+		free: None,
+		transactions_confirmed: ChannelManager_Confirm_transactions_confirmed,
+		transaction_unconfirmed: ChannelManager_Confirm_transaction_unconfirmed,
+		best_block_updated: ChannelManager_Confirm_best_block_updated,
+		get_relevant_txids: ChannelManager_Confirm_get_relevant_txids,
+	}
+}
+
+extern "C" fn ChannelManager_Confirm_transactions_confirmed(this_arg: *const c_void, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32) {
 	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
-	unsafe { &*this_arg.inner }.transactions_confirmed(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..])
+	<nativeChannelManager as lightning::chain::Confirm<>>::transactions_confirmed(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height)
 }
-
-/// Updates channel state with the current best blockchain tip. You should attempt to call this
-/// quickly after a new block becomes available, however if multiple new blocks become
-/// available at the same time, only a single `update_best_block()` call needs to be made.
-///
-/// This method should also be called immediately after any block disconnections, once at the
-/// reorganization fork point, and once with the new chain tip. Calling this method at the
-/// blockchain reorganization fork point ensures we learn when a funding transaction which was
-/// previously confirmed is reorganized out of the blockchain, ensuring we do not continue to
-/// accept payments which cannot be enforced on-chain.
-///
-/// In both the block-connection and block-disconnection case, this method may be called either
-/// once per block connected or disconnected, or simply at the fork point and new tip(s),
-/// skipping any intermediary blocks.
-#[no_mangle]
-pub extern "C" fn ChannelManager_update_best_block(this_arg: &ChannelManager, header: *const [u8; 80], mut height: u32) {
-	unsafe { &*this_arg.inner }.update_best_block(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height)
+extern "C" fn ChannelManager_Confirm_best_block_updated(this_arg: *const c_void, header: *const [u8; 80], mut height: u32) {
+	<nativeChannelManager as lightning::chain::Confirm<>>::best_block_updated(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height)
 }
-
-/// Gets the set of txids which should be monitored for their confirmation state.
-///
-/// If you're providing information about reorganizations via [`transaction_unconfirmed`], this
-/// is the set of transactions which you may need to call [`transaction_unconfirmed`] for.
-///
-/// This may be useful to poll to determine the set of transactions which must be registered
-/// with an Electrum server or for which an Electrum server needs to be polled to determine
-/// transaction confirmation state.
-///
-/// This may update after any [`transactions_confirmed`] or [`block_connected`] call.
-///
-/// Note that this is NOT the set of transactions which must be included in calls to
-/// [`transactions_confirmed`] if they are confirmed, but a small subset of it.
-///
-/// [`transactions_confirmed`]: Self::transactions_confirmed
-/// [`transaction_unconfirmed`]: Self::transaction_unconfirmed
-/// [`block_connected`]: chain::Listen::block_connected
 #[must_use]
-#[no_mangle]
-pub extern "C" fn ChannelManager_get_relevant_txids(this_arg: &ChannelManager) -> crate::c_types::derived::CVec_TxidZ {
-	let mut ret = unsafe { &*this_arg.inner }.get_relevant_txids();
+extern "C" fn ChannelManager_Confirm_get_relevant_txids(this_arg: *const c_void) -> crate::c_types::derived::CVec_TxidZ {
+	let mut ret = <nativeChannelManager as lightning::chain::Confirm<>>::get_relevant_txids(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, );
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.into_inner() } }); };
 	local_ret.into()
 }
-
-/// Marks a transaction as having been reorganized out of the blockchain.
-///
-/// If a transaction is included in [`get_relevant_txids`], and is no longer in the main branch
-/// of the blockchain, this function should be called to indicate that the transaction should
-/// be considered reorganized out.
-///
-/// Once this is called, the given transaction will no longer appear on [`get_relevant_txids`],
-/// though this may be called repeatedly for a given transaction without issue.
-///
-/// Note that if the transaction is confirmed on the main chain in a different block (indicated
-/// via a call to [`transactions_confirmed`]), it may re-appear in [`get_relevant_txids`], thus
-/// be very wary of race-conditions wherein the final state of a transaction indicated via
-/// these APIs is not the same as its state on the blockchain.
-///
-/// [`transactions_confirmed`]: Self::transactions_confirmed
-/// [`get_relevant_txids`]: Self::get_relevant_txids
-#[no_mangle]
-pub extern "C" fn ChannelManager_transaction_unconfirmed(this_arg: &ChannelManager, txid: *const [u8; 32]) {
-	unsafe { &*this_arg.inner }.transaction_unconfirmed(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*txid }[..]).unwrap())
+extern "C" fn ChannelManager_Confirm_transaction_unconfirmed(this_arg: *const c_void, txid: *const [u8; 32]) {
+	<nativeChannelManager as lightning::chain::Confirm<>>::transaction_unconfirmed(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &::bitcoin::hash_types::Txid::from_slice(&unsafe { &*txid }[..]).unwrap())
 }
 
 /// Blocks until ChannelManager needs to be persisted or a timeout is reached. It returns a bool
@@ -1327,7 +1281,7 @@ impl ChannelManagerReadArgs {
 #[no_mangle]
 pub extern "C" fn ChannelManagerReadArgs_get_keys_manager(this_ptr: &ChannelManagerReadArgs) -> *const crate::lightning::chain::keysinterface::KeysInterface {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.keys_manager;
-	&(*inner_val)
+	inner_val
 }
 /// The keys provider which will give us relevant keys. Some keys will be loaded during
 /// deserialization and KeysInterface::read_chan_signer will be used to read per-Channel
@@ -1342,7 +1296,7 @@ pub extern "C" fn ChannelManagerReadArgs_set_keys_manager(this_ptr: &mut Channel
 #[no_mangle]
 pub extern "C" fn ChannelManagerReadArgs_get_fee_estimator(this_ptr: &ChannelManagerReadArgs) -> *const crate::lightning::chain::chaininterface::FeeEstimator {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fee_estimator;
-	&(*inner_val)
+	inner_val
 }
 /// The fee_estimator for use in the ChannelManager in the future.
 ///
@@ -1359,7 +1313,7 @@ pub extern "C" fn ChannelManagerReadArgs_set_fee_estimator(this_ptr: &mut Channe
 #[no_mangle]
 pub extern "C" fn ChannelManagerReadArgs_get_chain_monitor(this_ptr: &ChannelManagerReadArgs) -> *const crate::lightning::chain::Watch {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.chain_monitor;
-	&(*inner_val)
+	inner_val
 }
 /// The chain::Watch for use in the ChannelManager in the future.
 ///
@@ -1376,7 +1330,7 @@ pub extern "C" fn ChannelManagerReadArgs_set_chain_monitor(this_ptr: &mut Channe
 #[no_mangle]
 pub extern "C" fn ChannelManagerReadArgs_get_tx_broadcaster(this_ptr: &ChannelManagerReadArgs) -> *const crate::lightning::chain::chaininterface::BroadcasterInterface {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.tx_broadcaster;
-	&(*inner_val)
+	inner_val
 }
 /// The BroadcasterInterface which will be used in the ChannelManager in the future and may be
 /// used to broadcast the latest local commitment transactions of channels which must be
@@ -1390,7 +1344,7 @@ pub extern "C" fn ChannelManagerReadArgs_set_tx_broadcaster(this_ptr: &mut Chann
 #[no_mangle]
 pub extern "C" fn ChannelManagerReadArgs_get_logger(this_ptr: &ChannelManagerReadArgs) -> *const crate::lightning::util::logger::Logger {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.logger;
-	&(*inner_val)
+	inner_val
 }
 /// The Logger for use in the ChannelManager and which may be used to log information during
 /// deserialization.
@@ -1403,7 +1357,7 @@ pub extern "C" fn ChannelManagerReadArgs_set_logger(this_ptr: &mut ChannelManage
 #[no_mangle]
 pub extern "C" fn ChannelManagerReadArgs_get_default_config(this_ptr: &ChannelManagerReadArgs) -> crate::lightning::util::config::UserConfig {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.default_config;
-	crate::lightning::util::config::UserConfig { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::util::config::UserConfig { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// Default settings used for new channels. Any existing channels will continue to use the
 /// runtime settings which were stored when the ChannelManager was serialized.

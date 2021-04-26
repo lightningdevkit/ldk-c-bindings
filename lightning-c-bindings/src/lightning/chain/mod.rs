@@ -111,10 +111,13 @@ impl Drop for Access {
 		}
 	}
 }
-/// The `Listen` trait is used to be notified of when blocks have been connected or disconnected
-/// from the chain.
+/// The `Listen` trait is used to notify when blocks have been connected or disconnected from the
+/// chain.
 ///
-/// Useful when needing to replay chain data upon startup or as new chain events occur.
+/// Useful when needing to replay chain data upon startup or as new chain events occur. Clients
+/// sourcing chain data using a block-oriented API should prefer this interface over [`Confirm`].
+/// Such clients fetch the entire header chain whereas clients using [`Confirm`] only fetch headers
+/// when needed.
 #[repr(C)]
 pub struct Listen {
 	/// An opaque pointer which is passed to your function implementations as an argument.
@@ -153,6 +156,130 @@ impl std::ops::Deref for Listen {
 #[no_mangle]
 pub extern "C" fn Listen_free(this_ptr: Listen) { }
 impl Drop for Listen {
+	fn drop(&mut self) {
+		if let Some(f) = self.free {
+			f(self.this_arg);
+		}
+	}
+}
+/// The `Confirm` trait is used to notify when transactions have been confirmed on chain or
+/// unconfirmed during a chain reorganization.
+///
+/// Clients sourcing chain data using a transaction-oriented API should prefer this interface over
+/// [`Listen`]. For instance, an Electrum client may implement [`Filter`] by subscribing to activity
+/// related to registered transactions and outputs. Upon notification, it would pass along the
+/// matching transactions using this interface.
+///
+/// # Use
+///
+/// The intended use is as follows:
+/// - Call [`transactions_confirmed`] to process any on-chain activity of interest.
+/// - Call [`transaction_unconfirmed`] to process any transaction returned by [`get_relevant_txids`]
+///   that has been reorganized out of the chain.
+/// - Call [`best_block_updated`] whenever a new chain tip becomes available.
+///
+/// # Order
+///
+/// Clients must call these methods in chain order. Specifically:
+/// - Transactions confirmed in a block must be given before transactions confirmed in a later
+///   block.
+/// - Dependent transactions within the same block must be given in topological order, possibly in
+///   separate calls.
+/// - Unconfirmed transactions must be given after the original confirmations and before any
+///   reconfirmation.
+///
+/// See individual method documentation for further details.
+///
+/// [`transactions_confirmed`]: Self::transactions_confirmed
+/// [`transaction_unconfirmed`]: Self::transaction_unconfirmed
+/// [`best_block_updated`]: Self::best_block_updated
+/// [`get_relevant_txids`]: Self::get_relevant_txids
+#[repr(C)]
+pub struct Confirm {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
+	pub this_arg: *mut c_void,
+	/// Processes transactions confirmed in a block with a given header and height.
+	///
+	/// Should be called for any transactions registered by [`Filter::register_tx`] or any
+	/// transactions spending an output registered by [`Filter::register_output`]. Such transactions
+	/// appearing in the same block do not need to be included in the same call; instead, multiple
+	/// calls with additional transactions may be made so long as they are made in [chain order].
+	///
+	/// May be called before or after [`best_block_updated`] for the corresponding block. However,
+	/// in the event of a chain reorganization, it must not be called with a `header` that is no
+	/// longer in the chain as of the last call to [`best_block_updated`].
+	///
+	/// [chain order]: Self#order
+	/// [`best_block_updated`]: Self::best_block_updated
+	pub transactions_confirmed: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, height: u32),
+	/// Processes a transaction that is no longer confirmed as result of a chain reorganization.
+	///
+	/// Should be called for any transaction returned by [`get_relevant_txids`] if it has been
+	/// reorganized out of the best chain. Once called, the given transaction should not be returned
+	/// by [`get_relevant_txids`] unless it has been reconfirmed via [`transactions_confirmed`].
+	///
+	/// [`get_relevant_txids`]: Self::get_relevant_txids
+	/// [`transactions_confirmed`]: Self::transactions_confirmed
+	pub transaction_unconfirmed: extern "C" fn (this_arg: *const c_void, txid: *const [u8; 32]),
+	/// Processes an update to the best header connected at the given height.
+	///
+	/// Should be called when a new header is available but may be skipped for intermediary blocks
+	/// if they become available at the same time.
+	pub best_block_updated: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], height: u32),
+	/// Returns transactions that should be monitored for reorganization out of the chain.
+	///
+	/// Should include any transactions passed to [`transactions_confirmed`] that have insufficient
+	/// confirmations to be safe from a chain reorganization. Should not include any transactions
+	/// passed to [`transaction_unconfirmed`] unless later reconfirmed.
+	///
+	/// May be called to determine the subset of transactions that must still be monitored for
+	/// reorganization. Will be idempotent between calls but may change as a result of calls to the
+	/// other interface methods. Thus, this is useful to determine which transactions may need to be
+	/// given to [`transaction_unconfirmed`].
+	///
+	/// [`transactions_confirmed`]: Self::transactions_confirmed
+	/// [`transaction_unconfirmed`]: Self::transaction_unconfirmed
+	#[must_use]
+	pub get_relevant_txids: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_TxidZ,
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
+}
+
+use lightning::chain::Confirm as rustConfirm;
+impl rustConfirm for Confirm {
+	fn transactions_confirmed(&self, header: &bitcoin::blockdata::block::BlockHeader, txdata: &lightning::chain::transaction::TransactionData, height: u32) {
+		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
+		let mut local_txdata = Vec::new(); for item in txdata.iter() { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = *item; let mut local_txdata_0 = (orig_txdata_0_0, crate::c_types::Transaction::from_bitcoin(&orig_txdata_0_1)).into(); local_txdata_0 }); };
+		(self.transactions_confirmed)(self.this_arg, &local_header, local_txdata.into(), height)
+	}
+	fn transaction_unconfirmed(&self, txid: &bitcoin::hash_types::Txid) {
+		(self.transaction_unconfirmed)(self.this_arg, txid.as_inner())
+	}
+	fn best_block_updated(&self, header: &bitcoin::blockdata::block::BlockHeader, height: u32) {
+		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
+		(self.best_block_updated)(self.this_arg, &local_header, height)
+	}
+	fn get_relevant_txids(&self) -> Vec<bitcoin::hash_types::Txid> {
+		let mut ret = (self.get_relevant_txids)(self.this_arg);
+		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { ::bitcoin::hash_types::Txid::from_slice(&item.data[..]).unwrap() }); };
+		local_ret
+	}
+}
+
+// We're essentially a pointer already, or at least a set of pointers, so allow us to be used
+// directly as a Deref trait in higher-level structs:
+impl std::ops::Deref for Confirm {
+	type Target = Self;
+	fn deref(&self) -> &Self {
+		self
+	}
+}
+/// Calls the free function if one is set
+#[no_mangle]
+pub extern "C" fn Confirm_free(this_ptr: Confirm) { }
+impl Drop for Confirm {
 	fn drop(&mut self) {
 		if let Some(f) = self.free {
 			f(self.this_arg);
@@ -401,7 +528,7 @@ pub extern "C" fn WatchedOutput_set_block_hash(this_ptr: &mut WatchedOutput, mut
 #[no_mangle]
 pub extern "C" fn WatchedOutput_get_outpoint(this_ptr: &WatchedOutput) -> crate::lightning::chain::transaction::OutPoint {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.outpoint;
-	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// Outpoint identifying the transaction output.
 #[no_mangle]
@@ -412,7 +539,7 @@ pub extern "C" fn WatchedOutput_set_outpoint(this_ptr: &mut WatchedOutput, mut v
 #[no_mangle]
 pub extern "C" fn WatchedOutput_get_script_pubkey(this_ptr: &WatchedOutput) -> crate::c_types::u8slice {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.script_pubkey;
-	crate::c_types::u8slice::from_slice(&(*inner_val)[..])
+	crate::c_types::u8slice::from_slice(&inner_val[..])
 }
 /// Spending condition of the transaction output.
 #[no_mangle]

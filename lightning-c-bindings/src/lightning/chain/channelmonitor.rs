@@ -83,7 +83,7 @@ impl ChannelMonitorUpdate {
 #[no_mangle]
 pub extern "C" fn ChannelMonitorUpdate_get_update_id(this_ptr: &ChannelMonitorUpdate) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.update_id;
-	(*inner_val)
+	*inner_val
 }
 /// The sequence number of this update. Updates *must* be replayed in-order according to this
 /// sequence number (and updates may panic if they are not). The update_id values are strictly
@@ -632,7 +632,7 @@ pub extern "C" fn ChannelMonitor_get_and_clear_pending_events(this_arg: &Channel
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_latest_holder_commitment_txn(this_arg: &ChannelMonitor, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionZ {
 	let mut ret = unsafe { &*this_arg.inner }.get_latest_holder_commitment_txn(logger);
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let mut local_ret_0 = ::bitcoin::consensus::encode::serialize(&item); crate::c_types::Transaction::from_vec(local_ret_0) }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::Transaction::from_bitcoin(&item) }); };
 	local_ret.into()
 }
 
@@ -667,11 +667,9 @@ pub extern "C" fn ChannelMonitor_block_disconnected(this_arg: &ChannelMonitor, h
 /// outputs to watch. See [`block_connected`] for details.
 ///
 /// Used instead of [`block_connected`] by clients that are notified of transactions rather than
-/// blocks. May be called before or after [`update_best_block`] for transactions in the
-/// corresponding block. See [`update_best_block`] for further calling expectations. 
+/// blocks. See [`chain::Confirm`] for calling expectations.
 ///
 /// [`block_connected`]: Self::block_connected
-/// [`update_best_block`]: Self::update_best_block
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_transactions_confirmed(this_arg: &ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
@@ -684,11 +682,9 @@ pub extern "C" fn ChannelMonitor_transactions_confirmed(this_arg: &ChannelMonito
 /// Processes a transaction that was reorganized out of the chain.
 ///
 /// Used instead of [`block_disconnected`] by clients that are notified of transactions rather
-/// than blocks. May be called before or after [`update_best_block`] for transactions in the
-/// corresponding block. See [`update_best_block`] for further calling expectations.
+/// than blocks. See [`chain::Confirm`] for calling expectations.
 ///
 /// [`block_disconnected`]: Self::block_disconnected
-/// [`update_best_block`]: Self::update_best_block
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_transaction_unconfirmed(this_arg: &ChannelMonitor, txid: *const [u8; 32], mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) {
 	unsafe { &*this_arg.inner }.transaction_unconfirmed(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*txid }[..]).unwrap(), broadcaster, fee_estimator, logger)
@@ -698,21 +694,13 @@ pub extern "C" fn ChannelMonitor_transaction_unconfirmed(this_arg: &ChannelMonit
 /// [`block_connected`] for details.
 ///
 /// Used instead of [`block_connected`] by clients that are notified of transactions rather than
-/// blocks. May be called before or after [`transactions_confirmed`] for the corresponding
-/// block.
-///
-/// Must be called after new blocks become available for the most recent block. Intermediary
-/// blocks, however, may be safely skipped. In the event of a chain re-organization, this only
-/// needs to be called for the most recent block assuming `transaction_unconfirmed` is called
-/// for any affected transactions.
+/// blocks. See [`chain::Confirm`] for calling expectations.
 ///
 /// [`block_connected`]: Self::block_connected
-/// [`transactions_confirmed`]: Self::transactions_confirmed
-/// [`transaction_unconfirmed`]: Self::transaction_unconfirmed
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_update_best_block(this_arg: &ChannelMonitor, header: *const [u8; 80], mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
-	let mut ret = unsafe { &*this_arg.inner }.update_best_block(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, broadcaster, fee_estimator, logger);
+pub extern "C" fn ChannelMonitor_best_block_updated(this_arg: &ChannelMonitor, header: *const [u8; 80], mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
+	let mut ret = unsafe { &*this_arg.inner }.best_block_updated(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, broadcaster, fee_estimator, logger);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
 }

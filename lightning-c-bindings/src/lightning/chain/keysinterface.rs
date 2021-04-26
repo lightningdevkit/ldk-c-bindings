@@ -64,7 +64,7 @@ impl DelayedPaymentOutputDescriptor {
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_outpoint(this_ptr: &DelayedPaymentOutputDescriptor) -> crate::lightning::chain::transaction::OutPoint {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.outpoint;
-	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The outpoint which is spendable
 #[no_mangle]
@@ -75,7 +75,7 @@ pub extern "C" fn DelayedPaymentOutputDescriptor_set_outpoint(this_ptr: &mut Del
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_per_commitment_point(this_ptr: &DelayedPaymentOutputDescriptor) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.per_commitment_point;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// Per commitment point to derive delayed_payment_key by key holder
 #[no_mangle]
@@ -87,7 +87,7 @@ pub extern "C" fn DelayedPaymentOutputDescriptor_set_per_commitment_point(this_p
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_to_self_delay(this_ptr: &DelayedPaymentOutputDescriptor) -> u16 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.to_self_delay;
-	(*inner_val)
+	*inner_val
 }
 /// The nSequence value which must be set in the spending input to satisfy the OP_CSV in
 /// the witness_script.
@@ -105,7 +105,7 @@ pub extern "C" fn DelayedPaymentOutputDescriptor_set_output(this_ptr: &mut Delay
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_revocation_pubkey(this_ptr: &DelayedPaymentOutputDescriptor) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.revocation_pubkey;
-	crate::c_types::PublicKey::from_rust(&(*inner_val))
+	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The revocation point specific to the commitment transaction which was broadcast. Used to
 /// derive the witnessScript for this output.
@@ -119,7 +119,7 @@ pub extern "C" fn DelayedPaymentOutputDescriptor_set_revocation_pubkey(this_ptr:
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_channel_keys_id(this_ptr: &DelayedPaymentOutputDescriptor) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_keys_id;
-	&(*inner_val)
+	inner_val
 }
 /// Arbitrary identification information returned by a call to
 /// `Sign::channel_keys_id()`. This may be useful in re-deriving keys used in
@@ -132,7 +132,7 @@ pub extern "C" fn DelayedPaymentOutputDescriptor_set_channel_keys_id(this_ptr: &
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_channel_value_satoshis(this_ptr: &DelayedPaymentOutputDescriptor) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_value_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// The value of the channel which this output originated from, possibly indirectly.
 #[no_mangle]
@@ -222,7 +222,7 @@ impl StaticPaymentOutputDescriptor {
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_get_outpoint(this_ptr: &StaticPaymentOutputDescriptor) -> crate::lightning::chain::transaction::OutPoint {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.outpoint;
-	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ( (&((*inner_val)) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The outpoint which is spendable
 #[no_mangle]
@@ -240,7 +240,7 @@ pub extern "C" fn StaticPaymentOutputDescriptor_set_output(this_ptr: &mut Static
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_get_channel_keys_id(this_ptr: &StaticPaymentOutputDescriptor) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_keys_id;
-	&(*inner_val)
+	inner_val
 }
 /// Arbitrary identification information returned by a call to
 /// `Sign::channel_keys_id()`. This may be useful in re-deriving keys used in
@@ -253,7 +253,7 @@ pub extern "C" fn StaticPaymentOutputDescriptor_set_channel_keys_id(this_ptr: &m
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_get_channel_value_satoshis(this_ptr: &StaticPaymentOutputDescriptor) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_value_satoshis;
-	(*inner_val)
+	*inner_val
 }
 /// The value of the channel which this transactions spends.
 #[no_mangle]
@@ -630,21 +630,18 @@ impl rustBaseSign for BaseSign {
 		local_ret
 	}
 	fn sign_justice_transaction(&self, justice_tx: &bitcoin::blockdata::transaction::Transaction, input: usize, amount: u64, per_commitment_key: &bitcoin::secp256k1::key::SecretKey, htlc: &Option<lightning::ln::chan_utils::HTLCOutputInCommitment>, _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut local_justice_tx = ::bitcoin::consensus::encode::serialize(justice_tx);
 		let mut local_htlc = &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { (if htlc.is_none() { std::ptr::null() } else {  { (htlc.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
-		let mut ret = (self.sign_justice_transaction)(self.this_arg, crate::c_types::Transaction::from_vec(local_justice_tx), input, amount, per_commitment_key.as_ref(), local_htlc);
+		let mut ret = (self.sign_justice_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(justice_tx), input, amount, per_commitment_key.as_ref(), local_htlc);
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn sign_counterparty_htlc_transaction(&self, htlc_tx: &bitcoin::blockdata::transaction::Transaction, input: usize, amount: u64, per_commitment_point: &bitcoin::secp256k1::key::PublicKey, htlc: &lightning::ln::chan_utils::HTLCOutputInCommitment, _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut local_htlc_tx = ::bitcoin::consensus::encode::serialize(htlc_tx);
-		let mut ret = (self.sign_counterparty_htlc_transaction)(self.this_arg, crate::c_types::Transaction::from_vec(local_htlc_tx), input, amount, crate::c_types::PublicKey::from_rust(&per_commitment_point), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { (htlc as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.sign_counterparty_htlc_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(htlc_tx), input, amount, crate::c_types::PublicKey::from_rust(&per_commitment_point), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { (htlc as *const _) as *mut _ }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn sign_closing_transaction(&self, closing_tx: &bitcoin::blockdata::transaction::Transaction, _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut local_closing_tx = ::bitcoin::consensus::encode::serialize(closing_tx);
-		let mut ret = (self.sign_closing_transaction)(self.this_arg, crate::c_types::Transaction::from_vec(local_closing_tx));
+		let mut ret = (self.sign_closing_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(closing_tx));
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
@@ -731,21 +728,18 @@ impl lightning::chain::keysinterface::BaseSign for Sign {
 		local_ret
 	}
 	fn sign_justice_transaction(&self, justice_tx: &bitcoin::blockdata::transaction::Transaction, input: usize, amount: u64, per_commitment_key: &bitcoin::secp256k1::key::SecretKey, htlc: &Option<lightning::ln::chan_utils::HTLCOutputInCommitment>, _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut local_justice_tx = ::bitcoin::consensus::encode::serialize(justice_tx);
 		let mut local_htlc = &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { (if htlc.is_none() { std::ptr::null() } else {  { (htlc.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
-		let mut ret = (self.BaseSign.sign_justice_transaction)(self.this_arg, crate::c_types::Transaction::from_vec(local_justice_tx), input, amount, per_commitment_key.as_ref(), local_htlc);
+		let mut ret = (self.BaseSign.sign_justice_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(justice_tx), input, amount, per_commitment_key.as_ref(), local_htlc);
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn sign_counterparty_htlc_transaction(&self, htlc_tx: &bitcoin::blockdata::transaction::Transaction, input: usize, amount: u64, per_commitment_point: &bitcoin::secp256k1::key::PublicKey, htlc: &lightning::ln::chan_utils::HTLCOutputInCommitment, _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut local_htlc_tx = ::bitcoin::consensus::encode::serialize(htlc_tx);
-		let mut ret = (self.BaseSign.sign_counterparty_htlc_transaction)(self.this_arg, crate::c_types::Transaction::from_vec(local_htlc_tx), input, amount, crate::c_types::PublicKey::from_rust(&per_commitment_point), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { (htlc as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.BaseSign.sign_counterparty_htlc_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(htlc_tx), input, amount, crate::c_types::PublicKey::from_rust(&per_commitment_point), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { (htlc as *const _) as *mut _ }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn sign_closing_transaction(&self, closing_tx: &bitcoin::blockdata::transaction::Transaction, _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut local_closing_tx = ::bitcoin::consensus::encode::serialize(closing_tx);
-		let mut ret = (self.BaseSign.sign_closing_transaction)(self.this_arg, crate::c_types::Transaction::from_vec(local_closing_tx));
+		let mut ret = (self.BaseSign.sign_closing_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(closing_tx));
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
@@ -958,7 +952,7 @@ impl InMemorySigner {
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_funding_key(this_ptr: &InMemorySigner) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.funding_key;
-	(*inner_val).as_ref()
+	inner_val.as_ref()
 }
 /// Private key of anchor tx
 #[no_mangle]
@@ -969,7 +963,7 @@ pub extern "C" fn InMemorySigner_set_funding_key(this_ptr: &mut InMemorySigner, 
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_revocation_base_key(this_ptr: &InMemorySigner) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.revocation_base_key;
-	(*inner_val).as_ref()
+	inner_val.as_ref()
 }
 /// Holder secret key for blinded revocation pubkey
 #[no_mangle]
@@ -980,7 +974,7 @@ pub extern "C" fn InMemorySigner_set_revocation_base_key(this_ptr: &mut InMemory
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_payment_key(this_ptr: &InMemorySigner) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.payment_key;
-	(*inner_val).as_ref()
+	inner_val.as_ref()
 }
 /// Holder secret key used for our balance in counterparty-broadcasted commitment transactions
 #[no_mangle]
@@ -991,7 +985,7 @@ pub extern "C" fn InMemorySigner_set_payment_key(this_ptr: &mut InMemorySigner, 
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_delayed_payment_base_key(this_ptr: &InMemorySigner) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.delayed_payment_base_key;
-	(*inner_val).as_ref()
+	inner_val.as_ref()
 }
 /// Holder secret key used in HTLC tx
 #[no_mangle]
@@ -1002,7 +996,7 @@ pub extern "C" fn InMemorySigner_set_delayed_payment_base_key(this_ptr: &mut InM
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_htlc_base_key(this_ptr: &InMemorySigner) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_base_key;
-	(*inner_val).as_ref()
+	inner_val.as_ref()
 }
 /// Holder htlc secret key used in commitment tx htlc outputs
 #[no_mangle]
@@ -1013,7 +1007,7 @@ pub extern "C" fn InMemorySigner_set_htlc_base_key(this_ptr: &mut InMemorySigner
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_commitment_seed(this_ptr: &InMemorySigner) -> *const [u8; 32] {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.commitment_seed;
-	&(*inner_val)
+	inner_val
 }
 /// Commitment seed
 #[no_mangle]
@@ -1417,7 +1411,7 @@ pub extern "C" fn KeysManager_spend_spendable_outputs(this_arg: &KeysManager, mu
 	let mut local_descriptors = Vec::new(); for mut item in descriptors.into_rust().drain(..) { local_descriptors.push( { item.into_native() }); };
 	let mut local_outputs = Vec::new(); for mut item in outputs.into_rust().drain(..) { local_outputs.push( { item.into_rust() }); };
 	let mut ret = unsafe { &*this_arg.inner }.spend_spendable_outputs(&local_descriptors.iter().collect::<Vec<_>>()[..], local_outputs, ::bitcoin::blockdata::script::Script::from(change_destination_script.into_rust()), feerate_sat_per_1000_weight, secp256k1::SECP256K1);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = ::bitcoin::consensus::encode::serialize(&o); crate::c_types::Transaction::from_vec(local_ret_0) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { 0u8 /*e*/ }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::Transaction::from_bitcoin(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { 0u8 /*e*/ }).into() };
 	local_ret
 }
 

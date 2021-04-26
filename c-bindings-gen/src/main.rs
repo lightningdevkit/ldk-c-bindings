@@ -25,6 +25,7 @@ use std::io::{Read, Write};
 use std::process;
 
 use proc_macro2::Span;
+use quote::format_ident;
 use syn::parse_quote;
 
 mod types;
@@ -65,7 +66,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 				writeln!(w, "pub extern \"C\" fn {}_write(obj: &{}) -> crate::c_types::derived::CVec_u8Z {{", for_obj, full_obj_path).unwrap();
 
 				let ref_type: syn::Type = syn::parse_quote!(&#for_ty);
-				assert!(!types.write_from_c_conversion_new_var(w, &syn::Ident::new("obj", Span::call_site()), &ref_type, Some(generics)));
+				assert!(!types.write_from_c_conversion_new_var(w, &format_ident!("obj"), &ref_type, Some(generics)));
 
 				write!(w, "\tcrate::c_types::serialize_obj(").unwrap();
 				types.write_from_c_conversion_prefix(w, &ref_type, Some(generics));
@@ -100,7 +101,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 						if let syn::GenericArgument::Type(args_ty) = args.args.iter().next().unwrap() {
 							types.write_c_type(w, args_ty, Some(generics), false);
 
-							assert!(!types.write_from_c_conversion_new_var(&mut arg_conv, &syn::Ident::new("arg", Span::call_site()), &args_ty, Some(generics)));
+							assert!(!types.write_from_c_conversion_new_var(&mut arg_conv, &format_ident!("arg"), &args_ty, Some(generics)));
 
 							write!(&mut arg_conv, "\tlet arg_conv = ").unwrap();
 							types.write_from_c_conversion_prefix(&mut arg_conv, &args_ty, Some(generics));
@@ -123,7 +124,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 					writeln!(w, "\tlet res = crate::c_types::deserialize_obj(ser);").unwrap();
 				}
 				write!(w, "\t").unwrap();
-				if types.write_to_c_conversion_new_var(w, &syn::Ident::new("res", Span::call_site()), &res_ty, Some(generics), false) {
+				if types.write_to_c_conversion_new_var(w, &format_ident!("res"), &res_ty, Some(generics), false) {
 					write!(w, "\n\t").unwrap();
 				}
 				types.write_to_c_conversion_inline_prefix(w, &res_ty, Some(generics), false);
@@ -602,7 +603,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> ", struct_name, ident, struct_name).unwrap();
 						types.write_c_type(w, &ref_type, Some(&gen_types), true);
 						write!(w, " {{\n\tlet mut inner_val = &mut unsafe {{ &mut *this_ptr.inner }}.{};\n\t", ident).unwrap();
-						let local_var = types.write_to_c_conversion_new_var(w, &syn::Ident::new("inner_val", Span::call_site()), &ref_type, Some(&gen_types), true);
+						let local_var = types.write_to_c_conversion_new_var(w, &format_ident!("inner_val"), &ref_type, Some(&gen_types), true);
 						if local_var { write!(w, "\n\t").unwrap(); }
 						types.write_to_c_conversion_inline_prefix(w, &ref_type, Some(&gen_types), true);
 						if local_var {
@@ -619,7 +620,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_set_{}(this_ptr: &mut {}, mut val: ", struct_name, ident, struct_name).unwrap();
 						types.write_c_type(w, &field.ty, Some(&gen_types), false);
 						write!(w, ") {{\n\t").unwrap();
-						let local_var = types.write_from_c_conversion_new_var(w, &syn::Ident::new("val", Span::call_site()), &field.ty, Some(&gen_types));
+						let local_var = types.write_from_c_conversion_new_var(w, &format_ident!("val"), &field.ty, Some(&gen_types));
 						if local_var { write!(w, "\n\t").unwrap(); }
 						write!(w, "unsafe {{ &mut *this_ptr.inner }}.{} = ", ident).unwrap();
 						types.write_from_c_conversion_prefix(w, &field.ty, Some(&gen_types));
@@ -642,8 +643,8 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 			}
 			write!(w, ") -> {} {{\n\t", struct_name).unwrap();
 			for field in fields.named.iter() {
-				let field_name = format!("{}_arg", field.ident.as_ref().unwrap());
-				if types.write_from_c_conversion_new_var(w, &syn::Ident::new(&field_name, Span::call_site()), &field.ty, Some(&gen_types)) {
+				let field_ident = format_ident!("{}_arg", field.ident.as_ref().unwrap());
+				if types.write_from_c_conversion_new_var(w, &field_ident, &field.ty, Some(&gen_types)) {
 					write!(w, "\n\t").unwrap();
 				}
 			}
@@ -1165,7 +1166,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 							if $ref {
 								write!(w, "let mut {}_nonref = (*{}).clone();\n\t\t\t\t", $field_ident, $field_ident).unwrap();
 								if new_var {
-									let nonref_ident = syn::Ident::new(&format!("{}_nonref", $field_ident), Span::call_site());
+									let nonref_ident = format_ident!("{}_nonref", $field_ident);
 									if $to_c {
 										types.write_to_c_conversion_new_var(w, &nonref_ident, &$field.ty, None, false);
 									} else {
@@ -1187,7 +1188,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 				} else if let syn::Fields::Unnamed(fields) = &var.fields {
 					write!(w, " {{\n\t\t\t\t").unwrap();
 					for (idx, field) in fields.unnamed.iter().enumerate() {
-						handle_field_a!(field, &syn::Ident::new(&(('a' as u8 + idx as u8) as char).to_string(), Span::call_site()));
+						handle_field_a!(field, &format_ident!("{}", ('a' as u8 + idx as u8) as char));
 					}
 				} else { write!(w, " ").unwrap(); }
 
@@ -1225,7 +1226,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 					write!(w, " (").unwrap();
 					for (idx, field) in fields.unnamed.iter().enumerate() {
 						write!(w, "\n\t\t\t\t\t").unwrap();
-						handle_field_b!(field, &syn::Ident::new(&(('a' as u8 + idx as u8) as char).to_string(), Span::call_site()));
+						handle_field_b!(field, &format_ident!("{}", ('a' as u8 + idx as u8) as char));
 					}
 					writeln!(w, "\n\t\t\t\t)").unwrap();
 					write!(w, "\t\t\t}}").unwrap();

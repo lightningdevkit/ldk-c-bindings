@@ -15,6 +15,7 @@ use std::hash;
 use crate::blocks::*;
 
 use proc_macro2::{TokenTree, Span};
+use quote::format_ident;
 use syn::parse_quote;
 
 // The following utils are used purely to build our known types maps - they break down all the
@@ -342,7 +343,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			($ident: expr, $path_suffix: expr) => {
 				if partial_path == "" && !dependencies.contains(&$ident) {
 					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
-					path.push(syn::PathSegment { ident: syn::Ident::new(crate_name, Span::call_site()), arguments: syn::PathArguments::None });
+					path.push(syn::PathSegment { ident: format_ident!("{}", crate_name), arguments: syn::PathArguments::None });
 				} else {
 					new_path = format!("{}{}{}", partial_path, $ident, $path_suffix);
 				}
@@ -384,7 +385,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 	}
 
 	fn insert_primitive(imports: &mut HashMap<syn::Ident, (String, syn::Path)>, id: &str) {
-		let ident = syn::Ident::new(id, Span::call_site());
+		let ident = format_ident!("{}", id);
 		let mut path = syn::punctuated::Punctuated::new();
 		path.push(syn::PathSegment { ident: ident.clone(), arguments: syn::PathArguments::None });
 		imports.insert(ident, (id.to_owned(), syn::Path { leading_colon: None, segments: path }));
@@ -1851,7 +1852,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 						write!(w, "{} {{ ", pfx).unwrap();
 						let new_var_name = format!("{}_{}", ident, idx);
-						let new_var = self.write_conversion_new_var_intern(w, &syn::Ident::new(&new_var_name, Span::call_site()),
+						let new_var = self.write_conversion_new_var_intern(w, &format_ident!("{}", new_var_name),
 								&var_access, conv_ty, generics, contains_slice || (is_ref && ty_has_inner), ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix);
 						if new_var { write!(w, " ").unwrap(); }
 
@@ -1976,7 +1977,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					for (idx, elem) in t.elems.iter().enumerate() {
 						if let syn::Type::Path(p) = elem {
 							let v_name = format!("orig_{}_{}", ident, idx);
-							let tuple_elem_ident = syn::Ident::new(&v_name, Span::call_site());
+							let tuple_elem_ident = format_ident!("{}", &v_name);
 							if self.write_conversion_new_var_intern(w, &tuple_elem_ident, &v_name, elem, generics,
 									false, ptr_for_ref, to_c,
 									path_lookup, container_lookup, var_prefix, var_suffix) {

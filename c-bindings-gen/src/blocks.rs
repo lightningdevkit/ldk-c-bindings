@@ -11,7 +11,9 @@
 
 use std::fs::File;
 use std::io::Write;
-use proc_macro2::{TokenTree, Span};
+
+use proc_macro2::TokenTree;
+use quote::format_ident;
 
 use crate::types::*;
 
@@ -502,7 +504,7 @@ pub fn write_method_params<W: std::io::Write>(w: &mut W, sig: &syn::Signature, t
 /// mut ret = " assuming the next print will be the unmapped Rust function to call followed by the
 /// parameters we mapped to/from C here.
 pub fn write_method_var_decl_body<W: std::io::Write>(w: &mut W, sig: &syn::Signature, extra_indent: &str, types: &TypeResolver, generics: Option<&GenericTypes>, to_c: bool) {
-	let mut num_unused = 0;
+	let mut num_unused = 0u32;
 	for inp in sig.inputs.iter() {
 		match inp {
 			syn::FnArg::Receiver(_) => {},
@@ -531,7 +533,7 @@ pub fn write_method_var_decl_body<W: std::io::Write>(w: &mut W, sig: &syn::Signa
 					},
 					syn::Pat::Wild(w) => {
 						if !w.attrs.is_empty() { unimplemented!(); }
-						write_new_var!(syn::Ident::new(&format!("unused_{}", num_unused), Span::call_site()), *arg.ty);
+						write_new_var!(format_ident!("unused_{}", num_unused), *arg.ty);
 						num_unused += 1;
 					},
 					_ => unimplemented!(),
@@ -624,7 +626,7 @@ pub fn write_method_call_params<W: std::io::Write>(w: &mut W, sig: &syn::Signatu
 				// If we're returning "Self" (and not "Self::X"), just do it manually
 				write!(w, "{} {{ inner: Box::into_raw(Box::new(ret)), is_owned: true }}", this_type).unwrap();
 			} else if to_c {
-				let new_var = types.write_from_c_conversion_new_var(w, &syn::Ident::new("ret", Span::call_site()), rtype, generics);
+				let new_var = types.write_from_c_conversion_new_var(w, &format_ident!("ret"), rtype, generics);
 				if new_var {
 					write!(w, "\n\t{}", extra_indent).unwrap();
 				}
@@ -633,7 +635,7 @@ pub fn write_method_call_params<W: std::io::Write>(w: &mut W, sig: &syn::Signatu
 				types.write_from_c_conversion_suffix(w, &*rtype, generics);
 			} else {
 				let ret_returned = if let syn::Type::Reference(_) = &**rtype { true } else { false };
-				let new_var = types.write_to_c_conversion_new_var(w, &syn::Ident::new("ret", Span::call_site()), &rtype, generics, true);
+				let new_var = types.write_to_c_conversion_new_var(w, &format_ident!("ret"), &rtype, generics, true);
 				if new_var {
 					write!(w, "\n\t{}", extra_indent).unwrap();
 				}

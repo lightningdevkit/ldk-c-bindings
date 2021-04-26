@@ -1458,7 +1458,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				split.next().unwrap();
 				let tail_str = split.next().unwrap();
 				assert!(split.next().is_none());
-				let len = &tail_str[..tail_str.len() - 1];
+				let len = usize::from_str_radix(&tail_str[..tail_str.len() - 1], 10).unwrap();
 				Some(parse_quote!([u8; #len]))
 			} else { None }
 		} else { None }

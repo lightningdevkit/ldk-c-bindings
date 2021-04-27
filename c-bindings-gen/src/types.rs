@@ -30,7 +30,7 @@ pub fn first_seg_self<'a>(t: &'a syn::Type) -> Option<impl Iterator<Item=&syn::P
 			let mut segs = p.path.segments.iter();
 			let ty = segs.next().unwrap();
 			if !ty.arguments.is_empty() { return None; }
-			if format!("{}", ty.ident) == "Self" {
+			if ty.ident == "Self" {
 				Some(segs)
 			} else { None }
 		},
@@ -56,7 +56,7 @@ pub fn path_matches_nongeneric(p: &syn::Path, exp: &[&str]) -> bool {
 	if p.segments.len() != exp.len() { return false; }
 	for (seg, e) in p.segments.iter().zip(exp.iter()) {
 		if seg.arguments != syn::PathArguments::None { return false; }
-		if &format!("{}", seg.ident) != *e { return false; }
+		if &seg.ident != *e { return false; }
 	}
 	true
 }
@@ -79,7 +79,7 @@ pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
 					// it somehow represents '///' or '//!'
 				},
 				TokenTree::Group(g) => {
-					if format!("{}", single_ident_generic_path_to_ident(&attr.path).unwrap()) == "cfg" {
+					if single_ident_generic_path_to_ident(&attr.path).unwrap() == "cfg" {
 						let mut iter = g.stream().into_iter();
 						if let TokenTree::Ident(i) = iter.next().unwrap() {
 							if i == "any" {
@@ -88,7 +88,7 @@ pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
 									let mut all_test = true;
 									for token in g.stream().into_iter() {
 										if let TokenTree::Ident(i) = token {
-											match format!("{}", i).as_str() {
+											match i.to_string().as_str() {
 												"test" => {},
 												"feature" => {},
 												_ => all_test = false,
@@ -190,7 +190,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 					for bound in type_param.bounds.iter() {
 						if let syn::TypeParamBound::Trait(trait_bound) = bound {
 							if let Some(ident) = single_ident_generic_path_to_ident(&trait_bound.path) {
-								match &format!("{}", ident) as &str { "Send" => continue, "Sync" => continue, _ => {} }
+								match ident.to_string().as_str() { "Send" => continue, "Sync" => continue, _ => {} }
 							}
 							if path_matches_nongeneric(&trait_bound.path, &["core", "clone", "Clone"]) { continue; }
 
@@ -222,13 +222,13 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 						let mut p_iter = p.path.segments.iter();
 						if let Some(gen) = self.typed_generics.get_mut(&p_iter.next().unwrap().ident) {
 							if gen.0 != "std::ops::Deref" { return false; }
-							if &format!("{}", p_iter.next().unwrap().ident) != "Target" { return false; }
+							if p_iter.next().unwrap().ident != "Target" { return false; }
 
 							let mut non_lifetimes_processed = false;
 							for bound in t.bounds.iter() {
 								if let syn::TypeParamBound::Trait(trait_bound) = bound {
 									if let Some(id) = trait_bound.path.get_ident() {
-										if format!("{}", id) == "Sized" { continue; }
+										if id == "Sized" { continue; }
 									}
 									if non_lifetimes_processed { return false; }
 									non_lifetimes_processed = true;
@@ -312,7 +312,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 			// Associated types are usually specified as "Self::Generic", so we check for that
 			// explicitly here.
 			let mut it = path.segments.iter();
-			if path.segments.len() == 2 && format!("{}", it.next().unwrap().ident) == "Self" {
+			if path.segments.len() == 2 && it.next().unwrap().ident == "Self" {
 				let ident = &it.next().unwrap().ident;
 				if let Some(res) = self.typed_generics.get(ident).map(|(a, b)| (a, b.unwrap())) {
 					return Some(res);

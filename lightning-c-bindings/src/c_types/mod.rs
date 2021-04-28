@@ -2,6 +2,8 @@
 
 /// Auto-generated C-mapped types for templated containers
 pub mod derived;
+/// Mapping to and from C
+pub mod mapping;
 
 use bitcoin::Transaction as BitcoinTransaction;
 use bitcoin::network::constants::Network as BitcoinNetwork;

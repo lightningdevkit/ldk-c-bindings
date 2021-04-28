@@ -756,7 +756,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		full_path == "bitcoin::secp256k1::Signing" ||
 		full_path == "bitcoin::secp256k1::Verification"
 	}
-	/// Returns true we if can just skip passing this to C entirely
+	/// Returns what a removed argument should be replaced with, generally some kind of constant
 	fn no_arg_path_to_rust(&self, full_path: &str) -> &str {
 		if full_path == "bitcoin::secp256k1::Secp256k1" {
 			"secp256k1::SECP256K1"

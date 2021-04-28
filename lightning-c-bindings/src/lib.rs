@@ -17,7 +17,6 @@
 #![allow(unused_unsafe)]
 #![allow(unused_braces)]
 pub mod c_types;
-pub mod bitcoin;
 pub mod lightning;
 pub mod lightning_persister;
 pub mod lightning_invoice;

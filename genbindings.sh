@@ -23,13 +23,11 @@ cd c-bindings-gen && cargo build --release && cd ..
 # Then wipe all the existing C bindings (because we're being run in the right directory)
 # note that we keep the few manually-generated files first:
 mv lightning-c-bindings/src/c_types/mod.rs ./
-mv lightning-c-bindings/src/bitcoin ./
 
 rm -rf lightning-c-bindings/src
 
 mkdir -p lightning-c-bindings/src/{c_types,lightning}
 mv ./mod.rs lightning-c-bindings/src/c_types/
-mv ./bitcoin lightning-c-bindings/src/
 
 # Finally, run the c-bindings-gen binary, building fresh bindings.
 OUT="$(pwd)/lightning-c-bindings/src"

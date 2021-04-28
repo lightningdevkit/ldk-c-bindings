@@ -4,6 +4,8 @@
 pub mod derived;
 
 use bitcoin::Transaction as BitcoinTransaction;
+use bitcoin::network::constants::Network as BitcoinNetwork;
+
 use bitcoin::hashes::Hash;
 use bitcoin::secp256k1::key::PublicKey as SecpPublicKey;
 use bitcoin::secp256k1::key::SecretKey as SecpSecretKey;
@@ -222,6 +224,38 @@ impl Drop for Transaction {
 #[no_mangle]
 /// Frees the data buffer, if data_is_owned is set and datalen > 0.
 pub extern "C" fn Transaction_free(_res: Transaction) { }
+
+#[repr(C)]
+/// An enum representing the possible Bitcoin or test networks which we can run on
+pub enum Network {
+	/// The main Bitcoin blockchain.
+	Bitcoin,
+	/// The testnet3 blockchain.
+	Testnet,
+	/// A local test blockchain.
+	Regtest,
+	/// A blockchain on which blocks are signed instead of mined.
+	Signet,
+}
+
+impl Network {
+	pub(crate) fn into_bitcoin(&self) -> BitcoinNetwork {
+		match self {
+			Network::Bitcoin => BitcoinNetwork::Bitcoin,
+			Network::Testnet => BitcoinNetwork::Testnet,
+			Network::Regtest => BitcoinNetwork::Regtest,
+			Network::Signet => BitcoinNetwork::Signet,
+		}
+	}
+	pub(crate) fn from_bitcoin(net: &BitcoinNetwork) -> Self {
+		match net {
+			BitcoinNetwork::Bitcoin => Network::Bitcoin,
+			BitcoinNetwork::Testnet => Network::Testnet,
+			BitcoinNetwork::Regtest => Network::Regtest,
+			BitcoinNetwork::Signet => Network::Signet,
+		}
+	}
+}
 
 pub(crate) fn bitcoin_to_C_outpoint(outpoint: ::bitcoin::blockdata::transaction::OutPoint) -> crate::lightning::chain::transaction::OutPoint {
 	crate::lightning::chain::transaction::OutPoint_new(ThirtyTwoBytes { data: outpoint.txid.into_inner() }, outpoint.vout.try_into().unwrap())

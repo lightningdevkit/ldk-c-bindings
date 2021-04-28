@@ -990,7 +990,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 		match full_path {
 			"[u8]" if is_ref => Some(("crate::c_types::u8slice::from_slice(", ")")),
-			"[usize]" if is_ref => Some(("crate::c_types::usizeslice::from_slice(", ")")),
 
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some(("{ let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(", ")); s }")),
 			"bitcoin::blockdata::block::Block" if is_ref => Some(("::bitcoin::consensus::encode::serialize(", ")")),

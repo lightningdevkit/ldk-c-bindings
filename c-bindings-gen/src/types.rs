@@ -781,6 +781,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		match ty {
 			"()" => true,
 			"crate::c_types::Signature" => true,
+			"crate::c_types::RecoverableSignature" => true,
 			"crate::c_types::TxOut" => true,
 			_ => false,
 		}
@@ -819,6 +820,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature"),
+			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some("crate::c_types::RecoverableSignature"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref  => Some("*const [u8; 32]"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
@@ -894,6 +896,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				=> Some(""),
 			"bitcoin::secp256k1::Signature" if is_ref => Some("&"),
 			"bitcoin::secp256k1::Signature" => Some(""),
+			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(""),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref => Some("&::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
@@ -954,6 +957,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(".into_rust()"),
 			"bitcoin::secp256k1::Signature" => Some(".into_rust()"),
+			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(".into_rust()"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some(".into_rust()"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
@@ -1033,6 +1037,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey::from_rust(&"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature::from_rust(&"),
+			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some("crate::c_types::RecoverableSignature::from_rust(&"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref => Some(""),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
@@ -1102,6 +1107,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(")"),
 			"bitcoin::secp256k1::Signature" => Some(")"),
+			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(")"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some(")"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"

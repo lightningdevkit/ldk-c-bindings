@@ -388,7 +388,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 													ident.mutability.is_some() || ident.subpat.is_some() {
 												unimplemented!();
 											}
-											write!(w, ", {}{}: ", if $type_resolver.skip_arg(&*arg.ty, Some(&meth_gen_types)) { "_" } else { "" }, ident.ident).unwrap();
+											write!(w, ", mut {}{}: ", if $type_resolver.skip_arg(&*arg.ty, Some(&meth_gen_types)) { "_" } else { "" }, ident.ident).unwrap();
 										}
 										_ => unimplemented!(),
 									}

@@ -8,10 +8,19 @@
 
 //! Utilities that handle persisting Rust-Lightning data to disk via standard filesystem APIs.
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
+mod util {
+
+use std::str::FromStr;
+use std::ffi::c_void;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+
+}
 
 use lightning_persister::FilesystemPersister as nativeFilesystemPersisterImport;
 type nativeFilesystemPersister = nativeFilesystemPersisterImport;

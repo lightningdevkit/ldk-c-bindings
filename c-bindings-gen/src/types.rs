@@ -164,19 +164,20 @@ pub fn is_enum_opaque(e: &syn::ItemEnum) -> bool {
 /// concrete C container struct, etc).
 #[must_use]
 pub struct GenericTypes<'a, 'b> {
+	self_ty: Option<(String, &'a syn::Path)>,
 	parent: Option<&'b GenericTypes<'b, 'b>>,
 	typed_generics: HashMap<&'a syn::Ident, (String, Option<&'a syn::Path>)>,
 }
 impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
-	pub fn new() -> Self {
-		Self { parent: None, typed_generics: HashMap::new(), }
+	pub fn new(self_ty: Option<(String, &'a syn::Path)>) -> Self {
+		Self { self_ty, parent: None, typed_generics: HashMap::new(), }
 	}
 
 	/// push a new context onto the stack, allowing for a new set of generics to be learned which
 	/// will override any lower contexts, but which will still fall back to resoltion via lower
 	/// contexts.
 	pub fn push_ctx<'c>(&'c self) -> GenericTypes<'a, 'c> {
-		GenericTypes { parent: Some(self), typed_generics: HashMap::new(), }
+		GenericTypes { self_ty: None, parent: Some(self), typed_generics: HashMap::new(), }
 	}
 
 	/// Learn the generics in generics in the current context, given a TypeResolver.
@@ -281,6 +282,11 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 
 	/// Attempt to resolve an Ident as a generic parameter and return the full path.
 	pub fn maybe_resolve_ident<'b>(&'b self, ident: &syn::Ident) -> Option<&'b String> {
+		if let Some(ty) = &self.self_ty {
+			if format!("{}", ident) == "Self" {
+				return Some(&ty.0);
+			}
+		}
 		if let Some(res) = self.typed_generics.get(ident).map(|(a, _)| a) {
 			return Some(res);
 		}
@@ -294,6 +300,11 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 	/// and syn::Path.
 	pub fn maybe_resolve_path<'b>(&'b self, path: &syn::Path) -> Option<(&'b String, &'a syn::Path)> {
 		if let Some(ident) = path.get_ident() {
+			if let Some(ty) = &self.self_ty {
+				if format!("{}", ident) == "Self" {
+					return Some((&ty.0, ty.1));
+				}
+			}
 			if let Some(res) = self.typed_generics.get(ident).map(|(a, b)| (a, b.unwrap())) {
 				return Some(res);
 			}
@@ -335,13 +346,22 @@ pub struct ImportResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
 	priv_modules: HashSet<syn::Ident>,
 }
 impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'crate_lft> {
-	fn process_use_intern(crate_name: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>,
+	fn process_use_intern(crate_name: &str, module_path: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>,
 			u: &syn::UseTree, partial_path: &str, mut path: syn::punctuated::Punctuated<syn::PathSegment, syn::token::Colon2>) {
 
 		let new_path;
 		macro_rules! push_path {
 			($ident: expr, $path_suffix: expr) => {
-				if partial_path == "" && !dependencies.contains(&$ident) {
+				if partial_path == "" && format!("{}", $ident) == "super" {
+					let mut mod_iter = module_path.rsplitn(2, "::");
+					mod_iter.next().unwrap();
+					let super_mod = mod_iter.next().unwrap();
+					new_path = format!("{}{}", super_mod, $path_suffix);
+					assert_eq!(path.len(), 0);
+					for module in super_mod.split("::") {
+						path.push(syn::PathSegment { ident: syn::Ident::new(module, Span::call_site()), arguments: syn::PathArguments::None });
+					}
+				} else if partial_path == "" && !dependencies.contains(&$ident) {
 					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
 					let crate_name_ident = format_ident!("{}", crate_name);
 					path.push(parse_quote!(#crate_name_ident));
@@ -355,7 +375,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		match u {
 			syn::UseTree::Path(p) => {
 				push_path!(p.ident, "::");
-				Self::process_use_intern(crate_name, dependencies, imports, &p.tree, &new_path, path);
+				Self::process_use_intern(crate_name, module_path, dependencies, imports, &p.tree, &new_path, path);
 			},
 			syn::UseTree::Name(n) => {
 				push_path!(n.ident, "");
@@ -363,7 +383,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			},
 			syn::UseTree::Group(g) => {
 				for i in g.items.iter() {
-					Self::process_use_intern(crate_name, dependencies, imports, i, partial_path, path.clone());
+					Self::process_use_intern(crate_name, module_path, dependencies, imports, i, partial_path, path.clone());
 				}
 			},
 			syn::UseTree::Rename(r) => {
@@ -376,14 +396,14 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		}
 	}
 
-	fn process_use(crate_name: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>, u: &syn::ItemUse) {
+	fn process_use(crate_name: &str, module_path: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>, u: &syn::ItemUse) {
 		if let syn::Visibility::Public(_) = u.vis {
 			// We actually only use these for #[cfg(fuzztarget)]
 			eprintln!("Ignoring pub(use) tree!");
 			return;
 		}
 		if u.leading_colon.is_some() { eprintln!("Ignoring leading-colon use!"); return; }
-		Self::process_use_intern(crate_name, dependencies, imports, &u.tree, "", syn::punctuated::Punctuated::new());
+		Self::process_use_intern(crate_name, module_path, dependencies, imports, &u.tree, "", syn::punctuated::Punctuated::new());
 	}
 
 	fn insert_primitive(imports: &mut HashMap<syn::Ident, (String, syn::Path)>, id: &str) {
@@ -393,6 +413,9 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 	}
 
 	pub fn new(crate_name: &'mod_lifetime str, dependencies: &'mod_lifetime HashSet<syn::Ident>, module_path: &'mod_lifetime str, contents: &'crate_lft [syn::Item]) -> Self {
+		Self::from_borrowed_items(crate_name, dependencies, module_path, &contents.iter().map(|a| a).collect::<Vec<_>>())
+	}
+	pub fn from_borrowed_items(crate_name: &'mod_lifetime str, dependencies: &'mod_lifetime HashSet<syn::Ident>, module_path: &'mod_lifetime str, contents: &[&'crate_lft syn::Item]) -> Self {
 		let mut imports = HashMap::new();
 		// Add primitives to the "imports" list:
 		Self::insert_primitive(&mut imports, "bool");
@@ -415,7 +438,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 
 		for item in contents.iter() {
 			match item {
-				syn::Item::Use(u) => Self::process_use(crate_name, dependencies, &mut imports, &u),
+				syn::Item::Use(u) => Self::process_use(crate_name, module_path, dependencies, &mut imports, &u),
 				syn::Item::Struct(s) => {
 					if let syn::Visibility::Public(_) = s.vis {
 						match export_status(&s.attrs) {
@@ -517,9 +540,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				format!("::{}", seg.ident)
 			}).collect();
 			let first_seg_str = format!("{}", first_seg.ident);
-			if first_seg_str == "std" {
-				Some(first_seg_str + &remaining)
-			} else if let Some((imp, _)) = self.imports.get(&first_seg.ident) {
+			if let Some((imp, _)) = self.imports.get(&first_seg.ident) {
 				if remaining != "" {
 					Some(imp.clone() + &remaining)
 				} else {
@@ -527,6 +548,8 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				}
 			} else if let Some(_) = self.priv_modules.get(&first_seg.ident) {
 				Some(format!("{}::{}{}", self.module_path, first_seg.ident, remaining))
+			} else if first_seg_str == "std" || first_seg_str == "core" || self.dependencies.contains(&first_seg.ident) {
+				Some(first_seg_str + &remaining)
 			} else { None }
 		}
 	}
@@ -627,6 +650,13 @@ impl FullLibraryAST {
 	}
 }
 
+/// List of manually-generated types which are clonable
+fn initial_clonable_types() -> HashSet<String> {
+	let mut res = HashSet::new();
+	res.insert("crate::c_types::u5".to_owned());
+	res
+}
+
 /// Top-level struct tracking everything which has been defined while walking the crate.
 pub struct CrateTypes<'a> {
 	/// This may contain structs or enums, but only when either is mapped as
@@ -662,7 +692,7 @@ impl<'a> CrateTypes<'a> {
 			opaques: HashMap::new(), mirrored_enums: HashMap::new(), traits: HashMap::new(),
 			type_aliases: HashMap::new(), reverse_alias_map: HashMap::new(),
 			templates_defined: RefCell::new(HashMap::default()),
-			clonable_types: RefCell::new(HashSet::new()), trait_impls: HashMap::new(),
+			clonable_types: RefCell::new(initial_clonable_types()), trait_impls: HashMap::new(),
 			template_file: RefCell::new(template_file), lib_ast: &libast,
 		}
 	}
@@ -771,6 +801,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// for arrays are different (https://github.com/eqrion/cbindgen/issues/528)
 
 			"[u8; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"[u8; 20]" if !is_ref => Some("crate::c_types::TwentyBytes"),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::SixteenBytes"),
 			"[u8; 10]" if !is_ref => Some("crate::c_types::TenBytes"),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes"),
@@ -781,16 +812,20 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" if is_ref => Some("crate::c_types::Str"),
 
 			"std::time::Duration" => Some("u64"),
+			"std::time::SystemTime" => Some("u64"),
 			"std::io::Error" => Some("crate::c_types::IOError"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bech32::u5" => Some("crate::c_types::u5"),
+
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref  => Some("*const [u8; 32]"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some("crate::c_types::SecretKey"),
-			"bitcoin::secp256k1::Error" if !is_ref => Some("crate::c_types::Secp256k1Error"),
+			"bitcoin::secp256k1::Error"|"secp256k1::Error"
+				if !is_ref => Some("crate::c_types::Secp256k1Error"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
@@ -801,10 +836,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::block::Block" if is_ref  => Some("crate::c_types::u8slice"),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid" if is_ref  => Some("*const [u8; 32]"),
-			"bitcoin::hash_types::Txid" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"bitcoin::hash_types::BlockHash" if is_ref  => Some("*const [u8; 32]"),
-			"bitcoin::hash_types::BlockHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if is_ref  => Some("*const [u8; 32]"),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("*const [u8; 32]"),
 			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
@@ -835,6 +870,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"[u8; 32]" if is_ref => Some("unsafe { &*"),
 			"[u8; 32]" if !is_ref => Some(""),
+			"[u8; 20]" if !is_ref => Some(""),
 			"[u8; 16]" if !is_ref => Some(""),
 			"[u8; 10]" if !is_ref => Some(""),
 			"[u8; 4]" if !is_ref => Some(""),
@@ -849,10 +885,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// cannot create a &String.
 
 			"std::time::Duration" => Some("std::time::Duration::from_secs("),
+			"std::time::SystemTime" => Some("(::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs("),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bech32::u5" => Some(""),
+
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				if is_ref => Some("&"),
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(""),
 			"bitcoin::secp256k1::Signature" if is_ref => Some("&"),
 			"bitcoin::secp256k1::Signature" => Some(""),
@@ -896,6 +935,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"[u8; 32]" if is_ref => Some("}"),
 			"[u8; 32]" if !is_ref => Some(".data"),
+			"[u8; 20]" if !is_ref => Some(".data"),
 			"[u8; 16]" if !is_ref => Some(".data"),
 			"[u8; 10]" if !is_ref => Some(".data"),
 			"[u8; 4]" if !is_ref => Some(".data"),
@@ -908,8 +948,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" if !is_ref => Some(".into_rust()).unwrap()"),
 
 			"std::time::Duration" => Some(")"),
+			"std::time::SystemTime" => Some("))"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bech32::u5" => Some(".into()"),
+
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(".into_rust()"),
 			"bitcoin::secp256k1::Signature" => Some(".into_rust()"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
@@ -970,6 +1013,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"[u8; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"[u8; 32]" if is_ref => Some(""),
+			"[u8; 20]" if !is_ref => Some("crate::c_types::TwentyBytes { data: "),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::SixteenBytes { data: "),
 			"[u8; 10]" if !is_ref => Some("crate::c_types::TenBytes { data: "),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes { data: "),
@@ -982,16 +1026,20 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" => Some(""),
 
 			"std::time::Duration" => Some(""),
+			"std::time::SystemTime" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bech32::u5" => Some(""),
+
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey::from_rust(&"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature::from_rust(&"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref => Some(""),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
-			"bitcoin::secp256k1::Error" if !is_ref => Some("crate::c_types::Secp256k1Error::from_rust("),
+			"bitcoin::secp256k1::Error"|"secp256k1::Error"
+				if !is_ref => Some("crate::c_types::Secp256k1Error::from_rust("),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
 			"bitcoin::blockdata::transaction::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
@@ -1005,9 +1053,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid" if is_ref => Some(""),
-			"bitcoin::hash_types::BlockHash" if is_ref => Some(""),
-			"bitcoin::hash_types::BlockHash" => Some("crate::c_types::ThirtyTwoBytes { data: "),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if is_ref => Some(""),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("&"),
 			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
@@ -1032,6 +1081,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"[u8; 32]" if !is_ref => Some(" }"),
 			"[u8; 32]" if is_ref => Some(""),
+			"[u8; 20]" if !is_ref => Some(" }"),
 			"[u8; 16]" if !is_ref => Some(" }"),
 			"[u8; 10]" if !is_ref => Some(" }"),
 			"[u8; 4]" if !is_ref => Some(" }"),
@@ -1045,16 +1095,20 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" if is_ref => Some(".as_str().into()"),
 
 			"std::time::Duration" => Some(".as_secs()"),
+			"std::time::SystemTime" => Some(".duration_since(::std::time::SystemTime::UNIX_EPOCH).expect(\"Times must be post-1970\").as_secs()"),
 			"std::io::Error" if !is_ref => Some(")"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
+			"bech32::u5" => Some(".into()"),
+
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(")"),
 			"bitcoin::secp256k1::Signature" => Some(")"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some(")"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref => Some(".as_ref()"),
-			"bitcoin::secp256k1::Error" if !is_ref => Some(")"),
+			"bitcoin::secp256k1::Error"|"secp256k1::Error"
+				if !is_ref => Some(")"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),
 			"bitcoin::blockdata::transaction::Transaction" => Some(")"),
@@ -1067,9 +1121,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if !is_ref => Some(".into_inner() }"),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid" if is_ref => Some(".as_inner()"),
-			"bitcoin::hash_types::BlockHash" if is_ref => Some(".as_inner()"),
-			"bitcoin::hash_types::BlockHash" => Some(".into_inner() }"),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if is_ref => Some(".as_inner()"),
+			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+				if !is_ref => Some(".into_inner() }"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
 			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some(".0"),
 			"lightning::ln::channelmanager::PaymentHash" => Some(".0 }"),
@@ -1087,7 +1142,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	fn empty_val_check_suffix_from_path(&self, full_path: &str) -> Option<&str> {
 		match full_path {
 			"lightning::ln::channelmanager::PaymentSecret" => Some(".data == [0; 32]"),
-			"bitcoin::secp256k1::key::PublicKey" => Some(".is_null()"),
+			"secp256k1::key::PublicKey"|"bitcoin::secp256k1::key::PublicKey" => Some(".is_null()"),
 			"bitcoin::secp256k1::Signature" => Some(".is_null()"),
 			_ => None
 		}
@@ -1157,6 +1212,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			},
 			"Vec" if !is_ref => {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
+			},
+			"Vec" => {
+				// We should only get here if the single contained has an inner
+				assert!(self.c_type_has_inner(single_contained.unwrap()));
+				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "*item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Slice" => {
 				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "*item".to_string())], "); }", ContainerPrefixLocation::PerConv))
@@ -1271,8 +1331,18 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		self.types.get_declared_type(ident)
 	}
 	/// Returns true if the object at the given path is mapped as X { inner: *mut origX, .. }.
-	pub fn c_type_has_inner_from_path(&self, full_path: &str) -> bool{
+	pub fn c_type_has_inner_from_path(&self, full_path: &str) -> bool {
 		self.crate_types.opaques.get(full_path).is_some()
+	}
+	/// Returns true if the object at the given path is mapped as X { inner: *mut origX, .. }.
+	pub fn c_type_has_inner(&self, ty: &syn::Type) -> bool {
+		match ty {
+			syn::Type::Path(p) => {
+				let full_path = self.resolve_path(&p.path, None);
+				self.c_type_has_inner_from_path(&full_path)
+			},
+			_ => false,
+		}
 	}
 
 	pub fn maybe_resolve_ident(&self, id: &syn::Ident) -> Option<String> {
@@ -2297,6 +2367,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			write!(w, "{}::", Self::generated_container_path()).unwrap();
 		}
 		self.write_c_mangled_container_path_intern(w, args, generics, ident, is_ref, is_mut, ptr_for_ref, false)
+	}
+	pub fn get_c_mangled_container_type(&self, args: Vec<&syn::Type>, generics: Option<&GenericTypes>, template_name: &str) -> Option<String> {
+		let mut out = Vec::new();
+		if !self.write_c_mangled_container_path(&mut out, args, generics, template_name, false, false, false) {
+			return None;
+		}
+		Some(String::from_utf8(out).unwrap())
 	}
 
 	// **********************************

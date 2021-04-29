@@ -11,6 +11,7 @@
 //! You probably want to create a NetGraphMsgHandler and use that as your RoutingMessageHandler and then
 //! interrogate it to get routes for your own payments.
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;

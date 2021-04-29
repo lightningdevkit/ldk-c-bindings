@@ -22,6 +22,7 @@
 //! https://lightning.readthedocs.io/lightning-signmessage.7.html
 //! https://api.lightning.community/#signmessage
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;

@@ -89,16 +89,6 @@ const uint8_t block_2[81] = {
 	0x00, // transaction count
 };
 
-const LDKThirtyTwoBytes payment_preimage_1 = {
-	.data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1 }
-};
-const LDKThirtyTwoBytes payment_hash_1 = {
-	.data = {
-		0xdc, 0xb1, 0xac, 0x4a, 0x5d, 0xe3, 0x70, 0xca, 0xd0, 0x91, 0xc1, 0x3f, 0x13, 0xae, 0xe2, 0xf9,
-		0x36, 0xc2, 0x78, 0xfa, 0x05, 0xd2, 0x64, 0x65, 0x3c, 0x0c, 0x13, 0x21, 0x85, 0x2a, 0x35, 0xe8
-	}
-};
-
 const LDKThirtyTwoBytes genesis_hash = { // We don't care particularly if this is "right"
 	.data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1 }
 };
@@ -503,8 +493,11 @@ int main() {
 		}
 
 		LDK::CVec_ChannelDetailsZ outbound_channels = ChannelManager_list_usable_channels(&cm1);
-		LDKThirtyTwoBytes payment_secret;
-		memset(payment_secret.data, 0x42, 32);
+		LDKCOption_u64Z min_value = {
+			.tag = LDKCOption_u64Z_Some,
+			.some = 5000,
+		};
+		LDK::C2Tuple_PaymentHashPaymentSecretZ payment_hash_secret = ChannelManager_create_inbound_payment(&cm2, min_value, 3600, 43);
 		{
 			LDK::LockedNetworkGraph graph_2_locked = NetGraphMsgHandler_read_locked_graph(&net_graph2);
 			LDK::NetworkGraph graph_2_ref = LockedNetworkGraph_graph(&graph_2_locked);
@@ -514,7 +507,7 @@ int main() {
 					.data = NULL, .datalen = 0
 				}, 5000, 10, logger1);
 			assert(route->result_ok);
-			LDK::CResult_NonePaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash_1, payment_secret);
+			LDK::CResult_NonePaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash_secret->a, payment_hash_secret->b);
 			assert(send_res->result_ok);
 		}
 
@@ -538,14 +531,16 @@ int main() {
 		PeerManager_process_events(&net2);
 
 		mons_updated = 0;
+		LDKThirtyTwoBytes payment_preimage;
 		{
 			LDK::CVec_EventZ events = ev2.get_and_clear_pending_events(ev2.this_arg);
 			assert(events->datalen == 1);
 			assert(events->data[0].tag == LDKEvent_PaymentReceived);
-			assert(!memcmp(events->data[0].payment_received.payment_hash.data, payment_hash_1.data, 32));
-			assert(!memcmp(events->data[0].payment_received.payment_secret.data, payment_secret.data, 32));
+			assert(!memcmp(events->data[0].payment_received.payment_hash.data, payment_hash_secret->a.data, 32));
+			assert(!memcmp(events->data[0].payment_received.payment_secret.data, payment_hash_secret->b.data, 32));
 			assert(events->data[0].payment_received.amt == 5000);
-			assert(ChannelManager_claim_funds(&cm2, payment_preimage_1, payment_secret, 5000));
+			memcpy(payment_preimage.data, events->data[0].payment_received.payment_preimage.data, 32);
+			assert(ChannelManager_claim_funds(&cm2, payment_preimage));
 		}
 		PeerManager_process_events(&net2);
 		// Wait until we've passed through a full set of monitor updates (ie new preimage + CS/RAA messages)
@@ -556,7 +551,7 @@ int main() {
 			LDK::CVec_EventZ events = ev1.get_and_clear_pending_events(ev1.this_arg);
 			assert(events->datalen == 1);
 			assert(events->data[0].tag == LDKEvent_PaymentSent);
-			assert(!memcmp(events->data[0].payment_sent.payment_preimage.data, payment_preimage_1.data, 32));
+			assert(!memcmp(events->data[0].payment_sent.payment_preimage.data, payment_preimage.data, 32));
 		}
 
 		conn.stop();

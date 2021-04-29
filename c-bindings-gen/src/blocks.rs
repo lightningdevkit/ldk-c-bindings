@@ -442,14 +442,16 @@ pub fn write_method_params<W: std::io::Write>(w: &mut W, sig: &syn::Signature, t
 	for inp in sig.inputs.iter() {
 		match inp {
 			syn::FnArg::Receiver(recv) => {
-				if !recv.attrs.is_empty() || recv.reference.is_none() { unimplemented!(); }
-				write!(w, "this_arg: {}{}",
-					match (self_ptr, recv.mutability.is_some()) {
-						(true, true) => "*mut ",
-						(true, false) => "*const ",
-						(false, true) => "&mut ",
-						(false, false) => "&",
-					}, this_param).unwrap();
+				if !recv.attrs.is_empty() { unimplemented!(); }
+				write!(w, "{}this_arg: {}{}", if recv.reference.is_none() { "mut " } else { "" },
+					if recv.reference.is_some() {
+						match (self_ptr, recv.mutability.is_some()) {
+							(true, true) => "*mut ",
+							(true, false) => "*const ",
+							(false, true) => "&mut ",
+							(false, false) => "&",
+						}
+					} else { "" }, this_param).unwrap();
 				assert!(first_arg);
 				first_arg = false;
 			},
@@ -556,8 +558,9 @@ pub fn write_method_call_params<W: std::io::Write>(w: &mut W, sig: &syn::Signatu
 	for inp in sig.inputs.iter() {
 		match inp {
 			syn::FnArg::Receiver(recv) => {
-				if !recv.attrs.is_empty() || recv.reference.is_none() { unimplemented!(); }
+				if !recv.attrs.is_empty() { unimplemented!(); }
 				if to_c {
+					if recv.reference.is_none() { unimplemented!(); }
 					write!(w, "self.this_arg").unwrap();
 					first_arg = false;
 				}
@@ -645,7 +648,7 @@ pub fn write_method_call_params<W: std::io::Write>(w: &mut W, sig: &syn::Signatu
 /// Prints concrete generic parameters for a struct/trait/function, including the less-than and
 /// greater-than symbols, if any generic parameters are defined.
 pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generics, types: &TypeResolver, concrete_lifetimes: bool) {
-	let mut gen_types = GenericTypes::new();
+	let mut gen_types = GenericTypes::new(None);
 	assert!(gen_types.learn_generics(generics, types));
 	if !generics.params.is_empty() {
 		write!(w, "<").unwrap();

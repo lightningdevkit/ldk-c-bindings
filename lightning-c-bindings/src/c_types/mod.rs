@@ -9,8 +9,22 @@ use bitcoin::secp256k1::key::PublicKey as SecpPublicKey;
 use bitcoin::secp256k1::key::SecretKey as SecpSecretKey;
 use bitcoin::secp256k1::Signature as SecpSignature;
 use bitcoin::secp256k1::Error as SecpError;
+use bitcoin::bech32;
 
 use std::convert::TryInto; // Bindings need at least rustc 1.34
+
+/// Integer in the range `0..32`
+#[derive(PartialEq, Eq, Copy, Clone)]
+#[allow(non_camel_case_types)]
+#[repr(C)]
+pub struct u5(u8);
+
+impl From<bech32::u5> for u5 {
+	fn from(o: bech32::u5) -> Self { Self(o.to_u8()) }
+}
+impl Into<bech32::u5> for u5 {
+	fn into(self) -> bech32::u5 { bech32::u5::try_from_u8(self.0).expect("u5 objects must be in the range 0..32") }
+}
 
 #[derive(Clone)]
 #[repr(C)]
@@ -296,6 +310,10 @@ pub struct TenBytes { /** The ten bytes */ pub data: [u8; 10], }
 #[repr(C)]
 /// A 16-byte byte array.
 pub struct SixteenBytes { /** The sixteen bytes */ pub data: [u8; 16], }
+#[derive(Clone)]
+#[repr(C)]
+/// A 20-byte byte array.
+pub struct TwentyBytes { /** The twenty bytes */ pub data: [u8; 20], }
 
 pub(crate) struct VecWriter(pub Vec<u8>);
 impl lightning::util::ser::Writer for VecWriter {
@@ -320,18 +338,20 @@ pub(crate) fn deserialize_obj_arg<A, I: lightning::util::ser::ReadableArgs<A>>(s
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 /// A Rust str object, ie a reference to a UTF8-valid string.
 /// This is *not* null-terminated so cannot be used directly as a C string!
 pub struct Str {
 	/// A pointer to the string's bytes, in UTF8 encoding
 	pub chars: *const u8,
 	/// The number of bytes (not characters!) pointed to by `chars`
-	pub len: usize
+	pub len: usize,
+	/// Whether the data pointed to by `chars` should be freed or not.
+	pub chars_is_owned: bool,
 }
 impl Into<Str> for &'static str {
 	fn into(self) -> Str {
-		Str { chars: self.as_ptr(), len: self.len() }
+		Str { chars: self.as_ptr(), len: self.len(), chars_is_owned: false }
 	}
 }
 impl Into<&'static str> for Str {
@@ -340,6 +360,23 @@ impl Into<&'static str> for Str {
 		std::str::from_utf8(unsafe { std::slice::from_raw_parts(self.chars, self.len) }).unwrap()
 	}
 }
+impl Into<Str> for String {
+	fn into(self) -> Str {
+		let s = Box::leak(self.into_boxed_str());
+		Str { chars: s.as_ptr(), len: s.len(), chars_is_owned: true }
+	}
+}
+
+impl Drop for Str {
+	fn drop(&mut self) {
+		if self.chars_is_owned && self.len != 0 {
+			let _ = derived::CVec_u8Z { data: self.chars as *mut u8, datalen: self.len };
+		}
+	}
+}
+#[no_mangle]
+/// Frees the data buffer, if chars_is_owned is set and len > 0.
+pub extern "C" fn Str_free(_res: Str) { }
 
 // Note that the C++ headers memset(0) all the Templ types to avoid deallocation!
 // Thus, they must gracefully handle being completely null in _free.

@@ -13,6 +13,7 @@
 //! future, as well as generate and broadcast funding transactions handle payment preimages and a
 //! few other things.
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
@@ -55,20 +56,37 @@ pub enum Event {
 	PaymentReceived {
 		/// The hash for which the preimage should be handed to the ChannelManager.
 		payment_hash: crate::c_types::ThirtyTwoBytes,
+		/// The preimage to the payment_hash, if the payment hash (and secret) were fetched via
+		/// [`ChannelManager::create_inbound_payment`]. If provided, this can be handed directly to
+		/// [`ChannelManager::claim_funds`].
+		///
+		/// [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
+		/// [`ChannelManager::claim_funds`]: crate::ln::channelmanager::ChannelManager::claim_funds
+		payment_preimage: crate::c_types::ThirtyTwoBytes,
 		/// The \"payment secret\". This authenticates the sender to the recipient, preventing a
 		/// number of deanonymization attacks during the routing process.
-		/// As nodes upgrade, the invoices you provide should likely migrate to setting the
-		/// payment_secret feature to required, at which point you should fail_backwards any HTLCs
-		/// which have a None here.
-		/// Until then, however, values of None should be ignored, and only incorrect Some values
-		/// should result in an HTLC fail_backwards.
-		/// Note that, in any case, this value must be passed as-is to any fail or claim calls as
-		/// the HTLC index includes this value.
+		/// It is provided here for your reference, however its accuracy is enforced directly by
+		/// [`ChannelManager`] using the values you previously provided to
+		/// [`ChannelManager::create_inbound_payment`] or
+		/// [`ChannelManager::create_inbound_payment_for_hash`].
+		///
+		/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
+		/// [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
+		/// [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
 		payment_secret: crate::c_types::ThirtyTwoBytes,
 		/// The value, in thousandths of a satoshi, that this payment is for. Note that you must
 		/// compare this to the expected value before accepting the payment (as otherwise you are
 		/// providing proof-of-payment for less than the value you expected!).
 		amt: u64,
+		/// This is the `user_payment_id` which was provided to
+		/// [`ChannelManager::create_inbound_payment_for_hash`] or
+		/// [`ChannelManager::create_inbound_payment`]. It has no meaning inside of LDK and is
+		/// simply copied here. It may be used to correlate PaymentReceived events with invoice
+		/// metadata stored elsewhere.
+		///
+		/// [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
+		/// [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
+		user_payment_id: u64,
 	},
 	/// Indicates an outbound payment we made succeeded (ie it made it all the way to its target
 	/// and we got back the payment preimage for it).
@@ -127,15 +145,19 @@ impl Event {
 					user_channel_id: user_channel_id_nonref,
 				}
 			},
-			Event::PaymentReceived {ref payment_hash, ref payment_secret, ref amt, } => {
+			Event::PaymentReceived {ref payment_hash, ref payment_preimage, ref payment_secret, ref amt, ref user_payment_id, } => {
 				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut payment_preimage_nonref = (*payment_preimage).clone();
+				let mut local_payment_preimage_nonref = if payment_preimage_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentPreimage(payment_preimage_nonref.data) }) };
 				let mut payment_secret_nonref = (*payment_secret).clone();
-				let mut local_payment_secret_nonref = if payment_secret_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentSecret(payment_secret_nonref.data) }) };
 				let mut amt_nonref = (*amt).clone();
+				let mut user_payment_id_nonref = (*user_payment_id).clone();
 				nativeEvent::PaymentReceived {
 					payment_hash: ::lightning::ln::channelmanager::PaymentHash(payment_hash_nonref.data),
-					payment_secret: local_payment_secret_nonref,
+					payment_preimage: local_payment_preimage_nonref,
+					payment_secret: ::lightning::ln::channelmanager::PaymentSecret(payment_secret_nonref.data),
 					amt: amt_nonref,
+					user_payment_id: user_payment_id_nonref,
 				}
 			},
 			Event::PaymentSent {ref payment_preimage, } => {
@@ -178,12 +200,14 @@ impl Event {
 					user_channel_id: user_channel_id,
 				}
 			},
-			Event::PaymentReceived {mut payment_hash, mut payment_secret, mut amt, } => {
-				let mut local_payment_secret = if payment_secret.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentSecret(payment_secret.data) }) };
+			Event::PaymentReceived {mut payment_hash, mut payment_preimage, mut payment_secret, mut amt, mut user_payment_id, } => {
+				let mut local_payment_preimage = if payment_preimage.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentPreimage(payment_preimage.data) }) };
 				nativeEvent::PaymentReceived {
 					payment_hash: ::lightning::ln::channelmanager::PaymentHash(payment_hash.data),
-					payment_secret: local_payment_secret,
+					payment_preimage: local_payment_preimage,
+					payment_secret: ::lightning::ln::channelmanager::PaymentSecret(payment_secret.data),
 					amt: amt,
+					user_payment_id: user_payment_id,
 				}
 			},
 			Event::PaymentSent {mut payment_preimage, } => {
@@ -225,15 +249,19 @@ impl Event {
 					user_channel_id: user_channel_id_nonref,
 				}
 			},
-			nativeEvent::PaymentReceived {ref payment_hash, ref payment_secret, ref amt, } => {
+			nativeEvent::PaymentReceived {ref payment_hash, ref payment_preimage, ref payment_secret, ref amt, ref user_payment_id, } => {
 				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut payment_preimage_nonref = (*payment_preimage).clone();
+				let mut local_payment_preimage_nonref = if payment_preimage_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_preimage_nonref.unwrap()).0 } } };
 				let mut payment_secret_nonref = (*payment_secret).clone();
-				let mut local_payment_secret_nonref = if payment_secret_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_secret_nonref.unwrap()).0 } } };
 				let mut amt_nonref = (*amt).clone();
+				let mut user_payment_id_nonref = (*user_payment_id).clone();
 				Event::PaymentReceived {
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
-					payment_secret: local_payment_secret_nonref,
+					payment_preimage: local_payment_preimage_nonref,
+					payment_secret: crate::c_types::ThirtyTwoBytes { data: payment_secret_nonref.0 },
 					amt: amt_nonref,
+					user_payment_id: user_payment_id_nonref,
 				}
 			},
 			nativeEvent::PaymentSent {ref payment_preimage, } => {
@@ -276,12 +304,14 @@ impl Event {
 					user_channel_id: user_channel_id,
 				}
 			},
-			nativeEvent::PaymentReceived {mut payment_hash, mut payment_secret, mut amt, } => {
-				let mut local_payment_secret = if payment_secret.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_secret.unwrap()).0 } } };
+			nativeEvent::PaymentReceived {mut payment_hash, mut payment_preimage, mut payment_secret, mut amt, mut user_payment_id, } => {
+				let mut local_payment_preimage = if payment_preimage.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_preimage.unwrap()).0 } } };
 				Event::PaymentReceived {
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
-					payment_secret: local_payment_secret,
+					payment_preimage: local_payment_preimage,
+					payment_secret: crate::c_types::ThirtyTwoBytes { data: payment_secret.0 },
 					amt: amt,
+					user_payment_id: user_payment_id,
 				}
 			},
 			nativeEvent::PaymentSent {mut payment_preimage, } => {

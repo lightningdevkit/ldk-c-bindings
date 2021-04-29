@@ -8,6 +8,7 @@
 
 //! Structs and impls for receiving messages about the network and storing the topology live here.
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;

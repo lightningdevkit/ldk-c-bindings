@@ -22,6 +22,7 @@
 //! events. The remote server would make use of [`ChainMonitor`] for block processing and for
 //! servicing [`ChannelMonitor`] updates from the client.
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
@@ -92,6 +93,76 @@ pub extern "C" fn ChainMonitor_new(chain_source: *mut crate::lightning::chain::F
 	let mut local_chain_source = if chain_source == std::ptr::null_mut() { None } else { Some( { unsafe { *Box::from_raw(chain_source) } }) };
 	let mut ret = lightning::chain::chainmonitor::ChainMonitor::new(local_chain_source, broadcaster, logger, feeest, persister);
 	ChainMonitor { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+}
+
+impl From<nativeChainMonitor> for crate::lightning::chain::Listen {
+	fn from(obj: nativeChainMonitor) -> Self {
+		let mut rust_obj = ChainMonitor { inner: Box::into_raw(Box::new(obj)), is_owned: true };
+		let mut ret = ChainMonitor_as_Listen(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
+		rust_obj.inner = std::ptr::null_mut();
+		ret.free = Some(ChainMonitor_free_void);
+		ret
+	}
+}
+/// Constructs a new Listen which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned Listen must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn ChainMonitor_as_Listen(this_arg: &ChainMonitor) -> crate::lightning::chain::Listen {
+	crate::lightning::chain::Listen {
+		this_arg: unsafe { (*this_arg).inner as *mut c_void },
+		free: None,
+		block_connected: ChainMonitor_Listen_block_connected,
+		block_disconnected: ChainMonitor_Listen_block_disconnected,
+	}
+}
+
+extern "C" fn ChainMonitor_Listen_block_connected(this_arg: *const c_void, mut block: crate::c_types::u8slice, mut height: u32) {
+	<nativeChainMonitor as lightning::chain::Listen<>>::block_connected(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, &::bitcoin::consensus::encode::deserialize(block.to_slice()).unwrap(), height)
+}
+extern "C" fn ChainMonitor_Listen_block_disconnected(this_arg: *const c_void, header: *const [u8; 80], mut height: u32) {
+	<nativeChainMonitor as lightning::chain::Listen<>>::block_disconnected(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height)
+}
+
+impl From<nativeChainMonitor> for crate::lightning::chain::Confirm {
+	fn from(obj: nativeChainMonitor) -> Self {
+		let mut rust_obj = ChainMonitor { inner: Box::into_raw(Box::new(obj)), is_owned: true };
+		let mut ret = ChainMonitor_as_Confirm(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
+		rust_obj.inner = std::ptr::null_mut();
+		ret.free = Some(ChainMonitor_free_void);
+		ret
+	}
+}
+/// Constructs a new Confirm which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned Confirm must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn ChainMonitor_as_Confirm(this_arg: &ChainMonitor) -> crate::lightning::chain::Confirm {
+	crate::lightning::chain::Confirm {
+		this_arg: unsafe { (*this_arg).inner as *mut c_void },
+		free: None,
+		transactions_confirmed: ChainMonitor_Confirm_transactions_confirmed,
+		transaction_unconfirmed: ChainMonitor_Confirm_transaction_unconfirmed,
+		best_block_updated: ChainMonitor_Confirm_best_block_updated,
+		get_relevant_txids: ChainMonitor_Confirm_get_relevant_txids,
+	}
+}
+
+extern "C" fn ChainMonitor_Confirm_transactions_confirmed(this_arg: *const c_void, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32) {
+	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
+	<nativeChainMonitor as lightning::chain::Confirm<>>::transactions_confirmed(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height)
+}
+extern "C" fn ChainMonitor_Confirm_transaction_unconfirmed(this_arg: *const c_void, txid: *const [u8; 32]) {
+	<nativeChainMonitor as lightning::chain::Confirm<>>::transaction_unconfirmed(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, &::bitcoin::hash_types::Txid::from_slice(&unsafe { &*txid }[..]).unwrap())
+}
+extern "C" fn ChainMonitor_Confirm_best_block_updated(this_arg: *const c_void, header: *const [u8; 80], mut height: u32) {
+	<nativeChainMonitor as lightning::chain::Confirm<>>::best_block_updated(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height)
+}
+#[must_use]
+extern "C" fn ChainMonitor_Confirm_get_relevant_txids(this_arg: *const c_void) -> crate::c_types::derived::CVec_TxidZ {
+	let mut ret = <nativeChainMonitor as lightning::chain::Confirm<>>::get_relevant_txids(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, );
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.into_inner() } }); };
+	local_ret.into()
 }
 
 impl From<nativeChainMonitor> for crate::lightning::chain::Watch {

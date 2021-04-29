@@ -16,8 +16,8 @@
 #![allow(unused_parens)]
 #![allow(unused_unsafe)]
 #![allow(unused_braces)]
-#![deny(missing_docs)]
 pub mod c_types;
 pub mod bitcoin;
 pub mod lightning;
 pub mod lightning_persister;
+pub mod lightning_invoice;

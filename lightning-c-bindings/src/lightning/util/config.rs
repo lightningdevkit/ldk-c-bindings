@@ -9,6 +9,7 @@
 //! Various user-configurable channel limits and settings which ChannelManager
 //! applies for you.
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;

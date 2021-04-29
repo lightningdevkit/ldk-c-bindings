@@ -812,6 +812,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" if is_ref => Some("crate::c_types::Str"),
 
 			"std::time::Duration" => Some("u64"),
+			"std::time::SystemTime" => Some("u64"),
 			"std::io::Error" => Some("crate::c_types::IOError"),
 
 			"bech32::u5" => Some("crate::c_types::u5"),
@@ -884,6 +885,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// cannot create a &String.
 
 			"std::time::Duration" => Some("std::time::Duration::from_secs("),
+			"std::time::SystemTime" => Some("(::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs("),
 
 			"bech32::u5" => Some(""),
 
@@ -946,6 +948,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" if !is_ref => Some(".into_rust()).unwrap()"),
 
 			"std::time::Duration" => Some(")"),
+			"std::time::SystemTime" => Some("))"),
 
 			"bech32::u5" => Some(".into()"),
 
@@ -1023,6 +1026,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" => Some(""),
 
 			"std::time::Duration" => Some(""),
+			"std::time::SystemTime" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
 
 			"bech32::u5" => Some(""),
@@ -1091,6 +1095,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"String" if is_ref => Some(".as_str().into()"),
 
 			"std::time::Duration" => Some(".as_secs()"),
+			"std::time::SystemTime" => Some(".duration_since(::std::time::SystemTime::UNIX_EPOCH).expect(\"Times must be post-1970\").as_secs()"),
 			"std::io::Error" if !is_ref => Some(")"),
 
 			"bech32::u5" => Some(".into()"),

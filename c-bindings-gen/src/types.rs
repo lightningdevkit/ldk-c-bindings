@@ -558,7 +558,6 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 	pub fn resolve_imported_refs(&self, mut ty: syn::Type) -> syn::Type {
 		match &mut ty {
 			syn::Type::Path(p) => {
-eprintln!("rir {:?}", p);
 				if p.path.segments.len() != 1 { unimplemented!(); }
 				let mut args = p.path.segments[0].arguments.clone();
 				if let syn::PathArguments::AngleBracketed(ref mut generics) = &mut args {

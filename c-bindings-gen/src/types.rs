@@ -1788,16 +1788,20 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		self.write_to_c_conversion_inline_suffix_inner(w, t, generics, false, ptr_for_ref, false);
 	}
 
-	fn write_from_c_conversion_prefix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool) {
+	fn write_from_c_conversion_prefix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, _ptr_for_ref: bool) {
 		self.write_conversion_inline_intern(w, t, generics, is_ref, false, false, "() /*", true, |_, _| "&local_".to_owned(),
 				|a, b, _c| self.from_c_conversion_prefix_from_path(a, b),
-				|w, decl_type, _full_path, is_ref, is_mut| match decl_type {
-					DeclType::StructImported if is_ref && ptr_for_ref => write!(w, "unsafe {{ &*(*").unwrap(),
-					DeclType::StructImported if is_mut && is_ref => write!(w, "unsafe {{ &mut *").unwrap(),
-					DeclType::StructImported if is_ref => write!(w, "unsafe {{ &*").unwrap(),
-					DeclType::StructImported if !is_ref => write!(w, "*unsafe {{ Box::from_raw(").unwrap(),
-					DeclType::MirroredEnum if is_ref => write!(w, "&").unwrap(),
-					DeclType::MirroredEnum => {},
+				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
+					DeclType::MirroredEnum if is_ref => write!(w, "{{ use crate::c_types::mapping::*; &").unwrap(),
+					DeclType::StructImported | DeclType::MirroredEnum => write!(w, "{{ use crate::c_types::mapping::*; ").unwrap(),
+
+					// DeclType::StructImported if is_ref && ptr_for_ref => write!(w, "unsafe {{ &*(*").unwrap(), // NEVER HIT
+					// DeclType::StructImported if is_mut && is_ref => write!(w, "unsafe {{ &mut *").unwrap(),
+					// DeclType::StructImported if is_ref => write!(w, "unsafe {{ &*").unwrap(),
+					// DeclType::StructImported if !is_ref => write!(w, "*unsafe {{ Box::from_raw(").unwrap(),
+
+					// DeclType::MirroredEnum if is_ref => write!(w, "&").unwrap(),
+					// DeclType::MirroredEnum => {},
 					DeclType::Trait(_) => {},
 					_ => unimplemented!(),
 				});
@@ -1805,7 +1809,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	pub fn write_from_c_conversion_prefix<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>) {
 		self.write_from_c_conversion_prefix_inner(w, t, generics, false, false);
 	}
-	fn write_from_c_conversion_suffix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool) {
+	fn write_from_c_conversion_suffix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, _ptr_for_ref: bool) {
 		self.write_conversion_inline_intern(w, t, generics, is_ref, false, false, "*/", false,
 				|has_inner, map_str_opt| match (has_inner, map_str_opt) {
 					(false, Some(map_str)) => format!(".iter(){}.collect::<Vec<_>>()[..]", map_str),
@@ -1814,12 +1818,17 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					(true, Some(_)) => unreachable!(),
 				},
 				|a, b, _c| self.from_c_conversion_suffix_from_path(a, b),
-				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
-					DeclType::StructImported if is_ref && ptr_for_ref => write!(w, ").inner }}").unwrap(),
-					DeclType::StructImported if is_ref => write!(w, ".inner }}").unwrap(),
-					DeclType::StructImported if !is_ref => write!(w, ".take_inner()) }}").unwrap(),
-					DeclType::MirroredEnum if is_ref => write!(w, ".to_native()").unwrap(),
-					DeclType::MirroredEnum => write!(w, ".into_native()").unwrap(),
+				|w, decl_type, _full_path, is_ref, is_mut| match decl_type {
+					DeclType::StructImported if is_ref && is_mut => write!(w, ".into_rust_ref_mut() }}").unwrap(),
+					DeclType::StructImported if is_ref => write!(w, ".into_rust_ref() }}").unwrap(),
+					DeclType::StructImported => write!(w, ".into_rust_owned() }}").unwrap(),
+
+					// DeclType::StructImported if is_ref && ptr_for_ref => write!(w, ").inner }}").unwrap(), // NEVER HIT
+					// DeclType::StructImported if is_ref => write!(w, ".inner }}").unwrap(),
+					// DeclType::StructImported if !is_ref => write!(w, ".take_inner()) }}").unwrap(),
+
+					DeclType::MirroredEnum => write!(w, ".into_rust_owned() }}").unwrap(),
+
 					DeclType::Trait(_) => {},
 					_ => unimplemented!(),
 				});

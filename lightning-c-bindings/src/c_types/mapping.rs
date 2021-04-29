@@ -1,8 +1,24 @@
-/// Map a type from C
+#![allow(missing_docs)]
+
 pub trait FromC<T: Sized> {
-	/// Do the mapping
 	fn from_c(from: T) -> Self;
 }
+
+pub trait IntoRust<T: Sized> {
+	fn into_rust_owned(self) -> T;
+}
+pub trait IntoRustRef<'lft_in, 'lft_out, T: Sized> {
+	fn into_rust_ref(&'lft_in self) -> &'lft_out T;
+}
+pub trait IntoRustRefMut<'lft_in, 'lft_out, T: Sized> {
+	fn into_rust_ref_mut(&'lft_in self) -> &'lft_out mut T;
+}
+
+// impl<U, T: FromC<U>> IntoRust<T> for U {
+//	 fn into_rust_owned(self) -> T {
+//		 FromC::from_c(self)
+//	 }
+// }
 
 impl FromC<u64> for std::time::Duration {
 	fn from_c(from: u64) -> Self {

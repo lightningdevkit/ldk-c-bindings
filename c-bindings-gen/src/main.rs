@@ -568,6 +568,17 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	writeln!(w, "\t\tret").unwrap();
 	writeln!(w, "\t}}\n}}").unwrap();
 
+	// Implement the conversion into rust as owned object, as reference and as mut reference
+	writeln!(w, "impl crate::c_types::mapping::IntoRust<native{}> for {} {{", struct_name, struct_name).unwrap();
+	writeln!(w, "\tfn into_rust_owned(self) -> native{} {{ *unsafe {{ Box::from_raw(self.take_inner()) }} }}", struct_name).unwrap();
+	writeln!(w, "}}").unwrap();
+	writeln!(w, "impl crate::c_types::mapping::IntoRustRef<'_, 'static, native{}> for {} {{", struct_name, struct_name).unwrap();
+	writeln!(w, "\tfn into_rust_ref(&self) -> &'static native{} {{ unsafe {{ &*self.inner }} }}", struct_name).unwrap();
+	writeln!(w, "}}").unwrap();
+	writeln!(w, "impl crate::c_types::mapping::IntoRustRefMut<'_, 'static, native{}> for {} {{", struct_name, struct_name).unwrap();
+	writeln!(w, "\tfn into_rust_ref_mut(&self) -> &'static mut native{} {{ unsafe {{ &mut *self.inner }} }}", struct_name).unwrap();
+	writeln!(w, "}}").unwrap();
+
 	write_cpp_wrapper(cpp_headers, &format!("{}", ident), true);
 }
 
@@ -1278,6 +1289,16 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	write_conv!(format!("into_native(self) -> native{}", e.ident), false, false);
 	write_conv!(format!("from_native(native: &native{}) -> Self", e.ident), true, true);
 	write_conv!(format!("native_into(native: native{}) -> Self", e.ident), true, false);
+	writeln!(w, "}}").unwrap();
+
+	// Implement the conversion into rust only as owned object, because even when using
+	// `to_native()` the returned structure will have a copy of the data and won't reference into
+	// the original instance. Implement for Borrow<T> instead of T so that the same trait can be
+	// used on references and owned objects since the behavior doesn't change. This could cause a
+	// performance regression when used on owned objects because the inner data instead of being
+	// moved is copied, but on the other end we gain a lot in terms of convenience.
+	writeln!(w, "impl<F: std::borrow::Borrow<{}>> crate::c_types::mapping::IntoRust<native{}> for F {{", e.ident, e.ident).unwrap();
+	writeln!(w, "\tfn into_rust_owned(self) -> native{} {{ use std::borrow::Borrow; self.borrow().to_native() }}", e.ident).unwrap();
 	writeln!(w, "}}").unwrap();
 
 	if needs_free {

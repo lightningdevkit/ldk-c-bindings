@@ -6,6 +6,7 @@
 // license as that which applies to the original source files from which this
 // source was automatically generated.
 
+//!lightning
 //! Rust-Lightning, not Rusty's Lightning!
 //!
 //! A full-featured but also flexible lightning implementation, in library form. This allows the
@@ -15,6 +16,7 @@
 //! generated/etc. This makes it a good candidate for tight integration into an existing wallet
 //! instead of having a rather-separate lightning appendage to a wallet.
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;

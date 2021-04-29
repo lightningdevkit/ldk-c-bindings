@@ -8,6 +8,7 @@
 
 //! Types describing on-chain transactions.
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;

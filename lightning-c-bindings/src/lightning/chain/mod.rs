@@ -8,6 +8,7 @@
 
 //! Structs and traits which allow other parts of rust-lightning to interact with the blockchain.
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
@@ -210,7 +211,7 @@ pub struct Confirm {
 	/// in the event of a chain reorganization, it must not be called with a `header` that is no
 	/// longer in the chain as of the last call to [`best_block_updated`].
 	///
-	/// [chain order]: Self#order
+	/// [chain order]: Confirm#Order
 	/// [`best_block_updated`]: Self::best_block_updated
 	pub transactions_confirmed: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, height: u32),
 	/// Processes a transaction that is no longer confirmed as result of a chain reorganization.

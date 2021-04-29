@@ -23,6 +23,7 @@
 //! raw socket events into your non-internet-facing system and then send routing events back to
 //! track the network on the less-secure system.
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
@@ -4759,6 +4760,14 @@ impl Drop for RoutingMessageHandler {
 			f(self.this_arg);
 		}
 	}
+}
+mod fuzzy_internal_msgs {
+
+use std::str::FromStr;
+use std::ffi::c_void;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+
 }
 #[no_mangle]
 /// Serialize the AcceptChannel object into a byte array which can be read by AcceptChannel_read

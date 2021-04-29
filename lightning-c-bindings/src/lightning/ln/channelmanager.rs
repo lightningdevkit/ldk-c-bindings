@@ -17,6 +17,7 @@
 //! imply it needs to fail HTLCs/payments/channels it manages).
 //!
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
@@ -299,6 +300,12 @@ pub static BREAKDOWN_TIMEOUT: u16 = lightning::ln::channelmanager::BREAKDOWN_TIM
 
 #[no_mangle]
 pub static MIN_CLTV_EXPIRY_DELTA: u16 = lightning::ln::channelmanager::MIN_CLTV_EXPIRY_DELTA;
+/// Minimum CLTV difference between the current block height and received inbound payments.
+/// Invoices generated for payment to us must set their `min_final_cltv_expiry` field to at least
+/// this value.
+
+#[no_mangle]
+pub static MIN_FINAL_CLTV_EXPIRY: u32 = lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY;
 
 use lightning::ln::channelmanager::ChannelDetails as nativeChannelDetailsImport;
 type nativeChannelDetails = nativeChannelDetailsImport;
@@ -883,9 +890,8 @@ pub extern "C" fn ChannelManager_timer_tick_occurred(this_arg: &ChannelManager) 
 /// HTLC backwards has been started.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_fail_htlc_backwards(this_arg: &ChannelManager, payment_hash: *const [u8; 32], mut payment_secret: crate::c_types::ThirtyTwoBytes) -> bool {
-	let mut local_payment_secret = if payment_secret.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentSecret(payment_secret.data) }) };
-	let mut ret = unsafe { &*this_arg.inner }.fail_htlc_backwards(&::lightning::ln::channelmanager::PaymentHash(unsafe { *payment_hash }), &local_payment_secret);
+pub extern "C" fn ChannelManager_fail_htlc_backwards(this_arg: &ChannelManager, payment_hash: *const [u8; 32]) -> bool {
+	let mut ret = unsafe { &*this_arg.inner }.fail_htlc_backwards(&::lightning::ln::channelmanager::PaymentHash(unsafe { *payment_hash }));
 	ret
 }
 
@@ -893,22 +899,19 @@ pub extern "C" fn ChannelManager_fail_htlc_backwards(this_arg: &ChannelManager, 
 /// generating message events for the net layer to claim the payment, if possible. Thus, you
 /// should probably kick the net layer to go send messages if this returns true!
 ///
-/// You must specify the expected amounts for this HTLC, and we will only claim HTLCs
-/// available within a few percent of the expected amount. This is critical for several
-/// reasons : a) it avoids providing senders with `proof-of-payment` (in the form of the
-/// payment_preimage without having provided the full value and b) it avoids certain
-/// privacy-breaking recipient-probing attacks which may reveal payment activity to
-/// motivated attackers.
-///
-/// Note that the privacy concerns in (b) are not relevant in payments with a payment_secret
-/// set. Thus, for such payments we will claim any payments which do not under-pay.
+/// Note that if you did not set an `amount_msat` when calling [`create_inbound_payment`] or
+/// [`create_inbound_payment_for_hash`] you must check that the amount in the `PaymentReceived`
+/// event matches your expectation. If you fail to do so and call this method, you may provide
+/// the sender \"proof-of-payment\" when they did not fulfill the full expected payment.
 ///
 /// May panic if called except in response to a PaymentReceived event.
+///
+/// [`create_inbound_payment`]: Self::create_inbound_payment
+/// [`create_inbound_payment_for_hash`]: Self::create_inbound_payment_for_hash
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_claim_funds(this_arg: &ChannelManager, mut payment_preimage: crate::c_types::ThirtyTwoBytes, mut payment_secret: crate::c_types::ThirtyTwoBytes, mut expected_amount: u64) -> bool {
-	let mut local_payment_secret = if payment_secret.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentSecret(payment_secret.data) }) };
-	let mut ret = unsafe { &*this_arg.inner }.claim_funds(::lightning::ln::channelmanager::PaymentPreimage(payment_preimage.data), &local_payment_secret, expected_amount);
+pub extern "C" fn ChannelManager_claim_funds(this_arg: &ChannelManager, mut payment_preimage: crate::c_types::ThirtyTwoBytes) -> bool {
+	let mut ret = unsafe { &*this_arg.inner }.claim_funds(::lightning::ln::channelmanager::PaymentPreimage(payment_preimage.data));
 	ret
 }
 
@@ -943,6 +946,81 @@ pub extern "C" fn ChannelManager_get_our_node_id(this_arg: &ChannelManager) -> c
 #[no_mangle]
 pub extern "C" fn ChannelManager_channel_monitor_updated(this_arg: &ChannelManager, funding_txo: &crate::lightning::chain::transaction::OutPoint, mut highest_applied_update_id: u64) {
 	unsafe { &*this_arg.inner }.channel_monitor_updated(unsafe { &*funding_txo.inner }, highest_applied_update_id)
+}
+
+/// Gets a payment secret and payment hash for use in an invoice given to a third party wishing
+/// to pay us.
+///
+/// This differs from [`create_inbound_payment_for_hash`] only in that it generates the
+/// [`PaymentHash`] and [`PaymentPreimage`] for you, returning the first and storing the second.
+///
+/// The [`PaymentPreimage`] will ultimately be returned to you in the [`PaymentReceived`], which
+/// will have the [`PaymentReceived::payment_preimage`] field filled in. That should then be
+/// passed directly to [`claim_funds`].
+///
+/// See [`create_inbound_payment_for_hash`] for detailed documentation on behavior and requirements.
+///
+/// [`claim_funds`]: Self::claim_funds
+/// [`PaymentReceived`]: events::Event::PaymentReceived
+/// [`PaymentReceived::payment_preimage`]: events::Event::PaymentReceived::payment_preimage
+/// [`create_inbound_payment_for_hash`]: Self::create_inbound_payment_for_hash
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_create_inbound_payment(this_arg: &ChannelManager, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut invoice_expiry_delta_secs: u32, mut user_payment_id: u64) -> crate::c_types::derived::C2Tuple_PaymentHashPaymentSecretZ {
+	let mut local_min_value_msat = if min_value_msat.is_some() { Some( { min_value_msat.take() }) } else { None };
+	let mut ret = unsafe { &*this_arg.inner }.create_inbound_payment(local_min_value_msat, invoice_expiry_delta_secs, user_payment_id);
+	let (mut orig_ret_0, mut orig_ret_1) = ret; let mut local_ret = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0.0 }, crate::c_types::ThirtyTwoBytes { data: orig_ret_1.0 }).into();
+	local_ret
+}
+
+/// Gets a [`PaymentSecret`] for a given [`PaymentHash`], for which the payment preimage is
+/// stored external to LDK.
+///
+/// A [`PaymentReceived`] event will only be generated if the [`PaymentSecret`] matches a
+/// payment secret fetched via this method or [`create_inbound_payment`], and which is at least
+/// the `min_value_msat` provided here, if one is provided.
+///
+/// The [`PaymentHash`] (and corresponding [`PaymentPreimage`]) must be globally unique. This
+/// method may return an Err if another payment with the same payment_hash is still pending.
+///
+/// `user_payment_id` will be provided back in [`PaymentReceived::user_payment_id`] events to
+/// allow tracking of which events correspond with which calls to this and
+/// [`create_inbound_payment`]. `user_payment_id` has no meaning inside of LDK, it is simply
+/// copied to events and otherwise ignored. It may be used to correlate PaymentReceived events
+/// with invoice metadata stored elsewhere.
+///
+/// `min_value_msat` should be set if the invoice being generated contains a value. Any payment
+/// received for the returned [`PaymentHash`] will be required to be at least `min_value_msat`
+/// before a [`PaymentReceived`] event will be generated, ensuring that we do not provide the
+/// sender \"proof-of-payment\" unless they have paid the required amount.
+///
+/// `invoice_expiry_delta_secs` describes the number of seconds that the invoice is valid for
+/// in excess of the current time. This should roughly match the expiry time set in the invoice.
+/// After this many seconds, we will remove the inbound payment, resulting in any attempts to
+/// pay the invoice failing. The BOLT spec suggests 7,200 secs as a default validity time for
+/// invoices when no timeout is set.
+///
+/// Note that we use block header time to time-out pending inbound payments (with some margin
+/// to compensate for the inaccuracy of block header timestamps). Thus, in practice we will
+/// accept a payment and generate a [`PaymentReceived`] event for some time after the expiry.
+/// If you need exact expiry semantics, you should enforce them upon receipt of
+/// [`PaymentReceived`].
+///
+/// May panic if `invoice_expiry_delta_secs` is greater than one year.
+///
+/// Note that invoices generated for inbound payments should have their `min_final_cltv_expiry`
+/// set to at least [`MIN_FINAL_CLTV_EXPIRY`].
+///
+/// [`create_inbound_payment`]: Self::create_inbound_payment
+/// [`PaymentReceived`]: events::Event::PaymentReceived
+/// [`PaymentReceived::user_payment_id`]: events::Event::PaymentReceived::user_payment_id
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_create_inbound_payment_for_hash(this_arg: &ChannelManager, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut invoice_expiry_delta_secs: u32, mut user_payment_id: u64) -> crate::c_types::derived::CResult_PaymentSecretAPIErrorZ {
+	let mut local_min_value_msat = if min_value_msat.is_some() { Some( { min_value_msat.take() }) } else { None };
+	let mut ret = unsafe { &*this_arg.inner }.create_inbound_payment_for_hash(::lightning::ln::channelmanager::PaymentHash(payment_hash.data), local_min_value_msat, invoice_expiry_delta_secs, user_payment_id);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
+	local_ret
 }
 
 impl From<nativeChannelManager> for crate::lightning::util::events::MessageSendEventsProvider {

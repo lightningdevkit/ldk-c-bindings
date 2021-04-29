@@ -21,10 +21,19 @@
 //! [BOLT #9]: https://github.com/lightningnetwork/lightning-rfc/blob/master/09-features.md
 //! [messages]: crate::ln::msgs
 
+use std::str::FromStr;
 use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
+mod sealed {
+
+use std::str::FromStr;
+use std::ffi::c_void;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+
+}
 impl Clone for InitFeatures {
 	fn clone(&self) -> Self {
 		Self {

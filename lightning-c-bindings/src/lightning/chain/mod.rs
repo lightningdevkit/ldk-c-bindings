@@ -82,12 +82,10 @@ pub struct Access {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
-unsafe impl Send for Access {}
-unsafe impl Sync for Access {}
 
 use lightning::chain::Access as rustAccess;
 impl rustAccess for Access {
-	fn get_utxo(&self, genesis_hash: &bitcoin::hash_types::BlockHash, short_channel_id: u64) -> Result<bitcoin::blockdata::transaction::TxOut, lightning::chain::AccessError> {
+	fn get_utxo(&self, mut genesis_hash: &bitcoin::hash_types::BlockHash, mut short_channel_id: u64) -> Result<bitcoin::blockdata::transaction::TxOut, lightning::chain::AccessError> {
 		let mut ret = (self.get_utxo)(self.this_arg, genesis_hash.as_inner(), short_channel_id);
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
@@ -135,11 +133,11 @@ pub struct Listen {
 
 use lightning::chain::Listen as rustListen;
 impl rustListen for Listen {
-	fn block_connected(&self, block: &bitcoin::blockdata::block::Block, height: u32) {
+	fn block_connected(&self, mut block: &bitcoin::blockdata::block::Block, mut height: u32) {
 		let mut local_block = ::bitcoin::consensus::encode::serialize(block);
 		(self.block_connected)(self.this_arg, crate::c_types::u8slice::from_slice(&local_block), height)
 	}
-	fn block_disconnected(&self, header: &bitcoin::blockdata::block::BlockHeader, height: u32) {
+	fn block_disconnected(&self, mut header: &bitcoin::blockdata::block::BlockHeader, mut height: u32) {
 		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
 		(self.block_disconnected)(self.this_arg, &local_header, height)
 	}
@@ -250,15 +248,15 @@ pub struct Confirm {
 
 use lightning::chain::Confirm as rustConfirm;
 impl rustConfirm for Confirm {
-	fn transactions_confirmed(&self, header: &bitcoin::blockdata::block::BlockHeader, txdata: &lightning::chain::transaction::TransactionData, height: u32) {
+	fn transactions_confirmed(&self, mut header: &bitcoin::blockdata::block::BlockHeader, mut txdata: &lightning::chain::transaction::TransactionData, mut height: u32) {
 		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
 		let mut local_txdata = Vec::new(); for item in txdata.iter() { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = *item; let mut local_txdata_0 = (orig_txdata_0_0, crate::c_types::Transaction::from_bitcoin(&orig_txdata_0_1)).into(); local_txdata_0 }); };
 		(self.transactions_confirmed)(self.this_arg, &local_header, local_txdata.into(), height)
 	}
-	fn transaction_unconfirmed(&self, txid: &bitcoin::hash_types::Txid) {
+	fn transaction_unconfirmed(&self, mut txid: &bitcoin::hash_types::Txid) {
 		(self.transaction_unconfirmed)(self.this_arg, txid.as_inner())
 	}
-	fn best_block_updated(&self, header: &bitcoin::blockdata::block::BlockHeader, height: u32) {
+	fn best_block_updated(&self, mut header: &bitcoin::blockdata::block::BlockHeader, mut height: u32) {
 		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
 		(self.best_block_updated)(self.this_arg, &local_header, height)
 	}
@@ -341,17 +339,15 @@ pub struct Watch {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
-unsafe impl Send for Watch {}
-unsafe impl Sync for Watch {}
 
 use lightning::chain::Watch as rustWatch;
 impl rustWatch<crate::lightning::chain::keysinterface::Sign> for Watch {
-	fn watch_channel(&self, funding_txo: lightning::chain::transaction::OutPoint, monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
+	fn watch_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
 		let mut ret = (self.watch_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(funding_txo)), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: Box::into_raw(Box::new(monitor)), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
-	fn update_channel(&self, funding_txo: lightning::chain::transaction::OutPoint, update: lightning::chain::channelmonitor::ChannelMonitorUpdate) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
+	fn update_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut update: lightning::chain::channelmonitor::ChannelMonitorUpdate) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
 		let mut ret = (self.update_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(funding_txo)), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: Box::into_raw(Box::new(update)), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
@@ -424,15 +420,13 @@ pub struct Filter {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
-unsafe impl Send for Filter {}
-unsafe impl Sync for Filter {}
 
 use lightning::chain::Filter as rustFilter;
 impl rustFilter for Filter {
-	fn register_tx(&self, txid: &bitcoin::hash_types::Txid, script_pubkey: &bitcoin::blockdata::script::Script) {
+	fn register_tx(&self, mut txid: &bitcoin::hash_types::Txid, mut script_pubkey: &bitcoin::blockdata::script::Script) {
 		(self.register_tx)(self.this_arg, txid.as_inner(), crate::c_types::u8slice::from_slice(&script_pubkey[..]))
 	}
-	fn register_output(&self, output: lightning::chain::WatchedOutput) -> Option<(usize, bitcoin::blockdata::transaction::Transaction)> {
+	fn register_output(&self, mut output: lightning::chain::WatchedOutput) -> Option<(usize, bitcoin::blockdata::transaction::Transaction)> {
 		let mut ret = (self.register_output)(self.this_arg, crate::lightning::chain::WatchedOutput { inner: Box::into_raw(Box::new(output)), is_owned: true });
 		let mut local_ret = if ret.is_some() { Some( { let (mut orig_ret_0_0, mut orig_ret_0_1) = ret.take().to_rust(); let mut local_ret_0 = (orig_ret_0_0, orig_ret_0_1.into_bitcoin()); local_ret_0 }) } else { None };
 		local_ret

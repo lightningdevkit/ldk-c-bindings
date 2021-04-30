@@ -1286,346 +1286,150 @@ typedef struct LDKCResult_CVec_SignatureZNoneZ {
    bool result_ok;
 } LDKCResult_CVec_SignatureZNoneZ;
 
+/**
+ * The contents of CResult_SiPrefixNoneZ
+ */
+typedef union LDKCResult_SiPrefixNoneZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   enum LDKSiPrefix *result;
+   /**
+    * Note that this value is always NULL, as there are no contents in the Err variant
+    */
+   void *err;
+} LDKCResult_SiPrefixNoneZPtr;
+
+/**
+ * A CResult_SiPrefixNoneZ represents the result of a fallible operation,
+ * containing a crate::lightning_invoice::SiPrefix on success and a () on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_SiPrefixNoneZ {
+   /**
+    * The contents of this CResult_SiPrefixNoneZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_SiPrefixNoneZPtr contents;
+   /**
+    * Whether this CResult_SiPrefixNoneZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_SiPrefixNoneZ;
+
 
 
 /**
- * SHA-256 hash
+ * Represents a syntactically and semantically correct lightning BOLT11 invoice.
+ *
+ * There are three ways to construct an `Invoice`:
+ *  1. using `InvoiceBuilder`
+ *  2. using `Invoice::from_signed(SignedRawInvoice)`
+ *  3. using `str::parse::<Invoice>(&str)`
  */
-typedef struct MUST_USE_STRUCT LDKSha256 {
+typedef struct MUST_USE_STRUCT LDKInvoice {
    /**
     * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
-   LDKnativeSha256 *inner;
+   LDKnativeInvoice *inner;
    /**
     * Indicates that this is the only struct which contains the same pointer.
     * Rust functions which take ownership of an object provided via an argument require
     * this to be true and invalidate the object pointed to by inner.
     */
    bool is_owned;
-} LDKSha256;
+} LDKInvoice;
+
+/**
+ * The contents of CResult_InvoiceNoneZ
+ */
+typedef union LDKCResult_InvoiceNoneZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKInvoice *result;
+   /**
+    * Note that this value is always NULL, as there are no contents in the Err variant
+    */
+   void *err;
+} LDKCResult_InvoiceNoneZPtr;
+
+/**
+ * A CResult_InvoiceNoneZ represents the result of a fallible operation,
+ * containing a crate::lightning_invoice::Invoice on success and a () on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_InvoiceNoneZ {
+   /**
+    * The contents of this CResult_InvoiceNoneZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_InvoiceNoneZPtr contents;
+   /**
+    * Whether this CResult_InvoiceNoneZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_InvoiceNoneZ;
 
 
 
 /**
- * Description string
+ * Represents a signed `RawInvoice` with cached hash. The signature is not checked and may be
+ * invalid.
  *
  * # Invariants
- * The description can be at most 639 __bytes__ long
+ * The hash has to be either from the deserialized invoice or from the serialized `raw_invoice`.
  */
-typedef struct MUST_USE_STRUCT LDKDescription {
+typedef struct MUST_USE_STRUCT LDKSignedRawInvoice {
    /**
     * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
-   LDKnativeDescription *inner;
+   LDKnativeSignedRawInvoice *inner;
    /**
     * Indicates that this is the only struct which contains the same pointer.
     * Rust functions which take ownership of an object provided via an argument require
     * this to be true and invalidate the object pointed to by inner.
     */
    bool is_owned;
-} LDKDescription;
-
-
+} LDKSignedRawInvoice;
 
 /**
- * Payee public key
+ * The contents of CResult_SignedRawInvoiceNoneZ
  */
-typedef struct MUST_USE_STRUCT LDKPayeePubKey {
+typedef union LDKCResult_SignedRawInvoiceNoneZPtr {
    /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
     */
-   LDKnativePayeePubKey *inner;
+   struct LDKSignedRawInvoice *result;
    /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
+    * Note that this value is always NULL, as there are no contents in the Err variant
     */
-   bool is_owned;
-} LDKPayeePubKey;
-
-
+   void *err;
+} LDKCResult_SignedRawInvoiceNoneZPtr;
 
 /**
- * Positive duration that defines when (relatively to the timestamp) in the future the invoice
- * expires
- *
- * # Invariants
- * The number of seconds this expiry time represents has to be in the range
- * `0...(SYSTEM_TIME_MAX_UNIX_TIMESTAMP - MAX_EXPIRY_TIME)` to avoid overflows when adding it to a
- * timestamp
+ * A CResult_SignedRawInvoiceNoneZ represents the result of a fallible operation,
+ * containing a crate::lightning_invoice::SignedRawInvoice on success and a () on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
  */
-typedef struct MUST_USE_STRUCT LDKExpiryTime {
+typedef struct LDKCResult_SignedRawInvoiceNoneZ {
    /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    * The contents of this CResult_SignedRawInvoiceNoneZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
     */
-   LDKnativeExpiryTime *inner;
+   union LDKCResult_SignedRawInvoiceNoneZPtr contents;
    /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
+    * Whether this CResult_SignedRawInvoiceNoneZ represents a success state.
     */
-   bool is_owned;
-} LDKExpiryTime;
-
-
-
-/**
- * `min_final_cltv_expiry` to use for the last HTLC in the route
- */
-typedef struct MUST_USE_STRUCT LDKMinFinalCltvExpiry {
-   /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
-    */
-   LDKnativeMinFinalCltvExpiry *inner;
-   /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
-    */
-   bool is_owned;
-} LDKMinFinalCltvExpiry;
-
-/**
- * Integer in the range `0..32`
- */
-typedef struct LDKu5 {
-   uint8_t _0;
-} LDKu5;
-
-/**
- * A 20-byte byte array.
- */
-typedef struct LDKTwentyBytes {
-   /**
-    * The twenty bytes
-    */
-   uint8_t data[20];
-} LDKTwentyBytes;
-
-/**
- * Fallback address in case no LN payment is possible
- */
-typedef enum LDKFallback_Tag {
-   LDKFallback_SegWitProgram,
-   LDKFallback_PubKeyHash,
-   LDKFallback_ScriptHash,
-   /**
-    * Must be last for serialization purposes
-    */
-   LDKFallback_Sentinel,
-} LDKFallback_Tag;
-
-typedef struct LDKFallback_LDKSegWitProgram_Body {
-   struct LDKu5 version;
-   struct LDKCVec_u8Z program;
-} LDKFallback_LDKSegWitProgram_Body;
-
-typedef struct MUST_USE_STRUCT LDKFallback {
-   LDKFallback_Tag tag;
-   union {
-      LDKFallback_LDKSegWitProgram_Body seg_wit_program;
-      struct {
-         struct LDKTwentyBytes pub_key_hash;
-      };
-      struct {
-         struct LDKTwentyBytes script_hash;
-      };
-   };
-} LDKFallback;
-
-
-
-/**
- * Private routing information
- *
- * # Invariants
- * The encoded route has to be <1024 5bit characters long (<=639 bytes or <=12 hops)
- *
- */
-typedef struct MUST_USE_STRUCT LDKRouteHint {
-   /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
-    */
-   LDKnativeRouteHint *inner;
-   /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
-    */
-   bool is_owned;
-} LDKRouteHint;
-
-
-
-/**
- * 256-bit payment secret
- */
-typedef struct MUST_USE_STRUCT LDKPaymentSecret {
-   /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
-    */
-   LDKnativePaymentSecret *inner;
-   /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
-    */
-   bool is_owned;
-} LDKPaymentSecret;
-
-
-
-/**
- * Features used within an invoice.
- */
-typedef struct MUST_USE_STRUCT LDKInvoiceFeatures {
-   /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
-    */
-   LDKnativeInvoiceFeatures *inner;
-   /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
-    */
-   bool is_owned;
-} LDKInvoiceFeatures;
-
-/**
- * Tagged field with known tag
- *
- * For descriptions of the enum values please refer to the enclosed type's docs.
- */
-typedef enum LDKTaggedField_Tag {
-   LDKTaggedField_PaymentHash,
-   LDKTaggedField_Description,
-   LDKTaggedField_PayeePubKey,
-   LDKTaggedField_DescriptionHash,
-   LDKTaggedField_ExpiryTime,
-   LDKTaggedField_MinFinalCltvExpiry,
-   LDKTaggedField_Fallback,
-   LDKTaggedField_Route,
-   LDKTaggedField_PaymentSecret,
-   LDKTaggedField_Features,
-   /**
-    * Must be last for serialization purposes
-    */
-   LDKTaggedField_Sentinel,
-} LDKTaggedField_Tag;
-
-typedef struct MUST_USE_STRUCT LDKTaggedField {
-   LDKTaggedField_Tag tag;
-   union {
-      struct {
-         struct LDKSha256 payment_hash;
-      };
-      struct {
-         struct LDKDescription description;
-      };
-      struct {
-         struct LDKPayeePubKey payee_pub_key;
-      };
-      struct {
-         struct LDKSha256 description_hash;
-      };
-      struct {
-         struct LDKExpiryTime expiry_time;
-      };
-      struct {
-         struct LDKMinFinalCltvExpiry min_final_cltv_expiry;
-      };
-      struct {
-         struct LDKFallback fallback;
-      };
-      struct {
-         struct LDKRouteHint route;
-      };
-      struct {
-         struct LDKPaymentSecret payment_secret;
-      };
-      struct {
-         struct LDKInvoiceFeatures features;
-      };
-   };
-} LDKTaggedField;
-
-/**
- * A dynamically-allocated array of crate::c_types::u5s of arbitrary size.
- * This corresponds to std::vector in C++
- */
-typedef struct LDKCVec_u5Z {
-   /**
-    * The elements in the array.
-    * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
-    */
-   struct LDKu5 *data;
-   /**
-    * The number of elements pointed to by `data`.
-    */
-   uintptr_t datalen;
-} LDKCVec_u5Z;
-
-/**
- * Tagged field which may have an unknown tag
- */
-typedef enum LDKRawTaggedField_Tag {
-   /**
-    * Parsed tagged field with known tag
-    */
-   LDKRawTaggedField_KnownSemantics,
-   /**
-    * tagged field which was not parsed due to an unknown tag or undefined field semantics
-    */
-   LDKRawTaggedField_UnknownSemantics,
-   /**
-    * Must be last for serialization purposes
-    */
-   LDKRawTaggedField_Sentinel,
-} LDKRawTaggedField_Tag;
-
-typedef struct MUST_USE_STRUCT LDKRawTaggedField {
-   LDKRawTaggedField_Tag tag;
-   union {
-      struct {
-         struct LDKTaggedField known_semantics;
-      };
-      struct {
-         struct LDKCVec_u5Z unknown_semantics;
-      };
-   };
-} LDKRawTaggedField;
-
-/**
- * A dynamically-allocated array of crate::lightning_invoice::RawTaggedFields of arbitrary size.
- * This corresponds to std::vector in C++
- */
-typedef struct LDKCVec_RawTaggedFieldZ {
-   /**
-    * The elements in the array.
-    * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
-    */
-   struct LDKRawTaggedField *data;
-   /**
-    * The number of elements pointed to by `data`.
-    */
-   uintptr_t datalen;
-} LDKCVec_RawTaggedFieldZ;
+   bool result_ok;
+} LDKCResult_SignedRawInvoiceNoneZ;
 
 
 
@@ -1700,6 +1504,26 @@ typedef struct LDKC3Tuple_RawInvoice_u832InvoiceSignatureZ {
    struct LDKInvoiceSignature c;
 } LDKC3Tuple_RawInvoice_u832InvoiceSignatureZ;
 
+
+
+/**
+ * Payee public key
+ */
+typedef struct MUST_USE_STRUCT LDKPayeePubKey {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativePayeePubKey *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKPayeePubKey;
+
 /**
  * The contents of CResult_PayeePubKeyErrorZ
  */
@@ -1732,6 +1556,30 @@ typedef struct LDKCResult_PayeePubKeyErrorZ {
     */
    bool result_ok;
 } LDKCResult_PayeePubKeyErrorZ;
+
+
+
+/**
+ * Private routing information
+ *
+ * # Invariants
+ * The encoded route has to be <1024 5bit characters long (<=639 bytes or <=12 hops)
+ *
+ */
+typedef struct MUST_USE_STRUCT LDKRouteHint {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeRouteHint *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKRouteHint;
 
 /**
  * A dynamically-allocated array of crate::lightning_invoice::RouteHints of arbitrary size.
@@ -1866,31 +1714,6 @@ typedef struct LDKCResult_NoneSemanticErrorZ {
    bool result_ok;
 } LDKCResult_NoneSemanticErrorZ;
 
-
-
-/**
- * Represents a syntactically and semantically correct lightning BOLT11 invoice.
- *
- * There are three ways to construct an `Invoice`:
- *  1. using `InvoiceBuilder`
- *  2. using `Invoice::from_signed(SignedRawInvoice)`
- *  3. using `str::parse::<Invoice>(&str)`
- */
-typedef struct MUST_USE_STRUCT LDKInvoice {
-   /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
-    */
-   LDKnativeInvoice *inner;
-   /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
-    */
-   bool is_owned;
-} LDKInvoice;
-
 /**
  * The contents of CResult_InvoiceSemanticErrorZ
  */
@@ -1924,6 +1747,29 @@ typedef struct LDKCResult_InvoiceSemanticErrorZ {
    bool result_ok;
 } LDKCResult_InvoiceSemanticErrorZ;
 
+
+
+/**
+ * Description string
+ *
+ * # Invariants
+ * The description can be at most 639 __bytes__ long
+ */
+typedef struct MUST_USE_STRUCT LDKDescription {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeDescription *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKDescription;
+
 /**
  * The contents of CResult_DescriptionCreationErrorZ
  */
@@ -1956,6 +1802,32 @@ typedef struct LDKCResult_DescriptionCreationErrorZ {
     */
    bool result_ok;
 } LDKCResult_DescriptionCreationErrorZ;
+
+
+
+/**
+ * Positive duration that defines when (relatively to the timestamp) in the future the invoice
+ * expires
+ *
+ * # Invariants
+ * The number of seconds this expiry time represents has to be in the range
+ * `0...(SYSTEM_TIME_MAX_UNIX_TIMESTAMP - MAX_EXPIRY_TIME)` to avoid overflows when adding it to a
+ * timestamp
+ */
+typedef struct MUST_USE_STRUCT LDKExpiryTime {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeExpiryTime *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKExpiryTime;
 
 /**
  * The contents of CResult_ExpiryTimeCreationErrorZ
@@ -2067,7 +1939,7 @@ typedef union LDKCResult_StringErrorZPtr {
     * A pointer to the contents in the success state.
     * Reading from this pointer when `result_ok` is not set is undefined.
     */
-   struct LDKCVec_u8Z *result;
+   struct LDKStr *result;
    /**
     * A pointer to the contents in the error state.
     * Reading from this pointer when `result_ok` is set is undefined.
@@ -2077,7 +1949,7 @@ typedef union LDKCResult_StringErrorZPtr {
 
 /**
  * A CResult_StringErrorZ represents the result of a fallible operation,
- * containing a crate::c_types::derived::CVec_u8Z on success and a crate::c_types::Secp256k1Error on failure.
+ * containing a crate::c_types::Str on success and a crate::c_types::Secp256k1Error on failure.
  * `result_ok` indicates the overall state, and the contents are provided via `contents`.
  */
 typedef struct LDKCResult_StringErrorZ {
@@ -5206,6 +5078,26 @@ typedef struct LDKCResult_ChannelFeaturesDecodeErrorZ {
    bool result_ok;
 } LDKCResult_ChannelFeaturesDecodeErrorZ;
 
+
+
+/**
+ * Features used within an invoice.
+ */
+typedef struct MUST_USE_STRUCT LDKInvoiceFeatures {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeInvoiceFeatures *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKInvoiceFeatures;
+
 /**
  * The contents of CResult_InvoiceFeaturesDecodeErrorZ
  */
@@ -6658,6 +6550,67 @@ typedef struct LDKCResult_GossipTimestampFilterDecodeErrorZ {
 } LDKCResult_GossipTimestampFilterDecodeErrorZ;
 
 /**
+ * When signing using a fallible method either an user-supplied `SignError` or a `CreationError`
+ * may occur.
+ */
+typedef enum LDKSignOrCreationError_Tag {
+   /**
+    * An error occurred during signing
+    */
+   LDKSignOrCreationError_SignError,
+   /**
+    * An error occurred while building the transaction
+    */
+   LDKSignOrCreationError_CreationError,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKSignOrCreationError_Sentinel,
+} LDKSignOrCreationError_Tag;
+
+typedef struct MUST_USE_STRUCT LDKSignOrCreationError {
+   LDKSignOrCreationError_Tag tag;
+   union {
+      struct {
+         enum LDKCreationError creation_error;
+      };
+   };
+} LDKSignOrCreationError;
+
+/**
+ * The contents of CResult_InvoiceSignOrCreationErrorZ
+ */
+typedef union LDKCResult_InvoiceSignOrCreationErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKInvoice *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKSignOrCreationError *err;
+} LDKCResult_InvoiceSignOrCreationErrorZPtr;
+
+/**
+ * A CResult_InvoiceSignOrCreationErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning_invoice::Invoice on success and a crate::lightning_invoice::SignOrCreationError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_InvoiceSignOrCreationErrorZ {
+   /**
+    * The contents of this CResult_InvoiceSignOrCreationErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_InvoiceSignOrCreationErrorZPtr contents;
+   /**
+    * Whether this CResult_InvoiceSignOrCreationErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_InvoiceSignOrCreationErrorZ;
+
+/**
  * The contents of CResult_SpendableOutputDescriptorDecodeErrorZ
  */
 typedef union LDKCResult_SpendableOutputDescriptorDecodeErrorZPtr {
@@ -6722,6 +6675,50 @@ typedef struct LDKCResult_SignDecodeErrorZ {
     */
    bool result_ok;
 } LDKCResult_SignDecodeErrorZ;
+
+/**
+ * Represents a secp256k1 signature serialized as two 32-byte numbers as well as a tag which
+ * allows recovering the exact public key which created the signature given the message.
+ */
+typedef struct LDKRecoverableSignature {
+   /**
+    * The bytes of the signature in "compact" form plus a "Recovery ID" which allows for
+    * recovery.
+    */
+   uint8_t serialized_form[68];
+} LDKRecoverableSignature;
+
+/**
+ * The contents of CResult_RecoverableSignatureNoneZ
+ */
+typedef union LDKCResult_RecoverableSignatureNoneZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKRecoverableSignature *result;
+   /**
+    * Note that this value is always NULL, as there are no contents in the Err variant
+    */
+   void *err;
+} LDKCResult_RecoverableSignatureNoneZPtr;
+
+/**
+ * A CResult_RecoverableSignatureNoneZ represents the result of a fallible operation,
+ * containing a crate::c_types::RecoverableSignature on success and a () on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_RecoverableSignatureNoneZ {
+   /**
+    * The contents of this CResult_RecoverableSignatureNoneZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_RecoverableSignatureNoneZPtr contents;
+   /**
+    * Whether this CResult_RecoverableSignatureNoneZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_RecoverableSignatureNoneZ;
 
 /**
  * A dynamically-allocated array of crate::c_types::derived::CVec_u8Zs of arbitrary size.
@@ -6998,14 +6995,14 @@ typedef struct LDKAPIError_LDKAPIMisuseError_Body {
    /**
     * A human-readable error message
     */
-   struct LDKCVec_u8Z err;
+   struct LDKStr err;
 } LDKAPIError_LDKAPIMisuseError_Body;
 
 typedef struct LDKAPIError_LDKFeeRateTooHigh_Body {
    /**
     * A human-readable error message
     */
-   struct LDKCVec_u8Z err;
+   struct LDKStr err;
    /**
     * The feerate which was too high.
     */
@@ -7023,7 +7020,7 @@ typedef struct LDKAPIError_LDKChannelUnavailable_Body {
    /**
     * A human-readable error message
     */
-   struct LDKCVec_u8Z err;
+   struct LDKStr err;
 } LDKAPIError_LDKChannelUnavailable_Body;
 
 typedef struct MUST_USE_STRUCT LDKAPIError {
@@ -7414,6 +7411,13 @@ typedef struct LDKKeysInterface {
     * you've read all of the provided bytes to ensure no corruption occurred.
     */
    struct LDKCResult_SignDecodeErrorZ (*read_chan_signer)(const void *this_arg, struct LDKu8slice reader);
+   /**
+    * Sign an invoice's preimage (note that this is the preimage of the invoice, not the HTLC's
+    * preimage). By parameterizing by the preimage instead of the hash, we allow implementors of
+    * this trait to parse the invoice and make sure they're signing what they expect, rather than
+    * blindly signing the hash.
+    */
+   struct LDKCResult_RecoverableSignatureNoneZ (*sign_invoice)(const void *this_arg, struct LDKCVec_u8Z invoice_preimage);
    /**
     * Frees any resources associated with this object given its this_arg pointer.
     * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -8614,30 +8618,6 @@ typedef struct MUST_USE_STRUCT LDKFilesystemPersister {
 
 
 /**
- * Represents a signed `RawInvoice` with cached hash. The signature is not checked and may be
- * invalid.
- *
- * # Invariants
- * The hash has to be either from the deserialized invoice or from the serialized `raw_invoice`.
- */
-typedef struct MUST_USE_STRUCT LDKSignedRawInvoice {
-   /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
-    */
-   LDKnativeSignedRawInvoice *inner;
-   /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
-    */
-   bool is_owned;
-} LDKSignedRawInvoice;
-
-
-
-/**
  * Data of the `RawInvoice` that is encoded in the data part
  */
 typedef struct MUST_USE_STRUCT LDKRawDataPart {
@@ -8654,6 +8634,94 @@ typedef struct MUST_USE_STRUCT LDKRawDataPart {
     */
    bool is_owned;
 } LDKRawDataPart;
+
+
+
+/**
+ * SHA-256 hash
+ */
+typedef struct MUST_USE_STRUCT LDKSha256 {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeSha256 *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKSha256;
+
+
+
+/**
+ * `min_final_cltv_expiry` to use for the last HTLC in the route
+ */
+typedef struct MUST_USE_STRUCT LDKMinFinalCltvExpiry {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeMinFinalCltvExpiry *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKMinFinalCltvExpiry;
+
+/**
+ * Integer in the range `0..32`
+ */
+typedef struct LDKu5 {
+   uint8_t _0;
+} LDKu5;
+
+/**
+ * A 20-byte byte array.
+ */
+typedef struct LDKTwentyBytes {
+   /**
+    * The twenty bytes
+    */
+   uint8_t data[20];
+} LDKTwentyBytes;
+
+/**
+ * Fallback address in case no LN payment is possible
+ */
+typedef enum LDKFallback_Tag {
+   LDKFallback_SegWitProgram,
+   LDKFallback_PubKeyHash,
+   LDKFallback_ScriptHash,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKFallback_Sentinel,
+} LDKFallback_Tag;
+
+typedef struct LDKFallback_LDKSegWitProgram_Body {
+   struct LDKu5 version;
+   struct LDKCVec_u8Z program;
+} LDKFallback_LDKSegWitProgram_Body;
+
+typedef struct MUST_USE_STRUCT LDKFallback {
+   LDKFallback_Tag tag;
+   union {
+      LDKFallback_LDKSegWitProgram_Body seg_wit_program;
+      struct {
+         struct LDKTwentyBytes pub_key_hash;
+      };
+      struct {
+         struct LDKTwentyBytes script_hash;
+      };
+   };
+} LDKFallback;
 
 extern const uintptr_t MAX_BUF_SIZE;
 
@@ -9027,14 +9095,67 @@ void CResult_CVec_SignatureZNoneZ_free(struct LDKCResult_CVec_SignatureZNoneZ _r
 struct LDKCResult_CVec_SignatureZNoneZ CResult_CVec_SignatureZNoneZ_clone(const struct LDKCResult_CVec_SignatureZNoneZ *NONNULL_PTR orig);
 
 /**
- * Frees the buffer pointed to by `data` if `datalen` is non-0.
+ * Creates a new CResult_SiPrefixNoneZ in the success state.
  */
-void CVec_RawTaggedFieldZ_free(struct LDKCVec_RawTaggedFieldZ _res);
+struct LDKCResult_SiPrefixNoneZ CResult_SiPrefixNoneZ_ok(enum LDKSiPrefix o);
 
 /**
- * Frees the buffer pointed to by `data` if `datalen` is non-0.
+ * Creates a new CResult_SiPrefixNoneZ in the error state.
  */
-void CVec_u5Z_free(struct LDKCVec_u5Z _res);
+struct LDKCResult_SiPrefixNoneZ CResult_SiPrefixNoneZ_err(void);
+
+/**
+ * Frees any resources used by the CResult_SiPrefixNoneZ.
+ */
+void CResult_SiPrefixNoneZ_free(struct LDKCResult_SiPrefixNoneZ _res);
+
+/**
+ * Creates a new CResult_SiPrefixNoneZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_SiPrefixNoneZ CResult_SiPrefixNoneZ_clone(const struct LDKCResult_SiPrefixNoneZ *NONNULL_PTR orig);
+
+/**
+ * Creates a new CResult_InvoiceNoneZ in the success state.
+ */
+struct LDKCResult_InvoiceNoneZ CResult_InvoiceNoneZ_ok(struct LDKInvoice o);
+
+/**
+ * Creates a new CResult_InvoiceNoneZ in the error state.
+ */
+struct LDKCResult_InvoiceNoneZ CResult_InvoiceNoneZ_err(void);
+
+/**
+ * Frees any resources used by the CResult_InvoiceNoneZ.
+ */
+void CResult_InvoiceNoneZ_free(struct LDKCResult_InvoiceNoneZ _res);
+
+/**
+ * Creates a new CResult_InvoiceNoneZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_InvoiceNoneZ CResult_InvoiceNoneZ_clone(const struct LDKCResult_InvoiceNoneZ *NONNULL_PTR orig);
+
+/**
+ * Creates a new CResult_SignedRawInvoiceNoneZ in the success state.
+ */
+struct LDKCResult_SignedRawInvoiceNoneZ CResult_SignedRawInvoiceNoneZ_ok(struct LDKSignedRawInvoice o);
+
+/**
+ * Creates a new CResult_SignedRawInvoiceNoneZ in the error state.
+ */
+struct LDKCResult_SignedRawInvoiceNoneZ CResult_SignedRawInvoiceNoneZ_err(void);
+
+/**
+ * Frees any resources used by the CResult_SignedRawInvoiceNoneZ.
+ */
+void CResult_SignedRawInvoiceNoneZ_free(struct LDKCResult_SignedRawInvoiceNoneZ _res);
+
+/**
+ * Creates a new CResult_SignedRawInvoiceNoneZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_SignedRawInvoiceNoneZ CResult_SignedRawInvoiceNoneZ_clone(const struct LDKCResult_SignedRawInvoiceNoneZ *NONNULL_PTR orig);
 
 /**
  * Frees the buffer pointed to by `data` if `datalen` is non-0.
@@ -9226,7 +9347,7 @@ struct LDKCResult_RouteHintCreationErrorZ CResult_RouteHintCreationErrorZ_clone(
 /**
  * Creates a new CResult_StringErrorZ in the success state.
  */
-struct LDKCResult_StringErrorZ CResult_StringErrorZ_ok(struct LDKCVec_u8Z o);
+struct LDKCResult_StringErrorZ CResult_StringErrorZ_ok(struct LDKStr o);
 
 /**
  * Creates a new CResult_StringErrorZ in the error state.
@@ -10619,6 +10740,27 @@ void CResult_GossipTimestampFilterDecodeErrorZ_free(struct LDKCResult_GossipTime
 struct LDKCResult_GossipTimestampFilterDecodeErrorZ CResult_GossipTimestampFilterDecodeErrorZ_clone(const struct LDKCResult_GossipTimestampFilterDecodeErrorZ *NONNULL_PTR orig);
 
 /**
+ * Creates a new CResult_InvoiceSignOrCreationErrorZ in the success state.
+ */
+struct LDKCResult_InvoiceSignOrCreationErrorZ CResult_InvoiceSignOrCreationErrorZ_ok(struct LDKInvoice o);
+
+/**
+ * Creates a new CResult_InvoiceSignOrCreationErrorZ in the error state.
+ */
+struct LDKCResult_InvoiceSignOrCreationErrorZ CResult_InvoiceSignOrCreationErrorZ_err(struct LDKSignOrCreationError e);
+
+/**
+ * Frees any resources used by the CResult_InvoiceSignOrCreationErrorZ.
+ */
+void CResult_InvoiceSignOrCreationErrorZ_free(struct LDKCResult_InvoiceSignOrCreationErrorZ _res);
+
+/**
+ * Creates a new CResult_InvoiceSignOrCreationErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_InvoiceSignOrCreationErrorZ CResult_InvoiceSignOrCreationErrorZ_clone(const struct LDKCResult_InvoiceSignOrCreationErrorZ *NONNULL_PTR orig);
+
+/**
  * Creates a new CResult_SpendableOutputDescriptorDecodeErrorZ in the success state.
  */
 struct LDKCResult_SpendableOutputDescriptorDecodeErrorZ CResult_SpendableOutputDescriptorDecodeErrorZ_ok(struct LDKSpendableOutputDescriptor o);
@@ -10717,6 +10859,27 @@ void CResult_SignDecodeErrorZ_free(struct LDKCResult_SignDecodeErrorZ _res);
  * but with all dynamically-allocated buffers duplicated in new buffers.
  */
 struct LDKCResult_SignDecodeErrorZ CResult_SignDecodeErrorZ_clone(const struct LDKCResult_SignDecodeErrorZ *NONNULL_PTR orig);
+
+/**
+ * Creates a new CResult_RecoverableSignatureNoneZ in the success state.
+ */
+struct LDKCResult_RecoverableSignatureNoneZ CResult_RecoverableSignatureNoneZ_ok(struct LDKRecoverableSignature o);
+
+/**
+ * Creates a new CResult_RecoverableSignatureNoneZ in the error state.
+ */
+struct LDKCResult_RecoverableSignatureNoneZ CResult_RecoverableSignatureNoneZ_err(void);
+
+/**
+ * Frees any resources used by the CResult_RecoverableSignatureNoneZ.
+ */
+void CResult_RecoverableSignatureNoneZ_free(struct LDKCResult_RecoverableSignatureNoneZ _res);
+
+/**
+ * Creates a new CResult_RecoverableSignatureNoneZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_RecoverableSignatureNoneZ CResult_RecoverableSignatureNoneZ_clone(const struct LDKCResult_RecoverableSignatureNoneZ *NONNULL_PTR orig);
 
 /**
  * Frees the buffer pointed to by `data` if `datalen` is non-0.
@@ -12811,6 +12974,10 @@ MUST_USE_RES struct LDKC2Tuple_PaymentHashPaymentSecretZ ChannelManager_create_i
  * If you need exact expiry semantics, you should enforce them upon receipt of
  * [`PaymentReceived`].
  *
+ * Pending inbound payments are stored in memory and in serialized versions of this
+ * [`ChannelManager`]. If potentially unbounded numbers of inbound payments may exist and
+ * space is limited, you may wish to rate-limit inbound payment creation.
+ *
  * May panic if `invoice_expiry_delta_secs` is greater than one year.
  *
  * Note that invoices generated for inbound payments should have their `min_final_cltv_expiry`
@@ -13038,12 +13205,12 @@ struct LDKStr ErrorMessage_get_data(const struct LDKErrorMessage *NONNULL_PTR th
  * or printed to stdout).  Otherwise, a well crafted error message may trigger a security
  * vulnerability in the terminal emulator or the logging subsystem.
  */
-void ErrorMessage_set_data(struct LDKErrorMessage *NONNULL_PTR this_ptr, struct LDKCVec_u8Z val);
+void ErrorMessage_set_data(struct LDKErrorMessage *NONNULL_PTR this_ptr, struct LDKStr val);
 
 /**
  * Constructs a new ErrorMessage given each field
  */
-MUST_USE_RES struct LDKErrorMessage ErrorMessage_new(struct LDKThirtyTwoBytes channel_id_arg, struct LDKCVec_u8Z data_arg);
+MUST_USE_RES struct LDKErrorMessage ErrorMessage_new(struct LDKThirtyTwoBytes channel_id_arg, struct LDKStr data_arg);
 
 /**
  * Creates a copy of the ErrorMessage
@@ -14736,7 +14903,7 @@ struct LDKStr LightningError_get_err(const struct LDKLightningError *NONNULL_PTR
 /**
  * A human-readable message describing the error
  */
-void LightningError_set_err(struct LDKLightningError *NONNULL_PTR this_ptr, struct LDKCVec_u8Z val);
+void LightningError_set_err(struct LDKLightningError *NONNULL_PTR this_ptr, struct LDKStr val);
 
 /**
  * The action which should be taken against the offending peer.
@@ -14751,7 +14918,7 @@ void LightningError_set_action(struct LDKLightningError *NONNULL_PTR this_ptr, s
 /**
  * Constructs a new LightningError given each field
  */
-MUST_USE_RES struct LDKLightningError LightningError_new(struct LDKCVec_u8Z err_arg, struct LDKErrorAction action_arg);
+MUST_USE_RES struct LDKLightningError LightningError_new(struct LDKStr err_arg, struct LDKErrorAction action_arg);
 
 /**
  * Creates a copy of the LightningError
@@ -16995,18 +17162,18 @@ void FilesystemPersister_free(struct LDKFilesystemPersister this_obj);
  * Initialize a new FilesystemPersister and set the path to the individual channels'
  * files.
  */
-MUST_USE_RES struct LDKFilesystemPersister FilesystemPersister_new(struct LDKCVec_u8Z path_to_channel_data);
+MUST_USE_RES struct LDKFilesystemPersister FilesystemPersister_new(struct LDKStr path_to_channel_data);
 
 /**
  * Get the directory which was provided when this persister was initialized.
  */
-MUST_USE_RES struct LDKCVec_u8Z FilesystemPersister_get_data_dir(const struct LDKFilesystemPersister *NONNULL_PTR this_arg);
+MUST_USE_RES struct LDKStr FilesystemPersister_get_data_dir(const struct LDKFilesystemPersister *NONNULL_PTR this_arg);
 
 /**
  * Writes the provided `ChannelManager` to the path provided at `FilesystemPersister`
  * initialization, within a file called \"manager\".
  */
-MUST_USE_RES struct LDKCResult_NoneErrorZ FilesystemPersister_persist_manager(struct LDKCVec_u8Z data_dir, const struct LDKChannelManager *NONNULL_PTR manager);
+MUST_USE_RES struct LDKCResult_NoneErrorZ FilesystemPersister_persist_manager(struct LDKStr data_dir, const struct LDKChannelManager *NONNULL_PTR manager);
 
 /**
  * Read `ChannelMonitor`s from disk.
@@ -17092,16 +17259,6 @@ struct LDKPositiveTimestamp RawDataPart_get_timestamp(const struct LDKRawDataPar
 void RawDataPart_set_timestamp(struct LDKRawDataPart *NONNULL_PTR this_ptr, struct LDKPositiveTimestamp val);
 
 /**
- * tagged fields of the payment request
- */
-void RawDataPart_set_tagged_fields(struct LDKRawDataPart *NONNULL_PTR this_ptr, struct LDKCVec_RawTaggedFieldZ val);
-
-/**
- * Constructs a new RawDataPart given each field
- */
-MUST_USE_RES struct LDKRawDataPart RawDataPart_new(struct LDKPositiveTimestamp timestamp_arg, struct LDKCVec_RawTaggedFieldZ tagged_fields_arg);
-
-/**
  * Creates a copy of the RawDataPart
  */
 struct LDKRawDataPart RawDataPart_clone(const struct LDKRawDataPart *NONNULL_PTR orig);
@@ -17133,26 +17290,6 @@ MUST_USE_RES uint64_t SiPrefix_multiplier(const enum LDKSiPrefix *NONNULL_PTR th
 enum LDKCurrency Currency_clone(const enum LDKCurrency *NONNULL_PTR orig);
 
 /**
- * Frees any resources used by the RawTaggedField
- */
-void RawTaggedField_free(struct LDKRawTaggedField this_ptr);
-
-/**
- * Creates a copy of the RawTaggedField
- */
-struct LDKRawTaggedField RawTaggedField_clone(const struct LDKRawTaggedField *NONNULL_PTR orig);
-
-/**
- * Frees any resources used by the TaggedField
- */
-void TaggedField_free(struct LDKTaggedField this_ptr);
-
-/**
- * Creates a copy of the TaggedField
- */
-struct LDKTaggedField TaggedField_clone(const struct LDKTaggedField *NONNULL_PTR orig);
-
-/**
  * Frees any resources used by the Sha256, if is_owned is set and inner is non-NULL.
  */
 void Sha256_free(struct LDKSha256 this_obj);
@@ -17181,16 +17318,6 @@ void PayeePubKey_free(struct LDKPayeePubKey this_obj);
  * Creates a copy of the PayeePubKey
  */
 struct LDKPayeePubKey PayeePubKey_clone(const struct LDKPayeePubKey *NONNULL_PTR orig);
-
-/**
- * Frees any resources used by the PaymentSecret, if is_owned is set and inner is non-NULL.
- */
-void PaymentSecret_free(struct LDKPaymentSecret this_obj);
-
-/**
- * Creates a copy of the PaymentSecret
- */
-struct LDKPaymentSecret PaymentSecret_clone(const struct LDKPaymentSecret *NONNULL_PTR orig);
 
 /**
  * Frees any resources used by the ExpiryTime, if is_owned is set and inner is non-NULL.
@@ -17293,7 +17420,7 @@ MUST_USE_RES struct LDKExpiryTime RawInvoice_expiry_time(const struct LDKRawInvo
 
 MUST_USE_RES struct LDKMinFinalCltvExpiry RawInvoice_min_final_cltv_expiry(const struct LDKRawInvoice *NONNULL_PTR this_arg);
 
-MUST_USE_RES struct LDKPaymentSecret RawInvoice_payment_secret(const struct LDKRawInvoice *NONNULL_PTR this_arg);
+MUST_USE_RES struct LDKThirtyTwoBytes RawInvoice_payment_secret(const struct LDKRawInvoice *NONNULL_PTR this_arg);
 
 MUST_USE_RES struct LDKInvoiceFeatures RawInvoice_features(const struct LDKRawInvoice *NONNULL_PTR this_arg);
 
@@ -17372,7 +17499,7 @@ MUST_USE_RES struct LDKPublicKey Invoice_payee_pub_key(const struct LDKInvoice *
 /**
  * Get the payment secret if one was included in the invoice
  */
-MUST_USE_RES struct LDKPaymentSecret Invoice_payment_secret(const struct LDKInvoice *NONNULL_PTR this_arg);
+MUST_USE_RES struct LDKThirtyTwoBytes Invoice_payment_secret(const struct LDKInvoice *NONNULL_PTR this_arg);
 
 /**
  * Get the invoice features if they were included in the invoice
@@ -17385,14 +17512,15 @@ MUST_USE_RES struct LDKInvoiceFeatures Invoice_features(const struct LDKInvoice 
 MUST_USE_RES struct LDKPublicKey Invoice_recover_payee_pub_key(const struct LDKInvoice *NONNULL_PTR this_arg);
 
 /**
- * Returns the invoice's expiry time if present
+ * Returns the invoice's expiry time, if present, otherwise [`DEFAULT_EXPIRY_TIME`].
  */
 MUST_USE_RES uint64_t Invoice_expiry_time(const struct LDKInvoice *NONNULL_PTR this_arg);
 
 /**
- * Returns the invoice's `min_cltv_expiry` time if present
+ * Returns the invoice's `min_final_cltv_expiry` time, if present, otherwise
+ * [`DEFAULT_MIN_FINAL_CLTV_EXPIRY`].
  */
-MUST_USE_RES struct LDKCOption_u64Z Invoice_min_final_cltv_expiry(const struct LDKInvoice *NONNULL_PTR this_arg);
+MUST_USE_RES uint64_t Invoice_min_final_cltv_expiry(const struct LDKInvoice *NONNULL_PTR this_arg);
 
 /**
  * Returns a list of all routes included in the invoice
@@ -17410,22 +17538,17 @@ MUST_USE_RES enum LDKCurrency Invoice_currency(const struct LDKInvoice *NONNULL_
 MUST_USE_RES struct LDKCOption_u64Z Invoice_amount_pico_btc(const struct LDKInvoice *NONNULL_PTR this_arg);
 
 /**
- * Numeric representation of the field's tag
- */
-MUST_USE_RES struct LDKu5 TaggedField_tag(const struct LDKTaggedField *NONNULL_PTR this_arg);
-
-/**
  * Creates a new `Description` if `description` is at most 1023 __bytes__ long,
  * returns `CreationError::DescriptionTooLong` otherwise
  *
  * Please note that single characters may use more than one byte due to UTF8 encoding.
  */
-MUST_USE_RES struct LDKCResult_DescriptionCreationErrorZ Description_new(struct LDKCVec_u8Z description);
+MUST_USE_RES struct LDKCResult_DescriptionCreationErrorZ Description_new(struct LDKStr description);
 
 /**
  * Returns the underlying description `String`
  */
-MUST_USE_RES struct LDKCVec_u8Z Description_into_inner(struct LDKDescription this_arg);
+MUST_USE_RES struct LDKStr Description_into_inner(struct LDKDescription this_arg);
 
 /**
  * Construct an `ExpiryTime` from seconds. If there exists a `PositiveTimestamp` which would
@@ -17480,5 +17603,64 @@ enum LDKSemanticError SemanticError_clone(const enum LDKSemanticError *NONNULL_P
  * Get the string representation of a SemanticError object
  */
 struct LDKStr SemanticError_to_str(const enum LDKSemanticError *NONNULL_PTR o);
+
+/**
+ * Frees any resources used by the SignOrCreationError
+ */
+void SignOrCreationError_free(struct LDKSignOrCreationError this_ptr);
+
+/**
+ * Creates a copy of the SignOrCreationError
+ */
+struct LDKSignOrCreationError SignOrCreationError_clone(const struct LDKSignOrCreationError *NONNULL_PTR orig);
+
+/**
+ * Get the string representation of a SignOrCreationError object
+ */
+struct LDKStr SignOrCreationError_to_str(const struct LDKSignOrCreationError *NONNULL_PTR o);
+
+/**
+ * Utility to construct an invoice. Generally, unless you want to do something like a custom
+ * cltv_expiry, this is what you should be using to create an invoice. The reason being, this
+ * method stores the invoice's payment secret and preimage in `ChannelManager`, so (a) the user
+ * doesn't have to store preimage/payment secret information and (b) `ChannelManager` can verify
+ * that the payment secret is valid when the invoice is paid.
+ */
+struct LDKCResult_InvoiceSignOrCreationErrorZ create_invoice_from_channelmanager(const struct LDKChannelManager *NONNULL_PTR channelmanager, struct LDKKeysInterface keys_manager, enum LDKCurrency network, struct LDKCOption_u64Z amt_msat, struct LDKStr description);
+
+/**
+ * Read a SiPrefix object from a string
+ */
+struct LDKCResult_SiPrefixNoneZ SiPrefix_from_str(struct LDKStr s);
+
+/**
+ * Read a Invoice object from a string
+ */
+struct LDKCResult_InvoiceNoneZ Invoice_from_str(struct LDKStr s);
+
+/**
+ * Read a SignedRawInvoice object from a string
+ */
+struct LDKCResult_SignedRawInvoiceNoneZ SignedRawInvoice_from_str(struct LDKStr s);
+
+/**
+ * Get the string representation of a Invoice object
+ */
+struct LDKStr Invoice_to_str(const struct LDKInvoice *NONNULL_PTR o);
+
+/**
+ * Get the string representation of a SignedRawInvoice object
+ */
+struct LDKStr SignedRawInvoice_to_str(const struct LDKSignedRawInvoice *NONNULL_PTR o);
+
+/**
+ * Get the string representation of a Currency object
+ */
+struct LDKStr Currency_to_str(const enum LDKCurrency *NONNULL_PTR o);
+
+/**
+ * Get the string representation of a SiPrefix object
+ */
+struct LDKStr SiPrefix_to_str(const enum LDKSiPrefix *NONNULL_PTR o);
 
 #endif /* LDK_C_BINDINGS_H */

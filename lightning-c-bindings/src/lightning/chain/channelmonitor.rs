@@ -556,7 +556,7 @@ pub(crate) extern "C" fn ChannelMonitor_write_void(obj: *const c_void) -> crate:
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_update_monitor(this_arg: &ChannelMonitor, updates: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, broadcaster: &crate::lightning::chain::chaininterface::BroadcasterInterface, fee_estimator: &crate::lightning::chain::chaininterface::FeeEstimator, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_NoneMonitorUpdateErrorZ {
 	let mut ret = unsafe { &*this_arg.inner }.update_monitor(unsafe { &*updates.inner }, broadcaster, fee_estimator, logger);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { 0u8 /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::MonitorUpdateError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::MonitorUpdateError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_ret
 }
 
@@ -769,17 +769,15 @@ pub struct Persist {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
-unsafe impl Send for Persist {}
-unsafe impl Sync for Persist {}
 
 use lightning::chain::channelmonitor::Persist as rustPersist;
 impl rustPersist<crate::lightning::chain::keysinterface::Sign> for Persist {
-	fn persist_new_channel(&self, id: lightning::chain::transaction::OutPoint, data: &lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
+	fn persist_new_channel(&self, mut id: lightning::chain::transaction::OutPoint, mut data: &lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
 		let mut ret = (self.persist_new_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(id)), is_owned: true }, &crate::lightning::chain::channelmonitor::ChannelMonitor { inner: unsafe { (data as *const _) as *mut _ }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
-	fn update_persisted_channel(&self, id: lightning::chain::transaction::OutPoint, update: &lightning::chain::channelmonitor::ChannelMonitorUpdate, data: &lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
+	fn update_persisted_channel(&self, mut id: lightning::chain::transaction::OutPoint, mut update: &lightning::chain::channelmonitor::ChannelMonitorUpdate, mut data: &lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
 		let mut ret = (self.update_persisted_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(id)), is_owned: true }, &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: unsafe { (update as *const _) as *mut _ }, is_owned: false }, &crate::lightning::chain::channelmonitor::ChannelMonitor { inner: unsafe { (data as *const _) as *mut _ }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret

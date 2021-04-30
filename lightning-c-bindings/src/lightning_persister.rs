@@ -81,26 +81,26 @@ impl FilesystemPersister {
 /// files.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn FilesystemPersister_new(mut path_to_channel_data: crate::c_types::derived::CVec_u8Z) -> FilesystemPersister {
-	let mut ret = lightning_persister::FilesystemPersister::new(String::from_utf8(path_to_channel_data.into_rust()).unwrap());
+pub extern "C" fn FilesystemPersister_new(mut path_to_channel_data: crate::c_types::Str) -> FilesystemPersister {
+	let mut ret = lightning_persister::FilesystemPersister::new(path_to_channel_data.into_string());
 	FilesystemPersister { inner: Box::into_raw(Box::new(ret)), is_owned: true }
 }
 
 /// Get the directory which was provided when this persister was initialized.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn FilesystemPersister_get_data_dir(this_arg: &FilesystemPersister) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn FilesystemPersister_get_data_dir(this_arg: &FilesystemPersister) -> crate::c_types::Str {
 	let mut ret = unsafe { &*this_arg.inner }.get_data_dir();
-	ret.into_bytes().into()
+	ret.into()
 }
 
 /// Writes the provided `ChannelManager` to the path provided at `FilesystemPersister`
 /// initialization, within a file called \"manager\".
 #[must_use]
 #[no_mangle]
-pub extern "C" fn FilesystemPersister_persist_manager(mut data_dir: crate::c_types::derived::CVec_u8Z, manager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NoneErrorZ {
-	let mut ret = lightning_persister::FilesystemPersister::persist_manager(String::from_utf8(data_dir.into_rust()).unwrap(), unsafe { &*manager.inner });
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { 0u8 /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
+pub extern "C" fn FilesystemPersister_persist_manager(mut data_dir: crate::c_types::Str, manager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NoneErrorZ {
+	let mut ret = lightning_persister::FilesystemPersister::persist_manager(data_dir.into_string(), unsafe { &*manager.inner });
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
 	local_ret
 }
 
@@ -138,13 +138,13 @@ pub extern "C" fn FilesystemPersister_as_Persist(this_arg: &FilesystemPersister)
 #[must_use]
 extern "C" fn FilesystemPersister_Persist_persist_new_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, monitor: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
 	let mut ret = <nativeFilesystemPersister as lightning::chain::channelmonitor::Persist<_>>::persist_new_channel(unsafe { &mut *(this_arg as *mut nativeFilesystemPersister) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, unsafe { &*monitor.inner });
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { 0u8 /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdateErr::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdateErr::native_into(e) }).into() };
 	local_ret
 }
 #[must_use]
 extern "C" fn FilesystemPersister_Persist_update_persisted_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, _update: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, monitor: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
 	let mut ret = <nativeFilesystemPersister as lightning::chain::channelmonitor::Persist<_>>::update_persisted_channel(unsafe { &mut *(this_arg as *mut nativeFilesystemPersister) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, unsafe { &*_update.inner }, unsafe { &*monitor.inner });
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { 0u8 /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdateErr::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdateErr::native_into(e) }).into() };
 	local_ret
 }
 

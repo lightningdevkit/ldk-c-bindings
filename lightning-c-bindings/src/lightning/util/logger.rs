@@ -108,12 +108,10 @@ pub struct Logger {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
-unsafe impl Sync for Logger {}
-unsafe impl Send for Logger {}
 
 use lightning::util::logger::Logger as rustLogger;
 impl rustLogger for Logger {
-	fn log(&self, record: &lightning::util::logger::Record) {
+	fn log(&self, mut record: &lightning::util::logger::Record) {
 		let mut local_record = std::ffi::CString::new(format!("{}", record.args)).unwrap();
 		(self.log)(self.this_arg, local_record.as_ptr())
 	}

@@ -534,7 +534,7 @@ pub extern "C" fn HTLCOutputInCommitment_get_payment_hash(this_ptr: &HTLCOutputI
 /// The hash of the preimage which unlocks this HTLC.
 #[no_mangle]
 pub extern "C" fn HTLCOutputInCommitment_set_payment_hash(this_ptr: &mut HTLCOutputInCommitment, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *this_ptr.inner }.payment_hash = ::lightning::ln::channelmanager::PaymentHash(val.data);
+	unsafe { &mut *this_ptr.inner }.payment_hash = ::lightning::ln::PaymentHash(val.data);
 }
 /// The position within the commitment transactions' outputs. This may be None if the value is
 /// below the dust limit (in which case no output appears in the commitment transaction and the
@@ -562,7 +562,7 @@ pub extern "C" fn HTLCOutputInCommitment_new(mut offered_arg: bool, mut amount_m
 		offered: offered_arg,
 		amount_msat: amount_msat_arg,
 		cltv_expiry: cltv_expiry_arg,
-		payment_hash: ::lightning::ln::channelmanager::PaymentHash(payment_hash_arg.data),
+		payment_hash: ::lightning::ln::PaymentHash(payment_hash_arg.data),
 		transaction_output_index: local_transaction_output_index_arg,
 	})), is_owned: true }
 }
@@ -1404,7 +1404,7 @@ pub extern "C" fn CommitmentTransaction_trust(this_arg: &CommitmentTransaction) 
 #[no_mangle]
 pub extern "C" fn CommitmentTransaction_verify(this_arg: &CommitmentTransaction, channel_parameters: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters, broadcaster_keys: &crate::lightning::ln::chan_utils::ChannelPublicKeys, countersignatory_keys: &crate::lightning::ln::chan_utils::ChannelPublicKeys) -> crate::c_types::derived::CResult_TrustedCommitmentTransactionNoneZ {
 	let mut ret = unsafe { &*this_arg.inner }.verify(unsafe { &*channel_parameters.inner }, unsafe { &*broadcaster_keys.inner }, unsafe { &*countersignatory_keys.inner }, secp256k1::SECP256K1);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::TrustedCommitmentTransaction { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { 0u8 /*e*/ }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::TrustedCommitmentTransaction { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 
@@ -1490,7 +1490,7 @@ pub extern "C" fn TrustedCommitmentTransaction_keys(this_arg: &TrustedCommitment
 #[no_mangle]
 pub extern "C" fn TrustedCommitmentTransaction_get_htlc_sigs(this_arg: &TrustedCommitmentTransaction, htlc_base_key: *const [u8; 32], channel_parameters: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters) -> crate::c_types::derived::CResult_CVec_SignatureZNoneZ {
 	let mut ret = unsafe { &*this_arg.inner }.get_htlc_sigs(&::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *htlc_base_key}[..]).unwrap(), unsafe { &*channel_parameters.inner }, secp256k1::SECP256K1);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { crate::c_types::Signature::from_rust(&item) }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { 0u8 /*e*/ }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { crate::c_types::Signature::from_rust(&item) }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 

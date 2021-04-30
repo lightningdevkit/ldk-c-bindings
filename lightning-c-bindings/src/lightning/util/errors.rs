@@ -23,14 +23,14 @@ pub enum APIError {
 	/// are documented, but generally indicates some precondition of a function was violated.
 	APIMisuseError {
 		/// A human-readable error message
-		err: crate::c_types::derived::CVec_u8Z,
+		err: crate::c_types::Str,
 	},
 	/// Due to a high feerate, we were unable to complete the request.
 	/// For example, this may be returned if the feerate implies we cannot open a channel at the
 	/// requested value, but opening a larger channel would succeed.
 	FeeRateTooHigh {
 		/// A human-readable error message
-		err: crate::c_types::derived::CVec_u8Z,
+		err: crate::c_types::Str,
 		/// The feerate which was too high.
 		feerate: u32,
 	},
@@ -45,7 +45,7 @@ pub enum APIError {
 	/// peer, channel at capacity, channel shutting down, etc.
 	ChannelUnavailable {
 		/// A human-readable error message
-		err: crate::c_types::derived::CVec_u8Z,
+		err: crate::c_types::Str,
 	},
 	/// An attempt to call watch/update_channel returned an Err (ie you did this!), causing the
 	/// attempted action to fail.
@@ -59,27 +59,27 @@ impl APIError {
 			APIError::APIMisuseError {ref err, } => {
 				let mut err_nonref = (*err).clone();
 				nativeAPIError::APIMisuseError {
-					err: String::from_utf8(err_nonref.into_rust()).unwrap(),
+					err: err_nonref.into_string(),
 				}
 			},
 			APIError::FeeRateTooHigh {ref err, ref feerate, } => {
 				let mut err_nonref = (*err).clone();
 				let mut feerate_nonref = (*feerate).clone();
 				nativeAPIError::FeeRateTooHigh {
-					err: String::from_utf8(err_nonref.into_rust()).unwrap(),
+					err: err_nonref.into_string(),
 					feerate: feerate_nonref,
 				}
 			},
 			APIError::RouteError {ref err, } => {
 				let mut err_nonref = (*err).clone();
 				nativeAPIError::RouteError {
-					err: err_nonref.into(),
+					err: err_nonref.into_str(),
 				}
 			},
 			APIError::ChannelUnavailable {ref err, } => {
 				let mut err_nonref = (*err).clone();
 				nativeAPIError::ChannelUnavailable {
-					err: String::from_utf8(err_nonref.into_rust()).unwrap(),
+					err: err_nonref.into_string(),
 				}
 			},
 			APIError::MonitorUpdateFailed => nativeAPIError::MonitorUpdateFailed,
@@ -90,23 +90,23 @@ impl APIError {
 		match self {
 			APIError::APIMisuseError {mut err, } => {
 				nativeAPIError::APIMisuseError {
-					err: String::from_utf8(err.into_rust()).unwrap(),
+					err: err.into_string(),
 				}
 			},
 			APIError::FeeRateTooHigh {mut err, mut feerate, } => {
 				nativeAPIError::FeeRateTooHigh {
-					err: String::from_utf8(err.into_rust()).unwrap(),
+					err: err.into_string(),
 					feerate: feerate,
 				}
 			},
 			APIError::RouteError {mut err, } => {
 				nativeAPIError::RouteError {
-					err: err.into(),
+					err: err.into_str(),
 				}
 			},
 			APIError::ChannelUnavailable {mut err, } => {
 				nativeAPIError::ChannelUnavailable {
-					err: String::from_utf8(err.into_rust()).unwrap(),
+					err: err.into_string(),
 				}
 			},
 			APIError::MonitorUpdateFailed => nativeAPIError::MonitorUpdateFailed,
@@ -118,14 +118,14 @@ impl APIError {
 			nativeAPIError::APIMisuseError {ref err, } => {
 				let mut err_nonref = (*err).clone();
 				APIError::APIMisuseError {
-					err: err_nonref.into_bytes().into(),
+					err: err_nonref.into(),
 				}
 			},
 			nativeAPIError::FeeRateTooHigh {ref err, ref feerate, } => {
 				let mut err_nonref = (*err).clone();
 				let mut feerate_nonref = (*feerate).clone();
 				APIError::FeeRateTooHigh {
-					err: err_nonref.into_bytes().into(),
+					err: err_nonref.into(),
 					feerate: feerate_nonref,
 				}
 			},
@@ -138,7 +138,7 @@ impl APIError {
 			nativeAPIError::ChannelUnavailable {ref err, } => {
 				let mut err_nonref = (*err).clone();
 				APIError::ChannelUnavailable {
-					err: err_nonref.into_bytes().into(),
+					err: err_nonref.into(),
 				}
 			},
 			nativeAPIError::MonitorUpdateFailed => APIError::MonitorUpdateFailed,
@@ -149,12 +149,12 @@ impl APIError {
 		match native {
 			nativeAPIError::APIMisuseError {mut err, } => {
 				APIError::APIMisuseError {
-					err: err.into_bytes().into(),
+					err: err.into(),
 				}
 			},
 			nativeAPIError::FeeRateTooHigh {mut err, mut feerate, } => {
 				APIError::FeeRateTooHigh {
-					err: err.into_bytes().into(),
+					err: err.into(),
 					feerate: feerate,
 				}
 			},
@@ -165,7 +165,7 @@ impl APIError {
 			},
 			nativeAPIError::ChannelUnavailable {mut err, } => {
 				APIError::ChannelUnavailable {
-					err: err.into_bytes().into(),
+					err: err.into(),
 				}
 			},
 			nativeAPIError::MonitorUpdateFailed => APIError::MonitorUpdateFailed,

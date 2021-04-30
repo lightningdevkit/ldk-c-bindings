@@ -33,14 +33,14 @@ use crate::c_types::*;
 #[no_mangle]
 pub extern "C" fn sign(mut msg: crate::c_types::u8slice, mut sk: crate::c_types::SecretKey) -> crate::c_types::derived::CResult_StringErrorZ {
 	let mut ret = lightning::util::message_signing::sign(msg.to_slice(), sk.into_rust());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o.into_bytes().into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
 }
 
 /// Recovers the PublicKey of the signer of the message given the message and the signature.
 #[no_mangle]
 pub extern "C" fn recover_pk(mut msg: crate::c_types::u8slice, mut sig: crate::c_types::Str) -> crate::c_types::derived::CResult_PublicKeyErrorZ {
-	let mut ret = lightning::util::message_signing::recover_pk(msg.to_slice(), sig.into());
+	let mut ret = lightning::util::message_signing::recover_pk(msg.to_slice(), sig.into_str());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::PublicKey::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
 }
@@ -49,7 +49,7 @@ pub extern "C" fn recover_pk(mut msg: crate::c_types::u8slice, mut sig: crate::c
 /// and the PublicKey.
 #[no_mangle]
 pub extern "C" fn verify(mut msg: crate::c_types::u8slice, mut sig: crate::c_types::Str, mut pk: crate::c_types::PublicKey) -> bool {
-	let mut ret = lightning::util::message_signing::verify(msg.to_slice(), sig.into(), pk.into_rust());
+	let mut ret = lightning::util::message_signing::verify(msg.to_slice(), sig.into_str(), pk.into_rust());
 	ret
 }
 

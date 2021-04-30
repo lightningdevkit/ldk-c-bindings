@@ -968,7 +968,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							writeln!(w, "pub extern \"C\" fn {}_from_str(s: crate::c_types::Str) -> {} {{", ident, container).unwrap();
 							writeln!(w, "\tmatch {}::from_str(s.into()) {{", resolved_path).unwrap();
 							writeln!(w, "\t\tOk(r) => {{").unwrap();
-							let new_var = types.write_to_c_conversion_new_var(w, &syn::Ident::new("r", Span::call_site()), &*i.self_ty, Some(&gen_types), false);
+							let new_var = types.write_to_c_conversion_new_var(w, &format_ident!("r"), &*i.self_ty, Some(&gen_types), false);
 							write!(w, "\t\t\tcrate::c_types::CResultTempl::ok(\n\t\t\t\t").unwrap();
 							types.write_to_c_conversion_inline_prefix(w, &*i.self_ty, Some(&gen_types), false);
 							write!(w, "{}r", if new_var { "local_" } else { "" }).unwrap();
@@ -980,8 +980,17 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 					} else if path_matches_nongeneric(&trait_path.1, &["Display"]) {
 						writeln!(w, "#[no_mangle]").unwrap();
 						writeln!(w, "/// Get the string representation of a {} object", ident).unwrap();
-						writeln!(w, "pub extern \"C\" fn {}_to_str(o: &{}) -> Str {{", ident, resolved_path).unwrap();
-						writeln!(w, "\tformat!(\"{{}}\", o).into()").unwrap();
+						writeln!(w, "pub extern \"C\" fn {}_to_str(o: &crate::{}) -> Str {{", ident, resolved_path).unwrap();
+
+						let self_ty = &i.self_ty;
+						let ref_type: syn::Type = syn::parse_quote!(&#self_ty);
+						let new_var = types.write_from_c_conversion_new_var(w, &format_ident!("o"), &ref_type, Some(&gen_types));
+						write!(w, "\tformat!(\"{{}}\", ").unwrap();
+						types.write_from_c_conversion_prefix(w, &ref_type, Some(&gen_types));
+						write!(w, "{}o", if new_var { "local_" } else { "" }).unwrap();
+						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
+						writeln!(w, ").into()").unwrap();
+
 						writeln!(w, "}}").unwrap();
 					} else {
 						//XXX: implement for other things like ToString

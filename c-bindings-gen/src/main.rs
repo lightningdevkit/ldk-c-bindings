@@ -1159,16 +1159,26 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 			}
 			write!(w, "\t}}").unwrap();
 		} else if let syn::Fields::Unnamed(fields) = &var.fields {
-			needs_free = true;
-			write!(w, "(").unwrap();
-			for (idx, field) in fields.unnamed.iter().enumerate() {
-				if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
-				types.write_c_type(w, &field.ty, Some(&gen_types), false);
-				if idx != fields.unnamed.len() - 1 {
-					write!(w, ",").unwrap();
+			let mut empty_tuple_variant = false;
+			if fields.unnamed.len() == 1 {
+				let mut empty_check = Vec::new();
+				types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), false);
+				if empty_check.is_empty() {
+					empty_tuple_variant = true;
 				}
 			}
-			write!(w, ")").unwrap();
+			if !empty_tuple_variant {
+				needs_free = true;
+				write!(w, "(").unwrap();
+				for (idx, field) in fields.unnamed.iter().enumerate() {
+					if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
+					types.write_c_type(w, &field.ty, Some(&gen_types), false);
+					if idx != fields.unnamed.len() - 1 {
+						write!(w, ",").unwrap();
+					}
+				}
+				write!(w, ")").unwrap();
+			}
 		}
 		if var.discriminant.is_some() { unimplemented!(); }
 		writeln!(w, ",").unwrap();
@@ -1180,6 +1190,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 			writeln!(w, "\t#[allow(unused)]\n\tpub(crate) fn {} {{\n\t\tmatch {} {{", $fn_sig, if $to_c { "native" } else { "self" }).unwrap();
 			for var in e.variants.iter() {
 				write!(w, "\t\t\t{}{}::{} ", if $to_c { "native" } else { "" }, e.ident, var.ident).unwrap();
+				let mut empty_tuple_variant = false;
 				if let syn::Fields::Named(fields) = &var.fields {
 					write!(w, "{{").unwrap();
 					for field in fields.named.iter() {
@@ -1188,12 +1199,21 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 					}
 					write!(w, "}} ").unwrap();
 				} else if let syn::Fields::Unnamed(fields) = &var.fields {
-					write!(w, "(").unwrap();
-					for (idx, field) in fields.unnamed.iter().enumerate() {
-						if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
-						write!(w, "{}{}, ", if $ref { "ref " } else { "mut " }, ('a' as u8 + idx as u8) as char).unwrap();
+					if fields.unnamed.len() == 1 {
+						let mut empty_check = Vec::new();
+						types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), false);
+						if empty_check.is_empty() {
+							empty_tuple_variant = true;
+						}
 					}
-					write!(w, ") ").unwrap();
+					if !empty_tuple_variant || $to_c {
+						write!(w, "(").unwrap();
+						for (idx, field) in fields.unnamed.iter().enumerate() {
+							if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
+							write!(w, "{}{}, ", if $ref { "ref " } else { "mut " }, ('a' as u8 + idx as u8) as char).unwrap();
+						}
+						write!(w, ") ").unwrap();
+					}
 				}
 				write!(w, "=>").unwrap();
 
@@ -1233,7 +1253,9 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 				} else if let syn::Fields::Unnamed(fields) = &var.fields {
 					write!(w, " {{\n\t\t\t\t").unwrap();
 					for (idx, field) in fields.unnamed.iter().enumerate() {
-						handle_field_a!(field, &format_ident!("{}", ('a' as u8 + idx as u8) as char));
+						if !empty_tuple_variant {
+							handle_field_a!(field, &format_ident!("{}", ('a' as u8 + idx as u8) as char));
+						}
 					}
 				} else { write!(w, " ").unwrap(); }
 
@@ -1268,12 +1290,14 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 					writeln!(w, "\n\t\t\t\t}}").unwrap();
 					write!(w, "\t\t\t}}").unwrap();
 				} else if let syn::Fields::Unnamed(fields) = &var.fields {
-					write!(w, " (").unwrap();
-					for (idx, field) in fields.unnamed.iter().enumerate() {
-						write!(w, "\n\t\t\t\t\t").unwrap();
-						handle_field_b!(field, &format_ident!("{}", ('a' as u8 + idx as u8) as char));
+					if !empty_tuple_variant || !$to_c {
+						write!(w, " (").unwrap();
+						for (idx, field) in fields.unnamed.iter().enumerate() {
+							write!(w, "\n\t\t\t\t\t").unwrap();
+							handle_field_b!(field, &format_ident!("{}", ('a' as u8 + idx as u8) as char));
+						}
+						writeln!(w, "\n\t\t\t\t)").unwrap();
 					}
-					writeln!(w, "\n\t\t\t\t)").unwrap();
 					write!(w, "\t\t\t}}").unwrap();
 				}
 				writeln!(w, ",").unwrap();

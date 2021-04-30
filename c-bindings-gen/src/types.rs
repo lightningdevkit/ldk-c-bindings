@@ -863,19 +863,26 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			return Some("".to_owned());
 		}
 		match full_path {
-			"Vec" if !is_ref => Some("local_"),
+			"Vec" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 			"Result" if !is_ref => Some("local_"),
 			"Option" if is_ref => Some("&local_"),
 			"Option" => Some("local_"),
 
-			"[u8; 32]" => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			// Types that have IntoRustRef conversion should be converted with &IntoRustRef::into_rust_ref( &val ),
+			// with an `&` before and inside the parenthesis.
+			// Types that only have IntoRust conversion should be converted (when `is_ref` is true)
+			// with &IntoRust::into_rust_owned( val ), with just the `&` before meaning that a
+			// normal conversion will be performed and then a ref to the result will be taken
+
+			"[u8; 32]" if is_ref => Some("&crate::c_types::mapping::IntoRustRef::into_rust_ref(&"),
+			"[u8; 32]" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 			"[u8; 20]" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 			"[u8; 10]" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 			"[u8; 3]" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 
-			"[u8]" if is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned(&"),
+			"[u8]" if is_ref => Some("&crate::c_types::mapping::IntoRustRef::into_rust_ref(&"),
 
 			"str" if is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 			"String" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
@@ -926,12 +933,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			return Some("".to_owned());
 		}
 		match full_path {
-			"Vec" if !is_ref => Some(""),
-			"Option" => Some(""),
+			"Vec" if !is_ref => Some(")"),
 			"Result" if !is_ref => Some(""),
+			"Option" => Some(""),
 
-			"[u8; 32]" if is_ref => Some(")"),
-			"[u8; 32]" if !is_ref => Some(")"),
+			"[u8; 32]" => Some(")"),
 			"[u8; 20]" if !is_ref => Some(")"),
 			"[u8; 16]" if !is_ref => Some(")"),
 			"[u8; 10]" if !is_ref => Some(")"),
@@ -1265,7 +1271,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"Slice" if is_ref => {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".as_slice().iter() {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
-			"Vec"|"Slice" => {
+			"Vec" => None,
+			"Slice" => {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".into_rust().drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Option" => {

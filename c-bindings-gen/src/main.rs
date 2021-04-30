@@ -568,15 +568,22 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	writeln!(w, "\t\tret").unwrap();
 	writeln!(w, "\t}}\n}}").unwrap();
 
-	// Implement the conversion into rust as owned object, as reference and as mut reference
+	// Implement the conversion into rust as owned object, as reference and as mut reference.
+	// We can also get a 'static reference by taking the inner ptr and consuming the struct
 	writeln!(w, "impl crate::c_types::mapping::IntoRust<native{}> for {} {{", struct_name, struct_name).unwrap();
 	writeln!(w, "\tfn into_rust_owned(self) -> native{} {{ *unsafe {{ Box::from_raw(self.take_inner()) }} }}", struct_name).unwrap();
 	writeln!(w, "}}").unwrap();
-	writeln!(w, "impl crate::c_types::mapping::IntoRustRef<'_, 'static, native{}> for {} {{", struct_name, struct_name).unwrap();
-	writeln!(w, "\tfn into_rust_ref(&self) -> &'static native{} {{ unsafe {{ &*self.inner }} }}", struct_name).unwrap();
+	writeln!(w, "impl crate::c_types::mapping::IntoRustRef<native{}> for {} {{", struct_name, struct_name).unwrap();
+	writeln!(w, "\tfn into_rust_ref(&self) -> &native{} {{ unsafe {{ &*self.inner }} }}", struct_name).unwrap();
 	writeln!(w, "}}").unwrap();
-	writeln!(w, "impl crate::c_types::mapping::IntoRustRefMut<'_, 'static, native{}> for {} {{", struct_name, struct_name).unwrap();
-	writeln!(w, "\tfn into_rust_ref_mut(&self) -> &'static mut native{} {{ unsafe {{ &mut *self.inner }} }}", struct_name).unwrap();
+	writeln!(w, "impl crate::c_types::mapping::IntoRust<&'static native{}> for {} {{", struct_name, struct_name).unwrap();
+	writeln!(w, "\tfn into_rust_owned(mut self) -> &'static native{} {{ unsafe {{ &*self.take_inner() }} }}", struct_name).unwrap();
+	writeln!(w, "}}").unwrap();
+	writeln!(w, "impl crate::c_types::mapping::IntoRustRefMut<native{}> for {} {{", struct_name, struct_name).unwrap();
+	writeln!(w, "\tfn into_rust_ref_mut(&self) -> &mut native{} {{ unsafe {{ &mut *self.inner }} }}", struct_name).unwrap();
+	writeln!(w, "}}").unwrap();
+	writeln!(w, "impl crate::c_types::mapping::IntoRust<&'static mut native{}> for {} {{", struct_name, struct_name).unwrap();
+	writeln!(w, "\tfn into_rust_owned(mut self) -> &'static mut native{} {{ unsafe {{ &mut *self.take_inner() }} }}", struct_name).unwrap();
 	writeln!(w, "}}").unwrap();
 
 	write_cpp_wrapper(cpp_headers, &format!("{}", ident), true);

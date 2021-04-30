@@ -253,6 +253,10 @@ pub fn write_vec_block<W: std::io::Write>(w: &mut W, mangled_container: &str, in
 		writeln!(w, "\t}}").unwrap();
 		writeln!(w, "}}").unwrap();
 	}
+
+	writeln!(w, "impl<T: crate::c_types::mapping::FromC<{}>> crate::c_types::mapping::IntoRust<Vec<T>> for {} {{", inner_type, mangled_container).unwrap();
+	writeln!(w, "\tfn into_rust_owned(mut self) -> Vec<T> {{ self.into_rust().into_iter().map(crate::c_types::mapping::FromC::from_c).collect() }}").unwrap();
+	writeln!(w, "}}").unwrap();
 }
 
 /// Writes out a C-callable concrete (A, B, ...) struct and utility methods

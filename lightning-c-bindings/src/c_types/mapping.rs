@@ -1,24 +1,31 @@
 #![allow(missing_docs)]
 
-pub trait FromC<T: Sized> {
-	fn from_c(from: T) -> Self;
-}
-
+/// Perform conversion from C into Rust by consuming the C value
 pub trait IntoRust<T: Sized> {
+	/// Do the conversion
 	fn into_rust_owned(self) -> T;
 }
-pub trait IntoRustRef<'lft_in, 'lft_out, T: Sized> {
-	fn into_rust_ref(&'lft_in self) -> &'lft_out T;
+/// Perform conversion from C into Rust by borrowing from the C value
+pub trait IntoRustRef<T: ?Sized> {
+	/// Do the conversion
+	fn into_rust_ref(&self) -> &T;
 }
-pub trait IntoRustRefMut<'lft_in, 'lft_out, T: Sized> {
-	fn into_rust_ref_mut(&'lft_in self) -> &'lft_out mut T;
+/// Perform conversion from C into Rust by mutably borrowing from the C value
+pub trait IntoRustRefMut<T: ?Sized> {
+	/// Do the conversion
+	fn into_rust_ref_mut(&self) -> &mut T;
 }
 
-// impl<U, T: FromC<U>> IntoRust<T> for U {
-//	 fn into_rust_owned(self) -> T {
-//		 FromC::from_c(self)
-//	 }
-// }
+macro_rules! into_rust_no_op {
+	($ty:ty) => {
+		impl IntoRust<$ty> for $ty {
+			#[inline]
+			fn into_rust_owned(self) -> $ty { self }
+		}
+	}
+}
+into_rust_no_op!(u8);
+into_rust_no_op!(u64);
 
 impl IntoRust<std::time::Duration > for u64 {
 	fn into_rust_owned(self) -> std::time::Duration  {
@@ -132,9 +139,9 @@ macro_rules! owned_u8_arr_from_c {
 }
 macro_rules! ref_u8_arr_from_c {
 	($arr_ty:ty) => {
-		impl IntoRust<&'static $arr_ty> for *const $arr_ty {
-			fn into_rust_owned(self) -> &'static $arr_ty {
-				unsafe { &*self }
+		impl IntoRustRef<$arr_ty> for *const $arr_ty {
+			fn into_rust_ref(&self) -> &$arr_ty {
+				unsafe { &**self }
 			}
 		}
 	}
@@ -149,8 +156,8 @@ ref_u8_arr_from_c!([u8; 32]);
 
 macro_rules! ref_slice_from_c {
 	($from:ty, $to:ty) => {
-		impl<'a> IntoRust<&'a [$to]> for &'a $from {
-			fn into_rust_owned(self) -> &'a [$to] {
+		impl IntoRustRef<[$to]> for $from {
+			fn into_rust_ref(&self) -> &[$to] {
 				self.to_slice()
 			}
 		}
@@ -166,5 +173,15 @@ impl IntoRust<bitcoin::blockdata::script::Script> for crate::c_types::derived::C
 impl IntoRust<bitcoin::blockdata::script::Script> for crate::c_types::u8slice {
 	fn into_rust_owned(self) -> bitcoin::blockdata::script::Script {
 		bitcoin::blockdata::script::Script::from(Vec::from(self.to_slice()))
+	}
+}
+
+/// Opposite of `IntoRust`, used mainly to express trait bounds
+pub trait FromC<T> {
+	fn from_c(from: T) -> Self;
+}
+impl<U, T: IntoRust<U>> FromC<T> for U {
+	fn from_c(from: T) -> Self {
+		from.into_rust_owned()
 	}
 }

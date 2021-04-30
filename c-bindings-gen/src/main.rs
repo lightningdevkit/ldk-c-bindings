@@ -1137,9 +1137,8 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	}
 	writeln_docs(w, &e.attrs, "");
 
-	if e.generics.lt_token.is_some() {
-		unimplemented!();
-	}
+	let mut gen_types = GenericTypes::new(None);
+	assert!(gen_types.learn_generics(&e.generics, types));
 
 	let mut needs_free = false;
 
@@ -1155,7 +1154,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 				if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
 				writeln_docs(w, &field.attrs, "\t\t");
 				write!(w, "\t\t{}: ", field.ident.as_ref().unwrap()).unwrap();
-				types.write_c_type(w, &field.ty, None, false);
+				types.write_c_type(w, &field.ty, Some(&gen_types), false);
 				writeln!(w, ",").unwrap();
 			}
 			write!(w, "\t}}").unwrap();
@@ -1164,7 +1163,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 			write!(w, "(").unwrap();
 			for (idx, field) in fields.unnamed.iter().enumerate() {
 				if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
-				types.write_c_type(w, &field.ty, None, false);
+				types.write_c_type(w, &field.ty, Some(&gen_types), false);
 				if idx != fields.unnamed.len() - 1 {
 					write!(w, ",").unwrap();
 				}
@@ -1204,9 +1203,9 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 						let mut sink = ::std::io::sink();
 						let mut out: &mut dyn std::io::Write = if $ref { &mut sink } else { w };
 						let new_var = if $to_c {
-							types.write_to_c_conversion_new_var(&mut out, $field_ident, &$field.ty, None, false)
+							types.write_to_c_conversion_new_var(&mut out, $field_ident, &$field.ty, Some(&gen_types), false)
 						} else {
-							types.write_from_c_conversion_new_var(&mut out, $field_ident, &$field.ty, None)
+							types.write_from_c_conversion_new_var(&mut out, $field_ident, &$field.ty, Some(&gen_types))
 						};
 						if $ref || new_var {
 							if $ref {
@@ -1214,9 +1213,9 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 								if new_var {
 									let nonref_ident = format_ident!("{}_nonref", $field_ident);
 									if $to_c {
-										types.write_to_c_conversion_new_var(w, &nonref_ident, &$field.ty, None, false);
+										types.write_to_c_conversion_new_var(w, &nonref_ident, &$field.ty, Some(&gen_types), false);
 									} else {
-										types.write_from_c_conversion_new_var(w, &nonref_ident, &$field.ty, None);
+										types.write_from_c_conversion_new_var(w, &nonref_ident, &$field.ty, Some(&gen_types));
 									}
 									write!(w, "\n\t\t\t\t").unwrap();
 								}
@@ -1244,16 +1243,16 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 					($field: expr, $field_ident: expr) => { {
 						if export_status(&$field.attrs) == ExportStatus::TestOnly { continue; }
 						if $to_c {
-							types.write_to_c_conversion_inline_prefix(w, &$field.ty, None, false);
+							types.write_to_c_conversion_inline_prefix(w, &$field.ty, Some(&gen_types), false);
 						} else {
-							types.write_from_c_conversion_prefix(w, &$field.ty, None);
+							types.write_from_c_conversion_prefix(w, &$field.ty, Some(&gen_types));
 						}
 						write!(w, "{}{}", $field_ident,
 							if $ref { "_nonref" } else { "" }).unwrap();
 						if $to_c {
-							types.write_to_c_conversion_inline_suffix(w, &$field.ty, None, false);
+							types.write_to_c_conversion_inline_suffix(w, &$field.ty, Some(&gen_types), false);
 						} else {
-							types.write_from_c_conversion_suffix(w, &$field.ty, None);
+							types.write_from_c_conversion_suffix(w, &$field.ty, Some(&gen_types));
 						}
 						write!(w, ",").unwrap();
 					} }

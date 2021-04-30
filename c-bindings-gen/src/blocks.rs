@@ -137,12 +137,8 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	writeln!(w, "\t}}").unwrap();
 	writeln!(w, "}}").unwrap();
 
-	// TODO: Templates should use () now that they can, too
-	let templ_ok_type = if ok_type != "()" { ok_type } else { "u8" };
-	let templ_err_type = if err_type != "()" { err_type } else { "u8" };
-
-	writeln!(w, "impl From<crate::c_types::CResultTempl<{}, {}>> for {} {{", templ_ok_type, templ_err_type, mangled_container).unwrap();
-	writeln!(w, "\tfn from(mut o: crate::c_types::CResultTempl<{}, {}>) -> Self {{", templ_ok_type, templ_err_type).unwrap();
+	writeln!(w, "impl From<crate::c_types::CResultTempl<{}, {}>> for {} {{", ok_type, err_type, mangled_container).unwrap();
+	writeln!(w, "\tfn from(mut o: crate::c_types::CResultTempl<{}, {}>) -> Self {{", ok_type, err_type).unwrap();
 	writeln!(w, "\t\tlet contents = if o.result_ok {{").unwrap();
 	if ok_type != "()" {
 		writeln!(w, "\t\t\tlet result = unsafe {{ o.contents.result }};").unwrap();

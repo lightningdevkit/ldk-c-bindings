@@ -1742,7 +1742,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 
 	fn write_to_c_conversion_inline_prefix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool, from_ptr: bool) {
-		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "0u8 /*", true, |_, _| "local_".to_owned(),
+		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "() /*", true, |_, _| "local_".to_owned(),
 				|a, b, c| self.to_c_conversion_inline_prefix_from_path(a, b, c),
 				|w, decl_type, decl_path, is_ref, _is_mut| {
 					match decl_type {

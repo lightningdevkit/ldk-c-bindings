@@ -974,7 +974,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							write!(w, "{}r", if new_var { "local_" } else { "" }).unwrap();
 							types.write_to_c_conversion_inline_suffix(w, &*i.self_ty, Some(&gen_types), false);
 							writeln!(w, "\n\t\t\t)\n\t\t}},").unwrap();
-							writeln!(w, "\t\tErr(e) => crate::c_types::CResultTempl::err(0u8),").unwrap();
+							writeln!(w, "\t\tErr(e) => crate::c_types::CResultTempl::err(()),").unwrap();
 							writeln!(w, "\t}}.into()\n}}").unwrap();
 						}
 					} else if path_matches_nongeneric(&trait_path.1, &["Display"]) {

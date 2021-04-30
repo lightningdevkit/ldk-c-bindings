@@ -382,10 +382,24 @@ impl Into<Str> for &'static str {
 		Str { chars: self.as_ptr(), len: self.len(), chars_is_owned: false }
 	}
 }
-impl Into<&'static str> for Str {
-	fn into(self) -> &'static str {
+impl Str {
+	pub(crate) fn into_str(&self) -> &'static str {
 		if self.len == 0 { return ""; }
 		std::str::from_utf8(unsafe { std::slice::from_raw_parts(self.chars, self.len) }).unwrap()
+	}
+	pub(crate) fn into_string(self) -> String {
+		let bytes = if self.len == 0 {
+			Vec::new()
+		} else if self.chars_is_owned {
+			unsafe {
+				Box::from_raw(std::slice::from_raw_parts_mut(unsafe { self.chars as *mut u8 }, self.len))
+			}.into()
+		} else {
+			let mut ret = Vec::with_capacity(self.len);
+			ret.extend_from_slice(unsafe { std::slice::from_raw_parts(self.chars, self.len) });
+			ret
+		};
+		String::from_utf8(bytes).unwrap()
 	}
 }
 impl Into<Str> for String {

@@ -842,8 +842,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 3]" if !is_ref => Some("crate::c_types::ThreeBytes"), // Used for RGB values
 
 			"str" if is_ref => Some("crate::c_types::Str"),
-			"String" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
-			"String" if is_ref => Some("crate::c_types::Str"),
+			"String" => Some("crate::c_types::Str"),
 
 			"std::time::Duration" => Some("u64"),
 			"std::time::SystemTime" => Some("u64"),
@@ -915,7 +914,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some(""),
 
 			"str" if is_ref => Some(""),
-			"String" if !is_ref => Some("String::from_utf8("),
+			"String" => Some(""),
 			// Note that we'll panic for String if is_ref, as we only have non-owned memory, we
 			// cannot create a &String.
 
@@ -980,8 +979,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8]" if is_ref => Some(".to_slice()"),
 			"[usize]" if is_ref => Some(".to_slice()"),
 
-			"str" if is_ref => Some(".into()"),
-			"String" if !is_ref => Some(".into_rust()).unwrap()"),
+			"str" if is_ref => Some(".into_str()"),
+			"String" => Some(".into_string()"),
 
 			"std::time::Duration" => Some(")"),
 			"std::time::SystemTime" => Some("))"),
@@ -1129,8 +1128,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some(""),
 
 			"str" if is_ref => Some(".into()"),
-			"String" if !is_ref => Some(".into_bytes().into()"),
 			"String" if is_ref => Some(".as_str().into()"),
+			"String" => Some(".into()"),
 
 			"std::time::Duration" => Some(".as_secs()"),
 			"std::time::SystemTime" => Some(".duration_since(::std::time::SystemTime::UNIX_EPOCH).expect(\"Times must be post-1970\").as_secs()"),

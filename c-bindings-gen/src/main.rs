@@ -966,7 +966,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							writeln!(w, "#[no_mangle]").unwrap();
 							writeln!(w, "/// Read a {} object from a string", ident).unwrap();
 							writeln!(w, "pub extern \"C\" fn {}_from_str(s: crate::c_types::Str) -> {} {{", ident, container).unwrap();
-							writeln!(w, "\tmatch {}::from_str(s.into()) {{", resolved_path).unwrap();
+							writeln!(w, "\tmatch {}::from_str(s.into_str()) {{", resolved_path).unwrap();
 							writeln!(w, "\t\tOk(r) => {{").unwrap();
 							let new_var = types.write_to_c_conversion_new_var(w, &format_ident!("r"), &*i.self_ty, Some(&gen_types), false);
 							write!(w, "\t\t\tcrate::c_types::CResultTempl::ok(\n\t\t\t\t").unwrap();

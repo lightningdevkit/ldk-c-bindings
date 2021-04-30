@@ -868,53 +868,52 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"Option" if is_ref => Some("&local_"),
 			"Option" => Some("local_"),
 
-			"[u8; 32]" if is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"[u8; 32]" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"[u8; 20]" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"[u8; 16]" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"[u8; 10]" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"[u8; 4]" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"[u8; 3]" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
+			"[u8; 32]" => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"[u8; 20]" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"[u8; 16]" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"[u8; 10]" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"[u8; 4]" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"[u8; 3]" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 
-			"[u8]" if is_ref => Some("crate::c_types::mapping::FromC::from_c(&"),
+			"[u8]" if is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned(&"),
 
-			"str" if is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"String" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
+			"str" if is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"String" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 			// Note that we'll panic for String if is_ref, as we only have non-owned memory, we
 			// cannot create a &String.
 
-			"std::time::Duration" => Some("crate::c_types::mapping::FromC::from_c("),
-			"std::time::SystemTime" => Some("crate::c_types::mapping::FromC::from_c("),
+			"std::time::Duration" => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"std::time::SystemTime" => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 
-			"bech32::u5" => Some("crate::c_types::mapping::FromC::from_c("),
+			"bech32::u5" => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				if is_ref => Some("&crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"
-				=> Some("crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::secp256k1::Signature" => Some("crate::c_types::mapping::FromC::from_c("),
+				if is_ref => Some("&crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
+				=> Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::secp256k1::Signature" => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if is_ref => Some("&crate::c_types::mapping::FromC::from_c("),
+				if is_ref => Some("&crate::c_types::mapping::IntoRust::into_rust_owned("),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::blockdata::script::Script" if is_ref => Some("&crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::blockdata::transaction::Transaction" if is_ref => Some("&crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::blockdata::transaction::Transaction" => Some("crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::network::constants::Network" => Some("crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::blockdata::block::BlockHeader" => Some("&crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::blockdata::block::Block" if is_ref => Some("&crate::c_types::mapping::FromC::from_c("),
+				if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::blockdata::script::Script" if is_ref => Some("&crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::blockdata::transaction::Transaction" if is_ref => Some("&crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::blockdata::transaction::Transaction" => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::network::constants::Network" => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::blockdata::block::BlockHeader" => Some("&crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::blockdata::block::Block" if is_ref => Some("&crate::c_types::mapping::IntoRust::into_rust_owned("),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid" if is_ref => Some("&crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::hash_types::Txid" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"bitcoin::hash_types::BlockHash" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("&crate::c_types::mapping::FromC::from_c("),
-			"lightning::ln::channelmanager::PaymentPreimage" if !is_ref => Some("crate::c_types::mapping::FromC::from_c("),
-			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some("&crate::c_types::mapping::FromC::from_c("),
-			"lightning::ln::channelmanager::PaymentSecret" => Some("crate::c_types::mapping::FromC::from_c("),
+			"bitcoin::hash_types::Txid" if is_ref => Some("&crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::hash_types::Txid" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"bitcoin::hash_types::BlockHash" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("&crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"lightning::ln::channelmanager::PaymentPreimage" if !is_ref => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some("&crate::c_types::mapping::IntoRust::into_rust_owned("),
+			"lightning::ln::channelmanager::PaymentSecret" => Some("crate::c_types::mapping::IntoRust::into_rust_owned("),
 
 			// List of traits we map (possibly during processing of other files):
 			"crate::util::logger::Logger" => Some(""),
@@ -1821,13 +1820,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				|w, decl_type, _full_path, is_ref, is_mut| match decl_type {
 					DeclType::StructImported if is_ref && is_mut => write!(w, ".into_rust_ref_mut() }}").unwrap(),
 					DeclType::StructImported if is_ref => write!(w, ".into_rust_ref() }}").unwrap(),
-					DeclType::StructImported => write!(w, ".into_rust_owned() }}").unwrap(),
+					DeclType::StructImported | DeclType::MirroredEnum => write!(w, ".into_rust_owned() }}").unwrap(),
 
 					// DeclType::StructImported if is_ref && ptr_for_ref => write!(w, ").inner }}").unwrap(), // NEVER HIT
 					// DeclType::StructImported if is_ref => write!(w, ".inner }}").unwrap(),
 					// DeclType::StructImported if !is_ref => write!(w, ".take_inner()) }}").unwrap(),
-
-					DeclType::MirroredEnum => write!(w, ".into_rust_owned() }}").unwrap(),
 
 					DeclType::Trait(_) => {},
 					_ => unimplemented!(),

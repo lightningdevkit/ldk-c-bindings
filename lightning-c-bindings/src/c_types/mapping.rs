@@ -20,38 +20,38 @@ pub trait IntoRustRefMut<'lft_in, 'lft_out, T: Sized> {
 //	 }
 // }
 
-impl FromC<u64> for std::time::Duration {
-	fn from_c(from: u64) -> Self {
-		std::time::Duration::from_secs(from)
+impl IntoRust<std::time::Duration > for u64 {
+	fn into_rust_owned(self) -> std::time::Duration  {
+		std::time::Duration::from_secs(self)
 	}
 }
-impl FromC<u64> for std::time::SystemTime {
-	fn from_c(from: u64) -> Self {
-		::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(from)
+impl IntoRust<std::time::SystemTime > for u64 {
+	fn into_rust_owned(self) -> std::time::SystemTime  {
+		::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(self)
 	}
 }
-impl FromC<crate::c_types::u5> for bitcoin::bech32::u5 {
-	fn from_c(from: crate::c_types::u5) -> Self {
-		from.into()
+impl IntoRust<bitcoin::bech32::u5> for crate::c_types::u5 {
+	fn into_rust_owned(self) -> bitcoin::bech32::u5 {
+		self.into()
 	}
 }
 
-impl FromC<crate::c_types::derived::CVec_u8Z> for String {
-	fn from_c(mut from: crate::c_types::derived::CVec_u8Z) -> Self {
-		String::from_utf8(from.into_rust()).unwrap()
+impl IntoRust<String> for  crate::c_types::derived::CVec_u8Z{
+	fn into_rust_owned(mut self) -> String {
+		String::from_utf8(self.into_rust()).unwrap()
 	}
 }
-impl FromC<crate::c_types::Str> for &'static str {
-	fn from_c(from: crate::c_types::Str) -> Self {
-		from.into()
+impl IntoRust<&'static str> for crate::c_types::Str {
+	fn into_rust_owned(self) -> &'static str {
+		self.into()
 	}
 }
 
 macro_rules! into_rust_from_c {
 	($from:ty, $to:ty, $method_name:ident) => {
-		impl FromC<$from> for $to {
-			fn from_c(mut from: $from) -> Self {
-				from.$method_name()
+		impl IntoRust<$to> for $from {
+			fn into_rust_owned(self) -> $to {
+				self.$method_name()
 			}
 		}
 	};
@@ -68,40 +68,40 @@ into_rust_from_c!(crate::c_types::TxOut, bitcoin::blockdata::transaction::TxOut)
 into_rust_from_c!(crate::c_types::Transaction, bitcoin::blockdata::transaction::Transaction, into_bitcoin);
 into_rust_from_c!(crate::c_types::Network, bitcoin::network::constants::Network, into_bitcoin);
 
-impl FromC<*const [u8; 32]> for ::bitcoin::secp256k1::key::SecretKey {
-	fn from_c(from: *const [u8; 32]) -> Self {
-		::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *from }[..]).unwrap()
+impl IntoRust<::bitcoin::secp256k1::key::SecretKey> for *const [u8; 32]{
+	fn into_rust_owned(self) -> ::bitcoin::secp256k1::key::SecretKey {
+		::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *self }[..]).unwrap()
 	}
 }
-impl FromC<*const [u8; 32]> for ::bitcoin::hash_types::Txid {
-	fn from_c(from: *const [u8; 32]) -> Self {
+impl IntoRust<::bitcoin::hash_types::Txid> for *const [u8; 32] {
+	fn into_rust_owned(self) -> ::bitcoin::hash_types::Txid{
 		use ::bitcoin::hashes::Hash;
-		::bitcoin::hash_types::Txid::from_slice(&unsafe { *from }[..]).unwrap()
+		::bitcoin::hash_types::Txid::from_slice(&unsafe { *self }[..]).unwrap()
 	}
 }
-impl FromC<crate::c_types::ThirtyTwoBytes> for ::bitcoin::hash_types::Txid {
-	fn from_c(from: crate::c_types::ThirtyTwoBytes) -> Self {
+impl IntoRust<::bitcoin::hash_types::Txid> for crate::c_types::ThirtyTwoBytes {
+	fn into_rust_owned(self) -> ::bitcoin::hash_types::Txid  {
 		use ::bitcoin::hashes::Hash;
-		::bitcoin::hash_types::Txid::from_slice(&from.data[..]).unwrap()
+		::bitcoin::hash_types::Txid::from_slice(&self.data[..]).unwrap()
 	}
 }
-impl FromC<crate::c_types::ThirtyTwoBytes> for ::bitcoin::hash_types::BlockHash {
-	fn from_c(from: crate::c_types::ThirtyTwoBytes) -> Self {
+impl IntoRust<::bitcoin::hash_types::BlockHash> for crate::c_types::ThirtyTwoBytes {
+	fn into_rust_owned(self) -> ::bitcoin::hash_types::BlockHash  {
 		use ::bitcoin::hashes::Hash;
-		::bitcoin::hash_types::BlockHash::from_slice(&from.data[..]).unwrap()
+		::bitcoin::hash_types::BlockHash::from_slice(&self.data[..]).unwrap()
 	}
 }
 
 macro_rules! thirty_two_bytes_ldk_types {
-	($ty:ty) => {
-		impl FromC<*const [u8; 32]> for $ty {
-			fn from_c(from: *const [u8; 32]) -> Self {
-				Self(unsafe { *from })
+	($($ty:tt)+) => {
+		impl IntoRust<$($ty)+> for *const [u8; 32] {
+			fn into_rust_owned(self) -> $($ty)+ {
+				$($ty)+(unsafe { *self })
 			}
 		}
-		impl FromC<crate::c_types::ThirtyTwoBytes> for $ty {
-			fn from_c(from: crate::c_types::ThirtyTwoBytes) -> Self {
-				Self(from.data)
+		impl IntoRust<$($ty)+> for crate::c_types::ThirtyTwoBytes {
+			fn into_rust_owned(self) -> $($ty)+ {
+				$($ty)+(self.data)
 			}
 		}
 	};
@@ -110,31 +110,31 @@ thirty_two_bytes_ldk_types!(::lightning::ln::channelmanager::PaymentHash);
 thirty_two_bytes_ldk_types!(::lightning::ln::channelmanager::PaymentPreimage);
 thirty_two_bytes_ldk_types!(::lightning::ln::channelmanager::PaymentSecret);
 
-impl FromC<*const [u8; 80]> for bitcoin::blockdata::block::BlockHeader {
-	fn from_c(from: *const [u8; 80]) -> Self {
-		::bitcoin::consensus::encode::deserialize(unsafe { &*from }).unwrap()
+impl IntoRust<bitcoin::blockdata::block::BlockHeader> for *const [u8; 80] {
+	fn into_rust_owned(self) -> bitcoin::blockdata::block::BlockHeader {
+		::bitcoin::consensus::encode::deserialize(unsafe { &*self }).unwrap()
 	}
 }
-impl FromC<crate::c_types::u8slice> for bitcoin::blockdata::block::Block {
-	fn from_c(from: crate::c_types::u8slice) -> Self {
-		::bitcoin::consensus::encode::deserialize(from.to_slice()).unwrap()
+impl IntoRust<bitcoin::blockdata::block::Block> for crate::c_types::u8slice {
+	fn into_rust_owned(self) -> bitcoin::blockdata::block::Block {
+		::bitcoin::consensus::encode::deserialize(self.to_slice()).unwrap()
 	}
 }
 
 macro_rules! owned_u8_arr_from_c {
 	($from:ty, $to:ty) => {
-		impl FromC<$from> for $to {
-			fn from_c(from: $from) -> Self {
-				from.data
+		impl IntoRust<$to> for $from {
+			fn into_rust_owned(self) -> $to {
+				self.data
 			}
 		}
 	}
 }
 macro_rules! ref_u8_arr_from_c {
 	($arr_ty:ty) => {
-		impl FromC<*const $arr_ty> for &$arr_ty {
-			fn from_c(from: *const $arr_ty) -> Self {
-				unsafe { &*from }
+		impl IntoRust<&'static $arr_ty> for *const $arr_ty {
+			fn into_rust_owned(self) -> &'static $arr_ty {
+				unsafe { &*self }
 			}
 		}
 	}
@@ -149,22 +149,22 @@ ref_u8_arr_from_c!([u8; 32]);
 
 macro_rules! ref_slice_from_c {
 	($from:ty, $to:ty) => {
-		impl<'a> FromC<&'a $from> for &'a [$to] {
-			fn from_c(from: &'a $from) -> Self {
-				from.to_slice()
+		impl<'a> IntoRust<&'a [$to]> for &'a $from {
+			fn into_rust_owned(self) -> &'a [$to] {
+				self.to_slice()
 			}
 		}
 	}
 }
 ref_slice_from_c!(crate::c_types::u8slice, u8);
 
-impl FromC<crate::c_types::derived::CVec_u8Z> for bitcoin::blockdata::script::Script {
-	fn from_c(mut from: crate::c_types::derived::CVec_u8Z) -> Self {
-		bitcoin::blockdata::script::Script::from(from.into_rust())
+impl IntoRust<bitcoin::blockdata::script::Script> for crate::c_types::derived::CVec_u8Z {
+	fn into_rust_owned(mut self) -> bitcoin::blockdata::script::Script {
+		bitcoin::blockdata::script::Script::from(self.into_rust())
 	}
 }
-impl FromC<crate::c_types::u8slice> for bitcoin::blockdata::script::Script {
-	fn from_c(from: crate::c_types::u8slice) -> Self {
-		bitcoin::blockdata::script::Script::from(Vec::from(from.to_slice()))
+impl IntoRust<bitcoin::blockdata::script::Script> for crate::c_types::u8slice {
+	fn into_rust_owned(self) -> bitcoin::blockdata::script::Script {
+		bitcoin::blockdata::script::Script::from(Vec::from(self.to_slice()))
 	}
 }

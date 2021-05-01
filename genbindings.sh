@@ -251,7 +251,7 @@ clang++ $LOCAL_CFLAGS -std=c++11 -flto -O2 demo.cpp target/release/libldk.a -ldl
 if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
 	# If we can use cross-language LTO, use it for building C dependencies (i.e. libsecp256k1) as well
 	export CC="$CLANG"
-	export CFLAGS_wasm32_wasi="-target wasm32"
+	export CFLAGS_wasm32_wasi="-target wasm32 -flto"
 fi
 
 if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]; then
@@ -260,8 +260,6 @@ if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]
 	clang -nostdlib -o /dev/null --target=wasm32-wasi -Wl,--no-entry genbindings_wasm_test_file.c > /dev/null 2>&1 &&
 	# And if it does, build a WASM binary without capturing errors
 	cargo rustc -v --target=wasm32-wasi -- -C embed-bitcode=yes &&
-	# Now that we've done our last non-LTO build, turn on LTO in CFLAGS as well
-	export CFLAGS="$CFLAGS -flto" &&
 	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target=wasm32-wasi -- -C opt-level=s -C linker-plugin-lto -C lto ||
 	echo "Cannot build WASM lib as clang does not seem to support the wasm32-wasi target"
 	rm genbindings_wasm_test_file.c

@@ -15,7 +15,7 @@ jobs:
         run: |
           apt-get update
           apt-get -y dist-upgrade
-          apt-get -y install cargo valgrind lld git g++ clang
+          apt-get -y install cargo libstd-rust-dev-wasm32 valgrind lld git g++ clang
       - name: Checkout source code
         uses: actions/checkout@v2
       - name: Sanity test bindings against Cargo.toml RL

@@ -9,6 +9,8 @@ use bitcoin::secp256k1::key::PublicKey as SecpPublicKey;
 use bitcoin::secp256k1::key::SecretKey as SecpSecretKey;
 use bitcoin::secp256k1::Signature as SecpSignature;
 use bitcoin::secp256k1::Error as SecpError;
+use bitcoin::secp256k1::recovery::RecoveryId;
+use bitcoin::secp256k1::recovery::RecoverableSignature as SecpRecoverableSignature;
 use bitcoin::bech32;
 
 use std::convert::TryInto; // Bindings need at least rustc 1.34
@@ -83,6 +85,32 @@ impl Signature {
 	// The following are used for Option<Signature> which we support, but don't use anymore
 	#[allow(unused)] pub(crate) fn is_null(&self) -> bool { self.compact_form[..] == [0; 64][..] }
 	#[allow(unused)] pub(crate) fn null() -> Self { Self { compact_form: [0; 64] } }
+}
+
+#[repr(C)]
+#[derive(Clone)]
+/// Represents a secp256k1 signature serialized as two 32-byte numbers as well as a tag which
+/// allows recovering the exact public key which created the signature given the message.
+pub struct RecoverableSignature {
+	/// The bytes of the signature in "compact" form plus a "Recovery ID" which allows for
+	/// recovery.
+	pub serialized_form: [u8; 68],
+}
+impl RecoverableSignature {
+	pub(crate) fn from_rust(pk: &SecpRecoverableSignature) -> Self {
+		let (id, compact_form) = pk.serialize_compact();
+		let mut serialized_form = [0; 68];
+		serialized_form[0..64].copy_from_slice(&compact_form[..]);
+		serialized_form[64..].copy_from_slice(&id.to_i32().to_le_bytes());
+		Self { serialized_form }
+	}
+	pub(crate) fn into_rust(&self) -> SecpRecoverableSignature {
+		let mut id = [0; 4];
+		id.copy_from_slice(&self.serialized_form[64..]);
+		SecpRecoverableSignature::from_compact(&self.serialized_form[0..64],
+				RecoveryId::from_i32(i32::from_le_bytes(id)).expect("Invalid Recovery ID"))
+			.unwrap()
+	}
 }
 
 #[repr(C)]
@@ -354,10 +382,24 @@ impl Into<Str> for &'static str {
 		Str { chars: self.as_ptr(), len: self.len(), chars_is_owned: false }
 	}
 }
-impl Into<&'static str> for Str {
-	fn into(self) -> &'static str {
+impl Str {
+	pub(crate) fn into_str(&self) -> &'static str {
 		if self.len == 0 { return ""; }
 		std::str::from_utf8(unsafe { std::slice::from_raw_parts(self.chars, self.len) }).unwrap()
+	}
+	pub(crate) fn into_string(self) -> String {
+		let bytes = if self.len == 0 {
+			Vec::new()
+		} else if self.chars_is_owned {
+			unsafe {
+				Box::from_raw(std::slice::from_raw_parts_mut(unsafe { self.chars as *mut u8 }, self.len))
+			}.into()
+		} else {
+			let mut ret = Vec::with_capacity(self.len);
+			ret.extend_from_slice(unsafe { std::slice::from_raw_parts(self.chars, self.len) });
+			ret
+		};
+		String::from_utf8(bytes).unwrap()
 	}
 }
 impl Into<Str> for String {

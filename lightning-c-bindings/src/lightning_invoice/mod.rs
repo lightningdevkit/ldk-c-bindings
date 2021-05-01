@@ -20,6 +20,7 @@ use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
+pub mod utils;
 pub mod constants;
 mod de {
 
@@ -36,6 +37,42 @@ use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
 }
+#[no_mangle]
+/// Read a SiPrefix object from a string
+pub extern "C" fn SiPrefix_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_SiPrefixNoneZ {
+	match lightning_invoice::SiPrefix::from_str(s.into_str()) {
+		Ok(r) => {
+			crate::c_types::CResultTempl::ok(
+				crate::lightning_invoice::SiPrefix::native_into(r)
+			)
+		},
+		Err(e) => crate::c_types::CResultTempl::err(()),
+	}.into()
+}
+#[no_mangle]
+/// Read a Invoice object from a string
+pub extern "C" fn Invoice_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_InvoiceNoneZ {
+	match lightning_invoice::Invoice::from_str(s.into_str()) {
+		Ok(r) => {
+			crate::c_types::CResultTempl::ok(
+				crate::lightning_invoice::Invoice { inner: Box::into_raw(Box::new(r)), is_owned: true }
+			)
+		},
+		Err(e) => crate::c_types::CResultTempl::err(()),
+	}.into()
+}
+#[no_mangle]
+/// Read a SignedRawInvoice object from a string
+pub extern "C" fn SignedRawInvoice_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_SignedRawInvoiceNoneZ {
+	match lightning_invoice::SignedRawInvoice::from_str(s.into_str()) {
+		Ok(r) => {
+			crate::c_types::CResultTempl::ok(
+				crate::lightning_invoice::SignedRawInvoice { inner: Box::into_raw(Box::new(r)), is_owned: true }
+			)
+		},
+		Err(e) => crate::c_types::CResultTempl::err(()),
+	}.into()
+}
 }
 mod ser {
 
@@ -44,6 +81,26 @@ use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
+#[no_mangle]
+/// Get the string representation of a Invoice object
+pub extern "C" fn Invoice_to_str(o: &crate::lightning_invoice::Invoice) -> Str {
+	format!("{}", unsafe { &*o.inner }).into()
+}
+#[no_mangle]
+/// Get the string representation of a SignedRawInvoice object
+pub extern "C" fn SignedRawInvoice_to_str(o: &crate::lightning_invoice::SignedRawInvoice) -> Str {
+	format!("{}", unsafe { &*o.inner }).into()
+}
+#[no_mangle]
+/// Get the string representation of a Currency object
+pub extern "C" fn Currency_to_str(o: &crate::lightning_invoice::Currency) -> Str {
+	format!("{}", &o.to_native()).into()
+}
+#[no_mangle]
+/// Get the string representation of a SiPrefix object
+pub extern "C" fn SiPrefix_to_str(o: &crate::lightning_invoice::SiPrefix) -> Str {
+	format!("{}", &o.to_native()).into()
+}
 }
 mod tb {
 
@@ -343,22 +400,6 @@ pub extern "C" fn RawDataPart_get_timestamp(this_ptr: &RawDataPart) -> crate::li
 pub extern "C" fn RawDataPart_set_timestamp(this_ptr: &mut RawDataPart, mut val: crate::lightning_invoice::PositiveTimestamp) {
 	unsafe { &mut *this_ptr.inner }.timestamp = *unsafe { Box::from_raw(val.take_inner()) };
 }
-/// tagged fields of the payment request
-#[no_mangle]
-pub extern "C" fn RawDataPart_set_tagged_fields(this_ptr: &mut RawDataPart, mut val: crate::c_types::derived::CVec_RawTaggedFieldZ) {
-	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item.into_native() }); };
-	unsafe { &mut *this_ptr.inner }.tagged_fields = local_val;
-}
-/// Constructs a new RawDataPart given each field
-#[must_use]
-#[no_mangle]
-pub extern "C" fn RawDataPart_new(mut timestamp_arg: crate::lightning_invoice::PositiveTimestamp, mut tagged_fields_arg: crate::c_types::derived::CVec_RawTaggedFieldZ) -> RawDataPart {
-	let mut local_tagged_fields_arg = Vec::new(); for mut item in tagged_fields_arg.into_rust().drain(..) { local_tagged_fields_arg.push( { item.into_native() }); };
-	RawDataPart { inner: Box::into_raw(Box::new(nativeRawDataPart {
-		timestamp: *unsafe { Box::from_raw(timestamp_arg.take_inner()) },
-		tagged_fields: local_tagged_fields_arg,
-	})), is_owned: true }
-}
 impl Clone for RawDataPart {
 	fn clone(&self) -> Self {
 		Self {
@@ -572,364 +613,6 @@ impl Currency {
 pub extern "C" fn Currency_clone(orig: &Currency) -> Currency {
 	orig.clone()
 }
-/// Tagged field which may have an unknown tag
-#[must_use]
-#[derive(Clone)]
-#[repr(C)]
-pub enum RawTaggedField {
-	/// Parsed tagged field with known tag
-	KnownSemantics(crate::lightning_invoice::TaggedField),
-	/// tagged field which was not parsed due to an unknown tag or undefined field semantics
-	UnknownSemantics(crate::c_types::derived::CVec_u5Z),
-}
-use lightning_invoice::RawTaggedField as nativeRawTaggedField;
-impl RawTaggedField {
-	#[allow(unused)]
-	pub(crate) fn to_native(&self) -> nativeRawTaggedField {
-		match self {
-			RawTaggedField::KnownSemantics (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				nativeRawTaggedField::KnownSemantics (
-					a_nonref.into_native(),
-				)
-			},
-			RawTaggedField::UnknownSemantics (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				let mut local_a_nonref = Vec::new(); for mut item in a_nonref.into_rust().drain(..) { local_a_nonref.push( { item.into() }); };
-				nativeRawTaggedField::UnknownSemantics (
-					local_a_nonref,
-				)
-			},
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn into_native(self) -> nativeRawTaggedField {
-		match self {
-			RawTaggedField::KnownSemantics (mut a, ) => {
-				nativeRawTaggedField::KnownSemantics (
-					a.into_native(),
-				)
-			},
-			RawTaggedField::UnknownSemantics (mut a, ) => {
-				let mut local_a = Vec::new(); for mut item in a.into_rust().drain(..) { local_a.push( { item.into() }); };
-				nativeRawTaggedField::UnknownSemantics (
-					local_a,
-				)
-			},
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeRawTaggedField) -> Self {
-		match native {
-			nativeRawTaggedField::KnownSemantics (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				RawTaggedField::KnownSemantics (
-					crate::lightning_invoice::TaggedField::native_into(a_nonref),
-				)
-			},
-			nativeRawTaggedField::UnknownSemantics (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				let mut local_a_nonref = Vec::new(); for mut item in a_nonref.drain(..) { local_a_nonref.push( { item.into() }); };
-				RawTaggedField::UnknownSemantics (
-					local_a_nonref.into(),
-				)
-			},
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn native_into(native: nativeRawTaggedField) -> Self {
-		match native {
-			nativeRawTaggedField::KnownSemantics (mut a, ) => {
-				RawTaggedField::KnownSemantics (
-					crate::lightning_invoice::TaggedField::native_into(a),
-				)
-			},
-			nativeRawTaggedField::UnknownSemantics (mut a, ) => {
-				let mut local_a = Vec::new(); for mut item in a.drain(..) { local_a.push( { item.into() }); };
-				RawTaggedField::UnknownSemantics (
-					local_a.into(),
-				)
-			},
-		}
-	}
-}
-/// Frees any resources used by the RawTaggedField
-#[no_mangle]
-pub extern "C" fn RawTaggedField_free(this_ptr: RawTaggedField) { }
-/// Creates a copy of the RawTaggedField
-#[no_mangle]
-pub extern "C" fn RawTaggedField_clone(orig: &RawTaggedField) -> RawTaggedField {
-	orig.clone()
-}
-/// Tagged field with known tag
-///
-/// For descriptions of the enum values please refer to the enclosed type's docs.
-#[must_use]
-#[derive(Clone)]
-#[repr(C)]
-pub enum TaggedField {
-	PaymentHash(crate::lightning_invoice::Sha256),
-	Description(crate::lightning_invoice::Description),
-	PayeePubKey(crate::lightning_invoice::PayeePubKey),
-	DescriptionHash(crate::lightning_invoice::Sha256),
-	ExpiryTime(crate::lightning_invoice::ExpiryTime),
-	MinFinalCltvExpiry(crate::lightning_invoice::MinFinalCltvExpiry),
-	Fallback(crate::lightning_invoice::Fallback),
-	Route(crate::lightning_invoice::RouteHint),
-	PaymentSecret(crate::lightning_invoice::PaymentSecret),
-	Features(crate::lightning::ln::features::InvoiceFeatures),
-}
-use lightning_invoice::TaggedField as nativeTaggedField;
-impl TaggedField {
-	#[allow(unused)]
-	pub(crate) fn to_native(&self) -> nativeTaggedField {
-		match self {
-			TaggedField::PaymentHash (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				nativeTaggedField::PaymentHash (
-					*unsafe { Box::from_raw(a_nonref.take_inner()) },
-				)
-			},
-			TaggedField::Description (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				nativeTaggedField::Description (
-					*unsafe { Box::from_raw(a_nonref.take_inner()) },
-				)
-			},
-			TaggedField::PayeePubKey (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				nativeTaggedField::PayeePubKey (
-					*unsafe { Box::from_raw(a_nonref.take_inner()) },
-				)
-			},
-			TaggedField::DescriptionHash (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				nativeTaggedField::DescriptionHash (
-					*unsafe { Box::from_raw(a_nonref.take_inner()) },
-				)
-			},
-			TaggedField::ExpiryTime (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				nativeTaggedField::ExpiryTime (
-					*unsafe { Box::from_raw(a_nonref.take_inner()) },
-				)
-			},
-			TaggedField::MinFinalCltvExpiry (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				nativeTaggedField::MinFinalCltvExpiry (
-					*unsafe { Box::from_raw(a_nonref.take_inner()) },
-				)
-			},
-			TaggedField::Fallback (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				nativeTaggedField::Fallback (
-					a_nonref.into_native(),
-				)
-			},
-			TaggedField::Route (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				nativeTaggedField::Route (
-					*unsafe { Box::from_raw(a_nonref.take_inner()) },
-				)
-			},
-			TaggedField::PaymentSecret (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				nativeTaggedField::PaymentSecret (
-					*unsafe { Box::from_raw(a_nonref.take_inner()) },
-				)
-			},
-			TaggedField::Features (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				nativeTaggedField::Features (
-					*unsafe { Box::from_raw(a_nonref.take_inner()) },
-				)
-			},
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn into_native(self) -> nativeTaggedField {
-		match self {
-			TaggedField::PaymentHash (mut a, ) => {
-				nativeTaggedField::PaymentHash (
-					*unsafe { Box::from_raw(a.take_inner()) },
-				)
-			},
-			TaggedField::Description (mut a, ) => {
-				nativeTaggedField::Description (
-					*unsafe { Box::from_raw(a.take_inner()) },
-				)
-			},
-			TaggedField::PayeePubKey (mut a, ) => {
-				nativeTaggedField::PayeePubKey (
-					*unsafe { Box::from_raw(a.take_inner()) },
-				)
-			},
-			TaggedField::DescriptionHash (mut a, ) => {
-				nativeTaggedField::DescriptionHash (
-					*unsafe { Box::from_raw(a.take_inner()) },
-				)
-			},
-			TaggedField::ExpiryTime (mut a, ) => {
-				nativeTaggedField::ExpiryTime (
-					*unsafe { Box::from_raw(a.take_inner()) },
-				)
-			},
-			TaggedField::MinFinalCltvExpiry (mut a, ) => {
-				nativeTaggedField::MinFinalCltvExpiry (
-					*unsafe { Box::from_raw(a.take_inner()) },
-				)
-			},
-			TaggedField::Fallback (mut a, ) => {
-				nativeTaggedField::Fallback (
-					a.into_native(),
-				)
-			},
-			TaggedField::Route (mut a, ) => {
-				nativeTaggedField::Route (
-					*unsafe { Box::from_raw(a.take_inner()) },
-				)
-			},
-			TaggedField::PaymentSecret (mut a, ) => {
-				nativeTaggedField::PaymentSecret (
-					*unsafe { Box::from_raw(a.take_inner()) },
-				)
-			},
-			TaggedField::Features (mut a, ) => {
-				nativeTaggedField::Features (
-					*unsafe { Box::from_raw(a.take_inner()) },
-				)
-			},
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeTaggedField) -> Self {
-		match native {
-			nativeTaggedField::PaymentHash (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				TaggedField::PaymentHash (
-					crate::lightning_invoice::Sha256 { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
-				)
-			},
-			nativeTaggedField::Description (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				TaggedField::Description (
-					crate::lightning_invoice::Description { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
-				)
-			},
-			nativeTaggedField::PayeePubKey (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				TaggedField::PayeePubKey (
-					crate::lightning_invoice::PayeePubKey { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
-				)
-			},
-			nativeTaggedField::DescriptionHash (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				TaggedField::DescriptionHash (
-					crate::lightning_invoice::Sha256 { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
-				)
-			},
-			nativeTaggedField::ExpiryTime (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				TaggedField::ExpiryTime (
-					crate::lightning_invoice::ExpiryTime { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
-				)
-			},
-			nativeTaggedField::MinFinalCltvExpiry (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				TaggedField::MinFinalCltvExpiry (
-					crate::lightning_invoice::MinFinalCltvExpiry { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
-				)
-			},
-			nativeTaggedField::Fallback (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				TaggedField::Fallback (
-					crate::lightning_invoice::Fallback::native_into(a_nonref),
-				)
-			},
-			nativeTaggedField::Route (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				TaggedField::Route (
-					crate::lightning_invoice::RouteHint { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
-				)
-			},
-			nativeTaggedField::PaymentSecret (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				TaggedField::PaymentSecret (
-					crate::lightning_invoice::PaymentSecret { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
-				)
-			},
-			nativeTaggedField::Features (ref a, ) => {
-				let mut a_nonref = (*a).clone();
-				TaggedField::Features (
-					crate::lightning::ln::features::InvoiceFeatures { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
-				)
-			},
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn native_into(native: nativeTaggedField) -> Self {
-		match native {
-			nativeTaggedField::PaymentHash (mut a, ) => {
-				TaggedField::PaymentHash (
-					crate::lightning_invoice::Sha256 { inner: Box::into_raw(Box::new(a)), is_owned: true },
-				)
-			},
-			nativeTaggedField::Description (mut a, ) => {
-				TaggedField::Description (
-					crate::lightning_invoice::Description { inner: Box::into_raw(Box::new(a)), is_owned: true },
-				)
-			},
-			nativeTaggedField::PayeePubKey (mut a, ) => {
-				TaggedField::PayeePubKey (
-					crate::lightning_invoice::PayeePubKey { inner: Box::into_raw(Box::new(a)), is_owned: true },
-				)
-			},
-			nativeTaggedField::DescriptionHash (mut a, ) => {
-				TaggedField::DescriptionHash (
-					crate::lightning_invoice::Sha256 { inner: Box::into_raw(Box::new(a)), is_owned: true },
-				)
-			},
-			nativeTaggedField::ExpiryTime (mut a, ) => {
-				TaggedField::ExpiryTime (
-					crate::lightning_invoice::ExpiryTime { inner: Box::into_raw(Box::new(a)), is_owned: true },
-				)
-			},
-			nativeTaggedField::MinFinalCltvExpiry (mut a, ) => {
-				TaggedField::MinFinalCltvExpiry (
-					crate::lightning_invoice::MinFinalCltvExpiry { inner: Box::into_raw(Box::new(a)), is_owned: true },
-				)
-			},
-			nativeTaggedField::Fallback (mut a, ) => {
-				TaggedField::Fallback (
-					crate::lightning_invoice::Fallback::native_into(a),
-				)
-			},
-			nativeTaggedField::Route (mut a, ) => {
-				TaggedField::Route (
-					crate::lightning_invoice::RouteHint { inner: Box::into_raw(Box::new(a)), is_owned: true },
-				)
-			},
-			nativeTaggedField::PaymentSecret (mut a, ) => {
-				TaggedField::PaymentSecret (
-					crate::lightning_invoice::PaymentSecret { inner: Box::into_raw(Box::new(a)), is_owned: true },
-				)
-			},
-			nativeTaggedField::Features (mut a, ) => {
-				TaggedField::Features (
-					crate::lightning::ln::features::InvoiceFeatures { inner: Box::into_raw(Box::new(a)), is_owned: true },
-				)
-			},
-		}
-	}
-}
-/// Frees any resources used by the TaggedField
-#[no_mangle]
-pub extern "C" fn TaggedField_free(this_ptr: TaggedField) { }
-/// Creates a copy of the TaggedField
-#[no_mangle]
-pub extern "C" fn TaggedField_clone(orig: &TaggedField) -> TaggedField {
-	orig.clone()
-}
 
 use lightning_invoice::Sha256 as nativeSha256Import;
 type nativeSha256 = nativeSha256Import;
@@ -1123,70 +806,6 @@ pub(crate) extern "C" fn PayeePubKey_clone_void(this_ptr: *const c_void) -> *mut
 #[no_mangle]
 /// Creates a copy of the PayeePubKey
 pub extern "C" fn PayeePubKey_clone(orig: &PayeePubKey) -> PayeePubKey {
-	orig.clone()
-}
-
-use lightning_invoice::PaymentSecret as nativePaymentSecretImport;
-type nativePaymentSecret = nativePaymentSecretImport;
-
-/// 256-bit payment secret
-#[must_use]
-#[repr(C)]
-pub struct PaymentSecret {
-	/// A pointer to the opaque Rust object.
-
-	/// Nearly everywhere, inner must be non-null, however in places where
-	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativePaymentSecret,
-	/// Indicates that this is the only struct which contains the same pointer.
-
-	/// Rust functions which take ownership of an object provided via an argument require
-	/// this to be true and invalidate the object pointed to by inner.
-	pub is_owned: bool,
-}
-
-impl Drop for PaymentSecret {
-	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativePaymentSecret>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
-		}
-	}
-}
-/// Frees any resources used by the PaymentSecret, if is_owned is set and inner is non-NULL.
-#[no_mangle]
-pub extern "C" fn PaymentSecret_free(this_obj: PaymentSecret) { }
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn PaymentSecret_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePaymentSecret); }
-}
-#[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-impl PaymentSecret {
-	pub(crate) fn take_inner(mut self) -> *mut nativePaymentSecret {
-		assert!(self.is_owned);
-		let ret = self.inner;
-		self.inner = std::ptr::null_mut();
-		ret
-	}
-}
-impl Clone for PaymentSecret {
-	fn clone(&self) -> Self {
-		Self {
-			inner: if <*mut nativePaymentSecret>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
-			is_owned: true,
-		}
-	}
-}
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn PaymentSecret_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePaymentSecret)).clone() })) as *mut c_void
-}
-#[no_mangle]
-/// Creates a copy of the PaymentSecret
-pub extern "C" fn PaymentSecret_clone(orig: &PaymentSecret) -> PaymentSecret {
 	orig.clone()
 }
 
@@ -1686,9 +1305,9 @@ pub extern "C" fn RawInvoice_min_final_cltv_expiry(this_arg: &RawInvoice) -> cra
 
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_payment_secret(this_arg: &RawInvoice) -> crate::lightning_invoice::PaymentSecret {
+pub extern "C" fn RawInvoice_payment_secret(this_arg: &RawInvoice) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*this_arg.inner }.payment_secret();
-	let mut local_ret = crate::lightning_invoice::PaymentSecret { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut local_ret = if ret.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (ret.unwrap()).0 } } };
 	local_ret
 }
 
@@ -1774,7 +1393,7 @@ pub extern "C" fn Invoice_into_signed_raw(mut this_arg: Invoice) -> crate::light
 #[no_mangle]
 pub extern "C" fn Invoice_check_signature(this_arg: &Invoice) -> crate::c_types::derived::CResult_NoneSemanticErrorZ {
 	let mut ret = unsafe { &*this_arg.inner }.check_signature();
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { 0u8 /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SemanticError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SemanticError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -1827,9 +1446,9 @@ pub extern "C" fn Invoice_payee_pub_key(this_arg: &Invoice) -> crate::c_types::P
 /// Get the payment secret if one was included in the invoice
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_payment_secret(this_arg: &Invoice) -> crate::lightning_invoice::PaymentSecret {
+pub extern "C" fn Invoice_payment_secret(this_arg: &Invoice) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*this_arg.inner }.payment_secret();
-	let mut local_ret = crate::lightning_invoice::PaymentSecret { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut local_ret = if ret.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (ret.unwrap()).0 } } };
 	local_ret
 }
 
@@ -1850,7 +1469,7 @@ pub extern "C" fn Invoice_recover_payee_pub_key(this_arg: &Invoice) -> crate::c_
 	crate::c_types::PublicKey::from_rust(&ret)
 }
 
-/// Returns the invoice's expiry time if present
+/// Returns the invoice's expiry time, if present, otherwise [`DEFAULT_EXPIRY_TIME`].
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_expiry_time(this_arg: &Invoice) -> u64 {
@@ -1858,13 +1477,13 @@ pub extern "C" fn Invoice_expiry_time(this_arg: &Invoice) -> u64 {
 	ret.as_secs()
 }
 
-/// Returns the invoice's `min_cltv_expiry` time if present
+/// Returns the invoice's `min_final_cltv_expiry` time, if present, otherwise
+/// [`DEFAULT_MIN_FINAL_CLTV_EXPIRY`].
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_min_final_cltv_expiry(this_arg: &Invoice) -> crate::c_types::derived::COption_u64Z {
+pub extern "C" fn Invoice_min_final_cltv_expiry(this_arg: &Invoice) -> u64 {
 	let mut ret = unsafe { &*this_arg.inner }.min_final_cltv_expiry();
-	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(ret.unwrap()) } };
-	local_ret
+	ret
 }
 
 /// Returns a list of all routes included in the invoice
@@ -1893,22 +1512,14 @@ pub extern "C" fn Invoice_amount_pico_btc(this_arg: &Invoice) -> crate::c_types:
 	local_ret
 }
 
-/// Numeric representation of the field's tag
-#[must_use]
-#[no_mangle]
-pub extern "C" fn TaggedField_tag(this_arg: &TaggedField) -> crate::c_types::u5 {
-	let mut ret = this_arg.to_native().tag();
-	ret.into()
-}
-
 /// Creates a new `Description` if `description` is at most 1023 __bytes__ long,
 /// returns `CreationError::DescriptionTooLong` otherwise
 ///
 /// Please note that single characters may use more than one byte due to UTF8 encoding.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Description_new(mut description: crate::c_types::derived::CVec_u8Z) -> crate::c_types::derived::CResult_DescriptionCreationErrorZ {
-	let mut ret = lightning_invoice::Description::new(String::from_utf8(description.into_rust()).unwrap());
+pub extern "C" fn Description_new(mut description: crate::c_types::Str) -> crate::c_types::derived::CResult_DescriptionCreationErrorZ {
+	let mut ret = lightning_invoice::Description::new(description.into_string());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Description { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
 	local_ret
 }
@@ -1916,9 +1527,9 @@ pub extern "C" fn Description_new(mut description: crate::c_types::derived::CVec
 /// Returns the underlying description `String`
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Description_into_inner(mut this_arg: Description) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn Description_into_inner(mut this_arg: Description) -> crate::c_types::Str {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).into_inner();
-	ret.into_bytes().into()
+	ret.into()
 }
 
 /// Construct an `ExpiryTime` from seconds. If there exists a `PositiveTimestamp` which would
@@ -2038,8 +1649,8 @@ pub extern "C" fn CreationError_clone(orig: &CreationError) -> CreationError {
 }
 #[no_mangle]
 /// Get the string representation of a CreationError object
-pub extern "C" fn CreationError_to_str(o: &lightning_invoice::CreationError) -> Str {
-	format!("{}", o).into()
+pub extern "C" fn CreationError_to_str(o: &crate::lightning_invoice::CreationError) -> Str {
+	format!("{}", &o.to_native()).into()
 }
 /// Errors that may occur when converting a `RawInvoice` to an `Invoice`. They relate to the
 /// requirements sections in BOLT #11
@@ -2114,6 +1725,89 @@ pub extern "C" fn SemanticError_clone(orig: &SemanticError) -> SemanticError {
 }
 #[no_mangle]
 /// Get the string representation of a SemanticError object
-pub extern "C" fn SemanticError_to_str(o: &lightning_invoice::SemanticError) -> Str {
-	format!("{}", o).into()
+pub extern "C" fn SemanticError_to_str(o: &crate::lightning_invoice::SemanticError) -> Str {
+	format!("{}", &o.to_native()).into()
+}
+/// When signing using a fallible method either an user-supplied `SignError` or a `CreationError`
+/// may occur.
+#[must_use]
+#[derive(Clone)]
+#[repr(C)]
+pub enum SignOrCreationError {
+	/// An error occurred during signing
+	SignError,
+	/// An error occurred while building the transaction
+	CreationError(crate::lightning_invoice::CreationError),
+}
+use lightning_invoice::SignOrCreationError as nativeSignOrCreationError;
+impl SignOrCreationError {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeSignOrCreationError {
+		match self {
+			SignOrCreationError::SignError => {
+				nativeSignOrCreationError::SignError (
+					() /*a_nonref*/,
+				)
+			},
+			SignOrCreationError::CreationError (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeSignOrCreationError::CreationError (
+					a_nonref.into_native(),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeSignOrCreationError {
+		match self {
+			SignOrCreationError::SignError => {
+				nativeSignOrCreationError::SignError (
+					() /*a*/,
+				)
+			},
+			SignOrCreationError::CreationError (mut a, ) => {
+				nativeSignOrCreationError::CreationError (
+					a.into_native(),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeSignOrCreationError) -> Self {
+		match native {
+			nativeSignOrCreationError::SignError (ref a, ) => {
+				SignOrCreationError::SignError			},
+			nativeSignOrCreationError::CreationError (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				SignOrCreationError::CreationError (
+					crate::lightning_invoice::CreationError::native_into(a_nonref),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeSignOrCreationError) -> Self {
+		match native {
+			nativeSignOrCreationError::SignError (mut a, ) => {
+				SignOrCreationError::SignError			},
+			nativeSignOrCreationError::CreationError (mut a, ) => {
+				SignOrCreationError::CreationError (
+					crate::lightning_invoice::CreationError::native_into(a),
+				)
+			},
+		}
+	}
+}
+/// Frees any resources used by the SignOrCreationError
+#[no_mangle]
+pub extern "C" fn SignOrCreationError_free(this_ptr: SignOrCreationError) { }
+/// Creates a copy of the SignOrCreationError
+#[no_mangle]
+pub extern "C" fn SignOrCreationError_clone(orig: &SignOrCreationError) -> SignOrCreationError {
+	orig.clone()
+}
+#[no_mangle]
+/// Get the string representation of a SignOrCreationError object
+pub extern "C" fn SignOrCreationError_to_str(o: &crate::lightning_invoice::SignOrCreationError) -> Str {
+	format!("{}", &o.to_native()).into()
 }

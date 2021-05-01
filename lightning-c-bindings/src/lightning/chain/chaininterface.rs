@@ -29,12 +29,10 @@ pub struct BroadcasterInterface {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
-unsafe impl Sync for BroadcasterInterface {}
-unsafe impl Send for BroadcasterInterface {}
 
 use lightning::chain::chaininterface::BroadcasterInterface as rustBroadcasterInterface;
 impl rustBroadcasterInterface for BroadcasterInterface {
-	fn broadcast_transaction(&self, tx: &bitcoin::blockdata::transaction::Transaction) {
+	fn broadcast_transaction(&self, mut tx: &bitcoin::blockdata::transaction::Transaction) {
 		(self.broadcast_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(tx))
 	}
 }
@@ -134,12 +132,10 @@ pub struct FeeEstimator {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
-unsafe impl Sync for FeeEstimator {}
-unsafe impl Send for FeeEstimator {}
 
 use lightning::chain::chaininterface::FeeEstimator as rustFeeEstimator;
 impl rustFeeEstimator for FeeEstimator {
-	fn get_est_sat_per_1000_weight(&self, confirmation_target: lightning::chain::chaininterface::ConfirmationTarget) -> u32 {
+	fn get_est_sat_per_1000_weight(&self, mut confirmation_target: lightning::chain::chaininterface::ConfirmationTarget) -> u32 {
 		let mut ret = (self.get_est_sat_per_1000_weight)(self.this_arg, crate::lightning::chain::chaininterface::ConfirmationTarget::native_into(confirmation_target));
 		ret
 	}

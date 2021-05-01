@@ -56,8 +56,6 @@ struct nativeDescriptionOpaque;
 typedef struct nativeDescriptionOpaque LDKnativeDescription;
 struct nativePayeePubKeyOpaque;
 typedef struct nativePayeePubKeyOpaque LDKnativePayeePubKey;
-struct nativePaymentSecretOpaque;
-typedef struct nativePaymentSecretOpaque LDKnativePaymentSecret;
 struct nativeExpiryTimeOpaque;
 typedef struct nativeExpiryTimeOpaque LDKnativeExpiryTime;
 struct nativeMinFinalCltvExpiryOpaque;

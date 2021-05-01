@@ -167,17 +167,18 @@ pub struct GenericTypes<'a, 'b> {
 	self_ty: Option<(String, &'a syn::Path)>,
 	parent: Option<&'b GenericTypes<'b, 'b>>,
 	typed_generics: HashMap<&'a syn::Ident, (String, Option<&'a syn::Path>)>,
+	default_generics: HashMap<&'a syn::Ident, (&'a syn::Type, syn::Type)>,
 }
 impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 	pub fn new(self_ty: Option<(String, &'a syn::Path)>) -> Self {
-		Self { self_ty, parent: None, typed_generics: HashMap::new(), }
+		Self { self_ty, parent: None, typed_generics: HashMap::new(), default_generics: HashMap::new(), }
 	}
 
 	/// push a new context onto the stack, allowing for a new set of generics to be learned which
 	/// will override any lower contexts, but which will still fall back to resoltion via lower
 	/// contexts.
 	pub fn push_ctx<'c>(&'c self) -> GenericTypes<'a, 'c> {
-		GenericTypes { self_ty: None, parent: Some(self), typed_generics: HashMap::new(), }
+		GenericTypes { self_ty: None, parent: Some(self), typed_generics: HashMap::new(), default_generics: HashMap::new(), }
 	}
 
 	/// Learn the generics in generics in the current context, given a TypeResolver.
@@ -207,6 +208,10 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								self.typed_generics.insert(&type_param.ident, (path, new_ident));
 							} else { return false; }
 						}
+					}
+					if let Some(default) = type_param.default.as_ref() {
+						assert!(type_param.bounds.is_empty());
+						self.default_generics.insert(&type_param.ident, (default, parse_quote!(&#default)));
 					}
 				},
 				_ => {},
@@ -296,6 +301,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 			None
 		}
 	}
+
 	/// Attempt to resolve a Path as a generic parameter and return the full path. as both a string
 	/// and syn::Path.
 	pub fn maybe_resolve_path<'b>(&'b self, path: &syn::Path) -> Option<(&'b String, &'a syn::Path)> {
@@ -324,6 +330,34 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 		} else {
 			None
 		}
+	}
+}
+
+trait ResolveType<'a> { fn resolve_type(&'a self, ty: &'a syn::Type) -> &'a syn::Type; }
+impl<'a, 'b, 'c: 'a + 'b> ResolveType<'c> for Option<&GenericTypes<'a, 'b>> {
+	fn resolve_type(&'c self, ty: &'c syn::Type) -> &'c syn::Type {
+		if let Some(us) = self {
+			match ty {
+				syn::Type::Path(p) => {
+					if let Some(ident) = p.path.get_ident() {
+						if let Some((ty, _)) = us.default_generics.get(ident) {
+							return ty;
+						}
+					}
+				},
+				syn::Type::Reference(syn::TypeReference { elem, .. }) => {
+					if let syn::Type::Path(p) = &**elem {
+						if let Some(ident) = p.path.get_ident() {
+							if let Some((_, refty)) = us.default_generics.get(ident) {
+								return refty;
+							}
+						}
+					}
+				}
+				_ => {},
+			}
+		}
+		ty
 	}
 }
 
@@ -558,7 +592,6 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 	pub fn resolve_imported_refs(&self, mut ty: syn::Type) -> syn::Type {
 		match &mut ty {
 			syn::Type::Path(p) => {
-eprintln!("rir {:?}", p);
 				if p.path.segments.len() != 1 { unimplemented!(); }
 				let mut args = p.path.segments[0].arguments.clone();
 				if let syn::PathArguments::AngleBracketed(ref mut generics) = &mut args {
@@ -782,6 +815,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		match ty {
 			"()" => true,
 			"crate::c_types::Signature" => true,
+			"crate::c_types::RecoverableSignature" => true,
 			"crate::c_types::TxOut" => true,
 			_ => false,
 		}
@@ -808,8 +842,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 3]" if !is_ref => Some("crate::c_types::ThreeBytes"), // Used for RGB values
 
 			"str" if is_ref => Some("crate::c_types::Str"),
-			"String" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
-			"String" if is_ref => Some("crate::c_types::Str"),
+			"String" => Some("crate::c_types::Str"),
 
 			"std::time::Duration" => Some("u64"),
 			"std::time::SystemTime" => Some("u64"),
@@ -820,6 +853,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature"),
+			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some("crate::c_types::RecoverableSignature"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref  => Some("*const [u8; 32]"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
@@ -841,12 +875,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("*const [u8; 32]"),
-			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some("*const [u8; 32]"),
-			"lightning::ln::channelmanager::PaymentPreimage" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::channelmanager::PaymentSecret" if is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::channelmanager::PaymentSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"lightning::ln::PaymentHash" if is_ref => Some("*const [u8; 32]"),
+			"lightning::ln::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"lightning::ln::PaymentPreimage" if is_ref => Some("*const [u8; 32]"),
+			"lightning::ln::PaymentPreimage" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"lightning::ln::PaymentSecret" if is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"lightning::ln::PaymentSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some("*const std::os::raw::c_char"),
@@ -880,7 +914,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some(""),
 
 			"str" if is_ref => Some(""),
-			"String" if !is_ref => Some("String::from_utf8("),
+			"String" => Some(""),
 			// Note that we'll panic for String if is_ref, as we only have non-owned memory, we
 			// cannot create a &String.
 
@@ -895,6 +929,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				=> Some(""),
 			"bitcoin::secp256k1::Signature" if is_ref => Some("&"),
 			"bitcoin::secp256k1::Signature" => Some(""),
+			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(""),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref => Some("&::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
@@ -912,11 +947,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if is_ref => Some("&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*"),
 			"bitcoin::hash_types::Txid" if !is_ref => Some("::bitcoin::hash_types::Txid::from_slice(&"),
 			"bitcoin::hash_types::BlockHash" => Some("::bitcoin::hash_types::BlockHash::from_slice(&"),
-			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("::lightning::ln::channelmanager::PaymentHash("),
-			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("&::lightning::ln::channelmanager::PaymentHash(unsafe { *"),
-			"lightning::ln::channelmanager::PaymentPreimage" if !is_ref => Some("::lightning::ln::channelmanager::PaymentPreimage("),
-			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some("&::lightning::ln::channelmanager::PaymentPreimage(unsafe { *"),
-			"lightning::ln::channelmanager::PaymentSecret" => Some("::lightning::ln::channelmanager::PaymentSecret("),
+			"lightning::ln::PaymentHash" if !is_ref => Some("::lightning::ln::PaymentHash("),
+			"lightning::ln::PaymentHash" if is_ref => Some("&::lightning::ln::PaymentHash(unsafe { *"),
+			"lightning::ln::PaymentPreimage" if !is_ref => Some("::lightning::ln::PaymentPreimage("),
+			"lightning::ln::PaymentPreimage" if is_ref => Some("&::lightning::ln::PaymentPreimage(unsafe { *"),
+			"lightning::ln::PaymentSecret" => Some("::lightning::ln::PaymentSecret("),
 
 			// List of traits we map (possibly during processing of other files):
 			"crate::util::logger::Logger" => Some(""),
@@ -944,8 +979,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8]" if is_ref => Some(".to_slice()"),
 			"[usize]" if is_ref => Some(".to_slice()"),
 
-			"str" if is_ref => Some(".into()"),
-			"String" if !is_ref => Some(".into_rust()).unwrap()"),
+			"str" if is_ref => Some(".into_str()"),
+			"String" => Some(".into_string()"),
 
 			"std::time::Duration" => Some(")"),
 			"std::time::SystemTime" => Some("))"),
@@ -955,6 +990,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(".into_rust()"),
 			"bitcoin::secp256k1::Signature" => Some(".into_rust()"),
+			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(".into_rust()"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some(".into_rust()"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
@@ -971,11 +1007,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if is_ref => Some(" }[..]).unwrap()"),
 			"bitcoin::hash_types::Txid" => Some(".data[..]).unwrap()"),
 			"bitcoin::hash_types::BlockHash" if !is_ref => Some(".data[..]).unwrap()"),
-			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some(".data)"),
-			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some(" })"),
-			"lightning::ln::channelmanager::PaymentPreimage" if !is_ref => Some(".data)"),
-			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some(" })"),
-			"lightning::ln::channelmanager::PaymentSecret" => Some(".data)"),
+			"lightning::ln::PaymentHash" if !is_ref => Some(".data)"),
+			"lightning::ln::PaymentHash" if is_ref => Some(" })"),
+			"lightning::ln::PaymentPreimage" if !is_ref => Some(".data)"),
+			"lightning::ln::PaymentPreimage" if is_ref => Some(" })"),
+			"lightning::ln::PaymentSecret" => Some(".data)"),
 
 			// List of traits we map (possibly during processing of other files):
 			"crate::util::logger::Logger" => Some(""),
@@ -1034,6 +1070,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey::from_rust(&"),
 			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature::from_rust(&"),
+			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some("crate::c_types::RecoverableSignature::from_rust(&"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref => Some(""),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
@@ -1058,11 +1095,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some("&"),
-			"lightning::ln::channelmanager::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some("&"),
-			"lightning::ln::channelmanager::PaymentPreimage" => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"lightning::ln::channelmanager::PaymentSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
+			"lightning::ln::PaymentHash" if is_ref => Some("&"),
+			"lightning::ln::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
+			"lightning::ln::PaymentPreimage" if is_ref => Some("&"),
+			"lightning::ln::PaymentPreimage" => Some("crate::c_types::ThirtyTwoBytes { data: "),
+			"lightning::ln::PaymentSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some("local_"),
@@ -1091,8 +1128,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some(""),
 
 			"str" if is_ref => Some(".into()"),
-			"String" if !is_ref => Some(".into_bytes().into()"),
 			"String" if is_ref => Some(".as_str().into()"),
+			"String" => Some(".into()"),
 
 			"std::time::Duration" => Some(".as_secs()"),
 			"std::time::SystemTime" => Some(".duration_since(::std::time::SystemTime::UNIX_EPOCH).expect(\"Times must be post-1970\").as_secs()"),
@@ -1103,6 +1140,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(")"),
 			"bitcoin::secp256k1::Signature" => Some(")"),
+			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(")"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some(")"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
@@ -1126,11 +1164,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some(".into_inner() }"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
-			"lightning::ln::channelmanager::PaymentHash" if is_ref => Some(".0"),
-			"lightning::ln::channelmanager::PaymentHash" => Some(".0 }"),
-			"lightning::ln::channelmanager::PaymentPreimage" if is_ref => Some(".0"),
-			"lightning::ln::channelmanager::PaymentPreimage" => Some(".0 }"),
-			"lightning::ln::channelmanager::PaymentSecret" if !is_ref => Some(".0 }"),
+			"lightning::ln::PaymentHash" if is_ref => Some(".0"),
+			"lightning::ln::PaymentHash" => Some(".0 }"),
+			"lightning::ln::PaymentPreimage" if is_ref => Some(".0"),
+			"lightning::ln::PaymentPreimage" => Some(".0 }"),
+			"lightning::ln::PaymentSecret" if !is_ref => Some(".0 }"),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some(".as_ptr()"),
@@ -1141,7 +1179,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 	fn empty_val_check_suffix_from_path(&self, full_path: &str) -> Option<&str> {
 		match full_path {
-			"lightning::ln::channelmanager::PaymentSecret" => Some(".data == [0; 32]"),
+			"lightning::ln::PaymentSecret" => Some(".data == [0; 32]"),
 			"secp256k1::key::PublicKey"|"bitcoin::secp256k1::key::PublicKey" => Some(".is_null()"),
 			"bitcoin::secp256k1::Signature" => Some(".is_null()"),
 			_ => None
@@ -1639,7 +1677,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			LP: Fn(&str, bool, bool) -> Option<String>, DL: Fn(&mut W, &DeclType, &str, bool, bool), SC: Fn(bool, Option<&str>) -> String>
 			(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, is_mut: bool, ptr_for_ref: bool,
 			 tupleconv: &str, prefix: bool, sliceconv: SC, path_lookup: LP, decl_lookup: DL) {
-		match t {
+		match generics.resolve_type(t) {
 			syn::Type::Reference(r) => {
 				self.write_conversion_inline_intern(w, &*r.elem, generics, true, r.mutability.is_some(),
 					ptr_for_ref, tupleconv, prefix, sliceconv, path_lookup, decl_lookup);
@@ -1737,7 +1775,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 
 	fn write_to_c_conversion_inline_prefix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool, from_ptr: bool) {
-		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "0u8 /*", true, |_, _| "local_".to_owned(),
+		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "() /*", true, |_, _| "local_".to_owned(),
 				|a, b, c| self.to_c_conversion_inline_prefix_from_path(a, b, c),
 				|w, decl_type, decl_path, is_ref, _is_mut| {
 					match decl_type {
@@ -1969,7 +2007,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			} }
 		}
 
-		match t {
+		match generics.resolve_type(t) {
 			syn::Type::Reference(r) => {
 				if let syn::Type::Slice(_) = &*r.elem {
 					self.write_conversion_new_var_intern(w, ident, var, &*r.elem, generics, is_ref, ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix)
@@ -2413,7 +2451,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 	fn write_c_type_intern<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, is_mut: bool, ptr_for_ref: bool) -> bool {
-		match t {
+		match generics.resolve_type(t) {
 			syn::Type::Path(p) => {
 				if p.qself.is_some() {
 					return false;

@@ -148,14 +148,14 @@ impl Event {
 			Event::PaymentReceived {ref payment_hash, ref payment_preimage, ref payment_secret, ref amt, ref user_payment_id, } => {
 				let mut payment_hash_nonref = (*payment_hash).clone();
 				let mut payment_preimage_nonref = (*payment_preimage).clone();
-				let mut local_payment_preimage_nonref = if payment_preimage_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentPreimage(payment_preimage_nonref.data) }) };
+				let mut local_payment_preimage_nonref = if payment_preimage_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(payment_preimage_nonref.data) }) };
 				let mut payment_secret_nonref = (*payment_secret).clone();
 				let mut amt_nonref = (*amt).clone();
 				let mut user_payment_id_nonref = (*user_payment_id).clone();
 				nativeEvent::PaymentReceived {
-					payment_hash: ::lightning::ln::channelmanager::PaymentHash(payment_hash_nonref.data),
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 					payment_preimage: local_payment_preimage_nonref,
-					payment_secret: ::lightning::ln::channelmanager::PaymentSecret(payment_secret_nonref.data),
+					payment_secret: ::lightning::ln::PaymentSecret(payment_secret_nonref.data),
 					amt: amt_nonref,
 					user_payment_id: user_payment_id_nonref,
 				}
@@ -163,14 +163,14 @@ impl Event {
 			Event::PaymentSent {ref payment_preimage, } => {
 				let mut payment_preimage_nonref = (*payment_preimage).clone();
 				nativeEvent::PaymentSent {
-					payment_preimage: ::lightning::ln::channelmanager::PaymentPreimage(payment_preimage_nonref.data),
+					payment_preimage: ::lightning::ln::PaymentPreimage(payment_preimage_nonref.data),
 				}
 			},
 			Event::PaymentFailed {ref payment_hash, ref rejected_by_dest, } => {
 				let mut payment_hash_nonref = (*payment_hash).clone();
 				let mut rejected_by_dest_nonref = (*rejected_by_dest).clone();
 				nativeEvent::PaymentFailed {
-					payment_hash: ::lightning::ln::channelmanager::PaymentHash(payment_hash_nonref.data),
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 					rejected_by_dest: rejected_by_dest_nonref,
 				}
 			},
@@ -201,23 +201,23 @@ impl Event {
 				}
 			},
 			Event::PaymentReceived {mut payment_hash, mut payment_preimage, mut payment_secret, mut amt, mut user_payment_id, } => {
-				let mut local_payment_preimage = if payment_preimage.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentPreimage(payment_preimage.data) }) };
+				let mut local_payment_preimage = if payment_preimage.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(payment_preimage.data) }) };
 				nativeEvent::PaymentReceived {
-					payment_hash: ::lightning::ln::channelmanager::PaymentHash(payment_hash.data),
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
 					payment_preimage: local_payment_preimage,
-					payment_secret: ::lightning::ln::channelmanager::PaymentSecret(payment_secret.data),
+					payment_secret: ::lightning::ln::PaymentSecret(payment_secret.data),
 					amt: amt,
 					user_payment_id: user_payment_id,
 				}
 			},
 			Event::PaymentSent {mut payment_preimage, } => {
 				nativeEvent::PaymentSent {
-					payment_preimage: ::lightning::ln::channelmanager::PaymentPreimage(payment_preimage.data),
+					payment_preimage: ::lightning::ln::PaymentPreimage(payment_preimage.data),
 				}
 			},
 			Event::PaymentFailed {mut payment_hash, mut rejected_by_dest, } => {
 				nativeEvent::PaymentFailed {
-					payment_hash: ::lightning::ln::channelmanager::PaymentHash(payment_hash.data),
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
 					rejected_by_dest: rejected_by_dest,
 				}
 			},

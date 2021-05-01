@@ -245,16 +245,16 @@ pub extern "C" fn ErrorMessage_get_data(this_ptr: &ErrorMessage) -> crate::c_typ
 /// or printed to stdout).  Otherwise, a well crafted error message may trigger a security
 /// vulnerability in the terminal emulator or the logging subsystem.
 #[no_mangle]
-pub extern "C" fn ErrorMessage_set_data(this_ptr: &mut ErrorMessage, mut val: crate::c_types::derived::CVec_u8Z) {
-	unsafe { &mut *this_ptr.inner }.data = String::from_utf8(val.into_rust()).unwrap();
+pub extern "C" fn ErrorMessage_set_data(this_ptr: &mut ErrorMessage, mut val: crate::c_types::Str) {
+	unsafe { &mut *this_ptr.inner }.data = val.into_string();
 }
 /// Constructs a new ErrorMessage given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ErrorMessage_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut data_arg: crate::c_types::derived::CVec_u8Z) -> ErrorMessage {
+pub extern "C" fn ErrorMessage_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut data_arg: crate::c_types::Str) -> ErrorMessage {
 	ErrorMessage { inner: Box::into_raw(Box::new(nativeErrorMessage {
 		channel_id: channel_id_arg.data,
-		data: String::from_utf8(data_arg.into_rust()).unwrap(),
+		data: data_arg.into_string(),
 	})), is_owned: true }
 }
 impl Clone for ErrorMessage {
@@ -1538,7 +1538,7 @@ pub extern "C" fn UpdateAddHTLC_get_payment_hash(this_ptr: &UpdateAddHTLC) -> *c
 /// The payment hash, the pre-image of which controls HTLC redemption
 #[no_mangle]
 pub extern "C" fn UpdateAddHTLC_set_payment_hash(this_ptr: &mut UpdateAddHTLC, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *this_ptr.inner }.payment_hash = ::lightning::ln::channelmanager::PaymentHash(val.data);
+	unsafe { &mut *this_ptr.inner }.payment_hash = ::lightning::ln::PaymentHash(val.data);
 }
 /// The expiry height of the HTLC
 #[no_mangle]
@@ -1646,7 +1646,7 @@ pub extern "C" fn UpdateFulfillHTLC_get_payment_preimage(this_ptr: &UpdateFulfil
 /// The pre-image of the payment hash, allowing HTLC redemption
 #[no_mangle]
 pub extern "C" fn UpdateFulfillHTLC_set_payment_preimage(this_ptr: &mut UpdateFulfillHTLC, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *this_ptr.inner }.payment_preimage = ::lightning::ln::channelmanager::PaymentPreimage(val.data);
+	unsafe { &mut *this_ptr.inner }.payment_preimage = ::lightning::ln::PaymentPreimage(val.data);
 }
 /// Constructs a new UpdateFulfillHTLC given each field
 #[must_use]
@@ -1655,7 +1655,7 @@ pub extern "C" fn UpdateFulfillHTLC_new(mut channel_id_arg: crate::c_types::Thir
 	UpdateFulfillHTLC { inner: Box::into_raw(Box::new(nativeUpdateFulfillHTLC {
 		channel_id: channel_id_arg.data,
 		htlc_id: htlc_id_arg,
-		payment_preimage: ::lightning::ln::channelmanager::PaymentPreimage(payment_preimage_arg.data),
+		payment_preimage: ::lightning::ln::PaymentPreimage(payment_preimage_arg.data),
 	})), is_owned: true }
 }
 impl Clone for UpdateFulfillHTLC {
@@ -4149,8 +4149,8 @@ pub extern "C" fn LightningError_get_err(this_ptr: &LightningError) -> crate::c_
 }
 /// A human-readable message describing the error
 #[no_mangle]
-pub extern "C" fn LightningError_set_err(this_ptr: &mut LightningError, mut val: crate::c_types::derived::CVec_u8Z) {
-	unsafe { &mut *this_ptr.inner }.err = String::from_utf8(val.into_rust()).unwrap();
+pub extern "C" fn LightningError_set_err(this_ptr: &mut LightningError, mut val: crate::c_types::Str) {
+	unsafe { &mut *this_ptr.inner }.err = val.into_string();
 }
 /// The action which should be taken against the offending peer.
 #[no_mangle]
@@ -4166,9 +4166,9 @@ pub extern "C" fn LightningError_set_action(this_ptr: &mut LightningError, mut v
 /// Constructs a new LightningError given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn LightningError_new(mut err_arg: crate::c_types::derived::CVec_u8Z, mut action_arg: crate::lightning::ln::msgs::ErrorAction) -> LightningError {
+pub extern "C" fn LightningError_new(mut err_arg: crate::c_types::Str, mut action_arg: crate::lightning::ln::msgs::ErrorAction) -> LightningError {
 	LightningError { inner: Box::into_raw(Box::new(nativeLightningError {
-		err: String::from_utf8(err_arg.into_rust()).unwrap(),
+		err: err_arg.into_string(),
 		action: action_arg.into_native(),
 	})), is_owned: true }
 }
@@ -4526,69 +4526,67 @@ impl lightning::util::events::MessageSendEventsProvider for ChannelMessageHandle
 		local_ret
 	}
 }
-unsafe impl Send for ChannelMessageHandler {}
-unsafe impl Sync for ChannelMessageHandler {}
 
 use lightning::ln::msgs::ChannelMessageHandler as rustChannelMessageHandler;
 impl rustChannelMessageHandler for ChannelMessageHandler {
-	fn handle_open_channel(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, their_features: lightning::ln::features::InitFeatures, msg: &lightning::ln::msgs::OpenChannel) {
+	fn handle_open_channel(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut their_features: lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::OpenChannel) {
 		(self.handle_open_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::features::InitFeatures { inner: Box::into_raw(Box::new(their_features)), is_owned: true }, &crate::lightning::ln::msgs::OpenChannel { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_accept_channel(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, their_features: lightning::ln::features::InitFeatures, msg: &lightning::ln::msgs::AcceptChannel) {
+	fn handle_accept_channel(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut their_features: lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::AcceptChannel) {
 		(self.handle_accept_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::features::InitFeatures { inner: Box::into_raw(Box::new(their_features)), is_owned: true }, &crate::lightning::ln::msgs::AcceptChannel { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_funding_created(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::FundingCreated) {
+	fn handle_funding_created(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::FundingCreated) {
 		(self.handle_funding_created)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingCreated { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_funding_signed(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::FundingSigned) {
+	fn handle_funding_signed(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::FundingSigned) {
 		(self.handle_funding_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingSigned { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_funding_locked(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::FundingLocked) {
+	fn handle_funding_locked(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::FundingLocked) {
 		(self.handle_funding_locked)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingLocked { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_shutdown(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, their_features: &lightning::ln::features::InitFeatures, msg: &lightning::ln::msgs::Shutdown) {
+	fn handle_shutdown(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut their_features: &lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::Shutdown) {
 		(self.handle_shutdown)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::features::InitFeatures { inner: unsafe { (their_features as *const _) as *mut _ }, is_owned: false }, &crate::lightning::ln::msgs::Shutdown { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_closing_signed(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::ClosingSigned) {
+	fn handle_closing_signed(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ClosingSigned) {
 		(self.handle_closing_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ClosingSigned { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_update_add_htlc(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::UpdateAddHTLC) {
+	fn handle_update_add_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateAddHTLC) {
 		(self.handle_update_add_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateAddHTLC { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_update_fulfill_htlc(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::UpdateFulfillHTLC) {
+	fn handle_update_fulfill_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFulfillHTLC) {
 		(self.handle_update_fulfill_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFulfillHTLC { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_update_fail_htlc(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::UpdateFailHTLC) {
+	fn handle_update_fail_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFailHTLC) {
 		(self.handle_update_fail_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFailHTLC { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_update_fail_malformed_htlc(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::UpdateFailMalformedHTLC) {
+	fn handle_update_fail_malformed_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFailMalformedHTLC) {
 		(self.handle_update_fail_malformed_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFailMalformedHTLC { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_commitment_signed(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::CommitmentSigned) {
+	fn handle_commitment_signed(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::CommitmentSigned) {
 		(self.handle_commitment_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::CommitmentSigned { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_revoke_and_ack(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::RevokeAndACK) {
+	fn handle_revoke_and_ack(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::RevokeAndACK) {
 		(self.handle_revoke_and_ack)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::RevokeAndACK { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_update_fee(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::UpdateFee) {
+	fn handle_update_fee(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFee) {
 		(self.handle_update_fee)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFee { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_announcement_signatures(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::AnnouncementSignatures) {
+	fn handle_announcement_signatures(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::AnnouncementSignatures) {
 		(self.handle_announcement_signatures)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::AnnouncementSignatures { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn peer_disconnected(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, no_connection_possible: bool) {
+	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut no_connection_possible: bool) {
 		(self.peer_disconnected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), no_connection_possible)
 	}
-	fn peer_connected(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::Init) {
+	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::Init) {
 		(self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_channel_reestablish(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::ChannelReestablish) {
+	fn handle_channel_reestablish(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ChannelReestablish) {
 		(self.handle_channel_reestablish)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ChannelReestablish { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_channel_update(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::ChannelUpdate) {
+	fn handle_channel_update(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ChannelUpdate) {
 		(self.handle_channel_update)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_error(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: &lightning::ln::msgs::ErrorMessage) {
+	fn handle_error(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ErrorMessage) {
 		(self.handle_error)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ErrorMessage { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false })
 	}
 }
@@ -4677,8 +4675,6 @@ pub struct RoutingMessageHandler {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
-unsafe impl Send for RoutingMessageHandler {}
-unsafe impl Sync for RoutingMessageHandler {}
 impl lightning::util::events::MessageSendEventsProvider for RoutingMessageHandler {
 	fn get_and_clear_pending_msg_events(&self) -> Vec<lightning::util::events::MessageSendEvent> {
 		let mut ret = (self.MessageSendEventsProvider.get_and_clear_pending_msg_events)(self.this_arg);
@@ -4689,54 +4685,54 @@ impl lightning::util::events::MessageSendEventsProvider for RoutingMessageHandle
 
 use lightning::ln::msgs::RoutingMessageHandler as rustRoutingMessageHandler;
 impl rustRoutingMessageHandler for RoutingMessageHandler {
-	fn handle_node_announcement(&self, msg: &lightning::ln::msgs::NodeAnnouncement) -> Result<bool, lightning::ln::msgs::LightningError> {
+	fn handle_node_announcement(&self, mut msg: &lightning::ln::msgs::NodeAnnouncement) -> Result<bool, lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_node_announcement)(self.this_arg, &crate::lightning::ln::msgs::NodeAnnouncement { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }) }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn handle_channel_announcement(&self, msg: &lightning::ln::msgs::ChannelAnnouncement) -> Result<bool, lightning::ln::msgs::LightningError> {
+	fn handle_channel_announcement(&self, mut msg: &lightning::ln::msgs::ChannelAnnouncement) -> Result<bool, lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_channel_announcement)(self.this_arg, &crate::lightning::ln::msgs::ChannelAnnouncement { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }) }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn handle_channel_update(&self, msg: &lightning::ln::msgs::ChannelUpdate) -> Result<bool, lightning::ln::msgs::LightningError> {
+	fn handle_channel_update(&self, mut msg: &lightning::ln::msgs::ChannelUpdate) -> Result<bool, lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_channel_update)(self.this_arg, &crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }) }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn handle_htlc_fail_channel_update(&self, update: &lightning::ln::msgs::HTLCFailChannelUpdate) {
+	fn handle_htlc_fail_channel_update(&self, mut update: &lightning::ln::msgs::HTLCFailChannelUpdate) {
 		(self.handle_htlc_fail_channel_update)(self.this_arg, &crate::lightning::ln::msgs::HTLCFailChannelUpdate::from_native(update))
 	}
-	fn get_next_channel_announcements(&self, starting_point: u64, batch_amount: u8) -> Vec<(lightning::ln::msgs::ChannelAnnouncement, Option<lightning::ln::msgs::ChannelUpdate>, Option<lightning::ln::msgs::ChannelUpdate>)> {
+	fn get_next_channel_announcements(&self, mut starting_point: u64, mut batch_amount: u8) -> Vec<(lightning::ln::msgs::ChannelAnnouncement, Option<lightning::ln::msgs::ChannelUpdate>, Option<lightning::ln::msgs::ChannelUpdate>)> {
 		let mut ret = (self.get_next_channel_announcements)(self.this_arg, starting_point, batch_amount);
 		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item.to_rust(); let mut local_orig_ret_0_1 = if orig_ret_0_1.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(orig_ret_0_1.take_inner()) } }) }; let mut local_orig_ret_0_2 = if orig_ret_0_2.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(orig_ret_0_2.take_inner()) } }) }; let mut local_ret_0 = (*unsafe { Box::from_raw(orig_ret_0_0.take_inner()) }, local_orig_ret_0_1, local_orig_ret_0_2); local_ret_0 }); };
 		local_ret
 	}
-	fn get_next_node_announcements(&self, starting_point: Option<&bitcoin::secp256k1::key::PublicKey>, batch_amount: u8) -> Vec<lightning::ln::msgs::NodeAnnouncement> {
+	fn get_next_node_announcements(&self, mut starting_point: Option<&bitcoin::secp256k1::key::PublicKey>, mut batch_amount: u8) -> Vec<lightning::ln::msgs::NodeAnnouncement> {
 		let mut local_starting_point = if starting_point.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(starting_point.unwrap())) } };
 		let mut ret = (self.get_next_node_announcements)(self.this_arg, local_starting_point, batch_amount);
 		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 		local_ret
 	}
-	fn sync_routing_table(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, init: &lightning::ln::msgs::Init) {
+	fn sync_routing_table(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut init: &lightning::ln::msgs::Init) {
 		(self.sync_routing_table)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { (init as *const _) as *mut _ }, is_owned: false })
 	}
-	fn handle_reply_channel_range(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: lightning::ln::msgs::ReplyChannelRange) -> Result<(), lightning::ln::msgs::LightningError> {
+	fn handle_reply_channel_range(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: lightning::ln::msgs::ReplyChannelRange) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_reply_channel_range)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::ReplyChannelRange { inner: Box::into_raw(Box::new(msg)), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn handle_reply_short_channel_ids_end(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: lightning::ln::msgs::ReplyShortChannelIdsEnd) -> Result<(), lightning::ln::msgs::LightningError> {
+	fn handle_reply_short_channel_ids_end(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: lightning::ln::msgs::ReplyShortChannelIdsEnd) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_reply_short_channel_ids_end)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::ReplyShortChannelIdsEnd { inner: Box::into_raw(Box::new(msg)), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn handle_query_channel_range(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: lightning::ln::msgs::QueryChannelRange) -> Result<(), lightning::ln::msgs::LightningError> {
+	fn handle_query_channel_range(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: lightning::ln::msgs::QueryChannelRange) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_query_channel_range)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::QueryChannelRange { inner: Box::into_raw(Box::new(msg)), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn handle_query_short_channel_ids(&self, their_node_id: &bitcoin::secp256k1::key::PublicKey, msg: lightning::ln::msgs::QueryShortChannelIds) -> Result<(), lightning::ln::msgs::LightningError> {
+	fn handle_query_short_channel_ids(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: lightning::ln::msgs::QueryShortChannelIds) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_query_short_channel_ids)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::QueryShortChannelIds { inner: Box::into_raw(Box::new(msg)), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret

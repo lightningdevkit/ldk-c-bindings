@@ -18,9 +18,14 @@ jobs:
           apt-get -y install cargo libstd-rust-dev-wasm32 valgrind lld git g++ clang
       - name: Checkout source code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Sanity test bindings against Cargo.toml RL
         working-directory: lightning-c-bindings
-        run: cargo check
+        run: |
+          # Note that the version tags aren't checked into git
+          touch src/version.rs
+          cargo check
       - name: Install cbindgen
         run: cargo install --force cbindgen
       - name: Checkout Rust-Lightning git

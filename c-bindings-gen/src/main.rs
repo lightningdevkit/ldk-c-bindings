@@ -1422,6 +1422,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 			writeln!(out, "#![allow(unused_braces)]").unwrap();
 			// TODO: We need to map deny(missing_docs) in the source crate(s)
 			//writeln!(out, "#![deny(missing_docs)]").unwrap();
+			writeln!(out, "pub mod version;").unwrap();
 			writeln!(out, "pub mod c_types;").unwrap();
 			writeln!(out, "pub mod bitcoin;").unwrap();
 		} else {

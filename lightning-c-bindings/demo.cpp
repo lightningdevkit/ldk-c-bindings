@@ -1,6 +1,5 @@
 extern "C" {
-#include "include/rust_types.h"
-#include "include/lightning.h"
+#include <lightning.h>
 }
 #include "include/lightningpp.hpp"
 

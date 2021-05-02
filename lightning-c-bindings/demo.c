@@ -1,5 +1,4 @@
-#include "include/rust_types.h"
-#include "include/lightning.h"
+#include <lightning.h>
 
 #include <assert.h>
 #include <stdio.h>

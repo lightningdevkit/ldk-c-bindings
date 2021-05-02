@@ -16,6 +16,7 @@
 #![allow(unused_parens)]
 #![allow(unused_unsafe)]
 #![allow(unused_braces)]
+pub mod version;
 pub mod c_types;
 pub mod bitcoin;
 pub mod lightning;

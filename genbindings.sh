@@ -13,6 +13,7 @@ fi
 ORIG_PWD="$(pwd)"
 cd "$1"
 LIGHTNING_PATH="$(pwd)"
+LIGHTNING_GIT="$(git describe --tag --dirty)"
 cd "$ORIG_PWD"
 
 # Generate (and reasonably test) C bindings
@@ -25,6 +26,42 @@ cd c-bindings-gen && cargo build --release && cd ..
 mv lightning-c-bindings/src/c_types/mod.rs ./
 mv lightning-c-bindings/src/bitcoin ./
 
+# Before we try to sed the Cargo.toml, generate version define tags
+# (ignoring any files that we're about to generate)
+
+git checkout lightning-c-bindings/src
+git checkout lightning-c-bindings/include
+BINDINGS_GIT="$(git describe --tag --dirty)"
+echo -e "#ifndef _LDK_HEADER_VER" > lightning-c-bindings/include/ldk_ver.h
+echo -e "static inline int _ldk_strncmp(const char *s1, const char *s2, uint64_t n) {" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\tif (n && *s1 != *s2) return 1;" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\twhile (n && *s1 != 0 && *s2 != 0) {" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\t\ts1++; s2++; n--;" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\t\tif (n && *s1 != *s2) return 1;" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\t}" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\treturn 0;" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "}" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "#define _LDK_HEADER_VER \"$LIGHTNING_GIT\"" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "#define _LDK_C_BINDINGS_HEADER_VER \"$BINDINGS_GIT\"" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "static inline const char* check_get_ldk_version() {" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\tLDKStr bin_ver = _ldk_get_compiled_version();" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\tif (_ldk_strncmp(_LDK_HEADER_VER, (const char*)bin_ver.chars, bin_ver.len) != 0) {" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\t// Version mismatch, we don't know what we're running!" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\t\treturn 0;" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\t}" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\treturn _LDK_HEADER_VER;" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "}" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "static inline const char* check_get_ldk_bindings_version() {" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\tLDKStr bin_ver = _ldk_c_bindings_get_compiled_version();" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\tif (_ldk_strncmp(_LDK_C_BINDINGS_HEADER_VER, (const char*)bin_ver.chars, bin_ver.len) != 0) {" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\t// Version mismatch, we don't know what we're running!" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\t\treturn 0;" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\t}" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "\treturn _LDK_C_BINDINGS_HEADER_VER;" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "}" >> lightning-c-bindings/include/ldk_ver.h
+echo -e "#endif /* _LDK_HEADER_VER */" >> lightning-c-bindings/include/ldk_ver.h
+
 rm -rf lightning-c-bindings/src
 
 mkdir -p lightning-c-bindings/src/{c_types,lightning}
@@ -34,7 +71,7 @@ mv ./bitcoin lightning-c-bindings/src/
 # Finally, run the c-bindings-gen binary, building fresh bindings.
 OUT="$(pwd)/lightning-c-bindings/src"
 OUT_TEMPL="$(pwd)/lightning-c-bindings/src/c_types/derived.rs"
-OUT_F="$(pwd)/lightning-c-bindings/include/rust_types.h"
+OUT_F="$(pwd)/lightning-c-bindings/include/ldk_rust_types.h"
 OUT_CPP="$(pwd)/lightning-c-bindings/include/lightningpp.hpp"
 BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
@@ -83,6 +120,15 @@ add_crate "lightning-invoice" "lightning_invoice"
 
 cat /tmp/crate-source.txt | RUST_BACKTRACE=1 "$BIN" "$OUT/" "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
 
+echo -e '#[no_mangle]' >> lightning-c-bindings/src/version.rs
+echo -e 'pub extern "C" fn _ldk_get_compiled_version() -> crate::c_types::Str {' >> lightning-c-bindings/src/version.rs
+echo -e '\t"'"$LIGHTNING_GIT"'".into()' >> lightning-c-bindings/src/version.rs
+echo -e '}' >> lightning-c-bindings/src/version.rs
+echo -e '#[no_mangle]' >> lightning-c-bindings/src/version.rs
+echo -e 'pub extern "C" fn _ldk_c_bindings_get_compiled_version() -> crate::c_types::Str {' >> lightning-c-bindings/src/version.rs
+echo -e '\t"'"$BINDINGS_GIT"'".into()' >> lightning-c-bindings/src/version.rs
+echo -e '}' >> lightning-c-bindings/src/version.rs
+
 # Set path to include our rustc wrapper as well as cbindgen
 PATH="$(pwd)/deterministic-build-wrappers:$PATH:~/.cargo/bin"
 # Now cd to lightning-c-bindings, build the generated bindings, and call cbindgen to build a C header file
@@ -110,18 +156,18 @@ if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.
-	sed -i '' 's/#include <stdlib.h>//g' include/lightning.h
+	sed -i '' 's/#include <stdlib.h>/#include <ldk_rust_types.h>/g' include/lightning.h
 else
 	sed -i 's/typedef LDKnative.*Import.*LDKnative.*;//g' include/lightning.h
 
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.
-	sed -i 's/#include <stdlib.h>//g' include/lightning.h
+	sed -i 's/#include <stdlib.h>/#include <ldk_rust_types.h>/g' include/lightning.h
 fi
 
 # Finally, sanity-check the generated C and C++ bindings with demo apps:
 
-LOCAL_CFLAGS="-Wall -Wno-nullability-completeness -pthread"
+LOCAL_CFLAGS="-Wall -Wno-nullability-completeness -pthread -Iinclude/"
 
 # Naively run the C demo app:
 gcc $LOCAL_CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl
@@ -251,7 +297,7 @@ clang++ $LOCAL_CFLAGS -std=c++11 -flto -O2 demo.cpp target/release/libldk.a -ldl
 if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
 	# If we can use cross-language LTO, use it for building C dependencies (i.e. libsecp256k1) as well
 	export CC="$CLANG"
-	export CFLAGS_wasm32_wasi="-target wasm32"
+	export CFLAGS_wasm32_wasi="-target wasm32 -flto"
 fi
 
 if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]; then
@@ -260,8 +306,6 @@ if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]
 	clang -nostdlib -o /dev/null --target=wasm32-wasi -Wl,--no-entry genbindings_wasm_test_file.c > /dev/null 2>&1 &&
 	# And if it does, build a WASM binary without capturing errors
 	cargo rustc -v --target=wasm32-wasi -- -C embed-bitcode=yes &&
-	# Now that we've done our last non-LTO build, turn on LTO in CFLAGS as well
-	export CFLAGS="$CFLAGS -flto" &&
 	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target=wasm32-wasi -- -C opt-level=s -C linker-plugin-lto -C lto ||
 	echo "Cannot build WASM lib as clang does not seem to support the wasm32-wasi target"
 	rm genbindings_wasm_test_file.c

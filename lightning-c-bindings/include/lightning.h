@@ -8,7 +8,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
-
+#include <ldk_rust_types.h>
 
 /**
  * An error when accessing the chain via [`Access`].
@@ -369,6 +369,25 @@ typedef enum LDKSiPrefix {
 } LDKSiPrefix;
 
 /**
+ * A Rust str object, ie a reference to a UTF8-valid string.
+ * This is *not* null-terminated so cannot be used directly as a C string!
+ */
+typedef struct LDKStr {
+   /**
+    * A pointer to the string's bytes, in UTF8 encoding
+    */
+   const uint8_t *chars;
+   /**
+    * The number of bytes (not characters!) pointed to by `chars`
+    */
+   uintptr_t len;
+   /**
+    * Whether the data pointed to by `chars` should be freed or not.
+    */
+   bool chars_is_owned;
+} LDKStr;
+
+/**
  * A serialized transaction, in (pointer, length) form.
  *
  * This type optionally owns its own memory, and thus the semantics around access change based on
@@ -430,25 +449,6 @@ typedef struct LDKTxOut {
     */
    uint64_t value;
 } LDKTxOut;
-
-/**
- * A Rust str object, ie a reference to a UTF8-valid string.
- * This is *not* null-terminated so cannot be used directly as a C string!
- */
-typedef struct LDKStr {
-   /**
-    * A pointer to the string's bytes, in UTF8 encoding
-    */
-   const uint8_t *chars;
-   /**
-    * The number of bytes (not characters!) pointed to by `chars`
-    */
-   uintptr_t len;
-   /**
-    * Whether the data pointed to by `chars` should be freed or not.
-    */
-   bool chars_is_owned;
-} LDKStr;
 
 
 
@@ -8756,6 +8756,10 @@ extern const uint8_t TAG_ROUTE;
 extern const uint8_t TAG_PAYMENT_SECRET;
 
 extern const uint8_t TAG_FEATURES;
+
+struct LDKStr _ldk_get_compiled_version(void);
+
+struct LDKStr _ldk_c_bindings_get_compiled_version(void);
 
 /**
  * Frees the data buffer, if data_is_owned is set and datalen > 0.
@@ -17664,3 +17668,5 @@ struct LDKStr Currency_to_str(const enum LDKCurrency *NONNULL_PTR o);
 struct LDKStr SiPrefix_to_str(const enum LDKSiPrefix *NONNULL_PTR o);
 
 #endif /* LDK_C_BINDINGS_H */
+
+#include <ldk_ver.h>

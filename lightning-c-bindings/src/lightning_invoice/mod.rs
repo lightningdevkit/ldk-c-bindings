@@ -1259,7 +1259,7 @@ pub extern "C" fn RawInvoice_hash(this_arg: &RawInvoice) -> crate::c_types::Thir
 #[no_mangle]
 pub extern "C" fn RawInvoice_payment_hash(this_arg: &RawInvoice) -> crate::lightning_invoice::Sha256 {
 	let mut ret = unsafe { &*this_arg.inner }.payment_hash();
-	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1267,7 +1267,7 @@ pub extern "C" fn RawInvoice_payment_hash(this_arg: &RawInvoice) -> crate::light
 #[no_mangle]
 pub extern "C" fn RawInvoice_description(this_arg: &RawInvoice) -> crate::lightning_invoice::Description {
 	let mut ret = unsafe { &*this_arg.inner }.description();
-	let mut local_ret = crate::lightning_invoice::Description { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::Description { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1275,7 +1275,7 @@ pub extern "C" fn RawInvoice_description(this_arg: &RawInvoice) -> crate::lightn
 #[no_mangle]
 pub extern "C" fn RawInvoice_payee_pub_key(this_arg: &RawInvoice) -> crate::lightning_invoice::PayeePubKey {
 	let mut ret = unsafe { &*this_arg.inner }.payee_pub_key();
-	let mut local_ret = crate::lightning_invoice::PayeePubKey { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::PayeePubKey { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1283,7 +1283,7 @@ pub extern "C" fn RawInvoice_payee_pub_key(this_arg: &RawInvoice) -> crate::ligh
 #[no_mangle]
 pub extern "C" fn RawInvoice_description_hash(this_arg: &RawInvoice) -> crate::lightning_invoice::Sha256 {
 	let mut ret = unsafe { &*this_arg.inner }.description_hash();
-	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1291,7 +1291,7 @@ pub extern "C" fn RawInvoice_description_hash(this_arg: &RawInvoice) -> crate::l
 #[no_mangle]
 pub extern "C" fn RawInvoice_expiry_time(this_arg: &RawInvoice) -> crate::lightning_invoice::ExpiryTime {
 	let mut ret = unsafe { &*this_arg.inner }.expiry_time();
-	let mut local_ret = crate::lightning_invoice::ExpiryTime { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::ExpiryTime { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1299,7 +1299,7 @@ pub extern "C" fn RawInvoice_expiry_time(this_arg: &RawInvoice) -> crate::lightn
 #[no_mangle]
 pub extern "C" fn RawInvoice_min_final_cltv_expiry(this_arg: &RawInvoice) -> crate::lightning_invoice::MinFinalCltvExpiry {
 	let mut ret = unsafe { &*this_arg.inner }.min_final_cltv_expiry();
-	let mut local_ret = crate::lightning_invoice::MinFinalCltvExpiry { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::MinFinalCltvExpiry { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1315,7 +1315,7 @@ pub extern "C" fn RawInvoice_payment_secret(this_arg: &RawInvoice) -> crate::c_t
 #[no_mangle]
 pub extern "C" fn RawInvoice_features(this_arg: &RawInvoice) -> crate::lightning::ln::features::InvoiceFeatures {
 	let mut ret = unsafe { &*this_arg.inner }.features();
-	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1457,7 +1457,7 @@ pub extern "C" fn Invoice_payment_secret(this_arg: &Invoice) -> crate::c_types::
 #[no_mangle]
 pub extern "C" fn Invoice_features(this_arg: &Invoice) -> crate::lightning::ln::features::InvoiceFeatures {
 	let mut ret = unsafe { &*this_arg.inner }.features();
-	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 

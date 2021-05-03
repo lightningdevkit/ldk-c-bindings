@@ -879,8 +879,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"lightning::ln::PaymentPreimage" if is_ref => Some("*const [u8; 32]"),
 			"lightning::ln::PaymentPreimage" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::PaymentSecret" if is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::PaymentSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+			"lightning::ln::PaymentSecret" => Some("crate::c_types::ThirtyTwoBytes"),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some("*const std::os::raw::c_char"),
@@ -1099,7 +1098,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"lightning::ln::PaymentPreimage" if is_ref => Some("&"),
 			"lightning::ln::PaymentPreimage" => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"lightning::ln::PaymentSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
+			"lightning::ln::PaymentSecret" => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some("local_"),
@@ -1168,7 +1167,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentHash" => Some(".0 }"),
 			"lightning::ln::PaymentPreimage" if is_ref => Some(".0"),
 			"lightning::ln::PaymentPreimage" => Some(".0 }"),
-			"lightning::ln::PaymentSecret" if !is_ref => Some(".0 }"),
+			"lightning::ln::PaymentSecret" => Some(".0 }"),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some(".as_ptr()"),
@@ -1260,17 +1259,25 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "*item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Option" => {
-				if let Some(syn::Type::Path(p)) = single_contained {
-					let inner_path = self.resolve_path(&p.path, generics);
+				let contained_struct = if let Some(syn::Type::Path(p)) = single_contained {
+					Some(self.resolve_path(&p.path, generics))
+				} else if let Some(syn::Type::Reference(r)) = single_contained {
+					if let syn::Type::Path(p) = &*r.elem {
+						Some(self.resolve_path(&p.path, generics))
+					} else { None }
+				} else { None };
+				if let Some(inner_path) = contained_struct {
 					if self.is_primitive(&inner_path) {
 						return Some(("if ", vec![
 							(format!(".is_none() {{ {}::COption_{}Z::None }} else {{ ", Self::generated_container_path(), inner_path),
 							 format!("{}::COption_{}Z::Some({}.unwrap())", Self::generated_container_path(), inner_path, var_access))
 							], " }", ContainerPrefixLocation::NoPrefix));
 					} else if self.c_type_has_inner_from_path(&inner_path) {
+						let is_inner_ref = if let Some(syn::Type::Reference(_)) = single_contained { true } else { false };
 						if is_ref {
 							return Some(("if ", vec![
-								(".is_none() { std::ptr::null() } else { ".to_owned(), format!("({}.as_ref().unwrap())", var_access))
+								(".is_none() { std::ptr::null() } else { ".to_owned(),
+									format!("({}{}.unwrap())", var_access, if is_inner_ref { "" } else { ".as_ref()" }))
 								], " }", ContainerPrefixLocation::OutsideConv));
 						} else {
 							return Some(("if ", vec![
@@ -1378,6 +1385,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			syn::Type::Path(p) => {
 				let full_path = self.resolve_path(&p.path, None);
 				self.c_type_has_inner_from_path(&full_path)
+			},
+			syn::Type::Reference(r) => {
+				self.c_type_has_inner(&*r.elem)
 			},
 			_ => false,
 		}
@@ -1531,6 +1541,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	/// unint'd memory).
 	pub fn write_empty_rust_val<W: std::io::Write>(&self, generics: Option<&GenericTypes>, w: &mut W, t: &syn::Type) {
 		match t {
+			syn::Type::Reference(r) => {
+				self.write_empty_rust_val(generics, w, &*r.elem)
+			},
 			syn::Type::Path(p) => {
 				let resolved = self.resolve_path(&p.path, generics);
 				if self.crate_types.opaques.get(&resolved).is_some() {
@@ -1576,6 +1589,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	/// See EmptyValExpectedTy for information on return types.
 	fn write_empty_rust_val_check_suffix<W: std::io::Write>(&self, generics: Option<&GenericTypes>, w: &mut W, t: &syn::Type) -> EmptyValExpectedTy {
 		match t {
+			syn::Type::Reference(r) => {
+				return self.write_empty_rust_val_check_suffix(generics, w, &*r.elem);
+			},
 			syn::Type::Path(p) => {
 				let resolved = self.resolve_path(&p.path, generics);
 				if let Some(arr_ty) = self.is_real_type_array(&resolved) {
@@ -1617,6 +1633,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	/// Prints a suffix to determine if a variable is empty (ie was set by write_empty_rust_val).
 	pub fn write_empty_rust_val_check<W: std::io::Write>(&self, generics: Option<&GenericTypes>, w: &mut W, t: &syn::Type, var_access: &str) {
 		match t {
+			syn::Type::Reference(r) => {
+				self.write_empty_rust_val_check(generics, w, &*r.elem, var_access);
+			},
 			syn::Type::Path(_) => {
 				write!(w, "{}", var_access).unwrap();
 				self.write_empty_rust_val_check_suffix(generics, w, t);
@@ -1934,13 +1953,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// pretty manual here and most of the below special-cases are for Options.
 				let mut needs_ref_map = false;
 				let mut only_contained_type = None;
+				let mut only_contained_type_nonref = None;
 				let mut only_contained_has_inner = false;
 				let mut contains_slice = false;
 				if $args_len == 1 {
 					only_contained_has_inner = ty_has_inner;
 					let arg = $args_iter().next().unwrap();
 					if let syn::Type::Reference(t) = arg {
-						only_contained_type = Some(&*t.elem);
+						only_contained_type = Some(arg);
+						only_contained_type_nonref = Some(&*t.elem);
 						if let syn::Type::Path(_) = &*t.elem {
 							is_ref = true;
 						} else if let syn::Type::Slice(_) = &*t.elem {
@@ -1951,7 +1972,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						// do an extra mapping step.
 						needs_ref_map = !only_contained_has_inner;
 					} else {
-						only_contained_type = Some(&arg);
+						only_contained_type = Some(arg);
+						only_contained_type_nonref = Some(arg);
 					}
 				}
 
@@ -1968,7 +1990,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						write!(&mut var, "{}", var_name).unwrap();
 						let var_access = String::from_utf8(var.into_inner()).unwrap();
 
-						let conv_ty = if needs_ref_map { only_contained_type.as_ref().unwrap() } else { ty };
+						let conv_ty = if needs_ref_map { only_contained_type_nonref.as_ref().unwrap() } else { ty };
 
 						write!(w, "{} {{ ", pfx).unwrap();
 						let new_var_name = format!("{}_{}", ident, idx);

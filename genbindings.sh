@@ -294,27 +294,35 @@ cargo clean --release
 CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C lto
 clang++ $LOCAL_CFLAGS -std=c++11 -flto -O2 demo.cpp target/release/libldk.a -ldl
 
+strip ./a.out
+echo "C++ Bin size and runtime with only RL (LTO) optimized:"
+ls -lha a.out
+time ./a.out > /dev/null
+
 if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
 	# If we can use cross-language LTO, use it for building C dependencies (i.e. libsecp256k1) as well
 	export CC="$CLANG"
-	export CFLAGS_wasm32_wasi="-target wasm32 -flto"
+	# The cc-rs crate tries to force -fdata-sections and -ffunction-sections on, which
+	# breaks -fembed-bitcode, so we turn off cc-rs' default flags and specify exactly
+	# what we want here.
+	export CFLAGS="$CFLAGS -fPIC -fembed-bitcode"
+	export CRATE_CC_NO_DEFAULTS=true
 fi
 
 if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]; then
 	# Test to see if clang supports wasm32 as a target (which is needed to build rust-secp256k1)
 	echo "int main() {}" > genbindings_wasm_test_file.c
-	clang -nostdlib -o /dev/null --target=wasm32-wasi -Wl,--no-entry genbindings_wasm_test_file.c > /dev/null 2>&1 &&
-	# And if it does, build a WASM binary without capturing errors
-	cargo rustc -v --target=wasm32-wasi -- -C embed-bitcode=yes &&
-	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target=wasm32-wasi -- -C opt-level=s -C linker-plugin-lto -C lto ||
-	echo "Cannot build WASM lib as clang does not seem to support the wasm32-wasi target"
+	if clang -nostdlib -o /dev/null --target=wasm32-wasi -Wl,--no-entry genbindings_wasm_test_file.c > /dev/null 2>&1; then
+		# And if it does, build a WASM binary without capturing errors
+		export CFLAGS_wasm32_wasi="-target wasm32"
+		cargo rustc -v --target=wasm32-wasi
+		export CFLAGS_wasm32_wasi="-target wasm32 -Os"
+		CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target=wasm32-wasi -- -C embed-bitcode=yes -C opt-level=s -C linker-plugin-lto -C lto
+	else
+		echo "Cannot build WASM lib as clang does not seem to support the wasm32-wasi target"
+	fi
 	rm genbindings_wasm_test_file.c
 fi
-
-strip ./a.out
-echo "C++ Bin size and runtime with only RL (LTO) optimized:"
-ls -lha a.out
-time ./a.out > /dev/null
 
 if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
 	# Finally, test cross-language LTO. Note that this will fail if rustc and clang++
@@ -322,11 +330,7 @@ if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
 	# or Ubuntu packages). This should work fine on Distros which do more involved
 	# packaging than simply shipping the rustup binaries (eg Debian should Just Work
 	# here).
-	# The cc-rs crate tries to force -fdata-sections and -ffunction-sections on, which
-	# breaks -fembed-bitcode, so we turn off cc-rs' default flags and specify exactly
-	# what we want here.
-	export CFLAGS="$CFLAGS -O3 -fPIC -fembed-bitcode"
-	export CRATE_CC_NO_DEFAULTS=true
+	export CFLAGS="$CFLAGS -O3"
 	# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 	cargo clean --release
 	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C linker-plugin-lto -C lto -C link-arg=-fuse-ld=lld

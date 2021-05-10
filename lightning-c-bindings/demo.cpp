@@ -485,28 +485,39 @@ int main() {
 				// We opened the channel with 1000 push_msat:
 				assert(ChannelDetails_get_outbound_capacity_msat(channel) == 40000*1000 - 1000);
 				assert(ChannelDetails_get_inbound_capacity_msat(channel) == 1000);
-				assert(ChannelDetails_get_is_live(channel));
+				assert(ChannelDetails_get_is_usable(channel));
 				break;
 			}
 			std::this_thread::yield();
 		}
 
-		LDK::CVec_ChannelDetailsZ outbound_channels = ChannelManager_list_usable_channels(&cm1);
 		LDKCOption_u64Z min_value = {
 			.tag = LDKCOption_u64Z_Some,
 			.some = 5000,
 		};
-		LDK::C2Tuple_PaymentHashPaymentSecretZ payment_hash_secret = ChannelManager_create_inbound_payment(&cm2, min_value, 3600, 43);
+		LDK::CResult_InvoiceSignOrCreationErrorZ invoice = create_invoice_from_channelmanager(&cm2,
+			KeysManager_as_KeysInterface(&keys2),
+			LDKCurrency_Bitcoin, min_value,
+			LDKStr {
+				.chars = (const uint8_t *)"Invoice Description",
+				.len =             strlen("Invoice Description"),
+				.chars_is_owned = false
+			});
+		assert(invoice->result_ok);
+		LDKThirtyTwoBytes payment_hash;
+		memcpy(payment_hash.data, Invoice_payment_hash(invoice->contents.result), 32);
+
 		{
+			LDK::CVec_ChannelDetailsZ outbound_channels = ChannelManager_list_usable_channels(&cm1);
 			LDK::LockedNetworkGraph graph_2_locked = NetGraphMsgHandler_read_locked_graph(&net_graph2);
 			LDK::NetworkGraph graph_2_ref = LockedNetworkGraph_graph(&graph_2_locked);
 			LDK::CResult_RouteLightningErrorZ route = get_route(ChannelManager_get_our_node_id(&cm1), &graph_2_ref, ChannelManager_get_our_node_id(&cm2), LDKInvoiceFeatures {
 					.inner = NULL, .is_owned = false
 				}, &outbound_channels, LDKCVec_RouteHintHopZ {
 					.data = NULL, .datalen = 0
-				}, 5000, 10, logger1);
+				}, 5000, Invoice_min_final_cltv_expiry(invoice->contents.result), logger1);
 			assert(route->result_ok);
-			LDK::CResult_NonePaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash_secret->a, payment_hash_secret->b);
+			LDK::CResult_NonePaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash, Invoice_payment_secret(invoice->contents.result));
 			assert(send_res->result_ok);
 		}
 
@@ -535,8 +546,8 @@ int main() {
 			LDK::CVec_EventZ events = ev2.get_and_clear_pending_events(ev2.this_arg);
 			assert(events->datalen == 1);
 			assert(events->data[0].tag == LDKEvent_PaymentReceived);
-			assert(!memcmp(events->data[0].payment_received.payment_hash.data, payment_hash_secret->a.data, 32));
-			assert(!memcmp(events->data[0].payment_received.payment_secret.data, payment_hash_secret->b.data, 32));
+			assert(!memcmp(events->data[0].payment_received.payment_hash.data, payment_hash.data, 32));
+			assert(!memcmp(events->data[0].payment_received.payment_secret.data, Invoice_payment_secret(invoice->contents.result).data, 32));
 			assert(events->data[0].payment_received.amt == 5000);
 			memcpy(payment_preimage.data, events->data[0].payment_received.payment_preimage.data, 32);
 			assert(ChannelManager_claim_funds(&cm2, payment_preimage));

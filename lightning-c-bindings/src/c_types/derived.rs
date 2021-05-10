@@ -5845,6 +5845,97 @@ impl Clone for CResult_CResult_NetAddressu8ZDecodeErrorZ {
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_CResult_NetAddressu8ZDecodeErrorZ_clone(orig: &CResult_CResult_NetAddressu8ZDecodeErrorZ) -> CResult_CResult_NetAddressu8ZDecodeErrorZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_NetAddressDecodeErrorZ
+pub union CResult_NetAddressDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::lightning::ln::msgs::NetAddress,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_NetAddressDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning::ln::msgs::NetAddress on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_NetAddressDecodeErrorZ {
+	/// The contents of this CResult_NetAddressDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_NetAddressDecodeErrorZPtr,
+	/// Whether this CResult_NetAddressDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_NetAddressDecodeErrorZ in the success state.
+pub extern "C" fn CResult_NetAddressDecodeErrorZ_ok(o: crate::lightning::ln::msgs::NetAddress) -> CResult_NetAddressDecodeErrorZ {
+	CResult_NetAddressDecodeErrorZ {
+		contents: CResult_NetAddressDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_NetAddressDecodeErrorZ in the error state.
+pub extern "C" fn CResult_NetAddressDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_NetAddressDecodeErrorZ {
+	CResult_NetAddressDecodeErrorZ {
+		contents: CResult_NetAddressDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_NetAddressDecodeErrorZ.
+pub extern "C" fn CResult_NetAddressDecodeErrorZ_free(_res: CResult_NetAddressDecodeErrorZ) { }
+impl Drop for CResult_NetAddressDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::NetAddress, crate::lightning::ln::msgs::DecodeError>> for CResult_NetAddressDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::NetAddress, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_NetAddressDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_NetAddressDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_NetAddressDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_NetAddressDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::lightning::ln::msgs::NetAddress>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_NetAddressDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_NetAddressDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_NetAddressDecodeErrorZ_clone(orig: &CResult_NetAddressDecodeErrorZ) -> CResult_NetAddressDecodeErrorZ { orig.clone() }
+#[repr(C)]
 /// A dynamically-allocated array of crate::lightning::ln::msgs::UpdateAddHTLCs of arbitrary size.
 /// This corresponds to std::vector in C++
 pub struct CVec_UpdateAddHTLCZ {

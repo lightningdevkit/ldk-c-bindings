@@ -88,6 +88,21 @@ impl Level {
 pub extern "C" fn Level_clone(orig: &Level) -> Level {
 	orig.clone()
 }
+/// Checks if two Levels contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn Level_eq(a: &Level, b: &Level) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
+/// Checks if two Levels contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn Level_hash(o: &Level) -> u64 {
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but its not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(&o.to_native(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
 /// Returns the most verbose logging level.
 #[must_use]
 #[no_mangle]

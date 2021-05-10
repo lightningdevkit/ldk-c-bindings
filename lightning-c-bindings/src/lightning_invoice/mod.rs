@@ -178,6 +178,15 @@ impl Invoice {
 		ret
 	}
 }
+/// Checks if two Invoices contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Invoice_eq(a: &Invoice, b: &Invoice) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
 impl Clone for Invoice {
 	fn clone(&self) -> Self {
 		Self {
@@ -245,6 +254,15 @@ impl SignedRawInvoice {
 		self.inner = std::ptr::null_mut();
 		ret
 	}
+}
+/// Checks if two SignedRawInvoices contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn SignedRawInvoice_eq(a: &SignedRawInvoice, b: &SignedRawInvoice) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
 }
 impl Clone for SignedRawInvoice {
 	fn clone(&self) -> Self {
@@ -325,6 +343,15 @@ pub extern "C" fn RawInvoice_get_data(this_ptr: &RawInvoice) -> crate::lightning
 pub extern "C" fn RawInvoice_set_data(this_ptr: &mut RawInvoice, mut val: crate::lightning_invoice::RawDataPart) {
 	unsafe { &mut *this_ptr.inner }.data = *unsafe { Box::from_raw(val.take_inner()) };
 }
+/// Checks if two RawInvoices contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RawInvoice_eq(a: &RawInvoice, b: &RawInvoice) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
 impl Clone for RawInvoice {
 	fn clone(&self) -> Self {
 		Self {
@@ -400,6 +427,15 @@ pub extern "C" fn RawDataPart_get_timestamp(this_ptr: &RawDataPart) -> crate::li
 pub extern "C" fn RawDataPart_set_timestamp(this_ptr: &mut RawDataPart, mut val: crate::lightning_invoice::PositiveTimestamp) {
 	unsafe { &mut *this_ptr.inner }.timestamp = *unsafe { Box::from_raw(val.take_inner()) };
 }
+/// Checks if two RawDataParts contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RawDataPart_eq(a: &RawDataPart, b: &RawDataPart) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
 impl Clone for RawDataPart {
 	fn clone(&self) -> Self {
 		Self {
@@ -468,6 +504,15 @@ impl PositiveTimestamp {
 		self.inner = std::ptr::null_mut();
 		ret
 	}
+}
+/// Checks if two PositiveTimestamps contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn PositiveTimestamp_eq(a: &PositiveTimestamp, b: &PositiveTimestamp) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
 }
 impl Clone for PositiveTimestamp {
 	fn clone(&self) -> Self {
@@ -546,6 +591,12 @@ impl SiPrefix {
 pub extern "C" fn SiPrefix_clone(orig: &SiPrefix) -> SiPrefix {
 	orig.clone()
 }
+/// Checks if two SiPrefixs contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn SiPrefix_eq(a: &SiPrefix, b: &SiPrefix) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 /// Returns the multiplier to go from a BTC value to picoBTC implied by this SiPrefix.
 /// This is effectively 10^12 * the prefix multiplier
 #[must_use]
@@ -613,6 +664,12 @@ impl Currency {
 pub extern "C" fn Currency_clone(orig: &Currency) -> Currency {
 	orig.clone()
 }
+/// Checks if two Currencys contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn Currency_eq(a: &Currency, b: &Currency) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 
 use lightning_invoice::Sha256 as nativeSha256Import;
 type nativeSha256 = nativeSha256Import;
@@ -657,6 +714,15 @@ impl Sha256 {
 		self.inner = std::ptr::null_mut();
 		ret
 	}
+}
+/// Checks if two Sha256s contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Sha256_eq(a: &Sha256, b: &Sha256) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
 }
 impl Clone for Sha256 {
 	fn clone(&self) -> Self {
@@ -725,6 +791,15 @@ impl Description {
 		ret
 	}
 }
+/// Checks if two Descriptions contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Description_eq(a: &Description, b: &Description) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
 impl Clone for Description {
 	fn clone(&self) -> Self {
 		Self {
@@ -788,6 +863,15 @@ impl PayeePubKey {
 		self.inner = std::ptr::null_mut();
 		ret
 	}
+}
+/// Checks if two PayeePubKeys contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn PayeePubKey_eq(a: &PayeePubKey, b: &PayeePubKey) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
 }
 impl Clone for PayeePubKey {
 	fn clone(&self) -> Self {
@@ -859,6 +943,15 @@ impl ExpiryTime {
 		ret
 	}
 }
+/// Checks if two ExpiryTimes contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ExpiryTime_eq(a: &ExpiryTime, b: &ExpiryTime) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
 impl Clone for ExpiryTime {
 	fn clone(&self) -> Self {
 		Self {
@@ -922,6 +1015,15 @@ impl MinFinalCltvExpiry {
 		self.inner = std::ptr::null_mut();
 		ret
 	}
+}
+/// Checks if two MinFinalCltvExpirys contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn MinFinalCltvExpiry_eq(a: &MinFinalCltvExpiry, b: &MinFinalCltvExpiry) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
 }
 impl Clone for MinFinalCltvExpiry {
 	fn clone(&self) -> Self {
@@ -1061,6 +1163,12 @@ pub extern "C" fn Fallback_free(this_ptr: Fallback) { }
 pub extern "C" fn Fallback_clone(orig: &Fallback) -> Fallback {
 	orig.clone()
 }
+/// Checks if two Fallbacks contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn Fallback_eq(a: &Fallback, b: &Fallback) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 
 use lightning_invoice::InvoiceSignature as nativeInvoiceSignatureImport;
 type nativeInvoiceSignature = nativeInvoiceSignatureImport;
@@ -1105,6 +1213,15 @@ impl InvoiceSignature {
 		self.inner = std::ptr::null_mut();
 		ret
 	}
+}
+/// Checks if two InvoiceSignatures contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn InvoiceSignature_eq(a: &InvoiceSignature, b: &InvoiceSignature) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
 }
 impl Clone for InvoiceSignature {
 	fn clone(&self) -> Self {
@@ -1173,6 +1290,15 @@ impl RouteHint {
 		self.inner = std::ptr::null_mut();
 		ret
 	}
+}
+/// Checks if two RouteHints contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RouteHint_eq(a: &RouteHint, b: &RouteHint) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
 }
 impl Clone for RouteHint {
 	fn clone(&self) -> Self {
@@ -1647,6 +1773,12 @@ impl CreationError {
 pub extern "C" fn CreationError_clone(orig: &CreationError) -> CreationError {
 	orig.clone()
 }
+/// Checks if two CreationErrors contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn CreationError_eq(a: &CreationError, b: &CreationError) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 #[no_mangle]
 /// Get the string representation of a CreationError object
 pub extern "C" fn CreationError_to_str(o: &crate::lightning_invoice::CreationError) -> Str {
@@ -1666,6 +1798,10 @@ pub enum SemanticError {
 	NoDescription,
 	/// The invoice contains multiple descriptions and/or description hashes which isn't allowed
 	MultipleDescriptions,
+	/// The invoice contains multiple payment secrets
+	MultiplePaymentSecrets,
+	/// The invoice's features are invalid
+	InvalidFeatures,
 	/// The recovery id doesn't fit the signature/pub key
 	InvalidRecoveryId,
 	/// The invoice's signature is invalid
@@ -1680,6 +1816,8 @@ impl SemanticError {
 			SemanticError::MultiplePaymentHashes => nativeSemanticError::MultiplePaymentHashes,
 			SemanticError::NoDescription => nativeSemanticError::NoDescription,
 			SemanticError::MultipleDescriptions => nativeSemanticError::MultipleDescriptions,
+			SemanticError::MultiplePaymentSecrets => nativeSemanticError::MultiplePaymentSecrets,
+			SemanticError::InvalidFeatures => nativeSemanticError::InvalidFeatures,
 			SemanticError::InvalidRecoveryId => nativeSemanticError::InvalidRecoveryId,
 			SemanticError::InvalidSignature => nativeSemanticError::InvalidSignature,
 		}
@@ -1691,6 +1829,8 @@ impl SemanticError {
 			SemanticError::MultiplePaymentHashes => nativeSemanticError::MultiplePaymentHashes,
 			SemanticError::NoDescription => nativeSemanticError::NoDescription,
 			SemanticError::MultipleDescriptions => nativeSemanticError::MultipleDescriptions,
+			SemanticError::MultiplePaymentSecrets => nativeSemanticError::MultiplePaymentSecrets,
+			SemanticError::InvalidFeatures => nativeSemanticError::InvalidFeatures,
 			SemanticError::InvalidRecoveryId => nativeSemanticError::InvalidRecoveryId,
 			SemanticError::InvalidSignature => nativeSemanticError::InvalidSignature,
 		}
@@ -1702,6 +1842,8 @@ impl SemanticError {
 			nativeSemanticError::MultiplePaymentHashes => SemanticError::MultiplePaymentHashes,
 			nativeSemanticError::NoDescription => SemanticError::NoDescription,
 			nativeSemanticError::MultipleDescriptions => SemanticError::MultipleDescriptions,
+			nativeSemanticError::MultiplePaymentSecrets => SemanticError::MultiplePaymentSecrets,
+			nativeSemanticError::InvalidFeatures => SemanticError::InvalidFeatures,
 			nativeSemanticError::InvalidRecoveryId => SemanticError::InvalidRecoveryId,
 			nativeSemanticError::InvalidSignature => SemanticError::InvalidSignature,
 		}
@@ -1713,6 +1855,8 @@ impl SemanticError {
 			nativeSemanticError::MultiplePaymentHashes => SemanticError::MultiplePaymentHashes,
 			nativeSemanticError::NoDescription => SemanticError::NoDescription,
 			nativeSemanticError::MultipleDescriptions => SemanticError::MultipleDescriptions,
+			nativeSemanticError::MultiplePaymentSecrets => SemanticError::MultiplePaymentSecrets,
+			nativeSemanticError::InvalidFeatures => SemanticError::InvalidFeatures,
 			nativeSemanticError::InvalidRecoveryId => SemanticError::InvalidRecoveryId,
 			nativeSemanticError::InvalidSignature => SemanticError::InvalidSignature,
 		}
@@ -1722,6 +1866,12 @@ impl SemanticError {
 #[no_mangle]
 pub extern "C" fn SemanticError_clone(orig: &SemanticError) -> SemanticError {
 	orig.clone()
+}
+/// Checks if two SemanticErrors contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn SemanticError_eq(a: &SemanticError, b: &SemanticError) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
 }
 #[no_mangle]
 /// Get the string representation of a SemanticError object
@@ -1805,6 +1955,12 @@ pub extern "C" fn SignOrCreationError_free(this_ptr: SignOrCreationError) { }
 #[no_mangle]
 pub extern "C" fn SignOrCreationError_clone(orig: &SignOrCreationError) -> SignOrCreationError {
 	orig.clone()
+}
+/// Checks if two SignOrCreationErrors contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn SignOrCreationError_eq(a: &SignOrCreationError, b: &SignOrCreationError) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
 }
 #[no_mangle]
 /// Get the string representation of a SignOrCreationError object

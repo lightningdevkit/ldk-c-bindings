@@ -400,6 +400,15 @@ pub extern "C" fn RouteHintHop_new(mut src_node_id_arg: crate::c_types::PublicKe
 		htlc_maximum_msat: local_htlc_maximum_msat_arg,
 	})), is_owned: true }
 }
+/// Checks if two RouteHintHops contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RouteHintHop_eq(a: &RouteHintHop, b: &RouteHintHop) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
 impl Clone for RouteHintHop {
 	fn clone(&self) -> Self {
 		Self {

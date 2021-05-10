@@ -319,52 +319,6 @@ pub extern "C" fn ChannelHandshakeLimits_get_min_max_accepted_htlcs(this_ptr: &C
 pub extern "C" fn ChannelHandshakeLimits_set_min_max_accepted_htlcs(this_ptr: &mut ChannelHandshakeLimits, mut val: u16) {
 	unsafe { &mut *this_ptr.inner }.min_max_accepted_htlcs = val;
 }
-/// Outputs below a certain value will not be added to on-chain transactions. The dust value is
-/// required to always be higher than this value so this only applies to HTLC outputs (and
-/// potentially to-self outputs before any payments have been made).
-/// Thus, HTLCs below this amount plus HTLC transaction fees are not enforceable on-chain.
-/// This setting allows you to set a minimum dust limit for their commitment transactions,
-/// reflecting the reality that tiny outputs are not considered standard transactions and will
-/// not propagate through the Bitcoin network.
-///
-/// Default value: 546, the current dust limit on the Bitcoin network.
-#[no_mangle]
-pub extern "C" fn ChannelHandshakeLimits_get_min_dust_limit_satoshis(this_ptr: &ChannelHandshakeLimits) -> u64 {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.min_dust_limit_satoshis;
-	*inner_val
-}
-/// Outputs below a certain value will not be added to on-chain transactions. The dust value is
-/// required to always be higher than this value so this only applies to HTLC outputs (and
-/// potentially to-self outputs before any payments have been made).
-/// Thus, HTLCs below this amount plus HTLC transaction fees are not enforceable on-chain.
-/// This setting allows you to set a minimum dust limit for their commitment transactions,
-/// reflecting the reality that tiny outputs are not considered standard transactions and will
-/// not propagate through the Bitcoin network.
-///
-/// Default value: 546, the current dust limit on the Bitcoin network.
-#[no_mangle]
-pub extern "C" fn ChannelHandshakeLimits_set_min_dust_limit_satoshis(this_ptr: &mut ChannelHandshakeLimits, mut val: u64) {
-	unsafe { &mut *this_ptr.inner }.min_dust_limit_satoshis = val;
-}
-/// Maximum allowed threshold above which outputs will not be generated in their commitment
-/// transactions.
-/// HTLCs below this amount plus HTLC transaction fees are not enforceable on-chain.
-///
-/// Default value: u64::max_value.
-#[no_mangle]
-pub extern "C" fn ChannelHandshakeLimits_get_max_dust_limit_satoshis(this_ptr: &ChannelHandshakeLimits) -> u64 {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.max_dust_limit_satoshis;
-	*inner_val
-}
-/// Maximum allowed threshold above which outputs will not be generated in their commitment
-/// transactions.
-/// HTLCs below this amount plus HTLC transaction fees are not enforceable on-chain.
-///
-/// Default value: u64::max_value.
-#[no_mangle]
-pub extern "C" fn ChannelHandshakeLimits_set_max_dust_limit_satoshis(this_ptr: &mut ChannelHandshakeLimits, mut val: u64) {
-	unsafe { &mut *this_ptr.inner }.max_dust_limit_satoshis = val;
-}
 /// Before a channel is usable the funding transaction will need to be confirmed by at least a
 /// certain number of blocks, specified by the node which is not the funder (as the funder can
 /// assume they aren't going to double-spend themselves).
@@ -431,15 +385,13 @@ pub extern "C" fn ChannelHandshakeLimits_set_their_to_self_delay(this_ptr: &mut 
 /// Constructs a new ChannelHandshakeLimits given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelHandshakeLimits_new(mut min_funding_satoshis_arg: u64, mut max_htlc_minimum_msat_arg: u64, mut min_max_htlc_value_in_flight_msat_arg: u64, mut max_channel_reserve_satoshis_arg: u64, mut min_max_accepted_htlcs_arg: u16, mut min_dust_limit_satoshis_arg: u64, mut max_dust_limit_satoshis_arg: u64, mut max_minimum_depth_arg: u32, mut force_announced_channel_preference_arg: bool, mut their_to_self_delay_arg: u16) -> ChannelHandshakeLimits {
+pub extern "C" fn ChannelHandshakeLimits_new(mut min_funding_satoshis_arg: u64, mut max_htlc_minimum_msat_arg: u64, mut min_max_htlc_value_in_flight_msat_arg: u64, mut max_channel_reserve_satoshis_arg: u64, mut min_max_accepted_htlcs_arg: u16, mut max_minimum_depth_arg: u32, mut force_announced_channel_preference_arg: bool, mut their_to_self_delay_arg: u16) -> ChannelHandshakeLimits {
 	ChannelHandshakeLimits { inner: Box::into_raw(Box::new(nativeChannelHandshakeLimits {
 		min_funding_satoshis: min_funding_satoshis_arg,
 		max_htlc_minimum_msat: max_htlc_minimum_msat_arg,
 		min_max_htlc_value_in_flight_msat: min_max_htlc_value_in_flight_msat_arg,
 		max_channel_reserve_satoshis: max_channel_reserve_satoshis_arg,
 		min_max_accepted_htlcs: min_max_accepted_htlcs_arg,
-		min_dust_limit_satoshis: min_dust_limit_satoshis_arg,
-		max_dust_limit_satoshis: max_dust_limit_satoshis_arg,
 		max_minimum_depth: max_minimum_depth_arg,
 		force_announced_channel_preference: force_announced_channel_preference_arg,
 		their_to_self_delay: their_to_self_delay_arg,

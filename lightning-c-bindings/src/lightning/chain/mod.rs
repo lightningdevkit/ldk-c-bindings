@@ -18,6 +18,22 @@ pub mod chainmonitor;
 pub mod channelmonitor;
 pub mod transaction;
 pub mod keysinterface;
+mod onchaintx {
+
+use std::str::FromStr;
+use std::ffi::c_void;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+
+}
+mod package {
+
+use std::str::FromStr;
+use std::ffi::c_void;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+
+}
 /// An error when accessing the chain via [`Access`].
 #[must_use]
 #[derive(Clone)]

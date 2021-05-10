@@ -479,6 +479,11 @@ pub extern "C" fn HTLCUpdate_read(ser: crate::c_types::u8slice) -> crate::c_type
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::HTLCUpdate { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
+/// Number of blocks we wait on seeing a HTLC output being solved before we fail corresponding inbound
+/// HTLCs. This prevents us from failing backwards and then getting a reorg resulting in us losing money.
+
+#[no_mangle]
+pub static ANTI_REORG_DELAY: u32 = lightning::chain::channelmonitor::ANTI_REORG_DELAY;
 
 use lightning::chain::channelmonitor::ChannelMonitor as nativeChannelMonitorImport;
 type nativeChannelMonitor = nativeChannelMonitorImport<crate::lightning::chain::keysinterface::Sign>;

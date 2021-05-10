@@ -111,6 +111,25 @@ pub(crate) extern "C" fn OutPoint_clone_void(this_ptr: *const c_void) -> *mut c_
 pub extern "C" fn OutPoint_clone(orig: &OutPoint) -> OutPoint {
 	orig.clone()
 }
+/// Checks if two OutPoints contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn OutPoint_eq(a: &OutPoint, b: &OutPoint) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
+/// Checks if two OutPoints contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn OutPoint_hash(o: &OutPoint) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but its not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(unsafe { &*o.inner }, &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
 /// Convert an `OutPoint` to a lightning channel id.
 #[must_use]
 #[no_mangle]

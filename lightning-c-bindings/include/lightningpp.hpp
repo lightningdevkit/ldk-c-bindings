@@ -953,6 +953,21 @@ public:
 	const LDKEventsProvider* operator &() const { return &self; }
 	const LDKEventsProvider* operator ->() const { return &self; }
 };
+class EventHandler {
+private:
+	LDKEventHandler self;
+public:
+	EventHandler(const EventHandler&) = delete;
+	EventHandler(EventHandler&& o) : self(o.self) { memset(&o, 0, sizeof(EventHandler)); }
+	EventHandler(LDKEventHandler&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKEventHandler)); }
+	operator LDKEventHandler() && { LDKEventHandler res = self; memset(&self, 0, sizeof(LDKEventHandler)); return res; }
+	~EventHandler() { EventHandler_free(self); }
+	EventHandler& operator=(EventHandler&& o) { EventHandler_free(self); self = o.self; memset(&o, 0, sizeof(EventHandler)); return *this; }
+	LDKEventHandler* operator &() { return &self; }
+	LDKEventHandler* operator ->() { return &self; }
+	const LDKEventHandler* operator &() const { return &self; }
+	const LDKEventHandler* operator ->() const { return &self; }
+};
 class NetworkGraph {
 private:
 	LDKNetworkGraph self;
@@ -2227,6 +2242,21 @@ public:
 	const LDKCResult_TxOutAccessErrorZ* operator &() const { return &self; }
 	const LDKCResult_TxOutAccessErrorZ* operator ->() const { return &self; }
 };
+class CResult_NetAddressDecodeErrorZ {
+private:
+	LDKCResult_NetAddressDecodeErrorZ self;
+public:
+	CResult_NetAddressDecodeErrorZ(const CResult_NetAddressDecodeErrorZ&) = delete;
+	CResult_NetAddressDecodeErrorZ(CResult_NetAddressDecodeErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_NetAddressDecodeErrorZ)); }
+	CResult_NetAddressDecodeErrorZ(LDKCResult_NetAddressDecodeErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_NetAddressDecodeErrorZ)); }
+	operator LDKCResult_NetAddressDecodeErrorZ() && { LDKCResult_NetAddressDecodeErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_NetAddressDecodeErrorZ)); return res; }
+	~CResult_NetAddressDecodeErrorZ() { CResult_NetAddressDecodeErrorZ_free(self); }
+	CResult_NetAddressDecodeErrorZ& operator=(CResult_NetAddressDecodeErrorZ&& o) { CResult_NetAddressDecodeErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_NetAddressDecodeErrorZ)); return *this; }
+	LDKCResult_NetAddressDecodeErrorZ* operator &() { return &self; }
+	LDKCResult_NetAddressDecodeErrorZ* operator ->() { return &self; }
+	const LDKCResult_NetAddressDecodeErrorZ* operator &() const { return &self; }
+	const LDKCResult_NetAddressDecodeErrorZ* operator ->() const { return &self; }
+};
 class CResult_UnsignedNodeAnnouncementDecodeErrorZ {
 private:
 	LDKCResult_UnsignedNodeAnnouncementDecodeErrorZ self;
@@ -2257,21 +2287,6 @@ public:
 	const LDKCResult_ReplyChannelRangeDecodeErrorZ* operator &() const { return &self; }
 	const LDKCResult_ReplyChannelRangeDecodeErrorZ* operator ->() const { return &self; }
 };
-class CResult_GossipTimestampFilterDecodeErrorZ {
-private:
-	LDKCResult_GossipTimestampFilterDecodeErrorZ self;
-public:
-	CResult_GossipTimestampFilterDecodeErrorZ(const CResult_GossipTimestampFilterDecodeErrorZ&) = delete;
-	CResult_GossipTimestampFilterDecodeErrorZ(CResult_GossipTimestampFilterDecodeErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_GossipTimestampFilterDecodeErrorZ)); }
-	CResult_GossipTimestampFilterDecodeErrorZ(LDKCResult_GossipTimestampFilterDecodeErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_GossipTimestampFilterDecodeErrorZ)); }
-	operator LDKCResult_GossipTimestampFilterDecodeErrorZ() && { LDKCResult_GossipTimestampFilterDecodeErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_GossipTimestampFilterDecodeErrorZ)); return res; }
-	~CResult_GossipTimestampFilterDecodeErrorZ() { CResult_GossipTimestampFilterDecodeErrorZ_free(self); }
-	CResult_GossipTimestampFilterDecodeErrorZ& operator=(CResult_GossipTimestampFilterDecodeErrorZ&& o) { CResult_GossipTimestampFilterDecodeErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_GossipTimestampFilterDecodeErrorZ)); return *this; }
-	LDKCResult_GossipTimestampFilterDecodeErrorZ* operator &() { return &self; }
-	LDKCResult_GossipTimestampFilterDecodeErrorZ* operator ->() { return &self; }
-	const LDKCResult_GossipTimestampFilterDecodeErrorZ* operator &() const { return &self; }
-	const LDKCResult_GossipTimestampFilterDecodeErrorZ* operator ->() const { return &self; }
-};
 class CResult_ChannelReestablishDecodeErrorZ {
 private:
 	LDKCResult_ChannelReestablishDecodeErrorZ self;
@@ -2286,6 +2301,21 @@ public:
 	LDKCResult_ChannelReestablishDecodeErrorZ* operator ->() { return &self; }
 	const LDKCResult_ChannelReestablishDecodeErrorZ* operator &() const { return &self; }
 	const LDKCResult_ChannelReestablishDecodeErrorZ* operator ->() const { return &self; }
+};
+class CResult_GossipTimestampFilterDecodeErrorZ {
+private:
+	LDKCResult_GossipTimestampFilterDecodeErrorZ self;
+public:
+	CResult_GossipTimestampFilterDecodeErrorZ(const CResult_GossipTimestampFilterDecodeErrorZ&) = delete;
+	CResult_GossipTimestampFilterDecodeErrorZ(CResult_GossipTimestampFilterDecodeErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_GossipTimestampFilterDecodeErrorZ)); }
+	CResult_GossipTimestampFilterDecodeErrorZ(LDKCResult_GossipTimestampFilterDecodeErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_GossipTimestampFilterDecodeErrorZ)); }
+	operator LDKCResult_GossipTimestampFilterDecodeErrorZ() && { LDKCResult_GossipTimestampFilterDecodeErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_GossipTimestampFilterDecodeErrorZ)); return res; }
+	~CResult_GossipTimestampFilterDecodeErrorZ() { CResult_GossipTimestampFilterDecodeErrorZ_free(self); }
+	CResult_GossipTimestampFilterDecodeErrorZ& operator=(CResult_GossipTimestampFilterDecodeErrorZ&& o) { CResult_GossipTimestampFilterDecodeErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_GossipTimestampFilterDecodeErrorZ)); return *this; }
+	LDKCResult_GossipTimestampFilterDecodeErrorZ* operator &() { return &self; }
+	LDKCResult_GossipTimestampFilterDecodeErrorZ* operator ->() { return &self; }
+	const LDKCResult_GossipTimestampFilterDecodeErrorZ* operator &() const { return &self; }
+	const LDKCResult_GossipTimestampFilterDecodeErrorZ* operator ->() const { return &self; }
 };
 class CResult_InvoiceSignOrCreationErrorZ {
 private:

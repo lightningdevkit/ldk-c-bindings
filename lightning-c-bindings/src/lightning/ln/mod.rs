@@ -27,14 +27,6 @@ pub mod msgs;
 pub mod peer_handler;
 pub mod chan_utils;
 pub mod features;
-mod onchaintx {
-
-use std::str::FromStr;
-use std::ffi::c_void;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-
-}
 mod peer_channel_encryptor {
 
 use std::str::FromStr;

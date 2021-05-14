@@ -949,6 +949,52 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						write!(w, "\t{} {{ inner: Box::into_raw(Box::new(Default::default())), is_owned: true }}\n", ident).unwrap();
 						write!(w, "}}\n").unwrap();
 					} else if path_matches_nongeneric(&trait_path.1, &["core", "cmp", "PartialEq"]) {
+					} else if path_matches_nongeneric(&trait_path.1, &["core", "cmp", "Eq"]) {
+						writeln!(w, "/// Checks if two {}s contain equal inner contents.", ident).unwrap();
+						writeln!(w, "/// This ignores pointers and is_owned flags and looks at the values in fields.").unwrap();
+						if types.c_type_has_inner_from_path(&resolved_path) {
+							writeln!(w, "/// Two objects with NULL inner values will be considered \"equal\" here.").unwrap();
+						}
+						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_eq(a: &{}, b: &{}) -> bool {{\n", ident, ident, ident).unwrap();
+						if types.c_type_has_inner_from_path(&resolved_path) {
+							write!(w, "\tif a.inner == b.inner {{ return true; }}\n").unwrap();
+							write!(w, "\tif a.inner.is_null() || b.inner.is_null() {{ return false; }}\n").unwrap();
+						}
+
+						let path = &p.path;
+						let ref_type: syn::Type = syn::parse_quote!(&#path);
+						assert!(!types.write_to_c_conversion_new_var(w, &format_ident!("a"), &*i.self_ty, Some(&gen_types), false), "We don't support new var conversions when comparing equality");
+
+						write!(w, "\tif ").unwrap();
+						types.write_from_c_conversion_prefix(w, &ref_type, Some(&gen_types));
+						write!(w, "a").unwrap();
+						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
+						write!(w, " == ").unwrap();
+						types.write_from_c_conversion_prefix(w, &ref_type, Some(&gen_types));
+						write!(w, "b").unwrap();
+						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
+
+						writeln!(w, " {{ true }} else {{ false }}\n}}").unwrap();
+					} else if path_matches_nongeneric(&trait_path.1, &["core", "hash", "Hash"]) {
+						writeln!(w, "/// Checks if two {}s contain equal inner contents.", ident).unwrap();
+						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_hash(o: &{}) -> u64 {{\n", ident, ident).unwrap();
+						if types.c_type_has_inner_from_path(&resolved_path) {
+							write!(w, "\tif o.inner.is_null() {{ return 0; }}\n").unwrap();
+						}
+
+						let path = &p.path;
+						let ref_type: syn::Type = syn::parse_quote!(&#path);
+						assert!(!types.write_to_c_conversion_new_var(w, &format_ident!("a"), &*i.self_ty, Some(&gen_types), false), "We don't support new var conversions when comparing equality");
+
+						writeln!(w, "\t// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core").unwrap();
+						writeln!(w, "\t#[allow(deprecated)]").unwrap();
+						writeln!(w, "\tlet mut hasher = core::hash::SipHasher::new();").unwrap();
+						write!(w, "\tstd::hash::Hash::hash(").unwrap();
+						types.write_from_c_conversion_prefix(w, &ref_type, Some(&gen_types));
+						write!(w, "o").unwrap();
+						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
+						writeln!(w, ", &mut hasher);").unwrap();
+						writeln!(w, "\tstd::hash::Hasher::finish(&hasher)\n}}").unwrap();
 					} else if (path_matches_nongeneric(&trait_path.1, &["core", "clone", "Clone"]) || path_matches_nongeneric(&trait_path.1, &["Clone"])) &&
 							types.c_type_has_inner_from_path(&resolved_path) {
 						writeln!(w, "impl Clone for {} {{", ident).unwrap();

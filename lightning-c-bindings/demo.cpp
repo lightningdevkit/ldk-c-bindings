@@ -185,6 +185,15 @@ LDKCVec_MonitorEventZ monitors_pending_monitor_events(const void *this_arg) {
 	}
 }
 
+struct EventQueue {
+	std::vector<LDK::Event> events;
+};
+void handle_event(const void *this_arg, LDKEvent event) {
+	EventQueue* arg = (EventQueue*) this_arg;
+	arg->events.push_back(std::move(event));
+}
+
+
 uintptr_t sock_send_data(void *this_arg, LDKu8slice data, bool resume_read) {
 	return write((int)((long)this_arg), data.data, data.datalen);
 }
@@ -419,16 +428,18 @@ int main() {
 
 		LDKEventsProvider ev1 = ChannelManager_as_EventsProvider(&cm1);
 		while (true) {
-			LDK::CVec_EventZ events = ev1.get_and_clear_pending_events(ev1.this_arg);
-			if (events->datalen == 1) {
-				assert(events->data[0].tag == LDKEvent_FundingGenerationReady);
-				assert(events->data[0].funding_generation_ready.user_channel_id == 42);
-				assert(events->data[0].funding_generation_ready.channel_value_satoshis == 40000);
-				assert(events->data[0].funding_generation_ready.output_script.datalen == 34);
-				assert(!memcmp(events->data[0].funding_generation_ready.output_script.data, channel_open_block + 58 + 81, 34));
+			EventQueue queue;
+			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
+			ev1.process_pending_events(ev1.this_arg, handler);
+			if (queue.events.size() == 1) {
+				assert(queue.events[0]->tag == LDKEvent_FundingGenerationReady);
+				assert(queue.events[0]->funding_generation_ready.user_channel_id == 42);
+				assert(queue.events[0]->funding_generation_ready.channel_value_satoshis == 40000);
+				assert(queue.events[0]->funding_generation_ready.output_script.datalen == 34);
+				assert(!memcmp(queue.events[0]->funding_generation_ready.output_script.data, channel_open_block + 58 + 81, 34));
 				LDKTransaction funding_transaction { .data = const_cast<uint8_t*>(channel_open_block + 81), .datalen = sizeof(channel_open_block) - 81, .data_is_owned = false };
 
-				LDK::CResult_NoneAPIErrorZ fund_res = ChannelManager_funding_transaction_generated(&cm1, &events->data[0].funding_generation_ready.temporary_channel_id.data, funding_transaction);
+				LDK::CResult_NoneAPIErrorZ fund_res = ChannelManager_funding_transaction_generated(&cm1, &queue.events[0]->funding_generation_ready.temporary_channel_id.data, funding_transaction);
 				assert(fund_res->result_ok);
 				break;
 			}
@@ -530,9 +541,11 @@ int main() {
 		// Check that we received the payment!
 		LDKEventsProvider ev2 = ChannelManager_as_EventsProvider(&cm2);
 		while (true) {
-			LDK::CVec_EventZ events = ev2.get_and_clear_pending_events(ev2.this_arg);
-			if (events->datalen == 1) {
-				assert(events->data[0].tag == LDKEvent_PendingHTLCsForwardable);
+			EventQueue queue;
+			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
+			ev2.process_pending_events(ev2.this_arg, handler);
+			if (queue.events.size() == 1) {
+				assert(queue.events[0]->tag == LDKEvent_PendingHTLCsForwardable);
 				break;
 			}
 			std::this_thread::yield();
@@ -543,13 +556,15 @@ int main() {
 		mons_updated = 0;
 		LDKThirtyTwoBytes payment_preimage;
 		{
-			LDK::CVec_EventZ events = ev2.get_and_clear_pending_events(ev2.this_arg);
-			assert(events->datalen == 1);
-			assert(events->data[0].tag == LDKEvent_PaymentReceived);
-			assert(!memcmp(events->data[0].payment_received.payment_hash.data, payment_hash.data, 32));
-			assert(!memcmp(events->data[0].payment_received.payment_secret.data, Invoice_payment_secret(invoice->contents.result).data, 32));
-			assert(events->data[0].payment_received.amt == 5000);
-			memcpy(payment_preimage.data, events->data[0].payment_received.payment_preimage.data, 32);
+			EventQueue queue;
+			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
+			ev2.process_pending_events(ev2.this_arg, handler);
+			assert(queue.events.size() == 1);
+			assert(queue.events[0]->tag == LDKEvent_PaymentReceived);
+			assert(!memcmp(queue.events[0]->payment_received.payment_hash.data, payment_hash.data, 32));
+			assert(!memcmp(queue.events[0]->payment_received.payment_secret.data, Invoice_payment_secret(invoice->contents.result).data, 32));
+			assert(queue.events[0]->payment_received.amt == 5000);
+			memcpy(payment_preimage.data, queue.events[0]->payment_received.payment_preimage.data, 32);
 			assert(ChannelManager_claim_funds(&cm2, payment_preimage));
 		}
 		PeerManager_process_events(&net2);
@@ -558,10 +573,12 @@ int main() {
 			std::this_thread::yield();
 		}
 		{
-			LDK::CVec_EventZ events = ev1.get_and_clear_pending_events(ev1.this_arg);
-			assert(events->datalen == 1);
-			assert(events->data[0].tag == LDKEvent_PaymentSent);
-			assert(!memcmp(events->data[0].payment_sent.payment_preimage.data, payment_preimage.data, 32));
+			EventQueue queue;
+			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
+			ev1.process_pending_events(ev1.this_arg, handler);
+			assert(queue.events.size() == 1);
+			assert(queue.events[0]->tag == LDKEvent_PaymentSent);
+			assert(!memcmp(queue.events[0]->payment_sent.payment_preimage.data, payment_preimage.data, 32));
 		}
 
 		conn.stop();

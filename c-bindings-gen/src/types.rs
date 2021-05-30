@@ -201,7 +201,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								if path == "Sized" { continue; }
 								if non_lifetimes_processed { return false; }
 								non_lifetimes_processed = true;
-								let new_ident = if path != "std::ops::Deref" {
+								let new_ident = if path != "std::ops::Deref" && path != "core::ops::Deref" {
 									path = "crate::".to_string() + &path;
 									Some(&trait_bound.path)
 								} else { None };
@@ -226,7 +226,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 						if p.path.leading_colon.is_some() { return false; }
 						let mut p_iter = p.path.segments.iter();
 						if let Some(gen) = self.typed_generics.get_mut(&p_iter.next().unwrap().ident) {
-							if gen.0 != "std::ops::Deref" { return false; }
+							if gen.0 != "std::ops::Deref" && gen.0 != "core::ops::Deref" { return false; }
 							if &format!("{}", p_iter.next().unwrap().ident) != "Target" { return false; }
 
 							let mut non_lifetimes_processed = false;
@@ -269,7 +269,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								// implement Deref<Target=Self> for relevant types). We don't
 								// bother to implement it for associated types, however, so we just
 								// ignore such bounds.
-								let new_ident = if path != "std::ops::Deref" {
+								let new_ident = if path != "std::ops::Deref" && path != "core::ops::Deref" {
 									path = "crate::".to_string() + &path;
 									Some(&tr.path)
 								} else { None };
@@ -842,9 +842,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 3]" if !is_ref => Some("crate::c_types::ThreeBytes"), // Used for RGB values
 
 			"str" if is_ref => Some("crate::c_types::Str"),
-			"String" => Some("crate::c_types::Str"),
+			"alloc::string::String"|"String" => Some("crate::c_types::Str"),
 
-			"std::time::Duration" => Some("u64"),
+			"std::time::Duration"|"core::time::Duration" => Some("u64"),
 			"std::time::SystemTime" => Some("u64"),
 			"std::io::Error" => Some("crate::c_types::IOError"),
 
@@ -913,11 +913,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some(""),
 
 			"str" if is_ref => Some(""),
-			"String" => Some(""),
+			"alloc::string::String"|"String" => Some(""),
 			// Note that we'll panic for String if is_ref, as we only have non-owned memory, we
 			// cannot create a &String.
 
-			"std::time::Duration" => Some("std::time::Duration::from_secs("),
+			"std::time::Duration"|"core::time::Duration" => Some("std::time::Duration::from_secs("),
 			"std::time::SystemTime" => Some("(::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs("),
 
 			"bech32::u5" => Some(""),
@@ -979,9 +979,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some(".to_slice()"),
 
 			"str" if is_ref => Some(".into_str()"),
-			"String" => Some(".into_string()"),
+			"alloc::string::String"|"String" => Some(".into_string()"),
 
-			"std::time::Duration" => Some(")"),
+			"std::time::Duration"|"core::time::Duration" => Some(")"),
 			"std::time::SystemTime" => Some("))"),
 
 			"bech32::u5" => Some(".into()"),
@@ -1058,9 +1058,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some("local_"),
 
 			"str" if is_ref => Some(""),
-			"String" => Some(""),
+			"alloc::string::String"|"String" => Some(""),
 
-			"std::time::Duration" => Some(""),
+			"std::time::Duration"|"core::time::Duration" => Some(""),
 			"std::time::SystemTime" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
 
@@ -1127,10 +1127,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some(""),
 
 			"str" if is_ref => Some(".into()"),
-			"String" if is_ref => Some(".as_str().into()"),
-			"String" => Some(".into()"),
+			"alloc::string::String"|"String" if is_ref => Some(".as_str().into()"),
+			"alloc::string::String"|"String" => Some(".into()"),
 
-			"std::time::Duration" => Some(".as_secs()"),
+			"std::time::Duration"|"core::time::Duration" => Some(".as_secs()"),
 			"std::time::SystemTime" => Some(".duration_since(::std::time::SystemTime::UNIX_EPOCH).expect(\"Times must be post-1970\").as_secs()"),
 			"std::io::Error" if !is_ref => Some(")"),
 

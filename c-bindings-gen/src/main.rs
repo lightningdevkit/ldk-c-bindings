@@ -180,7 +180,7 @@ eprintln!("{}", trait_path);
 // *** Per-Type Printing Logic ***
 // *******************************
 
-macro_rules! walk_supertraits { ($t: expr, $types: expr, ($( $pat: pat => $e: expr),*) ) => { {
+macro_rules! walk_supertraits { ($t: expr, $types: expr, ($( $($pat: pat)|* => $e: expr),*) ) => { {
 	if $t.colon_token.is_some() {
 		for st in $t.supertraits.iter() {
 			match st {
@@ -194,14 +194,14 @@ macro_rules! walk_supertraits { ($t: expr, $types: expr, ($( $pat: pat => $e: ex
 					if let Some(types) = types_opt {
 						if let Some(path) = types.maybe_resolve_path(&supertrait.path, None) {
 							match (&path as &str, &supertrait.path.segments.iter().last().unwrap().ident) {
-								$( $pat => $e, )*
+								$( $($pat)|* => $e, )*
 							}
 							continue;
 						}
 					}
 					if let Some(ident) = supertrait.path.get_ident() {
 						match (&format!("{}", ident) as &str, &ident) {
-							$( $pat => $e, )*
+							$( $($pat)|* => $e, )*
 						}
 					} else if types_opt.is_some() {
 						panic!("Supertrait unresolvable and not single-ident");
@@ -311,13 +311,13 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 			writeln!(w, "\tpub clone: Option<extern \"C\" fn (this_arg: *const c_void) -> *mut c_void>,").unwrap();
 			generated_fields.push(("clone".to_owned(), true));
 		},
-		("std::cmp::Eq", _) => {
+		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
 			writeln!(w, "\t/// Checks if two objects are equal given this object's this_arg pointer and another object.").unwrap();
 			writeln!(w, "\tpub eq: extern \"C\" fn (this_arg: *const c_void, other_arg: &{}) -> bool,", trait_name).unwrap();
 			writeln!(extra_headers, "typedef struct LDK{} LDK{};", trait_name, trait_name).unwrap();
 			generated_fields.push(("eq".to_owned(), true));
 		},
-		("std::hash::Hash", _) => {
+		("std::hash::Hash", _)|("core::hash::Hash", _) => {
 			writeln!(w, "\t/// Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.").unwrap();
 			writeln!(w, "\t/// This is used, for example, for inclusion of this object in a hash map.").unwrap();
 			writeln!(w, "\tpub hash: extern \"C\" fn (this_arg: *const c_void) -> u64,").unwrap();
@@ -452,12 +452,12 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	walk_supertraits!(t, Some(&types), (
 		("Send", _) => writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap(),
 		("Sync", _) => writeln!(w, "unsafe impl Sync for {} {{}}", trait_name).unwrap(),
-		("std::cmp::Eq", _) => {
+		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
 			writeln!(w, "impl std::cmp::Eq for {} {{}}", trait_name).unwrap();
 			writeln!(w, "impl std::cmp::PartialEq for {} {{", trait_name).unwrap();
 			writeln!(w, "\tfn eq(&self, o: &Self) -> bool {{ (self.eq)(self.this_arg, o) }}\n}}").unwrap();
 		},
-		("std::hash::Hash", _) => {
+		("std::hash::Hash", _)|("core::hash::Hash", _) => {
 			writeln!(w, "impl std::hash::Hash for {} {{", trait_name).unwrap();
 			writeln!(w, "\tfn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {{ hasher.write_u64((self.hash)(self.this_arg)) }}\n}}").unwrap();
 		},

@@ -66,6 +66,11 @@ pub enum ExportStatus {
 	Export,
 	NoExport,
 	TestOnly,
+	/// This is used only for traits to indicate that users should not be able to implement their
+	/// own version of a trait, but we should export Rust implementations of the trait (and the
+	/// trait itself).
+	/// Concretly, this means that we do not implement the Rust trait for the C trait struct.
+	NotImplementable,
 }
 /// Gets the ExportStatus of an object (struct, fn, etc) given its attributes.
 pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
@@ -117,6 +122,8 @@ pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
 				let line = format!("{}", lit);
 				if line.contains("(C-not exported)") {
 					return ExportStatus::NoExport;
+				} else if line.contains("(C-not implementable)") {
+					return ExportStatus::NotImplementable;
 				}
 			},
 			_ => unimplemented!(),
@@ -138,6 +145,7 @@ pub fn is_enum_opaque(e: &syn::ItemEnum) -> bool {
 			for field in fields.named.iter() {
 				match export_status(&field.attrs) {
 					ExportStatus::Export|ExportStatus::TestOnly => {},
+					ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 					ExportStatus::NoExport => return true,
 				}
 			}
@@ -145,6 +153,7 @@ pub fn is_enum_opaque(e: &syn::ItemEnum) -> bool {
 			for field in fields.unnamed.iter() {
 				match export_status(&field.attrs) {
 					ExportStatus::Export|ExportStatus::TestOnly => {},
+					ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 					ExportStatus::NoExport => return true,
 				}
 			}
@@ -479,6 +488,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 							ExportStatus::Export => { declared.insert(s.ident.clone(), DeclType::StructImported); },
 							ExportStatus::NoExport => { declared.insert(s.ident.clone(), DeclType::StructIgnored); },
 							ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 						}
 					}
 				},
@@ -499,13 +509,19 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 						match export_status(&e.attrs) {
 							ExportStatus::Export if is_enum_opaque(e) => { declared.insert(e.ident.clone(), DeclType::EnumIgnored); },
 							ExportStatus::Export => { declared.insert(e.ident.clone(), DeclType::MirroredEnum); },
+							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 							_ => continue,
 						}
 					}
 				},
-				syn::Item::Trait(t) if export_status(&t.attrs) == ExportStatus::Export => {
-					if let syn::Visibility::Public(_) = t.vis {
-						declared.insert(t.ident.clone(), DeclType::Trait(t));
+				syn::Item::Trait(t) => {
+					match export_status(&t.attrs) {
+						ExportStatus::Export|ExportStatus::NotImplementable => {
+							if let syn::Visibility::Public(_) = t.vis {
+								declared.insert(t.ident.clone(), DeclType::Trait(t));
+							}
+						},
+						_ => continue,
 					}
 				},
 				syn::Item::Mod(m) => {

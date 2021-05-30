@@ -221,8 +221,10 @@ macro_rules! walk_supertraits { ($t: expr, $types: expr, ($( $($pat: pat)|* => $
 /// a concrete Deref to the Rust trait.
 fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, types: &mut TypeResolver<'b, 'a>, extra_headers: &mut File, cpp_headers: &mut File) {
 	let trait_name = format!("{}", t.ident);
+	let implementable;
 	match export_status(&t.attrs) {
-		ExportStatus::Export => {},
+		ExportStatus::Export => { implementable = true; }
+		ExportStatus::NotImplementable => { implementable = false; },
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
 	}
 	writeln_docs(w, &t.attrs, "");
@@ -247,6 +249,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 					},
 					ExportStatus::Export => {},
 					ExportStatus::TestOnly => continue,
+					ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 				}
 				if m.default.is_some() { unimplemented!(); }
 
@@ -505,15 +508,17 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 
 	// Finally, implement the original Rust trait for the newly created mapped trait.
 	writeln!(w, "\nuse {}::{} as rust{};", types.module_path, t.ident, trait_name).unwrap();
-	write!(w, "impl rust{}", t.ident).unwrap();
-	maybe_write_generics(w, &t.generics, types, false);
-	writeln!(w, " for {} {{", trait_name).unwrap();
-	impl_trait_for_c!(t, "", types);
-	writeln!(w, "}}\n").unwrap();
-	writeln!(w, "// We're essentially a pointer already, or at least a set of pointers, so allow us to be used").unwrap();
-	writeln!(w, "// directly as a Deref trait in higher-level structs:").unwrap();
-	writeln!(w, "impl std::ops::Deref for {} {{\n\ttype Target = Self;", trait_name).unwrap();
-	writeln!(w, "\tfn deref(&self) -> &Self {{\n\t\tself\n\t}}\n}}").unwrap();
+	if implementable {
+		write!(w, "impl rust{}", t.ident).unwrap();
+		maybe_write_generics(w, &t.generics, types, false);
+		writeln!(w, " for {} {{", trait_name).unwrap();
+		impl_trait_for_c!(t, "", types);
+		writeln!(w, "}}\n").unwrap();
+		writeln!(w, "// We're essentially a pointer already, or at least a set of pointers, so allow us to be used").unwrap();
+		writeln!(w, "// directly as a Deref trait in higher-level structs:").unwrap();
+		writeln!(w, "impl std::ops::Deref for {} {{\n\ttype Target = Self;", trait_name).unwrap();
+		writeln!(w, "\tfn deref(&self) -> &Self {{\n\t\tself\n\t}}\n}}").unwrap();
+	}
 
 	writeln!(w, "/// Calls the free function if one is set").unwrap();
 	writeln!(w, "#[no_mangle]\npub extern \"C\" fn {}_free(this_ptr: {}) {{ }}", trait_name, trait_name).unwrap();
@@ -597,6 +602,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 						all_fields_settable = false;
 						continue
 					},
+					ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 				}
 
 				if let Some(ident) = &field.ident {
@@ -675,6 +681,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 	match export_status(&i.attrs) {
 		ExportStatus::Export => {},
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
+		ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 	}
 
 	if let syn::Type::Tuple(_) = &*i.self_ty {
@@ -739,7 +746,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 
 						let export = export_status(&trait_obj.attrs);
 						match export {
-							ExportStatus::Export => {},
+							ExportStatus::Export|ExportStatus::NotImplementable => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => return,
 						}
 
@@ -776,6 +783,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										continue;
 									},
 									ExportStatus::TestOnly => continue,
+									ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 								}
 
 								let mut printed = false;
@@ -843,6 +851,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 								match export_status(&trait_method.attrs) {
 									ExportStatus::Export => {},
 									ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+									ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 								}
 
 								if let syn::ReturnType::Type(_, _) = &$m.sig.output {
@@ -1006,6 +1015,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									match export_status(&m.attrs) {
 										ExportStatus::Export => {},
 										ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+										ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 									}
 									if m.defaultness.is_some() { unimplemented!(); }
 									writeln_docs(w, &m.attrs, "");
@@ -1128,6 +1138,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	match export_status(&e.attrs) {
 		ExportStatus::Export => {},
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
+		ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 	}
 
 	if is_enum_opaque(e) {
@@ -1328,6 +1339,7 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 	match export_status(&f.attrs) {
 		ExportStatus::Export => {},
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
+		ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 	}
 	writeln_docs(w, &f.attrs, "");
 
@@ -1481,6 +1493,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 						match export_status(&t.attrs) {
 							ExportStatus::Export => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 
 						let mut process_alias = true;
@@ -1552,6 +1565,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						match export_status(&s.attrs) {
 							ExportStatus::Export => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let struct_path = format!("{}::{}", module, s.ident);
 						crate_types.opaques.insert(struct_path, &s.ident);
@@ -1560,7 +1574,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 				syn::Item::Trait(t) => {
 					if let syn::Visibility::Public(_) = t.vis {
 						match export_status(&t.attrs) {
-							ExportStatus::Export => {},
+							ExportStatus::Export|ExportStatus::NotImplementable => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
 						}
 						let trait_path = format!("{}::{}", module, t.ident);
@@ -1578,6 +1592,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						match export_status(&t.attrs) {
 							ExportStatus::Export => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let type_path = format!("{}::{}", module, t.ident);
 						let mut process_alias = true;
@@ -1612,6 +1627,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						match export_status(&e.attrs) {
 							ExportStatus::Export => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let enum_path = format!("{}::{}", module, e.ident);
 						crate_types.opaques.insert(enum_path, &e.ident);
@@ -1622,6 +1638,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						match export_status(&e.attrs) {
 							ExportStatus::Export => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let enum_path = format!("{}::{}", module, e.ident);
 						crate_types.mirrored_enums.insert(enum_path, &e);

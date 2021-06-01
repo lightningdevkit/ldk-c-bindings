@@ -169,6 +169,22 @@ pub(crate) extern "C" fn RouteHop_clone_void(this_ptr: *const c_void) -> *mut c_
 pub extern "C" fn RouteHop_clone(orig: &RouteHop) -> RouteHop {
 	orig.clone()
 }
+#[no_mangle]
+/// Serialize the RouteHop object into a byte array which can be read by RouteHop_read
+pub extern "C" fn RouteHop_write(obj: &RouteHop) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+}
+#[no_mangle]
+pub(crate) extern "C" fn RouteHop_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRouteHop) })
+}
+#[no_mangle]
+/// Read a RouteHop from a byte array, created by RouteHop_write
+pub extern "C" fn RouteHop_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteHopDecodeErrorZ {
+	let res = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteHop { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	local_res
+}
 
 use lightning::routing::router::Route as nativeRouteImport;
 type nativeRoute = nativeRouteImport;

@@ -173,6 +173,22 @@ pub(crate) extern "C" fn DelayedPaymentOutputDescriptor_clone_void(this_ptr: *co
 pub extern "C" fn DelayedPaymentOutputDescriptor_clone(orig: &DelayedPaymentOutputDescriptor) -> DelayedPaymentOutputDescriptor {
 	orig.clone()
 }
+#[no_mangle]
+/// Serialize the DelayedPaymentOutputDescriptor object into a byte array which can be read by DelayedPaymentOutputDescriptor_read
+pub extern "C" fn DelayedPaymentOutputDescriptor_write(obj: &DelayedPaymentOutputDescriptor) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+}
+#[no_mangle]
+pub(crate) extern "C" fn DelayedPaymentOutputDescriptor_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeDelayedPaymentOutputDescriptor) })
+}
+#[no_mangle]
+/// Read a DelayedPaymentOutputDescriptor from a byte array, created by DelayedPaymentOutputDescriptor_write
+pub extern "C" fn DelayedPaymentOutputDescriptor_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
+	let res = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	local_res
+}
 
 use lightning::chain::keysinterface::StaticPaymentOutputDescriptor as nativeStaticPaymentOutputDescriptorImport;
 type nativeStaticPaymentOutputDescriptor = nativeStaticPaymentOutputDescriptorImport;
@@ -290,6 +306,22 @@ pub(crate) extern "C" fn StaticPaymentOutputDescriptor_clone_void(this_ptr: *con
 /// Creates a copy of the StaticPaymentOutputDescriptor
 pub extern "C" fn StaticPaymentOutputDescriptor_clone(orig: &StaticPaymentOutputDescriptor) -> StaticPaymentOutputDescriptor {
 	orig.clone()
+}
+#[no_mangle]
+/// Serialize the StaticPaymentOutputDescriptor object into a byte array which can be read by StaticPaymentOutputDescriptor_read
+pub extern "C" fn StaticPaymentOutputDescriptor_write(obj: &StaticPaymentOutputDescriptor) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+}
+#[no_mangle]
+pub(crate) extern "C" fn StaticPaymentOutputDescriptor_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeStaticPaymentOutputDescriptor) })
+}
+#[no_mangle]
+/// Read a StaticPaymentOutputDescriptor from a byte array, created by StaticPaymentOutputDescriptor_write
+pub extern "C" fn StaticPaymentOutputDescriptor_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_StaticPaymentOutputDescriptorDecodeErrorZ {
+	let res = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	local_res
 }
 /// When on-chain outputs are created by rust-lightning (which our counterparty is not able to
 /// claim at any point in the future) an event is generated which you must track and be able to

@@ -97,7 +97,7 @@ pub extern "C" fn Level_eq(a: &Level, b: &Level) -> bool {
 /// Checks if two Levels contain equal inner contents.
 #[no_mangle]
 pub extern "C" fn Level_hash(o: &Level) -> u64 {
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but its not in core
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
 	std::hash::Hash::hash(&o.to_native(), &mut hasher);

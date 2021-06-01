@@ -124,7 +124,7 @@ pub extern "C" fn OutPoint_eq(a: &OutPoint, b: &OutPoint) -> bool {
 #[no_mangle]
 pub extern "C" fn OutPoint_hash(o: &OutPoint) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but its not in core
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
 	std::hash::Hash::hash(unsafe { &*o.inner }, &mut hasher);

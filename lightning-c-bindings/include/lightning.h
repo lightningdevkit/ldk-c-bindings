@@ -3157,6 +3157,39 @@ typedef struct MUST_USE_STRUCT LDKRouteHop {
 } LDKRouteHop;
 
 /**
+ * The contents of CResult_RouteHopDecodeErrorZ
+ */
+typedef union LDKCResult_RouteHopDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKRouteHop *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_RouteHopDecodeErrorZPtr;
+
+/**
+ * A CResult_RouteHopDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::routing::router::RouteHop on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_RouteHopDecodeErrorZ {
+   /**
+    * The contents of this CResult_RouteHopDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_RouteHopDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_RouteHopDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_RouteHopDecodeErrorZ;
+
+/**
  * A dynamically-allocated array of crate::lightning::routing::router::RouteHops of arbitrary size.
  * This corresponds to std::vector in C++
  */
@@ -6664,6 +6697,72 @@ typedef struct LDKCResult_InvoiceSignOrCreationErrorZ {
 } LDKCResult_InvoiceSignOrCreationErrorZ;
 
 /**
+ * The contents of CResult_DelayedPaymentOutputDescriptorDecodeErrorZ
+ */
+typedef union LDKCResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKDelayedPaymentOutputDescriptor *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr;
+
+/**
+ * A CResult_DelayedPaymentOutputDescriptorDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
+   /**
+    * The contents of this CResult_DelayedPaymentOutputDescriptorDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_DelayedPaymentOutputDescriptorDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_DelayedPaymentOutputDescriptorDecodeErrorZ;
+
+/**
+ * The contents of CResult_StaticPaymentOutputDescriptorDecodeErrorZ
+ */
+typedef union LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKStaticPaymentOutputDescriptor *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZPtr;
+
+/**
+ * A CResult_StaticPaymentOutputDescriptorDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZ {
+   /**
+    * The contents of this CResult_StaticPaymentOutputDescriptorDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_StaticPaymentOutputDescriptorDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZ;
+
+/**
  * The contents of CResult_SpendableOutputDescriptorDecodeErrorZ
  */
 typedef union LDKCResult_SpendableOutputDescriptorDecodeErrorZPtr {
@@ -9699,6 +9798,27 @@ struct LDKCResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ CResult_C2Tuple_B
 void CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ_free(struct LDKCResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ _res);
 
 /**
+ * Creates a new CResult_RouteHopDecodeErrorZ in the success state.
+ */
+struct LDKCResult_RouteHopDecodeErrorZ CResult_RouteHopDecodeErrorZ_ok(struct LDKRouteHop o);
+
+/**
+ * Creates a new CResult_RouteHopDecodeErrorZ in the error state.
+ */
+struct LDKCResult_RouteHopDecodeErrorZ CResult_RouteHopDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Frees any resources used by the CResult_RouteHopDecodeErrorZ.
+ */
+void CResult_RouteHopDecodeErrorZ_free(struct LDKCResult_RouteHopDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_RouteHopDecodeErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_RouteHopDecodeErrorZ CResult_RouteHopDecodeErrorZ_clone(const struct LDKCResult_RouteHopDecodeErrorZ *NONNULL_PTR orig);
+
+/**
  * Frees the buffer pointed to by `data` if `datalen` is non-0.
  */
 void CVec_RouteHopZ_free(struct LDKCVec_RouteHopZ _res);
@@ -10887,6 +11007,48 @@ void CResult_InvoiceSignOrCreationErrorZ_free(struct LDKCResult_InvoiceSignOrCre
  * but with all dynamically-allocated buffers duplicated in new buffers.
  */
 struct LDKCResult_InvoiceSignOrCreationErrorZ CResult_InvoiceSignOrCreationErrorZ_clone(const struct LDKCResult_InvoiceSignOrCreationErrorZ *NONNULL_PTR orig);
+
+/**
+ * Creates a new CResult_DelayedPaymentOutputDescriptorDecodeErrorZ in the success state.
+ */
+struct LDKCResult_DelayedPaymentOutputDescriptorDecodeErrorZ CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_ok(struct LDKDelayedPaymentOutputDescriptor o);
+
+/**
+ * Creates a new CResult_DelayedPaymentOutputDescriptorDecodeErrorZ in the error state.
+ */
+struct LDKCResult_DelayedPaymentOutputDescriptorDecodeErrorZ CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Frees any resources used by the CResult_DelayedPaymentOutputDescriptorDecodeErrorZ.
+ */
+void CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_free(struct LDKCResult_DelayedPaymentOutputDescriptorDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_DelayedPaymentOutputDescriptorDecodeErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_DelayedPaymentOutputDescriptorDecodeErrorZ CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_clone(const struct LDKCResult_DelayedPaymentOutputDescriptorDecodeErrorZ *NONNULL_PTR orig);
+
+/**
+ * Creates a new CResult_StaticPaymentOutputDescriptorDecodeErrorZ in the success state.
+ */
+struct LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZ CResult_StaticPaymentOutputDescriptorDecodeErrorZ_ok(struct LDKStaticPaymentOutputDescriptor o);
+
+/**
+ * Creates a new CResult_StaticPaymentOutputDescriptorDecodeErrorZ in the error state.
+ */
+struct LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZ CResult_StaticPaymentOutputDescriptorDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Frees any resources used by the CResult_StaticPaymentOutputDescriptorDecodeErrorZ.
+ */
+void CResult_StaticPaymentOutputDescriptorDecodeErrorZ_free(struct LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_StaticPaymentOutputDescriptorDecodeErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZ CResult_StaticPaymentOutputDescriptorDecodeErrorZ_clone(const struct LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZ *NONNULL_PTR orig);
 
 /**
  * Creates a new CResult_SpendableOutputDescriptorDecodeErrorZ in the success state.
@@ -12286,6 +12448,16 @@ MUST_USE_RES struct LDKDelayedPaymentOutputDescriptor DelayedPaymentOutputDescri
 struct LDKDelayedPaymentOutputDescriptor DelayedPaymentOutputDescriptor_clone(const struct LDKDelayedPaymentOutputDescriptor *NONNULL_PTR orig);
 
 /**
+ * Serialize the DelayedPaymentOutputDescriptor object into a byte array which can be read by DelayedPaymentOutputDescriptor_read
+ */
+struct LDKCVec_u8Z DelayedPaymentOutputDescriptor_write(const struct LDKDelayedPaymentOutputDescriptor *NONNULL_PTR obj);
+
+/**
+ * Read a DelayedPaymentOutputDescriptor from a byte array, created by DelayedPaymentOutputDescriptor_write
+ */
+struct LDKCResult_DelayedPaymentOutputDescriptorDecodeErrorZ DelayedPaymentOutputDescriptor_read(struct LDKu8slice ser);
+
+/**
  * Frees any resources used by the StaticPaymentOutputDescriptor, if is_owned is set and inner is non-NULL.
  */
 void StaticPaymentOutputDescriptor_free(struct LDKStaticPaymentOutputDescriptor this_obj);
@@ -12338,6 +12510,16 @@ MUST_USE_RES struct LDKStaticPaymentOutputDescriptor StaticPaymentOutputDescript
  * Creates a copy of the StaticPaymentOutputDescriptor
  */
 struct LDKStaticPaymentOutputDescriptor StaticPaymentOutputDescriptor_clone(const struct LDKStaticPaymentOutputDescriptor *NONNULL_PTR orig);
+
+/**
+ * Serialize the StaticPaymentOutputDescriptor object into a byte array which can be read by StaticPaymentOutputDescriptor_read
+ */
+struct LDKCVec_u8Z StaticPaymentOutputDescriptor_write(const struct LDKStaticPaymentOutputDescriptor *NONNULL_PTR obj);
+
+/**
+ * Read a StaticPaymentOutputDescriptor from a byte array, created by StaticPaymentOutputDescriptor_write
+ */
+struct LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZ StaticPaymentOutputDescriptor_read(struct LDKu8slice ser);
 
 /**
  * Frees any resources used by the SpendableOutputDescriptor
@@ -16699,6 +16881,16 @@ MUST_USE_RES struct LDKRouteHop RouteHop_new(struct LDKPublicKey pubkey_arg, str
  * Creates a copy of the RouteHop
  */
 struct LDKRouteHop RouteHop_clone(const struct LDKRouteHop *NONNULL_PTR orig);
+
+/**
+ * Serialize the RouteHop object into a byte array which can be read by RouteHop_read
+ */
+struct LDKCVec_u8Z RouteHop_write(const struct LDKRouteHop *NONNULL_PTR obj);
+
+/**
+ * Read a RouteHop from a byte array, created by RouteHop_write
+ */
+struct LDKCResult_RouteHopDecodeErrorZ RouteHop_read(struct LDKu8slice ser);
 
 /**
  * Frees any resources used by the Route, if is_owned is set and inner is non-NULL.

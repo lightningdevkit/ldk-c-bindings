@@ -3574,6 +3574,97 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_BlockHas
 	}
 }
 #[repr(C)]
+/// The contents of CResult_RouteHopDecodeErrorZ
+pub union CResult_RouteHopDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::lightning::routing::router::RouteHop,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_RouteHopDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning::routing::router::RouteHop on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_RouteHopDecodeErrorZ {
+	/// The contents of this CResult_RouteHopDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_RouteHopDecodeErrorZPtr,
+	/// Whether this CResult_RouteHopDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_RouteHopDecodeErrorZ in the success state.
+pub extern "C" fn CResult_RouteHopDecodeErrorZ_ok(o: crate::lightning::routing::router::RouteHop) -> CResult_RouteHopDecodeErrorZ {
+	CResult_RouteHopDecodeErrorZ {
+		contents: CResult_RouteHopDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_RouteHopDecodeErrorZ in the error state.
+pub extern "C" fn CResult_RouteHopDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_RouteHopDecodeErrorZ {
+	CResult_RouteHopDecodeErrorZ {
+		contents: CResult_RouteHopDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_RouteHopDecodeErrorZ.
+pub extern "C" fn CResult_RouteHopDecodeErrorZ_free(_res: CResult_RouteHopDecodeErrorZ) { }
+impl Drop for CResult_RouteHopDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::lightning::routing::router::RouteHop, crate::lightning::ln::msgs::DecodeError>> for CResult_RouteHopDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::router::RouteHop, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_RouteHopDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_RouteHopDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_RouteHopDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_RouteHopDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::lightning::routing::router::RouteHop>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_RouteHopDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_RouteHopDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_RouteHopDecodeErrorZ_clone(orig: &CResult_RouteHopDecodeErrorZ) -> CResult_RouteHopDecodeErrorZ { orig.clone() }
+#[repr(C)]
 /// A dynamically-allocated array of crate::lightning::routing::router::RouteHops of arbitrary size.
 /// This corresponds to std::vector in C++
 pub struct CVec_RouteHopZ {
@@ -9031,6 +9122,188 @@ impl Clone for CResult_InvoiceSignOrCreationErrorZ {
 /// Creates a new CResult_InvoiceSignOrCreationErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_InvoiceSignOrCreationErrorZ_clone(orig: &CResult_InvoiceSignOrCreationErrorZ) -> CResult_InvoiceSignOrCreationErrorZ { orig.clone() }
+#[repr(C)]
+/// The contents of CResult_DelayedPaymentOutputDescriptorDecodeErrorZ
+pub union CResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_DelayedPaymentOutputDescriptorDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
+	/// The contents of this CResult_DelayedPaymentOutputDescriptorDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr,
+	/// Whether this CResult_DelayedPaymentOutputDescriptorDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_DelayedPaymentOutputDescriptorDecodeErrorZ in the success state.
+pub extern "C" fn CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_ok(o: crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor) -> CResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
+	CResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
+		contents: CResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_DelayedPaymentOutputDescriptorDecodeErrorZ in the error state.
+pub extern "C" fn CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
+	CResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
+		contents: CResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_DelayedPaymentOutputDescriptorDecodeErrorZ.
+pub extern "C" fn CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_free(_res: CResult_DelayedPaymentOutputDescriptorDecodeErrorZ) { }
+impl Drop for CResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor, crate::lightning::ln::msgs::DecodeError>> for CResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_DelayedPaymentOutputDescriptorDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_clone(orig: &CResult_DelayedPaymentOutputDescriptorDecodeErrorZ) -> CResult_DelayedPaymentOutputDescriptorDecodeErrorZ { orig.clone() }
+#[repr(C)]
+/// The contents of CResult_StaticPaymentOutputDescriptorDecodeErrorZ
+pub union CResult_StaticPaymentOutputDescriptorDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_StaticPaymentOutputDescriptorDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_StaticPaymentOutputDescriptorDecodeErrorZ {
+	/// The contents of this CResult_StaticPaymentOutputDescriptorDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_StaticPaymentOutputDescriptorDecodeErrorZPtr,
+	/// Whether this CResult_StaticPaymentOutputDescriptorDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_StaticPaymentOutputDescriptorDecodeErrorZ in the success state.
+pub extern "C" fn CResult_StaticPaymentOutputDescriptorDecodeErrorZ_ok(o: crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor) -> CResult_StaticPaymentOutputDescriptorDecodeErrorZ {
+	CResult_StaticPaymentOutputDescriptorDecodeErrorZ {
+		contents: CResult_StaticPaymentOutputDescriptorDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_StaticPaymentOutputDescriptorDecodeErrorZ in the error state.
+pub extern "C" fn CResult_StaticPaymentOutputDescriptorDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_StaticPaymentOutputDescriptorDecodeErrorZ {
+	CResult_StaticPaymentOutputDescriptorDecodeErrorZ {
+		contents: CResult_StaticPaymentOutputDescriptorDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_StaticPaymentOutputDescriptorDecodeErrorZ.
+pub extern "C" fn CResult_StaticPaymentOutputDescriptorDecodeErrorZ_free(_res: CResult_StaticPaymentOutputDescriptorDecodeErrorZ) { }
+impl Drop for CResult_StaticPaymentOutputDescriptorDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor, crate::lightning::ln::msgs::DecodeError>> for CResult_StaticPaymentOutputDescriptorDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_StaticPaymentOutputDescriptorDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_StaticPaymentOutputDescriptorDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_StaticPaymentOutputDescriptorDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_StaticPaymentOutputDescriptorDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_StaticPaymentOutputDescriptorDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_StaticPaymentOutputDescriptorDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_StaticPaymentOutputDescriptorDecodeErrorZ_clone(orig: &CResult_StaticPaymentOutputDescriptorDecodeErrorZ) -> CResult_StaticPaymentOutputDescriptorDecodeErrorZ { orig.clone() }
 #[repr(C)]
 /// The contents of CResult_SpendableOutputDescriptorDecodeErrorZ
 pub union CResult_SpendableOutputDescriptorDecodeErrorZPtr {

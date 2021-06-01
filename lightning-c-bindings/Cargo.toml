@@ -21,6 +21,7 @@ secp256k1 = { version = "0.20.1", features = ["global-context-less-secure"] }
 lightning = { git = "https://git.bitcoin.ninja/rust-lightning", rev = "3996eaab6e2eaf5fde9374b51d952c0edef5ea92", features = ["allow_wallclock_use"] }
 lightning-persister = { git = "https://git.bitcoin.ninja/rust-lightning", rev = "3996eaab6e2eaf5fde9374b51d952c0edef5ea92" }
 lightning-invoice = { git = "https://git.bitcoin.ninja/rust-lightning", rev = "3996eaab6e2eaf5fde9374b51d952c0edef5ea92" }
+lightning-background-processor = { git = "https://git.bitcoin.ninja/rust-lightning", rev = "3996eaab6e2eaf5fde9374b51d952c0edef5ea92" }
 
 [patch.crates-io]
 # Rust-Secp256k1 PR 279. Should be dropped once merged.

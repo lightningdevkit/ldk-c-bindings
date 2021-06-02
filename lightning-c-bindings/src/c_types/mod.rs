@@ -114,6 +114,7 @@ impl RecoverableSignature {
 }
 
 #[repr(C)]
+#[derive(Copy, Clone)]
 /// Represents an error returned from libsecp256k1 during validation of some secp256k1 data
 pub enum Secp256k1Error {
 	/// Signature failed verification
@@ -153,6 +154,7 @@ impl Secp256k1Error {
 
 #[repr(C)]
 #[allow(missing_docs)] // If there's no docs upstream, that's good enough for us
+#[derive(Clone, Copy, PartialEq)]
 /// Represents an IO Error. Note that some information is lost in the conversion from Rust.
 pub enum IOError {
 	NotFound,
@@ -247,12 +249,7 @@ pub struct Transaction {
 	pub data_is_owned: bool,
 }
 impl Transaction {
-	pub(crate) fn into_bitcoin(&self) -> BitcoinTransaction {
-		if self.datalen == 0 { panic!("0-length buffer can never represent a valid Transaction"); }
-		::bitcoin::consensus::encode::deserialize(unsafe { std::slice::from_raw_parts(self.data, self.datalen) }).unwrap()
-	}
-	pub(crate) fn from_bitcoin(btc: &BitcoinTransaction) -> Self {
-		let vec = ::bitcoin::consensus::encode::serialize(btc);
+	fn from_vec(vec: Vec<u8>) -> Self {
 		let datalen = vec.len();
 		let data = Box::into_raw(vec.into_boxed_slice());
 		Self {
@@ -261,12 +258,28 @@ impl Transaction {
 			data_is_owned: true,
 		}
 	}
+	pub(crate) fn into_bitcoin(&self) -> BitcoinTransaction {
+		if self.datalen == 0 { panic!("0-length buffer can never represent a valid Transaction"); }
+		::bitcoin::consensus::encode::deserialize(unsafe { std::slice::from_raw_parts(self.data, self.datalen) }).unwrap()
+	}
+	pub(crate) fn from_bitcoin(btc: &BitcoinTransaction) -> Self {
+		let vec = ::bitcoin::consensus::encode::serialize(btc);
+		Self::from_vec(vec)
+	}
 }
 impl Drop for Transaction {
 	fn drop(&mut self) {
 		if self.data_is_owned && self.datalen != 0 {
 			let _ = derived::CVec_u8Z { data: self.data as *mut u8, datalen: self.datalen };
 		}
+	}
+}
+impl Clone for Transaction {
+	fn clone(&self) -> Self {
+		let sl = unsafe { std::slice::from_raw_parts(self.data, self.datalen) };
+		let mut v = Vec::new();
+		v.extend_from_slice(&sl);
+		Self::from_vec(v)
 	}
 }
 #[no_mangle]

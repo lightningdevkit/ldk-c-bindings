@@ -4526,6 +4526,8 @@ pub struct ChannelMessageHandler {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for ChannelMessageHandler {}
+unsafe impl Sync for ChannelMessageHandler {}
 impl lightning::util::events::MessageSendEventsProvider for ChannelMessageHandler {
 	fn get_and_clear_pending_msg_events(&self) -> Vec<lightning::util::events::MessageSendEvent> {
 		let mut ret = (self.MessageSendEventsProvider.get_and_clear_pending_msg_events)(self.this_arg);
@@ -4682,6 +4684,8 @@ pub struct RoutingMessageHandler {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for RoutingMessageHandler {}
+unsafe impl Sync for RoutingMessageHandler {}
 impl lightning::util::events::MessageSendEventsProvider for RoutingMessageHandler {
 	fn get_and_clear_pending_msg_events(&self) -> Vec<lightning::util::events::MessageSendEvent> {
 		let mut ret = (self.MessageSendEventsProvider.get_and_clear_pending_msg_events)(self.this_arg);

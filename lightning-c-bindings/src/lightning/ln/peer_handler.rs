@@ -517,6 +517,8 @@ pub struct SocketDescriptor {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for SocketDescriptor {}
+unsafe impl Sync for SocketDescriptor {}
 impl std::cmp::Eq for SocketDescriptor {}
 impl std::cmp::PartialEq for SocketDescriptor {
 	fn eq(&self, o: &Self) -> bool { (self.eq)(self.this_arg, o) }

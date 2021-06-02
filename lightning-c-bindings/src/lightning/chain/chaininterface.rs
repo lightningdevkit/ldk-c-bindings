@@ -29,6 +29,8 @@ pub struct BroadcasterInterface {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for BroadcasterInterface {}
+unsafe impl Sync for BroadcasterInterface {}
 
 use lightning::chain::chaininterface::BroadcasterInterface as rustBroadcasterInterface;
 impl rustBroadcasterInterface for BroadcasterInterface {
@@ -132,6 +134,8 @@ pub struct FeeEstimator {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for FeeEstimator {}
+unsafe impl Sync for FeeEstimator {}
 
 use lightning::chain::chaininterface::FeeEstimator as rustFeeEstimator;
 impl rustFeeEstimator for FeeEstimator {

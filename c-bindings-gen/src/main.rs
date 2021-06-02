@@ -180,7 +180,7 @@ eprintln!("{}", trait_path);
 // *** Per-Type Printing Logic ***
 // *******************************
 
-macro_rules! walk_supertraits { ($t: expr, $types: expr, ($( $pat: pat => $e: expr),*) ) => { {
+macro_rules! walk_supertraits { ($t: expr, $types: expr, ($( $($pat: pat)|* => $e: expr),*) ) => { {
 	if $t.colon_token.is_some() {
 		for st in $t.supertraits.iter() {
 			match st {
@@ -194,14 +194,14 @@ macro_rules! walk_supertraits { ($t: expr, $types: expr, ($( $pat: pat => $e: ex
 					if let Some(types) = types_opt {
 						if let Some(path) = types.maybe_resolve_path(&supertrait.path, None) {
 							match (&path as &str, &supertrait.path.segments.iter().last().unwrap().ident) {
-								$( $pat => $e, )*
+								$( $($pat)|* => $e, )*
 							}
 							continue;
 						}
 					}
 					if let Some(ident) = supertrait.path.get_ident() {
 						match (&format!("{}", ident) as &str, &ident) {
-							$( $pat => $e, )*
+							$( $($pat)|* => $e, )*
 						}
 					} else if types_opt.is_some() {
 						panic!("Supertrait unresolvable and not single-ident");
@@ -221,8 +221,10 @@ macro_rules! walk_supertraits { ($t: expr, $types: expr, ($( $pat: pat => $e: ex
 /// a concrete Deref to the Rust trait.
 fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, types: &mut TypeResolver<'b, 'a>, extra_headers: &mut File, cpp_headers: &mut File) {
 	let trait_name = format!("{}", t.ident);
+	let implementable;
 	match export_status(&t.attrs) {
-		ExportStatus::Export => {},
+		ExportStatus::Export => { implementable = true; }
+		ExportStatus::NotImplementable => { implementable = false; },
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
 	}
 	writeln_docs(w, &t.attrs, "");
@@ -247,6 +249,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 					},
 					ExportStatus::Export => {},
 					ExportStatus::TestOnly => continue,
+					ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 				}
 				if m.default.is_some() { unimplemented!(); }
 
@@ -311,13 +314,13 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 			writeln!(w, "\tpub clone: Option<extern \"C\" fn (this_arg: *const c_void) -> *mut c_void>,").unwrap();
 			generated_fields.push(("clone".to_owned(), true));
 		},
-		("std::cmp::Eq", _) => {
+		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
 			writeln!(w, "\t/// Checks if two objects are equal given this object's this_arg pointer and another object.").unwrap();
 			writeln!(w, "\tpub eq: extern \"C\" fn (this_arg: *const c_void, other_arg: &{}) -> bool,", trait_name).unwrap();
 			writeln!(extra_headers, "typedef struct LDK{} LDK{};", trait_name, trait_name).unwrap();
 			generated_fields.push(("eq".to_owned(), true));
 		},
-		("std::hash::Hash", _) => {
+		("std::hash::Hash", _)|("core::hash::Hash", _) => {
 			writeln!(w, "\t/// Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.").unwrap();
 			writeln!(w, "\t/// This is used, for example, for inclusion of this object in a hash map.").unwrap();
 			writeln!(w, "\tpub hash: extern \"C\" fn (this_arg: *const c_void) -> u64,").unwrap();
@@ -452,12 +455,12 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	walk_supertraits!(t, Some(&types), (
 		("Send", _) => writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap(),
 		("Sync", _) => writeln!(w, "unsafe impl Sync for {} {{}}", trait_name).unwrap(),
-		("std::cmp::Eq", _) => {
+		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
 			writeln!(w, "impl std::cmp::Eq for {} {{}}", trait_name).unwrap();
 			writeln!(w, "impl std::cmp::PartialEq for {} {{", trait_name).unwrap();
 			writeln!(w, "\tfn eq(&self, o: &Self) -> bool {{ (self.eq)(self.this_arg, o) }}\n}}").unwrap();
 		},
-		("std::hash::Hash", _) => {
+		("std::hash::Hash", _)|("core::hash::Hash", _) => {
 			writeln!(w, "impl std::hash::Hash for {} {{", trait_name).unwrap();
 			writeln!(w, "\tfn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {{ hasher.write_u64((self.hash)(self.this_arg)) }}\n}}").unwrap();
 		},
@@ -505,15 +508,17 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 
 	// Finally, implement the original Rust trait for the newly created mapped trait.
 	writeln!(w, "\nuse {}::{} as rust{};", types.module_path, t.ident, trait_name).unwrap();
-	write!(w, "impl rust{}", t.ident).unwrap();
-	maybe_write_generics(w, &t.generics, types, false);
-	writeln!(w, " for {} {{", trait_name).unwrap();
-	impl_trait_for_c!(t, "", types);
-	writeln!(w, "}}\n").unwrap();
-	writeln!(w, "// We're essentially a pointer already, or at least a set of pointers, so allow us to be used").unwrap();
-	writeln!(w, "// directly as a Deref trait in higher-level structs:").unwrap();
-	writeln!(w, "impl std::ops::Deref for {} {{\n\ttype Target = Self;", trait_name).unwrap();
-	writeln!(w, "\tfn deref(&self) -> &Self {{\n\t\tself\n\t}}\n}}").unwrap();
+	if implementable {
+		write!(w, "impl rust{}", t.ident).unwrap();
+		maybe_write_generics(w, &t.generics, types, false);
+		writeln!(w, " for {} {{", trait_name).unwrap();
+		impl_trait_for_c!(t, "", types);
+		writeln!(w, "}}\n").unwrap();
+		writeln!(w, "// We're essentially a pointer already, or at least a set of pointers, so allow us to be used").unwrap();
+		writeln!(w, "// directly as a Deref trait in higher-level structs:").unwrap();
+		writeln!(w, "impl std::ops::Deref for {} {{\n\ttype Target = Self;", trait_name).unwrap();
+		writeln!(w, "\tfn deref(&self) -> &Self {{\n\t\tself\n\t}}\n}}").unwrap();
+	}
 
 	writeln!(w, "/// Calls the free function if one is set").unwrap();
 	writeln!(w, "#[no_mangle]\npub extern \"C\" fn {}_free(this_ptr: {}) {{ }}", trait_name, trait_name).unwrap();
@@ -597,6 +602,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 						all_fields_settable = false;
 						continue
 					},
+					ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 				}
 
 				if let Some(ident) = &field.ident {
@@ -675,6 +681,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 	match export_status(&i.attrs) {
 		ExportStatus::Export => {},
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
+		ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 	}
 
 	if let syn::Type::Tuple(_) = &*i.self_ty {
@@ -739,7 +746,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 
 						let export = export_status(&trait_obj.attrs);
 						match export {
-							ExportStatus::Export => {},
+							ExportStatus::Export|ExportStatus::NotImplementable => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => return,
 						}
 
@@ -776,6 +783,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										continue;
 									},
 									ExportStatus::TestOnly => continue,
+									ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 								}
 
 								let mut printed = false;
@@ -843,6 +851,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 								match export_status(&trait_method.attrs) {
 									ExportStatus::Export => {},
 									ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+									ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 								}
 
 								if let syn::ReturnType::Type(_, _) = &$m.sig.output {
@@ -940,6 +949,52 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						write!(w, "\t{} {{ inner: Box::into_raw(Box::new(Default::default())), is_owned: true }}\n", ident).unwrap();
 						write!(w, "}}\n").unwrap();
 					} else if path_matches_nongeneric(&trait_path.1, &["core", "cmp", "PartialEq"]) {
+					} else if path_matches_nongeneric(&trait_path.1, &["core", "cmp", "Eq"]) {
+						writeln!(w, "/// Checks if two {}s contain equal inner contents.", ident).unwrap();
+						writeln!(w, "/// This ignores pointers and is_owned flags and looks at the values in fields.").unwrap();
+						if types.c_type_has_inner_from_path(&resolved_path) {
+							writeln!(w, "/// Two objects with NULL inner values will be considered \"equal\" here.").unwrap();
+						}
+						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_eq(a: &{}, b: &{}) -> bool {{\n", ident, ident, ident).unwrap();
+						if types.c_type_has_inner_from_path(&resolved_path) {
+							write!(w, "\tif a.inner == b.inner {{ return true; }}\n").unwrap();
+							write!(w, "\tif a.inner.is_null() || b.inner.is_null() {{ return false; }}\n").unwrap();
+						}
+
+						let path = &p.path;
+						let ref_type: syn::Type = syn::parse_quote!(&#path);
+						assert!(!types.write_to_c_conversion_new_var(w, &format_ident!("a"), &*i.self_ty, Some(&gen_types), false), "We don't support new var conversions when comparing equality");
+
+						write!(w, "\tif ").unwrap();
+						types.write_from_c_conversion_prefix(w, &ref_type, Some(&gen_types));
+						write!(w, "a").unwrap();
+						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
+						write!(w, " == ").unwrap();
+						types.write_from_c_conversion_prefix(w, &ref_type, Some(&gen_types));
+						write!(w, "b").unwrap();
+						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
+
+						writeln!(w, " {{ true }} else {{ false }}\n}}").unwrap();
+					} else if path_matches_nongeneric(&trait_path.1, &["core", "hash", "Hash"]) {
+						writeln!(w, "/// Checks if two {}s contain equal inner contents.", ident).unwrap();
+						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_hash(o: &{}) -> u64 {{\n", ident, ident).unwrap();
+						if types.c_type_has_inner_from_path(&resolved_path) {
+							write!(w, "\tif o.inner.is_null() {{ return 0; }}\n").unwrap();
+						}
+
+						let path = &p.path;
+						let ref_type: syn::Type = syn::parse_quote!(&#path);
+						assert!(!types.write_to_c_conversion_new_var(w, &format_ident!("a"), &*i.self_ty, Some(&gen_types), false), "We don't support new var conversions when comparing equality");
+
+						writeln!(w, "\t// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core").unwrap();
+						writeln!(w, "\t#[allow(deprecated)]").unwrap();
+						writeln!(w, "\tlet mut hasher = core::hash::SipHasher::new();").unwrap();
+						write!(w, "\tstd::hash::Hash::hash(").unwrap();
+						types.write_from_c_conversion_prefix(w, &ref_type, Some(&gen_types));
+						write!(w, "o").unwrap();
+						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
+						writeln!(w, ", &mut hasher);").unwrap();
+						writeln!(w, "\tstd::hash::Hasher::finish(&hasher)\n}}").unwrap();
 					} else if (path_matches_nongeneric(&trait_path.1, &["core", "clone", "Clone"]) || path_matches_nongeneric(&trait_path.1, &["Clone"])) &&
 							types.c_type_has_inner_from_path(&resolved_path) {
 						writeln!(w, "impl Clone for {} {{", ident).unwrap();
@@ -1006,6 +1061,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									match export_status(&m.attrs) {
 										ExportStatus::Export => {},
 										ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+										ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 									}
 									if m.defaultness.is_some() { unimplemented!(); }
 									writeln_docs(w, &m.attrs, "");
@@ -1128,6 +1184,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	match export_status(&e.attrs) {
 		ExportStatus::Export => {},
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
+		ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 	}
 
 	if is_enum_opaque(e) {
@@ -1328,6 +1385,7 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 	match export_status(&f.attrs) {
 		ExportStatus::Export => {},
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
+		ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 	}
 	writeln_docs(w, &f.attrs, "");
 
@@ -1481,6 +1539,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 						match export_status(&t.attrs) {
 							ExportStatus::Export => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 
 						let mut process_alias = true;
@@ -1552,6 +1611,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						match export_status(&s.attrs) {
 							ExportStatus::Export => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let struct_path = format!("{}::{}", module, s.ident);
 						crate_types.opaques.insert(struct_path, &s.ident);
@@ -1560,7 +1620,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 				syn::Item::Trait(t) => {
 					if let syn::Visibility::Public(_) = t.vis {
 						match export_status(&t.attrs) {
-							ExportStatus::Export => {},
+							ExportStatus::Export|ExportStatus::NotImplementable => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
 						}
 						let trait_path = format!("{}::{}", module, t.ident);
@@ -1578,6 +1638,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						match export_status(&t.attrs) {
 							ExportStatus::Export => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let type_path = format!("{}::{}", module, t.ident);
 						let mut process_alias = true;
@@ -1612,6 +1673,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						match export_status(&e.attrs) {
 							ExportStatus::Export => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let enum_path = format!("{}::{}", module, e.ident);
 						crate_types.opaques.insert(enum_path, &e.ident);
@@ -1622,6 +1684,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						match export_status(&e.attrs) {
 							ExportStatus::Export => {},
 							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let enum_path = format!("{}::{}", module, e.ident);
 						crate_types.mirrored_enums.insert(enum_path, &e);

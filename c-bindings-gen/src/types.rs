@@ -66,6 +66,11 @@ pub enum ExportStatus {
 	Export,
 	NoExport,
 	TestOnly,
+	/// This is used only for traits to indicate that users should not be able to implement their
+	/// own version of a trait, but we should export Rust implementations of the trait (and the
+	/// trait itself).
+	/// Concretly, this means that we do not implement the Rust trait for the C trait struct.
+	NotImplementable,
 }
 /// Gets the ExportStatus of an object (struct, fn, etc) given its attributes.
 pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
@@ -117,6 +122,8 @@ pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
 				let line = format!("{}", lit);
 				if line.contains("(C-not exported)") {
 					return ExportStatus::NoExport;
+				} else if line.contains("(C-not implementable)") {
+					return ExportStatus::NotImplementable;
 				}
 			},
 			_ => unimplemented!(),
@@ -138,6 +145,7 @@ pub fn is_enum_opaque(e: &syn::ItemEnum) -> bool {
 			for field in fields.named.iter() {
 				match export_status(&field.attrs) {
 					ExportStatus::Export|ExportStatus::TestOnly => {},
+					ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 					ExportStatus::NoExport => return true,
 				}
 			}
@@ -145,6 +153,7 @@ pub fn is_enum_opaque(e: &syn::ItemEnum) -> bool {
 			for field in fields.unnamed.iter() {
 				match export_status(&field.attrs) {
 					ExportStatus::Export|ExportStatus::TestOnly => {},
+					ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 					ExportStatus::NoExport => return true,
 				}
 			}
@@ -201,7 +210,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								if path == "Sized" { continue; }
 								if non_lifetimes_processed { return false; }
 								non_lifetimes_processed = true;
-								let new_ident = if path != "std::ops::Deref" {
+								let new_ident = if path != "std::ops::Deref" && path != "core::ops::Deref" {
 									path = "crate::".to_string() + &path;
 									Some(&trait_bound.path)
 								} else { None };
@@ -226,7 +235,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 						if p.path.leading_colon.is_some() { return false; }
 						let mut p_iter = p.path.segments.iter();
 						if let Some(gen) = self.typed_generics.get_mut(&p_iter.next().unwrap().ident) {
-							if gen.0 != "std::ops::Deref" { return false; }
+							if gen.0 != "std::ops::Deref" && gen.0 != "core::ops::Deref" { return false; }
 							if &format!("{}", p_iter.next().unwrap().ident) != "Target" { return false; }
 
 							let mut non_lifetimes_processed = false;
@@ -269,7 +278,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								// implement Deref<Target=Self> for relevant types). We don't
 								// bother to implement it for associated types, however, so we just
 								// ignore such bounds.
-								let new_ident = if path != "std::ops::Deref" {
+								let new_ident = if path != "std::ops::Deref" && path != "core::ops::Deref" {
 									path = "crate::".to_string() + &path;
 									Some(&tr.path)
 								} else { None };
@@ -479,6 +488,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 							ExportStatus::Export => { declared.insert(s.ident.clone(), DeclType::StructImported); },
 							ExportStatus::NoExport => { declared.insert(s.ident.clone(), DeclType::StructIgnored); },
 							ExportStatus::TestOnly => continue,
+							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 						}
 					}
 				},
@@ -499,13 +509,19 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 						match export_status(&e.attrs) {
 							ExportStatus::Export if is_enum_opaque(e) => { declared.insert(e.ident.clone(), DeclType::EnumIgnored); },
 							ExportStatus::Export => { declared.insert(e.ident.clone(), DeclType::MirroredEnum); },
+							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 							_ => continue,
 						}
 					}
 				},
-				syn::Item::Trait(t) if export_status(&t.attrs) == ExportStatus::Export => {
-					if let syn::Visibility::Public(_) = t.vis {
-						declared.insert(t.ident.clone(), DeclType::Trait(t));
+				syn::Item::Trait(t) => {
+					match export_status(&t.attrs) {
+						ExportStatus::Export|ExportStatus::NotImplementable => {
+							if let syn::Visibility::Public(_) = t.vis {
+								declared.insert(t.ident.clone(), DeclType::Trait(t));
+							}
+						},
+						_ => continue,
 					}
 				},
 				syn::Item::Mod(m) => {
@@ -842,9 +858,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 3]" if !is_ref => Some("crate::c_types::ThreeBytes"), // Used for RGB values
 
 			"str" if is_ref => Some("crate::c_types::Str"),
-			"String" => Some("crate::c_types::Str"),
+			"alloc::string::String"|"String" => Some("crate::c_types::Str"),
 
-			"std::time::Duration" => Some("u64"),
+			"std::time::Duration"|"core::time::Duration" => Some("u64"),
 			"std::time::SystemTime" => Some("u64"),
 			"std::io::Error" => Some("crate::c_types::IOError"),
 
@@ -913,11 +929,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some(""),
 
 			"str" if is_ref => Some(""),
-			"String" => Some(""),
+			"alloc::string::String"|"String" => Some(""),
 			// Note that we'll panic for String if is_ref, as we only have non-owned memory, we
 			// cannot create a &String.
 
-			"std::time::Duration" => Some("std::time::Duration::from_secs("),
+			"std::time::Duration"|"core::time::Duration" => Some("std::time::Duration::from_secs("),
 			"std::time::SystemTime" => Some("(::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs("),
 
 			"bech32::u5" => Some(""),
@@ -979,9 +995,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some(".to_slice()"),
 
 			"str" if is_ref => Some(".into_str()"),
-			"String" => Some(".into_string()"),
+			"alloc::string::String"|"String" => Some(".into_string()"),
 
-			"std::time::Duration" => Some(")"),
+			"std::time::Duration"|"core::time::Duration" => Some(")"),
 			"std::time::SystemTime" => Some("))"),
 
 			"bech32::u5" => Some(".into()"),
@@ -1058,9 +1074,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some("local_"),
 
 			"str" if is_ref => Some(""),
-			"String" => Some(""),
+			"alloc::string::String"|"String" => Some(""),
 
-			"std::time::Duration" => Some(""),
+			"std::time::Duration"|"core::time::Duration" => Some(""),
 			"std::time::SystemTime" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
 
@@ -1127,10 +1143,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[usize]" if is_ref => Some(""),
 
 			"str" if is_ref => Some(".into()"),
-			"String" if is_ref => Some(".as_str().into()"),
-			"String" => Some(".into()"),
+			"alloc::string::String"|"String" if is_ref => Some(".as_str().into()"),
+			"alloc::string::String"|"String" => Some(".into()"),
 
-			"std::time::Duration" => Some(".as_secs()"),
+			"std::time::Duration"|"core::time::Duration" => Some(".as_secs()"),
 			"std::time::SystemTime" => Some(".duration_since(::std::time::SystemTime::UNIX_EPOCH).expect(\"Times must be post-1970\").as_secs()"),
 			"std::io::Error" if !is_ref => Some(")"),
 

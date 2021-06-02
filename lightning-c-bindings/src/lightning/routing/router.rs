@@ -169,6 +169,22 @@ pub(crate) extern "C" fn RouteHop_clone_void(this_ptr: *const c_void) -> *mut c_
 pub extern "C" fn RouteHop_clone(orig: &RouteHop) -> RouteHop {
 	orig.clone()
 }
+#[no_mangle]
+/// Serialize the RouteHop object into a byte array which can be read by RouteHop_read
+pub extern "C" fn RouteHop_write(obj: &RouteHop) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+}
+#[no_mangle]
+pub(crate) extern "C" fn RouteHop_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRouteHop) })
+}
+#[no_mangle]
+/// Read a RouteHop from a byte array, created by RouteHop_write
+pub extern "C" fn RouteHop_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteHopDecodeErrorZ {
+	let res = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteHop { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	local_res
+}
 
 use lightning::routing::router::Route as nativeRouteImport;
 type nativeRoute = nativeRouteImport;
@@ -399,6 +415,15 @@ pub extern "C" fn RouteHintHop_new(mut src_node_id_arg: crate::c_types::PublicKe
 		htlc_minimum_msat: local_htlc_minimum_msat_arg,
 		htlc_maximum_msat: local_htlc_maximum_msat_arg,
 	})), is_owned: true }
+}
+/// Checks if two RouteHintHops contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RouteHintHop_eq(a: &RouteHintHop, b: &RouteHintHop) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
 }
 impl Clone for RouteHintHop {
 	fn clone(&self) -> Self {

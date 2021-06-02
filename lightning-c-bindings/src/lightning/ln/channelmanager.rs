@@ -292,7 +292,7 @@ pub extern "C" fn BestBlock_height(this_arg: &BestBlock) -> u32 {
 #[no_mangle]
 pub static BREAKDOWN_TIMEOUT: u16 = lightning::ln::channelmanager::BREAKDOWN_TIMEOUT;
 /// The minimum number of blocks between an inbound HTLC's CLTV and the corresponding outbound
-/// HTLC's CLTV. The current default represents roughly six hours of blocks at six blocks/hour.
+/// HTLC's CLTV. The current default represents roughly seven hours of blocks at six blocks/hour.
 ///
 /// This can be increased (but not decreased) through [`ChannelConfig::cltv_expiry_delta`]
 ///
@@ -367,6 +367,27 @@ pub extern "C" fn ChannelDetails_get_channel_id(this_ptr: &ChannelDetails) -> *c
 #[no_mangle]
 pub extern "C" fn ChannelDetails_set_channel_id(this_ptr: &mut ChannelDetails, mut val: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &mut *this_ptr.inner }.channel_id = val.data;
+}
+/// The Channel's funding transaction output, if we've negotiated the funding transaction with
+/// our counterparty already.
+///
+/// Note that, if this has been set, `channel_id` will be equivalent to
+/// `funding_txo.unwrap().to_channel_id()`.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_get_funding_txo(this_ptr: &ChannelDetails) -> crate::lightning::chain::transaction::OutPoint {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.funding_txo;
+	let mut local_inner_val = crate::lightning::chain::transaction::OutPoint { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else {  { (inner_val.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	local_inner_val
+}
+/// The Channel's funding transaction output, if we've negotiated the funding transaction with
+/// our counterparty already.
+///
+/// Note that, if this has been set, `channel_id` will be equivalent to
+/// `funding_txo.unwrap().to_channel_id()`.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_set_funding_txo(this_ptr: &mut ChannelDetails, mut val: crate::lightning::chain::transaction::OutPoint) {
+	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
+	unsafe { &mut *this_ptr.inner }.funding_txo = local_val;
 }
 /// The position of the funding transaction in the chain. None if the funding transaction has
 /// not yet been confirmed and the channel fully opened.
@@ -467,18 +488,63 @@ pub extern "C" fn ChannelDetails_get_inbound_capacity_msat(this_ptr: &ChannelDet
 pub extern "C" fn ChannelDetails_set_inbound_capacity_msat(this_ptr: &mut ChannelDetails, mut val: u64) {
 	unsafe { &mut *this_ptr.inner }.inbound_capacity_msat = val;
 }
-/// True if the channel is (a) confirmed and funding_locked messages have been exchanged, (b)
-/// the peer is connected, and (c) no monitor update failure is pending resolution.
+/// True if the channel was initiated (and thus funded) by us.
 #[no_mangle]
-pub extern "C" fn ChannelDetails_get_is_live(this_ptr: &ChannelDetails) -> bool {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.is_live;
+pub extern "C" fn ChannelDetails_get_is_outbound(this_ptr: &ChannelDetails) -> bool {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.is_outbound;
+	*inner_val
+}
+/// True if the channel was initiated (and thus funded) by us.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_set_is_outbound(this_ptr: &mut ChannelDetails, mut val: bool) {
+	unsafe { &mut *this_ptr.inner }.is_outbound = val;
+}
+/// True if the channel is confirmed, funding_locked messages have been exchanged, and the
+/// channel is not currently being shut down. `funding_locked` message exchange implies the
+/// required confirmation count has been reached (and we were connected to the peer at some
+/// point after the funding transaction received enough confirmations).
+#[no_mangle]
+pub extern "C" fn ChannelDetails_get_is_funding_locked(this_ptr: &ChannelDetails) -> bool {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.is_funding_locked;
+	*inner_val
+}
+/// True if the channel is confirmed, funding_locked messages have been exchanged, and the
+/// channel is not currently being shut down. `funding_locked` message exchange implies the
+/// required confirmation count has been reached (and we were connected to the peer at some
+/// point after the funding transaction received enough confirmations).
+#[no_mangle]
+pub extern "C" fn ChannelDetails_set_is_funding_locked(this_ptr: &mut ChannelDetails, mut val: bool) {
+	unsafe { &mut *this_ptr.inner }.is_funding_locked = val;
+}
+/// True if the channel is (a) confirmed and funding_locked messages have been exchanged, (b)
+/// the peer is connected, (c) no monitor update failure is pending resolution, and (d) the
+/// channel is not currently negotiating a shutdown.
+///
+/// This is a strict superset of `is_funding_locked`.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_get_is_usable(this_ptr: &ChannelDetails) -> bool {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.is_usable;
 	*inner_val
 }
 /// True if the channel is (a) confirmed and funding_locked messages have been exchanged, (b)
-/// the peer is connected, and (c) no monitor update failure is pending resolution.
+/// the peer is connected, (c) no monitor update failure is pending resolution, and (d) the
+/// channel is not currently negotiating a shutdown.
+///
+/// This is a strict superset of `is_funding_locked`.
 #[no_mangle]
-pub extern "C" fn ChannelDetails_set_is_live(this_ptr: &mut ChannelDetails, mut val: bool) {
-	unsafe { &mut *this_ptr.inner }.is_live = val;
+pub extern "C" fn ChannelDetails_set_is_usable(this_ptr: &mut ChannelDetails, mut val: bool) {
+	unsafe { &mut *this_ptr.inner }.is_usable = val;
+}
+/// True if this channel is (or will be) publicly-announced.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_get_is_public(this_ptr: &ChannelDetails) -> bool {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.is_public;
+	*inner_val
+}
+/// True if this channel is (or will be) publicly-announced.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_set_is_public(this_ptr: &mut ChannelDetails, mut val: bool) {
+	unsafe { &mut *this_ptr.inner }.is_public = val;
 }
 impl Clone for ChannelDetails {
 	fn clone(&self) -> Self {
@@ -729,8 +795,9 @@ pub extern "C" fn ChannelManager_list_channels(this_arg: &ChannelManager) -> cra
 /// Gets the list of usable channels, in random order. Useful as an argument to
 /// get_route to ensure non-announced channels are used.
 ///
-/// These are guaranteed to have their is_live value set to true, see the documentation for
-/// ChannelDetails::is_live for more info on exactly what the criteria are.
+/// These are guaranteed to have their [`ChannelDetails::is_usable`] value set to true, see the
+/// documentation for [`ChannelDetails::is_usable`] for more info on exactly what the criteria
+/// are.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_list_usable_channels(this_arg: &ChannelManager) -> crate::c_types::derived::CVec_ChannelDetailsZ {
@@ -835,6 +902,8 @@ pub extern "C" fn ChannelManager_send_payment(this_arg: &ChannelManager, route: 
 /// Note that this includes RBF or similar transaction replacement strategies - lightning does
 /// not currently support replacing a funding transaction on an existing channel. Instead,
 /// create a new channel with a conflicting funding transaction.
+///
+/// [`Event::FundingGenerationReady`]: crate::util::events::Event::FundingGenerationReady
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_funding_transaction_generated(this_arg: &ChannelManager, temporary_channel_id: *const [u8; 32], mut funding_transaction: crate::c_types::Transaction) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
@@ -843,19 +912,24 @@ pub extern "C" fn ChannelManager_funding_transaction_generated(this_arg: &Channe
 	local_ret
 }
 
-/// Generates a signed node_announcement from the given arguments and creates a
-/// BroadcastNodeAnnouncement event. Note that such messages will be ignored unless peers have
-/// seen a channel_announcement from us (ie unless we have public channels open).
+/// Regenerates channel_announcements and generates a signed node_announcement from the given
+/// arguments, providing them in corresponding events via
+/// [`get_and_clear_pending_msg_events`], if at least one public channel has been confirmed
+/// on-chain. This effectively re-broadcasts all channel announcements and sends our node
+/// announcement to ensure that the lightning P2P network is aware of the channels we have and
+/// our network addresses.
 ///
-/// RGB is a node \"color\" and alias is a printable human-readable string to describe this node
-/// to humans. They carry no in-protocol meaning.
+/// `rgb` is a node \"color\" and `alias` is a printable human-readable string to describe this
+/// node to humans. They carry no in-protocol meaning.
 ///
-/// addresses represent the set (possibly empty) of socket addresses on which this node accepts
-/// incoming connections. These will be broadcast to the network, publicly tying these
-/// addresses together. If you wish to preserve user privacy, addresses should likely contain
-/// only Tor Onion addresses.
+/// `addresses` represent the set (possibly empty) of socket addresses on which this node
+/// accepts incoming connections. These will be included in the node_announcement, publicly
+/// tying these addresses together and to this node. If you wish to preserve user privacy,
+/// addresses should likely contain only Tor Onion addresses.
 ///
-/// Panics if addresses is absurdly large (more than 500).
+/// Panics if `addresses` is absurdly large (more than 500).
+///
+/// [`get_and_clear_pending_msg_events`]: MessageSendEventsProvider::get_and_clear_pending_msg_events
 #[no_mangle]
 pub extern "C" fn ChannelManager_broadcast_node_announcement(this_arg: &ChannelManager, mut rgb: crate::c_types::ThreeBytes, mut alias: crate::c_types::ThirtyTwoBytes, mut addresses: crate::c_types::derived::CVec_NetAddressZ) {
 	let mut local_addresses = Vec::new(); for mut item in addresses.into_rust().drain(..) { local_addresses.push( { item.into_native() }); };
@@ -997,7 +1071,7 @@ pub extern "C" fn ChannelManager_create_inbound_payment(this_arg: &ChannelManage
 /// `invoice_expiry_delta_secs` describes the number of seconds that the invoice is valid for
 /// in excess of the current time. This should roughly match the expiry time set in the invoice.
 /// After this many seconds, we will remove the inbound payment, resulting in any attempts to
-/// pay the invoice failing. The BOLT spec suggests 7,200 secs as a default validity time for
+/// pay the invoice failing. The BOLT spec suggests 3,600 secs as a default validity time for
 /// invoices when no timeout is set.
 ///
 /// Note that we use block header time to time-out pending inbound payments (with some margin
@@ -1072,15 +1146,12 @@ pub extern "C" fn ChannelManager_as_EventsProvider(this_arg: &ChannelManager) ->
 	crate::lightning::util::events::EventsProvider {
 		this_arg: unsafe { (*this_arg).inner as *mut c_void },
 		free: None,
-		get_and_clear_pending_events: ChannelManager_EventsProvider_get_and_clear_pending_events,
+		process_pending_events: ChannelManager_EventsProvider_process_pending_events,
 	}
 }
 
-#[must_use]
-extern "C" fn ChannelManager_EventsProvider_get_and_clear_pending_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_EventZ {
-	let mut ret = <nativeChannelManager as lightning::util::events::EventsProvider<>>::get_and_clear_pending_events(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::util::events::Event::native_into(item) }); };
-	local_ret.into()
+extern "C" fn ChannelManager_EventsProvider_process_pending_events(this_arg: *const c_void, mut handler: crate::lightning::util::events::EventHandler) {
+	<nativeChannelManager as lightning::util::events::EventsProvider<>>::process_pending_events(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, handler)
 }
 
 impl From<nativeChannelManager> for crate::lightning::chain::Listen {

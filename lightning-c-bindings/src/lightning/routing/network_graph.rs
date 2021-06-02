@@ -804,6 +804,15 @@ pub extern "C" fn RoutingFees_new(mut base_msat_arg: u32, mut proportional_milli
 		proportional_millionths: proportional_millionths_arg,
 	})), is_owned: true }
 }
+/// Checks if two RoutingFeess contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RoutingFees_eq(a: &RoutingFees, b: &RoutingFees) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
 impl Clone for RoutingFees {
 	fn clone(&self) -> Self {
 		Self {
@@ -824,13 +833,6 @@ pub extern "C" fn RoutingFees_clone(orig: &RoutingFees) -> RoutingFees {
 	orig.clone()
 }
 #[no_mangle]
-/// Read a RoutingFees from a byte array, created by RoutingFees_write
-pub extern "C" fn RoutingFees_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RoutingFeesDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::RoutingFees { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
-	local_res
-}
-#[no_mangle]
 /// Serialize the RoutingFees object into a byte array which can be read by RoutingFees_read
 pub extern "C" fn RoutingFees_write(obj: &RoutingFees) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
@@ -838,6 +840,13 @@ pub extern "C" fn RoutingFees_write(obj: &RoutingFees) -> crate::c_types::derive
 #[no_mangle]
 pub(crate) extern "C" fn RoutingFees_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRoutingFees) })
+}
+#[no_mangle]
+/// Read a RoutingFees from a byte array, created by RoutingFees_write
+pub extern "C" fn RoutingFees_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RoutingFeesDecodeErrorZ {
+	let res = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::RoutingFees { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	local_res
 }
 
 use lightning::routing::network_graph::NodeAnnouncementInfo as nativeNodeAnnouncementInfoImport;

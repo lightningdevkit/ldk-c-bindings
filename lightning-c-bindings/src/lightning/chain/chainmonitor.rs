@@ -224,14 +224,11 @@ pub extern "C" fn ChainMonitor_as_EventsProvider(this_arg: &ChainMonitor) -> cra
 	crate::lightning::util::events::EventsProvider {
 		this_arg: unsafe { (*this_arg).inner as *mut c_void },
 		free: None,
-		get_and_clear_pending_events: ChainMonitor_EventsProvider_get_and_clear_pending_events,
+		process_pending_events: ChainMonitor_EventsProvider_process_pending_events,
 	}
 }
 
-#[must_use]
-extern "C" fn ChainMonitor_EventsProvider_get_and_clear_pending_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_EventZ {
-	let mut ret = <nativeChainMonitor as lightning::util::events::EventsProvider<>>::get_and_clear_pending_events(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::util::events::Event::native_into(item) }); };
-	local_ret.into()
+extern "C" fn ChainMonitor_EventsProvider_process_pending_events(this_arg: *const c_void, mut handler: crate::lightning::util::events::EventHandler) {
+	<nativeChainMonitor as lightning::util::events::EventsProvider<>>::process_pending_events(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, handler)
 }
 

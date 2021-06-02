@@ -34,6 +34,42 @@ use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
 }
+/// Checks if two InitFeaturess contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn InitFeatures_eq(a: &InitFeatures, b: &InitFeatures) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
+/// Checks if two NodeFeaturess contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_eq(a: &NodeFeatures, b: &NodeFeatures) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
+/// Checks if two ChannelFeaturess contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ChannelFeatures_eq(a: &ChannelFeatures, b: &ChannelFeatures) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
+/// Checks if two InvoiceFeaturess contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_eq(a: &InvoiceFeatures, b: &InvoiceFeatures) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
 impl Clone for InitFeatures {
 	fn clone(&self) -> Self {
 		Self {
@@ -352,6 +388,30 @@ pub extern "C" fn InvoiceFeatures_empty() -> InvoiceFeatures {
 pub extern "C" fn InvoiceFeatures_known() -> InvoiceFeatures {
 	let mut ret = lightning::ln::features::InvoiceFeatures::known();
 	InvoiceFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+}
+
+/// Returns whether the `payment_secret` feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_payment_secret(this_arg: &InitFeatures) -> bool {
+	let mut ret = unsafe { &*this_arg.inner }.supports_payment_secret();
+	ret
+}
+
+/// Returns whether the `payment_secret` feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_payment_secret(this_arg: &NodeFeatures) -> bool {
+	let mut ret = unsafe { &*this_arg.inner }.supports_payment_secret();
+	ret
+}
+
+/// Returns whether the `payment_secret` feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_supports_payment_secret(this_arg: &InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*this_arg.inner }.supports_payment_secret();
+	ret
 }
 
 #[no_mangle]

@@ -25,3 +25,11 @@ pub mod util;
 pub mod chain;
 pub mod ln;
 pub mod routing;
+mod prelude {
+
+use std::str::FromStr;
+use std::ffi::c_void;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+
+}

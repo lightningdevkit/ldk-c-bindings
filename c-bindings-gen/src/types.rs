@@ -723,6 +723,14 @@ impl FullLibraryAST {
 fn initial_clonable_types() -> HashSet<String> {
 	let mut res = HashSet::new();
 	res.insert("crate::c_types::u5".to_owned());
+	res.insert("crate::c_types::ThirtyTwoBytes".to_owned());
+	res.insert("crate::c_types::PublicKey".to_owned());
+	res.insert("crate::c_types::Transaction".to_owned());
+	res.insert("crate::c_types::TxOut".to_owned());
+	res.insert("crate::c_types::Signature".to_owned());
+	res.insert("crate::c_types::RecoverableSignature".to_owned());
+	res.insert("crate::c_types::Secp256k1Error".to_owned());
+	res.insert("crate::c_types::IOError".to_owned());
 	res
 }
 
@@ -850,9 +858,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		if self.is_primitive(ty) { return true; }
 		match ty {
 			"()" => true,
-			"crate::c_types::Signature" => true,
-			"crate::c_types::RecoverableSignature" => true,
-			"crate::c_types::TxOut" => true,
 			_ => false,
 		}
 	}

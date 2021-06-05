@@ -774,6 +774,8 @@ pub struct Persist {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for Persist {}
+unsafe impl Sync for Persist {}
 
 use lightning::chain::channelmonitor::Persist as rustPersist;
 impl rustPersist<crate::lightning::chain::keysinterface::Sign> for Persist {

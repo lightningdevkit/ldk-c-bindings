@@ -112,9 +112,11 @@ echo > /tmp/crate-source.txt
 if [ "$2" = "true" ]; then
 	add_crate lightning lightning --features=allow_wallclock_use ', features = ["allow_wallclock_use"]'
 	add_crate "lightning-persister" "lightning_persister"
+	add_crate "lightning-background-processor" "lightning_background_processor"
 else
 	add_crate lightning lightning
 	drop_crate "lightning-persister"
+	drop_crate "lightning-background-processor"
 fi
 add_crate "lightning-invoice" "lightning_invoice"
 

@@ -98,6 +98,8 @@ pub struct Access {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for Access {}
+unsafe impl Sync for Access {}
 
 use lightning::chain::Access as rustAccess;
 impl rustAccess for Access {
@@ -146,6 +148,8 @@ pub struct Listen {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for Listen {}
+unsafe impl Sync for Listen {}
 
 use lightning::chain::Listen as rustListen;
 impl rustListen for Listen {
@@ -261,6 +265,8 @@ pub struct Confirm {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for Confirm {}
+unsafe impl Sync for Confirm {}
 
 use lightning::chain::Confirm as rustConfirm;
 impl rustConfirm for Confirm {
@@ -355,6 +361,8 @@ pub struct Watch {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for Watch {}
+unsafe impl Sync for Watch {}
 
 use lightning::chain::Watch as rustWatch;
 impl rustWatch<crate::lightning::chain::keysinterface::Sign> for Watch {
@@ -436,6 +444,8 @@ pub struct Filter {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for Filter {}
+unsafe impl Sync for Filter {}
 
 use lightning::chain::Filter as rustFilter;
 impl rustFilter for Filter {

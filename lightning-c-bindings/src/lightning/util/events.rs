@@ -1055,6 +1055,8 @@ pub struct MessageSendEventsProvider {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for MessageSendEventsProvider {}
+unsafe impl Sync for MessageSendEventsProvider {}
 
 use lightning::util::events::MessageSendEventsProvider as rustMessageSendEventsProvider;
 impl rustMessageSendEventsProvider for MessageSendEventsProvider {
@@ -1122,6 +1124,8 @@ pub struct EventsProvider {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for EventsProvider {}
+unsafe impl Sync for EventsProvider {}
 
 use lightning::util::events::EventsProvider as rustEventsProvider;
 /// Calls the free function if one is set
@@ -1148,6 +1152,8 @@ pub struct EventHandler {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for EventHandler {}
+unsafe impl Sync for EventHandler {}
 
 use lightning::util::events::EventHandler as rustEventHandler;
 impl rustEventHandler for EventHandler {

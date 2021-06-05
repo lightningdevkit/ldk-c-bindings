@@ -645,6 +645,8 @@ pub struct BaseSign {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for BaseSign {}
+unsafe impl Sync for BaseSign {}
 
 use lightning::chain::keysinterface::BaseSign as rustBaseSign;
 impl rustBaseSign for BaseSign {
@@ -749,6 +751,8 @@ pub struct Sign {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for Sign {}
+unsafe impl Sync for Sign {}
 impl lightning::chain::keysinterface::BaseSign for Sign {
 	fn get_per_commitment_point(&self, mut idx: u64, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> bitcoin::secp256k1::key::PublicKey {
 		let mut ret = (self.BaseSign.get_per_commitment_point)(self.this_arg, idx);
@@ -908,6 +912,8 @@ pub struct KeysInterface {
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
+unsafe impl Send for KeysInterface {}
+unsafe impl Sync for KeysInterface {}
 
 use lightning::chain::keysinterface::KeysInterface as rustKeysInterface;
 impl rustKeysInterface for KeysInterface {

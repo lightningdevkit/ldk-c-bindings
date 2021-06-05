@@ -176,7 +176,7 @@ pub struct GenericTypes<'a, 'b> {
 	self_ty: Option<(String, &'a syn::Path)>,
 	parent: Option<&'b GenericTypes<'b, 'b>>,
 	typed_generics: HashMap<&'a syn::Ident, (String, Option<&'a syn::Path>)>,
-	default_generics: HashMap<&'a syn::Ident, (&'a syn::Type, syn::Type)>,
+	default_generics: HashMap<&'a syn::Ident, (syn::Type, syn::Type)>,
 }
 impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 	pub fn new(self_ty: Option<(String, &'a syn::Path)>) -> Self {
@@ -197,7 +197,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 			match generic {
 				syn::GenericParam::Type(type_param) => {
 					let mut non_lifetimes_processed = false;
-					for bound in type_param.bounds.iter() {
+					'bound_loop: for bound in type_param.bounds.iter() {
 						if let syn::TypeParamBound::Trait(trait_bound) = bound {
 							if let Some(ident) = single_ident_generic_path_to_ident(&trait_bound.path) {
 								match &format!("{}", ident) as &str { "Send" => continue, "Sync" => continue, _ => {} }
@@ -213,6 +213,26 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								let new_ident = if path != "std::ops::Deref" && path != "core::ops::Deref" {
 									path = "crate::".to_string() + &path;
 									Some(&trait_bound.path)
+								} else if trait_bound.path.segments.len() == 1 {
+									// If we're templated on Deref<Target = ConcreteThing>, store
+									// the reference type in `default_generics` which handles full
+									// types and not just paths.
+									if let syn::PathArguments::AngleBracketed(ref args) =
+											trait_bound.path.segments[0].arguments {
+										for subargument in args.args.iter() {
+											match subargument {
+												syn::GenericArgument::Lifetime(_) => {},
+												syn::GenericArgument::Binding(ref b) => {
+													if &format!("{}", b.ident) != "Target" { return false; }
+													let default = &b.ty;
+													self.default_generics.insert(&type_param.ident, (parse_quote!(&#default), parse_quote!(&#default)));
+													break 'bound_loop;
+												},
+												_ => unimplemented!(),
+											}
+										}
+										None
+									} else { None }
 								} else { None };
 								self.typed_generics.insert(&type_param.ident, (path, new_ident));
 							} else { return false; }
@@ -220,7 +240,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 					}
 					if let Some(default) = type_param.default.as_ref() {
 						assert!(type_param.bounds.is_empty());
-						self.default_generics.insert(&type_param.ident, (default, parse_quote!(&#default)));
+						self.default_generics.insert(&type_param.ident, (default.clone(), parse_quote!(&#default)));
 					}
 				},
 				_ => {},
@@ -703,6 +723,14 @@ impl FullLibraryAST {
 fn initial_clonable_types() -> HashSet<String> {
 	let mut res = HashSet::new();
 	res.insert("crate::c_types::u5".to_owned());
+	res.insert("crate::c_types::ThirtyTwoBytes".to_owned());
+	res.insert("crate::c_types::PublicKey".to_owned());
+	res.insert("crate::c_types::Transaction".to_owned());
+	res.insert("crate::c_types::TxOut".to_owned());
+	res.insert("crate::c_types::Signature".to_owned());
+	res.insert("crate::c_types::RecoverableSignature".to_owned());
+	res.insert("crate::c_types::Secp256k1Error".to_owned());
+	res.insert("crate::c_types::IOError".to_owned());
 	res
 }
 
@@ -830,9 +858,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		if self.is_primitive(ty) { return true; }
 		match ty {
 			"()" => true,
-			"crate::c_types::Signature" => true,
-			"crate::c_types::RecoverableSignature" => true,
-			"crate::c_types::TxOut" => true,
 			_ => false,
 		}
 	}
@@ -930,6 +955,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"str" if is_ref => Some(""),
 			"alloc::string::String"|"String" => Some(""),
+			"std::io::Error" if !is_ref => Some(""),
 			// Note that we'll panic for String if is_ref, as we only have non-owned memory, we
 			// cannot create a &String.
 
@@ -996,6 +1022,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"str" if is_ref => Some(".into_str()"),
 			"alloc::string::String"|"String" => Some(".into_string()"),
+			"std::io::Error" if !is_ref => Some(".to_rust()"),
 
 			"std::time::Duration"|"core::time::Duration" => Some(")"),
 			"std::time::SystemTime" => Some("))"),

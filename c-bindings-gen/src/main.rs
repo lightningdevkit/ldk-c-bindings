@@ -450,11 +450,11 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		}
 	}
 
+	writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap();
+	writeln!(w, "unsafe impl Sync for {} {{}}", trait_name).unwrap();
 
 	// Implement supertraits for the C-mapped struct.
 	walk_supertraits!(t, Some(&types), (
-		("Send", _) => writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap(),
-		("Sync", _) => writeln!(w, "unsafe impl Sync for {} {{}}", trait_name).unwrap(),
 		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
 			writeln!(w, "impl std::cmp::Eq for {} {{}}", trait_name).unwrap();
 			writeln!(w, "impl std::cmp::PartialEq for {} {{", trait_name).unwrap();
@@ -464,6 +464,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 			writeln!(w, "impl std::hash::Hash for {} {{", trait_name).unwrap();
 			writeln!(w, "\tfn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {{ hasher.write_u64((self.hash)(self.this_arg)) }}\n}}").unwrap();
 		},
+		("Send", _) => {}, ("Sync", _) => {},
 		("Clone", _) => {
 			writeln!(w, "#[no_mangle]").unwrap();
 			writeln!(w, "/// Creates a copy of a {}", trait_name).unwrap();
@@ -495,11 +496,6 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				writeln!(w, "impl {} for {} {{", s, trait_name).unwrap();
 				impl_trait_for_c!(supertrait, format!(".{}", i), &resolver);
 				writeln!(w, "}}").unwrap();
-				walk_supertraits!(supertrait, Some(&types), (
-					("Send", _) => writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap(),
-					("Sync", _) => writeln!(w, "unsafe impl Sync for {} {{}}", trait_name).unwrap(),
-					_ => unimplemented!()
-				) );
 			} else {
 				do_write_impl_trait(w, s, i, &trait_name);
 			}

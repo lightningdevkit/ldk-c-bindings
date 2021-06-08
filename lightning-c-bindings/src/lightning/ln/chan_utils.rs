@@ -617,10 +617,16 @@ pub extern "C" fn make_funding_redeemscript(mut broadcaster: crate::c_types::Pub
 	ret.into_bytes().into()
 }
 
-/// panics if htlc.transaction_output_index.is_none()!
+/// Builds an unsigned HTLC-Success or HTLC-Timeout transaction from the given channel and HTLC
+/// parameters. This is used by [`TrustedCommitmentTransaction::get_htlc_sigs`] to fetch the
+/// transaction which needs signing, and can be used to construct an HTLC transaction which is
+/// broadcastable given a counterparty HTLC signature.
+///
+/// Panics if htlc.transaction_output_index.is_none() (as such HTLCs do not appear in the
+/// commitment transaction).
 #[no_mangle]
-pub extern "C" fn build_htlc_transaction(prev_hash: *const [u8; 32], mut feerate_per_kw: u32, mut contest_delay: u16, htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, mut broadcaster_delayed_payment_key: crate::c_types::PublicKey, mut revocation_key: crate::c_types::PublicKey) -> crate::c_types::Transaction {
-	let mut ret = lightning::ln::chan_utils::build_htlc_transaction(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*prev_hash }[..]).unwrap(), feerate_per_kw, contest_delay, unsafe { &*htlc.inner }, &broadcaster_delayed_payment_key.into_rust(), &revocation_key.into_rust());
+pub extern "C" fn build_htlc_transaction(commitment_txid: *const [u8; 32], mut feerate_per_kw: u32, mut contest_delay: u16, htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, mut broadcaster_delayed_payment_key: crate::c_types::PublicKey, mut revocation_key: crate::c_types::PublicKey) -> crate::c_types::Transaction {
+	let mut ret = lightning::ln::chan_utils::build_htlc_transaction(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*commitment_txid }[..]).unwrap(), feerate_per_kw, contest_delay, unsafe { &*htlc.inner }, &broadcaster_delayed_payment_key.into_rust(), &revocation_key.into_rust());
 	crate::c_types::Transaction::from_bitcoin(&ret)
 }
 
@@ -1494,7 +1500,12 @@ pub extern "C" fn TrustedCommitmentTransaction_get_htlc_sigs(this_arg: &TrustedC
 	local_ret
 }
 
-/// Get the transaction number obscure factor
+/// Commitment transaction numbers which appear in the transactions themselves are XOR'd with a
+/// shared secret first. This prevents on-chain observers from discovering how many commitment
+/// transactions occurred in a channel before it was closed.
+///
+/// This function gets the shared secret from relevant channel public keys and can be used to
+/// \"decrypt\" the commitment transaction number given a commitment transaction on-chain.
 #[no_mangle]
 pub extern "C" fn get_commitment_transaction_number_obscure_factor(mut broadcaster_payment_basepoint: crate::c_types::PublicKey, mut countersignatory_payment_basepoint: crate::c_types::PublicKey, mut outbound_from_broadcaster: bool) -> u64 {
 	let mut ret = lightning::ln::chan_utils::get_commitment_transaction_number_obscure_factor(&broadcaster_payment_basepoint.into_rust(), &countersignatory_payment_basepoint.into_rust(), outbound_from_broadcaster);

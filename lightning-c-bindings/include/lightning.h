@@ -164,9 +164,13 @@ typedef enum LDKCurrency {
     */
    LDKCurrency_Regtest,
    /**
-    * Bitcoin simnet/signet
+    * Bitcoin simnet
     */
    LDKCurrency_Simnet,
+   /**
+    * Bitcoin signet
+    */
+   LDKCurrency_Signet,
    /**
     * Must be last for serialization purposes
     */
@@ -5377,7 +5381,8 @@ typedef enum LDKEvent_Tag {
     */
    LDKEvent_PendingHTLCsForwardable,
    /**
-    * Used to indicate that an output was generated on-chain which you should know how to spend.
+    * Used to indicate that an output which you should know how to spend was confirmed on chain
+    * and is now spendable.
     * Such an output will *not* ever be spent by rust-lightning, and are not at risk of your
     * counterparty spending them due to some kind of timeout. Thus, you need to store them
     * somewhere and spend them when you create on-chain transactions.
@@ -12139,6 +12144,16 @@ void WatchedOutput_set_script_pubkey(struct LDKWatchedOutput *NONNULL_PTR this_p
 MUST_USE_RES struct LDKWatchedOutput WatchedOutput_new(struct LDKThirtyTwoBytes block_hash_arg, struct LDKOutPoint outpoint_arg, struct LDKCVec_u8Z script_pubkey_arg);
 
 /**
+ * Creates a copy of the WatchedOutput
+ */
+struct LDKWatchedOutput WatchedOutput_clone(const struct LDKWatchedOutput *NONNULL_PTR orig);
+
+/**
+ * Checks if two WatchedOutputs contain equal inner contents.
+ */
+uint64_t WatchedOutput_hash(const struct LDKWatchedOutput *NONNULL_PTR o);
+
+/**
  * Calls the free function if one is set
  */
 void BroadcasterInterface_free(struct LDKBroadcasterInterface this_ptr);
@@ -12945,6 +12960,11 @@ void ChainParameters_set_best_block(struct LDKChainParameters *NONNULL_PTR this_
  * Constructs a new ChainParameters given each field
  */
 MUST_USE_RES struct LDKChainParameters ChainParameters_new(enum LDKNetwork network_arg, struct LDKBestBlock best_block_arg);
+
+/**
+ * Creates a copy of the ChainParameters
+ */
+struct LDKChainParameters ChainParameters_clone(const struct LDKChainParameters *NONNULL_PTR orig);
 
 /**
  * Frees any resources used by the BestBlock, if is_owned is set and inner is non-NULL.
@@ -16383,9 +16403,15 @@ struct LDKCVec_u8Z get_htlc_redeemscript(const struct LDKHTLCOutputInCommitment 
 struct LDKCVec_u8Z make_funding_redeemscript(struct LDKPublicKey broadcaster, struct LDKPublicKey countersignatory);
 
 /**
- * panics if htlc.transaction_output_index.is_none()!
+ * Builds an unsigned HTLC-Success or HTLC-Timeout transaction from the given channel and HTLC
+ * parameters. This is used by [`TrustedCommitmentTransaction::get_htlc_sigs`] to fetch the
+ * transaction which needs signing, and can be used to construct an HTLC transaction which is
+ * broadcastable given a counterparty HTLC signature.
+ *
+ * Panics if htlc.transaction_output_index.is_none() (as such HTLCs do not appear in the
+ * commitment transaction).
  */
-struct LDKTransaction build_htlc_transaction(const uint8_t (*prev_hash)[32], uint32_t feerate_per_kw, uint16_t contest_delay, const struct LDKHTLCOutputInCommitment *NONNULL_PTR htlc, struct LDKPublicKey broadcaster_delayed_payment_key, struct LDKPublicKey revocation_key);
+struct LDKTransaction build_htlc_transaction(const uint8_t (*commitment_txid)[32], uint32_t feerate_per_kw, uint16_t contest_delay, const struct LDKHTLCOutputInCommitment *NONNULL_PTR htlc, struct LDKPublicKey broadcaster_delayed_payment_key, struct LDKPublicKey revocation_key);
 
 /**
  * Frees any resources used by the ChannelTransactionParameters, if is_owned is set and inner is non-NULL.
@@ -16760,7 +16786,12 @@ MUST_USE_RES struct LDKTxCreationKeys TrustedCommitmentTransaction_keys(const st
 MUST_USE_RES struct LDKCResult_CVec_SignatureZNoneZ TrustedCommitmentTransaction_get_htlc_sigs(const struct LDKTrustedCommitmentTransaction *NONNULL_PTR this_arg, const uint8_t (*htlc_base_key)[32], const struct LDKDirectedChannelTransactionParameters *NONNULL_PTR channel_parameters);
 
 /**
- * Get the transaction number obscure factor
+ * Commitment transaction numbers which appear in the transactions themselves are XOR'd with a
+ * shared secret first. This prevents on-chain observers from discovering how many commitment
+ * transactions occurred in a channel before it was closed.
+ *
+ * This function gets the shared secret from relevant channel public keys and can be used to
+ * \"decrypt\" the commitment transaction number given a commitment transaction on-chain.
  */
 uint64_t get_commitment_transaction_number_obscure_factor(struct LDKPublicKey broadcaster_payment_basepoint, struct LDKPublicKey countersignatory_payment_basepoint, bool outbound_from_broadcaster);
 

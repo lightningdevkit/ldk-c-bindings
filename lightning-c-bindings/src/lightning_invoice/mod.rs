@@ -617,8 +617,10 @@ pub enum Currency {
 	BitcoinTestnet,
 	/// Bitcoin regtest
 	Regtest,
-	/// Bitcoin simnet/signet
+	/// Bitcoin simnet
 	Simnet,
+	/// Bitcoin signet
+	Signet,
 }
 use lightning_invoice::Currency as nativeCurrency;
 impl Currency {
@@ -629,6 +631,7 @@ impl Currency {
 			Currency::BitcoinTestnet => nativeCurrency::BitcoinTestnet,
 			Currency::Regtest => nativeCurrency::Regtest,
 			Currency::Simnet => nativeCurrency::Simnet,
+			Currency::Signet => nativeCurrency::Signet,
 		}
 	}
 	#[allow(unused)]
@@ -638,6 +641,7 @@ impl Currency {
 			Currency::BitcoinTestnet => nativeCurrency::BitcoinTestnet,
 			Currency::Regtest => nativeCurrency::Regtest,
 			Currency::Simnet => nativeCurrency::Simnet,
+			Currency::Signet => nativeCurrency::Signet,
 		}
 	}
 	#[allow(unused)]
@@ -647,6 +651,7 @@ impl Currency {
 			nativeCurrency::BitcoinTestnet => Currency::BitcoinTestnet,
 			nativeCurrency::Regtest => Currency::Regtest,
 			nativeCurrency::Simnet => Currency::Simnet,
+			nativeCurrency::Signet => Currency::Signet,
 		}
 	}
 	#[allow(unused)]
@@ -656,6 +661,7 @@ impl Currency {
 			nativeCurrency::BitcoinTestnet => Currency::BitcoinTestnet,
 			nativeCurrency::Regtest => Currency::Regtest,
 			nativeCurrency::Simnet => Currency::Simnet,
+			nativeCurrency::Signet => Currency::Signet,
 		}
 	}
 }

@@ -186,6 +186,25 @@ pub extern "C" fn ChainParameters_new(mut network_arg: crate::bitcoin::network::
 		best_block: *unsafe { Box::from_raw(best_block_arg.take_inner()) },
 	})), is_owned: true }
 }
+impl Clone for ChainParameters {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeChainParameters>::is_null(self.inner) { std::ptr::null_mut() } else {
+				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ChainParameters_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChainParameters)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the ChainParameters
+pub extern "C" fn ChainParameters_clone(orig: &ChainParameters) -> ChainParameters {
+	orig.clone()
+}
 
 use lightning::ln::channelmanager::BestBlock as nativeBestBlockImport;
 type nativeBestBlock = nativeBestBlockImport;

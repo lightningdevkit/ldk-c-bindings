@@ -578,3 +578,32 @@ pub extern "C" fn WatchedOutput_new(mut block_hash_arg: crate::c_types::ThirtyTw
 		script_pubkey: ::bitcoin::blockdata::script::Script::from(script_pubkey_arg.into_rust()),
 	})), is_owned: true }
 }
+impl Clone for WatchedOutput {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeWatchedOutput>::is_null(self.inner) { std::ptr::null_mut() } else {
+				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn WatchedOutput_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeWatchedOutput)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the WatchedOutput
+pub extern "C" fn WatchedOutput_clone(orig: &WatchedOutput) -> WatchedOutput {
+	orig.clone()
+}
+/// Checks if two WatchedOutputs contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn WatchedOutput_hash(o: &WatchedOutput) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(unsafe { &*o.inner }, &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}

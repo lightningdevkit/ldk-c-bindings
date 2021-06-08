@@ -641,10 +641,10 @@ int main() {
 	}
 
 	// Actually close the channel
+	num_txs_broadcasted = 0;
 	close_res = ChannelManager_close_channel(&cm1, &chan_id);
 	assert(close_res->result_ok);
 	PeerManager_process_events(&net1);
-	num_txs_broadcasted = 0;
 	while (num_txs_broadcasted != 2) {
 		std::this_thread::yield();
 	}

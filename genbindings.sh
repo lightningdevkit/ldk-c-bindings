@@ -15,7 +15,7 @@ export LC_ALL=C
 ORIG_PWD="$(pwd)"
 cd "$1"
 LIGHTNING_PATH="$(pwd)"
-LIGHTNING_GIT="$(git describe --tag --dirty)"
+LIGHTNING_GIT="$(git describe --tag --dirty --abbrev=16)"
 cd "$ORIG_PWD"
 
 # Generate (and reasonably test) C bindings
@@ -33,7 +33,7 @@ mv lightning-c-bindings/src/bitcoin ./
 
 git checkout lightning-c-bindings/src
 git checkout lightning-c-bindings/include
-BINDINGS_GIT="$(git describe --tag --dirty)"
+BINDINGS_GIT="$(git describe --tag --dirty --abbrev=16)"
 echo -e "#ifndef _LDK_HEADER_VER" > lightning-c-bindings/include/ldk_ver.h
 echo -e "static inline int _ldk_strncmp(const char *s1, const char *s2, uint64_t n) {" >> lightning-c-bindings/include/ldk_ver.h
 echo -e "\tif (n && *s1 != *s2) return 1;" >> lightning-c-bindings/include/ldk_ver.h

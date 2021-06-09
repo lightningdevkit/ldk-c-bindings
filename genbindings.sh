@@ -137,13 +137,15 @@ PATH="$(pwd)/deterministic-build-wrappers:$PATH:~/.cargo/bin"
 cd lightning-c-bindings
 
 # Remap paths so that our builds are deterministic
-export RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo= -C target-cpu=generic"
+export RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo= -C target-cpu=sandybridge"
 
 # If the C compiler supports it, also set -ffile-prefix-map
 echo "int main() {}" > genbindings_path_map_test_file.c
 clang -o /dev/null -ffile-prefix-map=$HOME/.cargo= genbindings_path_map_test_file.c > /dev/null 2>&1 &&
 # Now that we've done our last non-LTO build, turn on LTO in CFLAGS as well
-export CFLAGS="-ffile-prefix-map=$HOME/.cargo="
+export BASE_CFLAGS="-ffile-prefix-map=$HOME/.cargo="
+ENV_TARGET=$(rustc --version --verbose | grep host | awk '{ print $2 }' | sed 's/-/_/g')
+export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 rm genbindings_path_map_test_file.c
 
 cargo build
@@ -307,7 +309,7 @@ if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
 	# The cc-rs crate tries to force -fdata-sections and -ffunction-sections on, which
 	# breaks -fembed-bitcode, so we turn off cc-rs' default flags and specify exactly
 	# what we want here.
-	export CFLAGS="$CFLAGS -fPIC -fembed-bitcode"
+	export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -fPIC -fembed-bitcode -march=sandybridge"
 	export CRATE_CC_NO_DEFAULTS=true
 fi
 
@@ -316,9 +318,9 @@ if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]
 	echo "int main() {}" > genbindings_wasm_test_file.c
 	if clang -nostdlib -o /dev/null --target=wasm32-wasi -Wl,--no-entry genbindings_wasm_test_file.c > /dev/null 2>&1; then
 		# And if it does, build a WASM binary without capturing errors
-		export CFLAGS_wasm32_wasi="-target wasm32"
+		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -target wasm32"
 		cargo rustc -v --target=wasm32-wasi
-		export CFLAGS_wasm32_wasi="-target wasm32 -Os"
+		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -target wasm32 -Os"
 		CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target=wasm32-wasi -- -C embed-bitcode=yes -C opt-level=s -C linker-plugin-lto -C lto
 	else
 		echo "Cannot build WASM lib as clang does not seem to support the wasm32-wasi target"
@@ -332,7 +334,7 @@ if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
 	# or Ubuntu packages). This should work fine on Distros which do more involved
 	# packaging than simply shipping the rustup binaries (eg Debian should Just Work
 	# here).
-	export CFLAGS="$CFLAGS -O3"
+	export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -O3 -fPIC -fembed-bitcode -march=sandybridge"
 	# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 	cargo clean --release
 	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C linker-plugin-lto -C lto -C link-arg=-fuse-ld=lld

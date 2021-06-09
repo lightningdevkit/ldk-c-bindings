@@ -9,6 +9,8 @@ if [ ! -d "$1/lightning" -o "$2" != "true" -a "$2" != "false" ]; then
 	exit 1
 fi
 
+export LC_ALL=C
+
 # On reasonable systems, we can use realpath here, but OSX is a diva with 20-year-old software.
 ORIG_PWD="$(pwd)"
 cd "$1"
@@ -143,7 +145,7 @@ export RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-pat
 echo "int main() {}" > genbindings_path_map_test_file.c
 clang -o /dev/null -ffile-prefix-map=$HOME/.cargo= genbindings_path_map_test_file.c > /dev/null 2>&1 &&
 # Now that we've done our last non-LTO build, turn on LTO in CFLAGS as well
-export BASE_CFLAGS="-ffile-prefix-map=$HOME/.cargo="
+export BASE_CFLAGS="-ffile-prefix-map=$HOME/.cargo= -frandom-seed=42"
 ENV_TARGET=$(rustc --version --verbose | grep host | awk '{ print $2 }' | sed 's/-/_/g')
 export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 rm genbindings_path_map_test_file.c

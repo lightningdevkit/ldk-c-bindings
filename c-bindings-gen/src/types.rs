@@ -1290,16 +1290,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							(").into(), Err(mut e) => crate::c_types::CResultTempl::err(".to_string(), "e".to_string())],
 						").into() }", ContainerPrefixLocation::PerConv))
 			},
-			"Vec" if !is_ref => {
+			"Vec" => {
+				if is_ref {
+					// We should only get here if the single contained has an inner
+					assert!(self.c_type_has_inner(single_contained.unwrap()));
+				}
 				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
-			"Vec" => {
-				// We should only get here if the single contained has an inner
-				assert!(self.c_type_has_inner(single_contained.unwrap()));
-				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "*item".to_string())], "); }", ContainerPrefixLocation::PerConv))
-			},
 			"Slice" => {
-				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "*item".to_string())], "); }", ContainerPrefixLocation::PerConv))
+				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Option" => {
 				let contained_struct = if let Some(syn::Type::Path(p)) = single_contained {

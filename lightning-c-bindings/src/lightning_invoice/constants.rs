@@ -36,7 +36,7 @@ pub static TAG_MIN_FINAL_CLTV_EXPIRY: u8 = lightning_invoice::constants::TAG_MIN
 pub static TAG_FALLBACK: u8 = lightning_invoice::constants::TAG_FALLBACK;
 
 #[no_mangle]
-pub static TAG_ROUTE: u8 = lightning_invoice::constants::TAG_ROUTE;
+pub static TAG_PRIVATE_ROUTE: u8 = lightning_invoice::constants::TAG_PRIVATE_ROUTE;
 
 #[no_mangle]
 pub static TAG_PAYMENT_SECRET: u8 = lightning_invoice::constants::TAG_PAYMENT_SECRET;

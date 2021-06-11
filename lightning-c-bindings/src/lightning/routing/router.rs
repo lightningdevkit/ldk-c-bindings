@@ -287,10 +287,83 @@ pub extern "C" fn Route_read(ser: crate::c_types::u8slice) -> crate::c_types::de
 	local_res
 }
 
+use lightning::routing::router::RouteHint as nativeRouteHintImport;
+type nativeRouteHint = nativeRouteHintImport;
+
+/// A list of hops along a payment path terminating with a channel to the recipient.
+#[must_use]
+#[repr(C)]
+pub struct RouteHint {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeRouteHint,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for RouteHint {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeRouteHint>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(self.inner) };
+		}
+	}
+}
+/// Frees any resources used by the RouteHint, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn RouteHint_free(this_obj: RouteHint) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+extern "C" fn RouteHint_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRouteHint); }
+}
+#[allow(unused)]
+/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+impl RouteHint {
+	pub(crate) fn take_inner(mut self) -> *mut nativeRouteHint {
+		assert!(self.is_owned);
+		let ret = self.inner;
+		self.inner = std::ptr::null_mut();
+		ret
+	}
+}
+/// Checks if two RouteHints contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RouteHint_eq(a: &RouteHint, b: &RouteHint) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+}
+impl Clone for RouteHint {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeRouteHint>::is_null(self.inner) { std::ptr::null_mut() } else {
+				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn RouteHint_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRouteHint)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the RouteHint
+pub extern "C" fn RouteHint_clone(orig: &RouteHint) -> RouteHint {
+	orig.clone()
+}
+
 use lightning::routing::router::RouteHintHop as nativeRouteHintHopImport;
 type nativeRouteHintHop = nativeRouteHintHopImport;
 
-/// A channel descriptor which provides a last-hop route to get_route
+/// A channel descriptor for a hop along a payment path.
 #[must_use]
 #[repr(C)]
 pub struct RouteHintHop {
@@ -449,8 +522,8 @@ pub extern "C" fn RouteHintHop_clone(orig: &RouteHintHop) -> RouteHintHop {
 /// If the payee provided features in their invoice, they should be provided via payee_features.
 /// Without this, MPP will only be used if the payee's features are available in the network graph.
 ///
-/// Extra routing hops between known nodes and the target will be used if they are included in
-/// last_hops.
+/// Private routing paths between a public node and the target may be included in `last_hops`.
+/// Currently, only the last hop in each path is considered.
 ///
 /// If some channels aren't announced, it may be useful to fill in a first_hops with the
 /// results from a local ChannelManager::list_usable_channels() call. If it is filled in, our
@@ -464,7 +537,7 @@ pub extern "C" fn RouteHintHop_clone(orig: &RouteHintHop) -> RouteHintHop {
 /// equal), however the enabled/disabled bit on such channels as well as the
 /// htlc_minimum_msat/htlc_maximum_msat *are* checked as they may change based on the receiving node.
 #[no_mangle]
-pub extern "C" fn get_route(mut our_node_id: crate::c_types::PublicKey, network: &crate::lightning::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, mut payee_features: crate::lightning::ln::features::InvoiceFeatures, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintHopZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+pub extern "C" fn get_route(mut our_node_id: crate::c_types::PublicKey, network: &crate::lightning::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, mut payee_features: crate::lightning::ln::features::InvoiceFeatures, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
 	let mut local_payee_features = if payee_features.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(payee_features.take_inner()) } }) };
 	let mut local_first_hops_base = if first_hops == std::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { unsafe { &*item.inner } }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
 	let mut local_last_hops = Vec::new(); for mut item in last_hops.as_slice().iter() { local_last_hops.push( { unsafe { &*item.inner } }); };

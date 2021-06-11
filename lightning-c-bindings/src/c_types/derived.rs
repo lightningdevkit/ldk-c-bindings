@@ -1661,29 +1661,29 @@ impl Clone for CVec_ChannelDetailsZ {
 	}
 }
 #[repr(C)]
-/// A dynamically-allocated array of crate::lightning::routing::router::RouteHintHops of arbitrary size.
+/// A dynamically-allocated array of crate::lightning::routing::router::RouteHints of arbitrary size.
 /// This corresponds to std::vector in C++
-pub struct CVec_RouteHintHopZ {
+pub struct CVec_RouteHintZ {
 	/// The elements in the array.
 	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
-	pub data: *mut crate::lightning::routing::router::RouteHintHop,
+	pub data: *mut crate::lightning::routing::router::RouteHint,
 	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
-impl CVec_RouteHintHopZ {
-	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::routing::router::RouteHintHop> {
+impl CVec_RouteHintZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::routing::router::RouteHint> {
 		if self.datalen == 0 { return Vec::new(); }
 		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
 		self.data = std::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
-	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::routing::router::RouteHintHop] {
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::routing::router::RouteHint] {
 		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
-impl From<Vec<crate::lightning::routing::router::RouteHintHop>> for CVec_RouteHintHopZ {
-	fn from(v: Vec<crate::lightning::routing::router::RouteHintHop>) -> Self {
+impl From<Vec<crate::lightning::routing::router::RouteHint>> for CVec_RouteHintZ {
+	fn from(v: Vec<crate::lightning::routing::router::RouteHint>) -> Self {
 		let datalen = v.len();
 		let data = Box::into_raw(v.into_boxed_slice());
 		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
@@ -1691,14 +1691,14 @@ impl From<Vec<crate::lightning::routing::router::RouteHintHop>> for CVec_RouteHi
 }
 #[no_mangle]
 /// Frees the buffer pointed to by `data` if `datalen` is non-0.
-pub extern "C" fn CVec_RouteHintHopZ_free(_res: CVec_RouteHintHopZ) { }
-impl Drop for CVec_RouteHintHopZ {
+pub extern "C" fn CVec_RouteHintZ_free(_res: CVec_RouteHintZ) { }
+impl Drop for CVec_RouteHintZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
 		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
-impl Clone for CVec_RouteHintHopZ {
+impl Clone for CVec_RouteHintZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
@@ -4957,29 +4957,29 @@ impl Clone for CResult_PayeePubKeyErrorZ {
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_PayeePubKeyErrorZ_clone(orig: &CResult_PayeePubKeyErrorZ) -> CResult_PayeePubKeyErrorZ { orig.clone() }
 #[repr(C)]
-/// A dynamically-allocated array of crate::lightning_invoice::RouteHints of arbitrary size.
+/// A dynamically-allocated array of crate::lightning_invoice::PrivateRoutes of arbitrary size.
 /// This corresponds to std::vector in C++
-pub struct CVec_RouteHintZ {
+pub struct CVec_PrivateRouteZ {
 	/// The elements in the array.
 	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
-	pub data: *mut crate::lightning_invoice::RouteHint,
+	pub data: *mut crate::lightning_invoice::PrivateRoute,
 	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
-impl CVec_RouteHintZ {
-	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning_invoice::RouteHint> {
+impl CVec_PrivateRouteZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning_invoice::PrivateRoute> {
 		if self.datalen == 0 { return Vec::new(); }
 		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
 		self.data = std::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
-	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning_invoice::RouteHint] {
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning_invoice::PrivateRoute] {
 		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
-impl From<Vec<crate::lightning_invoice::RouteHint>> for CVec_RouteHintZ {
-	fn from(v: Vec<crate::lightning_invoice::RouteHint>) -> Self {
+impl From<Vec<crate::lightning_invoice::PrivateRoute>> for CVec_PrivateRouteZ {
+	fn from(v: Vec<crate::lightning_invoice::PrivateRoute>) -> Self {
 		let datalen = v.len();
 		let data = Box::into_raw(v.into_boxed_slice());
 		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
@@ -4987,14 +4987,14 @@ impl From<Vec<crate::lightning_invoice::RouteHint>> for CVec_RouteHintZ {
 }
 #[no_mangle]
 /// Frees the buffer pointed to by `data` if `datalen` is non-0.
-pub extern "C" fn CVec_RouteHintZ_free(_res: CVec_RouteHintZ) { }
-impl Drop for CVec_RouteHintZ {
+pub extern "C" fn CVec_PrivateRouteZ_free(_res: CVec_PrivateRouteZ) { }
+impl Drop for CVec_PrivateRouteZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
 		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
-impl Clone for CVec_RouteHintZ {
+impl Clone for CVec_PrivateRouteZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
@@ -5454,50 +5454,50 @@ impl Clone for CResult_ExpiryTimeCreationErrorZ {
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ExpiryTimeCreationErrorZ_clone(orig: &CResult_ExpiryTimeCreationErrorZ) -> CResult_ExpiryTimeCreationErrorZ { orig.clone() }
 #[repr(C)]
-/// The contents of CResult_RouteHintCreationErrorZ
-pub union CResult_RouteHintCreationErrorZPtr {
+/// The contents of CResult_PrivateRouteCreationErrorZ
+pub union CResult_PrivateRouteCreationErrorZPtr {
 	/// A pointer to the contents in the success state.
 	/// Reading from this pointer when `result_ok` is not set is undefined.
-	pub result: *mut crate::lightning_invoice::RouteHint,
+	pub result: *mut crate::lightning_invoice::PrivateRoute,
 	/// A pointer to the contents in the error state.
 	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::lightning_invoice::CreationError,
 }
 #[repr(C)]
-/// A CResult_RouteHintCreationErrorZ represents the result of a fallible operation,
-/// containing a crate::lightning_invoice::RouteHint on success and a crate::lightning_invoice::CreationError on failure.
+/// A CResult_PrivateRouteCreationErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning_invoice::PrivateRoute on success and a crate::lightning_invoice::CreationError on failure.
 /// `result_ok` indicates the overall state, and the contents are provided via `contents`.
-pub struct CResult_RouteHintCreationErrorZ {
-	/// The contents of this CResult_RouteHintCreationErrorZ, accessible via either
+pub struct CResult_PrivateRouteCreationErrorZ {
+	/// The contents of this CResult_PrivateRouteCreationErrorZ, accessible via either
 	/// `err` or `result` depending on the state of `result_ok`.
-	pub contents: CResult_RouteHintCreationErrorZPtr,
-	/// Whether this CResult_RouteHintCreationErrorZ represents a success state.
+	pub contents: CResult_PrivateRouteCreationErrorZPtr,
+	/// Whether this CResult_PrivateRouteCreationErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
-/// Creates a new CResult_RouteHintCreationErrorZ in the success state.
-pub extern "C" fn CResult_RouteHintCreationErrorZ_ok(o: crate::lightning_invoice::RouteHint) -> CResult_RouteHintCreationErrorZ {
-	CResult_RouteHintCreationErrorZ {
-		contents: CResult_RouteHintCreationErrorZPtr {
+/// Creates a new CResult_PrivateRouteCreationErrorZ in the success state.
+pub extern "C" fn CResult_PrivateRouteCreationErrorZ_ok(o: crate::lightning_invoice::PrivateRoute) -> CResult_PrivateRouteCreationErrorZ {
+	CResult_PrivateRouteCreationErrorZ {
+		contents: CResult_PrivateRouteCreationErrorZPtr {
 			result: Box::into_raw(Box::new(o)),
 		},
 		result_ok: true,
 	}
 }
 #[no_mangle]
-/// Creates a new CResult_RouteHintCreationErrorZ in the error state.
-pub extern "C" fn CResult_RouteHintCreationErrorZ_err(e: crate::lightning_invoice::CreationError) -> CResult_RouteHintCreationErrorZ {
-	CResult_RouteHintCreationErrorZ {
-		contents: CResult_RouteHintCreationErrorZPtr {
+/// Creates a new CResult_PrivateRouteCreationErrorZ in the error state.
+pub extern "C" fn CResult_PrivateRouteCreationErrorZ_err(e: crate::lightning_invoice::CreationError) -> CResult_PrivateRouteCreationErrorZ {
+	CResult_PrivateRouteCreationErrorZ {
+		contents: CResult_PrivateRouteCreationErrorZPtr {
 			err: Box::into_raw(Box::new(e)),
 		},
 		result_ok: false,
 	}
 }
 #[no_mangle]
-/// Frees any resources used by the CResult_RouteHintCreationErrorZ.
-pub extern "C" fn CResult_RouteHintCreationErrorZ_free(_res: CResult_RouteHintCreationErrorZ) { }
-impl Drop for CResult_RouteHintCreationErrorZ {
+/// Frees any resources used by the CResult_PrivateRouteCreationErrorZ.
+pub extern "C" fn CResult_PrivateRouteCreationErrorZ_free(_res: CResult_PrivateRouteCreationErrorZ) { }
+impl Drop for CResult_PrivateRouteCreationErrorZ {
 	fn drop(&mut self) {
 		if self.result_ok {
 			if unsafe { !(self.contents.result as *mut ()).is_null() } {
@@ -5510,16 +5510,16 @@ impl Drop for CResult_RouteHintCreationErrorZ {
 		}
 	}
 }
-impl From<crate::c_types::CResultTempl<crate::lightning_invoice::RouteHint, crate::lightning_invoice::CreationError>> for CResult_RouteHintCreationErrorZ {
-	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::RouteHint, crate::lightning_invoice::CreationError>) -> Self {
+impl From<crate::c_types::CResultTempl<crate::lightning_invoice::PrivateRoute, crate::lightning_invoice::CreationError>> for CResult_PrivateRouteCreationErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::PrivateRoute, crate::lightning_invoice::CreationError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
 			unsafe { o.contents.result = std::ptr::null_mut() };
-			CResult_RouteHintCreationErrorZPtr { result }
+			CResult_PrivateRouteCreationErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
 			unsafe { o.contents.err = std::ptr::null_mut(); }
-			CResult_RouteHintCreationErrorZPtr { err }
+			CResult_PrivateRouteCreationErrorZPtr { err }
 		};
 		Self {
 			contents,
@@ -5527,23 +5527,23 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::RouteHint, crat
 		}
 	}
 }
-impl Clone for CResult_RouteHintCreationErrorZ {
+impl Clone for CResult_PrivateRouteCreationErrorZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
-			Self { result_ok: true, contents: CResult_RouteHintCreationErrorZPtr {
-				result: Box::into_raw(Box::new(<crate::lightning_invoice::RouteHint>::clone(unsafe { &*self.contents.result })))
+			Self { result_ok: true, contents: CResult_PrivateRouteCreationErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::lightning_invoice::PrivateRoute>::clone(unsafe { &*self.contents.result })))
 			} }
 		} else {
-			Self { result_ok: false, contents: CResult_RouteHintCreationErrorZPtr {
+			Self { result_ok: false, contents: CResult_PrivateRouteCreationErrorZPtr {
 				err: Box::into_raw(Box::new(<crate::lightning_invoice::CreationError>::clone(unsafe { &*self.contents.err })))
 			} }
 		}
 	}
 }
 #[no_mangle]
-/// Creates a new CResult_RouteHintCreationErrorZ which has the same data as `orig`
+/// Creates a new CResult_PrivateRouteCreationErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_RouteHintCreationErrorZ_clone(orig: &CResult_RouteHintCreationErrorZ) -> CResult_RouteHintCreationErrorZ { orig.clone() }
+pub extern "C" fn CResult_PrivateRouteCreationErrorZ_clone(orig: &CResult_PrivateRouteCreationErrorZ) -> CResult_PrivateRouteCreationErrorZ { orig.clone() }
 #[repr(C)]
 /// The contents of CResult_StringErrorZ
 pub union CResult_StringErrorZPtr {

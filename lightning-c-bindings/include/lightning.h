@@ -1425,38 +1425,38 @@ typedef struct LDKCVec_ChannelDetailsZ {
 
 
 /**
- * A channel descriptor which provides a last-hop route to get_route
+ * A list of hops along a payment path terminating with a channel to the recipient.
  */
-typedef struct MUST_USE_STRUCT LDKRouteHintHop {
+typedef struct MUST_USE_STRUCT LDKRouteHint {
    /**
     * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
-   LDKnativeRouteHintHop *inner;
+   LDKnativeRouteHint *inner;
    /**
     * Indicates that this is the only struct which contains the same pointer.
     * Rust functions which take ownership of an object provided via an argument require
     * this to be true and invalidate the object pointed to by inner.
     */
    bool is_owned;
-} LDKRouteHintHop;
+} LDKRouteHint;
 
 /**
- * A dynamically-allocated array of crate::lightning::routing::router::RouteHintHops of arbitrary size.
+ * A dynamically-allocated array of crate::lightning::routing::router::RouteHints of arbitrary size.
  * This corresponds to std::vector in C++
  */
-typedef struct LDKCVec_RouteHintHopZ {
+typedef struct LDKCVec_RouteHintZ {
    /**
     * The elements in the array.
     * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
     */
-   struct LDKRouteHintHop *data;
+   struct LDKRouteHint *data;
    /**
     * The number of elements pointed to by `data`.
     */
    uintptr_t datalen;
-} LDKCVec_RouteHintHopZ;
+} LDKCVec_RouteHintZ;
 
 
 
@@ -4805,36 +4805,36 @@ typedef struct LDKCResult_PayeePubKeyErrorZ {
  * The encoded route has to be <1024 5bit characters long (<=639 bytes or <=12 hops)
  *
  */
-typedef struct MUST_USE_STRUCT LDKRouteHint {
+typedef struct MUST_USE_STRUCT LDKPrivateRoute {
    /**
     * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
-   LDKnativeRouteHint *inner;
+   LDKnativePrivateRoute *inner;
    /**
     * Indicates that this is the only struct which contains the same pointer.
     * Rust functions which take ownership of an object provided via an argument require
     * this to be true and invalidate the object pointed to by inner.
     */
    bool is_owned;
-} LDKRouteHint;
+} LDKPrivateRoute;
 
 /**
- * A dynamically-allocated array of crate::lightning_invoice::RouteHints of arbitrary size.
+ * A dynamically-allocated array of crate::lightning_invoice::PrivateRoutes of arbitrary size.
  * This corresponds to std::vector in C++
  */
-typedef struct LDKCVec_RouteHintZ {
+typedef struct LDKCVec_PrivateRouteZ {
    /**
     * The elements in the array.
     * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
     */
-   struct LDKRouteHint *data;
+   struct LDKPrivateRoute *data;
    /**
     * The number of elements pointed to by `data`.
     */
    uintptr_t datalen;
-} LDKCVec_RouteHintZ;
+} LDKCVec_PrivateRouteZ;
 
 
 
@@ -5075,37 +5075,37 @@ typedef struct LDKCResult_ExpiryTimeCreationErrorZ {
 } LDKCResult_ExpiryTimeCreationErrorZ;
 
 /**
- * The contents of CResult_RouteHintCreationErrorZ
+ * The contents of CResult_PrivateRouteCreationErrorZ
  */
-typedef union LDKCResult_RouteHintCreationErrorZPtr {
+typedef union LDKCResult_PrivateRouteCreationErrorZPtr {
    /**
     * A pointer to the contents in the success state.
     * Reading from this pointer when `result_ok` is not set is undefined.
     */
-   struct LDKRouteHint *result;
+   struct LDKPrivateRoute *result;
    /**
     * A pointer to the contents in the error state.
     * Reading from this pointer when `result_ok` is set is undefined.
     */
    enum LDKCreationError *err;
-} LDKCResult_RouteHintCreationErrorZPtr;
+} LDKCResult_PrivateRouteCreationErrorZPtr;
 
 /**
- * A CResult_RouteHintCreationErrorZ represents the result of a fallible operation,
- * containing a crate::lightning_invoice::RouteHint on success and a crate::lightning_invoice::CreationError on failure.
+ * A CResult_PrivateRouteCreationErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning_invoice::PrivateRoute on success and a crate::lightning_invoice::CreationError on failure.
  * `result_ok` indicates the overall state, and the contents are provided via `contents`.
  */
-typedef struct LDKCResult_RouteHintCreationErrorZ {
+typedef struct LDKCResult_PrivateRouteCreationErrorZ {
    /**
-    * The contents of this CResult_RouteHintCreationErrorZ, accessible via either
+    * The contents of this CResult_PrivateRouteCreationErrorZ, accessible via either
     * `err` or `result` depending on the state of `result_ok`.
     */
-   union LDKCResult_RouteHintCreationErrorZPtr contents;
+   union LDKCResult_PrivateRouteCreationErrorZPtr contents;
    /**
-    * Whether this CResult_RouteHintCreationErrorZ represents a success state.
+    * Whether this CResult_PrivateRouteCreationErrorZ represents a success state.
     */
    bool result_ok;
-} LDKCResult_RouteHintCreationErrorZ;
+} LDKCResult_PrivateRouteCreationErrorZ;
 
 /**
  * The contents of CResult_StringErrorZ
@@ -8746,6 +8746,26 @@ typedef struct MUST_USE_STRUCT LDKDirectedChannelTransactionParameters {
 
 
 /**
+ * A channel descriptor for a hop along a payment path.
+ */
+typedef struct MUST_USE_STRUCT LDKRouteHintHop {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeRouteHintHop *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKRouteHintHop;
+
+
+
+/**
  * A simple newtype for RwLockReadGuard<'a, NetworkGraph>.
  * This exists only to make accessing a RwLock<NetworkGraph> possible from
  * the C bindings, as it can be done directly in Rust code.
@@ -9016,7 +9036,7 @@ extern const uint8_t TAG_MIN_FINAL_CLTV_EXPIRY;
 
 extern const uint8_t TAG_FALLBACK;
 
-extern const uint8_t TAG_ROUTE;
+extern const uint8_t TAG_PRIVATE_ROUTE;
 
 extern const uint8_t TAG_PAYMENT_SECRET;
 
@@ -9435,7 +9455,7 @@ void CVec_ChannelDetailsZ_free(struct LDKCVec_ChannelDetailsZ _res);
 /**
  * Frees the buffer pointed to by `data` if `datalen` is non-0.
  */
-void CVec_RouteHintHopZ_free(struct LDKCVec_RouteHintHopZ _res);
+void CVec_RouteHintZ_free(struct LDKCVec_RouteHintZ _res);
 
 /**
  * Creates a new CResult_RouteLightningErrorZ in the success state.
@@ -10162,7 +10182,7 @@ struct LDKCResult_PayeePubKeyErrorZ CResult_PayeePubKeyErrorZ_clone(const struct
 /**
  * Frees the buffer pointed to by `data` if `datalen` is non-0.
  */
-void CVec_RouteHintZ_free(struct LDKCVec_RouteHintZ _res);
+void CVec_PrivateRouteZ_free(struct LDKCVec_PrivateRouteZ _res);
 
 /**
  * Creates a new CResult_PositiveTimestampCreationErrorZ in the success state.
@@ -10270,25 +10290,25 @@ void CResult_ExpiryTimeCreationErrorZ_free(struct LDKCResult_ExpiryTimeCreationE
 struct LDKCResult_ExpiryTimeCreationErrorZ CResult_ExpiryTimeCreationErrorZ_clone(const struct LDKCResult_ExpiryTimeCreationErrorZ *NONNULL_PTR orig);
 
 /**
- * Creates a new CResult_RouteHintCreationErrorZ in the success state.
+ * Creates a new CResult_PrivateRouteCreationErrorZ in the success state.
  */
-struct LDKCResult_RouteHintCreationErrorZ CResult_RouteHintCreationErrorZ_ok(struct LDKRouteHint o);
+struct LDKCResult_PrivateRouteCreationErrorZ CResult_PrivateRouteCreationErrorZ_ok(struct LDKPrivateRoute o);
 
 /**
- * Creates a new CResult_RouteHintCreationErrorZ in the error state.
+ * Creates a new CResult_PrivateRouteCreationErrorZ in the error state.
  */
-struct LDKCResult_RouteHintCreationErrorZ CResult_RouteHintCreationErrorZ_err(enum LDKCreationError e);
+struct LDKCResult_PrivateRouteCreationErrorZ CResult_PrivateRouteCreationErrorZ_err(enum LDKCreationError e);
 
 /**
- * Frees any resources used by the CResult_RouteHintCreationErrorZ.
+ * Frees any resources used by the CResult_PrivateRouteCreationErrorZ.
  */
-void CResult_RouteHintCreationErrorZ_free(struct LDKCResult_RouteHintCreationErrorZ _res);
+void CResult_PrivateRouteCreationErrorZ_free(struct LDKCResult_PrivateRouteCreationErrorZ _res);
 
 /**
- * Creates a new CResult_RouteHintCreationErrorZ which has the same data as `orig`
+ * Creates a new CResult_PrivateRouteCreationErrorZ which has the same data as `orig`
  * but with all dynamically-allocated buffers duplicated in new buffers.
  */
-struct LDKCResult_RouteHintCreationErrorZ CResult_RouteHintCreationErrorZ_clone(const struct LDKCResult_RouteHintCreationErrorZ *NONNULL_PTR orig);
+struct LDKCResult_PrivateRouteCreationErrorZ CResult_PrivateRouteCreationErrorZ_clone(const struct LDKCResult_PrivateRouteCreationErrorZ *NONNULL_PTR orig);
 
 /**
  * Creates a new CResult_StringErrorZ in the success state.
@@ -17089,6 +17109,23 @@ struct LDKCVec_u8Z Route_write(const struct LDKRoute *NONNULL_PTR obj);
 struct LDKCResult_RouteDecodeErrorZ Route_read(struct LDKu8slice ser);
 
 /**
+ * Frees any resources used by the RouteHint, if is_owned is set and inner is non-NULL.
+ */
+void RouteHint_free(struct LDKRouteHint this_obj);
+
+/**
+ * Checks if two RouteHints contain equal inner contents.
+ * This ignores pointers and is_owned flags and looks at the values in fields.
+ * Two objects with NULL inner values will be considered "equal" here.
+ */
+bool RouteHint_eq(const struct LDKRouteHint *NONNULL_PTR a, const struct LDKRouteHint *NONNULL_PTR b);
+
+/**
+ * Creates a copy of the RouteHint
+ */
+struct LDKRouteHint RouteHint_clone(const struct LDKRouteHint *NONNULL_PTR orig);
+
+/**
  * Frees any resources used by the RouteHintHop, if is_owned is set and inner is non-NULL.
  */
 void RouteHintHop_free(struct LDKRouteHintHop this_obj);
@@ -17176,8 +17213,8 @@ struct LDKRouteHintHop RouteHintHop_clone(const struct LDKRouteHintHop *NONNULL_
  * If the payee provided features in their invoice, they should be provided via payee_features.
  * Without this, MPP will only be used if the payee's features are available in the network graph.
  *
- * Extra routing hops between known nodes and the target will be used if they are included in
- * last_hops.
+ * Private routing paths between a public node and the target may be included in `last_hops`.
+ * Currently, only the last hop in each path is considered.
  *
  * If some channels aren't announced, it may be useful to fill in a first_hops with the
  * results from a local ChannelManager::list_usable_channels() call. If it is filled in, our
@@ -17191,7 +17228,7 @@ struct LDKRouteHintHop RouteHintHop_clone(const struct LDKRouteHintHop *NONNULL_
  * equal), however the enabled/disabled bit on such channels as well as the
  * htlc_minimum_msat/htlc_maximum_msat *are* checked as they may change based on the receiving node.
  */
-struct LDKCResult_RouteLightningErrorZ get_route(struct LDKPublicKey our_node_id, const struct LDKNetworkGraph *NONNULL_PTR network, struct LDKPublicKey payee, struct LDKInvoiceFeatures payee_features, struct LDKCVec_ChannelDetailsZ *first_hops, struct LDKCVec_RouteHintHopZ last_hops, uint64_t final_value_msat, uint32_t final_cltv, struct LDKLogger logger);
+struct LDKCResult_RouteLightningErrorZ get_route(struct LDKPublicKey our_node_id, const struct LDKNetworkGraph *NONNULL_PTR network, struct LDKPublicKey payee, struct LDKInvoiceFeatures payee_features, struct LDKCVec_ChannelDetailsZ *first_hops, struct LDKCVec_RouteHintZ last_hops, uint64_t final_value_msat, uint32_t final_cltv, struct LDKLogger logger);
 
 /**
  * Frees any resources used by the NetworkGraph, if is_owned is set and inner is non-NULL.
@@ -18087,21 +18124,21 @@ bool InvoiceSignature_eq(const struct LDKInvoiceSignature *NONNULL_PTR a, const 
 struct LDKInvoiceSignature InvoiceSignature_clone(const struct LDKInvoiceSignature *NONNULL_PTR orig);
 
 /**
- * Frees any resources used by the RouteHint, if is_owned is set and inner is non-NULL.
+ * Frees any resources used by the PrivateRoute, if is_owned is set and inner is non-NULL.
  */
-void RouteHint_free(struct LDKRouteHint this_obj);
+void PrivateRoute_free(struct LDKPrivateRoute this_obj);
 
 /**
- * Checks if two RouteHints contain equal inner contents.
+ * Checks if two PrivateRoutes contain equal inner contents.
  * This ignores pointers and is_owned flags and looks at the values in fields.
  * Two objects with NULL inner values will be considered "equal" here.
  */
-bool RouteHint_eq(const struct LDKRouteHint *NONNULL_PTR a, const struct LDKRouteHint *NONNULL_PTR b);
+bool PrivateRoute_eq(const struct LDKPrivateRoute *NONNULL_PTR a, const struct LDKPrivateRoute *NONNULL_PTR b);
 
 /**
- * Creates a copy of the RouteHint
+ * Creates a copy of the PrivateRoute
  */
-struct LDKRouteHint RouteHint_clone(const struct LDKRouteHint *NONNULL_PTR orig);
+struct LDKPrivateRoute PrivateRoute_clone(const struct LDKPrivateRoute *NONNULL_PTR orig);
 
 /**
  * Disassembles the `SignedRawInvoice` into its three parts:
@@ -18158,7 +18195,7 @@ MUST_USE_RES struct LDKThirtyTwoBytes RawInvoice_payment_secret(const struct LDK
 
 MUST_USE_RES struct LDKInvoiceFeatures RawInvoice_features(const struct LDKRawInvoice *NONNULL_PTR this_arg);
 
-MUST_USE_RES struct LDKCVec_RouteHintZ RawInvoice_routes(const struct LDKRawInvoice *NONNULL_PTR this_arg);
+MUST_USE_RES struct LDKCVec_PrivateRouteZ RawInvoice_private_routes(const struct LDKRawInvoice *NONNULL_PTR this_arg);
 
 MUST_USE_RES struct LDKCOption_u64Z RawInvoice_amount_pico_btc(const struct LDKRawInvoice *NONNULL_PTR this_arg);
 
@@ -18199,7 +18236,7 @@ MUST_USE_RES struct LDKSignedRawInvoice Invoice_into_signed_raw(struct LDKInvoic
 MUST_USE_RES struct LDKCResult_NoneSemanticErrorZ Invoice_check_signature(const struct LDKInvoice *NONNULL_PTR this_arg);
 
 /**
- * Constructs an `Invoice` from a `SignedInvoice` by checking all its invariants.
+ * Constructs an `Invoice` from a `SignedRawInvoice` by checking all its invariants.
  * ```
  * use lightning_invoice::*;
  *
@@ -18259,7 +18296,12 @@ MUST_USE_RES uint64_t Invoice_min_final_cltv_expiry(const struct LDKInvoice *NON
 /**
  * Returns a list of all routes included in the invoice
  */
-MUST_USE_RES struct LDKCVec_RouteHintZ Invoice_routes(const struct LDKInvoice *NONNULL_PTR this_arg);
+MUST_USE_RES struct LDKCVec_PrivateRouteZ Invoice_private_routes(const struct LDKInvoice *NONNULL_PTR this_arg);
+
+/**
+ * Returns a list of all routes included in the invoice as the underlying hints
+ */
+MUST_USE_RES struct LDKCVec_RouteHintZ Invoice_route_hints(const struct LDKInvoice *NONNULL_PTR this_arg);
 
 /**
  * Returns the currency for which the invoice was issued
@@ -18309,14 +18351,14 @@ MUST_USE_RES uint64_t ExpiryTime_as_seconds(const struct LDKExpiryTime *NONNULL_
 MUST_USE_RES uint64_t ExpiryTime_as_duration(const struct LDKExpiryTime *NONNULL_PTR this_arg);
 
 /**
- * Create a new (partial) route from a list of hops
+ * Creates a new (partial) route from a list of hops
  */
-MUST_USE_RES struct LDKCResult_RouteHintCreationErrorZ RouteHint_new(struct LDKCVec_RouteHintHopZ hops);
+MUST_USE_RES struct LDKCResult_PrivateRouteCreationErrorZ PrivateRoute_new(struct LDKRouteHint hops);
 
 /**
- * Returrn the underlying vector of hops
+ * Returns the underlying list of hops
  */
-MUST_USE_RES struct LDKCVec_RouteHintHopZ RouteHint_into_inner(struct LDKRouteHint this_arg);
+MUST_USE_RES struct LDKRouteHint PrivateRoute_into_inner(struct LDKPrivateRoute this_arg);
 
 /**
  * Creates a copy of the CreationError

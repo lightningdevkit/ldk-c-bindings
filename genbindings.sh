@@ -147,7 +147,17 @@ clang -o /dev/null -ffile-prefix-map=$HOME/.cargo= genbindings_path_map_test_fil
 # Now that we've done our last non-LTO build, turn on LTO in CFLAGS as well
 export BASE_CFLAGS="-ffile-prefix-map=$HOME/.cargo= -frandom-seed=42"
 ENV_TARGET=$(rustc --version --verbose | grep host | awk '{ print $2 }' | sed 's/-/_/g')
-export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+case "$ENV_TARGET" in
+	"x86_64"*)
+		export RUSTFLAGS="$RUSTFLAGS -C target-cpu=sandybridge"
+		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+		;;
+	*)
+		# Assume this isn't targeted at another host and build for the host's CPU.
+		export RUSTFLAGS="$RUSTFLAGS -C target-cpu=native"
+		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -mcpu=native"
+		;;
+esac
 rm genbindings_path_map_test_file.c
 
 cargo build

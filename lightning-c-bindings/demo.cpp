@@ -524,9 +524,8 @@ int main() {
 			LDK::NetworkGraph graph_2_ref = LockedNetworkGraph_graph(&graph_2_locked);
 			LDK::CResult_RouteLightningErrorZ route = get_route(ChannelManager_get_our_node_id(&cm1), &graph_2_ref, ChannelManager_get_our_node_id(&cm2), LDKInvoiceFeatures {
 					.inner = NULL, .is_owned = false
-				}, &outbound_channels, LDKCVec_RouteHintHopZ {
-					.data = NULL, .datalen = 0
-				}, 5000, Invoice_min_final_cltv_expiry(invoice->contents.result), logger1);
+				}, &outbound_channels, Invoice_route_hints(invoice->contents.result),
+				5000, Invoice_min_final_cltv_expiry(invoice->contents.result), logger1);
 			assert(route->result_ok);
 			LDK::CResult_NonePaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash, Invoice_payment_secret(invoice->contents.result));
 			assert(send_res->result_ok);

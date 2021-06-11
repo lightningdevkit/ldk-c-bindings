@@ -18,10 +18,10 @@ crate-type = ["staticlib"
 bitcoin = "0.26"
 secp256k1 = { version = "0.20.1", features = ["global-context-less-secure"] }
 # Note that the following line is matched by genbindings to update the path
-lightning = { git = "https://git.bitcoin.ninja/rust-lightning", rev = "a8038a8234b70bc261f633a9e2b40adebebcd8d4", features = ["allow_wallclock_use"] }
-lightning-persister = { git = "https://git.bitcoin.ninja/rust-lightning", rev = "a8038a8234b70bc261f633a9e2b40adebebcd8d4" }
-lightning-invoice = { git = "https://git.bitcoin.ninja/rust-lightning", rev = "a8038a8234b70bc261f633a9e2b40adebebcd8d4" }
-lightning-background-processor = { git = "https://git.bitcoin.ninja/rust-lightning", rev = "a8038a8234b70bc261f633a9e2b40adebebcd8d4" }
+lightning = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "294009969aef617df4184ff41ef6daa5a445f213", features = ["allow_wallclock_use"] }
+lightning-persister = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "294009969aef617df4184ff41ef6daa5a445f213" }
+lightning-invoice = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "294009969aef617df4184ff41ef6daa5a445f213" }
+lightning-background-processor = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "294009969aef617df4184ff41ef6daa5a445f213" }
 
 [patch.crates-io]
 # Rust-Secp256k1 upstream to get PR 279 until it is released.

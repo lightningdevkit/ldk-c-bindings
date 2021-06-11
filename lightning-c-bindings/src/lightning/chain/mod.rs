@@ -272,7 +272,7 @@ use lightning::chain::Confirm as rustConfirm;
 impl rustConfirm for Confirm {
 	fn transactions_confirmed(&self, mut header: &bitcoin::blockdata::block::BlockHeader, mut txdata: &lightning::chain::transaction::TransactionData, mut height: u32) {
 		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
-		let mut local_txdata = Vec::new(); for item in txdata.iter() { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = *item; let mut local_txdata_0 = (orig_txdata_0_0, crate::c_types::Transaction::from_bitcoin(&orig_txdata_0_1)).into(); local_txdata_0 }); };
+		let mut local_txdata = Vec::new(); for item in txdata.iter() { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item; let mut local_txdata_0 = (orig_txdata_0_0, crate::c_types::Transaction::from_bitcoin(&orig_txdata_0_1)).into(); local_txdata_0 }); };
 		(self.transactions_confirmed)(self.this_arg, &local_header, local_txdata.into(), height)
 	}
 	fn transaction_unconfirmed(&self, mut txid: &bitcoin::hash_types::Txid) {

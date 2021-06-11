@@ -1249,8 +1249,8 @@ pub extern "C" fn InvoiceSignature_clone(orig: &InvoiceSignature) -> InvoiceSign
 	orig.clone()
 }
 
-use lightning_invoice::RouteHint as nativeRouteHintImport;
-type nativeRouteHint = nativeRouteHintImport;
+use lightning_invoice::PrivateRoute as nativePrivateRouteImport;
+type nativePrivateRoute = nativePrivateRouteImport;
 
 /// Private routing information
 ///
@@ -1259,12 +1259,12 @@ type nativeRouteHint = nativeRouteHintImport;
 ///
 #[must_use]
 #[repr(C)]
-pub struct RouteHint {
+pub struct PrivateRoute {
 	/// A pointer to the opaque Rust object.
 
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeRouteHint,
+	pub inner: *mut nativePrivateRoute,
 	/// Indicates that this is the only struct which contains the same pointer.
 
 	/// Rust functions which take ownership of an object provided via an argument require
@@ -1272,44 +1272,44 @@ pub struct RouteHint {
 	pub is_owned: bool,
 }
 
-impl Drop for RouteHint {
+impl Drop for PrivateRoute {
 	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeRouteHint>::is_null(self.inner) {
+		if self.is_owned && !<*mut nativePrivateRoute>::is_null(self.inner) {
 			let _ = unsafe { Box::from_raw(self.inner) };
 		}
 	}
 }
-/// Frees any resources used by the RouteHint, if is_owned is set and inner is non-NULL.
+/// Frees any resources used by the PrivateRoute, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn RouteHint_free(this_obj: RouteHint) { }
+pub extern "C" fn PrivateRoute_free(this_obj: PrivateRoute) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn RouteHint_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRouteHint); }
+extern "C" fn PrivateRoute_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePrivateRoute); }
 }
 #[allow(unused)]
 /// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-impl RouteHint {
-	pub(crate) fn take_inner(mut self) -> *mut nativeRouteHint {
+impl PrivateRoute {
+	pub(crate) fn take_inner(mut self) -> *mut nativePrivateRoute {
 		assert!(self.is_owned);
 		let ret = self.inner;
 		self.inner = std::ptr::null_mut();
 		ret
 	}
 }
-/// Checks if two RouteHints contain equal inner contents.
+/// Checks if two PrivateRoutes contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
 #[no_mangle]
-pub extern "C" fn RouteHint_eq(a: &RouteHint, b: &RouteHint) -> bool {
+pub extern "C" fn PrivateRoute_eq(a: &PrivateRoute, b: &PrivateRoute) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
 }
-impl Clone for RouteHint {
+impl Clone for PrivateRoute {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRouteHint>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativePrivateRoute>::is_null(self.inner) { std::ptr::null_mut() } else {
 				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
 			is_owned: true,
 		}
@@ -1317,12 +1317,12 @@ impl Clone for RouteHint {
 }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn RouteHint_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRouteHint)).clone() })) as *mut c_void
+pub(crate) extern "C" fn PrivateRoute_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePrivateRoute)).clone() })) as *mut c_void
 }
 #[no_mangle]
-/// Creates a copy of the RouteHint
-pub extern "C" fn RouteHint_clone(orig: &RouteHint) -> RouteHint {
+/// Creates a copy of the PrivateRoute
+pub extern "C" fn PrivateRoute_clone(orig: &PrivateRoute) -> PrivateRoute {
 	orig.clone()
 }
 /// Disassembles the `SignedRawInvoice` into its three parts:
@@ -1453,9 +1453,9 @@ pub extern "C" fn RawInvoice_features(this_arg: &RawInvoice) -> crate::lightning
 
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_routes(this_arg: &RawInvoice) -> crate::c_types::derived::CVec_RouteHintZ {
-	let mut ret = unsafe { &*this_arg.inner }.routes();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning_invoice::RouteHint { inner: unsafe { ( (&(**item) as *const _) as *mut _) }, is_owned: false } }); };
+pub extern "C" fn RawInvoice_private_routes(this_arg: &RawInvoice) -> crate::c_types::derived::CVec_PrivateRouteZ {
+	let mut ret = unsafe { &*this_arg.inner }.private_routes();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning_invoice::PrivateRoute { inner: unsafe { ( (&(*item) as *const _) as *mut _) }, is_owned: false } }); };
 	local_ret.into()
 }
 
@@ -1529,7 +1529,7 @@ pub extern "C" fn Invoice_check_signature(this_arg: &Invoice) -> crate::c_types:
 	local_ret
 }
 
-/// Constructs an `Invoice` from a `SignedInvoice` by checking all its invariants.
+/// Constructs an `Invoice` from a `SignedRawInvoice` by checking all its invariants.
 /// ```
 /// use lightning_invoice::*;
 ///
@@ -1621,9 +1621,18 @@ pub extern "C" fn Invoice_min_final_cltv_expiry(this_arg: &Invoice) -> u64 {
 /// Returns a list of all routes included in the invoice
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_routes(this_arg: &Invoice) -> crate::c_types::derived::CVec_RouteHintZ {
-	let mut ret = unsafe { &*this_arg.inner }.routes();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning_invoice::RouteHint { inner: unsafe { ( (&(**item) as *const _) as *mut _) }, is_owned: false } }); };
+pub extern "C" fn Invoice_private_routes(this_arg: &Invoice) -> crate::c_types::derived::CVec_PrivateRouteZ {
+	let mut ret = unsafe { &*this_arg.inner }.private_routes();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning_invoice::PrivateRoute { inner: unsafe { ( (&(*item) as *const _) as *mut _) }, is_owned: false } }); };
+	local_ret.into()
+}
+
+/// Returns a list of all routes included in the invoice as the underlying hints
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Invoice_route_hints(this_arg: &Invoice) -> crate::c_types::derived::CVec_RouteHintZ {
+	let mut ret = unsafe { &*this_arg.inner }.route_hints();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::routing::router::RouteHint { inner: unsafe { ( (&(*item) as *const _) as *mut _) }, is_owned: false } }); };
 	local_ret.into()
 }
 
@@ -1702,23 +1711,21 @@ pub extern "C" fn ExpiryTime_as_duration(this_arg: &ExpiryTime) -> u64 {
 	ret.as_secs()
 }
 
-/// Create a new (partial) route from a list of hops
+/// Creates a new (partial) route from a list of hops
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RouteHint_new(mut hops: crate::c_types::derived::CVec_RouteHintHopZ) -> crate::c_types::derived::CResult_RouteHintCreationErrorZ {
-	let mut local_hops = Vec::new(); for mut item in hops.into_rust().drain(..) { local_hops.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
-	let mut ret = lightning_invoice::RouteHint::new(local_hops);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::RouteHint { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
+pub extern "C" fn PrivateRoute_new(mut hops: crate::lightning::routing::router::RouteHint) -> crate::c_types::derived::CResult_PrivateRouteCreationErrorZ {
+	let mut ret = lightning_invoice::PrivateRoute::new(*unsafe { Box::from_raw(hops.take_inner()) });
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PrivateRoute { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
 	local_ret
 }
 
-/// Returrn the underlying vector of hops
+/// Returns the underlying list of hops
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RouteHint_into_inner(mut this_arg: RouteHint) -> crate::c_types::derived::CVec_RouteHintHopZ {
+pub extern "C" fn PrivateRoute_into_inner(mut this_arg: PrivateRoute) -> crate::lightning::routing::router::RouteHint {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).into_inner();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::routing::router::RouteHintHop { inner: Box::into_raw(Box::new(item)), is_owned: true } }); };
-	local_ret.into()
+	crate::lightning::routing::router::RouteHint { inner: Box::into_raw(Box::new(ret)), is_owned: true }
 }
 
 /// Errors that may occur when constructing a new `RawInvoice` or `Invoice`

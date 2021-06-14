@@ -145,7 +145,7 @@ LOCAL_CFLAGS="" # CFLAGS for demo apps
 BASE_RUSTFLAGS="" # RUSTFLAGS
 
 # Remap paths so that our builds are deterministic
-export RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo= -C target-cpu=sandybridge"
+BASE_RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo="
 
 # If the C compiler supports it, also set -ffile-prefix-map
 echo "int main() {}" > genbindings_path_map_test_file.c
@@ -158,23 +158,30 @@ LOCAL_CFLAGS="-Wall -Wno-nullability-completeness -pthread -Iinclude/"
 if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 	LOCAL_CFLAGS="$LOCAL_CFLAGS -isysroot$(xcrun --show-sdk-path)"
 	BASE_CFLAGS="$BASE_CFLAGS -isysroot$(xcrun --show-sdk-path)"
+	# Targeting aarch64 appears to be supported only starting with Big Sur, so check it before use
+	clang -o /dev/null -target=aarch64-apple-darwin -mcpu=apple-a14 genbindings_path_map_test_file.c > /dev/null 2>&1 &&
+	export CFLAGS_aarch64_apple_darwin="$BASE_CFLAGS -target=aarch64-apple-darwin -mcpu=apple-a14"
 fi
+
+rm genbindings_path_map_test_file.c
 
 ENV_TARGET=$(rustc --version --verbose | grep host | awk '{ print $2 }' | sed 's/-/_/g')
 case "$ENV_TARGET" in
 	"x86_64"*)
-		export RUSTFLAGS="$RUSTFLAGS -C target-cpu=sandybridge"
+		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge"
 		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 		;;
 	*)
 		# Assume this isn't targeted at another host and build for the host's CPU.
-		export RUSTFLAGS="$RUSTFLAGS -C target-cpu=native"
+		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=native"
 		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -mcpu=native"
 		;;
 esac
-rm genbindings_path_map_test_file.c
 
 cargo build
+if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
+	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" cargo build --target aarch64-apple-darwin
+fi
 cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1
 
 # cbindgen is relatively braindead when exporting typedefs -
@@ -293,6 +300,9 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "
 		else
 			sed -i.bk 's/,"cdylib"]/]/g' Cargo.toml
 		fi
+		if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
+			RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" RUSTC_BOOTSTRAP=1 cargo rustc --target aarch64-apple-darwin -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
+		fi
 		RUSTC_BOOTSTRAP=1 cargo rustc -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
 		mv Cargo.toml.bk Cargo.toml
 
@@ -344,6 +354,10 @@ if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]
 		echo "Cannot build WASM lib as clang does not seem to support the wasm32-wasi target"
 	fi
 	rm genbindings_wasm_test_file.c
+fi
+
+if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
+	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target aarch64-apple-darwin -- -C lto
 fi
 
 if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then

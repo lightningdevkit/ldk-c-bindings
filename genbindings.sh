@@ -156,11 +156,13 @@ BASE_CFLAGS="$BASE_CFLAGS -frandom-seed=42"
 LOCAL_CFLAGS="-Wall -Wno-nullability-completeness -pthread -Iinclude/"
 
 if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
-	LOCAL_CFLAGS="$LOCAL_CFLAGS -isysroot$(xcrun --show-sdk-path)"
-	BASE_CFLAGS="$BASE_CFLAGS -isysroot$(xcrun --show-sdk-path)"
+	export MACOSX_DEPLOYMENT_TARGET=10.9
+	LOCAL_CFLAGS="$LOCAL_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
+	BASE_CFLAGS="$BASE_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
 	# Targeting aarch64 appears to be supported only starting with Big Sur, so check it before use
-	clang -o /dev/null -target=aarch64-apple-darwin -mcpu=apple-a14 genbindings_path_map_test_file.c > /dev/null 2>&1 &&
-	export CFLAGS_aarch64_apple_darwin="$BASE_CFLAGS -target=aarch64-apple-darwin -mcpu=apple-a14"
+	clang -o /dev/null $BASE_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14 genbindings_path_map_test_file.c &&
+	export CFLAGS_aarch64_apple_darwin="$BASE_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14" ||
+	echo "WARNING: Can not build targeting aarch64-apple-darin. Upgrade to Big Sur or try upstream clang"
 fi
 
 rm genbindings_path_map_test_file.c

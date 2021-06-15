@@ -134,33 +134,54 @@ echo -e '\t"'"$BINDINGS_GIT"'".into()' >> lightning-c-bindings/src/version.rs
 echo -e '}' >> lightning-c-bindings/src/version.rs
 
 # Set path to include our rustc wrapper as well as cbindgen
+export LDK_RUSTC_PATH="$(which rustc)"
 PATH="$(pwd)/deterministic-build-wrappers:$PATH:~/.cargo/bin"
 # Now cd to lightning-c-bindings, build the generated bindings, and call cbindgen to build a C header file
 cd lightning-c-bindings
 
+# Set up CFLAGS and RUSTFLAGS vars appropriately for building libsecp256k1 and demo apps...
+BASE_CFLAGS="" # CFLAGS for libsecp256k1
+LOCAL_CFLAGS="" # CFLAGS for demo apps
+BASE_RUSTFLAGS="" # RUSTFLAGS
+
 # Remap paths so that our builds are deterministic
-export RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo= -C target-cpu=sandybridge"
+BASE_RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo="
 
 # If the C compiler supports it, also set -ffile-prefix-map
 echo "int main() {}" > genbindings_path_map_test_file.c
 clang -o /dev/null -ffile-prefix-map=$HOME/.cargo= genbindings_path_map_test_file.c > /dev/null 2>&1 &&
-# Now that we've done our last non-LTO build, turn on LTO in CFLAGS as well
-export BASE_CFLAGS="-ffile-prefix-map=$HOME/.cargo= -frandom-seed=42"
+export BASE_CFLAGS="-ffile-prefix-map=$HOME/.cargo="
+
+BASE_CFLAGS="$BASE_CFLAGS -frandom-seed=42"
+LOCAL_CFLAGS="-Wall -Wno-nullability-completeness -pthread -Iinclude/"
+
+if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+	LOCAL_CFLAGS="$LOCAL_CFLAGS -isysroot$(xcrun --show-sdk-path)"
+	BASE_CFLAGS="$BASE_CFLAGS -isysroot$(xcrun --show-sdk-path)"
+	# Targeting aarch64 appears to be supported only starting with Big Sur, so check it before use
+	clang -o /dev/null -target=aarch64-apple-darwin -mcpu=apple-a14 genbindings_path_map_test_file.c > /dev/null 2>&1 &&
+	export CFLAGS_aarch64_apple_darwin="$BASE_CFLAGS -target=aarch64-apple-darwin -mcpu=apple-a14"
+fi
+
+rm genbindings_path_map_test_file.c
+
 ENV_TARGET=$(rustc --version --verbose | grep host | awk '{ print $2 }' | sed 's/-/_/g')
 case "$ENV_TARGET" in
 	"x86_64"*)
-		export RUSTFLAGS="$RUSTFLAGS -C target-cpu=sandybridge"
+		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge"
 		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 		;;
 	*)
 		# Assume this isn't targeted at another host and build for the host's CPU.
-		export RUSTFLAGS="$RUSTFLAGS -C target-cpu=native"
+		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=native"
 		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -mcpu=native"
 		;;
 esac
-rm genbindings_path_map_test_file.c
 
 cargo build
+if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
+	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" cargo build --target aarch64-apple-darwin
+fi
 cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1
 
 # cbindgen is relatively braindead when exporting typedefs -
@@ -182,9 +203,6 @@ else
 fi
 
 # Finally, sanity-check the generated C and C++ bindings with demo apps:
-
-LOCAL_CFLAGS="-Wall -Wno-nullability-completeness -pthread -Iinclude/"
-
 # Naively run the C demo app:
 gcc $LOCAL_CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl
 ./a.out
@@ -243,23 +261,13 @@ fi
 RUSTC_LLVM_V=$(rustc --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 2); }' | tr -d '.')
 
 if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
-	# Apple is special, as always, and decided that they must ensure that there is no way to identify
-	# the LLVM version used. Why? Just to make your life hard.
-	# This list is taken from https://en.wikipedia.org/wiki/Xcode
-	APPLE_CLANG_V=$(clang --version | head -n1 | awk '{ print $4 }')
-	if [ "$APPLE_CLANG_V" = "10.0.0" ]; then
-		CLANG_LLVM_V="6"
-	elif [ "$APPLE_CLANG_V" = "10.0.1" ]; then
-		CLANG_LLVM_V="7"
-	elif [ "$APPLE_CLANG_V" = "11.0.0" ]; then
-		CLANG_LLVM_V="8"
-	elif [ "$APPLE_CLANG_V" = "11.0.3" ]; then
-		CLANG_LLVM_V="9"
-	elif [ "$APPLE_CLANG_V" = "12.0.0" ]; then
-		CLANG_LLVM_V="10"
-	else
-		echo "WARNING: Unable to identify Apple clang LLVM version"
+	# Apple is special, as always, and their versions of clang aren't
+	# compatible with upstream LLVM.
+	if [ "$(clang --version | grep 'Apple clang')" != "" ]; then
+		echo "Apple clang isn't compatible with upstream clang, install upstream clang"
 		CLANG_LLVM_V="0"
+	else
+		CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }' | tr -d '.')
 	fi
 else
 	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }' | tr -d '.')
@@ -270,7 +278,12 @@ if [ "$CLANG_LLVM_V" = "$RUSTC_LLVM_V" ]; then
 	CLANGPP=clang++
 elif [ "$(which clang-$RUSTC_LLVM_V)" != "" ]; then
 	CLANG="$(which clang-$RUSTC_LLVM_V)"
-	CLANGPP="$(which clang++-$RUSTC_LLVM_V)"
+	CLANGPP="$(which clang++-$RUSTC_LLVM_V || echo clang++)"
+	if [ "$($CLANG --version)" != "$($CLANGPP --version)" ]; then
+		echo "$CLANG and $CLANGPP are not the same version of clang!"
+		unset CLANG
+		unset CLANGPP
+	fi
 fi
 
 if [ "$CLANG" != "" -a "$CLANGPP" = "" ]; then
@@ -286,6 +299,9 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "
 			sed -i .bk 's/,"cdylib"]/]/g' Cargo.toml
 		else
 			sed -i.bk 's/,"cdylib"]/]/g' Cargo.toml
+		fi
+		if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
+			RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" RUSTC_BOOTSTRAP=1 cargo rustc --target aarch64-apple-darwin -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
 		fi
 		RUSTC_BOOTSTRAP=1 cargo rustc -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
 		mv Cargo.toml.bk Cargo.toml
@@ -338,6 +354,10 @@ if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]
 		echo "Cannot build WASM lib as clang does not seem to support the wasm32-wasi target"
 	fi
 	rm genbindings_wasm_test_file.c
+fi
+
+if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
+	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target aarch64-apple-darwin -- -C lto
 fi
 
 if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then

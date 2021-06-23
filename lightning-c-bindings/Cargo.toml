@@ -16,16 +16,12 @@ crate-type = ["staticlib"
 
 [dependencies]
 bitcoin = "0.26"
-secp256k1 = { version = "0.20.1", features = ["global-context-less-secure"] }
+secp256k1 = { version = "0.20.3", features = ["global-context-less-secure"] }
 # Note that the following line is matched by genbindings to update the path
 lightning = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "294009969aef617df4184ff41ef6daa5a445f213", features = ["allow_wallclock_use"] }
 lightning-persister = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "294009969aef617df4184ff41ef6daa5a445f213" }
 lightning-invoice = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "294009969aef617df4184ff41ef6daa5a445f213" }
 lightning-background-processor = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "294009969aef617df4184ff41ef6daa5a445f213" }
-
-[patch.crates-io]
-# Rust-Secp256k1 upstream to get PR 279 until it is released.
-secp256k1 = { git = 'https://github.com/TheBlueMatt/rust-secp256k1' }
 
 # Always force panic=abort, further options are set in the genbindings.sh build script
 [profile.dev]

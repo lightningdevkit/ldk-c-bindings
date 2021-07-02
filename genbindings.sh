@@ -209,14 +209,22 @@ fi
 gcc $LOCAL_CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl
 ./a.out
 
-# And run the C++ demo app in valgrind to test memory model correctness and lack of leaks.
+# And run the C++ demo app
 g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread demo.cpp -Ltarget/debug/ -lldk -ldl
+LD_LIBRARY_PATH=target/debug/ ./a.out > /dev/null
+
+# Finally, run the C++ demo app with our native networking library
+# in valgrind to test memory model correctness and lack of leaks.
+gcc $LOCAL_CFLAGS -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
 if [ -x "`which valgrind`" ]; then
-	LD_LIBRARY_PATH=target/debug/ valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
+	valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
 	echo
 else
 	echo "WARNING: Please install valgrind for more testing"
+	./a.out
 fi
+
 
 # Test a statically-linked C++ version, tracking the resulting binary size and runtime
 # across debug, LTO, and cross-language LTO builds (using the same compiler each time).
@@ -246,6 +254,11 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" ]; then
 
 			# ...then the C++ demo app
 			clang++-$LLVM_V $LOCAL_CFLAGS -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g demo.cpp target/debug/libldk.a -ldl
+			./a.out >/dev/null
+
+			# ...then the C++ demo app with the ldk_net network implementation
+			clang-$LLVM_V $LOCAL_CFLAGS -std=c99 -fsanitize=memory -fsanitize-memory-track-origins -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+			clang++-$LLVM_V $LOCAL_CFLAGS -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
 			./a.out >/dev/null
 
 			# restore exit-on-failure
@@ -314,6 +327,11 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "
 
 		# ...then the C++ demo app
 		$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g demo.cpp target/debug/libldk.a -ldl
+		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
+
+		# ...then the C++ demo app with the ldk_net network implementation
+		$CLANG $LOCAL_CFLAGS -fsanitize=address -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+		$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
 		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
 	else
 		echo "WARNING: Please install clang-$RUSTC_LLVM_V and clang++-$RUSTC_LLVM_V to build with address sanitizer"

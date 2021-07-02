@@ -1,11 +1,17 @@
 extern "C" {
 #include <lightning.h>
+
+#ifdef REAL_NET
+#include <ldk_net.h>
+#endif
 }
 #include "include/lightningpp.hpp"
 
 #include <assert.h>
 #include <stdio.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 
 #include <atomic>
@@ -193,6 +199,68 @@ void handle_event(const void *this_arg, LDKEvent event) {
 	arg->events.push_back(std::move(event));
 }
 
+#ifdef REAL_NET
+class PeersConnection {
+	void* node1_handler;
+	void* node2_handler;
+
+public:
+	PeersConnection(LDK::ChannelManager& cm1, LDK::ChannelManager& cm2, LDK::PeerManager& net1, LDK::PeerManager& net2) {
+		node1_handler = init_socket_handling(&net1);
+		node2_handler = init_socket_handling(&net2);
+
+		struct sockaddr_in listen_addr;
+		listen_addr.sin_family = AF_INET;
+		listen_addr.sin_addr.s_addr = htonl((127 << 8*3) | 1);
+		listen_addr.sin_port = htons(10042);
+		assert(!socket_bind(node2_handler, (sockaddr*)&listen_addr, sizeof(listen_addr)));
+
+		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));
+
+		while (true) {
+			// Wait for the initial handshakes to complete...
+			LDK::CVec_PublicKeyZ peers_1 = PeerManager_get_peer_node_ids(&net1);
+			LDK::CVec_PublicKeyZ peers_2 = PeerManager_get_peer_node_ids(&net2);
+			if (peers_1->datalen == 1 && peers_2->datalen == 1) { break; }
+			std::this_thread::yield();
+		}
+
+		// Connect twice, which should auto-disconnect, and is a good test of our disconnect pipeline
+		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));
+		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));
+
+		// Then disconnect the "main" connection, while another connection is being made.
+		PeerManager_disconnect_by_node_id(&net1, ChannelManager_get_our_node_id(&cm2), false);
+		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));
+
+		// Wait for all our sockets to disconnect (making sure we disconnect any new connections)...
+		while (true) {
+			PeerManager_disconnect_by_node_id(&net1, ChannelManager_get_our_node_id(&cm2), false);
+			// Wait for the peers to disconnect...
+			LDK::CVec_PublicKeyZ peers_1 = PeerManager_get_peer_node_ids(&net1);
+			LDK::CVec_PublicKeyZ peers_2 = PeerManager_get_peer_node_ids(&net2);
+			if (peers_1->datalen == 0 && peers_2->datalen == 0) { break; }
+			std::this_thread::yield();
+		}
+
+		// Finally make an actual connection and keep it this time
+		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));
+
+		while (true) {
+			// Wait for the initial handshakes to complete...
+			LDK::CVec_PublicKeyZ peers_1 = PeerManager_get_peer_node_ids(&net1);
+			LDK::CVec_PublicKeyZ peers_2 = PeerManager_get_peer_node_ids(&net2);
+			if (peers_1->datalen == 1 && peers_2->datalen == 1) { break; }
+			std::this_thread::yield();
+		}
+	}
+	void stop() {
+		interrupt_socket_handling(node1_handler);
+		interrupt_socket_handling(node2_handler);
+	}
+};
+
+#else // REAL_NET
 
 uintptr_t sock_send_data(void *this_arg, LDKu8slice data, bool resume_read) {
 	return write((int)((long)this_arg), data.data, data.datalen);
@@ -284,6 +352,7 @@ public:
 		t2.join();
 	}
 };
+#endif // !REAL_NET
 
 int main() {
 	uint8_t channel_open_header[80];

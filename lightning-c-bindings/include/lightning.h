@@ -210,29 +210,25 @@ typedef enum LDKIOError {
  */
 typedef enum LDKLevel {
    /**
-    *Designates logger being silent
+    * Designates very low priority, often extremely verbose, information
     */
-   LDKLevel_Off,
-   /**
-    * Designates very serious errors
-    */
-   LDKLevel_Error,
-   /**
-    * Designates hazardous situations
-    */
-   LDKLevel_Warn,
-   /**
-    * Designates useful information
-    */
-   LDKLevel_Info,
+   LDKLevel_Trace,
    /**
     * Designates lower priority information
     */
    LDKLevel_Debug,
    /**
-    * Designates very low priority, often extremely verbose, information
+    * Designates useful information
     */
-   LDKLevel_Trace,
+   LDKLevel_Info,
+   /**
+    * Designates hazardous situations
+    */
+   LDKLevel_Warn,
+   /**
+    * Designates very serious errors
+    */
+   LDKLevel_Error,
    /**
     * Must be last for serialization purposes
     */
@@ -2210,6 +2206,11 @@ typedef enum LDKErrorAction_Tag {
     */
    LDKErrorAction_IgnoreError,
    /**
+    * The peer did something harmless that we weren't able to meaningfully process.
+    * If the error is logged, log it at the given level.
+    */
+   LDKErrorAction_IgnoreAndLog,
+   /**
     * The peer did something incorrect. Tell them.
     */
    LDKErrorAction_SendErrorMessage,
@@ -2237,6 +2238,9 @@ typedef struct MUST_USE_STRUCT LDKErrorAction {
    LDKErrorAction_Tag tag;
    union {
       LDKErrorAction_LDKDisconnectPeer_Body disconnect_peer;
+      struct {
+         enum LDKLevel ignore_and_log;
+      };
       LDKErrorAction_LDKSendErrorMessage_Body send_error_message;
    };
 } LDKErrorAction;
@@ -2455,6 +2459,12 @@ typedef enum LDKMessageSendEvent_Tag {
     */
    LDKMessageSendEvent_BroadcastChannelUpdate,
    /**
+    * Used to indicate that a channel_update should be sent to a single peer.
+    * In contrast to [`Self::BroadcastChannelUpdate`], this is used when the channel is a
+    * private channel and we shouldn't be informing all of our peers of channel parameters.
+    */
+   LDKMessageSendEvent_SendChannelUpdate,
+   /**
     * Broadcast an error downstream to be handled
     */
    LDKMessageSendEvent_HandleError,
@@ -2629,6 +2639,17 @@ typedef struct LDKMessageSendEvent_LDKBroadcastChannelUpdate_Body {
    struct LDKChannelUpdate msg;
 } LDKMessageSendEvent_LDKBroadcastChannelUpdate_Body;
 
+typedef struct LDKMessageSendEvent_LDKSendChannelUpdate_Body {
+   /**
+    * The node_id of the node which should receive this message
+    */
+   struct LDKPublicKey node_id;
+   /**
+    * The channel_update which should be sent.
+    */
+   struct LDKChannelUpdate msg;
+} LDKMessageSendEvent_LDKSendChannelUpdate_Body;
+
 typedef struct LDKMessageSendEvent_LDKHandleError_Body {
    /**
     * The node_id of the node which should receive this message
@@ -2697,6 +2718,7 @@ typedef struct MUST_USE_STRUCT LDKMessageSendEvent {
       LDKMessageSendEvent_LDKBroadcastChannelAnnouncement_Body broadcast_channel_announcement;
       LDKMessageSendEvent_LDKBroadcastNodeAnnouncement_Body broadcast_node_announcement;
       LDKMessageSendEvent_LDKBroadcastChannelUpdate_Body broadcast_channel_update;
+      LDKMessageSendEvent_LDKSendChannelUpdate_Body send_channel_update;
       LDKMessageSendEvent_LDKHandleError_Body handle_error;
       LDKMessageSendEvent_LDKPaymentFailureNetworkUpdate_Body payment_failure_network_update;
       LDKMessageSendEvent_LDKSendChannelRangeQuery_Body send_channel_range_query;
@@ -3666,6 +3688,33 @@ typedef struct LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
     */
    bool result_ok;
 } LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ;
+
+/**
+ * An enum which can either contain a u16 or not
+ */
+typedef enum LDKCOption_u16Z_Tag {
+   /**
+    * When we're in this state, this COption_u16Z contains a u16
+    */
+   LDKCOption_u16Z_Some,
+   /**
+    * When we're in this state, this COption_u16Z contains nothing
+    */
+   LDKCOption_u16Z_None,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKCOption_u16Z_Sentinel,
+} LDKCOption_u16Z_Tag;
+
+typedef struct LDKCOption_u16Z {
+   LDKCOption_u16Z_Tag tag;
+   union {
+      struct {
+         uint16_t some;
+      };
+   };
+} LDKCOption_u16Z;
 
 /**
  * Indicates an error on the client's part (usually some variant of attempting to use too-low or
@@ -7900,6 +7949,26 @@ typedef struct MUST_USE_STRUCT LDKUserConfig {
    bool is_owned;
 } LDKUserConfig;
 
+
+
+/**
+ * The best known block as identified by its hash and height.
+ */
+typedef struct MUST_USE_STRUCT LDKBestBlock {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeBestBlock *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKBestBlock;
+
 /**
  * The `Access` trait defines behavior for accessing chain data and state, such as blocks and
  * UTXOs.
@@ -8277,22 +8346,23 @@ typedef struct MUST_USE_STRUCT LDKChainParameters {
 
 
 /**
- * The best known block as identified by its hash and height.
+ * Channel parameters which apply to our counterparty. These are split out from [`ChannelDetails`]
+ * to better separate parameters.
  */
-typedef struct MUST_USE_STRUCT LDKBestBlock {
+typedef struct MUST_USE_STRUCT LDKChannelCounterparty {
    /**
     * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
-   LDKnativeBestBlock *inner;
+   LDKnativeChannelCounterparty *inner;
    /**
     * Indicates that this is the only struct which contains the same pointer.
     * Rust functions which take ownership of an object provided via an argument require
     * this to be true and invalidate the object pointed to by inner.
     */
    bool is_owned;
-} LDKBestBlock;
+} LDKChannelCounterparty;
 
 /**
  * A 3-byte byte array.
@@ -8633,11 +8703,12 @@ typedef struct MUST_USE_STRUCT LDKMessageHandler {
  *
  * For efficiency, Clone should be relatively cheap for this type.
  *
- * You probably want to just extend an int and put a file descriptor in a struct and implement
- * send_data. Note that if you are using a higher-level net library that may call close() itself,
- * be careful to ensure you don't have races whereby you might register a new connection with an
- * fd which is the same as a previous one which has yet to be removed via
- * PeerManager::socket_disconnected().
+ * Two descriptors may compare equal (by [`cmp::Eq`] and [`hash::Hash`]) as long as the original
+ * has been disconnected, the [`PeerManager`] has been informed of the disconnection (either by it
+ * having triggered the disconnection or a call to [`PeerManager::socket_disconnected`]), and no
+ * further calls to the [`PeerManager`] related to the original socket occur. This allows you to
+ * use a file descriptor for your SocketDescriptor directly, however for simplicity you may wish
+ * to simply use another value which is guaranteed to be globally unique instead.
  */
 typedef struct LDKSocketDescriptor {
    /**
@@ -8649,25 +8720,27 @@ typedef struct LDKSocketDescriptor {
     * Attempts to send some data from the given slice to the peer.
     *
     * Returns the amount of data which was sent, possibly 0 if the socket has since disconnected.
-    * Note that in the disconnected case, socket_disconnected must still fire and further write
-    * attempts may occur until that time.
+    * Note that in the disconnected case, [`PeerManager::socket_disconnected`] must still be
+    * called and further write attempts may occur until that time.
     *
-    * If the returned size is smaller than data.len(), a write_available event must
-    * trigger the next time more data can be written. Additionally, until the a send_data event
-    * completes fully, no further read_events should trigger on the same peer!
+    * If the returned size is smaller than `data.len()`, a
+    * [`PeerManager::write_buffer_space_avail`] call must be made the next time more data can be
+    * written. Additionally, until a `send_data` event completes fully, no further
+    * [`PeerManager::read_event`] calls should be made for the same peer! Because this is to
+    * prevent denial-of-service issues, you should not read or buffer any data from the socket
+    * until then.
     *
-    * If a read_event on this descriptor had previously returned true (indicating that read
-    * events should be paused to prevent DoS in the send buffer), resume_read may be set
-    * indicating that read events on this descriptor should resume. A resume_read of false does
-    * *not* imply that further read events should be paused.
+    * If a [`PeerManager::read_event`] call on this descriptor had previously returned true
+    * (indicating that read events should be paused to prevent DoS in the send buffer),
+    * `resume_read` may be set indicating that read events on this descriptor should resume. A
+    * `resume_read` of false carries no meaning, and should not cause any action.
     */
    uintptr_t (*send_data)(void *this_arg, struct LDKu8slice data, bool resume_read);
    /**
-    * Disconnect the socket pointed to by this SocketDescriptor. Once this function returns, no
-    * more calls to write_buffer_space_avail, read_event or socket_disconnected may be made with
-    * this descriptor. No socket_disconnected call should be generated as a result of this call,
-    * though races may occur whereby disconnect_socket is called after a call to
-    * socket_disconnected but prior to socket_disconnected returning.
+    * Disconnect the socket pointed to by this SocketDescriptor.
+    *
+    * You do *not* need to call [`PeerManager::socket_disconnected`] with this socket after this
+    * call (doing so is a noop).
     */
    void (*disconnect_socket)(void *this_arg);
    /**
@@ -8695,14 +8768,25 @@ typedef struct LDKSocketDescriptor {
 
 
 /**
- * A PeerManager manages a set of peers, described by their SocketDescriptor and marshalls socket
- * events into messages which it passes on to its MessageHandlers.
+ * A PeerManager manages a set of peers, described by their [`SocketDescriptor`] and marshalls
+ * socket events into messages which it passes on to its [`MessageHandler`].
+ *
+ * Locks are taken internally, so you must never assume that reentrancy from a
+ * [`SocketDescriptor`] call back into [`PeerManager`] methods will not deadlock.
+ *
+ * Calls to [`read_event`] will decode relevant messages and pass them to the
+ * [`ChannelMessageHandler`], likely doing message processing in-line. Thus, the primary form of
+ * parallelism in Rust-Lightning is in calls to [`read_event`]. Note, however, that calls to any
+ * [`PeerManager`] functions related to the same connection must occur only in serial, making new
+ * calls only after previous ones have returned.
  *
  * Rather than using a plain PeerManager, it is preferable to use either a SimpleArcPeerManager
  * a SimpleRefPeerManager, for conciseness. See their documentation for more details, but
  * essentially you should default to using a SimpleRefPeerManager, and use a
  * SimpleArcPeerManager when you require a PeerManager with a static lifetime, such as when
  * you're using lightning-net-tokio.
+ *
+ * [`read_event`]: PeerManager::read_event
  */
 typedef struct MUST_USE_STRUCT LDKPeerManager {
    /**
@@ -9021,6 +9105,10 @@ extern const uint16_t MIN_CLTV_EXPIRY_DELTA;
 extern const uint32_t MIN_FINAL_CLTV_EXPIRY;
 
 extern const uintptr_t REVOKEABLE_REDEEMSCRIPT_MAX_LENGTH;
+
+extern const uint64_t DEFAULT_EXPIRY_TIME;
+
+extern const uint64_t DEFAULT_MIN_FINAL_CLTV_EXPIRY;
 
 extern const uint8_t TAG_PAYMENT_HASH;
 
@@ -9912,6 +10000,27 @@ struct LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ CResult_CVec_C2Tu
  * Frees any resources used by the CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ.
  */
 void CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ_free(struct LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ _res);
+
+/**
+ * Constructs a new COption_u16Z containing a u16
+ */
+struct LDKCOption_u16Z COption_u16Z_some(uint16_t o);
+
+/**
+ * Constructs a new COption_u16Z containing nothing
+ */
+struct LDKCOption_u16Z COption_u16Z_none(void);
+
+/**
+ * Frees any resources associated with the u16, if we are in the Some state
+ */
+void COption_u16Z_free(struct LDKCOption_u16Z _res);
+
+/**
+ * Creates a new COption_u16Z which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCOption_u16Z COption_u16Z_clone(const struct LDKCOption_u16Z *NONNULL_PTR orig);
 
 /**
  * Creates a new CResult_NoneAPIErrorZ in the success state.
@@ -11590,7 +11699,7 @@ struct LDKAPIError APIError_clone(const struct LDKAPIError *NONNULL_PTR orig);
  * A receiver knowing the PublicKey (e.g. the node's id) and the message can be sure that the signature was generated by the caller.
  * Signatures are EC recoverable, meaning that given the message and the signature the PublicKey of the signer can be extracted.
  */
-struct LDKCResult_StringErrorZ sign(struct LDKu8slice msg, struct LDKSecretKey sk);
+struct LDKCResult_StringErrorZ sign(struct LDKu8slice msg, const uint8_t (*sk)[32]);
 
 /**
  * Recovers the PublicKey of the signer of the message given the message and the signature.
@@ -11835,20 +11944,26 @@ uint32_t ChannelHandshakeLimits_get_max_minimum_depth(const struct LDKChannelHan
 void ChannelHandshakeLimits_set_max_minimum_depth(struct LDKChannelHandshakeLimits *NONNULL_PTR this_ptr, uint32_t val);
 
 /**
- * Set to force the incoming channel to match our announced channel preference in
- * ChannelConfig.
+ * Set to force an incoming channel to match our announced channel preference in
+ * [`ChannelConfig::announced_channel`].
  *
- * Default value: true, to make the default that no announced channels are possible (which is
- * appropriate for any nodes which are not online very reliably).
+ * For a node which is not online reliably, this should be set to true and
+ * [`ChannelConfig::announced_channel`] set to false, ensuring that no announced (aka public)
+ * channels will ever be opened.
+ *
+ * Default value: true.
  */
 bool ChannelHandshakeLimits_get_force_announced_channel_preference(const struct LDKChannelHandshakeLimits *NONNULL_PTR this_ptr);
 
 /**
- * Set to force the incoming channel to match our announced channel preference in
- * ChannelConfig.
+ * Set to force an incoming channel to match our announced channel preference in
+ * [`ChannelConfig::announced_channel`].
  *
- * Default value: true, to make the default that no announced channels are possible (which is
- * appropriate for any nodes which are not online very reliably).
+ * For a node which is not online reliably, this should be set to true and
+ * [`ChannelConfig::announced_channel`] set to false, ensuring that no announced (aka public)
+ * channels will ever be opened.
+ *
+ * Default value: true.
  */
 void ChannelHandshakeLimits_set_force_announced_channel_preference(struct LDKChannelHandshakeLimits *NONNULL_PTR this_ptr, bool val);
 
@@ -11895,22 +12010,56 @@ MUST_USE_RES struct LDKChannelHandshakeLimits ChannelHandshakeLimits_default(voi
 void ChannelConfig_free(struct LDKChannelConfig this_obj);
 
 /**
- * Amount (in millionths of a satoshi) the channel will charge per transferred satoshi.
+ * Amount (in millionths of a satoshi) charged per satoshi for payments forwarded outbound
+ * over the channel.
  * This may be allowed to change at runtime in a later update, however doing so must result in
  * update messages sent to notify all nodes of our updated relay fee.
  *
  * Default value: 0.
  */
-uint32_t ChannelConfig_get_fee_proportional_millionths(const struct LDKChannelConfig *NONNULL_PTR this_ptr);
+uint32_t ChannelConfig_get_forwarding_fee_proportional_millionths(const struct LDKChannelConfig *NONNULL_PTR this_ptr);
 
 /**
- * Amount (in millionths of a satoshi) the channel will charge per transferred satoshi.
+ * Amount (in millionths of a satoshi) charged per satoshi for payments forwarded outbound
+ * over the channel.
  * This may be allowed to change at runtime in a later update, however doing so must result in
  * update messages sent to notify all nodes of our updated relay fee.
  *
  * Default value: 0.
  */
-void ChannelConfig_set_fee_proportional_millionths(struct LDKChannelConfig *NONNULL_PTR this_ptr, uint32_t val);
+void ChannelConfig_set_forwarding_fee_proportional_millionths(struct LDKChannelConfig *NONNULL_PTR this_ptr, uint32_t val);
+
+/**
+ * Amount (in milli-satoshi) charged for payments forwarded outbound over the channel, in
+ * excess of [`forwarding_fee_proportional_millionths`].
+ * This may be allowed to change at runtime in a later update, however doing so must result in
+ * update messages sent to notify all nodes of our updated relay fee.
+ *
+ * The default value of a single satoshi roughly matches the market rate on many routing nodes
+ * as of July 2021. Adjusting it upwards or downwards may change whether nodes route through
+ * this node.
+ *
+ * Default value: 1000.
+ *
+ * [`forwarding_fee_proportional_millionths`]: ChannelConfig::forwarding_fee_proportional_millionths
+ */
+uint32_t ChannelConfig_get_forwarding_fee_base_msat(const struct LDKChannelConfig *NONNULL_PTR this_ptr);
+
+/**
+ * Amount (in milli-satoshi) charged for payments forwarded outbound over the channel, in
+ * excess of [`forwarding_fee_proportional_millionths`].
+ * This may be allowed to change at runtime in a later update, however doing so must result in
+ * update messages sent to notify all nodes of our updated relay fee.
+ *
+ * The default value of a single satoshi roughly matches the market rate on many routing nodes
+ * as of July 2021. Adjusting it upwards or downwards may change whether nodes route through
+ * this node.
+ *
+ * Default value: 1000.
+ *
+ * [`forwarding_fee_proportional_millionths`]: ChannelConfig::forwarding_fee_proportional_millionths
+ */
+void ChannelConfig_set_forwarding_fee_base_msat(struct LDKChannelConfig *NONNULL_PTR this_ptr, uint32_t val);
 
 /**
  * The difference in the CLTV value between incoming HTLCs and an outbound HTLC forwarded over
@@ -11965,7 +12114,7 @@ void ChannelConfig_set_cltv_expiry_delta(struct LDKChannelConfig *NONNULL_PTR th
  * This should only be set to true for nodes which expect to be online reliably.
  *
  * As the node which funds a channel picks this value this will only apply for new outbound
- * channels unless ChannelHandshakeLimits::force_announced_channel_preferences is set.
+ * channels unless [`ChannelHandshakeLimits::force_announced_channel_preference`] is set.
  *
  * This cannot be changed after the initial channel handshake.
  *
@@ -11980,7 +12129,7 @@ bool ChannelConfig_get_announced_channel(const struct LDKChannelConfig *NONNULL_
  * This should only be set to true for nodes which expect to be online reliably.
  *
  * As the node which funds a channel picks this value this will only apply for new outbound
- * channels unless ChannelHandshakeLimits::force_announced_channel_preferences is set.
+ * channels unless [`ChannelHandshakeLimits::force_announced_channel_preference`] is set.
  *
  * This cannot be changed after the initial channel handshake.
  *
@@ -12021,7 +12170,7 @@ void ChannelConfig_set_commit_upfront_shutdown_pubkey(struct LDKChannelConfig *N
 /**
  * Constructs a new ChannelConfig given each field
  */
-MUST_USE_RES struct LDKChannelConfig ChannelConfig_new(uint32_t fee_proportional_millionths_arg, uint16_t cltv_expiry_delta_arg, bool announced_channel_arg, bool commit_upfront_shutdown_pubkey_arg);
+MUST_USE_RES struct LDKChannelConfig ChannelConfig_new(uint32_t forwarding_fee_proportional_millionths_arg, uint32_t forwarding_fee_base_msat_arg, uint16_t cltv_expiry_delta_arg, bool announced_channel_arg, bool commit_upfront_shutdown_pubkey_arg);
 
 /**
  * Creates a copy of the ChannelConfig
@@ -12079,9 +12228,49 @@ struct LDKChannelConfig UserConfig_get_channel_options(const struct LDKUserConfi
 void UserConfig_set_channel_options(struct LDKUserConfig *NONNULL_PTR this_ptr, struct LDKChannelConfig val);
 
 /**
+ * If this is set to false, we will reject any HTLCs which were to be forwarded over private
+ * channels. This prevents us from taking on HTLC-forwarding risk when we intend to run as a
+ * node which is not online reliably.
+ *
+ * For nodes which are not online reliably, you should set all channels to *not* be announced
+ * (using [`ChannelConfig::announced_channel`] and
+ * [`ChannelHandshakeLimits::force_announced_channel_preference`]) and set this to false to
+ * ensure you are not exposed to any forwarding risk.
+ *
+ * Note that because you cannot change a channel's announced state after creation, there is no
+ * way to disable forwarding on public channels retroactively. Thus, in order to change a node
+ * from a publicly-announced forwarding node to a private non-forwarding node you must close
+ * all your channels and open new ones. For privacy, you should also change your node_id
+ * (swapping all private and public key material for new ones) at that time.
+ *
+ * Default value: false.
+ */
+bool UserConfig_get_accept_forwards_to_priv_channels(const struct LDKUserConfig *NONNULL_PTR this_ptr);
+
+/**
+ * If this is set to false, we will reject any HTLCs which were to be forwarded over private
+ * channels. This prevents us from taking on HTLC-forwarding risk when we intend to run as a
+ * node which is not online reliably.
+ *
+ * For nodes which are not online reliably, you should set all channels to *not* be announced
+ * (using [`ChannelConfig::announced_channel`] and
+ * [`ChannelHandshakeLimits::force_announced_channel_preference`]) and set this to false to
+ * ensure you are not exposed to any forwarding risk.
+ *
+ * Note that because you cannot change a channel's announced state after creation, there is no
+ * way to disable forwarding on public channels retroactively. Thus, in order to change a node
+ * from a publicly-announced forwarding node to a private non-forwarding node you must close
+ * all your channels and open new ones. For privacy, you should also change your node_id
+ * (swapping all private and public key material for new ones) at that time.
+ *
+ * Default value: false.
+ */
+void UserConfig_set_accept_forwards_to_priv_channels(struct LDKUserConfig *NONNULL_PTR this_ptr, bool val);
+
+/**
  * Constructs a new UserConfig given each field
  */
-MUST_USE_RES struct LDKUserConfig UserConfig_new(struct LDKChannelHandshakeConfig own_channel_config_arg, struct LDKChannelHandshakeLimits peer_channel_config_limits_arg, struct LDKChannelConfig channel_options_arg);
+MUST_USE_RES struct LDKUserConfig UserConfig_new(struct LDKChannelHandshakeConfig own_channel_config_arg, struct LDKChannelHandshakeLimits peer_channel_config_limits_arg, struct LDKChannelConfig channel_options_arg, bool accept_forwards_to_priv_channels_arg);
 
 /**
  * Creates a copy of the UserConfig
@@ -12092,6 +12281,37 @@ struct LDKUserConfig UserConfig_clone(const struct LDKUserConfig *NONNULL_PTR or
  * Creates a "default" UserConfig. See struct and individual field documentaiton for details on which values are used.
  */
 MUST_USE_RES struct LDKUserConfig UserConfig_default(void);
+
+/**
+ * Frees any resources used by the BestBlock, if is_owned is set and inner is non-NULL.
+ */
+void BestBlock_free(struct LDKBestBlock this_obj);
+
+/**
+ * Creates a copy of the BestBlock
+ */
+struct LDKBestBlock BestBlock_clone(const struct LDKBestBlock *NONNULL_PTR orig);
+
+/**
+ * Constructs a `BestBlock` that represents the genesis block at height 0 of the given
+ * network.
+ */
+MUST_USE_RES struct LDKBestBlock BestBlock_from_genesis(enum LDKNetwork network);
+
+/**
+ * Returns a `BestBlock` as identified by the given block hash and height.
+ */
+MUST_USE_RES struct LDKBestBlock BestBlock_new(struct LDKThirtyTwoBytes block_hash, uint32_t height);
+
+/**
+ * Returns the best block hash.
+ */
+MUST_USE_RES struct LDKThirtyTwoBytes BestBlock_block_hash(const struct LDKBestBlock *NONNULL_PTR this_arg);
+
+/**
+ * Returns the best block height.
+ */
+MUST_USE_RES uint32_t BestBlock_height(const struct LDKBestBlock *NONNULL_PTR this_arg);
 
 /**
  * Creates a copy of the AccessError
@@ -12451,6 +12671,12 @@ MUST_USE_RES struct LDKCVec_TransactionOutputsZ ChannelMonitor_best_block_update
  * Returns the set of txids that should be monitored for re-organization out of the chain.
  */
 MUST_USE_RES struct LDKCVec_TxidZ ChannelMonitor_get_relevant_txids(const struct LDKChannelMonitor *NONNULL_PTR this_arg);
+
+/**
+ * Gets the latest best block which was connected either via the [`chain::Listen`] or
+ * [`chain::Confirm`] interfaces.
+ */
+MUST_USE_RES struct LDKBestBlock ChannelMonitor_current_best_block(const struct LDKChannelMonitor *NONNULL_PTR this_arg);
 
 /**
  * Calls the free function if one is set
@@ -12987,34 +13213,60 @@ MUST_USE_RES struct LDKChainParameters ChainParameters_new(enum LDKNetwork netwo
 struct LDKChainParameters ChainParameters_clone(const struct LDKChainParameters *NONNULL_PTR orig);
 
 /**
- * Frees any resources used by the BestBlock, if is_owned is set and inner is non-NULL.
+ * Frees any resources used by the ChannelCounterparty, if is_owned is set and inner is non-NULL.
  */
-void BestBlock_free(struct LDKBestBlock this_obj);
+void ChannelCounterparty_free(struct LDKChannelCounterparty this_obj);
 
 /**
- * Creates a copy of the BestBlock
+ * The node_id of our counterparty
  */
-struct LDKBestBlock BestBlock_clone(const struct LDKBestBlock *NONNULL_PTR orig);
+struct LDKPublicKey ChannelCounterparty_get_node_id(const struct LDKChannelCounterparty *NONNULL_PTR this_ptr);
 
 /**
- * Returns the best block from the genesis of the given network.
+ * The node_id of our counterparty
  */
-MUST_USE_RES struct LDKBestBlock BestBlock_from_genesis(enum LDKNetwork network);
+void ChannelCounterparty_set_node_id(struct LDKChannelCounterparty *NONNULL_PTR this_ptr, struct LDKPublicKey val);
 
 /**
- * Returns the best block as identified by the given block hash and height.
+ * The Features the channel counterparty provided upon last connection.
+ * Useful for routing as it is the most up-to-date copy of the counterparty's features and
+ * many routing-relevant features are present in the init context.
  */
-MUST_USE_RES struct LDKBestBlock BestBlock_new(struct LDKThirtyTwoBytes block_hash, uint32_t height);
+struct LDKInitFeatures ChannelCounterparty_get_features(const struct LDKChannelCounterparty *NONNULL_PTR this_ptr);
 
 /**
- * Returns the best block hash.
+ * The Features the channel counterparty provided upon last connection.
+ * Useful for routing as it is the most up-to-date copy of the counterparty's features and
+ * many routing-relevant features are present in the init context.
  */
-MUST_USE_RES struct LDKThirtyTwoBytes BestBlock_block_hash(const struct LDKBestBlock *NONNULL_PTR this_arg);
+void ChannelCounterparty_set_features(struct LDKChannelCounterparty *NONNULL_PTR this_ptr, struct LDKInitFeatures val);
 
 /**
- * Returns the best block height.
+ * The value, in satoshis, that must always be held in the channel for our counterparty. This
+ * value ensures that if our counterparty broadcasts a revoked state, we can punish them by
+ * claiming at least this value on chain.
+ *
+ * This value is not included in [`inbound_capacity_msat`] as it can never be spent.
+ *
+ * [`inbound_capacity_msat`]: ChannelDetails::inbound_capacity_msat
  */
-MUST_USE_RES uint32_t BestBlock_height(const struct LDKBestBlock *NONNULL_PTR this_arg);
+uint64_t ChannelCounterparty_get_unspendable_punishment_reserve(const struct LDKChannelCounterparty *NONNULL_PTR this_ptr);
+
+/**
+ * The value, in satoshis, that must always be held in the channel for our counterparty. This
+ * value ensures that if our counterparty broadcasts a revoked state, we can punish them by
+ * claiming at least this value on chain.
+ *
+ * This value is not included in [`inbound_capacity_msat`] as it can never be spent.
+ *
+ * [`inbound_capacity_msat`]: ChannelDetails::inbound_capacity_msat
+ */
+void ChannelCounterparty_set_unspendable_punishment_reserve(struct LDKChannelCounterparty *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * Creates a copy of the ChannelCounterparty
+ */
+struct LDKChannelCounterparty ChannelCounterparty_clone(const struct LDKChannelCounterparty *NONNULL_PTR orig);
 
 /**
  * Frees any resources used by the ChannelDetails, if is_owned is set and inner is non-NULL.
@@ -13036,6 +13288,16 @@ const uint8_t (*ChannelDetails_get_channel_id(const struct LDKChannelDetails *NO
  * lifetime of the channel.
  */
 void ChannelDetails_set_channel_id(struct LDKChannelDetails *NONNULL_PTR this_ptr, struct LDKThirtyTwoBytes val);
+
+/**
+ * Parameters which apply to our counterparty. See individual fields for more information.
+ */
+struct LDKChannelCounterparty ChannelDetails_get_counterparty(const struct LDKChannelDetails *NONNULL_PTR this_ptr);
+
+/**
+ * Parameters which apply to our counterparty. See individual fields for more information.
+ */
+void ChannelDetails_set_counterparty(struct LDKChannelDetails *NONNULL_PTR this_ptr, struct LDKChannelCounterparty val);
 
 /**
  * The Channel's funding transaction output, if we've negotiated the funding transaction with
@@ -13068,30 +13330,6 @@ struct LDKCOption_u64Z ChannelDetails_get_short_channel_id(const struct LDKChann
 void ChannelDetails_set_short_channel_id(struct LDKChannelDetails *NONNULL_PTR this_ptr, struct LDKCOption_u64Z val);
 
 /**
- * The node_id of our counterparty
- */
-struct LDKPublicKey ChannelDetails_get_remote_network_id(const struct LDKChannelDetails *NONNULL_PTR this_ptr);
-
-/**
- * The node_id of our counterparty
- */
-void ChannelDetails_set_remote_network_id(struct LDKChannelDetails *NONNULL_PTR this_ptr, struct LDKPublicKey val);
-
-/**
- * The Features the channel counterparty provided upon last connection.
- * Useful for routing as it is the most up-to-date copy of the counterparty's features and
- * many routing-relevant features are present in the init context.
- */
-struct LDKInitFeatures ChannelDetails_get_counterparty_features(const struct LDKChannelDetails *NONNULL_PTR this_ptr);
-
-/**
- * The Features the channel counterparty provided upon last connection.
- * Useful for routing as it is the most up-to-date copy of the counterparty's features and
- * many routing-relevant features are present in the init context.
- */
-void ChannelDetails_set_counterparty_features(struct LDKChannelDetails *NONNULL_PTR this_ptr, struct LDKInitFeatures val);
-
-/**
  * The value, in satoshis, of this channel as appears in the funding output
  */
 uint64_t ChannelDetails_get_channel_value_satoshis(const struct LDKChannelDetails *NONNULL_PTR this_ptr);
@@ -13100,6 +13338,32 @@ uint64_t ChannelDetails_get_channel_value_satoshis(const struct LDKChannelDetail
  * The value, in satoshis, of this channel as appears in the funding output
  */
 void ChannelDetails_set_channel_value_satoshis(struct LDKChannelDetails *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * The value, in satoshis, that must always be held in the channel for us. This value ensures
+ * that if we broadcast a revoked state, our counterparty can punish us by claiming at least
+ * this value on chain.
+ *
+ * This value is not included in [`outbound_capacity_msat`] as it can never be spent.
+ *
+ * This value will be `None` for outbound channels until the counterparty accepts the channel.
+ *
+ * [`outbound_capacity_msat`]: ChannelDetails::outbound_capacity_msat
+ */
+struct LDKCOption_u64Z ChannelDetails_get_unspendable_punishment_reserve(const struct LDKChannelDetails *NONNULL_PTR this_ptr);
+
+/**
+ * The value, in satoshis, that must always be held in the channel for us. This value ensures
+ * that if we broadcast a revoked state, our counterparty can punish us by claiming at least
+ * this value on chain.
+ *
+ * This value is not included in [`outbound_capacity_msat`] as it can never be spent.
+ *
+ * This value will be `None` for outbound channels until the counterparty accepts the channel.
+ *
+ * [`outbound_capacity_msat`]: ChannelDetails::outbound_capacity_msat
+ */
+void ChannelDetails_set_unspendable_punishment_reserve(struct LDKChannelDetails *NONNULL_PTR this_ptr, struct LDKCOption_u64Z val);
 
 /**
  * The user_id passed in to create_channel, or 0 if the channel was inbound.
@@ -13116,6 +13380,10 @@ void ChannelDetails_set_user_id(struct LDKChannelDetails *NONNULL_PTR this_ptr, 
  * any pending HTLCs which are not yet fully resolved (and, thus, who's balance is not
  * available for inclusion in new outbound HTLCs). This further does not include any pending
  * outgoing HTLCs which are awaiting some other resolution to be sent.
+ *
+ * This value is not exact. Due to various in-flight changes, feerate changes, and our
+ * conflict-avoidance policy, exactly this amount is not likely to be spendable. However, we
+ * should be able to spend nearly this amount.
  */
 uint64_t ChannelDetails_get_outbound_capacity_msat(const struct LDKChannelDetails *NONNULL_PTR this_ptr);
 
@@ -13124,6 +13392,10 @@ uint64_t ChannelDetails_get_outbound_capacity_msat(const struct LDKChannelDetail
  * any pending HTLCs which are not yet fully resolved (and, thus, who's balance is not
  * available for inclusion in new outbound HTLCs). This further does not include any pending
  * outgoing HTLCs which are awaiting some other resolution to be sent.
+ *
+ * This value is not exact. Due to various in-flight changes, feerate changes, and our
+ * conflict-avoidance policy, exactly this amount is not likely to be spendable. However, we
+ * should be able to spend nearly this amount.
  */
 void ChannelDetails_set_outbound_capacity_msat(struct LDKChannelDetails *NONNULL_PTR this_ptr, uint64_t val);
 
@@ -13133,6 +13405,10 @@ void ChannelDetails_set_outbound_capacity_msat(struct LDKChannelDetails *NONNULL
  * available for inclusion in new inbound HTLCs).
  * Note that there are some corner cases not fully handled here, so the actual available
  * inbound capacity may be slightly higher than this.
+ *
+ * This value is not exact. Due to various in-flight changes, feerate changes, and our
+ * counterparty's conflict-avoidance policy, exactly this amount is not likely to be spendable.
+ * However, our counterparty should be able to spend nearly this amount.
  */
 uint64_t ChannelDetails_get_inbound_capacity_msat(const struct LDKChannelDetails *NONNULL_PTR this_ptr);
 
@@ -13142,8 +13418,64 @@ uint64_t ChannelDetails_get_inbound_capacity_msat(const struct LDKChannelDetails
  * available for inclusion in new inbound HTLCs).
  * Note that there are some corner cases not fully handled here, so the actual available
  * inbound capacity may be slightly higher than this.
+ *
+ * This value is not exact. Due to various in-flight changes, feerate changes, and our
+ * counterparty's conflict-avoidance policy, exactly this amount is not likely to be spendable.
+ * However, our counterparty should be able to spend nearly this amount.
  */
 void ChannelDetails_set_inbound_capacity_msat(struct LDKChannelDetails *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * The number of required confirmations on the funding transaction before the funding will be
+ * considered \"locked\". This number is selected by the channel fundee (i.e. us if
+ * [`is_outbound`] is *not* set), and can be selected for inbound channels with
+ * [`ChannelHandshakeConfig::minimum_depth`] or limited for outbound channels with
+ * [`ChannelHandshakeLimits::max_minimum_depth`].
+ *
+ * This value will be `None` for outbound channels until the counterparty accepts the channel.
+ *
+ * [`is_outbound`]: ChannelDetails::is_outbound
+ * [`ChannelHandshakeConfig::minimum_depth`]: crate::util::config::ChannelHandshakeConfig::minimum_depth
+ * [`ChannelHandshakeLimits::max_minimum_depth`]: crate::util::config::ChannelHandshakeLimits::max_minimum_depth
+ */
+struct LDKCOption_u32Z ChannelDetails_get_confirmations_required(const struct LDKChannelDetails *NONNULL_PTR this_ptr);
+
+/**
+ * The number of required confirmations on the funding transaction before the funding will be
+ * considered \"locked\". This number is selected by the channel fundee (i.e. us if
+ * [`is_outbound`] is *not* set), and can be selected for inbound channels with
+ * [`ChannelHandshakeConfig::minimum_depth`] or limited for outbound channels with
+ * [`ChannelHandshakeLimits::max_minimum_depth`].
+ *
+ * This value will be `None` for outbound channels until the counterparty accepts the channel.
+ *
+ * [`is_outbound`]: ChannelDetails::is_outbound
+ * [`ChannelHandshakeConfig::minimum_depth`]: crate::util::config::ChannelHandshakeConfig::minimum_depth
+ * [`ChannelHandshakeLimits::max_minimum_depth`]: crate::util::config::ChannelHandshakeLimits::max_minimum_depth
+ */
+void ChannelDetails_set_confirmations_required(struct LDKChannelDetails *NONNULL_PTR this_ptr, struct LDKCOption_u32Z val);
+
+/**
+ * The number of blocks (after our commitment transaction confirms) that we will need to wait
+ * until we can claim our funds after we force-close the channel. During this time our
+ * counterparty is allowed to punish us if we broadcasted a stale state. If our counterparty
+ * force-closes the channel and broadcasts a commitment transaction we do not have to wait any
+ * time to claim our non-HTLC-encumbered funds.
+ *
+ * This value will be `None` for outbound channels until the counterparty accepts the channel.
+ */
+struct LDKCOption_u16Z ChannelDetails_get_force_close_spend_delay(const struct LDKChannelDetails *NONNULL_PTR this_ptr);
+
+/**
+ * The number of blocks (after our commitment transaction confirms) that we will need to wait
+ * until we can claim our funds after we force-close the channel. During this time our
+ * counterparty is allowed to punish us if we broadcasted a stale state. If our counterparty
+ * force-closes the channel and broadcasts a commitment transaction we do not have to wait any
+ * time to claim our non-HTLC-encumbered funds.
+ *
+ * This value will be `None` for outbound channels until the counterparty accepts the channel.
+ */
+void ChannelDetails_set_force_close_spend_delay(struct LDKChannelDetails *NONNULL_PTR this_ptr, struct LDKCOption_u16Z val);
 
 /**
  * True if the channel was initiated (and thus funded) by us.
@@ -13159,7 +13491,10 @@ void ChannelDetails_set_is_outbound(struct LDKChannelDetails *NONNULL_PTR this_p
  * True if the channel is confirmed, funding_locked messages have been exchanged, and the
  * channel is not currently being shut down. `funding_locked` message exchange implies the
  * required confirmation count has been reached (and we were connected to the peer at some
- * point after the funding transaction received enough confirmations).
+ * point after the funding transaction received enough confirmations). The required
+ * confirmation count is provided in [`confirmations_required`].
+ *
+ * [`confirmations_required`]: ChannelDetails::confirmations_required
  */
 bool ChannelDetails_get_is_funding_locked(const struct LDKChannelDetails *NONNULL_PTR this_ptr);
 
@@ -13167,14 +13502,16 @@ bool ChannelDetails_get_is_funding_locked(const struct LDKChannelDetails *NONNUL
  * True if the channel is confirmed, funding_locked messages have been exchanged, and the
  * channel is not currently being shut down. `funding_locked` message exchange implies the
  * required confirmation count has been reached (and we were connected to the peer at some
- * point after the funding transaction received enough confirmations).
+ * point after the funding transaction received enough confirmations). The required
+ * confirmation count is provided in [`confirmations_required`].
+ *
+ * [`confirmations_required`]: ChannelDetails::confirmations_required
  */
 void ChannelDetails_set_is_funding_locked(struct LDKChannelDetails *NONNULL_PTR this_ptr, bool val);
 
 /**
  * True if the channel is (a) confirmed and funding_locked messages have been exchanged, (b)
- * the peer is connected, (c) no monitor update failure is pending resolution, and (d) the
- * channel is not currently negotiating a shutdown.
+ * the peer is connected, and (c) the channel is not currently negotiating a shutdown.
  *
  * This is a strict superset of `is_funding_locked`.
  */
@@ -13182,8 +13519,7 @@ bool ChannelDetails_get_is_usable(const struct LDKChannelDetails *NONNULL_PTR th
 
 /**
  * True if the channel is (a) confirmed and funding_locked messages have been exchanged, (b)
- * the peer is connected, (c) no monitor update failure is pending resolution, and (d) the
- * channel is not currently negotiating a shutdown.
+ * the peer is connected, and (c) the channel is not currently negotiating a shutdown.
  *
  * This is a strict superset of `is_funding_locked`.
  */
@@ -13198,6 +13534,11 @@ bool ChannelDetails_get_is_public(const struct LDKChannelDetails *NONNULL_PTR th
  * True if this channel is (or will be) publicly-announced.
  */
 void ChannelDetails_set_is_public(struct LDKChannelDetails *NONNULL_PTR this_ptr, bool val);
+
+/**
+ * Constructs a new ChannelDetails given each field
+ */
+MUST_USE_RES struct LDKChannelDetails ChannelDetails_new(struct LDKThirtyTwoBytes channel_id_arg, struct LDKChannelCounterparty counterparty_arg, struct LDKOutPoint funding_txo_arg, struct LDKCOption_u64Z short_channel_id_arg, uint64_t channel_value_satoshis_arg, struct LDKCOption_u64Z unspendable_punishment_reserve_arg, uint64_t user_id_arg, uint64_t outbound_capacity_msat_arg, uint64_t inbound_capacity_msat_arg, struct LDKCOption_u32Z confirmations_required_arg, struct LDKCOption_u16Z force_close_spend_delay_arg, bool is_outbound_arg, bool is_funding_locked_arg, bool is_usable_arg, bool is_public_arg);
 
 /**
  * Creates a copy of the ChannelDetails
@@ -13249,6 +13590,10 @@ MUST_USE_RES struct LDKUserConfig ChannelManager_get_current_default_configurati
  *
  * Raises APIError::APIMisuseError when channel_value_satoshis > 2**24 or push_msat is
  * greater than channel_value_satoshis * 1k or channel_value_satoshis is < 1000.
+ *
+ * Note that we do not check if you are currently connected to the given peer. If no
+ * connection is available, the outbound `open_channel` message may fail to send, resulting in
+ * the channel eventually being silently forgotten.
  */
 MUST_USE_RES struct LDKCResult_NoneAPIErrorZ ChannelManager_create_channel(const struct LDKChannelManager *NONNULL_PTR this_arg, struct LDKPublicKey their_network_key, uint64_t channel_value_satoshis, uint64_t push_msat, uint64_t user_id, struct LDKUserConfig override_config);
 
@@ -13560,6 +13905,12 @@ MUST_USE_RES bool ChannelManager_await_persistable_update_timeout(const struct L
  * up.
  */
 void ChannelManager_await_persistable_update(const struct LDKChannelManager *NONNULL_PTR this_arg);
+
+/**
+ * Gets the latest best block which was connected either via the [`chain::Listen`] or
+ * [`chain::Confirm`] interfaces.
+ */
+MUST_USE_RES struct LDKBestBlock ChannelManager_current_best_block(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
 /**
  * Constructs a new ChannelMessageHandler which calls the relevant methods on this_arg.
@@ -15903,25 +16254,35 @@ void MessageHandler_free(struct LDKMessageHandler this_obj);
 
 /**
  * A message handler which handles messages specific to channels. Usually this is just a
- * ChannelManager object or a ErroringMessageHandler.
+ * [`ChannelManager`] object or an [`ErroringMessageHandler`].
+ *
+ * [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
  */
 const struct LDKChannelMessageHandler *MessageHandler_get_chan_handler(const struct LDKMessageHandler *NONNULL_PTR this_ptr);
 
 /**
  * A message handler which handles messages specific to channels. Usually this is just a
- * ChannelManager object or a ErroringMessageHandler.
+ * [`ChannelManager`] object or an [`ErroringMessageHandler`].
+ *
+ * [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
  */
 void MessageHandler_set_chan_handler(struct LDKMessageHandler *NONNULL_PTR this_ptr, struct LDKChannelMessageHandler val);
 
 /**
  * A message handler which handles messages updating our knowledge of the network channel
- * graph. Usually this is just a NetGraphMsgHandlerMonitor object or an IgnoringMessageHandler.
+ * graph. Usually this is just a [`NetGraphMsgHandler`] object or an
+ * [`IgnoringMessageHandler`].
+ *
+ * [`NetGraphMsgHandler`]: crate::routing::network_graph::NetGraphMsgHandler
  */
 const struct LDKRoutingMessageHandler *MessageHandler_get_route_handler(const struct LDKMessageHandler *NONNULL_PTR this_ptr);
 
 /**
  * A message handler which handles messages updating our knowledge of the network channel
- * graph. Usually this is just a NetGraphMsgHandlerMonitor object or an IgnoringMessageHandler.
+ * graph. Usually this is just a [`NetGraphMsgHandler`] object or an
+ * [`IgnoringMessageHandler`].
+ *
+ * [`NetGraphMsgHandler`]: crate::routing::network_graph::NetGraphMsgHandler
  */
 void MessageHandler_set_route_handler(struct LDKMessageHandler *NONNULL_PTR this_ptr, struct LDKRoutingMessageHandler val);
 
@@ -15995,8 +16356,10 @@ MUST_USE_RES struct LDKCVec_PublicKeyZ PeerManager_get_peer_node_ids(const struc
  *
  * Returns a small number of bytes to send to the remote node (currently always 50).
  *
- * Panics if descriptor is duplicative with some other descriptor which has not yet had a
- * socket_disconnected().
+ * Panics if descriptor is duplicative with some other descriptor which has not yet been
+ * [`socket_disconnected()`].
+ *
+ * [`socket_disconnected()`]: PeerManager::socket_disconnected
  */
 MUST_USE_RES struct LDKCResult_CVec_u8ZPeerHandleErrorZ PeerManager_new_outbound_connection(const struct LDKPeerManager *NONNULL_PTR this_arg, struct LDKPublicKey their_node_id, struct LDKSocketDescriptor descriptor);
 
@@ -16008,8 +16371,10 @@ MUST_USE_RES struct LDKCResult_CVec_u8ZPeerHandleErrorZ PeerManager_new_outbound
  * call socket_disconnected for the new descriptor but must disconnect the connection
  * immediately.
  *
- * Panics if descriptor is duplicative with some other descriptor which has not yet had
- * socket_disconnected called.
+ * Panics if descriptor is duplicative with some other descriptor which has not yet been
+ * [`socket_disconnected()`].
+ *
+ * [`socket_disconnected()`]: PeerManager::socket_disconnected
  */
 MUST_USE_RES struct LDKCResult_NonePeerHandleErrorZ PeerManager_new_inbound_connection(const struct LDKPeerManager *NONNULL_PTR this_arg, struct LDKSocketDescriptor descriptor);
 
@@ -16018,12 +16383,14 @@ MUST_USE_RES struct LDKCResult_NonePeerHandleErrorZ PeerManager_new_inbound_conn
  *
  * May return an Err to indicate that the connection should be closed.
  *
- * Will most likely call send_data on the descriptor passed in (or the descriptor handed into
- * new_*\\_connection) before returning. Thus, be very careful with reentrancy issues! The
- * invariants around calling write_buffer_space_avail in case a write did not fully complete
- * must still hold - be ready to call write_buffer_space_avail again if a write call generated
- * here isn't sufficient! Panics if the descriptor was not previously registered in a
- * new_\\*_connection event.
+ * May call [`send_data`] on the descriptor passed in (or an equal descriptor) before
+ * returning. Thus, be very careful with reentrancy issues! The invariants around calling
+ * [`write_buffer_space_avail`] in case a write did not fully complete must still hold - be
+ * ready to call `[write_buffer_space_avail`] again if a write call generated here isn't
+ * sufficient!
+ *
+ * [`send_data`]: SocketDescriptor::send_data
+ * [`write_buffer_space_avail`]: PeerManager::write_buffer_space_avail
  */
 MUST_USE_RES struct LDKCResult_NonePeerHandleErrorZ PeerManager_write_buffer_space_avail(const struct LDKPeerManager *NONNULL_PTR this_arg, struct LDKSocketDescriptor *NONNULL_PTR descriptor);
 
@@ -16032,51 +16399,60 @@ MUST_USE_RES struct LDKCResult_NonePeerHandleErrorZ PeerManager_write_buffer_spa
  *
  * May return an Err to indicate that the connection should be closed.
  *
- * Will *not* call back into send_data on any descriptors to avoid reentrancy complexity.
- * Thus, however, you almost certainly want to call process_events() after any read_event to
- * generate send_data calls to handle responses.
+ * Will *not* call back into [`send_data`] on any descriptors to avoid reentrancy complexity.
+ * Thus, however, you should call [`process_events`] after any `read_event` to generate
+ * [`send_data`] calls to handle responses.
  *
- * If Ok(true) is returned, further read_events should not be triggered until a send_data call
- * on this file descriptor has resume_read set (preventing DoS issues in the send buffer).
+ * If `Ok(true)` is returned, further read_events should not be triggered until a
+ * [`send_data`] call on this descriptor has `resume_read` set (preventing DoS issues in the
+ * send buffer).
  *
- * Panics if the descriptor was not previously registered in a new_*_connection event.
+ * [`send_data`]: SocketDescriptor::send_data
+ * [`process_events`]: PeerManager::process_events
  */
 MUST_USE_RES struct LDKCResult_boolPeerHandleErrorZ PeerManager_read_event(const struct LDKPeerManager *NONNULL_PTR this_arg, struct LDKSocketDescriptor *NONNULL_PTR peer_descriptor, struct LDKu8slice data);
 
 /**
  * Checks for any events generated by our handlers and processes them. Includes sending most
  * response messages as well as messages generated by calls to handler functions directly (eg
- * functions like ChannelManager::process_pending_htlc_forward or send_payment).
+ * functions like [`ChannelManager::process_pending_htlc_forwards`] or [`send_payment`]).
+ *
+ * May call [`send_data`] on [`SocketDescriptor`]s. Thus, be very careful with reentrancy
+ * issues!
+ *
+ * [`send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+ * [`ChannelManager::process_pending_htlc_forwards`]: crate::ln::channelmanager::ChannelManager::process_pending_htlc_forwards
+ * [`send_data`]: SocketDescriptor::send_data
  */
 void PeerManager_process_events(const struct LDKPeerManager *NONNULL_PTR this_arg);
 
 /**
  * Indicates that the given socket descriptor's connection is now closed.
- *
- * This must only be called if the socket has been disconnected by the peer or your own
- * decision to disconnect it and must NOT be called in any case where other parts of this
- * library (eg PeerHandleError, explicit disconnect_socket calls) instruct you to disconnect
- * the peer.
- *
- * Panics if the descriptor was not previously registered in a successful new_*_connection event.
  */
 void PeerManager_socket_disconnected(const struct LDKPeerManager *NONNULL_PTR this_arg, const struct LDKSocketDescriptor *NONNULL_PTR descriptor);
 
 /**
  * Disconnect a peer given its node id.
  *
- * Set no_connection_possible to true to prevent any further connection with this peer,
+ * Set `no_connection_possible` to true to prevent any further connection with this peer,
  * force-closing any channels we have with it.
  *
- * If a peer is connected, this will call `disconnect_socket` on the descriptor for the peer,
- * so be careful about reentrancy issues.
+ * If a peer is connected, this will call [`disconnect_socket`] on the descriptor for the
+ * peer. Thus, be very careful about reentrancy issues.
+ *
+ * [`disconnect_socket`]: SocketDescriptor::disconnect_socket
  */
 void PeerManager_disconnect_by_node_id(const struct LDKPeerManager *NONNULL_PTR this_arg, struct LDKPublicKey node_id, bool no_connection_possible);
 
 /**
  * This function should be called roughly once every 30 seconds.
- * It will send pings to each peer and disconnect those which did not respond to the last round of pings.
- * Will most likely call send_data on all of the registered descriptors, thus, be very careful with reentrancy issues!
+ * It will send pings to each peer and disconnect those which did not respond to the last
+ * round of pings.
+ *
+ * May call [`send_data`] on all [`SocketDescriptor`]s. Thus, be very careful with reentrancy
+ * issues!
+ *
+ * [`send_data`]: SocketDescriptor::send_data
  */
 void PeerManager_timer_tick_occurred(const struct LDKPeerManager *NONNULL_PTR this_arg);
 

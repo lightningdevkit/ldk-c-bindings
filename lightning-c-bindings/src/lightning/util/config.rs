@@ -340,21 +340,27 @@ pub extern "C" fn ChannelHandshakeLimits_get_max_minimum_depth(this_ptr: &Channe
 pub extern "C" fn ChannelHandshakeLimits_set_max_minimum_depth(this_ptr: &mut ChannelHandshakeLimits, mut val: u32) {
 	unsafe { &mut *this_ptr.inner }.max_minimum_depth = val;
 }
-/// Set to force the incoming channel to match our announced channel preference in
-/// ChannelConfig.
+/// Set to force an incoming channel to match our announced channel preference in
+/// [`ChannelConfig::announced_channel`].
 ///
-/// Default value: true, to make the default that no announced channels are possible (which is
-/// appropriate for any nodes which are not online very reliably).
+/// For a node which is not online reliably, this should be set to true and
+/// [`ChannelConfig::announced_channel`] set to false, ensuring that no announced (aka public)
+/// channels will ever be opened.
+///
+/// Default value: true.
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_get_force_announced_channel_preference(this_ptr: &ChannelHandshakeLimits) -> bool {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.force_announced_channel_preference;
 	*inner_val
 }
-/// Set to force the incoming channel to match our announced channel preference in
-/// ChannelConfig.
+/// Set to force an incoming channel to match our announced channel preference in
+/// [`ChannelConfig::announced_channel`].
 ///
-/// Default value: true, to make the default that no announced channels are possible (which is
-/// appropriate for any nodes which are not online very reliably).
+/// For a node which is not online reliably, this should be set to true and
+/// [`ChannelConfig::announced_channel`] set to false, ensuring that no announced (aka public)
+/// channels will ever be opened.
+///
+/// Default value: true.
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_set_force_announced_channel_preference(this_ptr: &mut ChannelHandshakeLimits, mut val: bool) {
 	unsafe { &mut *this_ptr.inner }.force_announced_channel_preference = val;
@@ -468,24 +474,59 @@ impl ChannelConfig {
 		ret
 	}
 }
-/// Amount (in millionths of a satoshi) the channel will charge per transferred satoshi.
+/// Amount (in millionths of a satoshi) charged per satoshi for payments forwarded outbound
+/// over the channel.
 /// This may be allowed to change at runtime in a later update, however doing so must result in
 /// update messages sent to notify all nodes of our updated relay fee.
 ///
 /// Default value: 0.
 #[no_mangle]
-pub extern "C" fn ChannelConfig_get_fee_proportional_millionths(this_ptr: &ChannelConfig) -> u32 {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fee_proportional_millionths;
+pub extern "C" fn ChannelConfig_get_forwarding_fee_proportional_millionths(this_ptr: &ChannelConfig) -> u32 {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.forwarding_fee_proportional_millionths;
 	*inner_val
 }
-/// Amount (in millionths of a satoshi) the channel will charge per transferred satoshi.
+/// Amount (in millionths of a satoshi) charged per satoshi for payments forwarded outbound
+/// over the channel.
 /// This may be allowed to change at runtime in a later update, however doing so must result in
 /// update messages sent to notify all nodes of our updated relay fee.
 ///
 /// Default value: 0.
 #[no_mangle]
-pub extern "C" fn ChannelConfig_set_fee_proportional_millionths(this_ptr: &mut ChannelConfig, mut val: u32) {
-	unsafe { &mut *this_ptr.inner }.fee_proportional_millionths = val;
+pub extern "C" fn ChannelConfig_set_forwarding_fee_proportional_millionths(this_ptr: &mut ChannelConfig, mut val: u32) {
+	unsafe { &mut *this_ptr.inner }.forwarding_fee_proportional_millionths = val;
+}
+/// Amount (in milli-satoshi) charged for payments forwarded outbound over the channel, in
+/// excess of [`forwarding_fee_proportional_millionths`].
+/// This may be allowed to change at runtime in a later update, however doing so must result in
+/// update messages sent to notify all nodes of our updated relay fee.
+///
+/// The default value of a single satoshi roughly matches the market rate on many routing nodes
+/// as of July 2021. Adjusting it upwards or downwards may change whether nodes route through
+/// this node.
+///
+/// Default value: 1000.
+///
+/// [`forwarding_fee_proportional_millionths`]: ChannelConfig::forwarding_fee_proportional_millionths
+#[no_mangle]
+pub extern "C" fn ChannelConfig_get_forwarding_fee_base_msat(this_ptr: &ChannelConfig) -> u32 {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.forwarding_fee_base_msat;
+	*inner_val
+}
+/// Amount (in milli-satoshi) charged for payments forwarded outbound over the channel, in
+/// excess of [`forwarding_fee_proportional_millionths`].
+/// This may be allowed to change at runtime in a later update, however doing so must result in
+/// update messages sent to notify all nodes of our updated relay fee.
+///
+/// The default value of a single satoshi roughly matches the market rate on many routing nodes
+/// as of July 2021. Adjusting it upwards or downwards may change whether nodes route through
+/// this node.
+///
+/// Default value: 1000.
+///
+/// [`forwarding_fee_proportional_millionths`]: ChannelConfig::forwarding_fee_proportional_millionths
+#[no_mangle]
+pub extern "C" fn ChannelConfig_set_forwarding_fee_base_msat(this_ptr: &mut ChannelConfig, mut val: u32) {
+	unsafe { &mut *this_ptr.inner }.forwarding_fee_base_msat = val;
 }
 /// The difference in the CLTV value between incoming HTLCs and an outbound HTLC forwarded over
 /// the channel this config applies to.
@@ -540,7 +581,7 @@ pub extern "C" fn ChannelConfig_set_cltv_expiry_delta(this_ptr: &mut ChannelConf
 /// This should only be set to true for nodes which expect to be online reliably.
 ///
 /// As the node which funds a channel picks this value this will only apply for new outbound
-/// channels unless ChannelHandshakeLimits::force_announced_channel_preferences is set.
+/// channels unless [`ChannelHandshakeLimits::force_announced_channel_preference`] is set.
 ///
 /// This cannot be changed after the initial channel handshake.
 ///
@@ -556,7 +597,7 @@ pub extern "C" fn ChannelConfig_get_announced_channel(this_ptr: &ChannelConfig) 
 /// This should only be set to true for nodes which expect to be online reliably.
 ///
 /// As the node which funds a channel picks this value this will only apply for new outbound
-/// channels unless ChannelHandshakeLimits::force_announced_channel_preferences is set.
+/// channels unless [`ChannelHandshakeLimits::force_announced_channel_preference`] is set.
 ///
 /// This cannot be changed after the initial channel handshake.
 ///
@@ -599,9 +640,10 @@ pub extern "C" fn ChannelConfig_set_commit_upfront_shutdown_pubkey(this_ptr: &mu
 /// Constructs a new ChannelConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelConfig_new(mut fee_proportional_millionths_arg: u32, mut cltv_expiry_delta_arg: u16, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool) -> ChannelConfig {
+pub extern "C" fn ChannelConfig_new(mut forwarding_fee_proportional_millionths_arg: u32, mut forwarding_fee_base_msat_arg: u32, mut cltv_expiry_delta_arg: u16, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool) -> ChannelConfig {
 	ChannelConfig { inner: Box::into_raw(Box::new(nativeChannelConfig {
-		fee_proportional_millionths: fee_proportional_millionths_arg,
+		forwarding_fee_proportional_millionths: forwarding_fee_proportional_millionths_arg,
+		forwarding_fee_base_msat: forwarding_fee_base_msat_arg,
 		cltv_expiry_delta: cltv_expiry_delta_arg,
 		announced_channel: announced_channel_arg,
 		commit_upfront_shutdown_pubkey: commit_upfront_shutdown_pubkey_arg,
@@ -729,14 +771,56 @@ pub extern "C" fn UserConfig_get_channel_options(this_ptr: &UserConfig) -> crate
 pub extern "C" fn UserConfig_set_channel_options(this_ptr: &mut UserConfig, mut val: crate::lightning::util::config::ChannelConfig) {
 	unsafe { &mut *this_ptr.inner }.channel_options = *unsafe { Box::from_raw(val.take_inner()) };
 }
+/// If this is set to false, we will reject any HTLCs which were to be forwarded over private
+/// channels. This prevents us from taking on HTLC-forwarding risk when we intend to run as a
+/// node which is not online reliably.
+///
+/// For nodes which are not online reliably, you should set all channels to *not* be announced
+/// (using [`ChannelConfig::announced_channel`] and
+/// [`ChannelHandshakeLimits::force_announced_channel_preference`]) and set this to false to
+/// ensure you are not exposed to any forwarding risk.
+///
+/// Note that because you cannot change a channel's announced state after creation, there is no
+/// way to disable forwarding on public channels retroactively. Thus, in order to change a node
+/// from a publicly-announced forwarding node to a private non-forwarding node you must close
+/// all your channels and open new ones. For privacy, you should also change your node_id
+/// (swapping all private and public key material for new ones) at that time.
+///
+/// Default value: false.
+#[no_mangle]
+pub extern "C" fn UserConfig_get_accept_forwards_to_priv_channels(this_ptr: &UserConfig) -> bool {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.accept_forwards_to_priv_channels;
+	*inner_val
+}
+/// If this is set to false, we will reject any HTLCs which were to be forwarded over private
+/// channels. This prevents us from taking on HTLC-forwarding risk when we intend to run as a
+/// node which is not online reliably.
+///
+/// For nodes which are not online reliably, you should set all channels to *not* be announced
+/// (using [`ChannelConfig::announced_channel`] and
+/// [`ChannelHandshakeLimits::force_announced_channel_preference`]) and set this to false to
+/// ensure you are not exposed to any forwarding risk.
+///
+/// Note that because you cannot change a channel's announced state after creation, there is no
+/// way to disable forwarding on public channels retroactively. Thus, in order to change a node
+/// from a publicly-announced forwarding node to a private non-forwarding node you must close
+/// all your channels and open new ones. For privacy, you should also change your node_id
+/// (swapping all private and public key material for new ones) at that time.
+///
+/// Default value: false.
+#[no_mangle]
+pub extern "C" fn UserConfig_set_accept_forwards_to_priv_channels(this_ptr: &mut UserConfig, mut val: bool) {
+	unsafe { &mut *this_ptr.inner }.accept_forwards_to_priv_channels = val;
+}
 /// Constructs a new UserConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn UserConfig_new(mut own_channel_config_arg: crate::lightning::util::config::ChannelHandshakeConfig, mut peer_channel_config_limits_arg: crate::lightning::util::config::ChannelHandshakeLimits, mut channel_options_arg: crate::lightning::util::config::ChannelConfig) -> UserConfig {
+pub extern "C" fn UserConfig_new(mut own_channel_config_arg: crate::lightning::util::config::ChannelHandshakeConfig, mut peer_channel_config_limits_arg: crate::lightning::util::config::ChannelHandshakeLimits, mut channel_options_arg: crate::lightning::util::config::ChannelConfig, mut accept_forwards_to_priv_channels_arg: bool) -> UserConfig {
 	UserConfig { inner: Box::into_raw(Box::new(nativeUserConfig {
 		own_channel_config: *unsafe { Box::from_raw(own_channel_config_arg.take_inner()) },
 		peer_channel_config_limits: *unsafe { Box::from_raw(peer_channel_config_limits_arg.take_inner()) },
 		channel_options: *unsafe { Box::from_raw(channel_options_arg.take_inner()) },
+		accept_forwards_to_priv_channels: accept_forwards_to_priv_channels_arg,
 	})), is_owned: true }
 }
 impl Clone for UserConfig {

@@ -3790,6 +3790,40 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::CVec_C2Tuple_Blo
 	}
 }
 #[repr(C)]
+#[derive(Clone)]
+/// An enum which can either contain a u16 or not
+pub enum COption_u16Z {
+	/// When we're in this state, this COption_u16Z contains a u16
+	Some(u16),
+	/// When we're in this state, this COption_u16Z contains nothing
+	None
+}
+impl COption_u16Z {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> u16 {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+/// Constructs a new COption_u16Z containing a u16
+pub extern "C" fn COption_u16Z_some(o: u16) -> COption_u16Z {
+	COption_u16Z::Some(o)
+}
+#[no_mangle]
+/// Constructs a new COption_u16Z containing nothing
+pub extern "C" fn COption_u16Z_none() -> COption_u16Z {
+	COption_u16Z::None
+}
+#[no_mangle]
+/// Frees any resources associated with the u16, if we are in the Some state
+pub extern "C" fn COption_u16Z_free(_res: COption_u16Z) { }
+#[no_mangle]
+/// Creates a new COption_u16Z which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn COption_u16Z_clone(orig: &COption_u16Z) -> COption_u16Z { orig.clone() }
+#[repr(C)]
 /// The contents of CResult_NoneAPIErrorZ
 pub union CResult_NoneAPIErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant

@@ -4014,6 +4014,9 @@ pub enum ErrorAction {
 	},
 	/// The peer did something harmless that we weren't able to process, just log and ignore
 	IgnoreError,
+	/// The peer did something harmless that we weren't able to meaningfully process.
+	/// If the error is logged, log it at the given level.
+	IgnoreAndLog(crate::lightning::util::logger::Level),
 	/// The peer did something incorrect. Tell them.
 	SendErrorMessage {
 		/// The message to send.
@@ -4033,6 +4036,12 @@ impl ErrorAction {
 				}
 			},
 			ErrorAction::IgnoreError => nativeErrorAction::IgnoreError,
+			ErrorAction::IgnoreAndLog (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeErrorAction::IgnoreAndLog (
+					a_nonref.into_native(),
+				)
+			},
 			ErrorAction::SendErrorMessage {ref msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				nativeErrorAction::SendErrorMessage {
@@ -4051,6 +4060,11 @@ impl ErrorAction {
 				}
 			},
 			ErrorAction::IgnoreError => nativeErrorAction::IgnoreError,
+			ErrorAction::IgnoreAndLog (mut a, ) => {
+				nativeErrorAction::IgnoreAndLog (
+					a.into_native(),
+				)
+			},
 			ErrorAction::SendErrorMessage {mut msg, } => {
 				nativeErrorAction::SendErrorMessage {
 					msg: *unsafe { Box::from_raw(msg.take_inner()) },
@@ -4069,6 +4083,12 @@ impl ErrorAction {
 				}
 			},
 			nativeErrorAction::IgnoreError => ErrorAction::IgnoreError,
+			nativeErrorAction::IgnoreAndLog (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				ErrorAction::IgnoreAndLog (
+					crate::lightning::util::logger::Level::native_into(a_nonref),
+				)
+			},
 			nativeErrorAction::SendErrorMessage {ref msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				ErrorAction::SendErrorMessage {
@@ -4087,6 +4107,11 @@ impl ErrorAction {
 				}
 			},
 			nativeErrorAction::IgnoreError => ErrorAction::IgnoreError,
+			nativeErrorAction::IgnoreAndLog (mut a, ) => {
+				ErrorAction::IgnoreAndLog (
+					crate::lightning::util::logger::Level::native_into(a),
+				)
+			},
 			nativeErrorAction::SendErrorMessage {mut msg, } => {
 				ErrorAction::SendErrorMessage {
 					msg: crate::lightning::ln::msgs::ErrorMessage { inner: Box::into_raw(Box::new(msg)), is_owned: true },

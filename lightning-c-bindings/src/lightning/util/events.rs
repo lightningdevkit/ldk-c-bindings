@@ -460,6 +460,15 @@ pub enum MessageSendEvent {
 		/// The channel_update which should be sent.
 		msg: crate::lightning::ln::msgs::ChannelUpdate,
 	},
+	/// Used to indicate that a channel_update should be sent to a single peer.
+	/// In contrast to [`Self::BroadcastChannelUpdate`], this is used when the channel is a
+	/// private channel and we shouldn't be informing all of our peers of channel parameters.
+	SendChannelUpdate {
+		/// The node_id of the node which should receive this message
+		node_id: crate::c_types::PublicKey,
+		/// The channel_update which should be sent.
+		msg: crate::lightning::ln::msgs::ChannelUpdate,
+	},
 	/// Broadcast an error downstream to be handled
 	HandleError {
 		/// The node_id of the node which should receive this message
@@ -610,6 +619,14 @@ impl MessageSendEvent {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
+			MessageSendEvent::SendChannelUpdate {ref node_id, ref msg, } => {
+				let mut node_id_nonref = (*node_id).clone();
+				let mut msg_nonref = (*msg).clone();
+				nativeMessageSendEvent::SendChannelUpdate {
+					node_id: node_id_nonref.into_rust(),
+					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
+				}
+			},
 			MessageSendEvent::HandleError {ref node_id, ref action, } => {
 				let mut node_id_nonref = (*node_id).clone();
 				let mut action_nonref = (*action).clone();
@@ -732,6 +749,12 @@ impl MessageSendEvent {
 			},
 			MessageSendEvent::BroadcastChannelUpdate {mut msg, } => {
 				nativeMessageSendEvent::BroadcastChannelUpdate {
+					msg: *unsafe { Box::from_raw(msg.take_inner()) },
+				}
+			},
+			MessageSendEvent::SendChannelUpdate {mut node_id, mut msg, } => {
+				nativeMessageSendEvent::SendChannelUpdate {
+					node_id: node_id.into_rust(),
 					msg: *unsafe { Box::from_raw(msg.take_inner()) },
 				}
 			},
@@ -877,6 +900,14 @@ impl MessageSendEvent {
 					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
 				}
 			},
+			nativeMessageSendEvent::SendChannelUpdate {ref node_id, ref msg, } => {
+				let mut node_id_nonref = (*node_id).clone();
+				let mut msg_nonref = (*msg).clone();
+				MessageSendEvent::SendChannelUpdate {
+					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
+					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+				}
+			},
 			nativeMessageSendEvent::HandleError {ref node_id, ref action, } => {
 				let mut node_id_nonref = (*node_id).clone();
 				let mut action_nonref = (*action).clone();
@@ -999,6 +1030,12 @@ impl MessageSendEvent {
 			},
 			nativeMessageSendEvent::BroadcastChannelUpdate {mut msg, } => {
 				MessageSendEvent::BroadcastChannelUpdate {
+					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+				}
+			},
+			nativeMessageSendEvent::SendChannelUpdate {mut node_id, mut msg, } => {
+				MessageSendEvent::SendChannelUpdate {
+					node_id: crate::c_types::PublicKey::from_rust(&node_id),
 					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg)), is_owned: true },
 				}
 			},

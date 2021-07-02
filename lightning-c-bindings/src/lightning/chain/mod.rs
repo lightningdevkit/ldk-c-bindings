@@ -34,6 +34,103 @@ use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
 }
+
+use lightning::chain::BestBlock as nativeBestBlockImport;
+type nativeBestBlock = nativeBestBlockImport;
+
+/// The best known block as identified by its hash and height.
+#[must_use]
+#[repr(C)]
+pub struct BestBlock {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeBestBlock,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for BestBlock {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeBestBlock>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(self.inner) };
+		}
+	}
+}
+/// Frees any resources used by the BestBlock, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn BestBlock_free(this_obj: BestBlock) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+extern "C" fn BestBlock_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBestBlock); }
+}
+#[allow(unused)]
+/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+impl BestBlock {
+	pub(crate) fn take_inner(mut self) -> *mut nativeBestBlock {
+		assert!(self.is_owned);
+		let ret = self.inner;
+		self.inner = std::ptr::null_mut();
+		ret
+	}
+}
+impl Clone for BestBlock {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeBestBlock>::is_null(self.inner) { std::ptr::null_mut() } else {
+				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn BestBlock_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBestBlock)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the BestBlock
+pub extern "C" fn BestBlock_clone(orig: &BestBlock) -> BestBlock {
+	orig.clone()
+}
+/// Constructs a `BestBlock` that represents the genesis block at height 0 of the given
+/// network.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BestBlock_from_genesis(mut network: crate::bitcoin::network::Network) -> BestBlock {
+	let mut ret = lightning::chain::BestBlock::from_genesis(network.into_bitcoin());
+	BestBlock { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+}
+
+/// Returns a `BestBlock` as identified by the given block hash and height.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BestBlock_new(mut block_hash: crate::c_types::ThirtyTwoBytes, mut height: u32) -> BestBlock {
+	let mut ret = lightning::chain::BestBlock::new(::bitcoin::hash_types::BlockHash::from_slice(&block_hash.data[..]).unwrap(), height);
+	BestBlock { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+}
+
+/// Returns the best block hash.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BestBlock_block_hash(this_arg: &BestBlock) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*this_arg.inner }.block_hash();
+	crate::c_types::ThirtyTwoBytes { data: ret.into_inner() }
+}
+
+/// Returns the best block height.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BestBlock_height(this_arg: &BestBlock) -> u32 {
+	let mut ret = unsafe { &*this_arg.inner }.height();
+	ret
+}
+
 /// An error when accessing the chain via [`Access`].
 #[must_use]
 #[derive(Clone)]

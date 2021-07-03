@@ -280,10 +280,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						writeln!(w, "\tpub set_{}: Option<extern \"C\" fn(&{})>,", m.sig.ident, trait_name).unwrap();
 						generated_fields.push((format!("set_{}", m.sig.ident), true));
 						// Note that cbindgen will now generate
-						// typedef struct Thing {..., set_thing: (const Thing*), ...} Thing;
+						// typedef struct Thing {..., set_thing: (const struct Thing*), ...} Thing;
 						// which does not compile since Thing is not defined before it is used.
 						writeln!(extra_headers, "struct LDK{};", trait_name).unwrap();
-						writeln!(extra_headers, "typedef struct LDK{} LDK{};", trait_name, trait_name).unwrap();
 						continue;
 					}
 					// Sadly, this currently doesn't do what we want, but it should be easy to get
@@ -317,7 +316,6 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
 			writeln!(w, "\t/// Checks if two objects are equal given this object's this_arg pointer and another object.").unwrap();
 			writeln!(w, "\tpub eq: extern \"C\" fn (this_arg: *const c_void, other_arg: &{}) -> bool,", trait_name).unwrap();
-			writeln!(extra_headers, "typedef struct LDK{} LDK{};", trait_name, trait_name).unwrap();
 			generated_fields.push(("eq".to_owned(), true));
 		},
 		("std::hash::Hash", _)|("core::hash::Hash", _) => {

@@ -344,7 +344,7 @@ fi
 # Clear stale release build artifacts from previous runs
 cargo clean --release
 CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C lto
-clang++ $LOCAL_CFLAGS -std=c++11 -flto -O2 demo.cpp target/release/libldk.a -ldl
+clang++ $LOCAL_CFLAGS -std=c++11 -O2 demo.cpp target/release/libldk.a -ldl
 
 strip ./a.out
 echo "C++ Bin size and runtime with only RL (LTO) optimized:"

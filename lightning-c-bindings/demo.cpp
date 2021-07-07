@@ -481,14 +481,16 @@ int main() {
 
 		LDK::CVec_ChannelDetailsZ new_channels = ChannelManager_list_channels(&cm1);
 		assert(new_channels->datalen == 1);
-		LDKPublicKey chan_open_pk = ChannelDetails_get_remote_network_id(&new_channels->data[0]);
+		LDK::ChannelCounterparty new_channels_counterparty = ChannelDetails_get_counterparty(&new_channels->data[0]);
+		LDKPublicKey chan_open_pk = ChannelCounterparty_get_node_id(&new_channels_counterparty);
 		assert(!memcmp(chan_open_pk.compressed_form, ChannelManager_get_our_node_id(&cm2).compressed_form, 33));
 
 		while (true) {
 			LDK::CVec_ChannelDetailsZ new_channels_2 = ChannelManager_list_channels(&cm2);
 			if (new_channels_2->datalen == 1) {
 				// Sample getting our counterparty's init features (which used to be hard to do without a memory leak):
-				const LDK::InitFeatures init_feats = ChannelDetails_get_counterparty_features(&new_channels_2->data[0]);
+				LDK::ChannelCounterparty new_channels_2_counterparty = ChannelDetails_get_counterparty(&new_channels_2->data[0]);
+				const LDK::InitFeatures init_feats = ChannelCounterparty_get_features(&new_channels_2_counterparty);
 				assert(init_feats->inner != NULL);
 				break;
 			}
@@ -555,16 +557,21 @@ int main() {
 			LDK::CVec_ChannelDetailsZ outbound_channels = ChannelManager_list_usable_channels(&cm1);
 			if (outbound_channels->datalen == 1) {
 				const LDKChannelDetails *channel = &outbound_channels->data[0];
+				LDK::ChannelCounterparty counterparty = ChannelDetails_get_counterparty(channel);
 				// Note that the channel ID is the same as the channel txid reversed as the output index is 0
 				uint8_t expected_chan_id[32];
 				for (int i = 0; i < 32; i++) { expected_chan_id[i] = channel_open_txid[31-i]; }
 				assert(!memcmp(ChannelDetails_get_channel_id(channel), expected_chan_id, 32));
-				assert(!memcmp(ChannelDetails_get_remote_network_id(channel).compressed_form,
-						ChannelManager_get_our_node_id(&cm2).compressed_form, 33));
+				assert(!memcmp(
+					ChannelCounterparty_get_node_id(&counterparty).compressed_form,
+					ChannelManager_get_our_node_id(&cm2).compressed_form, 33));
 				assert(ChannelDetails_get_channel_value_satoshis(channel) == 40000);
 				// We opened the channel with 1000 push_msat:
-				assert(ChannelDetails_get_outbound_capacity_msat(channel) == 40000*1000 - 1000);
-				assert(ChannelDetails_get_inbound_capacity_msat(channel) == 1000);
+				assert(ChannelDetails_get_outbound_capacity_msat(channel) ==
+					40000*1000 - 1000 - 1000 * ChannelCounterparty_get_unspendable_punishment_reserve(&counterparty));
+				int64_t inbound_capacity = ((int64_t)1000) - ChannelCounterparty_get_unspendable_punishment_reserve(&counterparty);
+				if (inbound_capacity < 0) inbound_capacity = 0;
+				assert(ChannelDetails_get_inbound_capacity_msat(channel) == (uint64_t)inbound_capacity);
 				assert(ChannelDetails_get_is_usable(channel));
 				break;
 			}

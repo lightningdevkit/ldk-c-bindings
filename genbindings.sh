@@ -273,7 +273,7 @@ else
 	echo "WARNING: Can't use memory sanitizer on non-Linux, non-x86 platforms"
 fi
 
-RUSTC_LLVM_V=$(rustc --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 2); }' | tr -d '.')
+RUSTC_LLVM_V=$(rustc --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 4); }')
 
 if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 	# Apple is special, as always, and their versions of clang aren't
@@ -282,22 +282,40 @@ if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 		echo "Apple clang isn't compatible with upstream clang, install upstream clang"
 		CLANG_LLVM_V="0"
 	else
-		CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }' | tr -d '.')
+		CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 4); }')
+		if [ -x "$(which ld64.lld)" ]; then
+			LLD_LLVM_V="$(ld64.lld --version | awk '{ print substr($2, 0, 4); }')"
+		fi
 	fi
 else
-	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }' | tr -d '.')
+	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 4); }')
+	if [ -x "$(which ld.lld)" ]; then
+		LLD_LLVM_V="$(ld.lld --version | awk '{ print substr($2, 0, 4); }')"
+	fi
 fi
+
 
 if [ "$CLANG_LLVM_V" = "$RUSTC_LLVM_V" ]; then
 	CLANG=clang
 	CLANGPP=clang++
-elif [ "$(which clang-$RUSTC_LLVM_V)" != "" ]; then
+	if [ "$LLD_LLVM_V" = "$CLANG_LLVM_V" ]; then
+		LLD=lld
+	fi
+elif [ -x "$(which clang-$RUSTC_LLVM_V)" ]; then
 	CLANG="$(which clang-$RUSTC_LLVM_V)"
 	CLANGPP="$(which clang++-$RUSTC_LLVM_V || echo clang++)"
 	if [ "$($CLANG --version)" != "$($CLANGPP --version)" ]; then
 		echo "$CLANG and $CLANGPP are not the same version of clang!"
 		unset CLANG
 		unset CLANGPP
+	fi
+	if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
+		LLD="$(which lld-$RUSTC_LLVM_V || echo lld)"
+		LLD_LLVM_V="$(ld.$LLD --version | awk '{ print substr($2, 0, 4); }')"
+		if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
+			echo "Could not find a workable version of lld, not using cross-language LTO"
+			unset LLD
+		fi
 	fi
 fi
 
@@ -380,7 +398,7 @@ if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
 	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target aarch64-apple-darwin -- -C lto
 fi
 
-if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
+if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" -a "$LLD" != "" ]; then
 	# Finally, test cross-language LTO. Note that this will fail if rustc and clang++
 	# build against different versions of LLVM (eg when rustc is installed via rustup
 	# or Ubuntu packages). This should work fine on Distros which do more involved
@@ -389,7 +407,7 @@ if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
 	export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -O3 -fPIC -fembed-bitcode -march=sandybridge"
 	# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 	cargo clean --release
-	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C linker-plugin-lto -C lto -C link-arg=-fuse-ld=lld
+	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C linker-plugin-lto -C lto -C linker=$CLANG -C link-arg=-fuse-ld=$LLD
 	$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=lld -O2 demo.cpp target/release/libldk.a -ldl
 	strip ./a.out
 	echo "C++ Bin size and runtime with cross-language LTO:"

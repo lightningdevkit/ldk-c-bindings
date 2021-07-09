@@ -242,7 +242,7 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" ]; then
 		LLVM_V=$(rustc +nightly --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 2); }')
 		if [ -x "$(which clang-$LLVM_V)" ]; then
 			cargo +nightly clean
-			cargo +nightly rustc -Zbuild-std --target x86_64-unknown-linux-gnu -v -- -Zsanitizer=memory -Zsanitizer-memory-track-origins -Cforce-frame-pointers=yes
+			cargo +nightly rustc -Zbuild-std=std,panic_abort --target x86_64-unknown-linux-gnu -v -- -Zsanitizer=memory -Zsanitizer-memory-track-origins -Cforce-frame-pointers=yes
 			mv target/x86_64-unknown-linux-gnu/debug/libldk.* target/debug/
 
 			# Sadly, std doesn't seem to compile into something that is memsan-safe as of Aug 2020,

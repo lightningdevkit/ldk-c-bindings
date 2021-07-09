@@ -20,6 +20,54 @@ cd "$ORIG_PWD"
 
 # Generate (and reasonably test) C bindings
 
+# First we set various compiler flags...
+HOST_PLATFORM="$(rustc --version --verbose | grep "host:")"
+
+# Set path to include our rustc wrapper as well as cbindgen
+export LDK_RUSTC_PATH="$(which rustc)"
+PATH="$(pwd)/deterministic-build-wrappers:$PATH:~/.cargo/bin"
+
+# Set up CFLAGS and RUSTFLAGS vars appropriately for building libsecp256k1 and demo apps...
+BASE_CFLAGS="" # CFLAGS for libsecp256k1
+LOCAL_CFLAGS="" # CFLAGS for demo apps
+BASE_RUSTFLAGS="" # RUSTFLAGS
+
+# Remap paths so that our builds are deterministic
+BASE_RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo="
+
+# If the C compiler supports it, also set -ffile-prefix-map
+echo "int main() {}" > genbindings_path_map_test_file.c
+clang -o /dev/null -ffile-prefix-map=$HOME/.cargo= genbindings_path_map_test_file.c > /dev/null 2>&1 &&
+export BASE_CFLAGS="-ffile-prefix-map=$HOME/.cargo="
+
+BASE_CFLAGS="$BASE_CFLAGS -frandom-seed=42"
+LOCAL_CFLAGS="-Wall -Wno-nullability-completeness -pthread -Iinclude/"
+
+if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+	export MACOSX_DEPLOYMENT_TARGET=10.9
+	LOCAL_CFLAGS="$LOCAL_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
+	BASE_CFLAGS="$BASE_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
+	# Targeting aarch64 appears to be supported only starting with Big Sur, so check it before use
+	clang -o /dev/null $BASE_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14 genbindings_path_map_test_file.c &&
+	export CFLAGS_aarch64_apple_darwin="$BASE_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14" ||
+	echo "WARNING: Can not build targeting aarch64-apple-darin. Upgrade to Big Sur or try upstream clang"
+fi
+
+rm genbindings_path_map_test_file.c
+
+ENV_TARGET=$(rustc --version --verbose | grep host | awk '{ print $2 }' | sed 's/-/_/g')
+case "$ENV_TARGET" in
+	"x86_64"*)
+		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge"
+		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+		;;
+	*)
+		# Assume this isn't targeted at another host and build for the host's CPU.
+		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=native"
+		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -mcpu=native"
+		;;
+esac
+
 # First build the latest c-bindings-gen binary
 cd c-bindings-gen && cargo build --release && cd ..
 
@@ -77,8 +125,6 @@ OUT_F="$(pwd)/lightning-c-bindings/include/ldk_rust_types.h"
 OUT_CPP="$(pwd)/lightning-c-bindings/include/lightningpp.hpp"
 BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
-HOST_PLATFORM="$(rustc --version --verbose | grep "host:")"
-
 function add_crate() {
 	pushd "$LIGHTNING_PATH/$1"
 	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check $3 -- -Zunstable-options --pretty=expanded > /tmp/$1-crate-source.txt
@@ -133,52 +179,8 @@ echo -e 'pub extern "C" fn _ldk_c_bindings_get_compiled_version() -> crate::c_ty
 echo -e '\t"'"$BINDINGS_GIT"'".into()' >> lightning-c-bindings/src/version.rs
 echo -e '}' >> lightning-c-bindings/src/version.rs
 
-# Set path to include our rustc wrapper as well as cbindgen
-export LDK_RUSTC_PATH="$(which rustc)"
-PATH="$(pwd)/deterministic-build-wrappers:$PATH:~/.cargo/bin"
 # Now cd to lightning-c-bindings, build the generated bindings, and call cbindgen to build a C header file
 cd lightning-c-bindings
-
-# Set up CFLAGS and RUSTFLAGS vars appropriately for building libsecp256k1 and demo apps...
-BASE_CFLAGS="" # CFLAGS for libsecp256k1
-LOCAL_CFLAGS="" # CFLAGS for demo apps
-BASE_RUSTFLAGS="" # RUSTFLAGS
-
-# Remap paths so that our builds are deterministic
-BASE_RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo="
-
-# If the C compiler supports it, also set -ffile-prefix-map
-echo "int main() {}" > genbindings_path_map_test_file.c
-clang -o /dev/null -ffile-prefix-map=$HOME/.cargo= genbindings_path_map_test_file.c > /dev/null 2>&1 &&
-export BASE_CFLAGS="-ffile-prefix-map=$HOME/.cargo="
-
-BASE_CFLAGS="$BASE_CFLAGS -frandom-seed=42"
-LOCAL_CFLAGS="-Wall -Wno-nullability-completeness -pthread -Iinclude/"
-
-if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
-	export MACOSX_DEPLOYMENT_TARGET=10.9
-	LOCAL_CFLAGS="$LOCAL_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
-	BASE_CFLAGS="$BASE_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
-	# Targeting aarch64 appears to be supported only starting with Big Sur, so check it before use
-	clang -o /dev/null $BASE_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14 genbindings_path_map_test_file.c &&
-	export CFLAGS_aarch64_apple_darwin="$BASE_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14" ||
-	echo "WARNING: Can not build targeting aarch64-apple-darin. Upgrade to Big Sur or try upstream clang"
-fi
-
-rm genbindings_path_map_test_file.c
-
-ENV_TARGET=$(rustc --version --verbose | grep host | awk '{ print $2 }' | sed 's/-/_/g')
-case "$ENV_TARGET" in
-	"x86_64"*)
-		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge"
-		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
-		;;
-	*)
-		# Assume this isn't targeted at another host and build for the host's CPU.
-		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=native"
-		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -mcpu=native"
-		;;
-esac
 
 cargo build
 if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then

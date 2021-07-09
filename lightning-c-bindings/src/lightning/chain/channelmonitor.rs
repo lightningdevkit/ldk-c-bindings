@@ -720,6 +720,15 @@ pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &ChannelMonitor) -
 	local_ret.into()
 }
 
+/// Gets the latest best block which was connected either via the [`chain::Listen`] or
+/// [`chain::Confirm`] interfaces.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelMonitor_current_best_block(this_arg: &ChannelMonitor) -> crate::lightning::chain::BestBlock {
+	let mut ret = unsafe { &*this_arg.inner }.current_best_block();
+	crate::lightning::chain::BestBlock { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+}
+
 /// `Persist` defines behavior for persisting channel monitors: this could mean
 /// writing once to disk, and/or uploading to one or more backup services.
 ///

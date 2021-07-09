@@ -432,27 +432,37 @@ impl MessageHandler {
 	}
 }
 /// A message handler which handles messages specific to channels. Usually this is just a
-/// ChannelManager object or a ErroringMessageHandler.
+/// [`ChannelManager`] object or an [`ErroringMessageHandler`].
+///
+/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
 #[no_mangle]
 pub extern "C" fn MessageHandler_get_chan_handler(this_ptr: &MessageHandler) -> *const crate::lightning::ln::msgs::ChannelMessageHandler {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.chan_handler;
 	inner_val
 }
 /// A message handler which handles messages specific to channels. Usually this is just a
-/// ChannelManager object or a ErroringMessageHandler.
+/// [`ChannelManager`] object or an [`ErroringMessageHandler`].
+///
+/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
 #[no_mangle]
 pub extern "C" fn MessageHandler_set_chan_handler(this_ptr: &mut MessageHandler, mut val: crate::lightning::ln::msgs::ChannelMessageHandler) {
 	unsafe { &mut *this_ptr.inner }.chan_handler = val;
 }
 /// A message handler which handles messages updating our knowledge of the network channel
-/// graph. Usually this is just a NetGraphMsgHandlerMonitor object or an IgnoringMessageHandler.
+/// graph. Usually this is just a [`NetGraphMsgHandler`] object or an
+/// [`IgnoringMessageHandler`].
+///
+/// [`NetGraphMsgHandler`]: crate::routing::network_graph::NetGraphMsgHandler
 #[no_mangle]
 pub extern "C" fn MessageHandler_get_route_handler(this_ptr: &MessageHandler) -> *const crate::lightning::ln::msgs::RoutingMessageHandler {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.route_handler;
 	inner_val
 }
 /// A message handler which handles messages updating our knowledge of the network channel
-/// graph. Usually this is just a NetGraphMsgHandlerMonitor object or an IgnoringMessageHandler.
+/// graph. Usually this is just a [`NetGraphMsgHandler`] object or an
+/// [`IgnoringMessageHandler`].
+///
+/// [`NetGraphMsgHandler`]: crate::routing::network_graph::NetGraphMsgHandler
 #[no_mangle]
 pub extern "C" fn MessageHandler_set_route_handler(this_ptr: &mut MessageHandler, mut val: crate::lightning::ln::msgs::RoutingMessageHandler) {
 	unsafe { &mut *this_ptr.inner }.route_handler = val;
@@ -472,11 +482,12 @@ pub extern "C" fn MessageHandler_new(mut chan_handler_arg: crate::lightning::ln:
 ///
 /// For efficiency, Clone should be relatively cheap for this type.
 ///
-/// You probably want to just extend an int and put a file descriptor in a struct and implement
-/// send_data. Note that if you are using a higher-level net library that may call close() itself,
-/// be careful to ensure you don't have races whereby you might register a new connection with an
-/// fd which is the same as a previous one which has yet to be removed via
-/// PeerManager::socket_disconnected().
+/// Two descriptors may compare equal (by [`cmp::Eq`] and [`hash::Hash`]) as long as the original
+/// has been disconnected, the [`PeerManager`] has been informed of the disconnection (either by it
+/// having triggered the disconnection or a call to [`PeerManager::socket_disconnected`]), and no
+/// further calls to the [`PeerManager`] related to the original socket occur. This allows you to
+/// use a file descriptor for your SocketDescriptor directly, however for simplicity you may wish
+/// to simply use another value which is guaranteed to be globally unique instead.
 #[repr(C)]
 pub struct SocketDescriptor {
 	/// An opaque pointer which is passed to your function implementations as an argument.
@@ -485,24 +496,26 @@ pub struct SocketDescriptor {
 	/// Attempts to send some data from the given slice to the peer.
 	///
 	/// Returns the amount of data which was sent, possibly 0 if the socket has since disconnected.
-	/// Note that in the disconnected case, socket_disconnected must still fire and further write
-	/// attempts may occur until that time.
+	/// Note that in the disconnected case, [`PeerManager::socket_disconnected`] must still be
+	/// called and further write attempts may occur until that time.
 	///
-	/// If the returned size is smaller than data.len(), a write_available event must
-	/// trigger the next time more data can be written. Additionally, until the a send_data event
-	/// completes fully, no further read_events should trigger on the same peer!
+	/// If the returned size is smaller than `data.len()`, a
+	/// [`PeerManager::write_buffer_space_avail`] call must be made the next time more data can be
+	/// written. Additionally, until a `send_data` event completes fully, no further
+	/// [`PeerManager::read_event`] calls should be made for the same peer! Because this is to
+	/// prevent denial-of-service issues, you should not read or buffer any data from the socket
+	/// until then.
 	///
-	/// If a read_event on this descriptor had previously returned true (indicating that read
-	/// events should be paused to prevent DoS in the send buffer), resume_read may be set
-	/// indicating that read events on this descriptor should resume. A resume_read of false does
-	/// *not* imply that further read events should be paused.
+	/// If a [`PeerManager::read_event`] call on this descriptor had previously returned true
+	/// (indicating that read events should be paused to prevent DoS in the send buffer),
+	/// `resume_read` may be set indicating that read events on this descriptor should resume. A
+	/// `resume_read` of false carries no meaning, and should not cause any action.
 	#[must_use]
 	pub send_data: extern "C" fn (this_arg: *mut c_void, data: crate::c_types::u8slice, resume_read: bool) -> usize,
-	/// Disconnect the socket pointed to by this SocketDescriptor. Once this function returns, no
-	/// more calls to write_buffer_space_avail, read_event or socket_disconnected may be made with
-	/// this descriptor. No socket_disconnected call should be generated as a result of this call,
-	/// though races may occur whereby disconnect_socket is called after a call to
-	/// socket_disconnected but prior to socket_disconnected returning.
+	/// Disconnect the socket pointed to by this SocketDescriptor.
+	///
+	/// You do *not* need to call [`PeerManager::socket_disconnected`] with this socket after this
+	/// call (doing so is a noop).
 	pub disconnect_socket: extern "C" fn (this_arg: *mut c_void),
 	/// Checks if two objects are equal given this object's this_arg pointer and another object.
 	pub eq: extern "C" fn (this_arg: *const c_void, other_arg: &SocketDescriptor) -> bool,
@@ -666,14 +679,25 @@ pub extern "C" fn PeerHandleError_clone(orig: &PeerHandleError) -> PeerHandleErr
 use lightning::ln::peer_handler::PeerManager as nativePeerManagerImport;
 type nativePeerManager = nativePeerManagerImport<crate::lightning::ln::peer_handler::SocketDescriptor, crate::lightning::ln::msgs::ChannelMessageHandler, crate::lightning::ln::msgs::RoutingMessageHandler, crate::lightning::util::logger::Logger>;
 
-/// A PeerManager manages a set of peers, described by their SocketDescriptor and marshalls socket
-/// events into messages which it passes on to its MessageHandlers.
+/// A PeerManager manages a set of peers, described by their [`SocketDescriptor`] and marshalls
+/// socket events into messages which it passes on to its [`MessageHandler`].
+///
+/// Locks are taken internally, so you must never assume that reentrancy from a
+/// [`SocketDescriptor`] call back into [`PeerManager`] methods will not deadlock.
+///
+/// Calls to [`read_event`] will decode relevant messages and pass them to the
+/// [`ChannelMessageHandler`], likely doing message processing in-line. Thus, the primary form of
+/// parallelism in Rust-Lightning is in calls to [`read_event`]. Note, however, that calls to any
+/// [`PeerManager`] functions related to the same connection must occur only in serial, making new
+/// calls only after previous ones have returned.
 ///
 /// Rather than using a plain PeerManager, it is preferable to use either a SimpleArcPeerManager
 /// a SimpleRefPeerManager, for conciseness. See their documentation for more details, but
 /// essentially you should default to using a SimpleRefPeerManager, and use a
 /// SimpleArcPeerManager when you require a PeerManager with a static lifetime, such as when
 /// you're using lightning-net-tokio.
+///
+/// [`read_event`]: PeerManager::read_event
 #[must_use]
 #[repr(C)]
 pub struct PeerManager {
@@ -743,8 +767,10 @@ pub extern "C" fn PeerManager_get_peer_node_ids(this_arg: &PeerManager) -> crate
 ///
 /// Returns a small number of bytes to send to the remote node (currently always 50).
 ///
-/// Panics if descriptor is duplicative with some other descriptor which has not yet had a
-/// socket_disconnected().
+/// Panics if descriptor is duplicative with some other descriptor which has not yet been
+/// [`socket_disconnected()`].
+///
+/// [`socket_disconnected()`]: PeerManager::socket_disconnected
 #[must_use]
 #[no_mangle]
 pub extern "C" fn PeerManager_new_outbound_connection(this_arg: &PeerManager, mut their_node_id: crate::c_types::PublicKey, mut descriptor: crate::lightning::ln::peer_handler::SocketDescriptor) -> crate::c_types::derived::CResult_CVec_u8ZPeerHandleErrorZ {
@@ -760,8 +786,10 @@ pub extern "C" fn PeerManager_new_outbound_connection(this_arg: &PeerManager, mu
 /// call socket_disconnected for the new descriptor but must disconnect the connection
 /// immediately.
 ///
-/// Panics if descriptor is duplicative with some other descriptor which has not yet had
-/// socket_disconnected called.
+/// Panics if descriptor is duplicative with some other descriptor which has not yet been
+/// [`socket_disconnected()`].
+///
+/// [`socket_disconnected()`]: PeerManager::socket_disconnected
 #[must_use]
 #[no_mangle]
 pub extern "C" fn PeerManager_new_inbound_connection(this_arg: &PeerManager, mut descriptor: crate::lightning::ln::peer_handler::SocketDescriptor) -> crate::c_types::derived::CResult_NonePeerHandleErrorZ {
@@ -774,12 +802,14 @@ pub extern "C" fn PeerManager_new_inbound_connection(this_arg: &PeerManager, mut
 ///
 /// May return an Err to indicate that the connection should be closed.
 ///
-/// Will most likely call send_data on the descriptor passed in (or the descriptor handed into
-/// new_*\\_connection) before returning. Thus, be very careful with reentrancy issues! The
-/// invariants around calling write_buffer_space_avail in case a write did not fully complete
-/// must still hold - be ready to call write_buffer_space_avail again if a write call generated
-/// here isn't sufficient! Panics if the descriptor was not previously registered in a
-/// new_\\*_connection event.
+/// May call [`send_data`] on the descriptor passed in (or an equal descriptor) before
+/// returning. Thus, be very careful with reentrancy issues! The invariants around calling
+/// [`write_buffer_space_avail`] in case a write did not fully complete must still hold - be
+/// ready to call `[write_buffer_space_avail`] again if a write call generated here isn't
+/// sufficient!
+///
+/// [`send_data`]: SocketDescriptor::send_data
+/// [`write_buffer_space_avail`]: PeerManager::write_buffer_space_avail
 #[must_use]
 #[no_mangle]
 pub extern "C" fn PeerManager_write_buffer_space_avail(this_arg: &PeerManager, descriptor: &mut crate::lightning::ln::peer_handler::SocketDescriptor) -> crate::c_types::derived::CResult_NonePeerHandleErrorZ {
@@ -792,14 +822,16 @@ pub extern "C" fn PeerManager_write_buffer_space_avail(this_arg: &PeerManager, d
 ///
 /// May return an Err to indicate that the connection should be closed.
 ///
-/// Will *not* call back into send_data on any descriptors to avoid reentrancy complexity.
-/// Thus, however, you almost certainly want to call process_events() after any read_event to
-/// generate send_data calls to handle responses.
+/// Will *not* call back into [`send_data`] on any descriptors to avoid reentrancy complexity.
+/// Thus, however, you should call [`process_events`] after any `read_event` to generate
+/// [`send_data`] calls to handle responses.
 ///
-/// If Ok(true) is returned, further read_events should not be triggered until a send_data call
-/// on this file descriptor has resume_read set (preventing DoS issues in the send buffer).
+/// If `Ok(true)` is returned, further read_events should not be triggered until a
+/// [`send_data`] call on this descriptor has `resume_read` set (preventing DoS issues in the
+/// send buffer).
 ///
-/// Panics if the descriptor was not previously registered in a new_*_connection event.
+/// [`send_data`]: SocketDescriptor::send_data
+/// [`process_events`]: PeerManager::process_events
 #[must_use]
 #[no_mangle]
 pub extern "C" fn PeerManager_read_event(this_arg: &PeerManager, peer_descriptor: &mut crate::lightning::ln::peer_handler::SocketDescriptor, mut data: crate::c_types::u8slice) -> crate::c_types::derived::CResult_boolPeerHandleErrorZ {
@@ -810,20 +842,20 @@ pub extern "C" fn PeerManager_read_event(this_arg: &PeerManager, peer_descriptor
 
 /// Checks for any events generated by our handlers and processes them. Includes sending most
 /// response messages as well as messages generated by calls to handler functions directly (eg
-/// functions like ChannelManager::process_pending_htlc_forward or send_payment).
+/// functions like [`ChannelManager::process_pending_htlc_forwards`] or [`send_payment`]).
+///
+/// May call [`send_data`] on [`SocketDescriptor`]s. Thus, be very careful with reentrancy
+/// issues!
+///
+/// [`send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+/// [`ChannelManager::process_pending_htlc_forwards`]: crate::ln::channelmanager::ChannelManager::process_pending_htlc_forwards
+/// [`send_data`]: SocketDescriptor::send_data
 #[no_mangle]
 pub extern "C" fn PeerManager_process_events(this_arg: &PeerManager) {
 	unsafe { &*this_arg.inner }.process_events()
 }
 
 /// Indicates that the given socket descriptor's connection is now closed.
-///
-/// This must only be called if the socket has been disconnected by the peer or your own
-/// decision to disconnect it and must NOT be called in any case where other parts of this
-/// library (eg PeerHandleError, explicit disconnect_socket calls) instruct you to disconnect
-/// the peer.
-///
-/// Panics if the descriptor was not previously registered in a successful new_*_connection event.
 #[no_mangle]
 pub extern "C" fn PeerManager_socket_disconnected(this_arg: &PeerManager, descriptor: &crate::lightning::ln::peer_handler::SocketDescriptor) {
 	unsafe { &*this_arg.inner }.socket_disconnected(descriptor)
@@ -831,19 +863,26 @@ pub extern "C" fn PeerManager_socket_disconnected(this_arg: &PeerManager, descri
 
 /// Disconnect a peer given its node id.
 ///
-/// Set no_connection_possible to true to prevent any further connection with this peer,
+/// Set `no_connection_possible` to true to prevent any further connection with this peer,
 /// force-closing any channels we have with it.
 ///
-/// If a peer is connected, this will call `disconnect_socket` on the descriptor for the peer,
-/// so be careful about reentrancy issues.
+/// If a peer is connected, this will call [`disconnect_socket`] on the descriptor for the
+/// peer. Thus, be very careful about reentrancy issues.
+///
+/// [`disconnect_socket`]: SocketDescriptor::disconnect_socket
 #[no_mangle]
 pub extern "C" fn PeerManager_disconnect_by_node_id(this_arg: &PeerManager, mut node_id: crate::c_types::PublicKey, mut no_connection_possible: bool) {
 	unsafe { &*this_arg.inner }.disconnect_by_node_id(node_id.into_rust(), no_connection_possible)
 }
 
 /// This function should be called roughly once every 30 seconds.
-/// It will send pings to each peer and disconnect those which did not respond to the last round of pings.
-/// Will most likely call send_data on all of the registered descriptors, thus, be very careful with reentrancy issues!
+/// It will send pings to each peer and disconnect those which did not respond to the last
+/// round of pings.
+///
+/// May call [`send_data`] on all [`SocketDescriptor`]s. Thus, be very careful with reentrancy
+/// issues!
+///
+/// [`send_data`]: SocketDescriptor::send_data
 #[no_mangle]
 pub extern "C" fn PeerManager_timer_tick_occurred(this_arg: &PeerManager) {
 	unsafe { &*this_arg.inner }.timer_tick_occurred()

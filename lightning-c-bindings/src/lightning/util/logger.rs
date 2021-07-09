@@ -23,63 +23,57 @@ use crate::c_types::*;
 #[derive(Clone)]
 #[repr(C)]
 pub enum Level {
-	///Designates logger being silent
-	Off,
-	/// Designates very serious errors
-	Error,
-	/// Designates hazardous situations
-	Warn,
-	/// Designates useful information
-	Info,
-	/// Designates lower priority information
-	Debug,
 	/// Designates very low priority, often extremely verbose, information
 	Trace,
+	/// Designates lower priority information
+	Debug,
+	/// Designates useful information
+	Info,
+	/// Designates hazardous situations
+	Warn,
+	/// Designates very serious errors
+	Error,
 }
 use lightning::util::logger::Level as nativeLevel;
 impl Level {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeLevel {
 		match self {
-			Level::Off => nativeLevel::Off,
-			Level::Error => nativeLevel::Error,
-			Level::Warn => nativeLevel::Warn,
-			Level::Info => nativeLevel::Info,
-			Level::Debug => nativeLevel::Debug,
 			Level::Trace => nativeLevel::Trace,
+			Level::Debug => nativeLevel::Debug,
+			Level::Info => nativeLevel::Info,
+			Level::Warn => nativeLevel::Warn,
+			Level::Error => nativeLevel::Error,
 		}
 	}
 	#[allow(unused)]
 	pub(crate) fn into_native(self) -> nativeLevel {
 		match self {
-			Level::Off => nativeLevel::Off,
-			Level::Error => nativeLevel::Error,
-			Level::Warn => nativeLevel::Warn,
-			Level::Info => nativeLevel::Info,
-			Level::Debug => nativeLevel::Debug,
 			Level::Trace => nativeLevel::Trace,
+			Level::Debug => nativeLevel::Debug,
+			Level::Info => nativeLevel::Info,
+			Level::Warn => nativeLevel::Warn,
+			Level::Error => nativeLevel::Error,
 		}
 	}
 	#[allow(unused)]
 	pub(crate) fn from_native(native: &nativeLevel) -> Self {
 		match native {
-			nativeLevel::Off => Level::Off,
-			nativeLevel::Error => Level::Error,
-			nativeLevel::Warn => Level::Warn,
-			nativeLevel::Info => Level::Info,
-			nativeLevel::Debug => Level::Debug,
 			nativeLevel::Trace => Level::Trace,
+			nativeLevel::Debug => Level::Debug,
+			nativeLevel::Info => Level::Info,
+			nativeLevel::Warn => Level::Warn,
+			nativeLevel::Error => Level::Error,
 		}
 	}
 	#[allow(unused)]
 	pub(crate) fn native_into(native: nativeLevel) -> Self {
 		match native {
-			nativeLevel::Off => Level::Off,
-			nativeLevel::Error => Level::Error,
-			nativeLevel::Warn => Level::Warn,
-			nativeLevel::Info => Level::Info,
-			nativeLevel::Debug => Level::Debug,
 			nativeLevel::Trace => Level::Trace,
+			nativeLevel::Debug => Level::Debug,
+			nativeLevel::Info => Level::Info,
+			nativeLevel::Warn => Level::Warn,
+			nativeLevel::Error => Level::Error,
 		}
 	}
 }

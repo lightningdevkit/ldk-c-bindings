@@ -110,6 +110,22 @@ use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
 }
+/// Default expiry time as defined by [BOLT 11].
+///
+/// [BOLT 11]: https://github.com/lightningnetwork/lightning-rfc/blob/master/11-payment-encoding.md
+
+#[no_mangle]
+pub static DEFAULT_EXPIRY_TIME: u64 = lightning_invoice::DEFAULT_EXPIRY_TIME;
+/// Default minimum final CLTV expiry as defined by [BOLT 11].
+///
+/// Note that this is *not* the same value as rust-lightning's minimum CLTV expiry, which is
+/// provided in [`MIN_FINAL_CLTV_EXPIRY`].
+///
+/// [BOLT 11]: https://github.com/lightningnetwork/lightning-rfc/blob/master/11-payment-encoding.md
+/// [`MIN_FINAL_CLTV_EXPIRY`]: lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY
+
+#[no_mangle]
+pub static DEFAULT_MIN_FINAL_CLTV_EXPIRY: u64 = lightning_invoice::DEFAULT_MIN_FINAL_CLTV_EXPIRY;
 /// **Call this function on startup to ensure that all assumptions about the platform are valid.**
 ///
 /// Unfortunately we have to make assumptions about the upper bounds of the `SystemTime` type on

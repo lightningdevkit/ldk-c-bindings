@@ -166,21 +166,21 @@ pub extern "C" fn ChainParameters_set_network(this_ptr: &mut ChainParameters, mu
 ///
 /// Used to track on-chain channel funding outputs and send payments with reliable timelocks.
 #[no_mangle]
-pub extern "C" fn ChainParameters_get_best_block(this_ptr: &ChainParameters) -> crate::lightning::ln::channelmanager::BestBlock {
+pub extern "C" fn ChainParameters_get_best_block(this_ptr: &ChainParameters) -> crate::lightning::chain::BestBlock {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.best_block;
-	crate::lightning::ln::channelmanager::BestBlock { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::chain::BestBlock { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
 }
 /// The hash and height of the latest block successfully connected.
 ///
 /// Used to track on-chain channel funding outputs and send payments with reliable timelocks.
 #[no_mangle]
-pub extern "C" fn ChainParameters_set_best_block(this_ptr: &mut ChainParameters, mut val: crate::lightning::ln::channelmanager::BestBlock) {
+pub extern "C" fn ChainParameters_set_best_block(this_ptr: &mut ChainParameters, mut val: crate::lightning::chain::BestBlock) {
 	unsafe { &mut *this_ptr.inner }.best_block = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Constructs a new ChainParameters given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChainParameters_new(mut network_arg: crate::bitcoin::network::Network, mut best_block_arg: crate::lightning::ln::channelmanager::BestBlock) -> ChainParameters {
+pub extern "C" fn ChainParameters_new(mut network_arg: crate::bitcoin::network::Network, mut best_block_arg: crate::lightning::chain::BestBlock) -> ChainParameters {
 	ChainParameters { inner: Box::into_raw(Box::new(nativeChainParameters {
 		network: network_arg.into_bitcoin(),
 		best_block: *unsafe { Box::from_raw(best_block_arg.take_inner()) },
@@ -205,102 +205,6 @@ pub(crate) extern "C" fn ChainParameters_clone_void(this_ptr: *const c_void) -> 
 pub extern "C" fn ChainParameters_clone(orig: &ChainParameters) -> ChainParameters {
 	orig.clone()
 }
-
-use lightning::ln::channelmanager::BestBlock as nativeBestBlockImport;
-type nativeBestBlock = nativeBestBlockImport;
-
-/// The best known block as identified by its hash and height.
-#[must_use]
-#[repr(C)]
-pub struct BestBlock {
-	/// A pointer to the opaque Rust object.
-
-	/// Nearly everywhere, inner must be non-null, however in places where
-	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeBestBlock,
-	/// Indicates that this is the only struct which contains the same pointer.
-
-	/// Rust functions which take ownership of an object provided via an argument require
-	/// this to be true and invalidate the object pointed to by inner.
-	pub is_owned: bool,
-}
-
-impl Drop for BestBlock {
-	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeBestBlock>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
-		}
-	}
-}
-/// Frees any resources used by the BestBlock, if is_owned is set and inner is non-NULL.
-#[no_mangle]
-pub extern "C" fn BestBlock_free(this_obj: BestBlock) { }
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn BestBlock_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBestBlock); }
-}
-#[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-impl BestBlock {
-	pub(crate) fn take_inner(mut self) -> *mut nativeBestBlock {
-		assert!(self.is_owned);
-		let ret = self.inner;
-		self.inner = std::ptr::null_mut();
-		ret
-	}
-}
-impl Clone for BestBlock {
-	fn clone(&self) -> Self {
-		Self {
-			inner: if <*mut nativeBestBlock>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
-			is_owned: true,
-		}
-	}
-}
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn BestBlock_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBestBlock)).clone() })) as *mut c_void
-}
-#[no_mangle]
-/// Creates a copy of the BestBlock
-pub extern "C" fn BestBlock_clone(orig: &BestBlock) -> BestBlock {
-	orig.clone()
-}
-/// Returns the best block from the genesis of the given network.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn BestBlock_from_genesis(mut network: crate::bitcoin::network::Network) -> BestBlock {
-	let mut ret = lightning::ln::channelmanager::BestBlock::from_genesis(network.into_bitcoin());
-	BestBlock { inner: Box::into_raw(Box::new(ret)), is_owned: true }
-}
-
-/// Returns the best block as identified by the given block hash and height.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn BestBlock_new(mut block_hash: crate::c_types::ThirtyTwoBytes, mut height: u32) -> BestBlock {
-	let mut ret = lightning::ln::channelmanager::BestBlock::new(::bitcoin::hash_types::BlockHash::from_slice(&block_hash.data[..]).unwrap(), height);
-	BestBlock { inner: Box::into_raw(Box::new(ret)), is_owned: true }
-}
-
-/// Returns the best block hash.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn BestBlock_block_hash(this_arg: &BestBlock) -> crate::c_types::ThirtyTwoBytes {
-	let mut ret = unsafe { &*this_arg.inner }.block_hash();
-	crate::c_types::ThirtyTwoBytes { data: ret.into_inner() }
-}
-
-/// Returns the best block height.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn BestBlock_height(this_arg: &BestBlock) -> u32 {
-	let mut ret = unsafe { &*this_arg.inner }.height();
-	ret
-}
-
 /// The amount of time in blocks we require our counterparty wait to claim their money (ie time
 /// between when we, or our watchtower, must check for them having broadcast a theft transaction).
 ///
@@ -325,6 +229,120 @@ pub static MIN_CLTV_EXPIRY_DELTA: u16 = lightning::ln::channelmanager::MIN_CLTV_
 
 #[no_mangle]
 pub static MIN_FINAL_CLTV_EXPIRY: u32 = lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY;
+
+use lightning::ln::channelmanager::ChannelCounterparty as nativeChannelCounterpartyImport;
+type nativeChannelCounterparty = nativeChannelCounterpartyImport;
+
+/// Channel parameters which apply to our counterparty. These are split out from [`ChannelDetails`]
+/// to better separate parameters.
+#[must_use]
+#[repr(C)]
+pub struct ChannelCounterparty {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeChannelCounterparty,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for ChannelCounterparty {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeChannelCounterparty>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(self.inner) };
+		}
+	}
+}
+/// Frees any resources used by the ChannelCounterparty, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn ChannelCounterparty_free(this_obj: ChannelCounterparty) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+extern "C" fn ChannelCounterparty_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelCounterparty); }
+}
+#[allow(unused)]
+/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+impl ChannelCounterparty {
+	pub(crate) fn take_inner(mut self) -> *mut nativeChannelCounterparty {
+		assert!(self.is_owned);
+		let ret = self.inner;
+		self.inner = std::ptr::null_mut();
+		ret
+	}
+}
+/// The node_id of our counterparty
+#[no_mangle]
+pub extern "C" fn ChannelCounterparty_get_node_id(this_ptr: &ChannelCounterparty) -> crate::c_types::PublicKey {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.node_id;
+	crate::c_types::PublicKey::from_rust(&inner_val)
+}
+/// The node_id of our counterparty
+#[no_mangle]
+pub extern "C" fn ChannelCounterparty_set_node_id(this_ptr: &mut ChannelCounterparty, mut val: crate::c_types::PublicKey) {
+	unsafe { &mut *this_ptr.inner }.node_id = val.into_rust();
+}
+/// The Features the channel counterparty provided upon last connection.
+/// Useful for routing as it is the most up-to-date copy of the counterparty's features and
+/// many routing-relevant features are present in the init context.
+#[no_mangle]
+pub extern "C" fn ChannelCounterparty_get_features(this_ptr: &ChannelCounterparty) -> crate::lightning::ln::features::InitFeatures {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.features;
+	crate::lightning::ln::features::InitFeatures { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
+}
+/// The Features the channel counterparty provided upon last connection.
+/// Useful for routing as it is the most up-to-date copy of the counterparty's features and
+/// many routing-relevant features are present in the init context.
+#[no_mangle]
+pub extern "C" fn ChannelCounterparty_set_features(this_ptr: &mut ChannelCounterparty, mut val: crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut *this_ptr.inner }.features = *unsafe { Box::from_raw(val.take_inner()) };
+}
+/// The value, in satoshis, that must always be held in the channel for our counterparty. This
+/// value ensures that if our counterparty broadcasts a revoked state, we can punish them by
+/// claiming at least this value on chain.
+///
+/// This value is not included in [`inbound_capacity_msat`] as it can never be spent.
+///
+/// [`inbound_capacity_msat`]: ChannelDetails::inbound_capacity_msat
+#[no_mangle]
+pub extern "C" fn ChannelCounterparty_get_unspendable_punishment_reserve(this_ptr: &ChannelCounterparty) -> u64 {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.unspendable_punishment_reserve;
+	*inner_val
+}
+/// The value, in satoshis, that must always be held in the channel for our counterparty. This
+/// value ensures that if our counterparty broadcasts a revoked state, we can punish them by
+/// claiming at least this value on chain.
+///
+/// This value is not included in [`inbound_capacity_msat`] as it can never be spent.
+///
+/// [`inbound_capacity_msat`]: ChannelDetails::inbound_capacity_msat
+#[no_mangle]
+pub extern "C" fn ChannelCounterparty_set_unspendable_punishment_reserve(this_ptr: &mut ChannelCounterparty, mut val: u64) {
+	unsafe { &mut *this_ptr.inner }.unspendable_punishment_reserve = val;
+}
+impl Clone for ChannelCounterparty {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeChannelCounterparty>::is_null(self.inner) { std::ptr::null_mut() } else {
+				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ChannelCounterparty_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelCounterparty)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the ChannelCounterparty
+pub extern "C" fn ChannelCounterparty_clone(orig: &ChannelCounterparty) -> ChannelCounterparty {
+	orig.clone()
+}
 
 use lightning::ln::channelmanager::ChannelDetails as nativeChannelDetailsImport;
 type nativeChannelDetails = nativeChannelDetailsImport;
@@ -387,6 +405,17 @@ pub extern "C" fn ChannelDetails_get_channel_id(this_ptr: &ChannelDetails) -> *c
 pub extern "C" fn ChannelDetails_set_channel_id(this_ptr: &mut ChannelDetails, mut val: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &mut *this_ptr.inner }.channel_id = val.data;
 }
+/// Parameters which apply to our counterparty. See individual fields for more information.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_get_counterparty(this_ptr: &ChannelDetails) -> crate::lightning::ln::channelmanager::ChannelCounterparty {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.counterparty;
+	crate::lightning::ln::channelmanager::ChannelCounterparty { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
+}
+/// Parameters which apply to our counterparty. See individual fields for more information.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_set_counterparty(this_ptr: &mut ChannelDetails, mut val: crate::lightning::ln::channelmanager::ChannelCounterparty) {
+	unsafe { &mut *this_ptr.inner }.counterparty = *unsafe { Box::from_raw(val.take_inner()) };
+}
 /// The Channel's funding transaction output, if we've negotiated the funding transaction with
 /// our counterparty already.
 ///
@@ -423,32 +452,6 @@ pub extern "C" fn ChannelDetails_set_short_channel_id(this_ptr: &mut ChannelDeta
 	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
 	unsafe { &mut *this_ptr.inner }.short_channel_id = local_val;
 }
-/// The node_id of our counterparty
-#[no_mangle]
-pub extern "C" fn ChannelDetails_get_remote_network_id(this_ptr: &ChannelDetails) -> crate::c_types::PublicKey {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.remote_network_id;
-	crate::c_types::PublicKey::from_rust(&inner_val)
-}
-/// The node_id of our counterparty
-#[no_mangle]
-pub extern "C" fn ChannelDetails_set_remote_network_id(this_ptr: &mut ChannelDetails, mut val: crate::c_types::PublicKey) {
-	unsafe { &mut *this_ptr.inner }.remote_network_id = val.into_rust();
-}
-/// The Features the channel counterparty provided upon last connection.
-/// Useful for routing as it is the most up-to-date copy of the counterparty's features and
-/// many routing-relevant features are present in the init context.
-#[no_mangle]
-pub extern "C" fn ChannelDetails_get_counterparty_features(this_ptr: &ChannelDetails) -> crate::lightning::ln::features::InitFeatures {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.counterparty_features;
-	crate::lightning::ln::features::InitFeatures { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
-}
-/// The Features the channel counterparty provided upon last connection.
-/// Useful for routing as it is the most up-to-date copy of the counterparty's features and
-/// many routing-relevant features are present in the init context.
-#[no_mangle]
-pub extern "C" fn ChannelDetails_set_counterparty_features(this_ptr: &mut ChannelDetails, mut val: crate::lightning::ln::features::InitFeatures) {
-	unsafe { &mut *this_ptr.inner }.counterparty_features = *unsafe { Box::from_raw(val.take_inner()) };
-}
 /// The value, in satoshis, of this channel as appears in the funding output
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_channel_value_satoshis(this_ptr: &ChannelDetails) -> u64 {
@@ -459,6 +462,35 @@ pub extern "C" fn ChannelDetails_get_channel_value_satoshis(this_ptr: &ChannelDe
 #[no_mangle]
 pub extern "C" fn ChannelDetails_set_channel_value_satoshis(this_ptr: &mut ChannelDetails, mut val: u64) {
 	unsafe { &mut *this_ptr.inner }.channel_value_satoshis = val;
+}
+/// The value, in satoshis, that must always be held in the channel for us. This value ensures
+/// that if we broadcast a revoked state, our counterparty can punish us by claiming at least
+/// this value on chain.
+///
+/// This value is not included in [`outbound_capacity_msat`] as it can never be spent.
+///
+/// This value will be `None` for outbound channels until the counterparty accepts the channel.
+///
+/// [`outbound_capacity_msat`]: ChannelDetails::outbound_capacity_msat
+#[no_mangle]
+pub extern "C" fn ChannelDetails_get_unspendable_punishment_reserve(this_ptr: &ChannelDetails) -> crate::c_types::derived::COption_u64Z {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.unspendable_punishment_reserve;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(inner_val.unwrap()) } };
+	local_inner_val
+}
+/// The value, in satoshis, that must always be held in the channel for us. This value ensures
+/// that if we broadcast a revoked state, our counterparty can punish us by claiming at least
+/// this value on chain.
+///
+/// This value is not included in [`outbound_capacity_msat`] as it can never be spent.
+///
+/// This value will be `None` for outbound channels until the counterparty accepts the channel.
+///
+/// [`outbound_capacity_msat`]: ChannelDetails::outbound_capacity_msat
+#[no_mangle]
+pub extern "C" fn ChannelDetails_set_unspendable_punishment_reserve(this_ptr: &mut ChannelDetails, mut val: crate::c_types::derived::COption_u64Z) {
+	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
+	unsafe { &mut *this_ptr.inner }.unspendable_punishment_reserve = local_val;
 }
 /// The user_id passed in to create_channel, or 0 if the channel was inbound.
 #[no_mangle]
@@ -475,6 +507,10 @@ pub extern "C" fn ChannelDetails_set_user_id(this_ptr: &mut ChannelDetails, mut 
 /// any pending HTLCs which are not yet fully resolved (and, thus, who's balance is not
 /// available for inclusion in new outbound HTLCs). This further does not include any pending
 /// outgoing HTLCs which are awaiting some other resolution to be sent.
+///
+/// This value is not exact. Due to various in-flight changes, feerate changes, and our
+/// conflict-avoidance policy, exactly this amount is not likely to be spendable. However, we
+/// should be able to spend nearly this amount.
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_outbound_capacity_msat(this_ptr: &ChannelDetails) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.outbound_capacity_msat;
@@ -484,6 +520,10 @@ pub extern "C" fn ChannelDetails_get_outbound_capacity_msat(this_ptr: &ChannelDe
 /// any pending HTLCs which are not yet fully resolved (and, thus, who's balance is not
 /// available for inclusion in new outbound HTLCs). This further does not include any pending
 /// outgoing HTLCs which are awaiting some other resolution to be sent.
+///
+/// This value is not exact. Due to various in-flight changes, feerate changes, and our
+/// conflict-avoidance policy, exactly this amount is not likely to be spendable. However, we
+/// should be able to spend nearly this amount.
 #[no_mangle]
 pub extern "C" fn ChannelDetails_set_outbound_capacity_msat(this_ptr: &mut ChannelDetails, mut val: u64) {
 	unsafe { &mut *this_ptr.inner }.outbound_capacity_msat = val;
@@ -493,6 +533,10 @@ pub extern "C" fn ChannelDetails_set_outbound_capacity_msat(this_ptr: &mut Chann
 /// available for inclusion in new inbound HTLCs).
 /// Note that there are some corner cases not fully handled here, so the actual available
 /// inbound capacity may be slightly higher than this.
+///
+/// This value is not exact. Due to various in-flight changes, feerate changes, and our
+/// counterparty's conflict-avoidance policy, exactly this amount is not likely to be spendable.
+/// However, our counterparty should be able to spend nearly this amount.
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_inbound_capacity_msat(this_ptr: &ChannelDetails) -> u64 {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.inbound_capacity_msat;
@@ -503,9 +547,71 @@ pub extern "C" fn ChannelDetails_get_inbound_capacity_msat(this_ptr: &ChannelDet
 /// available for inclusion in new inbound HTLCs).
 /// Note that there are some corner cases not fully handled here, so the actual available
 /// inbound capacity may be slightly higher than this.
+///
+/// This value is not exact. Due to various in-flight changes, feerate changes, and our
+/// counterparty's conflict-avoidance policy, exactly this amount is not likely to be spendable.
+/// However, our counterparty should be able to spend nearly this amount.
 #[no_mangle]
 pub extern "C" fn ChannelDetails_set_inbound_capacity_msat(this_ptr: &mut ChannelDetails, mut val: u64) {
 	unsafe { &mut *this_ptr.inner }.inbound_capacity_msat = val;
+}
+/// The number of required confirmations on the funding transaction before the funding will be
+/// considered \"locked\". This number is selected by the channel fundee (i.e. us if
+/// [`is_outbound`] is *not* set), and can be selected for inbound channels with
+/// [`ChannelHandshakeConfig::minimum_depth`] or limited for outbound channels with
+/// [`ChannelHandshakeLimits::max_minimum_depth`].
+///
+/// This value will be `None` for outbound channels until the counterparty accepts the channel.
+///
+/// [`is_outbound`]: ChannelDetails::is_outbound
+/// [`ChannelHandshakeConfig::minimum_depth`]: crate::util::config::ChannelHandshakeConfig::minimum_depth
+/// [`ChannelHandshakeLimits::max_minimum_depth`]: crate::util::config::ChannelHandshakeLimits::max_minimum_depth
+#[no_mangle]
+pub extern "C" fn ChannelDetails_get_confirmations_required(this_ptr: &ChannelDetails) -> crate::c_types::derived::COption_u32Z {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.confirmations_required;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u32Z::None } else {  { crate::c_types::derived::COption_u32Z::Some(inner_val.unwrap()) } };
+	local_inner_val
+}
+/// The number of required confirmations on the funding transaction before the funding will be
+/// considered \"locked\". This number is selected by the channel fundee (i.e. us if
+/// [`is_outbound`] is *not* set), and can be selected for inbound channels with
+/// [`ChannelHandshakeConfig::minimum_depth`] or limited for outbound channels with
+/// [`ChannelHandshakeLimits::max_minimum_depth`].
+///
+/// This value will be `None` for outbound channels until the counterparty accepts the channel.
+///
+/// [`is_outbound`]: ChannelDetails::is_outbound
+/// [`ChannelHandshakeConfig::minimum_depth`]: crate::util::config::ChannelHandshakeConfig::minimum_depth
+/// [`ChannelHandshakeLimits::max_minimum_depth`]: crate::util::config::ChannelHandshakeLimits::max_minimum_depth
+#[no_mangle]
+pub extern "C" fn ChannelDetails_set_confirmations_required(this_ptr: &mut ChannelDetails, mut val: crate::c_types::derived::COption_u32Z) {
+	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
+	unsafe { &mut *this_ptr.inner }.confirmations_required = local_val;
+}
+/// The number of blocks (after our commitment transaction confirms) that we will need to wait
+/// until we can claim our funds after we force-close the channel. During this time our
+/// counterparty is allowed to punish us if we broadcasted a stale state. If our counterparty
+/// force-closes the channel and broadcasts a commitment transaction we do not have to wait any
+/// time to claim our non-HTLC-encumbered funds.
+///
+/// This value will be `None` for outbound channels until the counterparty accepts the channel.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_get_force_close_spend_delay(this_ptr: &ChannelDetails) -> crate::c_types::derived::COption_u16Z {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.force_close_spend_delay;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u16Z::None } else {  { crate::c_types::derived::COption_u16Z::Some(inner_val.unwrap()) } };
+	local_inner_val
+}
+/// The number of blocks (after our commitment transaction confirms) that we will need to wait
+/// until we can claim our funds after we force-close the channel. During this time our
+/// counterparty is allowed to punish us if we broadcasted a stale state. If our counterparty
+/// force-closes the channel and broadcasts a commitment transaction we do not have to wait any
+/// time to claim our non-HTLC-encumbered funds.
+///
+/// This value will be `None` for outbound channels until the counterparty accepts the channel.
+#[no_mangle]
+pub extern "C" fn ChannelDetails_set_force_close_spend_delay(this_ptr: &mut ChannelDetails, mut val: crate::c_types::derived::COption_u16Z) {
+	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
+	unsafe { &mut *this_ptr.inner }.force_close_spend_delay = local_val;
 }
 /// True if the channel was initiated (and thus funded) by us.
 #[no_mangle]
@@ -521,7 +627,10 @@ pub extern "C" fn ChannelDetails_set_is_outbound(this_ptr: &mut ChannelDetails, 
 /// True if the channel is confirmed, funding_locked messages have been exchanged, and the
 /// channel is not currently being shut down. `funding_locked` message exchange implies the
 /// required confirmation count has been reached (and we were connected to the peer at some
-/// point after the funding transaction received enough confirmations).
+/// point after the funding transaction received enough confirmations). The required
+/// confirmation count is provided in [`confirmations_required`].
+///
+/// [`confirmations_required`]: ChannelDetails::confirmations_required
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_is_funding_locked(this_ptr: &ChannelDetails) -> bool {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.is_funding_locked;
@@ -530,14 +639,16 @@ pub extern "C" fn ChannelDetails_get_is_funding_locked(this_ptr: &ChannelDetails
 /// True if the channel is confirmed, funding_locked messages have been exchanged, and the
 /// channel is not currently being shut down. `funding_locked` message exchange implies the
 /// required confirmation count has been reached (and we were connected to the peer at some
-/// point after the funding transaction received enough confirmations).
+/// point after the funding transaction received enough confirmations). The required
+/// confirmation count is provided in [`confirmations_required`].
+///
+/// [`confirmations_required`]: ChannelDetails::confirmations_required
 #[no_mangle]
 pub extern "C" fn ChannelDetails_set_is_funding_locked(this_ptr: &mut ChannelDetails, mut val: bool) {
 	unsafe { &mut *this_ptr.inner }.is_funding_locked = val;
 }
 /// True if the channel is (a) confirmed and funding_locked messages have been exchanged, (b)
-/// the peer is connected, (c) no monitor update failure is pending resolution, and (d) the
-/// channel is not currently negotiating a shutdown.
+/// the peer is connected, and (c) the channel is not currently negotiating a shutdown.
 ///
 /// This is a strict superset of `is_funding_locked`.
 #[no_mangle]
@@ -546,8 +657,7 @@ pub extern "C" fn ChannelDetails_get_is_usable(this_ptr: &ChannelDetails) -> boo
 	*inner_val
 }
 /// True if the channel is (a) confirmed and funding_locked messages have been exchanged, (b)
-/// the peer is connected, (c) no monitor update failure is pending resolution, and (d) the
-/// channel is not currently negotiating a shutdown.
+/// the peer is connected, and (c) the channel is not currently negotiating a shutdown.
 ///
 /// This is a strict superset of `is_funding_locked`.
 #[no_mangle]
@@ -564,6 +674,33 @@ pub extern "C" fn ChannelDetails_get_is_public(this_ptr: &ChannelDetails) -> boo
 #[no_mangle]
 pub extern "C" fn ChannelDetails_set_is_public(this_ptr: &mut ChannelDetails, mut val: bool) {
 	unsafe { &mut *this_ptr.inner }.is_public = val;
+}
+/// Constructs a new ChannelDetails given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelDetails_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut counterparty_arg: crate::lightning::ln::channelmanager::ChannelCounterparty, mut funding_txo_arg: crate::lightning::chain::transaction::OutPoint, mut short_channel_id_arg: crate::c_types::derived::COption_u64Z, mut channel_value_satoshis_arg: u64, mut unspendable_punishment_reserve_arg: crate::c_types::derived::COption_u64Z, mut user_id_arg: u64, mut outbound_capacity_msat_arg: u64, mut inbound_capacity_msat_arg: u64, mut confirmations_required_arg: crate::c_types::derived::COption_u32Z, mut force_close_spend_delay_arg: crate::c_types::derived::COption_u16Z, mut is_outbound_arg: bool, mut is_funding_locked_arg: bool, mut is_usable_arg: bool, mut is_public_arg: bool) -> ChannelDetails {
+	let mut local_funding_txo_arg = if funding_txo_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(funding_txo_arg.take_inner()) } }) };
+	let mut local_short_channel_id_arg = if short_channel_id_arg.is_some() { Some( { short_channel_id_arg.take() }) } else { None };
+	let mut local_unspendable_punishment_reserve_arg = if unspendable_punishment_reserve_arg.is_some() { Some( { unspendable_punishment_reserve_arg.take() }) } else { None };
+	let mut local_confirmations_required_arg = if confirmations_required_arg.is_some() { Some( { confirmations_required_arg.take() }) } else { None };
+	let mut local_force_close_spend_delay_arg = if force_close_spend_delay_arg.is_some() { Some( { force_close_spend_delay_arg.take() }) } else { None };
+	ChannelDetails { inner: Box::into_raw(Box::new(nativeChannelDetails {
+		channel_id: channel_id_arg.data,
+		counterparty: *unsafe { Box::from_raw(counterparty_arg.take_inner()) },
+		funding_txo: local_funding_txo_arg,
+		short_channel_id: local_short_channel_id_arg,
+		channel_value_satoshis: channel_value_satoshis_arg,
+		unspendable_punishment_reserve: local_unspendable_punishment_reserve_arg,
+		user_id: user_id_arg,
+		outbound_capacity_msat: outbound_capacity_msat_arg,
+		inbound_capacity_msat: inbound_capacity_msat_arg,
+		confirmations_required: local_confirmations_required_arg,
+		force_close_spend_delay: local_force_close_spend_delay_arg,
+		is_outbound: is_outbound_arg,
+		is_funding_locked: is_funding_locked_arg,
+		is_usable: is_usable_arg,
+		is_public: is_public_arg,
+	})), is_owned: true }
 }
 impl Clone for ChannelDetails {
 	fn clone(&self) -> Self {
@@ -792,6 +929,10 @@ pub extern "C" fn ChannelManager_get_current_default_configuration(this_arg: &Ch
 ///
 /// Raises APIError::APIMisuseError when channel_value_satoshis > 2**24 or push_msat is
 /// greater than channel_value_satoshis * 1k or channel_value_satoshis is < 1000.
+///
+/// Note that we do not check if you are currently connected to the given peer. If no
+/// connection is available, the outbound `open_channel` message may fail to send, resulting in
+/// the channel eventually being silently forgotten.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_create_channel(this_arg: &ChannelManager, mut their_network_key: crate::c_types::PublicKey, mut channel_value_satoshis: u64, mut push_msat: u64, mut user_id: u64, mut override_config: crate::lightning::util::config::UserConfig) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
@@ -1261,6 +1402,15 @@ pub extern "C" fn ChannelManager_await_persistable_update_timeout(this_arg: &Cha
 #[no_mangle]
 pub extern "C" fn ChannelManager_await_persistable_update(this_arg: &ChannelManager) {
 	unsafe { &*this_arg.inner }.await_persistable_update()
+}
+
+/// Gets the latest best block which was connected either via the [`chain::Listen`] or
+/// [`chain::Confirm`] interfaces.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_current_best_block(this_arg: &ChannelManager) -> crate::lightning::chain::BestBlock {
+	let mut ret = unsafe { &*this_arg.inner }.current_best_block();
+	crate::lightning::chain::BestBlock { inner: Box::into_raw(Box::new(ret)), is_owned: true }
 }
 
 impl From<nativeChannelManager> for crate::lightning::ln::msgs::ChannelMessageHandler {

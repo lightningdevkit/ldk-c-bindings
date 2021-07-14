@@ -25,7 +25,8 @@ HOST_PLATFORM="$(rustc --version --verbose | grep "host:")"
 
 # Set path to include our rustc wrapper as well as cbindgen
 export LDK_RUSTC_PATH="$(which rustc)"
-PATH="$(pwd)/deterministic-build-wrappers:$PATH:~/.cargo/bin"
+export RUSTC="$(pwd)/deterministic-build-wrappers/rustc"
+PATH="$PATH:~/.cargo/bin"
 
 # Set up CFLAGS and RUSTFLAGS vars appropriately for building libsecp256k1 and demo apps...
 BASE_CFLAGS="" # CFLAGS for libsecp256k1
@@ -395,6 +396,21 @@ if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]
 	fi
 	rm genbindings_wasm_test_file.c
 fi
+
+EXTRA_TARGETS=( $LDK_C_BINDINGS_EXTRA_TARGETS )
+EXTRA_CCS=( $LDK_C_BINDINGS_EXTRA_TARGET_CCS )
+
+if [ ${#EXTRA_TARGETS[@]} != ${#EXTRA_CCS[@]} ]; then
+	echo "LDK_C_BINDINGS_EXTRA_TARGETS and LDK_C_BINDINGS_EXTRA_TARGET_CCS didn't have the same number of elements!"
+	exit 1
+fi
+
+for IDX in ${!EXTRA_TARGETS[@]}; do
+	EXTRA_ENV_TARGET=$(echo "${EXTRA_TARGETS[$IDX]}" | sed 's/-/_/g')
+	export CFLAGS_$EXTRA_ENV_TARGET="$BASE_CFLAGS"
+	export CC_$EXTRA_ENV_TARGET=${EXTRA_CCS[$IDX]}
+	RUSTFLAGS="$BASE_RUSTFLAGS -C linker=${EXTRA_CCS[$IDX]}" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target "${EXTRA_TARGETS[$IDX]}" -- -C lto
+done
 
 if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
 	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target aarch64-apple-darwin -- -C lto

@@ -427,7 +427,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						}
 						write_method_var_decl_body(w, &m.sig, "\t", $type_resolver, Some(&meth_gen_types), true);
 						write!(w, "(self{}.{})(", $impl_accessor, m.sig.ident).unwrap();
-						write_method_call_params(w, &m.sig, "\t", $type_resolver, Some(&meth_gen_types), "", true);
+						let mut args = Vec::new();
+						write_method_call_params(&mut args, &m.sig, "\t", $type_resolver, Some(&meth_gen_types), "", true);
+						w.write_all(String::from_utf8(args).unwrap().replace("self", &format!("self{}", $impl_accessor)).as_bytes()).unwrap();
 
 						writeln!(w, "\n\t}}").unwrap();
 					},

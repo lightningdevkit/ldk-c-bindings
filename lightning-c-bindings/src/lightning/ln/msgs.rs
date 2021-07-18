@@ -2677,6 +2677,40 @@ pub extern "C" fn NetAddress_clone(orig: &NetAddress) -> NetAddress {
 	orig.clone()
 }
 #[no_mangle]
+/// Utility method to constructs a new IPv4-variant NetAddress
+pub extern "C" fn NetAddress_ipv4(addr: crate::c_types::FourBytes, port: u16) -> NetAddress {
+	NetAddress::IPv4 {
+		addr,
+		port,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new IPv6-variant NetAddress
+pub extern "C" fn NetAddress_ipv6(addr: crate::c_types::SixteenBytes, port: u16) -> NetAddress {
+	NetAddress::IPv6 {
+		addr,
+		port,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new OnionV2-variant NetAddress
+pub extern "C" fn NetAddress_onion_v2(addr: crate::c_types::TenBytes, port: u16) -> NetAddress {
+	NetAddress::OnionV2 {
+		addr,
+		port,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new OnionV3-variant NetAddress
+pub extern "C" fn NetAddress_onion_v3(ed25519_pubkey: crate::c_types::ThirtyTwoBytes, checksum: u16, version: u8, port: u16) -> NetAddress {
+	NetAddress::OnionV3 {
+		ed25519_pubkey,
+		checksum,
+		version,
+		port,
+	}
+}
+#[no_mangle]
 /// Serialize the NetAddress object into a byte array which can be read by NetAddress_read
 pub extern "C" fn NetAddress_write(obj: &NetAddress) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
@@ -4010,6 +4044,8 @@ pub enum ErrorAction {
 	/// The peer took some action which made us think they were useless. Disconnect them.
 	DisconnectPeer {
 		/// An error message which we should make an effort to send before we disconnect.
+		///
+		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
 		msg: crate::lightning::ln::msgs::ErrorMessage,
 	},
 	/// The peer did something harmless that we weren't able to process, just log and ignore
@@ -4127,6 +4163,29 @@ pub extern "C" fn ErrorAction_free(this_ptr: ErrorAction) { }
 #[no_mangle]
 pub extern "C" fn ErrorAction_clone(orig: &ErrorAction) -> ErrorAction {
 	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new DisconnectPeer-variant ErrorAction
+pub extern "C" fn ErrorAction_disconnect_peer(msg: crate::lightning::ln::msgs::ErrorMessage) -> ErrorAction {
+	ErrorAction::DisconnectPeer {
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new IgnoreError-variant ErrorAction
+pub extern "C" fn ErrorAction_ignore_error() -> ErrorAction {
+	ErrorAction::IgnoreError}
+#[no_mangle]
+/// Utility method to constructs a new IgnoreAndLog-variant ErrorAction
+pub extern "C" fn ErrorAction_ignore_and_log(a: crate::lightning::util::logger::Level) -> ErrorAction {
+	ErrorAction::IgnoreAndLog(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new SendErrorMessage-variant ErrorAction
+pub extern "C" fn ErrorAction_send_error_message(msg: crate::lightning::ln::msgs::ErrorMessage) -> ErrorAction {
+	ErrorAction::SendErrorMessage {
+		msg,
+	}
 }
 
 use lightning::ln::msgs::LightningError as nativeLightningErrorImport;
@@ -4294,6 +4353,8 @@ pub extern "C" fn CommitmentUpdate_set_update_fail_malformed_htlcs(this_ptr: &mu
 	unsafe { &mut *this_ptr.inner }.update_fail_malformed_htlcs = local_val;
 }
 /// An update_fee message which should be sent
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_update_fee(this_ptr: &CommitmentUpdate) -> crate::lightning::ln::msgs::UpdateFee {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.update_fee;
@@ -4301,6 +4362,8 @@ pub extern "C" fn CommitmentUpdate_get_update_fee(this_ptr: &CommitmentUpdate) -
 	local_inner_val
 }
 /// An update_fee message which should be sent
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_set_update_fee(this_ptr: &mut CommitmentUpdate, mut val: crate::lightning::ln::msgs::UpdateFee) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
@@ -4493,6 +4556,29 @@ pub extern "C" fn HTLCFailChannelUpdate_free(this_ptr: HTLCFailChannelUpdate) { 
 pub extern "C" fn HTLCFailChannelUpdate_clone(orig: &HTLCFailChannelUpdate) -> HTLCFailChannelUpdate {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new ChannelUpdateMessage-variant HTLCFailChannelUpdate
+pub extern "C" fn HTLCFailChannelUpdate_channel_update_message(msg: crate::lightning::ln::msgs::ChannelUpdate) -> HTLCFailChannelUpdate {
+	HTLCFailChannelUpdate::ChannelUpdateMessage {
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new ChannelClosed-variant HTLCFailChannelUpdate
+pub extern "C" fn HTLCFailChannelUpdate_channel_closed(short_channel_id: u64, is_permanent: bool) -> HTLCFailChannelUpdate {
+	HTLCFailChannelUpdate::ChannelClosed {
+		short_channel_id,
+		is_permanent,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new NodeFailure-variant HTLCFailChannelUpdate
+pub extern "C" fn HTLCFailChannelUpdate_node_failure(node_id: crate::c_types::PublicKey, is_permanent: bool) -> HTLCFailChannelUpdate {
+	HTLCFailChannelUpdate::NodeFailure {
+		node_id,
+		is_permanent,
+	}
+}
 /// A trait to describe an object which can receive channel messages.
 ///
 /// Messages MAY be called in parallel when they originate from different their_node_ids, however
@@ -4553,9 +4639,37 @@ pub struct ChannelMessageHandler {
 }
 unsafe impl Send for ChannelMessageHandler {}
 unsafe impl Sync for ChannelMessageHandler {}
+#[no_mangle]
+pub(crate) extern "C" fn ChannelMessageHandler_clone_fields(orig: &ChannelMessageHandler) -> ChannelMessageHandler {
+	ChannelMessageHandler {
+		this_arg: orig.this_arg,
+		handle_open_channel: Clone::clone(&orig.handle_open_channel),
+		handle_accept_channel: Clone::clone(&orig.handle_accept_channel),
+		handle_funding_created: Clone::clone(&orig.handle_funding_created),
+		handle_funding_signed: Clone::clone(&orig.handle_funding_signed),
+		handle_funding_locked: Clone::clone(&orig.handle_funding_locked),
+		handle_shutdown: Clone::clone(&orig.handle_shutdown),
+		handle_closing_signed: Clone::clone(&orig.handle_closing_signed),
+		handle_update_add_htlc: Clone::clone(&orig.handle_update_add_htlc),
+		handle_update_fulfill_htlc: Clone::clone(&orig.handle_update_fulfill_htlc),
+		handle_update_fail_htlc: Clone::clone(&orig.handle_update_fail_htlc),
+		handle_update_fail_malformed_htlc: Clone::clone(&orig.handle_update_fail_malformed_htlc),
+		handle_commitment_signed: Clone::clone(&orig.handle_commitment_signed),
+		handle_revoke_and_ack: Clone::clone(&orig.handle_revoke_and_ack),
+		handle_update_fee: Clone::clone(&orig.handle_update_fee),
+		handle_announcement_signatures: Clone::clone(&orig.handle_announcement_signatures),
+		peer_disconnected: Clone::clone(&orig.peer_disconnected),
+		peer_connected: Clone::clone(&orig.peer_connected),
+		handle_channel_reestablish: Clone::clone(&orig.handle_channel_reestablish),
+		handle_channel_update: Clone::clone(&orig.handle_channel_update),
+		handle_error: Clone::clone(&orig.handle_error),
+		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider_clone_fields(&orig.MessageSendEventsProvider),
+		free: Clone::clone(&orig.free),
+	}
+}
 impl lightning::util::events::MessageSendEventsProvider for ChannelMessageHandler {
 	fn get_and_clear_pending_msg_events(&self) -> Vec<lightning::util::events::MessageSendEvent> {
-		let mut ret = (self.MessageSendEventsProvider.get_and_clear_pending_msg_events)(self.this_arg);
+		let mut ret = (self.MessageSendEventsProvider.get_and_clear_pending_msg_events)(self.MessageSendEventsProvider.this_arg);
 		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { item.into_native() }); };
 		local_ret
 	}
@@ -4678,6 +4792,8 @@ pub struct RoutingMessageHandler {
 	/// starting at the node *after* the provided publickey and including batch_amount entries
 	/// immediately higher (as defined by <PublicKey as Ord>::cmp) than starting_point.
 	/// If None is provided for starting_point, we start at the first node.
+	///
+	/// Note that starting_point (or a relevant inner pointer) may be NULL or all-0s to represent None
 	#[must_use]
 	pub get_next_node_announcements: extern "C" fn (this_arg: *const c_void, starting_point: crate::c_types::PublicKey, batch_amount: u8) -> crate::c_types::derived::CVec_NodeAnnouncementZ,
 	/// Called when a connection is established with a peer. This can be used to
@@ -4711,9 +4827,28 @@ pub struct RoutingMessageHandler {
 }
 unsafe impl Send for RoutingMessageHandler {}
 unsafe impl Sync for RoutingMessageHandler {}
+#[no_mangle]
+pub(crate) extern "C" fn RoutingMessageHandler_clone_fields(orig: &RoutingMessageHandler) -> RoutingMessageHandler {
+	RoutingMessageHandler {
+		this_arg: orig.this_arg,
+		handle_node_announcement: Clone::clone(&orig.handle_node_announcement),
+		handle_channel_announcement: Clone::clone(&orig.handle_channel_announcement),
+		handle_channel_update: Clone::clone(&orig.handle_channel_update),
+		handle_htlc_fail_channel_update: Clone::clone(&orig.handle_htlc_fail_channel_update),
+		get_next_channel_announcements: Clone::clone(&orig.get_next_channel_announcements),
+		get_next_node_announcements: Clone::clone(&orig.get_next_node_announcements),
+		sync_routing_table: Clone::clone(&orig.sync_routing_table),
+		handle_reply_channel_range: Clone::clone(&orig.handle_reply_channel_range),
+		handle_reply_short_channel_ids_end: Clone::clone(&orig.handle_reply_short_channel_ids_end),
+		handle_query_channel_range: Clone::clone(&orig.handle_query_channel_range),
+		handle_query_short_channel_ids: Clone::clone(&orig.handle_query_short_channel_ids),
+		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider_clone_fields(&orig.MessageSendEventsProvider),
+		free: Clone::clone(&orig.free),
+	}
+}
 impl lightning::util::events::MessageSendEventsProvider for RoutingMessageHandler {
 	fn get_and_clear_pending_msg_events(&self) -> Vec<lightning::util::events::MessageSendEvent> {
-		let mut ret = (self.MessageSendEventsProvider.get_and_clear_pending_msg_events)(self.this_arg);
+		let mut ret = (self.MessageSendEventsProvider.get_and_clear_pending_msg_events)(self.MessageSendEventsProvider.this_arg);
 		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { item.into_native() }); };
 		local_ret
 	}

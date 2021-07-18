@@ -607,6 +607,22 @@ impl SiPrefix {
 pub extern "C" fn SiPrefix_clone(orig: &SiPrefix) -> SiPrefix {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new Milli-variant SiPrefix
+pub extern "C" fn SiPrefix_milli() -> SiPrefix {
+	SiPrefix::Milli}
+#[no_mangle]
+/// Utility method to constructs a new Micro-variant SiPrefix
+pub extern "C" fn SiPrefix_micro() -> SiPrefix {
+	SiPrefix::Micro}
+#[no_mangle]
+/// Utility method to constructs a new Nano-variant SiPrefix
+pub extern "C" fn SiPrefix_nano() -> SiPrefix {
+	SiPrefix::Nano}
+#[no_mangle]
+/// Utility method to constructs a new Pico-variant SiPrefix
+pub extern "C" fn SiPrefix_pico() -> SiPrefix {
+	SiPrefix::Pico}
 /// Checks if two SiPrefixs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -686,6 +702,26 @@ impl Currency {
 pub extern "C" fn Currency_clone(orig: &Currency) -> Currency {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new Bitcoin-variant Currency
+pub extern "C" fn Currency_bitcoin() -> Currency {
+	Currency::Bitcoin}
+#[no_mangle]
+/// Utility method to constructs a new BitcoinTestnet-variant Currency
+pub extern "C" fn Currency_bitcoin_testnet() -> Currency {
+	Currency::BitcoinTestnet}
+#[no_mangle]
+/// Utility method to constructs a new Regtest-variant Currency
+pub extern "C" fn Currency_regtest() -> Currency {
+	Currency::Regtest}
+#[no_mangle]
+/// Utility method to constructs a new Simnet-variant Currency
+pub extern "C" fn Currency_simnet() -> Currency {
+	Currency::Simnet}
+#[no_mangle]
+/// Utility method to constructs a new Signet-variant Currency
+pub extern "C" fn Currency_signet() -> Currency {
+	Currency::Signet}
 /// Checks if two Currencys contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -1185,6 +1221,24 @@ pub extern "C" fn Fallback_free(this_ptr: Fallback) { }
 pub extern "C" fn Fallback_clone(orig: &Fallback) -> Fallback {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new SegWitProgram-variant Fallback
+pub extern "C" fn Fallback_seg_wit_program(version: crate::c_types::u5, program: crate::c_types::derived::CVec_u8Z) -> Fallback {
+	Fallback::SegWitProgram {
+		version,
+		program,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new PubKeyHash-variant Fallback
+pub extern "C" fn Fallback_pub_key_hash(a: crate::c_types::TwentyBytes) -> Fallback {
+	Fallback::PubKeyHash(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new ScriptHash-variant Fallback
+pub extern "C" fn Fallback_script_hash(a: crate::c_types::TwentyBytes) -> Fallback {
+	Fallback::ScriptHash(a, )
+}
 /// Checks if two Fallbacks contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -1403,6 +1457,8 @@ pub extern "C" fn RawInvoice_hash(this_arg: &RawInvoice) -> crate::c_types::Thir
 	crate::c_types::ThirtyTwoBytes { data: ret }
 }
 
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_payment_hash(this_arg: &RawInvoice) -> crate::lightning_invoice::Sha256 {
@@ -1411,6 +1467,8 @@ pub extern "C" fn RawInvoice_payment_hash(this_arg: &RawInvoice) -> crate::light
 	local_ret
 }
 
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_description(this_arg: &RawInvoice) -> crate::lightning_invoice::Description {
@@ -1419,6 +1477,8 @@ pub extern "C" fn RawInvoice_description(this_arg: &RawInvoice) -> crate::lightn
 	local_ret
 }
 
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_payee_pub_key(this_arg: &RawInvoice) -> crate::lightning_invoice::PayeePubKey {
@@ -1427,6 +1487,8 @@ pub extern "C" fn RawInvoice_payee_pub_key(this_arg: &RawInvoice) -> crate::ligh
 	local_ret
 }
 
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_description_hash(this_arg: &RawInvoice) -> crate::lightning_invoice::Sha256 {
@@ -1435,6 +1497,8 @@ pub extern "C" fn RawInvoice_description_hash(this_arg: &RawInvoice) -> crate::l
 	local_ret
 }
 
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_expiry_time(this_arg: &RawInvoice) -> crate::lightning_invoice::ExpiryTime {
@@ -1443,6 +1507,8 @@ pub extern "C" fn RawInvoice_expiry_time(this_arg: &RawInvoice) -> crate::lightn
 	local_ret
 }
 
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_min_final_cltv_expiry(this_arg: &RawInvoice) -> crate::lightning_invoice::MinFinalCltvExpiry {
@@ -1451,6 +1517,8 @@ pub extern "C" fn RawInvoice_min_final_cltv_expiry(this_arg: &RawInvoice) -> cra
 	local_ret
 }
 
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_payment_secret(this_arg: &RawInvoice) -> crate::c_types::ThirtyTwoBytes {
@@ -1459,6 +1527,8 @@ pub extern "C" fn RawInvoice_payment_secret(this_arg: &RawInvoice) -> crate::c_t
 	local_ret
 }
 
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_features(this_arg: &RawInvoice) -> crate::lightning::ln::features::InvoiceFeatures {
@@ -1583,6 +1653,8 @@ pub extern "C" fn Invoice_payment_hash(this_arg: &Invoice) -> *const [u8; 32] {
 }
 
 /// Get the payee's public key if one was included in the invoice
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_payee_pub_key(this_arg: &Invoice) -> crate::c_types::PublicKey {
@@ -1592,6 +1664,8 @@ pub extern "C" fn Invoice_payee_pub_key(this_arg: &Invoice) -> crate::c_types::P
 }
 
 /// Get the payment secret if one was included in the invoice
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_payment_secret(this_arg: &Invoice) -> crate::c_types::ThirtyTwoBytes {
@@ -1601,6 +1675,8 @@ pub extern "C" fn Invoice_payment_secret(this_arg: &Invoice) -> crate::c_types::
 }
 
 /// Get the invoice features if they were included in the invoice
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_features(this_arg: &Invoice) -> crate::lightning::ln::features::InvoiceFeatures {
@@ -1802,6 +1878,22 @@ impl CreationError {
 pub extern "C" fn CreationError_clone(orig: &CreationError) -> CreationError {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new DescriptionTooLong-variant CreationError
+pub extern "C" fn CreationError_description_too_long() -> CreationError {
+	CreationError::DescriptionTooLong}
+#[no_mangle]
+/// Utility method to constructs a new RouteTooLong-variant CreationError
+pub extern "C" fn CreationError_route_too_long() -> CreationError {
+	CreationError::RouteTooLong}
+#[no_mangle]
+/// Utility method to constructs a new TimestampOutOfBounds-variant CreationError
+pub extern "C" fn CreationError_timestamp_out_of_bounds() -> CreationError {
+	CreationError::TimestampOutOfBounds}
+#[no_mangle]
+/// Utility method to constructs a new ExpiryTimeOutOfBounds-variant CreationError
+pub extern "C" fn CreationError_expiry_time_out_of_bounds() -> CreationError {
+	CreationError::ExpiryTimeOutOfBounds}
 /// Checks if two CreationErrors contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -1896,6 +1988,38 @@ impl SemanticError {
 pub extern "C" fn SemanticError_clone(orig: &SemanticError) -> SemanticError {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new NoPaymentHash-variant SemanticError
+pub extern "C" fn SemanticError_no_payment_hash() -> SemanticError {
+	SemanticError::NoPaymentHash}
+#[no_mangle]
+/// Utility method to constructs a new MultiplePaymentHashes-variant SemanticError
+pub extern "C" fn SemanticError_multiple_payment_hashes() -> SemanticError {
+	SemanticError::MultiplePaymentHashes}
+#[no_mangle]
+/// Utility method to constructs a new NoDescription-variant SemanticError
+pub extern "C" fn SemanticError_no_description() -> SemanticError {
+	SemanticError::NoDescription}
+#[no_mangle]
+/// Utility method to constructs a new MultipleDescriptions-variant SemanticError
+pub extern "C" fn SemanticError_multiple_descriptions() -> SemanticError {
+	SemanticError::MultipleDescriptions}
+#[no_mangle]
+/// Utility method to constructs a new MultiplePaymentSecrets-variant SemanticError
+pub extern "C" fn SemanticError_multiple_payment_secrets() -> SemanticError {
+	SemanticError::MultiplePaymentSecrets}
+#[no_mangle]
+/// Utility method to constructs a new InvalidFeatures-variant SemanticError
+pub extern "C" fn SemanticError_invalid_features() -> SemanticError {
+	SemanticError::InvalidFeatures}
+#[no_mangle]
+/// Utility method to constructs a new InvalidRecoveryId-variant SemanticError
+pub extern "C" fn SemanticError_invalid_recovery_id() -> SemanticError {
+	SemanticError::InvalidRecoveryId}
+#[no_mangle]
+/// Utility method to constructs a new InvalidSignature-variant SemanticError
+pub extern "C" fn SemanticError_invalid_signature() -> SemanticError {
+	SemanticError::InvalidSignature}
 /// Checks if two SemanticErrors contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -1984,6 +2108,16 @@ pub extern "C" fn SignOrCreationError_free(this_ptr: SignOrCreationError) { }
 #[no_mangle]
 pub extern "C" fn SignOrCreationError_clone(orig: &SignOrCreationError) -> SignOrCreationError {
 	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new SignError-variant SignOrCreationError
+pub extern "C" fn SignOrCreationError_sign_error() -> SignOrCreationError {
+	SignOrCreationError::SignError
+}
+#[no_mangle]
+/// Utility method to constructs a new CreationError-variant SignOrCreationError
+pub extern "C" fn SignOrCreationError_creation_error(a: crate::lightning_invoice::CreationError) -> SignOrCreationError {
+	SignOrCreationError::CreationError(a, )
 }
 /// Checks if two SignOrCreationErrors contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.

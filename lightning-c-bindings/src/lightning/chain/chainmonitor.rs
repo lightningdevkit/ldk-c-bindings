@@ -87,6 +87,8 @@ impl ChainMonitor {
 /// pre-filter blocks or only fetch blocks matching a compact filter. Otherwise, clients may
 /// always need to fetch full blocks absent another means for determining which blocks contain
 /// transactions relevant to the watched channels.
+///
+/// Note that chain_source (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChainMonitor_new(chain_source: *mut crate::lightning::chain::Filter, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut logger: crate::lightning::util::logger::Logger, mut feeest: crate::lightning::chain::chaininterface::FeeEstimator, mut persister: crate::lightning::chain::channelmonitor::Persist) -> ChainMonitor {

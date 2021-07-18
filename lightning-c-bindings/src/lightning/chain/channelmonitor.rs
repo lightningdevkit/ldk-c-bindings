@@ -244,6 +244,14 @@ impl ChannelMonitorUpdateErr {
 pub extern "C" fn ChannelMonitorUpdateErr_clone(orig: &ChannelMonitorUpdateErr) -> ChannelMonitorUpdateErr {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new TemporaryFailure-variant ChannelMonitorUpdateErr
+pub extern "C" fn ChannelMonitorUpdateErr_temporary_failure() -> ChannelMonitorUpdateErr {
+	ChannelMonitorUpdateErr::TemporaryFailure}
+#[no_mangle]
+/// Utility method to constructs a new PermanentFailure-variant ChannelMonitorUpdateErr
+pub extern "C" fn ChannelMonitorUpdateErr_permanent_failure() -> ChannelMonitorUpdateErr {
+	ChannelMonitorUpdateErr::PermanentFailure}
 
 use lightning::chain::channelmonitor::MonitorUpdateError as nativeMonitorUpdateErrorImport;
 type nativeMonitorUpdateError = nativeMonitorUpdateErrorImport;
@@ -396,6 +404,16 @@ pub extern "C" fn MonitorEvent_free(this_ptr: MonitorEvent) { }
 #[no_mangle]
 pub extern "C" fn MonitorEvent_clone(orig: &MonitorEvent) -> MonitorEvent {
 	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new HTLCEvent-variant MonitorEvent
+pub extern "C" fn MonitorEvent_htlcevent(a: crate::lightning::chain::channelmonitor::HTLCUpdate) -> MonitorEvent {
+	MonitorEvent::HTLCEvent(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new CommitmentTxBroadcasted-variant MonitorEvent
+pub extern "C" fn MonitorEvent_commitment_tx_broadcasted(a: crate::lightning::chain::transaction::OutPoint) -> MonitorEvent {
+	MonitorEvent::CommitmentTxBroadcasted(a, )
 }
 
 use lightning::chain::channelmonitor::HTLCUpdate as nativeHTLCUpdateImport;
@@ -785,6 +803,15 @@ pub struct Persist {
 }
 unsafe impl Send for Persist {}
 unsafe impl Sync for Persist {}
+#[no_mangle]
+pub(crate) extern "C" fn Persist_clone_fields(orig: &Persist) -> Persist {
+	Persist {
+		this_arg: orig.this_arg,
+		persist_new_channel: Clone::clone(&orig.persist_new_channel),
+		update_persisted_channel: Clone::clone(&orig.update_persisted_channel),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::chain::channelmonitor::Persist as rustPersist;
 impl rustPersist<crate::lightning::chain::keysinterface::Sign> for Persist {

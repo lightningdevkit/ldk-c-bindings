@@ -421,6 +421,8 @@ pub extern "C" fn ChannelDetails_set_counterparty(this_ptr: &mut ChannelDetails,
 ///
 /// Note that, if this has been set, `channel_id` will be equivalent to
 /// `funding_txo.unwrap().to_channel_id()`.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_funding_txo(this_ptr: &ChannelDetails) -> crate::lightning::chain::transaction::OutPoint {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.funding_txo;
@@ -432,6 +434,8 @@ pub extern "C" fn ChannelDetails_get_funding_txo(this_ptr: &ChannelDetails) -> c
 ///
 /// Note that, if this has been set, `channel_id` will be equivalent to
 /// `funding_txo.unwrap().to_channel_id()`.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelDetails_set_funding_txo(this_ptr: &mut ChannelDetails, mut val: crate::lightning::chain::transaction::OutPoint) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
@@ -889,6 +893,26 @@ pub extern "C" fn PaymentSendFailure_free(this_ptr: PaymentSendFailure) { }
 pub extern "C" fn PaymentSendFailure_clone(orig: &PaymentSendFailure) -> PaymentSendFailure {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new ParameterError-variant PaymentSendFailure
+pub extern "C" fn PaymentSendFailure_parameter_error(a: crate::lightning::util::errors::APIError) -> PaymentSendFailure {
+	PaymentSendFailure::ParameterError(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new PathParameterError-variant PaymentSendFailure
+pub extern "C" fn PaymentSendFailure_path_parameter_error(a: crate::c_types::derived::CVec_CResult_NoneAPIErrorZZ) -> PaymentSendFailure {
+	PaymentSendFailure::PathParameterError(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new AllFailedRetrySafe-variant PaymentSendFailure
+pub extern "C" fn PaymentSendFailure_all_failed_retry_safe(a: crate::c_types::derived::CVec_APIErrorZ) -> PaymentSendFailure {
+	PaymentSendFailure::AllFailedRetrySafe(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new PartialFailure-variant PaymentSendFailure
+pub extern "C" fn PaymentSendFailure_partial_failure(a: crate::c_types::derived::CVec_CResult_NoneAPIErrorZZ) -> PaymentSendFailure {
+	PaymentSendFailure::PartialFailure(a, )
+}
 /// Constructs a new ChannelManager to hold several channels and route between them.
 ///
 /// This is the main \"logic hub\" for all channel-related actions, and implements
@@ -933,6 +957,8 @@ pub extern "C" fn ChannelManager_get_current_default_configuration(this_arg: &Ch
 /// Note that we do not check if you are currently connected to the given peer. If no
 /// connection is available, the outbound `open_channel` message may fail to send, resulting in
 /// the channel eventually being silently forgotten.
+///
+/// Note that override_config (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_create_channel(this_arg: &ChannelManager, mut their_network_key: crate::c_types::PublicKey, mut channel_value_satoshis: u64, mut push_msat: u64, mut user_id: u64, mut override_config: crate::lightning::util::config::UserConfig) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
@@ -1035,12 +1061,35 @@ pub extern "C" fn ChannelManager_force_close_all_channels(this_arg: &ChannelMana
 /// If a payment_secret *is* provided, we assume that the invoice had the payment_secret feature
 /// bit set (either as required or as available). If multiple paths are present in the Route,
 /// we assume the invoice had the basic_mpp feature set.
+///
+/// Note that payment_secret (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_send_payment(this_arg: &ChannelManager, route: &crate::lightning::routing::router::Route, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut payment_secret: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_NonePaymentSendFailureZ {
 	let mut local_payment_secret = if payment_secret.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentSecret(payment_secret.data) }) };
 	let mut ret = unsafe { &*this_arg.inner }.send_payment(unsafe { &*route.inner }, ::lightning::ln::PaymentHash(payment_hash.data), &local_payment_secret);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::channelmanager::PaymentSendFailure::native_into(e) }).into() };
+	local_ret
+}
+
+/// Send a spontaneous payment, which is a payment that does not require the recipient to have
+/// generated an invoice. Optionally, you may specify the preimage. If you do choose to specify
+/// the preimage, it must be a cryptographically secure random value that no intermediate node
+/// would be able to guess -- otherwise, an intermediate node may claim the payment and it will
+/// never reach the recipient.
+///
+/// Similar to regular payments, you MUST NOT reuse a `payment_preimage` value. See
+/// [`send_payment`] for more information about the risks of duplicate preimage usage.
+///
+/// [`send_payment`]: Self::send_payment
+///
+/// Note that payment_preimage (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_send_spontaneous_payment(this_arg: &ChannelManager, route: &crate::lightning::routing::router::Route, mut payment_preimage: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_PaymentHashPaymentSendFailureZ {
+	let mut local_payment_preimage = if payment_preimage.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(payment_preimage.data) }) };
+	let mut ret = unsafe { &*this_arg.inner }.send_spontaneous_payment(unsafe { &*route.inner }, local_payment_preimage);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::channelmanager::PaymentSendFailure::native_into(e) }).into() };
 	local_ret
 }
 
@@ -1217,7 +1266,7 @@ pub extern "C" fn ChannelManager_create_inbound_payment(this_arg: &ChannelManage
 /// The [`PaymentHash`] (and corresponding [`PaymentPreimage`]) must be globally unique. This
 /// method may return an Err if another payment with the same payment_hash is still pending.
 ///
-/// `user_payment_id` will be provided back in [`PaymentReceived::user_payment_id`] events to
+/// `user_payment_id` will be provided back in [`PaymentPurpose::InvoicePayment::user_payment_id`] events to
 /// allow tracking of which events correspond with which calls to this and
 /// [`create_inbound_payment`]. `user_payment_id` has no meaning inside of LDK, it is simply
 /// copied to events and otherwise ignored. It may be used to correlate PaymentReceived events
@@ -1251,7 +1300,7 @@ pub extern "C" fn ChannelManager_create_inbound_payment(this_arg: &ChannelManage
 ///
 /// [`create_inbound_payment`]: Self::create_inbound_payment
 /// [`PaymentReceived`]: events::Event::PaymentReceived
-/// [`PaymentReceived::user_payment_id`]: events::Event::PaymentReceived::user_payment_id
+/// [`PaymentPurpose::InvoicePayment::user_payment_id`]: events::PaymentPurpose::InvoicePayment::user_payment_id
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_create_inbound_payment_for_hash(this_arg: &ChannelManager, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut invoice_expiry_delta_secs: u32, mut user_payment_id: u64) -> crate::c_types::derived::CResult_PaymentSecretAPIErrorZ {

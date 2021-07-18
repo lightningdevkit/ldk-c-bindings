@@ -178,6 +178,8 @@ impl NetGraphMsgHandler {
 /// Chain monitor is used to make sure announced channels exist on-chain,
 /// channel data is correct, and that the announcement is signed with
 /// channel owners' keys.
+///
+/// Note that chain_access (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NetGraphMsgHandler_new(mut genesis_hash: crate::c_types::ThirtyTwoBytes, chain_access: *mut crate::lightning::chain::Access, mut logger: crate::lightning::util::logger::Logger) -> NetGraphMsgHandler {
@@ -188,6 +190,8 @@ pub extern "C" fn NetGraphMsgHandler_new(mut genesis_hash: crate::c_types::Thirt
 
 /// Creates a new tracker of the actual state of the network of channels and nodes,
 /// assuming an existing Network Graph.
+///
+/// Note that chain_access (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NetGraphMsgHandler_from_net_graph(chain_access: *mut crate::lightning::chain::Access, mut logger: crate::lightning::util::logger::Logger, mut network_graph: crate::lightning::routing::network_graph::NetworkGraph) -> NetGraphMsgHandler {
@@ -199,6 +203,8 @@ pub extern "C" fn NetGraphMsgHandler_from_net_graph(chain_access: *mut crate::li
 /// Adds a provider used to check new announcements. Does not affect
 /// existing announcements unless they are updated.
 /// Add, update or remove the provider would replace the current one.
+///
+/// Note that chain_access (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn NetGraphMsgHandler_add_chain_access(this_arg: &mut NetGraphMsgHandler, chain_access: *mut crate::lightning::chain::Access) {
 	let mut local_chain_access = if chain_access == std::ptr::null_mut() { None } else { Some( { unsafe { *Box::from_raw(chain_access) } }) };
@@ -470,6 +476,8 @@ pub extern "C" fn DirectionalChannelInfo_set_fees(this_ptr: &mut DirectionalChan
 /// Mostly redundant with the data we store in fields explicitly.
 /// Everything else is useful only for sending out for initial routing sync.
 /// Not stored if contains excess data to prevent DoS.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn DirectionalChannelInfo_get_last_update_message(this_ptr: &DirectionalChannelInfo) -> crate::lightning::ln::msgs::ChannelUpdate {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.last_update_message;
@@ -480,6 +488,8 @@ pub extern "C" fn DirectionalChannelInfo_get_last_update_message(this_ptr: &Dire
 /// Mostly redundant with the data we store in fields explicitly.
 /// Everything else is useful only for sending out for initial routing sync.
 /// Not stored if contains excess data to prevent DoS.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn DirectionalChannelInfo_set_last_update_message(this_ptr: &mut DirectionalChannelInfo, mut val: crate::lightning::ln::msgs::ChannelUpdate) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
@@ -605,6 +615,8 @@ pub extern "C" fn ChannelInfo_set_node_one(this_ptr: &mut ChannelInfo, mut val: 
 	unsafe { &mut *this_ptr.inner }.node_one = val.into_rust();
 }
 /// Details about the first direction of a channel
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_one_to_two(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::DirectionalChannelInfo {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.one_to_two;
@@ -612,6 +624,8 @@ pub extern "C" fn ChannelInfo_get_one_to_two(this_ptr: &ChannelInfo) -> crate::l
 	local_inner_val
 }
 /// Details about the first direction of a channel
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelInfo_set_one_to_two(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::DirectionalChannelInfo) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
@@ -629,6 +643,8 @@ pub extern "C" fn ChannelInfo_set_node_two(this_ptr: &mut ChannelInfo, mut val: 
 	unsafe { &mut *this_ptr.inner }.node_two = val.into_rust();
 }
 /// Details about the second direction of a channel
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_two_to_one(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::DirectionalChannelInfo {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.two_to_one;
@@ -636,6 +652,8 @@ pub extern "C" fn ChannelInfo_get_two_to_one(this_ptr: &ChannelInfo) -> crate::l
 	local_inner_val
 }
 /// Details about the second direction of a channel
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelInfo_set_two_to_one(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::DirectionalChannelInfo) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
@@ -658,6 +676,8 @@ pub extern "C" fn ChannelInfo_set_capacity_sats(this_ptr: &mut ChannelInfo, mut 
 /// Mostly redundant with the data we store in fields explicitly.
 /// Everything else is useful only for sending out for initial routing sync.
 /// Not stored if contains excess data to prevent DoS.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_announcement_message(this_ptr: &ChannelInfo) -> crate::lightning::ln::msgs::ChannelAnnouncement {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.announcement_message;
@@ -668,6 +688,8 @@ pub extern "C" fn ChannelInfo_get_announcement_message(this_ptr: &ChannelInfo) -
 /// Mostly redundant with the data we store in fields explicitly.
 /// Everything else is useful only for sending out for initial routing sync.
 /// Not stored if contains excess data to prevent DoS.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelInfo_set_announcement_message(this_ptr: &mut ChannelInfo, mut val: crate::lightning::ln::msgs::ChannelAnnouncement) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
@@ -953,6 +975,8 @@ pub extern "C" fn NodeAnnouncementInfo_set_addresses(this_ptr: &mut NodeAnnounce
 /// Mostly redundant with the data we store in fields explicitly.
 /// Everything else is useful only for sending out for initial routing sync.
 /// Not stored if contains excess data to prevent DoS.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn NodeAnnouncementInfo_get_announcement_message(this_ptr: &NodeAnnouncementInfo) -> crate::lightning::ln::msgs::NodeAnnouncement {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.announcement_message;
@@ -963,6 +987,8 @@ pub extern "C" fn NodeAnnouncementInfo_get_announcement_message(this_ptr: &NodeA
 /// Mostly redundant with the data we store in fields explicitly.
 /// Everything else is useful only for sending out for initial routing sync.
 /// Not stored if contains excess data to prevent DoS.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn NodeAnnouncementInfo_set_announcement_message(this_ptr: &mut NodeAnnouncementInfo, mut val: crate::lightning::ln::msgs::NodeAnnouncement) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
@@ -1072,6 +1098,8 @@ pub extern "C" fn NodeInfo_set_channels(this_ptr: &mut NodeInfo, mut val: crate:
 /// Lowest fees enabling routing via any of the enabled, known channels to a node.
 /// The two fields (flat and proportional fee) are independent,
 /// meaning they don't have to refer to the same channel.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn NodeInfo_get_lowest_inbound_channel_fees(this_ptr: &NodeInfo) -> crate::lightning::routing::network_graph::RoutingFees {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.lowest_inbound_channel_fees;
@@ -1081,6 +1109,8 @@ pub extern "C" fn NodeInfo_get_lowest_inbound_channel_fees(this_ptr: &NodeInfo) 
 /// Lowest fees enabling routing via any of the enabled, known channels to a node.
 /// The two fields (flat and proportional fee) are independent,
 /// meaning they don't have to refer to the same channel.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn NodeInfo_set_lowest_inbound_channel_fees(this_ptr: &mut NodeInfo, mut val: crate::lightning::routing::network_graph::RoutingFees) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
@@ -1089,6 +1119,8 @@ pub extern "C" fn NodeInfo_set_lowest_inbound_channel_fees(this_ptr: &mut NodeIn
 /// More information about a node from node_announcement.
 /// Optional because we store a Node entry after learning about it from
 /// a channel announcement, but before receiving a node announcement.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn NodeInfo_get_announcement_info(this_ptr: &NodeInfo) -> crate::lightning::routing::network_graph::NodeAnnouncementInfo {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.announcement_info;
@@ -1098,6 +1130,8 @@ pub extern "C" fn NodeInfo_get_announcement_info(this_ptr: &NodeInfo) -> crate::
 /// More information about a node from node_announcement.
 /// Optional because we store a Node entry after learning about it from
 /// a channel announcement, but before receiving a node announcement.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn NodeInfo_set_announcement_info(this_ptr: &mut NodeInfo, mut val: crate::lightning::routing::network_graph::NodeAnnouncementInfo) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
@@ -1209,6 +1243,8 @@ pub extern "C" fn NetworkGraph_update_node_from_unsigned_announcement(this_arg: 
 ///
 /// If a `chain::Access` object is provided via `chain_access`, it will be called to verify
 /// the corresponding UTXO exists on chain and is correctly-formatted.
+///
+/// Note that chain_access (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NetworkGraph_update_channel_from_announcement(this_arg: &mut NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelAnnouncement, chain_access: *mut crate::lightning::chain::Access) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
@@ -1224,6 +1260,8 @@ pub extern "C" fn NetworkGraph_update_channel_from_announcement(this_arg: &mut N
 ///
 /// If a `chain::Access` object is provided via `chain_access`, it will be called to verify
 /// the corresponding UTXO exists on chain and is correctly-formatted.
+///
+/// Note that chain_access (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NetworkGraph_update_channel_from_unsigned_announcement(this_arg: &mut NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelAnnouncement, chain_access: *mut crate::lightning::chain::Access) -> crate::c_types::derived::CResult_NoneLightningErrorZ {

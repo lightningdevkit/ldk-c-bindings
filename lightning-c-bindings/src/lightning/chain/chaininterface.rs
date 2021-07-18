@@ -31,6 +31,14 @@ pub struct BroadcasterInterface {
 }
 unsafe impl Send for BroadcasterInterface {}
 unsafe impl Sync for BroadcasterInterface {}
+#[no_mangle]
+pub(crate) extern "C" fn BroadcasterInterface_clone_fields(orig: &BroadcasterInterface) -> BroadcasterInterface {
+	BroadcasterInterface {
+		this_arg: orig.this_arg,
+		broadcast_transaction: Clone::clone(&orig.broadcast_transaction),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::chain::chaininterface::BroadcasterInterface as rustBroadcasterInterface;
 impl rustBroadcasterInterface for BroadcasterInterface {
@@ -110,6 +118,18 @@ impl ConfirmationTarget {
 pub extern "C" fn ConfirmationTarget_clone(orig: &ConfirmationTarget) -> ConfirmationTarget {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new Background-variant ConfirmationTarget
+pub extern "C" fn ConfirmationTarget_background() -> ConfirmationTarget {
+	ConfirmationTarget::Background}
+#[no_mangle]
+/// Utility method to constructs a new Normal-variant ConfirmationTarget
+pub extern "C" fn ConfirmationTarget_normal() -> ConfirmationTarget {
+	ConfirmationTarget::Normal}
+#[no_mangle]
+/// Utility method to constructs a new HighPriority-variant ConfirmationTarget
+pub extern "C" fn ConfirmationTarget_high_priority() -> ConfirmationTarget {
+	ConfirmationTarget::HighPriority}
 /// A trait which should be implemented to provide feerate information on a number of time
 /// horizons.
 ///
@@ -136,6 +156,14 @@ pub struct FeeEstimator {
 }
 unsafe impl Send for FeeEstimator {}
 unsafe impl Sync for FeeEstimator {}
+#[no_mangle]
+pub(crate) extern "C" fn FeeEstimator_clone_fields(orig: &FeeEstimator) -> FeeEstimator {
+	FeeEstimator {
+		this_arg: orig.this_arg,
+		get_est_sat_per_1000_weight: Clone::clone(&orig.get_est_sat_per_1000_weight),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::chain::chaininterface::FeeEstimator as rustFeeEstimator;
 impl rustFeeEstimator for FeeEstimator {

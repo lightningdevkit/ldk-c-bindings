@@ -18,6 +18,153 @@ use std::ffi::c_void;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
+/// Some information provided on receipt of payment depends on whether the payment received is a
+/// spontaneous payment or a \"conventional\" lightning payment that's paying an invoice.
+#[must_use]
+#[derive(Clone)]
+#[repr(C)]
+pub enum PaymentPurpose {
+	/// Information for receiving a payment that we generated an invoice for.
+	InvoicePayment {
+		/// The preimage to the payment_hash, if the payment hash (and secret) were fetched via
+		/// [`ChannelManager::create_inbound_payment`]. If provided, this can be handed directly to
+		/// [`ChannelManager::claim_funds`].
+		///
+		/// [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
+		/// [`ChannelManager::claim_funds`]: crate::ln::channelmanager::ChannelManager::claim_funds
+		///
+		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+		payment_preimage: crate::c_types::ThirtyTwoBytes,
+		/// The \"payment secret\". This authenticates the sender to the recipient, preventing a
+		/// number of deanonymization attacks during the routing process.
+		/// It is provided here for your reference, however its accuracy is enforced directly by
+		/// [`ChannelManager`] using the values you previously provided to
+		/// [`ChannelManager::create_inbound_payment`] or
+		/// [`ChannelManager::create_inbound_payment_for_hash`].
+		///
+		/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
+		/// [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
+		/// [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
+		payment_secret: crate::c_types::ThirtyTwoBytes,
+		/// This is the `user_payment_id` which was provided to
+		/// [`ChannelManager::create_inbound_payment_for_hash`] or
+		/// [`ChannelManager::create_inbound_payment`]. It has no meaning inside of LDK and is
+		/// simply copied here. It may be used to correlate PaymentReceived events with invoice
+		/// metadata stored elsewhere.
+		///
+		/// [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
+		/// [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
+		user_payment_id: u64,
+	},
+	/// Because this is a spontaneous payment, the payer generated their own preimage rather than us
+	/// (the payee) providing a preimage.
+	SpontaneousPayment(crate::c_types::ThirtyTwoBytes),
+}
+use lightning::util::events::PaymentPurpose as nativePaymentPurpose;
+impl PaymentPurpose {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativePaymentPurpose {
+		match self {
+			PaymentPurpose::InvoicePayment {ref payment_preimage, ref payment_secret, ref user_payment_id, } => {
+				let mut payment_preimage_nonref = (*payment_preimage).clone();
+				let mut local_payment_preimage_nonref = if payment_preimage_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(payment_preimage_nonref.data) }) };
+				let mut payment_secret_nonref = (*payment_secret).clone();
+				let mut user_payment_id_nonref = (*user_payment_id).clone();
+				nativePaymentPurpose::InvoicePayment {
+					payment_preimage: local_payment_preimage_nonref,
+					payment_secret: ::lightning::ln::PaymentSecret(payment_secret_nonref.data),
+					user_payment_id: user_payment_id_nonref,
+				}
+			},
+			PaymentPurpose::SpontaneousPayment (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativePaymentPurpose::SpontaneousPayment (
+					::lightning::ln::PaymentPreimage(a_nonref.data),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativePaymentPurpose {
+		match self {
+			PaymentPurpose::InvoicePayment {mut payment_preimage, mut payment_secret, mut user_payment_id, } => {
+				let mut local_payment_preimage = if payment_preimage.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(payment_preimage.data) }) };
+				nativePaymentPurpose::InvoicePayment {
+					payment_preimage: local_payment_preimage,
+					payment_secret: ::lightning::ln::PaymentSecret(payment_secret.data),
+					user_payment_id: user_payment_id,
+				}
+			},
+			PaymentPurpose::SpontaneousPayment (mut a, ) => {
+				nativePaymentPurpose::SpontaneousPayment (
+					::lightning::ln::PaymentPreimage(a.data),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativePaymentPurpose) -> Self {
+		match native {
+			nativePaymentPurpose::InvoicePayment {ref payment_preimage, ref payment_secret, ref user_payment_id, } => {
+				let mut payment_preimage_nonref = (*payment_preimage).clone();
+				let mut local_payment_preimage_nonref = if payment_preimage_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_preimage_nonref.unwrap()).0 } } };
+				let mut payment_secret_nonref = (*payment_secret).clone();
+				let mut user_payment_id_nonref = (*user_payment_id).clone();
+				PaymentPurpose::InvoicePayment {
+					payment_preimage: local_payment_preimage_nonref,
+					payment_secret: crate::c_types::ThirtyTwoBytes { data: payment_secret_nonref.0 },
+					user_payment_id: user_payment_id_nonref,
+				}
+			},
+			nativePaymentPurpose::SpontaneousPayment (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				PaymentPurpose::SpontaneousPayment (
+					crate::c_types::ThirtyTwoBytes { data: a_nonref.0 },
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativePaymentPurpose) -> Self {
+		match native {
+			nativePaymentPurpose::InvoicePayment {mut payment_preimage, mut payment_secret, mut user_payment_id, } => {
+				let mut local_payment_preimage = if payment_preimage.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_preimage.unwrap()).0 } } };
+				PaymentPurpose::InvoicePayment {
+					payment_preimage: local_payment_preimage,
+					payment_secret: crate::c_types::ThirtyTwoBytes { data: payment_secret.0 },
+					user_payment_id: user_payment_id,
+				}
+			},
+			nativePaymentPurpose::SpontaneousPayment (mut a, ) => {
+				PaymentPurpose::SpontaneousPayment (
+					crate::c_types::ThirtyTwoBytes { data: a.0 },
+				)
+			},
+		}
+	}
+}
+/// Frees any resources used by the PaymentPurpose
+#[no_mangle]
+pub extern "C" fn PaymentPurpose_free(this_ptr: PaymentPurpose) { }
+/// Creates a copy of the PaymentPurpose
+#[no_mangle]
+pub extern "C" fn PaymentPurpose_clone(orig: &PaymentPurpose) -> PaymentPurpose {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new InvoicePayment-variant PaymentPurpose
+pub extern "C" fn PaymentPurpose_invoice_payment(payment_preimage: crate::c_types::ThirtyTwoBytes, payment_secret: crate::c_types::ThirtyTwoBytes, user_payment_id: u64) -> PaymentPurpose {
+	PaymentPurpose::InvoicePayment {
+		payment_preimage,
+		payment_secret,
+		user_payment_id,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SpontaneousPayment-variant PaymentPurpose
+pub extern "C" fn PaymentPurpose_spontaneous_payment(a: crate::c_types::ThirtyTwoBytes) -> PaymentPurpose {
+	PaymentPurpose::SpontaneousPayment(a, )
+}
 /// An Event which you should probably take some action in response to.
 ///
 /// Note that while Writeable and Readable are implemented for Event, you probably shouldn't use
@@ -56,37 +203,13 @@ pub enum Event {
 	PaymentReceived {
 		/// The hash for which the preimage should be handed to the ChannelManager.
 		payment_hash: crate::c_types::ThirtyTwoBytes,
-		/// The preimage to the payment_hash, if the payment hash (and secret) were fetched via
-		/// [`ChannelManager::create_inbound_payment`]. If provided, this can be handed directly to
-		/// [`ChannelManager::claim_funds`].
-		///
-		/// [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
-		/// [`ChannelManager::claim_funds`]: crate::ln::channelmanager::ChannelManager::claim_funds
-		payment_preimage: crate::c_types::ThirtyTwoBytes,
-		/// The \"payment secret\". This authenticates the sender to the recipient, preventing a
-		/// number of deanonymization attacks during the routing process.
-		/// It is provided here for your reference, however its accuracy is enforced directly by
-		/// [`ChannelManager`] using the values you previously provided to
-		/// [`ChannelManager::create_inbound_payment`] or
-		/// [`ChannelManager::create_inbound_payment_for_hash`].
-		///
-		/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
-		/// [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
-		/// [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
-		payment_secret: crate::c_types::ThirtyTwoBytes,
 		/// The value, in thousandths of a satoshi, that this payment is for. Note that you must
 		/// compare this to the expected value before accepting the payment (as otherwise you are
 		/// providing proof-of-payment for less than the value you expected!).
 		amt: u64,
-		/// This is the `user_payment_id` which was provided to
-		/// [`ChannelManager::create_inbound_payment_for_hash`] or
-		/// [`ChannelManager::create_inbound_payment`]. It has no meaning inside of LDK and is
-		/// simply copied here. It may be used to correlate PaymentReceived events with invoice
-		/// metadata stored elsewhere.
-		///
-		/// [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
-		/// [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
-		user_payment_id: u64,
+		/// Information for claiming this received payment, based on whether the purpose of the
+		/// payment is to pay an invoice or to send a spontaneous payment.
+		purpose: crate::lightning::util::events::PaymentPurpose,
 	},
 	/// Indicates an outbound payment we made succeeded (ie it made it all the way to its target
 	/// and we got back the payment preimage for it).
@@ -124,6 +247,27 @@ pub enum Event {
 		/// The outputs which you should store as spendable by you.
 		outputs: crate::c_types::derived::CVec_SpendableOutputDescriptorZ,
 	},
+	/// This event is generated when a payment has been successfully forwarded through us and a
+	/// forwarding fee earned.
+	PaymentForwarded {
+		/// The fee, in milli-satoshis, which was earned as a result of the payment.
+		///
+		/// Note that if we force-closed the channel over which we forwarded an HTLC while the HTLC
+		/// was pending, the amount the next hop claimed will have been rounded down to the nearest
+		/// whole satoshi. Thus, the fee calculated here may be higher than expected as we still
+		/// claimed the full value in millisatoshis from the source. In this case,
+		/// `claim_from_onchain_tx` will be set.
+		///
+		/// If the channel which sent us the payment has been force-closed, we will claim the funds
+		/// via an on-chain transaction. In that case we do not yet know the on-chain transaction
+		/// fees which we will spend and will instead set this to `None`. It is possible duplicate
+		/// `PaymentForwarded` events are generated for the same payment iff `fee_earned_msat` is
+		/// `None`.
+		fee_earned_msat: crate::c_types::derived::COption_u64Z,
+		/// If this is `true`, the forwarded HTLC was claimed by our counterparty via an on-chain
+		/// transaction.
+		claim_from_onchain_tx: bool,
+	},
 }
 use lightning::util::events::Event as nativeEvent;
 impl Event {
@@ -142,19 +286,14 @@ impl Event {
 					user_channel_id: user_channel_id_nonref,
 				}
 			},
-			Event::PaymentReceived {ref payment_hash, ref payment_preimage, ref payment_secret, ref amt, ref user_payment_id, } => {
+			Event::PaymentReceived {ref payment_hash, ref amt, ref purpose, } => {
 				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut payment_preimage_nonref = (*payment_preimage).clone();
-				let mut local_payment_preimage_nonref = if payment_preimage_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(payment_preimage_nonref.data) }) };
-				let mut payment_secret_nonref = (*payment_secret).clone();
 				let mut amt_nonref = (*amt).clone();
-				let mut user_payment_id_nonref = (*user_payment_id).clone();
+				let mut purpose_nonref = (*purpose).clone();
 				nativeEvent::PaymentReceived {
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
-					payment_preimage: local_payment_preimage_nonref,
-					payment_secret: ::lightning::ln::PaymentSecret(payment_secret_nonref.data),
 					amt: amt_nonref,
-					user_payment_id: user_payment_id_nonref,
+					purpose: purpose_nonref.into_native(),
 				}
 			},
 			Event::PaymentSent {ref payment_preimage, } => {
@@ -184,6 +323,15 @@ impl Event {
 					outputs: local_outputs_nonref,
 				}
 			},
+			Event::PaymentForwarded {ref fee_earned_msat, ref claim_from_onchain_tx, } => {
+				let mut fee_earned_msat_nonref = (*fee_earned_msat).clone();
+				let mut local_fee_earned_msat_nonref = if fee_earned_msat_nonref.is_some() { Some( { fee_earned_msat_nonref.take() }) } else { None };
+				let mut claim_from_onchain_tx_nonref = (*claim_from_onchain_tx).clone();
+				nativeEvent::PaymentForwarded {
+					fee_earned_msat: local_fee_earned_msat_nonref,
+					claim_from_onchain_tx: claim_from_onchain_tx_nonref,
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -197,14 +345,11 @@ impl Event {
 					user_channel_id: user_channel_id,
 				}
 			},
-			Event::PaymentReceived {mut payment_hash, mut payment_preimage, mut payment_secret, mut amt, mut user_payment_id, } => {
-				let mut local_payment_preimage = if payment_preimage.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(payment_preimage.data) }) };
+			Event::PaymentReceived {mut payment_hash, mut amt, mut purpose, } => {
 				nativeEvent::PaymentReceived {
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
-					payment_preimage: local_payment_preimage,
-					payment_secret: ::lightning::ln::PaymentSecret(payment_secret.data),
 					amt: amt,
-					user_payment_id: user_payment_id,
+					purpose: purpose.into_native(),
 				}
 			},
 			Event::PaymentSent {mut payment_preimage, } => {
@@ -229,6 +374,13 @@ impl Event {
 					outputs: local_outputs,
 				}
 			},
+			Event::PaymentForwarded {mut fee_earned_msat, mut claim_from_onchain_tx, } => {
+				let mut local_fee_earned_msat = if fee_earned_msat.is_some() { Some( { fee_earned_msat.take() }) } else { None };
+				nativeEvent::PaymentForwarded {
+					fee_earned_msat: local_fee_earned_msat,
+					claim_from_onchain_tx: claim_from_onchain_tx,
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -246,19 +398,14 @@ impl Event {
 					user_channel_id: user_channel_id_nonref,
 				}
 			},
-			nativeEvent::PaymentReceived {ref payment_hash, ref payment_preimage, ref payment_secret, ref amt, ref user_payment_id, } => {
+			nativeEvent::PaymentReceived {ref payment_hash, ref amt, ref purpose, } => {
 				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut payment_preimage_nonref = (*payment_preimage).clone();
-				let mut local_payment_preimage_nonref = if payment_preimage_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_preimage_nonref.unwrap()).0 } } };
-				let mut payment_secret_nonref = (*payment_secret).clone();
 				let mut amt_nonref = (*amt).clone();
-				let mut user_payment_id_nonref = (*user_payment_id).clone();
+				let mut purpose_nonref = (*purpose).clone();
 				Event::PaymentReceived {
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
-					payment_preimage: local_payment_preimage_nonref,
-					payment_secret: crate::c_types::ThirtyTwoBytes { data: payment_secret_nonref.0 },
 					amt: amt_nonref,
-					user_payment_id: user_payment_id_nonref,
+					purpose: crate::lightning::util::events::PaymentPurpose::native_into(purpose_nonref),
 				}
 			},
 			nativeEvent::PaymentSent {ref payment_preimage, } => {
@@ -288,6 +435,15 @@ impl Event {
 					outputs: local_outputs_nonref.into(),
 				}
 			},
+			nativeEvent::PaymentForwarded {ref fee_earned_msat, ref claim_from_onchain_tx, } => {
+				let mut fee_earned_msat_nonref = (*fee_earned_msat).clone();
+				let mut local_fee_earned_msat_nonref = if fee_earned_msat_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(fee_earned_msat_nonref.unwrap()) } };
+				let mut claim_from_onchain_tx_nonref = (*claim_from_onchain_tx).clone();
+				Event::PaymentForwarded {
+					fee_earned_msat: local_fee_earned_msat_nonref,
+					claim_from_onchain_tx: claim_from_onchain_tx_nonref,
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -301,14 +457,11 @@ impl Event {
 					user_channel_id: user_channel_id,
 				}
 			},
-			nativeEvent::PaymentReceived {mut payment_hash, mut payment_preimage, mut payment_secret, mut amt, mut user_payment_id, } => {
-				let mut local_payment_preimage = if payment_preimage.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_preimage.unwrap()).0 } } };
+			nativeEvent::PaymentReceived {mut payment_hash, mut amt, mut purpose, } => {
 				Event::PaymentReceived {
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
-					payment_preimage: local_payment_preimage,
-					payment_secret: crate::c_types::ThirtyTwoBytes { data: payment_secret.0 },
 					amt: amt,
-					user_payment_id: user_payment_id,
+					purpose: crate::lightning::util::events::PaymentPurpose::native_into(purpose),
 				}
 			},
 			nativeEvent::PaymentSent {mut payment_preimage, } => {
@@ -333,6 +486,13 @@ impl Event {
 					outputs: local_outputs.into(),
 				}
 			},
+			nativeEvent::PaymentForwarded {mut fee_earned_msat, mut claim_from_onchain_tx, } => {
+				let mut local_fee_earned_msat = if fee_earned_msat.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(fee_earned_msat.unwrap()) } };
+				Event::PaymentForwarded {
+					fee_earned_msat: local_fee_earned_msat,
+					claim_from_onchain_tx: claim_from_onchain_tx,
+				}
+			},
 		}
 	}
 }
@@ -343,6 +503,62 @@ pub extern "C" fn Event_free(this_ptr: Event) { }
 #[no_mangle]
 pub extern "C" fn Event_clone(orig: &Event) -> Event {
 	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new FundingGenerationReady-variant Event
+pub extern "C" fn Event_funding_generation_ready(temporary_channel_id: crate::c_types::ThirtyTwoBytes, channel_value_satoshis: u64, output_script: crate::c_types::derived::CVec_u8Z, user_channel_id: u64) -> Event {
+	Event::FundingGenerationReady {
+		temporary_channel_id,
+		channel_value_satoshis,
+		output_script,
+		user_channel_id,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new PaymentReceived-variant Event
+pub extern "C" fn Event_payment_received(payment_hash: crate::c_types::ThirtyTwoBytes, amt: u64, purpose: crate::lightning::util::events::PaymentPurpose) -> Event {
+	Event::PaymentReceived {
+		payment_hash,
+		amt,
+		purpose,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new PaymentSent-variant Event
+pub extern "C" fn Event_payment_sent(payment_preimage: crate::c_types::ThirtyTwoBytes) -> Event {
+	Event::PaymentSent {
+		payment_preimage,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new PaymentFailed-variant Event
+pub extern "C" fn Event_payment_failed(payment_hash: crate::c_types::ThirtyTwoBytes, rejected_by_dest: bool) -> Event {
+	Event::PaymentFailed {
+		payment_hash,
+		rejected_by_dest,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new PendingHTLCsForwardable-variant Event
+pub extern "C" fn Event_pending_htlcs_forwardable(time_forwardable: u64) -> Event {
+	Event::PendingHTLCsForwardable {
+		time_forwardable,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SpendableOutputs-variant Event
+pub extern "C" fn Event_spendable_outputs(outputs: crate::c_types::derived::CVec_SpendableOutputDescriptorZ) -> Event {
+	Event::SpendableOutputs {
+		outputs,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new PaymentForwarded-variant Event
+pub extern "C" fn Event_payment_forwarded(fee_earned_msat: crate::c_types::derived::COption_u64Z, claim_from_onchain_tx: bool) -> Event {
+	Event::PaymentForwarded {
+		fee_earned_msat,
+		claim_from_onchain_tx,
+	}
 }
 #[no_mangle]
 /// Serialize the Event object into a byte array which can be read by Event_read
@@ -1079,6 +1295,163 @@ pub extern "C" fn MessageSendEvent_free(this_ptr: MessageSendEvent) { }
 pub extern "C" fn MessageSendEvent_clone(orig: &MessageSendEvent) -> MessageSendEvent {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new SendAcceptChannel-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_accept_channel(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::AcceptChannel) -> MessageSendEvent {
+	MessageSendEvent::SendAcceptChannel {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendOpenChannel-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_open_channel(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::OpenChannel) -> MessageSendEvent {
+	MessageSendEvent::SendOpenChannel {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendFundingCreated-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_funding_created(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::FundingCreated) -> MessageSendEvent {
+	MessageSendEvent::SendFundingCreated {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendFundingSigned-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_funding_signed(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::FundingSigned) -> MessageSendEvent {
+	MessageSendEvent::SendFundingSigned {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendFundingLocked-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_funding_locked(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::FundingLocked) -> MessageSendEvent {
+	MessageSendEvent::SendFundingLocked {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendAnnouncementSignatures-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_announcement_signatures(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::AnnouncementSignatures) -> MessageSendEvent {
+	MessageSendEvent::SendAnnouncementSignatures {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new UpdateHTLCs-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_update_htlcs(node_id: crate::c_types::PublicKey, updates: crate::lightning::ln::msgs::CommitmentUpdate) -> MessageSendEvent {
+	MessageSendEvent::UpdateHTLCs {
+		node_id,
+		updates,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendRevokeAndACK-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_revoke_and_ack(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::RevokeAndACK) -> MessageSendEvent {
+	MessageSendEvent::SendRevokeAndACK {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendClosingSigned-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_closing_signed(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::ClosingSigned) -> MessageSendEvent {
+	MessageSendEvent::SendClosingSigned {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendShutdown-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_shutdown(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::Shutdown) -> MessageSendEvent {
+	MessageSendEvent::SendShutdown {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendChannelReestablish-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_channel_reestablish(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::ChannelReestablish) -> MessageSendEvent {
+	MessageSendEvent::SendChannelReestablish {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new BroadcastChannelAnnouncement-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_broadcast_channel_announcement(msg: crate::lightning::ln::msgs::ChannelAnnouncement, update_msg: crate::lightning::ln::msgs::ChannelUpdate) -> MessageSendEvent {
+	MessageSendEvent::BroadcastChannelAnnouncement {
+		msg,
+		update_msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new BroadcastNodeAnnouncement-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_broadcast_node_announcement(msg: crate::lightning::ln::msgs::NodeAnnouncement) -> MessageSendEvent {
+	MessageSendEvent::BroadcastNodeAnnouncement {
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new BroadcastChannelUpdate-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_broadcast_channel_update(msg: crate::lightning::ln::msgs::ChannelUpdate) -> MessageSendEvent {
+	MessageSendEvent::BroadcastChannelUpdate {
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendChannelUpdate-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_channel_update(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::ChannelUpdate) -> MessageSendEvent {
+	MessageSendEvent::SendChannelUpdate {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new HandleError-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_handle_error(node_id: crate::c_types::PublicKey, action: crate::lightning::ln::msgs::ErrorAction) -> MessageSendEvent {
+	MessageSendEvent::HandleError {
+		node_id,
+		action,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new PaymentFailureNetworkUpdate-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_payment_failure_network_update(update: crate::lightning::ln::msgs::HTLCFailChannelUpdate) -> MessageSendEvent {
+	MessageSendEvent::PaymentFailureNetworkUpdate {
+		update,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendChannelRangeQuery-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_channel_range_query(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::QueryChannelRange) -> MessageSendEvent {
+	MessageSendEvent::SendChannelRangeQuery {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendShortIdsQuery-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_short_ids_query(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::QueryShortChannelIds) -> MessageSendEvent {
+	MessageSendEvent::SendShortIdsQuery {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendReplyChannelRange-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_reply_channel_range(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::ReplyChannelRange) -> MessageSendEvent {
+	MessageSendEvent::SendReplyChannelRange {
+		node_id,
+		msg,
+	}
+}
 /// A trait indicating an object may generate message send events
 #[repr(C)]
 pub struct MessageSendEventsProvider {
@@ -1095,6 +1468,14 @@ pub struct MessageSendEventsProvider {
 }
 unsafe impl Send for MessageSendEventsProvider {}
 unsafe impl Sync for MessageSendEventsProvider {}
+#[no_mangle]
+pub(crate) extern "C" fn MessageSendEventsProvider_clone_fields(orig: &MessageSendEventsProvider) -> MessageSendEventsProvider {
+	MessageSendEventsProvider {
+		this_arg: orig.this_arg,
+		get_and_clear_pending_msg_events: Clone::clone(&orig.get_and_clear_pending_msg_events),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::util::events::MessageSendEventsProvider as rustMessageSendEventsProvider;
 impl rustMessageSendEventsProvider for MessageSendEventsProvider {
@@ -1164,6 +1545,14 @@ pub struct EventsProvider {
 }
 unsafe impl Send for EventsProvider {}
 unsafe impl Sync for EventsProvider {}
+#[no_mangle]
+pub(crate) extern "C" fn EventsProvider_clone_fields(orig: &EventsProvider) -> EventsProvider {
+	EventsProvider {
+		this_arg: orig.this_arg,
+		process_pending_events: Clone::clone(&orig.process_pending_events),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::util::events::EventsProvider as rustEventsProvider;
 /// Calls the free function if one is set
@@ -1192,6 +1581,14 @@ pub struct EventHandler {
 }
 unsafe impl Send for EventHandler {}
 unsafe impl Sync for EventHandler {}
+#[no_mangle]
+pub(crate) extern "C" fn EventHandler_clone_fields(orig: &EventHandler) -> EventHandler {
+	EventHandler {
+		this_arg: orig.this_arg,
+		handle_event: Clone::clone(&orig.handle_event),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::util::events::EventHandler as rustEventHandler;
 impl rustEventHandler for EventHandler {

@@ -237,7 +237,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "\t/// An opaque pointer which is passed to your function implementations as an argument.").unwrap();
 	writeln!(w, "\t/// This has no meaning in the LDK, and can be NULL or any other value.").unwrap();
 	writeln!(w, "\tpub this_arg: *mut c_void,").unwrap();
-	let mut generated_fields = Vec::new(); // Every field's (name, Option<clone_fn>) except this_arg, used in Clone generation
+	// We store every field's (name, Option<clone_fn>, docs) except this_arg, used in Clone generation
+	// docs is only set if its a function which should be callable on the object itself in C++
+	let mut generated_fields = Vec::new();
 	for item in t.items.iter() {
 		match item {
 			&syn::TraitItem::Method(ref m) => {
@@ -271,14 +273,14 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						// happen) as well as provide an Option<>al function pointer which is
 						// called when the trait method is called which allows updating on the fly.
 						write!(w, "\tpub {}: ", m.sig.ident).unwrap();
-						generated_fields.push((format!("{}", m.sig.ident), None));
+						generated_fields.push((format!("{}", m.sig.ident), None, None));
 						types.write_c_type(w, &*r.elem, Some(&meth_gen_types), false);
 						writeln!(w, ",").unwrap();
 						writeln!(w, "\t/// Fill in the {} field as a reference to it will be given to Rust after this returns", m.sig.ident).unwrap();
 						writeln!(w, "\t/// Note that this takes a pointer to this object, not the this_ptr like other methods do").unwrap();
 						writeln!(w, "\t/// This function pointer may be NULL if {} is filled in when this object is created and never needs updating.", m.sig.ident).unwrap();
 						writeln!(w, "\tpub set_{}: Option<extern \"C\" fn(&{})>,", m.sig.ident, trait_name).unwrap();
-						generated_fields.push((format!("set_{}", m.sig.ident), None));
+						generated_fields.push((format!("set_{}", m.sig.ident), None, None));
 						// Note that cbindgen will now generate
 						// typedef struct Thing {..., set_thing: (const struct Thing*), ...} Thing;
 						// which does not compile since Thing is not defined before it is used.
@@ -290,8 +292,12 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 					writeln!(w, "\t#[must_use]").unwrap();
 				}
 
+				let mut cpp_docs = Vec::new();
+				writeln_docs(&mut cpp_docs, &m.attrs, "\t * ");
+				let docs_string = "\t/**\n".to_owned() + &String::from_utf8(cpp_docs).unwrap().replace("///", "") + "\t */\n";
+
 				write!(w, "\tpub {}: extern \"C\" fn (", m.sig.ident).unwrap();
-				generated_fields.push((format!("{}", m.sig.ident), None));
+				generated_fields.push((format!("{}", m.sig.ident), None, Some(docs_string)));
 				write_method_params(w, &m.sig, "c_void", types, Some(&meth_gen_types), true, false);
 				writeln!(w, ",").unwrap();
 			},
@@ -306,26 +312,32 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 			writeln!(w, "\t/// The new {} is provided, and should be mutated as needed to perform a", trait_name).unwrap();
 			writeln!(w, "\t/// deep copy of the object pointed to by this_arg or avoid any double-freeing.").unwrap();
 			writeln!(w, "\tpub cloned: Option<extern \"C\" fn (new_{}: &mut {})>,", trait_name, trait_name).unwrap();
-			generated_fields.push(("cloned".to_owned(), None));
+			generated_fields.push(("cloned".to_owned(), None, None));
 		},
 		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
-			writeln!(w, "\t/// Checks if two objects are equal given this object's this_arg pointer and another object.").unwrap();
+			let eq_docs = "Checks if two objects are equal given this object's this_arg pointer and another object.";
+			writeln!(w, "\t/// {}", eq_docs).unwrap();
 			writeln!(w, "\tpub eq: extern \"C\" fn (this_arg: *const c_void, other_arg: &{}) -> bool,", trait_name).unwrap();
-			generated_fields.push(("eq".to_owned(), None));
+			generated_fields.push(("eq".to_owned(), None, Some(format!("\t/** {} */\n", eq_docs))));
 		},
 		("std::hash::Hash", _)|("core::hash::Hash", _) => {
-			writeln!(w, "\t/// Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.").unwrap();
-			writeln!(w, "\t/// This is used, for example, for inclusion of this object in a hash map.").unwrap();
+			let hash_docs_a = "Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.";
+			let hash_docs_b = "This is used, for example, for inclusion of this object in a hash map.";
+			writeln!(w, "\t/// {}", hash_docs_a).unwrap();
+			writeln!(w, "\t/// {}", hash_docs_b).unwrap();
 			writeln!(w, "\tpub hash: extern \"C\" fn (this_arg: *const c_void) -> u64,").unwrap();
-			generated_fields.push(("hash".to_owned(), None));
+			generated_fields.push(("hash".to_owned(), None,
+				Some(format!("\t/**\n\t * {}\n\t * {}\n\t */\n", hash_docs_a, hash_docs_b))));
 		},
 		("Send", _) => {}, ("Sync", _) => {},
 		(s, i) => {
+			// TODO: Both of the below should expose supertrait methods in C++, but doing so is
+			// nontrivial.
 			generated_fields.push(if types.crate_types.traits.get(s).is_none() {
 				let (docs, name, ret) = convert_trait_impl_field(s);
 				writeln!(w, "\t/// {}", docs).unwrap();
 				writeln!(w, "\tpub {}: extern \"C\" fn (this_arg: *const c_void) -> {},", name, ret).unwrap();
-				(name, None) // Assume clonable
+				(name, None, None) // Assume clonable
 			} else {
 				// For in-crate supertraits, just store a C-mapped copy of the supertrait as a member.
 				writeln!(w, "\t/// Implementation of {} for this object.", i).unwrap();
@@ -333,14 +345,14 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				writeln!(w, "\tpub {}: crate::{},", i, s).unwrap();
 				(format!("{}", i), if !is_clonable {
 					Some(format!("crate::{}_clone_fields", s))
-				} else { None })
+				} else { None }, None)
 			});
 		}
 	) );
 	writeln!(w, "\t/// Frees any resources associated with this object given its this_arg pointer.").unwrap();
 	writeln!(w, "\t/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.").unwrap();
 	writeln!(w, "\tpub free: Option<extern \"C\" fn(this_arg: *mut c_void)>,").unwrap();
-	generated_fields.push(("free".to_owned(), None));
+	generated_fields.push(("free".to_owned(), None, None));
 	writeln!(w, "}}").unwrap();
 
 	macro_rules! impl_trait_for_c {
@@ -449,7 +461,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "pub(crate) extern \"C\" fn {}_clone_fields(orig: &{}) -> {} {{", trait_name, trait_name, trait_name).unwrap();
 	writeln!(w, "\t{} {{", trait_name).unwrap();
 	writeln!(w, "\t\tthis_arg: orig.this_arg,").unwrap();
-	for (field, clone_fn) in generated_fields.iter() {
+	for (field, clone_fn, _) in generated_fields.iter() {
 		if let Some(f) = clone_fn {
 			// If the field isn't clonable, blindly assume its a trait and hope for the best.
 			writeln!(w, "\t\t{}: {}(&orig.{}),", field, f, field).unwrap();
@@ -522,7 +534,8 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "\t\t\tf(self.this_arg);").unwrap();
 	writeln!(w, "\t\t}}\n\t}}\n}}").unwrap();
 
-	write_cpp_wrapper(cpp_headers, &trait_name, true);
+	write_cpp_wrapper(cpp_headers, &trait_name, true, Some(generated_fields.drain(..)
+		.filter_map(|(name, _, docs)| if let Some(docs) = docs { Some((name, docs)) } else { None }).collect()));
 }
 
 /// Write out a simple "opaque" type (eg structs) which contain a pointer to the native Rust type
@@ -567,7 +580,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	writeln!(w, "\t\tret").unwrap();
 	writeln!(w, "\t}}\n}}").unwrap();
 
-	write_cpp_wrapper(cpp_headers, &format!("{}", ident), true);
+	write_cpp_wrapper(cpp_headers, &format!("{}", ident), true, None);
 }
 
 /// Writes out all the relevant mappings for a Rust struct, deferring to writeln_opaque to generate
@@ -1360,7 +1373,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", e.ident, e.ident, e.ident).unwrap();
 	writeln!(w, "\torig.clone()").unwrap();
 	writeln!(w, "}}").unwrap();
-	write_cpp_wrapper(cpp_headers, &format!("{}", e.ident), needs_free);
+	write_cpp_wrapper(cpp_headers, &format!("{}", e.ident), needs_free, None);
 }
 
 fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &mut TypeResolver<'b, 'a>) {
@@ -1744,7 +1757,7 @@ fn main() {
 	// For container templates which we created while walking the crate, make sure we add C++
 	// mapped types so that C++ users can utilize the auto-destructors available.
 	for (ty, has_destructor) in libtypes.templates_defined.borrow().iter() {
-		write_cpp_wrapper(&mut cpp_header_file, ty, *has_destructor);
+		write_cpp_wrapper(&mut cpp_header_file, ty, *has_destructor, None);
 	}
 	writeln!(cpp_header_file, "}}").unwrap();
 

@@ -20,7 +20,7 @@ use crate::types::*;
 /// Writes out a C++ wrapper class for the given type, which contains various utilities to access
 /// the underlying C-mapped type safely avoiding some common memory management issues by handling
 /// resource-freeing and prevending accidental raw copies.
-pub fn write_cpp_wrapper(cpp_header_file: &mut File, ty: &str, has_destructor: bool) {
+pub fn write_cpp_wrapper(cpp_header_file: &mut File, ty: &str, has_destructor: bool, trait_methods: Option<Vec<(String, String)>>) {
 	writeln!(cpp_header_file, "class {} {{", ty).unwrap();
 	writeln!(cpp_header_file, "private:").unwrap();
 	writeln!(cpp_header_file, "\tLDK{} self;", ty).unwrap();
@@ -39,6 +39,14 @@ pub fn write_cpp_wrapper(cpp_header_file: &mut File, ty: &str, has_destructor: b
 	writeln!(cpp_header_file, "\tLDK{}* operator ->() {{ return &self; }}", ty).unwrap();
 	writeln!(cpp_header_file, "\tconst LDK{}* operator &() const {{ return &self; }}", ty).unwrap();
 	writeln!(cpp_header_file, "\tconst LDK{}* operator ->() const {{ return &self; }}", ty).unwrap();
+	if let Some(methods) = trait_methods {
+		for (meth_name, meth_docs) in methods {
+			cpp_header_file.write_all(meth_docs.as_bytes()).unwrap();
+			// Note that we have zero logic to print C/C__ code for a given function. Instead, we
+			// simply use sed to replace the following in genbindings.sh
+			writeln!(cpp_header_file, "XXX {} {}", ty, meth_name).unwrap();
+		}
+	}
 	writeln!(cpp_header_file, "}};").unwrap();
 }
 

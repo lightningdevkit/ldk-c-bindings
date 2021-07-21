@@ -207,6 +207,70 @@ else
 	sed -i 's/#include <stdlib.h>/#include "ldk_rust_types.h"/g' include/lightning.h
 fi
 
+# Build C++ class methods which call trait methods
+set +x # Echoing every command is very verbose here
+OLD_IFS="$IFS"
+export IFS=''
+echo '#include <string.h>' > include/lightningpp_new.hpp
+echo 'namespace LDK {' >> include/lightningpp_new.hpp
+echo '// Forward declarations' >> include/lightningpp_new.hpp
+cat include/lightningpp.hpp | sed -n 's/class \(.*\) {/class \1;/p' >> include/lightningpp_new.hpp
+echo '' >> include/lightningpp_new.hpp
+
+DECLS=""
+while read LINE; do
+	case "$LINE" in
+		"#include <string.h>")
+			# We already printed this above.
+			;;
+		"namespace LDK {")
+			# We already printed this above.
+			;;
+		"}")
+			# We'll print this at the end
+			;;
+		"XXX"*)
+			STRUCT_NAME="$(echo "$LINE" | awk '{ print $2 }')"
+			METHOD_NAME="$(echo "$LINE" | awk '{ print $3 }')"
+			STRUCT_CONTENTS="$(cat include/lightning.h  | sed -n -e "/struct LDK$STRUCT_NAME/{:s" -e "/\} LDK$STRUCT_NAME;/!{N" -e "b s" -e "}" -e p -e "}")"
+			METHOD="$(echo "$STRUCT_CONTENTS" | grep "(\*$METHOD_NAME)")"
+			if [ "$METHOD" = "" ]; then
+				echo "Unable to find method declaration for $LINE"
+				exit 1
+			fi
+			RETVAL="$(echo "$METHOD" | sed 's/[ ]*\([A-Za-z0-9 _]*\)(\*\(.*\)).*/\1/' | sed 's/^struct LDK/LDK::/g' | tr -d ' ')"
+			[ "$RETVAL" = "LDK::SecretKey" ] && RETVAL="LDKSecretKey"
+			[ "$RETVAL" = "LDK::PublicKey" ] && RETVAL="LDKPublicKey"
+			[ "$RETVAL" = "LDK::ThirtyTwoBytes" ] && RETVAL="LDKThirtyTwoBytes"
+			PARAMS="$(echo "$METHOD" | sed 's/.*(\*.*)(\(const \)*void \*this_arg\(, \)*\(.*\));/\3/')"
+
+			echo -e "\tinline $RETVAL $METHOD_NAME($PARAMS);" >> include/lightningpp_new.hpp
+			DECLS="$DECLS"$'\n'"inline $RETVAL $STRUCT_NAME::$METHOD_NAME($PARAMS) {"
+
+			DECLS="$DECLS"$'\n'$'\t'
+			[ "$RETVAL" != "void" ] && DECLS="$DECLS$RETVAL ret = "
+			DECLS="$DECLS(self.$METHOD_NAME)(self.this_arg"
+
+			IFS=','; for PARAM in $PARAMS; do
+				DECLS="$DECLS, "
+				DECLS="$DECLS$(echo $PARAM | sed 's/.* (*\**\([a-zA-Z0-9_]*\)\()[\[0-9\]*]\)*/\1/')"
+			done
+			IFS=''
+
+			DECLS="$DECLS);"
+			[ "$RETVAL" != "void" ] && DECLS="$DECLS"$'\n'$'\t'"return ret;"
+			DECLS="$DECLS"$'\n'"}"
+			;;
+		*)
+			echo "$LINE" >> include/lightningpp_new.hpp
+	esac
+done < include/lightningpp.hpp
+echo "$DECLS" >> include/lightningpp_new.hpp
+echo "}" >> include/lightningpp_new.hpp
+export IFS="$OLD_IFS"
+set -x
+mv include/lightningpp_new.hpp include/lightningpp.hpp
+
 # Finally, sanity-check the generated C and C++ bindings with demo apps:
 # Naively run the C demo app:
 gcc $LOCAL_CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl

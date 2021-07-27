@@ -276,7 +276,7 @@ else
 	echo "WARNING: Can't use memory sanitizer on non-Linux, non-x86 platforms"
 fi
 
-RUSTC_LLVM_V=$(rustc --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 4); }')
+RUSTC_LLVM_V=$(rustc --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 2); }')
 
 if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 	# Apple is special, as always, and their versions of clang aren't
@@ -285,15 +285,15 @@ if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 		echo "Apple clang isn't compatible with upstream clang, install upstream clang"
 		CLANG_LLVM_V="0"
 	else
-		CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 4); }')
+		CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }')
 		if [ -x "$(which ld64.lld)" ]; then
-			LLD_LLVM_V="$(ld64.lld --version | awk '{ print substr($2, 0, 4); }')"
+			LLD_LLVM_V="$(ld64.lld --version | awk '{ print substr($2, 0, 2); }')"
 		fi
 	fi
 else
-	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 4); }')
+	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }')
 	if [ -x "$(which ld.lld)" ]; then
-		LLD_LLVM_V="$(ld.lld --version | awk '{ print substr($2, 0, 4); }')"
+		LLD_LLVM_V="$(ld.lld --version | awk '{ print substr($2, 0, 2); }')"
 	fi
 fi
 
@@ -314,7 +314,7 @@ elif [ -x "$(which clang-$RUSTC_LLVM_V)" ]; then
 	fi
 	if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
 		LLD="$(which lld-$RUSTC_LLVM_V || echo lld)"
-		LLD_LLVM_V="$(ld.$LLD --version | awk '{ print substr($2, 0, 4); }')"
+		LLD_LLVM_V="$(ld.$LLD --version | awk '{ print substr($2, 0, 2); }')"
 		if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
 			echo "Could not find a workable version of lld, not using cross-language LTO"
 			unset LLD

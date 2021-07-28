@@ -198,13 +198,13 @@ if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.
-	sed -i '' 's/#include <stdlib.h>/#include <ldk_rust_types.h>/g' include/lightning.h
+	sed -i '' 's/#include <stdlib.h>/#include "ldk_rust_types.h"/g' include/lightning.h
 else
 	sed -i 's/typedef LDKnative.*Import.*LDKnative.*;//g' include/lightning.h
 
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.
-	sed -i 's/#include <stdlib.h>/#include <ldk_rust_types.h>/g' include/lightning.h
+	sed -i 's/#include <stdlib.h>/#include "ldk_rust_types.h"/g' include/lightning.h
 fi
 
 # Finally, sanity-check the generated C and C++ bindings with demo apps:

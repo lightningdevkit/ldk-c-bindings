@@ -1,4 +1,4 @@
-#include <lightning.h>
+#include "lightning.h"
 #include <sys/socket.h>
 /**
  * Initializes socket handling and spawns a background thread to handle socket

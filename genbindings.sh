@@ -218,7 +218,7 @@ LD_LIBRARY_PATH=target/debug/ ./a.out > /dev/null
 
 # Finally, run the C++ demo app with our native networking library
 # in valgrind to test memory model correctness and lack of leaks.
-gcc $LOCAL_CFLAGS -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+gcc $LOCAL_CFLAGS -fPIC -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
 g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
 if [ -x "`which valgrind`" ]; then
 	valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
@@ -351,7 +351,7 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "
 		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
 
 		# ...then the C++ demo app with the ldk_net network implementation
-		$CLANG $LOCAL_CFLAGS -fsanitize=address -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+		$CLANG $LOCAL_CFLAGS -fPIC -fsanitize=address -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
 		$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
 		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
 	else

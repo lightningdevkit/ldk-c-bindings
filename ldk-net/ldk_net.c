@@ -38,7 +38,7 @@
 
 #define MAX_CONNS 1024
 struct SocketHandler {
-	const struct LDKPeerManager *ldk_peer_manager;
+	struct LDKPeerManager ldk_peer_manager;
 	pthread_t socket_thread;
 	bool should_exit;
 	int pipefds[2];
@@ -215,7 +215,7 @@ static void *sock_thread_fn(void* arg) {
 								if (newfd >= 0) {
 									// Received a new connection, register it!
 									LDKSocketDescriptor new_descriptor = get_descriptor(handler, newfd);
-									LDKCResult_NonePeerHandleErrorZ con_res = PeerManager_new_inbound_connection(handler->ldk_peer_manager, new_descriptor);
+									LDKCResult_NonePeerHandleErrorZ con_res = PeerManager_new_inbound_connection(&handler->ldk_peer_manager, new_descriptor);
 									if (con_res.result_ok) {
 										if (register_socket(handler, newfd, 0))
 											shutdown(newfd, SHUT_RDWR);
@@ -237,7 +237,7 @@ static void *sock_thread_fn(void* arg) {
 								.data = readbuf,
 								.datalen = readlen,
 							};
-							LDKCResult_boolPeerHandleErrorZ res = PeerManager_read_event(handler->ldk_peer_manager, &descriptor, data);
+							LDKCResult_boolPeerHandleErrorZ res = PeerManager_read_event(&handler->ldk_peer_manager, &descriptor, data);
 							if (res.result_ok) {
 								if (*res.contents.result) {
 									lockres = pthread_mutex_lock(&handler->sockets_mutex);
@@ -255,7 +255,7 @@ static void *sock_thread_fn(void* arg) {
 						}
 					}
 					if (pollfds[i].revents & POLLOUT) {
-						LDKCResult_NonePeerHandleErrorZ res = PeerManager_write_buffer_space_avail(handler->ldk_peer_manager, &descriptor);
+						LDKCResult_NonePeerHandleErrorZ res = PeerManager_write_buffer_space_avail(&handler->ldk_peer_manager, &descriptor);
 						if (!res.result_ok) {
 							close_socks[close_socks_count++] = i;
 						}
@@ -274,7 +274,7 @@ static void *sock_thread_fn(void* arg) {
 		// as we walk.
 		for (int i = 0; i < close_socks_count; i++) {
 			LDKSocketDescriptor descriptor = get_descriptor(handler, handler->pollfds[close_socks[i]].fd);
-			PeerManager_socket_disconnected(handler->ldk_peer_manager, &descriptor);
+			PeerManager_socket_disconnected(&handler->ldk_peer_manager, &descriptor);
 			SocketDescriptor_free(descriptor);
 		}
 
@@ -294,14 +294,14 @@ static void *sock_thread_fn(void* arg) {
 		lockres = pthread_mutex_unlock(&handler->sockets_mutex);
 		assert(lockres == 0);
 
-		PeerManager_process_events(handler->ldk_peer_manager);
+		PeerManager_process_events(&handler->ldk_peer_manager);
 	}
 
 	lockres = pthread_mutex_lock(&handler->sockets_mutex);
 	assert(lockres == 0);
 	for (int i = 0; i < handler->sockcount; i++) {
 		LDKSocketDescriptor descriptor = get_descriptor(handler, handler->pollfds[i].fd);
-		PeerManager_socket_disconnected(handler->ldk_peer_manager, &descriptor);
+		PeerManager_socket_disconnected(&handler->ldk_peer_manager, &descriptor);
 		SocketDescriptor_free(descriptor);
 	}
 
@@ -326,7 +326,7 @@ void* init_socket_handling(const struct LDKPeerManager *NONNULL_PTR ldk_peer_man
 	handler->pipefds[0] = -1;
 	handler->pipefds[1] = -1;
 
-	handler->ldk_peer_manager = ldk_peer_manager;
+	handler->ldk_peer_manager = *ldk_peer_manager;
 	handler->should_exit = false;
 
 	if (pipe(handler->pipefds) != 0) goto err;
@@ -380,7 +380,7 @@ int socket_connect(void* arg, LDKPublicKey pubkey, struct sockaddr *addr, size_t
 	if (register_socket(handler, fd, 0)) return -4;
 
 	LDKSocketDescriptor descriptor = get_descriptor(handler, fd);
-	LDKCResult_CVec_u8ZPeerHandleErrorZ con_res = PeerManager_new_outbound_connection(handler->ldk_peer_manager, pubkey, descriptor);
+	LDKCResult_CVec_u8ZPeerHandleErrorZ con_res = PeerManager_new_outbound_connection(&handler->ldk_peer_manager, pubkey, descriptor);
 	if (con_res.result_ok) {
 		ssize_t write_count = send(fd, con_res.contents.result->data, con_res.contents.result->datalen, MSG_NOSIGNAL);
 		if (write_count != con_res.contents.result->datalen)

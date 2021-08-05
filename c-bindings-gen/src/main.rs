@@ -258,7 +258,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				let mut meth_gen_types = gen_types.push_ctx();
 				assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
 
-				writeln_docs(w, &m.attrs, "\t");
+				writeln_fn_docs(w, &m.attrs, "\t", types, Some(&meth_gen_types), m.sig.inputs.iter(), &m.sig.output);
 
 				if let syn::ReturnType::Type(_, rtype) = &m.sig.output {
 					if let syn::Type::Reference(r) = &**rtype {
@@ -293,7 +293,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				}
 
 				let mut cpp_docs = Vec::new();
-				writeln_docs(&mut cpp_docs, &m.attrs, "\t * ");
+				writeln_fn_docs(&mut cpp_docs, &m.attrs, "\t * ", types, Some(&meth_gen_types), m.sig.inputs.iter(), &m.sig.output);
 				let docs_string = "\t/**\n".to_owned() + &String::from_utf8(cpp_docs).unwrap().replace("///", "") + "\t */\n";
 
 				write!(w, "\tpub {}: extern \"C\" fn (", m.sig.ident).unwrap();
@@ -617,7 +617,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 						and_token: syn::Token!(&)(Span::call_site()), lifetime: None, mutability: None,
 						elem: Box::new(field.ty.clone()) });
 					if types.understood_c_type(&ref_type, Some(&gen_types)) {
-						writeln_docs(w, &field.attrs, "");
+						writeln_arg_docs(w, &field.attrs, "", types, Some(&gen_types), vec![].drain(..), Some(&ref_type));
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> ", struct_name, ident, struct_name).unwrap();
 						types.write_c_type(w, &ref_type, Some(&gen_types), true);
 						write!(w, " {{\n\tlet mut inner_val = &mut unsafe {{ &mut *this_ptr.inner }}.{};\n\t", ident).unwrap();
@@ -630,7 +630,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 					}
 
 					if types.understood_c_type(&field.ty, Some(&gen_types)) {
-						writeln_docs(w, &field.attrs, "");
+						writeln_arg_docs(w, &field.attrs, "", types, Some(&gen_types), vec![("val".to_owned(), &field.ty)].drain(..), None);
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_set_{}(this_ptr: &mut {}, mut val: ", struct_name, ident, struct_name).unwrap();
 						types.write_c_type(w, &field.ty, Some(&gen_types), false);
 						write!(w, ") {{\n\t").unwrap();
@@ -1058,8 +1058,10 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										ExportStatus::NoExport|ExportStatus::TestOnly => continue,
 										ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 									}
+									let mut meth_gen_types = gen_types.push_ctx();
+									assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
 									if m.defaultness.is_some() { unimplemented!(); }
-									writeln_docs(w, &m.attrs, "");
+									writeln_fn_docs(w, &m.attrs, "", types, Some(&meth_gen_types), m.sig.inputs.iter(), &m.sig.output);
 									if let syn::ReturnType::Type(_, _) = &m.sig.output {
 										writeln!(w, "#[must_use]").unwrap();
 									}
@@ -1069,8 +1071,6 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										DeclType::StructImported => format!("{}", ident),
 										_ => unimplemented!(),
 									};
-									let mut meth_gen_types = gen_types.push_ctx();
-									assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
 									write_method_params(w, &m.sig, &ret_type, types, Some(&meth_gen_types), false, true);
 									write!(w, " {{\n\t").unwrap();
 									write_method_var_decl_body(w, &m.sig, "", types, Some(&meth_gen_types), false);
@@ -1204,7 +1204,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 			writeln!(w, " {{").unwrap();
 			for field in fields.named.iter() {
 				if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
-				writeln_docs(w, &field.attrs, "\t\t");
+				writeln_field_docs(w, &field.attrs, "\t\t", types, Some(&gen_types), &field.ty);
 				write!(w, "\t\t{}: ", field.ident.as_ref().unwrap()).unwrap();
 				types.write_c_type(w, &field.ty, Some(&gen_types), false);
 				writeln!(w, ",").unwrap();
@@ -1382,10 +1382,10 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
 		ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 	}
-	writeln_docs(w, &f.attrs, "");
-
 	let mut gen_types = GenericTypes::new(None);
 	if !gen_types.learn_generics(&f.sig.generics, types) { return; }
+
+	writeln_fn_docs(w, &f.attrs, "", types, Some(&gen_types), f.sig.inputs.iter(), &f.sig.output);
 
 	write!(w, "#[no_mangle]\npub extern \"C\" fn {}(", f.sig.ident).unwrap();
 	write_method_params(w, &f.sig, "", types, Some(&gen_types), false, true);
@@ -1522,7 +1522,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 						if let syn::Type::Path(p) = &*c.ty {
 							let resolved_path = type_resolver.resolve_path(&p.path, None);
 							if type_resolver.is_primitive(&resolved_path) {
-								writeln_docs(&mut out, &c.attrs, "");
+								writeln_field_docs(&mut out, &c.attrs, "", &mut type_resolver, None, &*c.ty);
 								writeln!(out, "\n#[no_mangle]").unwrap();
 								writeln!(out, "pub static {}: {} = {}::{};", c.ident, resolved_path, module, c.ident).unwrap();
 							}

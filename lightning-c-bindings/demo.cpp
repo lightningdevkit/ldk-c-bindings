@@ -308,7 +308,7 @@ public:
 			.disconnect_socket = sock_disconnect_socket,
 			.eq = sock_eq,
 			.hash = sock_hash,
-			.clone = NULL,
+			.cloned = NULL,
 			.free = NULL,
 		};
 
@@ -318,7 +318,7 @@ public:
 			.disconnect_socket = sock_disconnect_socket,
 			.eq = sock_eq,
 			.hash = sock_hash,
-			.clone = NULL,
+			.cloned = NULL,
 			.free = NULL,
 		};
 

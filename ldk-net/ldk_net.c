@@ -142,12 +142,12 @@ static uint64_t sock_hash(const void* desc) {
 	const struct Descriptor *descriptor = (const struct Descriptor*)desc;
 	return (uint64_t)descriptor->fd;
 }
-static void* sock_clone(const void* desc) {
-	const struct Descriptor *descriptor = (const struct Descriptor*)desc;
+static void sock_cloned(LDKSocketDescriptor *NONNULL_PTR ldk_desc) {
+	const struct Descriptor *descriptor = (const struct Descriptor*)ldk_desc->this_arg;
 	struct Descriptor *new_desc = malloc(sizeof(struct Descriptor));
 	new_desc->handler = descriptor->handler;
 	new_desc->fd = descriptor->fd;
-	return new_desc;
+	ldk_desc->this_arg = (void*) new_desc;
 }
 static void sock_free(void* desc) {
 	free(desc);
@@ -163,7 +163,7 @@ static inline LDKSocketDescriptor get_descriptor(struct SocketHandler *handler, 
 		.disconnect_socket = sock_disconnect,
 		.eq = sock_eq,
 		.hash = sock_hash,
-		.clone = sock_clone,
+		.cloned = sock_cloned,
 		.free = sock_free,
 	};
 	return ret;

@@ -1170,6 +1170,23 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 	}
 }
 
+/// Replaces upper case charachters with underscore followed by lower case except the first
+/// charachter and repeated upper case characthers (which are only made lower case).
+fn camel_to_snake_case(camel: &str) -> String {
+	let mut res = "".to_string();
+	let mut last_upper = -1;
+	for (idx, c) in camel.chars().enumerate() {
+		if c.is_uppercase() {
+			if last_upper != idx as isize - 1 { res.push('_'); }
+			res.push(c.to_lowercase().next().unwrap());
+			last_upper = idx as isize;
+		} else {
+			res.push(c);
+		}
+	}
+	res
+}
+
 
 /// Print a mapping of an enum. If all of the enum's fields are C-mapped in some form (or the enum
 /// is unitary), we generate an equivalent enum with all types replaced with their C mapped
@@ -1193,25 +1210,31 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	assert!(gen_types.learn_generics(&e.generics, types));
 
 	let mut needs_free = false;
+	let mut constr = Vec::new();
 
 	writeln!(w, "#[must_use]\n#[derive(Clone)]\n#[repr(C)]\npub enum {} {{", e.ident).unwrap();
 	for var in e.variants.iter() {
 		assert_eq!(export_status(&var.attrs), ExportStatus::Export); // We can't partially-export a mirrored enum
 		writeln_docs(w, &var.attrs, "\t");
 		write!(w, "\t{}", var.ident).unwrap();
+		writeln!(&mut constr, "#[no_mangle]\n/// Utility method to constructs a new {}-variant {}", var.ident, e.ident).unwrap();
+		let constr_name = camel_to_snake_case(&format!("{}", var.ident));
+		write!(&mut constr, "pub extern \"C\" fn {}_{}(", e.ident, constr_name).unwrap();
+		let mut empty_tuple_variant = false;
 		if let syn::Fields::Named(fields) = &var.fields {
 			needs_free = true;
 			writeln!(w, " {{").unwrap();
-			for field in fields.named.iter() {
+			for (idx, field) in fields.named.iter().enumerate() {
 				if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
 				writeln_field_docs(w, &field.attrs, "\t\t", types, Some(&gen_types), &field.ty);
 				write!(w, "\t\t{}: ", field.ident.as_ref().unwrap()).unwrap();
+				write!(&mut constr, "{}{}: ", if idx != 0 { ", " } else { "" }, field.ident.as_ref().unwrap()).unwrap();
 				types.write_c_type(w, &field.ty, Some(&gen_types), false);
+				types.write_c_type(&mut constr, &field.ty, Some(&gen_types), false);
 				writeln!(w, ",").unwrap();
 			}
 			write!(w, "\t}}").unwrap();
 		} else if let syn::Fields::Unnamed(fields) = &var.fields {
-			let mut empty_tuple_variant = false;
 			if fields.unnamed.len() == 1 {
 				let mut empty_check = Vec::new();
 				types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), false);
@@ -1224,15 +1247,37 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 				write!(w, "(").unwrap();
 				for (idx, field) in fields.unnamed.iter().enumerate() {
 					if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
+					write!(&mut constr, "{}: ", ('a' as u8 + idx as u8) as char).unwrap();
 					types.write_c_type(w, &field.ty, Some(&gen_types), false);
+					types.write_c_type(&mut constr, &field.ty, Some(&gen_types), false);
 					if idx != fields.unnamed.len() - 1 {
 						write!(w, ",").unwrap();
+						write!(&mut constr, ",").unwrap();
 					}
 				}
 				write!(w, ")").unwrap();
 			}
 		}
 		if var.discriminant.is_some() { unimplemented!(); }
+		write!(&mut constr, ") -> {} {{\n\t{}::{}", e.ident, e.ident, var.ident).unwrap();
+		if let syn::Fields::Named(fields) = &var.fields {
+			writeln!(&mut constr, " {{").unwrap();
+			for field in fields.named.iter() {
+				writeln!(&mut constr, "\t\t{},", field.ident.as_ref().unwrap()).unwrap();
+			}
+			writeln!(&mut constr, "\t}}").unwrap();
+		} else if let syn::Fields::Unnamed(fields) = &var.fields {
+			if !empty_tuple_variant {
+				write!(&mut constr, "(").unwrap();
+				for idx in 0..fields.unnamed.len() {
+					write!(&mut constr, "{}, ", ('a' as u8 + idx as u8) as char).unwrap();
+				}
+				writeln!(&mut constr, ")").unwrap();
+			} else {
+				writeln!(&mut constr, "").unwrap();
+			}
+		}
+		writeln!(&mut constr, "}}").unwrap();
 		writeln!(w, ",").unwrap();
 	}
 	writeln!(w, "}}\nuse {}::{} as native{};\nimpl {} {{", types.module_path, e.ident, e.ident, e.ident).unwrap();
@@ -1373,6 +1418,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", e.ident, e.ident, e.ident).unwrap();
 	writeln!(w, "\torig.clone()").unwrap();
 	writeln!(w, "}}").unwrap();
+	w.write_all(&constr).unwrap();
 	write_cpp_wrapper(cpp_headers, &format!("{}", e.ident), needs_free, None);
 }
 

@@ -15,7 +15,7 @@ crate-type = ["staticlib"
 ,"cdylib"]
 
 [dependencies]
-bitcoin = "0.27"
+bitcoin = "0.26"
 secp256k1 = { version = "0.20.3", features = ["global-context-less-secure"] }
 # Note that the following line is matched by genbindings to update the path
 lightning = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "853007800ebb433f53b5b10e1a941cc65c04e829", features = ["allow_wallclock_use"] }

@@ -28,7 +28,6 @@ class Confirm;
 class Watch;
 class Filter;
 class WatchedOutput;
-class PaymentPurpose;
 class Event;
 class MessageSendEvent;
 class MessageSendEventsProvider;
@@ -269,7 +268,6 @@ class CResult_NoneSemanticErrorZ;
 class CVec_MonitorEventZ;
 class CVec_C2Tuple_u32ScriptZZ;
 class CResult_NoneChannelMonitorUpdateErrZ;
-class CResult_PaymentHashPaymentSendFailureZ;
 class CResult_SiPrefixNoneZ;
 class CResult_PublicKeyErrorZ;
 class C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ;
@@ -827,21 +825,6 @@ public:
 	LDKWatchedOutput* operator ->() { return &self; }
 	const LDKWatchedOutput* operator &() const { return &self; }
 	const LDKWatchedOutput* operator ->() const { return &self; }
-};
-class PaymentPurpose {
-private:
-	LDKPaymentPurpose self;
-public:
-	PaymentPurpose(const PaymentPurpose&) = delete;
-	PaymentPurpose(PaymentPurpose&& o) : self(o.self) { memset(&o, 0, sizeof(PaymentPurpose)); }
-	PaymentPurpose(LDKPaymentPurpose&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKPaymentPurpose)); }
-	operator LDKPaymentPurpose() && { LDKPaymentPurpose res = self; memset(&self, 0, sizeof(LDKPaymentPurpose)); return res; }
-	~PaymentPurpose() { PaymentPurpose_free(self); }
-	PaymentPurpose& operator=(PaymentPurpose&& o) { PaymentPurpose_free(self); self = o.self; memset(&o, 0, sizeof(PaymentPurpose)); return *this; }
-	LDKPaymentPurpose* operator &() { return &self; }
-	LDKPaymentPurpose* operator ->() { return &self; }
-	const LDKPaymentPurpose* operator &() const { return &self; }
-	const LDKPaymentPurpose* operator ->() const { return &self; }
 };
 class Event {
 private:
@@ -4856,21 +4839,6 @@ public:
 	LDKCResult_NoneChannelMonitorUpdateErrZ* operator ->() { return &self; }
 	const LDKCResult_NoneChannelMonitorUpdateErrZ* operator &() const { return &self; }
 	const LDKCResult_NoneChannelMonitorUpdateErrZ* operator ->() const { return &self; }
-};
-class CResult_PaymentHashPaymentSendFailureZ {
-private:
-	LDKCResult_PaymentHashPaymentSendFailureZ self;
-public:
-	CResult_PaymentHashPaymentSendFailureZ(const CResult_PaymentHashPaymentSendFailureZ&) = delete;
-	CResult_PaymentHashPaymentSendFailureZ(CResult_PaymentHashPaymentSendFailureZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_PaymentHashPaymentSendFailureZ)); }
-	CResult_PaymentHashPaymentSendFailureZ(LDKCResult_PaymentHashPaymentSendFailureZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_PaymentHashPaymentSendFailureZ)); }
-	operator LDKCResult_PaymentHashPaymentSendFailureZ() && { LDKCResult_PaymentHashPaymentSendFailureZ res = self; memset(&self, 0, sizeof(LDKCResult_PaymentHashPaymentSendFailureZ)); return res; }
-	~CResult_PaymentHashPaymentSendFailureZ() { CResult_PaymentHashPaymentSendFailureZ_free(self); }
-	CResult_PaymentHashPaymentSendFailureZ& operator=(CResult_PaymentHashPaymentSendFailureZ&& o) { CResult_PaymentHashPaymentSendFailureZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_PaymentHashPaymentSendFailureZ)); return *this; }
-	LDKCResult_PaymentHashPaymentSendFailureZ* operator &() { return &self; }
-	LDKCResult_PaymentHashPaymentSendFailureZ* operator ->() { return &self; }
-	const LDKCResult_PaymentHashPaymentSendFailureZ* operator &() const { return &self; }
-	const LDKCResult_PaymentHashPaymentSendFailureZ* operator ->() const { return &self; }
 };
 class CResult_SiPrefixNoneZ {
 private:

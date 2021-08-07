@@ -3957,39 +3957,6 @@ typedef struct LDKCResult_NonePaymentSendFailureZ {
 } LDKCResult_NonePaymentSendFailureZ;
 
 /**
- * The contents of CResult_PaymentHashPaymentSendFailureZ
- */
-typedef union LDKCResult_PaymentHashPaymentSendFailureZPtr {
-   /**
-    * A pointer to the contents in the success state.
-    * Reading from this pointer when `result_ok` is not set is undefined.
-    */
-   struct LDKThirtyTwoBytes *result;
-   /**
-    * A pointer to the contents in the error state.
-    * Reading from this pointer when `result_ok` is set is undefined.
-    */
-   struct LDKPaymentSendFailure *err;
-} LDKCResult_PaymentHashPaymentSendFailureZPtr;
-
-/**
- * A CResult_PaymentHashPaymentSendFailureZ represents the result of a fallible operation,
- * containing a crate::c_types::ThirtyTwoBytes on success and a crate::lightning::ln::channelmanager::PaymentSendFailure on failure.
- * `result_ok` indicates the overall state, and the contents are provided via `contents`.
- */
-typedef struct LDKCResult_PaymentHashPaymentSendFailureZ {
-   /**
-    * The contents of this CResult_PaymentHashPaymentSendFailureZ, accessible via either
-    * `err` or `result` depending on the state of `result_ok`.
-    */
-   union LDKCResult_PaymentHashPaymentSendFailureZPtr contents;
-   /**
-    * Whether this CResult_PaymentHashPaymentSendFailureZ represents a success state.
-    */
-   bool result_ok;
-} LDKCResult_PaymentHashPaymentSendFailureZ;
-
-/**
  * A 4-byte byte array.
  */
 typedef struct LDKFourBytes {
@@ -5416,74 +5383,6 @@ typedef struct LDKCVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
 } LDKCVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ;
 
 /**
- * Some information provided on receipt of payment depends on whether the payment received is a
- * spontaneous payment or a \"conventional\" lightning payment that's paying an invoice.
- */
-typedef enum LDKPaymentPurpose_Tag {
-   /**
-    * Information for receiving a payment that we generated an invoice for.
-    */
-   LDKPaymentPurpose_InvoicePayment,
-   /**
-    * Because this is a spontaneous payment, the payer generated their own preimage rather than us
-    * (the payee) providing a preimage.
-    */
-   LDKPaymentPurpose_SpontaneousPayment,
-   /**
-    * Must be last for serialization purposes
-    */
-   LDKPaymentPurpose_Sentinel,
-} LDKPaymentPurpose_Tag;
-
-typedef struct LDKPaymentPurpose_LDKInvoicePayment_Body {
-   /**
-    * The preimage to the payment_hash, if the payment hash (and secret) were fetched via
-    * [`ChannelManager::create_inbound_payment`]. If provided, this can be handed directly to
-    * [`ChannelManager::claim_funds`].
-    *
-    * [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
-    * [`ChannelManager::claim_funds`]: crate::ln::channelmanager::ChannelManager::claim_funds
-    *
-    * Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
-    */
-   struct LDKThirtyTwoBytes payment_preimage;
-   /**
-    * The \"payment secret\". This authenticates the sender to the recipient, preventing a
-    * number of deanonymization attacks during the routing process.
-    * It is provided here for your reference, however its accuracy is enforced directly by
-    * [`ChannelManager`] using the values you previously provided to
-    * [`ChannelManager::create_inbound_payment`] or
-    * [`ChannelManager::create_inbound_payment_for_hash`].
-    *
-    * [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
-    * [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
-    * [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
-    */
-   struct LDKThirtyTwoBytes payment_secret;
-   /**
-    * This is the `user_payment_id` which was provided to
-    * [`ChannelManager::create_inbound_payment_for_hash`] or
-    * [`ChannelManager::create_inbound_payment`]. It has no meaning inside of LDK and is
-    * simply copied here. It may be used to correlate PaymentReceived events with invoice
-    * metadata stored elsewhere.
-    *
-    * [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
-    * [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
-    */
-   uint64_t user_payment_id;
-} LDKPaymentPurpose_LDKInvoicePayment_Body;
-
-typedef struct MUST_USE_STRUCT LDKPaymentPurpose {
-   LDKPaymentPurpose_Tag tag;
-   union {
-      LDKPaymentPurpose_LDKInvoicePayment_Body invoice_payment;
-      struct {
-         struct LDKThirtyTwoBytes spontaneous_payment;
-      };
-   };
-} LDKPaymentPurpose;
-
-/**
  * An Event which you should probably take some action in response to.
  *
  * Note that while Writeable and Readable are implemented for Event, you probably shouldn't use
@@ -5536,11 +5435,6 @@ typedef enum LDKEvent_Tag {
     */
    LDKEvent_SpendableOutputs,
    /**
-    * This event is generated when a payment has been successfully forwarded through us and a
-    * forwarding fee earned.
-    */
-   LDKEvent_PaymentForwarded,
-   /**
     * Must be last for serialization purposes
     */
    LDKEvent_Sentinel,
@@ -5572,16 +5466,46 @@ typedef struct LDKEvent_LDKPaymentReceived_Body {
     */
    struct LDKThirtyTwoBytes payment_hash;
    /**
+    * The preimage to the payment_hash, if the payment hash (and secret) were fetched via
+    * [`ChannelManager::create_inbound_payment`]. If provided, this can be handed directly to
+    * [`ChannelManager::claim_funds`].
+    *
+    * [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
+    * [`ChannelManager::claim_funds`]: crate::ln::channelmanager::ChannelManager::claim_funds
+    *
+    * Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+    */
+   struct LDKThirtyTwoBytes payment_preimage;
+   /**
+    * The \"payment secret\". This authenticates the sender to the recipient, preventing a
+    * number of deanonymization attacks during the routing process.
+    * It is provided here for your reference, however its accuracy is enforced directly by
+    * [`ChannelManager`] using the values you previously provided to
+    * [`ChannelManager::create_inbound_payment`] or
+    * [`ChannelManager::create_inbound_payment_for_hash`].
+    *
+    * [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
+    * [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
+    * [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
+    */
+   struct LDKThirtyTwoBytes payment_secret;
+   /**
     * The value, in thousandths of a satoshi, that this payment is for. Note that you must
     * compare this to the expected value before accepting the payment (as otherwise you are
     * providing proof-of-payment for less than the value you expected!).
     */
    uint64_t amt;
    /**
-    * Information for claiming this received payment, based on whether the purpose of the
-    * payment is to pay an invoice or to send a spontaneous payment.
+    * This is the `user_payment_id` which was provided to
+    * [`ChannelManager::create_inbound_payment_for_hash`] or
+    * [`ChannelManager::create_inbound_payment`]. It has no meaning inside of LDK and is
+    * simply copied here. It may be used to correlate PaymentReceived events with invoice
+    * metadata stored elsewhere.
+    *
+    * [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
+    * [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
     */
-   struct LDKPaymentPurpose purpose;
+   uint64_t user_payment_id;
 } LDKEvent_LDKPaymentReceived_Body;
 
 typedef struct LDKEvent_LDKPaymentSent_Body {
@@ -5623,30 +5547,6 @@ typedef struct LDKEvent_LDKSpendableOutputs_Body {
    struct LDKCVec_SpendableOutputDescriptorZ outputs;
 } LDKEvent_LDKSpendableOutputs_Body;
 
-typedef struct LDKEvent_LDKPaymentForwarded_Body {
-   /**
-    * The fee, in milli-satoshis, which was earned as a result of the payment.
-    *
-    * Note that if we force-closed the channel over which we forwarded an HTLC while the HTLC
-    * was pending, the amount the next hop claimed will have been rounded down to the nearest
-    * whole satoshi. Thus, the fee calculated here may be higher than expected as we still
-    * claimed the full value in millisatoshis from the source. In this case,
-    * `claim_from_onchain_tx` will be set.
-    *
-    * If the channel which sent us the payment has been force-closed, we will claim the funds
-    * via an on-chain transaction. In that case we do not yet know the on-chain transaction
-    * fees which we will spend and will instead set this to `None`. It is possible duplicate
-    * `PaymentForwarded` events are generated for the same payment iff `fee_earned_msat` is
-    * `None`.
-    */
-   struct LDKCOption_u64Z fee_earned_msat;
-   /**
-    * If this is `true`, the forwarded HTLC was claimed by our counterparty via an on-chain
-    * transaction.
-    */
-   bool claim_from_onchain_tx;
-} LDKEvent_LDKPaymentForwarded_Body;
-
 typedef struct MUST_USE_STRUCT LDKEvent {
    LDKEvent_Tag tag;
    union {
@@ -5656,7 +5556,6 @@ typedef struct MUST_USE_STRUCT LDKEvent {
       LDKEvent_LDKPaymentFailed_Body payment_failed;
       LDKEvent_LDKPendingHTLCsForwardable_Body pending_htl_cs_forwardable;
       LDKEvent_LDKSpendableOutputs_Body spendable_outputs;
-      LDKEvent_LDKPaymentForwarded_Body payment_forwarded;
    };
 } LDKEvent;
 
@@ -9043,7 +8942,6 @@ typedef struct MUST_USE_STRUCT LDKFilesystemPersister {
  * then there is a risk of channels force-closing on startup when the manager realizes it's
  * outdated. However, as long as `ChannelMonitor` backups are sound, no funds besides those used
  * for unilateral chain closure fees are at risk.
- *BackgroundProcessor will immediately stop on drop. It should be stored until shutdown.
  */
 typedef struct MUST_USE_STRUCT LDKBackgroundProcessor {
    /**
@@ -10181,27 +10079,6 @@ void CResult_NonePaymentSendFailureZ_free(struct LDKCResult_NonePaymentSendFailu
  * but with all dynamically-allocated buffers duplicated in new buffers.
  */
 struct LDKCResult_NonePaymentSendFailureZ CResult_NonePaymentSendFailureZ_clone(const struct LDKCResult_NonePaymentSendFailureZ *NONNULL_PTR orig);
-
-/**
- * Creates a new CResult_PaymentHashPaymentSendFailureZ in the success state.
- */
-struct LDKCResult_PaymentHashPaymentSendFailureZ CResult_PaymentHashPaymentSendFailureZ_ok(struct LDKThirtyTwoBytes o);
-
-/**
- * Creates a new CResult_PaymentHashPaymentSendFailureZ in the error state.
- */
-struct LDKCResult_PaymentHashPaymentSendFailureZ CResult_PaymentHashPaymentSendFailureZ_err(struct LDKPaymentSendFailure e);
-
-/**
- * Frees any resources used by the CResult_PaymentHashPaymentSendFailureZ.
- */
-void CResult_PaymentHashPaymentSendFailureZ_free(struct LDKCResult_PaymentHashPaymentSendFailureZ _res);
-
-/**
- * Creates a new CResult_PaymentHashPaymentSendFailureZ which has the same data as `orig`
- * but with all dynamically-allocated buffers duplicated in new buffers.
- */
-struct LDKCResult_PaymentHashPaymentSendFailureZ CResult_PaymentHashPaymentSendFailureZ_clone(const struct LDKCResult_PaymentHashPaymentSendFailureZ *NONNULL_PTR orig);
 
 /**
  * Frees the buffer pointed to by `data` if `datalen` is non-0.
@@ -11774,26 +11651,6 @@ void CResult_InvoiceSignOrCreationErrorZ_free(struct LDKCResult_InvoiceSignOrCre
 struct LDKCResult_InvoiceSignOrCreationErrorZ CResult_InvoiceSignOrCreationErrorZ_clone(const struct LDKCResult_InvoiceSignOrCreationErrorZ *NONNULL_PTR orig);
 
 /**
- * Frees any resources used by the PaymentPurpose
- */
-void PaymentPurpose_free(struct LDKPaymentPurpose this_ptr);
-
-/**
- * Creates a copy of the PaymentPurpose
- */
-struct LDKPaymentPurpose PaymentPurpose_clone(const struct LDKPaymentPurpose *NONNULL_PTR orig);
-
-/**
- * Utility method to constructs a new InvoicePayment-variant PaymentPurpose
- */
-struct LDKPaymentPurpose PaymentPurpose_invoice_payment(struct LDKThirtyTwoBytes payment_preimage, struct LDKThirtyTwoBytes payment_secret, uint64_t user_payment_id);
-
-/**
- * Utility method to constructs a new SpontaneousPayment-variant PaymentPurpose
- */
-struct LDKPaymentPurpose PaymentPurpose_spontaneous_payment(struct LDKThirtyTwoBytes a);
-
-/**
  * Frees any resources used by the Event
  */
 void Event_free(struct LDKEvent this_ptr);
@@ -11811,7 +11668,7 @@ struct LDKEvent Event_funding_generation_ready(struct LDKThirtyTwoBytes temporar
 /**
  * Utility method to constructs a new PaymentReceived-variant Event
  */
-struct LDKEvent Event_payment_received(struct LDKThirtyTwoBytes payment_hash, uint64_t amt, struct LDKPaymentPurpose purpose);
+struct LDKEvent Event_payment_received(struct LDKThirtyTwoBytes payment_hash, struct LDKThirtyTwoBytes payment_preimage, struct LDKThirtyTwoBytes payment_secret, uint64_t amt, uint64_t user_payment_id);
 
 /**
  * Utility method to constructs a new PaymentSent-variant Event
@@ -11832,11 +11689,6 @@ struct LDKEvent Event_pending_htlcs_forwardable(uint64_t time_forwardable);
  * Utility method to constructs a new SpendableOutputs-variant Event
  */
 struct LDKEvent Event_spendable_outputs(struct LDKCVec_SpendableOutputDescriptorZ outputs);
-
-/**
- * Utility method to constructs a new PaymentForwarded-variant Event
- */
-struct LDKEvent Event_payment_forwarded(struct LDKCOption_u64Z fee_earned_msat, bool claim_from_onchain_tx);
 
 /**
  * Serialize the Event object into a byte array which can be read by Event_read
@@ -14106,22 +13958,6 @@ void ChannelManager_force_close_all_channels(const struct LDKChannelManager *NON
 MUST_USE_RES struct LDKCResult_NonePaymentSendFailureZ ChannelManager_send_payment(const struct LDKChannelManager *NONNULL_PTR this_arg, const struct LDKRoute *NONNULL_PTR route, struct LDKThirtyTwoBytes payment_hash, struct LDKThirtyTwoBytes payment_secret);
 
 /**
- * Send a spontaneous payment, which is a payment that does not require the recipient to have
- * generated an invoice. Optionally, you may specify the preimage. If you do choose to specify
- * the preimage, it must be a cryptographically secure random value that no intermediate node
- * would be able to guess -- otherwise, an intermediate node may claim the payment and it will
- * never reach the recipient.
- *
- * Similar to regular payments, you MUST NOT reuse a `payment_preimage` value. See
- * [`send_payment`] for more information about the risks of duplicate preimage usage.
- *
- * [`send_payment`]: Self::send_payment
- *
- * Note that payment_preimage (or a relevant inner pointer) may be NULL or all-0s to represent None
- */
-MUST_USE_RES struct LDKCResult_PaymentHashPaymentSendFailureZ ChannelManager_send_spontaneous_payment(const struct LDKChannelManager *NONNULL_PTR this_arg, const struct LDKRoute *NONNULL_PTR route, struct LDKThirtyTwoBytes payment_preimage);
-
-/**
  * Call this upon creation of a funding transaction for the given channel.
  *
  * Returns an [`APIError::APIMisuseError`] if the funding_transaction spent non-SegWit outputs
@@ -14272,7 +14108,7 @@ MUST_USE_RES struct LDKC2Tuple_PaymentHashPaymentSecretZ ChannelManager_create_i
  * The [`PaymentHash`] (and corresponding [`PaymentPreimage`]) must be globally unique. This
  * method may return an Err if another payment with the same payment_hash is still pending.
  *
- * `user_payment_id` will be provided back in [`PaymentPurpose::InvoicePayment::user_payment_id`] events to
+ * `user_payment_id` will be provided back in [`PaymentReceived::user_payment_id`] events to
  * allow tracking of which events correspond with which calls to this and
  * [`create_inbound_payment`]. `user_payment_id` has no meaning inside of LDK, it is simply
  * copied to events and otherwise ignored. It may be used to correlate PaymentReceived events
@@ -14306,7 +14142,7 @@ MUST_USE_RES struct LDKC2Tuple_PaymentHashPaymentSecretZ ChannelManager_create_i
  *
  * [`create_inbound_payment`]: Self::create_inbound_payment
  * [`PaymentReceived`]: events::Event::PaymentReceived
- * [`PaymentPurpose::InvoicePayment::user_payment_id`]: events::PaymentPurpose::InvoicePayment::user_payment_id
+ * [`PaymentReceived::user_payment_id`]: events::Event::PaymentReceived::user_payment_id
  */
 MUST_USE_RES struct LDKCResult_PaymentSecretAPIErrorZ ChannelManager_create_inbound_payment_for_hash(const struct LDKChannelManager *NONNULL_PTR this_arg, struct LDKThirtyTwoBytes payment_hash, struct LDKCOption_u64Z min_value_msat, uint32_t invoice_expiry_delta_secs, uint64_t user_payment_id);
 
@@ -18095,15 +17931,6 @@ bool RouteHintHop_eq(const struct LDKRouteHintHop *NONNULL_PTR a, const struct L
 struct LDKRouteHintHop RouteHintHop_clone(const struct LDKRouteHintHop *NONNULL_PTR orig);
 
 /**
- * Gets a keysend route from us (payer) to the given target node (payee). This is needed because
- * keysend payments do not have an invoice from which to pull the payee's supported features, which
- * makes it tricky to otherwise supply the `payee_features` parameter of `get_route`.
- *
- * Note that first_hops (or a relevant inner pointer) may be NULL or all-0s to represent None
- */
-struct LDKCResult_RouteLightningErrorZ get_keysend_route(struct LDKPublicKey our_node_id, const struct LDKNetworkGraph *NONNULL_PTR network, struct LDKPublicKey payee, struct LDKCVec_ChannelDetailsZ *first_hops, struct LDKCVec_RouteHintZ last_hops, uint64_t final_value_msat, uint32_t final_cltv, struct LDKLogger logger);
-
-/**
  * Gets a route from us (payer) to the given target node (payee).
  *
  * If the payee provided features in their invoice, they should be provided via payee_features.
@@ -18766,25 +18593,21 @@ void BackgroundProcessor_free(struct LDKBackgroundProcessor this_obj);
 void ChannelManagerPersister_free(struct LDKChannelManagerPersister this_ptr);
 
 /**
- * Start a background thread that takes care of responsibilities enumerated in the [top-level
- * documentation].
+ * Start a background thread that takes care of responsibilities enumerated in the top-level
+ * documentation.
  *
- * The thread runs indefinitely unless the object is dropped, [`stop`] is called, or
- * `persist_manager` returns an error. In case of an error, the error is retrieved by calling
- * either [`join`] or [`stop`].
- *
- * Typically, users should either implement [`ChannelManagerPersister`] to never return an
- * error or call [`join`] and handle any error that may arise. For the latter case, the
- * `BackgroundProcessor` must be restarted by calling `start` again after handling the error.
+ * If `persist_manager` returns an error, then this thread will return said error (and
+ * `start()` will need to be called again to restart the `BackgroundProcessor`). Users should
+ * wait on [`thread_handle`]'s `join()` method to be able to tell if and when an error is
+ * returned, or implement `persist_manager` such that an error is never returned to the
+ * `BackgroundProcessor`
  *
  * `persist_manager` is responsible for writing out the [`ChannelManager`] to disk, and/or
  * uploading to one or more backup services. See [`ChannelManager::write`] for writing out a
  * [`ChannelManager`]. See [`FilesystemPersister::persist_manager`] for Rust-Lightning's
  * provided implementation.
  *
- * [top-level documentation]: Self
- * [`join`]: Self::join
- * [`stop`]: Self::stop
+ * [`thread_handle`]: BackgroundProcessor::thread_handle
  * [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
  * [`ChannelManager::write`]: lightning::ln::channelmanager::ChannelManager#impl-Writeable
  * [`FilesystemPersister::persist_manager`]: lightning_persister::FilesystemPersister::persist_manager
@@ -18792,28 +18615,7 @@ void ChannelManagerPersister_free(struct LDKChannelManagerPersister this_ptr);
 MUST_USE_RES struct LDKBackgroundProcessor BackgroundProcessor_start(struct LDKChannelManagerPersister persister, struct LDKEventHandler event_handler, const struct LDKChainMonitor *NONNULL_PTR chain_monitor, const struct LDKChannelManager *NONNULL_PTR channel_manager, const struct LDKPeerManager *NONNULL_PTR peer_manager, struct LDKLogger logger);
 
 /**
- * Join `BackgroundProcessor`'s thread, returning any error that occurred while persisting
- * [`ChannelManager`].
- *
- * # Panics
- *
- * This function panics if the background thread has panicked such as while persisting or
- * handling events.
- *
- * [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
- */
-MUST_USE_RES struct LDKCResult_NoneErrorZ BackgroundProcessor_join(struct LDKBackgroundProcessor this_arg);
-
-/**
- * Stop `BackgroundProcessor`'s thread, returning any error that occurred while persisting
- * [`ChannelManager`].
- *
- * # Panics
- *
- * This function panics if the background thread has panicked such as while persisting or
- * handling events.
- *
- * [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
+ * Stop `BackgroundProcessor`'s thread.
  */
 MUST_USE_RES struct LDKCResult_NoneErrorZ BackgroundProcessor_stop(struct LDKBackgroundProcessor this_arg);
 

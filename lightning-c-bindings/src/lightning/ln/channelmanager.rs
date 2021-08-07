@@ -1072,27 +1072,6 @@ pub extern "C" fn ChannelManager_send_payment(this_arg: &ChannelManager, route: 
 	local_ret
 }
 
-/// Send a spontaneous payment, which is a payment that does not require the recipient to have
-/// generated an invoice. Optionally, you may specify the preimage. If you do choose to specify
-/// the preimage, it must be a cryptographically secure random value that no intermediate node
-/// would be able to guess -- otherwise, an intermediate node may claim the payment and it will
-/// never reach the recipient.
-///
-/// Similar to regular payments, you MUST NOT reuse a `payment_preimage` value. See
-/// [`send_payment`] for more information about the risks of duplicate preimage usage.
-///
-/// [`send_payment`]: Self::send_payment
-///
-/// Note that payment_preimage (or a relevant inner pointer) may be NULL or all-0s to represent None
-#[must_use]
-#[no_mangle]
-pub extern "C" fn ChannelManager_send_spontaneous_payment(this_arg: &ChannelManager, route: &crate::lightning::routing::router::Route, mut payment_preimage: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_PaymentHashPaymentSendFailureZ {
-	let mut local_payment_preimage = if payment_preimage.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(payment_preimage.data) }) };
-	let mut ret = unsafe { &*this_arg.inner }.send_spontaneous_payment(unsafe { &*route.inner }, local_payment_preimage);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::channelmanager::PaymentSendFailure::native_into(e) }).into() };
-	local_ret
-}
-
 /// Call this upon creation of a funding transaction for the given channel.
 ///
 /// Returns an [`APIError::APIMisuseError`] if the funding_transaction spent non-SegWit outputs
@@ -1266,7 +1245,7 @@ pub extern "C" fn ChannelManager_create_inbound_payment(this_arg: &ChannelManage
 /// The [`PaymentHash`] (and corresponding [`PaymentPreimage`]) must be globally unique. This
 /// method may return an Err if another payment with the same payment_hash is still pending.
 ///
-/// `user_payment_id` will be provided back in [`PaymentPurpose::InvoicePayment::user_payment_id`] events to
+/// `user_payment_id` will be provided back in [`PaymentReceived::user_payment_id`] events to
 /// allow tracking of which events correspond with which calls to this and
 /// [`create_inbound_payment`]. `user_payment_id` has no meaning inside of LDK, it is simply
 /// copied to events and otherwise ignored. It may be used to correlate PaymentReceived events
@@ -1300,7 +1279,7 @@ pub extern "C" fn ChannelManager_create_inbound_payment(this_arg: &ChannelManage
 ///
 /// [`create_inbound_payment`]: Self::create_inbound_payment
 /// [`PaymentReceived`]: events::Event::PaymentReceived
-/// [`PaymentPurpose::InvoicePayment::user_payment_id`]: events::PaymentPurpose::InvoicePayment::user_payment_id
+/// [`PaymentReceived::user_payment_id`]: events::Event::PaymentReceived::user_payment_id
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_create_inbound_payment_for_hash(this_arg: &ChannelManager, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut invoice_expiry_delta_secs: u32, mut user_payment_id: u64) -> crate::c_types::derived::CResult_PaymentSecretAPIErrorZ {

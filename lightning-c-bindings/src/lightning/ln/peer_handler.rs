@@ -522,16 +522,28 @@ pub struct SocketDescriptor {
 	/// Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.
 	/// This is used, for example, for inclusion of this object in a hash map.
 	pub hash: extern "C" fn (this_arg: *const c_void) -> u64,
-	/// Creates a copy of the object pointed to by this_arg, for a copy of this SocketDescriptor.
-	/// Note that the ultimate copy of the SocketDescriptor will have all function pointers the same as the original.
-	/// May be NULL if no action needs to be taken, the this_arg pointer will be copied into the new SocketDescriptor.
-	pub clone: Option<extern "C" fn (this_arg: *const c_void) -> *mut c_void>,
+	/// Called, if set, after this SocketDescriptor has been cloned into a duplicate object.
+	/// The new SocketDescriptor is provided, and should be mutated as needed to perform a
+	/// deep copy of the object pointed to by this_arg or avoid any double-freeing.
+	pub cloned: Option<extern "C" fn (new_SocketDescriptor: &mut SocketDescriptor)>,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for SocketDescriptor {}
 unsafe impl Sync for SocketDescriptor {}
+#[no_mangle]
+pub(crate) extern "C" fn SocketDescriptor_clone_fields(orig: &SocketDescriptor) -> SocketDescriptor {
+	SocketDescriptor {
+		this_arg: orig.this_arg,
+		send_data: Clone::clone(&orig.send_data),
+		disconnect_socket: Clone::clone(&orig.disconnect_socket),
+		eq: Clone::clone(&orig.eq),
+		hash: Clone::clone(&orig.hash),
+		cloned: Clone::clone(&orig.cloned),
+		free: Clone::clone(&orig.free),
+	}
+}
 impl std::cmp::Eq for SocketDescriptor {}
 impl std::cmp::PartialEq for SocketDescriptor {
 	fn eq(&self, o: &Self) -> bool { (self.eq)(self.this_arg, o) }
@@ -542,15 +554,9 @@ impl std::hash::Hash for SocketDescriptor {
 #[no_mangle]
 /// Creates a copy of a SocketDescriptor
 pub extern "C" fn SocketDescriptor_clone(orig: &SocketDescriptor) -> SocketDescriptor {
-	SocketDescriptor {
-		this_arg: if let Some(f) = orig.clone { (f)(orig.this_arg) } else { orig.this_arg },
-		send_data: Clone::clone(&orig.send_data),
-		disconnect_socket: Clone::clone(&orig.disconnect_socket),
-		eq: Clone::clone(&orig.eq),
-		hash: Clone::clone(&orig.hash),
-		clone: Clone::clone(&orig.clone),
-		free: Clone::clone(&orig.free),
-	}
+	let mut res = SocketDescriptor_clone_fields(orig);
+	if let Some(f) = orig.cloned { (f)(&mut res) };
+	res
 }
 impl Clone for SocketDescriptor {
 	fn clone(&self) -> Self {

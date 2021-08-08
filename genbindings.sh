@@ -198,14 +198,78 @@ if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.
-	sed -i '' 's/#include <stdlib.h>/#include <ldk_rust_types.h>/g' include/lightning.h
+	sed -i '' 's/#include <stdlib.h>/#include "ldk_rust_types.h"/g' include/lightning.h
 else
 	sed -i 's/typedef LDKnative.*Import.*LDKnative.*;//g' include/lightning.h
 
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.
-	sed -i 's/#include <stdlib.h>/#include <ldk_rust_types.h>/g' include/lightning.h
+	sed -i 's/#include <stdlib.h>/#include "ldk_rust_types.h"/g' include/lightning.h
 fi
+
+# Build C++ class methods which call trait methods
+set +x # Echoing every command is very verbose here
+OLD_IFS="$IFS"
+export IFS=''
+echo '#include <string.h>' > include/lightningpp_new.hpp
+echo 'namespace LDK {' >> include/lightningpp_new.hpp
+echo '// Forward declarations' >> include/lightningpp_new.hpp
+cat include/lightningpp.hpp | sed -n 's/class \(.*\) {/class \1;/p' >> include/lightningpp_new.hpp
+echo '' >> include/lightningpp_new.hpp
+
+DECLS=""
+while read LINE; do
+	case "$LINE" in
+		"#include <string.h>")
+			# We already printed this above.
+			;;
+		"namespace LDK {")
+			# We already printed this above.
+			;;
+		"}")
+			# We'll print this at the end
+			;;
+		"XXX"*)
+			STRUCT_NAME="$(echo "$LINE" | awk '{ print $2 }')"
+			METHOD_NAME="$(echo "$LINE" | awk '{ print $3 }')"
+			STRUCT_CONTENTS="$(cat include/lightning.h  | sed -n -e "/struct LDK$STRUCT_NAME/{:s" -e "/\} LDK$STRUCT_NAME;/!{N" -e "b s" -e "}" -e p -e "}")"
+			METHOD="$(echo "$STRUCT_CONTENTS" | grep "(\*$METHOD_NAME)")"
+			if [ "$METHOD" = "" ]; then
+				echo "Unable to find method declaration for $LINE"
+				exit 1
+			fi
+			RETVAL="$(echo "$METHOD" | sed 's/[ ]*\([A-Za-z0-9 _]*\)(\*\(.*\)).*/\1/' | sed 's/^struct LDK/LDK::/g' | tr -d ' ')"
+			[ "$RETVAL" = "LDK::SecretKey" ] && RETVAL="LDKSecretKey"
+			[ "$RETVAL" = "LDK::PublicKey" ] && RETVAL="LDKPublicKey"
+			[ "$RETVAL" = "LDK::ThirtyTwoBytes" ] && RETVAL="LDKThirtyTwoBytes"
+			PARAMS="$(echo "$METHOD" | sed 's/.*(\*.*)(\(const \)*void \*this_arg\(, \)*\(.*\));/\3/')"
+
+			echo -e "\tinline $RETVAL $METHOD_NAME($PARAMS);" >> include/lightningpp_new.hpp
+			DECLS="$DECLS"$'\n'"inline $RETVAL $STRUCT_NAME::$METHOD_NAME($PARAMS) {"
+
+			DECLS="$DECLS"$'\n'$'\t'
+			[ "$RETVAL" != "void" ] && DECLS="$DECLS$RETVAL ret = "
+			DECLS="$DECLS(self.$METHOD_NAME)(self.this_arg"
+
+			IFS=','; for PARAM in $PARAMS; do
+				DECLS="$DECLS, "
+				DECLS="$DECLS$(echo $PARAM | sed 's/.* (*\**\([a-zA-Z0-9_]*\)\()[\[0-9\]*]\)*/\1/')"
+			done
+			IFS=''
+
+			DECLS="$DECLS);"
+			[ "$RETVAL" != "void" ] && DECLS="$DECLS"$'\n'$'\t'"return ret;"
+			DECLS="$DECLS"$'\n'"}"
+			;;
+		*)
+			echo "$LINE" >> include/lightningpp_new.hpp
+	esac
+done < include/lightningpp.hpp
+echo "$DECLS" >> include/lightningpp_new.hpp
+echo "}" >> include/lightningpp_new.hpp
+export IFS="$OLD_IFS"
+set -x
+mv include/lightningpp_new.hpp include/lightningpp.hpp
 
 # Finally, sanity-check the generated C and C++ bindings with demo apps:
 # Naively run the C demo app:
@@ -218,7 +282,7 @@ LD_LIBRARY_PATH=target/debug/ ./a.out > /dev/null
 
 # Finally, run the C++ demo app with our native networking library
 # in valgrind to test memory model correctness and lack of leaks.
-gcc $LOCAL_CFLAGS -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+gcc $LOCAL_CFLAGS -fPIC -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
 g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
 if [ -x "`which valgrind`" ]; then
 	valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
@@ -276,7 +340,7 @@ else
 	echo "WARNING: Can't use memory sanitizer on non-Linux, non-x86 platforms"
 fi
 
-RUSTC_LLVM_V=$(rustc --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 4); }')
+RUSTC_LLVM_V=$(rustc --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 2); }')
 
 if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 	# Apple is special, as always, and their versions of clang aren't
@@ -285,15 +349,15 @@ if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 		echo "Apple clang isn't compatible with upstream clang, install upstream clang"
 		CLANG_LLVM_V="0"
 	else
-		CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 4); }')
+		CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }')
 		if [ -x "$(which ld64.lld)" ]; then
-			LLD_LLVM_V="$(ld64.lld --version | awk '{ print substr($2, 0, 4); }')"
+			LLD_LLVM_V="$(ld64.lld --version | awk '{ print substr($2, 0, 2); }')"
 		fi
 	fi
 else
-	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 4); }')
+	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }')
 	if [ -x "$(which ld.lld)" ]; then
-		LLD_LLVM_V="$(ld.lld --version | awk '{ print substr($2, 0, 4); }')"
+		LLD_LLVM_V="$(ld.lld --version | awk '{ print substr($2, 0, 2); }')"
 	fi
 fi
 
@@ -314,7 +378,7 @@ elif [ -x "$(which clang-$RUSTC_LLVM_V)" ]; then
 	fi
 	if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
 		LLD="$(which lld-$RUSTC_LLVM_V || echo lld)"
-		LLD_LLVM_V="$(ld.$LLD --version | awk '{ print substr($2, 0, 4); }')"
+		LLD_LLVM_V="$(ld.$LLD --version | awk '{ print substr($2, 0, 2); }')"
 		if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
 			echo "Could not find a workable version of lld, not using cross-language LTO"
 			unset LLD
@@ -351,7 +415,7 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "
 		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
 
 		# ...then the C++ demo app with the ldk_net network implementation
-		$CLANG $LOCAL_CFLAGS -fsanitize=address -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+		$CLANG $LOCAL_CFLAGS -fPIC -fsanitize=address -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
 		$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
 		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
 	else

@@ -15,13 +15,13 @@ crate-type = ["staticlib"
 ,"cdylib"]
 
 [dependencies]
-bitcoin = "0.26"
+bitcoin = "0.27"
 secp256k1 = { version = "0.20.3", features = ["global-context-less-secure"] }
 # Note that the following line is matched by genbindings to update the path
-lightning = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "afae12ea1e610634f90335443e3fe9f126bf5551", features = ["allow_wallclock_use"] }
-lightning-persister = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "afae12ea1e610634f90335443e3fe9f126bf5551" }
-lightning-invoice = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "afae12ea1e610634f90335443e3fe9f126bf5551" }
-lightning-background-processor = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "afae12ea1e610634f90335443e3fe9f126bf5551" }
+lightning = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "853007800ebb433f53b5b10e1a941cc65c04e829", features = ["allow_wallclock_use"] }
+lightning-persister = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "853007800ebb433f53b5b10e1a941cc65c04e829" }
+lightning-invoice = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "853007800ebb433f53b5b10e1a941cc65c04e829" }
+lightning-background-processor = { git = "https://github.com/rust-bitcoin/rust-lightning", rev = "853007800ebb433f53b5b10e1a941cc65c04e829" }
 
 # Always force panic=abort, further options are set in the genbindings.sh build script
 [profile.dev]

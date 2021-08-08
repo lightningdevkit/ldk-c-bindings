@@ -1,5 +1,298 @@
 #include <string.h>
 namespace LDK {
+// Forward declarations
+class TxCreationKeys;
+class ChannelPublicKeys;
+class HTLCOutputInCommitment;
+class ChannelTransactionParameters;
+class CounterpartyChannelTransactionParameters;
+class DirectedChannelTransactionParameters;
+class HolderCommitmentTransaction;
+class BuiltCommitmentTransaction;
+class CommitmentTransaction;
+class TrustedCommitmentTransaction;
+class BackgroundProcessor;
+class ChannelManagerPersister;
+class RouteHop;
+class Route;
+class RouteHint;
+class RouteHintHop;
+class BroadcasterInterface;
+class ConfirmationTarget;
+class FeeEstimator;
+class BestBlock;
+class AccessError;
+class Access;
+class Listen;
+class Confirm;
+class Watch;
+class Filter;
+class WatchedOutput;
+class PaymentPurpose;
+class Event;
+class MessageSendEvent;
+class MessageSendEventsProvider;
+class EventsProvider;
+class EventHandler;
+class InitFeatures;
+class NodeFeatures;
+class ChannelFeatures;
+class InvoiceFeatures;
+class DelayedPaymentOutputDescriptor;
+class StaticPaymentOutputDescriptor;
+class SpendableOutputDescriptor;
+class BaseSign;
+class Sign;
+class KeysInterface;
+class InMemorySigner;
+class KeysManager;
+class FilesystemPersister;
+class ChannelManager;
+class ChainParameters;
+class ChannelCounterparty;
+class ChannelDetails;
+class PaymentSendFailure;
+class ChannelManagerReadArgs;
+class ChannelHandshakeConfig;
+class ChannelHandshakeLimits;
+class ChannelConfig;
+class UserConfig;
+class APIError;
+class OutPoint;
+class Invoice;
+class SignedRawInvoice;
+class RawInvoice;
+class RawDataPart;
+class PositiveTimestamp;
+class SiPrefix;
+class Currency;
+class Sha256;
+class Description;
+class PayeePubKey;
+class ExpiryTime;
+class MinFinalCltvExpiry;
+class Fallback;
+class InvoiceSignature;
+class PrivateRoute;
+class CreationError;
+class SemanticError;
+class SignOrCreationError;
+class ChannelMonitorUpdate;
+class ChannelMonitorUpdateErr;
+class MonitorUpdateError;
+class MonitorEvent;
+class HTLCUpdate;
+class ChannelMonitor;
+class Persist;
+class IgnoringMessageHandler;
+class ErroringMessageHandler;
+class MessageHandler;
+class SocketDescriptor;
+class PeerHandleError;
+class PeerManager;
+class NetworkGraph;
+class LockedNetworkGraph;
+class NetGraphMsgHandler;
+class DirectionalChannelInfo;
+class ChannelInfo;
+class RoutingFees;
+class NodeAnnouncementInfo;
+class NodeInfo;
+class DecodeError;
+class Init;
+class ErrorMessage;
+class Ping;
+class Pong;
+class OpenChannel;
+class AcceptChannel;
+class FundingCreated;
+class FundingSigned;
+class FundingLocked;
+class Shutdown;
+class ClosingSigned;
+class UpdateAddHTLC;
+class UpdateFulfillHTLC;
+class UpdateFailHTLC;
+class UpdateFailMalformedHTLC;
+class CommitmentSigned;
+class RevokeAndACK;
+class UpdateFee;
+class DataLossProtect;
+class ChannelReestablish;
+class AnnouncementSignatures;
+class NetAddress;
+class UnsignedNodeAnnouncement;
+class NodeAnnouncement;
+class UnsignedChannelAnnouncement;
+class ChannelAnnouncement;
+class UnsignedChannelUpdate;
+class ChannelUpdate;
+class QueryChannelRange;
+class ReplyChannelRange;
+class QueryShortChannelIds;
+class ReplyShortChannelIdsEnd;
+class GossipTimestampFilter;
+class ErrorAction;
+class LightningError;
+class CommitmentUpdate;
+class HTLCFailChannelUpdate;
+class ChannelMessageHandler;
+class RoutingMessageHandler;
+class Level;
+class Logger;
+class ChainMonitor;
+class CVec_SpendableOutputDescriptorZ;
+class CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ;
+class CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ;
+class CResult_HTLCUpdateDecodeErrorZ;
+class C2Tuple_SignatureCVec_SignatureZZ;
+class CVec_C2Tuple_u32TxOutZZ;
+class CResult_ChannelInfoDecodeErrorZ;
+class CResult_FundingCreatedDecodeErrorZ;
+class CResult_ChannelAnnouncementDecodeErrorZ;
+class CResult_PositiveTimestampCreationErrorZ;
+class CResult_CVec_u8ZPeerHandleErrorZ;
+class CResult_InvoiceFeaturesDecodeErrorZ;
+class CResult_ChannelMonitorUpdateDecodeErrorZ;
+class COption_u64Z;
+class CResult_TxOutAccessErrorZ;
+class CResult_NetAddressDecodeErrorZ;
+class CResult_UnsignedNodeAnnouncementDecodeErrorZ;
+class CResult_ReplyChannelRangeDecodeErrorZ;
+class CResult_ChannelReestablishDecodeErrorZ;
+class CResult_GossipTimestampFilterDecodeErrorZ;
+class CResult_InvoiceSignOrCreationErrorZ;
+class CResult_CommitmentSignedDecodeErrorZ;
+class CVec_UpdateAddHTLCZ;
+class COption_u32Z;
+class CResult_InitFeaturesDecodeErrorZ;
+class CResult_StaticPaymentOutputDescriptorDecodeErrorZ;
+class CResult_CommitmentTransactionDecodeErrorZ;
+class COption_C2Tuple_usizeTransactionZZ;
+class CResult_TransactionNoneZ;
+class CResult_SignedRawInvoiceNoneZ;
+class CResult_ExpiryTimeCreationErrorZ;
+class CResult_PingDecodeErrorZ;
+class CVec_TransactionOutputsZ;
+class CResult_ErrorMessageDecodeErrorZ;
+class CResult_OpenChannelDecodeErrorZ;
+class CVec_CVec_u8ZZ;
+class CResult_SecretKeyErrorZ;
+class CResult_InvoiceNoneZ;
+class CResult_QueryChannelRangeDecodeErrorZ;
+class C2Tuple_usizeTransactionZ;
+class CResult_TxCreationKeysDecodeErrorZ;
+class CResult_ChannelFeaturesDecodeErrorZ;
+class CVec_ChannelMonitorZ;
+class CVec_TransactionZ;
+class CResult_UpdateFeeDecodeErrorZ;
+class CResult_RouteHopDecodeErrorZ;
+class CResult_NodeAnnouncementDecodeErrorZ;
+class CResult_HTLCOutputInCommitmentDecodeErrorZ;
+class CResult_boolLightningErrorZ;
+class CResult_TxCreationKeysErrorZ;
+class C2Tuple_BlockHashChannelMonitorZ;
+class CResult_FundingSignedDecodeErrorZ;
+class CResult_RecoverableSignatureNoneZ;
+class CResult_NodeAnnouncementInfoDecodeErrorZ;
+class CResult_NetAddressu8Z;
+class CVec_UpdateFailMalformedHTLCZ;
+class C3Tuple_RawInvoice_u832InvoiceSignatureZ;
+class CResult_NetworkGraphDecodeErrorZ;
+class CVec_RouteHopZ;
+class CVec_C2Tuple_BlockHashChannelMonitorZZ;
+class CResult_NonePaymentSendFailureZ;
+class CResult_RouteLightningErrorZ;
+class CResult_ChannelPublicKeysDecodeErrorZ;
+class CVec_u8Z;
+class CResult_NodeInfoDecodeErrorZ;
+class CResult_ClosingSignedDecodeErrorZ;
+class CResult_HolderCommitmentTransactionDecodeErrorZ;
+class CVec_CResult_NoneAPIErrorZZ;
+class CResult_SignatureNoneZ;
+class C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ;
+class CResult_InitDecodeErrorZ;
+class CResult_OutPointDecodeErrorZ;
+class CVec_ChannelDetailsZ;
+class CResult_SignDecodeErrorZ;
+class CVec_MessageSendEventZ;
+class C2Tuple_OutPointScriptZ;
+class CResult_UpdateFailMalformedHTLCDecodeErrorZ;
+class CVec_NodeAnnouncementZ;
+class CResult_UnsignedChannelAnnouncementDecodeErrorZ;
+class CVec_TxidZ;
+class CResult_NoneMonitorUpdateErrorZ;
+class CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ;
+class CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ;
+class CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ;
+class CResult_CVec_CVec_u8ZZNoneZ;
+class C2Tuple_PaymentHashPaymentSecretZ;
+class CResult_AcceptChannelDecodeErrorZ;
+class C2Tuple_BlockHashChannelManagerZ;
+class CResult_ChannelTransactionParametersDecodeErrorZ;
+class CResult_PongDecodeErrorZ;
+class CVec_SignatureZ;
+class CVec_u64Z;
+class CResult_DelayedPaymentOutputDescriptorDecodeErrorZ;
+class CResult_StringErrorZ;
+class CResult_NoneErrorZ;
+class C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ;
+class CVec_RouteHintZ;
+class COption_u16Z;
+class CVec_CVec_RouteHopZZ;
+class CResult_TrustedCommitmentTransactionNoneZ;
+class CResult_NoneLightningErrorZ;
+class CResult_NonePeerHandleErrorZ;
+class CResult_CVec_SignatureZNoneZ;
+class CResult_DescriptionCreationErrorZ;
+class CResult_RoutingFeesDecodeErrorZ;
+class CResult_PayeePubKeyErrorZ;
+class CResult_QueryShortChannelIdsDecodeErrorZ;
+class CResult_InvoiceSemanticErrorZ;
+class CResult_UpdateAddHTLCDecodeErrorZ;
+class CResult_NoneAPIErrorZ;
+class CResult_CounterpartyChannelTransactionParametersDecodeErrorZ;
+class CVec_NetAddressZ;
+class CVec_C2Tuple_usizeTransactionZZ;
+class CVec_PublicKeyZ;
+class CResult_DirectionalChannelInfoDecodeErrorZ;
+class C2Tuple_u32TxOutZ;
+class CResult_UpdateFailHTLCDecodeErrorZ;
+class CResult_ChannelConfigDecodeErrorZ;
+class CVec_PrivateRouteZ;
+class CResult_SpendableOutputDescriptorDecodeErrorZ;
+class CResult_RevokeAndACKDecodeErrorZ;
+class CResult_UnsignedChannelUpdateDecodeErrorZ;
+class CResult_ShutdownDecodeErrorZ;
+class CVec_EventZ;
+class CResult_NoneSemanticErrorZ;
+class CVec_MonitorEventZ;
+class CVec_C2Tuple_u32ScriptZZ;
+class CResult_NoneChannelMonitorUpdateErrZ;
+class CResult_PaymentHashPaymentSendFailureZ;
+class CResult_SiPrefixNoneZ;
+class CResult_PublicKeyErrorZ;
+class C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ;
+class CResult_PrivateRouteCreationErrorZ;
+class CResult_boolPeerHandleErrorZ;
+class CResult_ChannelUpdateDecodeErrorZ;
+class CVec_APIErrorZ;
+class CVec_UpdateFulfillHTLCZ;
+class CResult_AnnouncementSignaturesDecodeErrorZ;
+class CResult_UpdateFulfillHTLCDecodeErrorZ;
+class CResult_NodeFeaturesDecodeErrorZ;
+class CResult_InMemorySignerDecodeErrorZ;
+class CResult_PaymentSecretAPIErrorZ;
+class C2Tuple_u32ScriptZ;
+class CResult_CResult_NetAddressu8ZDecodeErrorZ;
+class CResult_ReplyShortChannelIdsEndDecodeErrorZ;
+class CResult_RouteDecodeErrorZ;
+class CResult_BuiltCommitmentTransactionDecodeErrorZ;
+class CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ;
+class CVec_TxOutZ;
+class CVec_UpdateFailHTLCZ;
+class CResult_FundingLockedDecodeErrorZ;
+
 class TxCreationKeys {
 private:
 	LDKTxCreationKeys self;
@@ -179,6 +472,13 @@ public:
 	LDKChannelManagerPersister* operator ->() { return &self; }
 	const LDKChannelManagerPersister* operator &() const { return &self; }
 	const LDKChannelManagerPersister* operator ->() const { return &self; }
+	/**
+	 *  Persist the given [`ChannelManager`] to disk, returning an error if persistence failed
+	 *  (which will cause the [`BackgroundProcessor`] which called this method to exit.
+	 * 
+	 *  [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
+	 */
+	inline LDK::CResult_NoneErrorZ persist_manager(const struct LDKChannelManager *NONNULL_PTR channel_manager);
 };
 class RouteHop {
 private:
@@ -254,6 +554,10 @@ public:
 	LDKBroadcasterInterface* operator ->() { return &self; }
 	const LDKBroadcasterInterface* operator &() const { return &self; }
 	const LDKBroadcasterInterface* operator ->() const { return &self; }
+	/**
+	 *  Sends a transaction out to (hopefully) be mined.
+	 */
+	inline void broadcast_transaction(struct LDKTransaction tx);
 };
 class ConfirmationTarget {
 private:
@@ -283,6 +587,17 @@ public:
 	LDKFeeEstimator* operator ->() { return &self; }
 	const LDKFeeEstimator* operator &() const { return &self; }
 	const LDKFeeEstimator* operator ->() const { return &self; }
+	/**
+	 *  Gets estimated satoshis of fee required per 1000 Weight-Units.
+	 * 
+	 *  Must be no smaller than 253 (ie 1 satoshi-per-byte rounded up to ensure later round-downs
+	 *  don't put us below 1 satoshi-per-byte).
+	 * 
+	 *  This translates to:
+	 *   * satoshis-per-byte * 250
+	 *   * ceil(satoshis-per-kbyte / 4)
+	 */
+	inline uint32_t get_est_sat_per_1000_weight(enum LDKConfirmationTarget confirmation_target);
 };
 class BestBlock {
 private:
@@ -327,6 +642,14 @@ public:
 	LDKAccess* operator ->() { return &self; }
 	const LDKAccess* operator &() const { return &self; }
 	const LDKAccess* operator ->() const { return &self; }
+	/**
+	 *  Returns the transaction output of a funding transaction encoded by [`short_channel_id`].
+	 *  Returns an error if `genesis_hash` is for a different chain or if such a transaction output
+	 *  is unknown.
+	 * 
+	 *  [`short_channel_id`]: https://github.com/lightningnetwork/lightning-rfc/blob/master/07-routing-gossip.md#definition-of-short_channel_id
+	 */
+	inline LDK::CResult_TxOutAccessErrorZ get_utxo(const uint8_t (*genesis_hash)[32], uint64_t short_channel_id);
 };
 class Listen {
 private:
@@ -342,6 +665,14 @@ public:
 	LDKListen* operator ->() { return &self; }
 	const LDKListen* operator &() const { return &self; }
 	const LDKListen* operator ->() const { return &self; }
+	/**
+	 *  Notifies the listener that a block was added at the given height.
+	 */
+	inline void block_connected(struct LDKu8slice block, uint32_t height);
+	/**
+	 *  Notifies the listener that a block was removed at the given height.
+	 */
+	inline void block_disconnected(const uint8_t (*header)[80], uint32_t height);
 };
 class Confirm {
 private:
@@ -357,6 +688,56 @@ public:
 	LDKConfirm* operator ->() { return &self; }
 	const LDKConfirm* operator &() const { return &self; }
 	const LDKConfirm* operator ->() const { return &self; }
+	/**
+	 *  Processes transactions confirmed in a block with a given header and height.
+	 * 
+	 *  Should be called for any transactions registered by [`Filter::register_tx`] or any
+	 *  transactions spending an output registered by [`Filter::register_output`]. Such transactions
+	 *  appearing in the same block do not need to be included in the same call; instead, multiple
+	 *  calls with additional transactions may be made so long as they are made in [chain order].
+	 * 
+	 *  May be called before or after [`best_block_updated`] for the corresponding block. However,
+	 *  in the event of a chain reorganization, it must not be called with a `header` that is no
+	 *  longer in the chain as of the last call to [`best_block_updated`].
+	 * 
+	 *  [chain order]: Confirm#Order
+	 *  [`best_block_updated`]: Self::best_block_updated
+	 */
+	inline void transactions_confirmed(const uint8_t (*header)[80], struct LDKCVec_C2Tuple_usizeTransactionZZ txdata, uint32_t height);
+	/**
+	 *  Processes a transaction that is no longer confirmed as result of a chain reorganization.
+	 * 
+	 *  Should be called for any transaction returned by [`get_relevant_txids`] if it has been
+	 *  reorganized out of the best chain. Once called, the given transaction should not be returned
+	 *  by [`get_relevant_txids`] unless it has been reconfirmed via [`transactions_confirmed`].
+	 * 
+	 *  [`get_relevant_txids`]: Self::get_relevant_txids
+	 *  [`transactions_confirmed`]: Self::transactions_confirmed
+	 */
+	inline void transaction_unconfirmed(const uint8_t (*txid)[32]);
+	/**
+	 *  Processes an update to the best header connected at the given height.
+	 * 
+	 *  Should be called when a new header is available but may be skipped for intermediary blocks
+	 *  if they become available at the same time.
+	 */
+	inline void best_block_updated(const uint8_t (*header)[80], uint32_t height);
+	/**
+	 *  Returns transactions that should be monitored for reorganization out of the chain.
+	 * 
+	 *  Should include any transactions passed to [`transactions_confirmed`] that have insufficient
+	 *  confirmations to be safe from a chain reorganization. Should not include any transactions
+	 *  passed to [`transaction_unconfirmed`] unless later reconfirmed.
+	 * 
+	 *  May be called to determine the subset of transactions that must still be monitored for
+	 *  reorganization. Will be idempotent between calls but may change as a result of calls to the
+	 *  other interface methods. Thus, this is useful to determine which transactions may need to be
+	 *  given to [`transaction_unconfirmed`].
+	 * 
+	 *  [`transactions_confirmed`]: Self::transactions_confirmed
+	 *  [`transaction_unconfirmed`]: Self::transaction_unconfirmed
+	 */
+	inline LDK::CVec_TxidZ get_relevant_txids();
 };
 class Watch {
 private:
@@ -372,6 +753,33 @@ public:
 	LDKWatch* operator ->() { return &self; }
 	const LDKWatch* operator &() const { return &self; }
 	const LDKWatch* operator ->() const { return &self; }
+	/**
+	 *  Watches a channel identified by `funding_txo` using `monitor`.
+	 * 
+	 *  Implementations are responsible for watching the chain for the funding transaction along
+	 *  with any spends of outputs returned by [`get_outputs_to_watch`]. In practice, this means
+	 *  calling [`block_connected`] and [`block_disconnected`] on the monitor.
+	 * 
+	 *  [`get_outputs_to_watch`]: channelmonitor::ChannelMonitor::get_outputs_to_watch
+	 *  [`block_connected`]: channelmonitor::ChannelMonitor::block_connected
+	 *  [`block_disconnected`]: channelmonitor::ChannelMonitor::block_disconnected
+	 */
+	inline LDK::CResult_NoneChannelMonitorUpdateErrZ watch_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitor monitor);
+	/**
+	 *  Updates a channel identified by `funding_txo` by applying `update` to its monitor.
+	 * 
+	 *  Implementations must call [`update_monitor`] with the given update. See
+	 *  [`ChannelMonitorUpdateErr`] for invariants around returning an error.
+	 * 
+	 *  [`update_monitor`]: channelmonitor::ChannelMonitor::update_monitor
+	 *  [`ChannelMonitorUpdateErr`]: channelmonitor::ChannelMonitorUpdateErr
+	 */
+	inline LDK::CResult_NoneChannelMonitorUpdateErrZ update_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitorUpdate update);
+	/**
+	 *  Returns any monitor events since the last call. Subsequent calls must only return new
+	 *  events.
+	 */
+	inline LDK::CVec_MonitorEventZ release_pending_monitor_events();
 };
 class Filter {
 private:
@@ -387,6 +795,23 @@ public:
 	LDKFilter* operator ->() { return &self; }
 	const LDKFilter* operator &() const { return &self; }
 	const LDKFilter* operator ->() const { return &self; }
+	/**
+	 *  Registers interest in a transaction with `txid` and having an output with `script_pubkey` as
+	 *  a spending condition.
+	 */
+	inline void register_tx(const uint8_t (*txid)[32], struct LDKu8slice script_pubkey);
+	/**
+	 *  Registers interest in spends of a transaction output.
+	 * 
+	 *  Optionally, when `output.block_hash` is set, should return any transaction spending the
+	 *  output that is found in the corresponding block along with its index.
+	 * 
+	 *  This return value is useful for Electrum clients in order to supply in-block descendant
+	 *  transactions which otherwise were not included. This is not necessary for other clients if
+	 *  such descendant transactions were already included (e.g., when a BIP 157 client provides the
+	 *  full block).
+	 */
+	inline LDK::COption_C2Tuple_usizeTransactionZZ register_output(struct LDKWatchedOutput output);
 };
 class WatchedOutput {
 private:
@@ -402,6 +827,21 @@ public:
 	LDKWatchedOutput* operator ->() { return &self; }
 	const LDKWatchedOutput* operator &() const { return &self; }
 	const LDKWatchedOutput* operator ->() const { return &self; }
+};
+class PaymentPurpose {
+private:
+	LDKPaymentPurpose self;
+public:
+	PaymentPurpose(const PaymentPurpose&) = delete;
+	PaymentPurpose(PaymentPurpose&& o) : self(o.self) { memset(&o, 0, sizeof(PaymentPurpose)); }
+	PaymentPurpose(LDKPaymentPurpose&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKPaymentPurpose)); }
+	operator LDKPaymentPurpose() && { LDKPaymentPurpose res = self; memset(&self, 0, sizeof(LDKPaymentPurpose)); return res; }
+	~PaymentPurpose() { PaymentPurpose_free(self); }
+	PaymentPurpose& operator=(PaymentPurpose&& o) { PaymentPurpose_free(self); self = o.self; memset(&o, 0, sizeof(PaymentPurpose)); return *this; }
+	LDKPaymentPurpose* operator &() { return &self; }
+	LDKPaymentPurpose* operator ->() { return &self; }
+	const LDKPaymentPurpose* operator &() const { return &self; }
+	const LDKPaymentPurpose* operator ->() const { return &self; }
 };
 class Event {
 private:
@@ -447,6 +887,11 @@ public:
 	LDKMessageSendEventsProvider* operator ->() { return &self; }
 	const LDKMessageSendEventsProvider* operator &() const { return &self; }
 	const LDKMessageSendEventsProvider* operator ->() const { return &self; }
+	/**
+	 *  Gets the list of pending events which were generated by previous actions, clearing the list
+	 *  in the process.
+	 */
+	inline LDK::CVec_MessageSendEventZ get_and_clear_pending_msg_events();
 };
 class EventsProvider {
 private:
@@ -462,6 +907,14 @@ public:
 	LDKEventsProvider* operator ->() { return &self; }
 	const LDKEventsProvider* operator &() const { return &self; }
 	const LDKEventsProvider* operator ->() const { return &self; }
+	/**
+	 *  Processes any events generated since the last call using the given event handler.
+	 * 
+	 *  Subsequent calls must only process new events. However, handlers must be capable of handling
+	 *  duplicate events across process restarts. This may occur if the provider was recovered from
+	 *  an old state (i.e., it hadn't been successfully persisted after processing pending events).
+	 */
+	inline void process_pending_events(struct LDKEventHandler handler);
 };
 class EventHandler {
 private:
@@ -477,6 +930,12 @@ public:
 	LDKEventHandler* operator ->() { return &self; }
 	const LDKEventHandler* operator &() const { return &self; }
 	const LDKEventHandler* operator ->() const { return &self; }
+	/**
+	 *  Handles the given [`Event`].
+	 * 
+	 *  See [`EventsProvider`] for details that must be considered when implementing this method.
+	 */
+	inline void handle_event(struct LDKEvent event);
 };
 class InitFeatures {
 private:
@@ -597,6 +1056,135 @@ public:
 	LDKBaseSign* operator ->() { return &self; }
 	const LDKBaseSign* operator &() const { return &self; }
 	const LDKBaseSign* operator ->() const { return &self; }
+	/**
+	 *  Gets the per-commitment point for a specific commitment number
+	 * 
+	 *  Note that the commitment number starts at (1 << 48) - 1 and counts backwards.
+	 */
+	inline LDKPublicKey get_per_commitment_point(uint64_t idx);
+	/**
+	 *  Gets the commitment secret for a specific commitment number as part of the revocation process
+	 * 
+	 *  An external signer implementation should error here if the commitment was already signed
+	 *  and should refuse to sign it in the future.
+	 * 
+	 *  May be called more than once for the same index.
+	 * 
+	 *  Note that the commitment number starts at (1 << 48) - 1 and counts backwards.
+	 */
+	inline LDKThirtyTwoBytes release_commitment_secret(uint64_t idx);
+	/**
+	 *  Gets an arbitrary identifier describing the set of keys which are provided back to you in
+	 *  some SpendableOutputDescriptor types. This should be sufficient to identify this
+	 *  Sign object uniquely and lookup or re-derive its keys.
+	 */
+	inline LDKThirtyTwoBytes channel_keys_id();
+	/**
+	 *  Create a signature for a counterparty's commitment transaction and associated HTLC transactions.
+	 * 
+	 *  Note that if signing fails or is rejected, the channel will be force-closed.
+	 */
+	inline LDK::CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ sign_counterparty_commitment(const struct LDKCommitmentTransaction *NONNULL_PTR commitment_tx);
+	/**
+	 *  Create a signatures for a holder's commitment transaction and its claiming HTLC transactions.
+	 *  This will only ever be called with a non-revoked commitment_tx.  This will be called with the
+	 *  latest commitment_tx when we initiate a force-close.
+	 *  This will be called with the previous latest, just to get claiming HTLC signatures, if we are
+	 *  reacting to a ChannelMonitor replica that decided to broadcast before it had been updated to
+	 *  the latest.
+	 *  This may be called multiple times for the same transaction.
+	 * 
+	 *  An external signer implementation should check that the commitment has not been revoked.
+	 * 
+	 *  May return Err if key derivation fails.  Callers, such as ChannelMonitor, will panic in such a case.
+	 */
+	inline LDK::CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ sign_holder_commitment_and_htlcs(const struct LDKHolderCommitmentTransaction *NONNULL_PTR commitment_tx);
+	/**
+	 *  Create a signature for the given input in a transaction spending an HTLC transaction output
+	 *  or a commitment transaction `to_local` output when our counterparty broadcasts an old state.
+	 * 
+	 *  A justice transaction may claim multiple outputs at the same time if timelocks are
+	 *  similar, but only a signature for the input at index `input` should be signed for here.
+	 *  It may be called multiple times for same output(s) if a fee-bump is needed with regards
+	 *  to an upcoming timelock expiration.
+	 * 
+	 *  Amount is value of the output spent by this input, committed to in the BIP 143 signature.
+	 * 
+	 *  per_commitment_key is revocation secret which was provided by our counterparty when they
+	 *  revoked the state which they eventually broadcast. It's not a _holder_ secret key and does
+	 *  not allow the spending of any funds by itself (you need our holder revocation_secret to do
+	 *  so).
+	 */
+	inline LDK::CResult_SignatureNoneZ sign_justice_revoked_output(struct LDKTransaction justice_tx, uintptr_t input, uint64_t amount, const uint8_t (*per_commitment_key)[32]);
+	/**
+	 *  Create a signature for the given input in a transaction spending a commitment transaction
+	 *  HTLC output when our counterparty broadcasts an old state.
+	 * 
+	 *  A justice transaction may claim multiple outputs at the same time if timelocks are
+	 *  similar, but only a signature for the input at index `input` should be signed for here.
+	 *  It may be called multiple times for same output(s) if a fee-bump is needed with regards
+	 *  to an upcoming timelock expiration.
+	 * 
+	 *  Amount is value of the output spent by this input, committed to in the BIP 143 signature.
+	 * 
+	 *  per_commitment_key is revocation secret which was provided by our counterparty when they
+	 *  revoked the state which they eventually broadcast. It's not a _holder_ secret key and does
+	 *  not allow the spending of any funds by itself (you need our holder revocation_secret to do
+	 *  so).
+	 * 
+	 *  htlc holds HTLC elements (hash, timelock), thus changing the format of the witness script
+	 *  (which is committed to in the BIP 143 signatures).
+	 */
+	inline LDK::CResult_SignatureNoneZ sign_justice_revoked_htlc(struct LDKTransaction justice_tx, uintptr_t input, uint64_t amount, const uint8_t (*per_commitment_key)[32], const struct LDKHTLCOutputInCommitment *NONNULL_PTR htlc);
+	/**
+	 *  Create a signature for a claiming transaction for a HTLC output on a counterparty's commitment
+	 *  transaction, either offered or received.
+	 * 
+	 *  Such a transaction may claim multiples offered outputs at same time if we know the
+	 *  preimage for each when we create it, but only the input at index `input` should be
+	 *  signed for here. It may be called multiple times for same output(s) if a fee-bump is
+	 *  needed with regards to an upcoming timelock expiration.
+	 * 
+	 *  Witness_script is either a offered or received script as defined in BOLT3 for HTLC
+	 *  outputs.
+	 * 
+	 *  Amount is value of the output spent by this input, committed to in the BIP 143 signature.
+	 * 
+	 *  Per_commitment_point is the dynamic point corresponding to the channel state
+	 *  detected onchain. It has been generated by our counterparty and is used to derive
+	 *  channel state keys, which are then included in the witness script and committed to in the
+	 *  BIP 143 signature.
+	 */
+	inline LDK::CResult_SignatureNoneZ sign_counterparty_htlc_transaction(struct LDKTransaction htlc_tx, uintptr_t input, uint64_t amount, struct LDKPublicKey per_commitment_point, const struct LDKHTLCOutputInCommitment *NONNULL_PTR htlc);
+	/**
+	 *  Create a signature for a (proposed) closing transaction.
+	 * 
+	 *  Note that, due to rounding, there may be one "missing" satoshi, and either party may have
+	 *  chosen to forgo their output as dust.
+	 */
+	inline LDK::CResult_SignatureNoneZ sign_closing_transaction(struct LDKTransaction closing_tx);
+	/**
+	 *  Signs a channel announcement message with our funding key, proving it comes from one
+	 *  of the channel participants.
+	 * 
+	 *  Note that if this fails or is rejected, the channel will not be publicly announced and
+	 *  our counterparty may (though likely will not) close the channel on us for violating the
+	 *  protocol.
+	 */
+	inline LDK::CResult_SignatureNoneZ sign_channel_announcement(const struct LDKUnsignedChannelAnnouncement *NONNULL_PTR msg);
+	/**
+	 *  Set the counterparty static channel data, including basepoints,
+	 *  counterparty_selected/holder_selected_contest_delay and funding outpoint.
+	 *  This is done as soon as the funding outpoint is known.  Since these are static channel data,
+	 *  they MUST NOT be allowed to change to different values once set.
+	 * 
+	 *  channel_parameters.is_populated() MUST be true.
+	 * 
+	 *  We bind holder_selected_contest_delay late here for API convenience.
+	 * 
+	 *  Will be called before any signatures are applied.
+	 */
+	inline void ready_channel(const struct LDKChannelTransactionParameters *NONNULL_PTR channel_parameters);
 };
 class Sign {
 private:
@@ -627,6 +1215,58 @@ public:
 	LDKKeysInterface* operator ->() { return &self; }
 	const LDKKeysInterface* operator &() const { return &self; }
 	const LDKKeysInterface* operator ->() const { return &self; }
+	/**
+	 *  Get node secret key (aka node_id or network_key).
+	 * 
+	 *  This method must return the same value each time it is called.
+	 */
+	inline LDKSecretKey get_node_secret();
+	/**
+	 *  Get a script pubkey which we send funds to when claiming on-chain contestable outputs.
+	 * 
+	 *  This method should return a different value each time it is called, to avoid linking
+	 *  on-chain funds across channels as controlled to the same user.
+	 */
+	inline LDK::CVec_u8Z get_destination_script();
+	/**
+	 *  Get a public key which we will send funds to (in the form of a P2WPKH output) when closing
+	 *  a channel.
+	 * 
+	 *  This method should return a different value each time it is called, to avoid linking
+	 *  on-chain funds across channels as controlled to the same user.
+	 */
+	inline LDKPublicKey get_shutdown_pubkey();
+	/**
+	 *  Get a new set of Sign for per-channel secrets. These MUST be unique even if you
+	 *  restarted with some stale data!
+	 * 
+	 *  This method must return a different value each time it is called.
+	 */
+	inline LDK::Sign get_channel_signer(bool inbound, uint64_t channel_value_satoshis);
+	/**
+	 *  Gets a unique, cryptographically-secure, random 32 byte value. This is used for encrypting
+	 *  onion packets and for temporary channel IDs. There is no requirement that these be
+	 *  persisted anywhere, though they must be unique across restarts.
+	 * 
+	 *  This method must return a different value each time it is called.
+	 */
+	inline LDKThirtyTwoBytes get_secure_random_bytes();
+	/**
+	 *  Reads a `Signer` for this `KeysInterface` from the given input stream.
+	 *  This is only called during deserialization of other objects which contain
+	 *  `Sign`-implementing objects (ie `ChannelMonitor`s and `ChannelManager`s).
+	 *  The bytes are exactly those which `<Self::Signer as Writeable>::write()` writes, and
+	 *  contain no versioning scheme. You may wish to include your own version prefix and ensure
+	 *  you've read all of the provided bytes to ensure no corruption occurred.
+	 */
+	inline LDK::CResult_SignDecodeErrorZ read_chan_signer(struct LDKu8slice reader);
+	/**
+	 *  Sign an invoice's preimage (note that this is the preimage of the invoice, not the HTLC's
+	 *  preimage). By parameterizing by the preimage instead of the hash, we allow implementors of
+	 *  this trait to parse the invoice and make sure they're signing what they expect, rather than
+	 *  blindly signing the hash.
+	 */
+	inline LDK::CResult_RecoverableSignatureNoneZ sign_invoice(struct LDKCVec_u8Z invoice_preimage);
 };
 class InMemorySigner {
 private:
@@ -1222,6 +1862,42 @@ public:
 	LDKPersist* operator ->() { return &self; }
 	const LDKPersist* operator &() const { return &self; }
 	const LDKPersist* operator ->() const { return &self; }
+	/**
+	 *  Persist a new channel's data. The data can be stored any way you want, but
+	 *  the identifier provided by Rust-Lightning is the channel's outpoint (and
+	 *  it is up to you to maintain a correct mapping between the outpoint and the
+	 *  stored channel data). Note that you **must** persist every new monitor to
+	 *  disk. See the `Persist` trait documentation for more details.
+	 * 
+	 *  See [`ChannelMonitor::write`] for writing out a `ChannelMonitor`,
+	 *  and [`ChannelMonitorUpdateErr`] for requirements when returning errors.
+	 */
+	inline LDK::CResult_NoneChannelMonitorUpdateErrZ persist_new_channel(struct LDKOutPoint id, const struct LDKChannelMonitor *NONNULL_PTR data);
+	/**
+	 *  Update one channel's data. The provided `ChannelMonitor` has already
+	 *  applied the given update.
+	 * 
+	 *  Note that on every update, you **must** persist either the
+	 *  `ChannelMonitorUpdate` or the updated monitor itself to disk/backups. See
+	 *  the `Persist` trait documentation for more details.
+	 * 
+	 *  If an implementer chooses to persist the updates only, they need to make
+	 *  sure that all the updates are applied to the `ChannelMonitors` *before*
+	 *  the set of channel monitors is given to the `ChannelManager`
+	 *  deserialization routine. See [`ChannelMonitor::update_monitor`] for
+	 *  applying a monitor update to a monitor. If full `ChannelMonitors` are
+	 *  persisted, then there is no need to persist individual updates.
+	 * 
+	 *  Note that there could be a performance tradeoff between persisting complete
+	 *  channel monitors on every update vs. persisting only updates and applying
+	 *  them in batches. The size of each monitor grows `O(number of state updates)`
+	 *  whereas updates are small and `O(1)`.
+	 * 
+	 *  See [`ChannelMonitor::write`] for writing out a `ChannelMonitor`,
+	 *  [`ChannelMonitorUpdate::write`] for writing out an update, and
+	 *  [`ChannelMonitorUpdateErr`] for requirements when returning errors.
+	 */
+	inline LDK::CResult_NoneChannelMonitorUpdateErrZ update_persisted_channel(struct LDKOutPoint id, const struct LDKChannelMonitorUpdate *NONNULL_PTR update, const struct LDKChannelMonitor *NONNULL_PTR data);
 };
 class IgnoringMessageHandler {
 private:
@@ -1282,6 +1958,40 @@ public:
 	LDKSocketDescriptor* operator ->() { return &self; }
 	const LDKSocketDescriptor* operator &() const { return &self; }
 	const LDKSocketDescriptor* operator ->() const { return &self; }
+	/**
+	 *  Attempts to send some data from the given slice to the peer.
+	 * 
+	 *  Returns the amount of data which was sent, possibly 0 if the socket has since disconnected.
+	 *  Note that in the disconnected case, [`PeerManager::socket_disconnected`] must still be
+	 *  called and further write attempts may occur until that time.
+	 * 
+	 *  If the returned size is smaller than `data.len()`, a
+	 *  [`PeerManager::write_buffer_space_avail`] call must be made the next time more data can be
+	 *  written. Additionally, until a `send_data` event completes fully, no further
+	 *  [`PeerManager::read_event`] calls should be made for the same peer! Because this is to
+	 *  prevent denial-of-service issues, you should not read or buffer any data from the socket
+	 *  until then.
+	 * 
+	 *  If a [`PeerManager::read_event`] call on this descriptor had previously returned true
+	 *  (indicating that read events should be paused to prevent DoS in the send buffer),
+	 *  `resume_read` may be set indicating that read events on this descriptor should resume. A
+	 *  `resume_read` of false carries no meaning, and should not cause any action.
+	 */
+	inline uintptr_t send_data(struct LDKu8slice data, bool resume_read);
+	/**
+	 *  Disconnect the socket pointed to by this SocketDescriptor.
+	 * 
+	 *  You do *not* need to call [`PeerManager::socket_disconnected`] with this socket after this
+	 *  call (doing so is a noop).
+	 */
+	inline void disconnect_socket();
+	/** Checks if two objects are equal given this object's this_arg pointer and another object. */
+	inline bool eq(const struct LDKSocketDescriptor *NONNULL_PTR other_arg);
+	/**
+	 * Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.
+	 * This is used, for example, for inclusion of this object in a hash map.
+	 */
+	inline uint64_t hash();
 };
 class PeerHandleError {
 private:
@@ -2017,6 +2727,89 @@ public:
 	LDKChannelMessageHandler* operator ->() { return &self; }
 	const LDKChannelMessageHandler* operator &() const { return &self; }
 	const LDKChannelMessageHandler* operator ->() const { return &self; }
+	/**
+	 *  Handle an incoming open_channel message from the given peer.
+	 */
+	inline void handle_open_channel(struct LDKPublicKey their_node_id, struct LDKInitFeatures their_features, const struct LDKOpenChannel *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming accept_channel message from the given peer.
+	 */
+	inline void handle_accept_channel(struct LDKPublicKey their_node_id, struct LDKInitFeatures their_features, const struct LDKAcceptChannel *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming funding_created message from the given peer.
+	 */
+	inline void handle_funding_created(struct LDKPublicKey their_node_id, const struct LDKFundingCreated *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming funding_signed message from the given peer.
+	 */
+	inline void handle_funding_signed(struct LDKPublicKey their_node_id, const struct LDKFundingSigned *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming funding_locked message from the given peer.
+	 */
+	inline void handle_funding_locked(struct LDKPublicKey their_node_id, const struct LDKFundingLocked *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming shutdown message from the given peer.
+	 */
+	inline void handle_shutdown(struct LDKPublicKey their_node_id, const struct LDKInitFeatures *NONNULL_PTR their_features, const struct LDKShutdown *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming closing_signed message from the given peer.
+	 */
+	inline void handle_closing_signed(struct LDKPublicKey their_node_id, const struct LDKClosingSigned *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming update_add_htlc message from the given peer.
+	 */
+	inline void handle_update_add_htlc(struct LDKPublicKey their_node_id, const struct LDKUpdateAddHTLC *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming update_fulfill_htlc message from the given peer.
+	 */
+	inline void handle_update_fulfill_htlc(struct LDKPublicKey their_node_id, const struct LDKUpdateFulfillHTLC *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming update_fail_htlc message from the given peer.
+	 */
+	inline void handle_update_fail_htlc(struct LDKPublicKey their_node_id, const struct LDKUpdateFailHTLC *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming update_fail_malformed_htlc message from the given peer.
+	 */
+	inline void handle_update_fail_malformed_htlc(struct LDKPublicKey their_node_id, const struct LDKUpdateFailMalformedHTLC *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming commitment_signed message from the given peer.
+	 */
+	inline void handle_commitment_signed(struct LDKPublicKey their_node_id, const struct LDKCommitmentSigned *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming revoke_and_ack message from the given peer.
+	 */
+	inline void handle_revoke_and_ack(struct LDKPublicKey their_node_id, const struct LDKRevokeAndACK *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming update_fee message from the given peer.
+	 */
+	inline void handle_update_fee(struct LDKPublicKey their_node_id, const struct LDKUpdateFee *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming announcement_signatures message from the given peer.
+	 */
+	inline void handle_announcement_signatures(struct LDKPublicKey their_node_id, const struct LDKAnnouncementSignatures *NONNULL_PTR msg);
+	/**
+	 *  Indicates a connection to the peer failed/an existing connection was lost. If no connection
+	 *  is believed to be possible in the future (eg they're sending us messages we don't
+	 *  understand or indicate they require unknown feature bits), no_connection_possible is set
+	 *  and any outstanding channels should be failed.
+	 */
+	inline void peer_disconnected(struct LDKPublicKey their_node_id, bool no_connection_possible);
+	/**
+	 *  Handle a peer reconnecting, possibly generating channel_reestablish message(s).
+	 */
+	inline void peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming channel_reestablish message from the given peer.
+	 */
+	inline void handle_channel_reestablish(struct LDKPublicKey their_node_id, const struct LDKChannelReestablish *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming channel update from the given peer.
+	 */
+	inline void handle_channel_update(struct LDKPublicKey their_node_id, const struct LDKChannelUpdate *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming error message from the given peer.
+	 */
+	inline void handle_error(struct LDKPublicKey their_node_id, const struct LDKErrorMessage *NONNULL_PTR msg);
 };
 class RoutingMessageHandler {
 private:
@@ -2032,6 +2825,69 @@ public:
 	LDKRoutingMessageHandler* operator ->() { return &self; }
 	const LDKRoutingMessageHandler* operator &() const { return &self; }
 	const LDKRoutingMessageHandler* operator ->() const { return &self; }
+	/**
+	 *  Handle an incoming node_announcement message, returning true if it should be forwarded on,
+	 *  false or returning an Err otherwise.
+	 */
+	inline LDK::CResult_boolLightningErrorZ handle_node_announcement(const struct LDKNodeAnnouncement *NONNULL_PTR msg);
+	/**
+	 *  Handle a channel_announcement message, returning true if it should be forwarded on, false
+	 *  or returning an Err otherwise.
+	 */
+	inline LDK::CResult_boolLightningErrorZ handle_channel_announcement(const struct LDKChannelAnnouncement *NONNULL_PTR msg);
+	/**
+	 *  Handle an incoming channel_update message, returning true if it should be forwarded on,
+	 *  false or returning an Err otherwise.
+	 */
+	inline LDK::CResult_boolLightningErrorZ handle_channel_update(const struct LDKChannelUpdate *NONNULL_PTR msg);
+	/**
+	 *  Handle some updates to the route graph that we learned due to an outbound failed payment.
+	 */
+	inline void handle_htlc_fail_channel_update(const struct LDKHTLCFailChannelUpdate *NONNULL_PTR update);
+	/**
+	 *  Gets a subset of the channel announcements and updates required to dump our routing table
+	 *  to a remote node, starting at the short_channel_id indicated by starting_point and
+	 *  including the batch_amount entries immediately higher in numerical value than starting_point.
+	 */
+	inline LDK::CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ get_next_channel_announcements(uint64_t starting_point, uint8_t batch_amount);
+	/**
+	 *  Gets a subset of the node announcements required to dump our routing table to a remote node,
+	 *  starting at the node *after* the provided publickey and including batch_amount entries
+	 *  immediately higher (as defined by <PublicKey as Ord>::cmp) than starting_point.
+	 *  If None is provided for starting_point, we start at the first node.
+	 * 
+	 *  Note that starting_point (or a relevant inner pointer) may be NULL or all-0s to represent None
+	 */
+	inline LDK::CVec_NodeAnnouncementZ get_next_node_announcements(struct LDKPublicKey starting_point, uint8_t batch_amount);
+	/**
+	 *  Called when a connection is established with a peer. This can be used to
+	 *  perform routing table synchronization using a strategy defined by the
+	 *  implementor.
+	 */
+	inline void sync_routing_table(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init);
+	/**
+	 *  Handles the reply of a query we initiated to learn about channels
+	 *  for a given range of blocks. We can expect to receive one or more
+	 *  replies to a single query.
+	 */
+	inline LDK::CResult_NoneLightningErrorZ handle_reply_channel_range(struct LDKPublicKey their_node_id, struct LDKReplyChannelRange msg);
+	/**
+	 *  Handles the reply of a query we initiated asking for routing gossip
+	 *  messages for a list of channels. We should receive this message when
+	 *  a node has completed its best effort to send us the pertaining routing
+	 *  gossip messages.
+	 */
+	inline LDK::CResult_NoneLightningErrorZ handle_reply_short_channel_ids_end(struct LDKPublicKey their_node_id, struct LDKReplyShortChannelIdsEnd msg);
+	/**
+	 *  Handles when a peer asks us to send a list of short_channel_ids
+	 *  for the requested range of blocks.
+	 */
+	inline LDK::CResult_NoneLightningErrorZ handle_query_channel_range(struct LDKPublicKey their_node_id, struct LDKQueryChannelRange msg);
+	/**
+	 *  Handles when a peer asks us to send routing gossip messages for a
+	 *  list of short_channel_ids.
+	 */
+	inline LDK::CResult_NoneLightningErrorZ handle_query_short_channel_ids(struct LDKPublicKey their_node_id, struct LDKQueryShortChannelIds msg);
 };
 class Level {
 private:
@@ -2061,6 +2917,10 @@ public:
 	LDKLogger* operator ->() { return &self; }
 	const LDKLogger* operator &() const { return &self; }
 	const LDKLogger* operator ->() const { return &self; }
+	/**
+	 *  Logs the `Record`
+	 */
+	inline void log(const char *record);
 };
 class ChainMonitor {
 private:
@@ -3997,6 +4857,21 @@ public:
 	const LDKCResult_NoneChannelMonitorUpdateErrZ* operator &() const { return &self; }
 	const LDKCResult_NoneChannelMonitorUpdateErrZ* operator ->() const { return &self; }
 };
+class CResult_PaymentHashPaymentSendFailureZ {
+private:
+	LDKCResult_PaymentHashPaymentSendFailureZ self;
+public:
+	CResult_PaymentHashPaymentSendFailureZ(const CResult_PaymentHashPaymentSendFailureZ&) = delete;
+	CResult_PaymentHashPaymentSendFailureZ(CResult_PaymentHashPaymentSendFailureZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_PaymentHashPaymentSendFailureZ)); }
+	CResult_PaymentHashPaymentSendFailureZ(LDKCResult_PaymentHashPaymentSendFailureZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_PaymentHashPaymentSendFailureZ)); }
+	operator LDKCResult_PaymentHashPaymentSendFailureZ() && { LDKCResult_PaymentHashPaymentSendFailureZ res = self; memset(&self, 0, sizeof(LDKCResult_PaymentHashPaymentSendFailureZ)); return res; }
+	~CResult_PaymentHashPaymentSendFailureZ() { CResult_PaymentHashPaymentSendFailureZ_free(self); }
+	CResult_PaymentHashPaymentSendFailureZ& operator=(CResult_PaymentHashPaymentSendFailureZ&& o) { CResult_PaymentHashPaymentSendFailureZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_PaymentHashPaymentSendFailureZ)); return *this; }
+	LDKCResult_PaymentHashPaymentSendFailureZ* operator &() { return &self; }
+	LDKCResult_PaymentHashPaymentSendFailureZ* operator ->() { return &self; }
+	const LDKCResult_PaymentHashPaymentSendFailureZ* operator &() const { return &self; }
+	const LDKCResult_PaymentHashPaymentSendFailureZ* operator ->() const { return &self; }
+};
 class CResult_SiPrefixNoneZ {
 private:
 	LDKCResult_SiPrefixNoneZ self;
@@ -4327,4 +5202,267 @@ public:
 	const LDKCResult_FundingLockedDecodeErrorZ* operator &() const { return &self; }
 	const LDKCResult_FundingLockedDecodeErrorZ* operator ->() const { return &self; }
 };
+
+inline LDK::CResult_NoneErrorZ ChannelManagerPersister::persist_manager(const struct LDKChannelManager *NONNULL_PTR channel_manager) {
+	LDK::CResult_NoneErrorZ ret = (self.persist_manager)(self.this_arg, channel_manager);
+	return ret;
+}
+inline void BroadcasterInterface::broadcast_transaction(struct LDKTransaction tx) {
+	(self.broadcast_transaction)(self.this_arg, tx);
+}
+inline uint32_t FeeEstimator::get_est_sat_per_1000_weight(enum LDKConfirmationTarget confirmation_target) {
+	uint32_t ret = (self.get_est_sat_per_1000_weight)(self.this_arg, confirmation_target);
+	return ret;
+}
+inline LDK::CResult_TxOutAccessErrorZ Access::get_utxo(const uint8_t (*genesis_hash)[32], uint64_t short_channel_id) {
+	LDK::CResult_TxOutAccessErrorZ ret = (self.get_utxo)(self.this_arg, genesis_hash, short_channel_id);
+	return ret;
+}
+inline void Listen::block_connected(struct LDKu8slice block, uint32_t height) {
+	(self.block_connected)(self.this_arg, block, height);
+}
+inline void Listen::block_disconnected(const uint8_t (*header)[80], uint32_t height) {
+	(self.block_disconnected)(self.this_arg, header, height);
+}
+inline void Confirm::transactions_confirmed(const uint8_t (*header)[80], struct LDKCVec_C2Tuple_usizeTransactionZZ txdata, uint32_t height) {
+	(self.transactions_confirmed)(self.this_arg, header, txdata, height);
+}
+inline void Confirm::transaction_unconfirmed(const uint8_t (*txid)[32]) {
+	(self.transaction_unconfirmed)(self.this_arg, txid);
+}
+inline void Confirm::best_block_updated(const uint8_t (*header)[80], uint32_t height) {
+	(self.best_block_updated)(self.this_arg, header, height);
+}
+inline LDK::CVec_TxidZ Confirm::get_relevant_txids() {
+	LDK::CVec_TxidZ ret = (self.get_relevant_txids)(self.this_arg);
+	return ret;
+}
+inline LDK::CResult_NoneChannelMonitorUpdateErrZ Watch::watch_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitor monitor) {
+	LDK::CResult_NoneChannelMonitorUpdateErrZ ret = (self.watch_channel)(self.this_arg, funding_txo, monitor);
+	return ret;
+}
+inline LDK::CResult_NoneChannelMonitorUpdateErrZ Watch::update_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitorUpdate update) {
+	LDK::CResult_NoneChannelMonitorUpdateErrZ ret = (self.update_channel)(self.this_arg, funding_txo, update);
+	return ret;
+}
+inline LDK::CVec_MonitorEventZ Watch::release_pending_monitor_events() {
+	LDK::CVec_MonitorEventZ ret = (self.release_pending_monitor_events)(self.this_arg);
+	return ret;
+}
+inline void Filter::register_tx(const uint8_t (*txid)[32], struct LDKu8slice script_pubkey) {
+	(self.register_tx)(self.this_arg, txid, script_pubkey);
+}
+inline LDK::COption_C2Tuple_usizeTransactionZZ Filter::register_output(struct LDKWatchedOutput output) {
+	LDK::COption_C2Tuple_usizeTransactionZZ ret = (self.register_output)(self.this_arg, output);
+	return ret;
+}
+inline LDK::CVec_MessageSendEventZ MessageSendEventsProvider::get_and_clear_pending_msg_events() {
+	LDK::CVec_MessageSendEventZ ret = (self.get_and_clear_pending_msg_events)(self.this_arg);
+	return ret;
+}
+inline void EventsProvider::process_pending_events(struct LDKEventHandler handler) {
+	(self.process_pending_events)(self.this_arg, handler);
+}
+inline void EventHandler::handle_event(struct LDKEvent event) {
+	(self.handle_event)(self.this_arg, event);
+}
+inline LDKPublicKey BaseSign::get_per_commitment_point(uint64_t idx) {
+	LDKPublicKey ret = (self.get_per_commitment_point)(self.this_arg, idx);
+	return ret;
+}
+inline LDKThirtyTwoBytes BaseSign::release_commitment_secret(uint64_t idx) {
+	LDKThirtyTwoBytes ret = (self.release_commitment_secret)(self.this_arg, idx);
+	return ret;
+}
+inline LDKThirtyTwoBytes BaseSign::channel_keys_id() {
+	LDKThirtyTwoBytes ret = (self.channel_keys_id)(self.this_arg);
+	return ret;
+}
+inline LDK::CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ BaseSign::sign_counterparty_commitment(const struct LDKCommitmentTransaction *NONNULL_PTR commitment_tx) {
+	LDK::CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ ret = (self.sign_counterparty_commitment)(self.this_arg, commitment_tx);
+	return ret;
+}
+inline LDK::CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ BaseSign::sign_holder_commitment_and_htlcs(const struct LDKHolderCommitmentTransaction *NONNULL_PTR commitment_tx) {
+	LDK::CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ ret = (self.sign_holder_commitment_and_htlcs)(self.this_arg, commitment_tx);
+	return ret;
+}
+inline LDK::CResult_SignatureNoneZ BaseSign::sign_justice_revoked_output(struct LDKTransaction justice_tx, uintptr_t input, uint64_t amount, const uint8_t (*per_commitment_key)[32]) {
+	LDK::CResult_SignatureNoneZ ret = (self.sign_justice_revoked_output)(self.this_arg, justice_tx, input, amount, per_commitment_key);
+	return ret;
+}
+inline LDK::CResult_SignatureNoneZ BaseSign::sign_justice_revoked_htlc(struct LDKTransaction justice_tx, uintptr_t input, uint64_t amount, const uint8_t (*per_commitment_key)[32], const struct LDKHTLCOutputInCommitment *NONNULL_PTR htlc) {
+	LDK::CResult_SignatureNoneZ ret = (self.sign_justice_revoked_htlc)(self.this_arg, justice_tx, input, amount, per_commitment_key, htlc);
+	return ret;
+}
+inline LDK::CResult_SignatureNoneZ BaseSign::sign_counterparty_htlc_transaction(struct LDKTransaction htlc_tx, uintptr_t input, uint64_t amount, struct LDKPublicKey per_commitment_point, const struct LDKHTLCOutputInCommitment *NONNULL_PTR htlc) {
+	LDK::CResult_SignatureNoneZ ret = (self.sign_counterparty_htlc_transaction)(self.this_arg, htlc_tx, input, amount, per_commitment_point, htlc);
+	return ret;
+}
+inline LDK::CResult_SignatureNoneZ BaseSign::sign_closing_transaction(struct LDKTransaction closing_tx) {
+	LDK::CResult_SignatureNoneZ ret = (self.sign_closing_transaction)(self.this_arg, closing_tx);
+	return ret;
+}
+inline LDK::CResult_SignatureNoneZ BaseSign::sign_channel_announcement(const struct LDKUnsignedChannelAnnouncement *NONNULL_PTR msg) {
+	LDK::CResult_SignatureNoneZ ret = (self.sign_channel_announcement)(self.this_arg, msg);
+	return ret;
+}
+inline void BaseSign::ready_channel(const struct LDKChannelTransactionParameters *NONNULL_PTR channel_parameters) {
+	(self.ready_channel)(self.this_arg, channel_parameters);
+}
+inline LDKSecretKey KeysInterface::get_node_secret() {
+	LDKSecretKey ret = (self.get_node_secret)(self.this_arg);
+	return ret;
+}
+inline LDK::CVec_u8Z KeysInterface::get_destination_script() {
+	LDK::CVec_u8Z ret = (self.get_destination_script)(self.this_arg);
+	return ret;
+}
+inline LDKPublicKey KeysInterface::get_shutdown_pubkey() {
+	LDKPublicKey ret = (self.get_shutdown_pubkey)(self.this_arg);
+	return ret;
+}
+inline LDK::Sign KeysInterface::get_channel_signer(bool inbound, uint64_t channel_value_satoshis) {
+	LDK::Sign ret = (self.get_channel_signer)(self.this_arg, inbound, channel_value_satoshis);
+	return ret;
+}
+inline LDKThirtyTwoBytes KeysInterface::get_secure_random_bytes() {
+	LDKThirtyTwoBytes ret = (self.get_secure_random_bytes)(self.this_arg);
+	return ret;
+}
+inline LDK::CResult_SignDecodeErrorZ KeysInterface::read_chan_signer(struct LDKu8slice reader) {
+	LDK::CResult_SignDecodeErrorZ ret = (self.read_chan_signer)(self.this_arg, reader);
+	return ret;
+}
+inline LDK::CResult_RecoverableSignatureNoneZ KeysInterface::sign_invoice(struct LDKCVec_u8Z invoice_preimage) {
+	LDK::CResult_RecoverableSignatureNoneZ ret = (self.sign_invoice)(self.this_arg, invoice_preimage);
+	return ret;
+}
+inline LDK::CResult_NoneChannelMonitorUpdateErrZ Persist::persist_new_channel(struct LDKOutPoint id, const struct LDKChannelMonitor *NONNULL_PTR data) {
+	LDK::CResult_NoneChannelMonitorUpdateErrZ ret = (self.persist_new_channel)(self.this_arg, id, data);
+	return ret;
+}
+inline LDK::CResult_NoneChannelMonitorUpdateErrZ Persist::update_persisted_channel(struct LDKOutPoint id, const struct LDKChannelMonitorUpdate *NONNULL_PTR update, const struct LDKChannelMonitor *NONNULL_PTR data) {
+	LDK::CResult_NoneChannelMonitorUpdateErrZ ret = (self.update_persisted_channel)(self.this_arg, id, update, data);
+	return ret;
+}
+inline uintptr_t SocketDescriptor::send_data(struct LDKu8slice data, bool resume_read) {
+	uintptr_t ret = (self.send_data)(self.this_arg, data, resume_read);
+	return ret;
+}
+inline void SocketDescriptor::disconnect_socket() {
+	(self.disconnect_socket)(self.this_arg);
+}
+inline bool SocketDescriptor::eq(const struct LDKSocketDescriptor *NONNULL_PTR other_arg) {
+	bool ret = (self.eq)(self.this_arg, other_arg);
+	return ret;
+}
+inline uint64_t SocketDescriptor::hash() {
+	uint64_t ret = (self.hash)(self.this_arg);
+	return ret;
+}
+inline void ChannelMessageHandler::handle_open_channel(struct LDKPublicKey their_node_id, struct LDKInitFeatures their_features, const struct LDKOpenChannel *NONNULL_PTR msg) {
+	(self.handle_open_channel)(self.this_arg, their_node_id, their_features, msg);
+}
+inline void ChannelMessageHandler::handle_accept_channel(struct LDKPublicKey their_node_id, struct LDKInitFeatures their_features, const struct LDKAcceptChannel *NONNULL_PTR msg) {
+	(self.handle_accept_channel)(self.this_arg, their_node_id, their_features, msg);
+}
+inline void ChannelMessageHandler::handle_funding_created(struct LDKPublicKey their_node_id, const struct LDKFundingCreated *NONNULL_PTR msg) {
+	(self.handle_funding_created)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_funding_signed(struct LDKPublicKey their_node_id, const struct LDKFundingSigned *NONNULL_PTR msg) {
+	(self.handle_funding_signed)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_funding_locked(struct LDKPublicKey their_node_id, const struct LDKFundingLocked *NONNULL_PTR msg) {
+	(self.handle_funding_locked)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_shutdown(struct LDKPublicKey their_node_id, const struct LDKInitFeatures *NONNULL_PTR their_features, const struct LDKShutdown *NONNULL_PTR msg) {
+	(self.handle_shutdown)(self.this_arg, their_node_id, their_features, msg);
+}
+inline void ChannelMessageHandler::handle_closing_signed(struct LDKPublicKey their_node_id, const struct LDKClosingSigned *NONNULL_PTR msg) {
+	(self.handle_closing_signed)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_update_add_htlc(struct LDKPublicKey their_node_id, const struct LDKUpdateAddHTLC *NONNULL_PTR msg) {
+	(self.handle_update_add_htlc)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_update_fulfill_htlc(struct LDKPublicKey their_node_id, const struct LDKUpdateFulfillHTLC *NONNULL_PTR msg) {
+	(self.handle_update_fulfill_htlc)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_update_fail_htlc(struct LDKPublicKey their_node_id, const struct LDKUpdateFailHTLC *NONNULL_PTR msg) {
+	(self.handle_update_fail_htlc)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_update_fail_malformed_htlc(struct LDKPublicKey their_node_id, const struct LDKUpdateFailMalformedHTLC *NONNULL_PTR msg) {
+	(self.handle_update_fail_malformed_htlc)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_commitment_signed(struct LDKPublicKey their_node_id, const struct LDKCommitmentSigned *NONNULL_PTR msg) {
+	(self.handle_commitment_signed)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_revoke_and_ack(struct LDKPublicKey their_node_id, const struct LDKRevokeAndACK *NONNULL_PTR msg) {
+	(self.handle_revoke_and_ack)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_update_fee(struct LDKPublicKey their_node_id, const struct LDKUpdateFee *NONNULL_PTR msg) {
+	(self.handle_update_fee)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_announcement_signatures(struct LDKPublicKey their_node_id, const struct LDKAnnouncementSignatures *NONNULL_PTR msg) {
+	(self.handle_announcement_signatures)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::peer_disconnected(struct LDKPublicKey their_node_id, bool no_connection_possible) {
+	(self.peer_disconnected)(self.this_arg, their_node_id, no_connection_possible);
+}
+inline void ChannelMessageHandler::peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR msg) {
+	(self.peer_connected)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_channel_reestablish(struct LDKPublicKey their_node_id, const struct LDKChannelReestablish *NONNULL_PTR msg) {
+	(self.handle_channel_reestablish)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_channel_update(struct LDKPublicKey their_node_id, const struct LDKChannelUpdate *NONNULL_PTR msg) {
+	(self.handle_channel_update)(self.this_arg, their_node_id, msg);
+}
+inline void ChannelMessageHandler::handle_error(struct LDKPublicKey their_node_id, const struct LDKErrorMessage *NONNULL_PTR msg) {
+	(self.handle_error)(self.this_arg, their_node_id, msg);
+}
+inline LDK::CResult_boolLightningErrorZ RoutingMessageHandler::handle_node_announcement(const struct LDKNodeAnnouncement *NONNULL_PTR msg) {
+	LDK::CResult_boolLightningErrorZ ret = (self.handle_node_announcement)(self.this_arg, msg);
+	return ret;
+}
+inline LDK::CResult_boolLightningErrorZ RoutingMessageHandler::handle_channel_announcement(const struct LDKChannelAnnouncement *NONNULL_PTR msg) {
+	LDK::CResult_boolLightningErrorZ ret = (self.handle_channel_announcement)(self.this_arg, msg);
+	return ret;
+}
+inline LDK::CResult_boolLightningErrorZ RoutingMessageHandler::handle_channel_update(const struct LDKChannelUpdate *NONNULL_PTR msg) {
+	LDK::CResult_boolLightningErrorZ ret = (self.handle_channel_update)(self.this_arg, msg);
+	return ret;
+}
+inline void RoutingMessageHandler::handle_htlc_fail_channel_update(const struct LDKHTLCFailChannelUpdate *NONNULL_PTR update) {
+	(self.handle_htlc_fail_channel_update)(self.this_arg, update);
+}
+inline LDK::CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ RoutingMessageHandler::get_next_channel_announcements(uint64_t starting_point, uint8_t batch_amount) {
+	LDK::CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ ret = (self.get_next_channel_announcements)(self.this_arg, starting_point, batch_amount);
+	return ret;
+}
+inline LDK::CVec_NodeAnnouncementZ RoutingMessageHandler::get_next_node_announcements(struct LDKPublicKey starting_point, uint8_t batch_amount) {
+	LDK::CVec_NodeAnnouncementZ ret = (self.get_next_node_announcements)(self.this_arg, starting_point, batch_amount);
+	return ret;
+}
+inline void RoutingMessageHandler::sync_routing_table(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init) {
+	(self.sync_routing_table)(self.this_arg, their_node_id, init);
+}
+inline LDK::CResult_NoneLightningErrorZ RoutingMessageHandler::handle_reply_channel_range(struct LDKPublicKey their_node_id, struct LDKReplyChannelRange msg) {
+	LDK::CResult_NoneLightningErrorZ ret = (self.handle_reply_channel_range)(self.this_arg, their_node_id, msg);
+	return ret;
+}
+inline LDK::CResult_NoneLightningErrorZ RoutingMessageHandler::handle_reply_short_channel_ids_end(struct LDKPublicKey their_node_id, struct LDKReplyShortChannelIdsEnd msg) {
+	LDK::CResult_NoneLightningErrorZ ret = (self.handle_reply_short_channel_ids_end)(self.this_arg, their_node_id, msg);
+	return ret;
+}
+inline LDK::CResult_NoneLightningErrorZ RoutingMessageHandler::handle_query_channel_range(struct LDKPublicKey their_node_id, struct LDKQueryChannelRange msg) {
+	LDK::CResult_NoneLightningErrorZ ret = (self.handle_query_channel_range)(self.this_arg, their_node_id, msg);
+	return ret;
+}
+inline LDK::CResult_NoneLightningErrorZ RoutingMessageHandler::handle_query_short_channel_ids(struct LDKPublicKey their_node_id, struct LDKQueryShortChannelIds msg) {
+	LDK::CResult_NoneLightningErrorZ ret = (self.handle_query_short_channel_ids)(self.this_arg, their_node_id, msg);
+	return ret;
+}
+inline void Logger::log(const char *record) {
+	(self.log)(self.this_arg, record);
+}
 }

@@ -180,3 +180,36 @@ pub extern "C" fn APIError_free(this_ptr: APIError) { }
 pub extern "C" fn APIError_clone(orig: &APIError) -> APIError {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new APIMisuseError-variant APIError
+pub extern "C" fn APIError_apimisuse_error(err: crate::c_types::Str) -> APIError {
+	APIError::APIMisuseError {
+		err,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new FeeRateTooHigh-variant APIError
+pub extern "C" fn APIError_fee_rate_too_high(err: crate::c_types::Str, feerate: u32) -> APIError {
+	APIError::FeeRateTooHigh {
+		err,
+		feerate,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new RouteError-variant APIError
+pub extern "C" fn APIError_route_error(err: crate::c_types::Str) -> APIError {
+	APIError::RouteError {
+		err,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new ChannelUnavailable-variant APIError
+pub extern "C" fn APIError_channel_unavailable(err: crate::c_types::Str) -> APIError {
+	APIError::ChannelUnavailable {
+		err,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new MonitorUpdateFailed-variant APIError
+pub extern "C" fn APIError_monitor_update_failed() -> APIError {
+	APIError::MonitorUpdateFailed}

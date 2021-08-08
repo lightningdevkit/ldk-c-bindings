@@ -20,7 +20,7 @@ use crate::types::*;
 /// Writes out a C++ wrapper class for the given type, which contains various utilities to access
 /// the underlying C-mapped type safely avoiding some common memory management issues by handling
 /// resource-freeing and prevending accidental raw copies.
-pub fn write_cpp_wrapper(cpp_header_file: &mut File, ty: &str, has_destructor: bool) {
+pub fn write_cpp_wrapper(cpp_header_file: &mut File, ty: &str, has_destructor: bool, trait_methods: Option<Vec<(String, String)>>) {
 	writeln!(cpp_header_file, "class {} {{", ty).unwrap();
 	writeln!(cpp_header_file, "private:").unwrap();
 	writeln!(cpp_header_file, "\tLDK{} self;", ty).unwrap();
@@ -39,6 +39,14 @@ pub fn write_cpp_wrapper(cpp_header_file: &mut File, ty: &str, has_destructor: b
 	writeln!(cpp_header_file, "\tLDK{}* operator ->() {{ return &self; }}", ty).unwrap();
 	writeln!(cpp_header_file, "\tconst LDK{}* operator &() const {{ return &self; }}", ty).unwrap();
 	writeln!(cpp_header_file, "\tconst LDK{}* operator ->() const {{ return &self; }}", ty).unwrap();
+	if let Some(methods) = trait_methods {
+		for (meth_name, meth_docs) in methods {
+			cpp_header_file.write_all(meth_docs.as_bytes()).unwrap();
+			// Note that we have zero logic to print C/C__ code for a given function. Instead, we
+			// simply use sed to replace the following in genbindings.sh
+			writeln!(cpp_header_file, "XXX {} {}", ty, meth_name).unwrap();
+		}
+	}
 	writeln!(cpp_header_file, "}};").unwrap();
 }
 
@@ -370,7 +378,33 @@ pub fn write_option_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 }
 
 /// Prints the docs from a given attribute list unless its tagged no export
+pub fn writeln_fn_docs<'a, W: std::io::Write, I>(w: &mut W, attrs: &[syn::Attribute], prefix: &str, types: &mut TypeResolver, generics: Option<&GenericTypes>, args: I, ret: &syn::ReturnType) where I: Iterator<Item = &'a syn::FnArg> {
+	writeln_docs_impl(w, attrs, prefix, Some((types, generics,
+		args.filter_map(|arg| if let syn::FnArg::Typed(ty) = arg {
+				if let syn::Pat::Ident(id) = &*ty.pat {
+					Some((id.ident.to_string(), &*ty.ty))
+				} else { unimplemented!() }
+			} else { None }),
+		if let syn::ReturnType::Type(_, ty) = ret { Some(&**ty) } else { None },
+		None
+	)));
+}
+
+/// Prints the docs from a given attribute list unless its tagged no export
 pub fn writeln_docs<W: std::io::Write>(w: &mut W, attrs: &[syn::Attribute], prefix: &str) {
+	writeln_docs_impl(w, attrs, prefix, None::<(_, _, std::vec::Drain<'_, (String, &syn::Type)>, _, _)>);
+}
+
+pub fn writeln_arg_docs<'a, W: std::io::Write, I>(w: &mut W, attrs: &[syn::Attribute], prefix: &str, types: &mut TypeResolver, generics: Option<&GenericTypes>, args: I, ret: Option<&syn::Type>) where I: Iterator<Item = (String, &'a syn::Type)> {
+	writeln_docs_impl(w, attrs, prefix, Some((types, generics, args, ret, None)))
+}
+
+pub fn writeln_field_docs<W: std::io::Write>(w: &mut W, attrs: &[syn::Attribute], prefix: &str, types: &mut TypeResolver, generics: Option<&GenericTypes>, field: &syn::Type) {
+	writeln_docs_impl(w, attrs, prefix, Some((types, generics, vec![].drain(..), None, Some(field))))
+}
+
+/// Prints the docs from a given attribute list unless its tagged no export
+fn writeln_docs_impl<'a, W: std::io::Write, I>(w: &mut W, attrs: &[syn::Attribute], prefix: &str, method_args_ret: Option<(&mut TypeResolver, Option<&GenericTypes>, I, Option<&syn::Type>, Option<&syn::Type>)>) where I: Iterator<Item = (String, &'a syn::Type)> {
 	for attr in attrs.iter() {
 		let tokens_clone = attr.tokens.clone();
 		let mut token_iter = tokens_clone.into_iter();
@@ -406,6 +440,51 @@ pub fn writeln_docs<W: std::io::Write>(w: &mut W, attrs: &[syn::Attribute], pref
 			},
 		}
 	}
+	if let Some((types, generics, inp, outp, field)) = method_args_ret {
+		let mut nullable_found = false;
+		for (name, inp) in inp {
+			if types.skip_arg(inp, generics) { continue; }
+			if if let syn::Type::Reference(syn::TypeReference { elem, .. }) = inp {
+				if let syn::Type::Path(syn::TypePath { ref path, .. }) = &**elem {
+					types.is_path_transparent_container(path, generics, true)
+				} else { false }
+			} else if let syn::Type::Path(syn::TypePath { ref path, .. }) = inp {
+				types.is_path_transparent_container(path, generics, true)
+			} else { false } {
+				// Note downstream clients match this text exactly so any changes may require
+				// changes in the Java and Swift bindings, at least.
+				if !nullable_found { writeln!(w, "{}///", prefix).unwrap(); }
+				nullable_found = true;
+				writeln!(w, "{}/// Note that {} (or a relevant inner pointer) may be NULL or all-0s to represent None", prefix, name).unwrap();
+			}
+		}
+		if if let Some(syn::Type::Reference(syn::TypeReference { elem, .. })) = outp {
+			if let syn::Type::Path(syn::TypePath { ref path, .. }) = &**elem {
+				types.is_path_transparent_container(path, generics, true)
+			} else { false }
+		} else if let Some(syn::Type::Path(syn::TypePath { ref path, .. })) = outp {
+			types.is_path_transparent_container(path, generics, true)
+		} else { false } {
+			// Note downstream clients match this text exactly so any changes may require
+			// changes in the Java and Swift bindings, at least.
+			if !nullable_found { writeln!(w, "{}///", prefix).unwrap(); }
+			nullable_found = true;
+			writeln!(w, "{}/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None", prefix).unwrap();
+		}
+		if if let Some(syn::Type::Reference(syn::TypeReference { elem, .. })) = field {
+			if let syn::Type::Path(syn::TypePath { ref path, .. }) = &**elem {
+				types.is_path_transparent_container(path, generics, true)
+			} else { false }
+		} else if let Some(syn::Type::Path(syn::TypePath { ref path, .. })) = field {
+			types.is_path_transparent_container(path, generics, true)
+		} else { false } {
+			// Note downstream clients match this text exactly so any changes may require
+			// changes in the Java and Swift bindings, at least.
+			if !nullable_found { writeln!(w, "{}///", prefix).unwrap(); }
+			writeln!(w, "{}/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None", prefix).unwrap();
+		}
+	}
+
 }
 
 /// Print the parameters in a method declaration, starting after the open parenthesis, through and

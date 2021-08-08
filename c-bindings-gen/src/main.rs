@@ -237,7 +237,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "\t/// An opaque pointer which is passed to your function implementations as an argument.").unwrap();
 	writeln!(w, "\t/// This has no meaning in the LDK, and can be NULL or any other value.").unwrap();
 	writeln!(w, "\tpub this_arg: *mut c_void,").unwrap();
-	let mut generated_fields = Vec::new(); // Every field's (name, is_clonable) except this_arg, used in Clone generation
+	// We store every field's (name, Option<clone_fn>, docs) except this_arg, used in Clone generation
+	// docs is only set if its a function which should be callable on the object itself in C++
+	let mut generated_fields = Vec::new();
 	for item in t.items.iter() {
 		match item {
 			&syn::TraitItem::Method(ref m) => {
@@ -256,7 +258,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				let mut meth_gen_types = gen_types.push_ctx();
 				assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
 
-				writeln_docs(w, &m.attrs, "\t");
+				writeln_fn_docs(w, &m.attrs, "\t", types, Some(&meth_gen_types), m.sig.inputs.iter(), &m.sig.output);
 
 				if let syn::ReturnType::Type(_, rtype) = &m.sig.output {
 					if let syn::Type::Reference(r) = &**rtype {
@@ -271,14 +273,14 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						// happen) as well as provide an Option<>al function pointer which is
 						// called when the trait method is called which allows updating on the fly.
 						write!(w, "\tpub {}: ", m.sig.ident).unwrap();
-						generated_fields.push((format!("{}", m.sig.ident), true));
+						generated_fields.push((format!("{}", m.sig.ident), None, None));
 						types.write_c_type(w, &*r.elem, Some(&meth_gen_types), false);
 						writeln!(w, ",").unwrap();
 						writeln!(w, "\t/// Fill in the {} field as a reference to it will be given to Rust after this returns", m.sig.ident).unwrap();
 						writeln!(w, "\t/// Note that this takes a pointer to this object, not the this_ptr like other methods do").unwrap();
 						writeln!(w, "\t/// This function pointer may be NULL if {} is filled in when this object is created and never needs updating.", m.sig.ident).unwrap();
 						writeln!(w, "\tpub set_{}: Option<extern \"C\" fn(&{})>,", m.sig.ident, trait_name).unwrap();
-						generated_fields.push((format!("set_{}", m.sig.ident), true));
+						generated_fields.push((format!("set_{}", m.sig.ident), None, None));
 						// Note that cbindgen will now generate
 						// typedef struct Thing {..., set_thing: (const struct Thing*), ...} Thing;
 						// which does not compile since Thing is not defined before it is used.
@@ -290,8 +292,12 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 					writeln!(w, "\t#[must_use]").unwrap();
 				}
 
+				let mut cpp_docs = Vec::new();
+				writeln_fn_docs(&mut cpp_docs, &m.attrs, "\t * ", types, Some(&meth_gen_types), m.sig.inputs.iter(), &m.sig.output);
+				let docs_string = "\t/**\n".to_owned() + &String::from_utf8(cpp_docs).unwrap().replace("///", "") + "\t */\n";
+
 				write!(w, "\tpub {}: extern \"C\" fn (", m.sig.ident).unwrap();
-				generated_fields.push((format!("{}", m.sig.ident), true));
+				generated_fields.push((format!("{}", m.sig.ident), None, Some(docs_string)));
 				write_method_params(w, &m.sig, "c_void", types, Some(&meth_gen_types), true, false);
 				writeln!(w, ",").unwrap();
 			},
@@ -300,55 +306,53 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		}
 	}
 	// Add functions which may be required for supertrait implementations.
-	let mut requires_clone = false;
-	walk_supertraits!(t, Some(&types), (
-		("Clone", _) => requires_clone = true,
-		(_, _) => {}
-	) );
 	walk_supertraits!(t, Some(&types), (
 		("Clone", _) => {
-			writeln!(w, "\t/// Creates a copy of the object pointed to by this_arg, for a copy of this {}.", trait_name).unwrap();
-			writeln!(w, "\t/// Note that the ultimate copy of the {} will have all function pointers the same as the original.", trait_name).unwrap();
-			writeln!(w, "\t/// May be NULL if no action needs to be taken, the this_arg pointer will be copied into the new {}.", trait_name).unwrap();
-			writeln!(w, "\tpub clone: Option<extern \"C\" fn (this_arg: *const c_void) -> *mut c_void>,").unwrap();
-			generated_fields.push(("clone".to_owned(), true));
+			writeln!(w, "\t/// Called, if set, after this {} has been cloned into a duplicate object.", trait_name).unwrap();
+			writeln!(w, "\t/// The new {} is provided, and should be mutated as needed to perform a", trait_name).unwrap();
+			writeln!(w, "\t/// deep copy of the object pointed to by this_arg or avoid any double-freeing.").unwrap();
+			writeln!(w, "\tpub cloned: Option<extern \"C\" fn (new_{}: &mut {})>,", trait_name, trait_name).unwrap();
+			generated_fields.push(("cloned".to_owned(), None, None));
 		},
 		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
-			writeln!(w, "\t/// Checks if two objects are equal given this object's this_arg pointer and another object.").unwrap();
+			let eq_docs = "Checks if two objects are equal given this object's this_arg pointer and another object.";
+			writeln!(w, "\t/// {}", eq_docs).unwrap();
 			writeln!(w, "\tpub eq: extern \"C\" fn (this_arg: *const c_void, other_arg: &{}) -> bool,", trait_name).unwrap();
-			generated_fields.push(("eq".to_owned(), true));
+			generated_fields.push(("eq".to_owned(), None, Some(format!("\t/** {} */\n", eq_docs))));
 		},
 		("std::hash::Hash", _)|("core::hash::Hash", _) => {
-			writeln!(w, "\t/// Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.").unwrap();
-			writeln!(w, "\t/// This is used, for example, for inclusion of this object in a hash map.").unwrap();
+			let hash_docs_a = "Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.";
+			let hash_docs_b = "This is used, for example, for inclusion of this object in a hash map.";
+			writeln!(w, "\t/// {}", hash_docs_a).unwrap();
+			writeln!(w, "\t/// {}", hash_docs_b).unwrap();
 			writeln!(w, "\tpub hash: extern \"C\" fn (this_arg: *const c_void) -> u64,").unwrap();
-			generated_fields.push(("hash".to_owned(), true));
+			generated_fields.push(("hash".to_owned(), None,
+				Some(format!("\t/**\n\t * {}\n\t * {}\n\t */\n", hash_docs_a, hash_docs_b))));
 		},
 		("Send", _) => {}, ("Sync", _) => {},
 		(s, i) => {
+			// TODO: Both of the below should expose supertrait methods in C++, but doing so is
+			// nontrivial.
 			generated_fields.push(if types.crate_types.traits.get(s).is_none() {
 				let (docs, name, ret) = convert_trait_impl_field(s);
 				writeln!(w, "\t/// {}", docs).unwrap();
 				writeln!(w, "\tpub {}: extern \"C\" fn (this_arg: *const c_void) -> {},", name, ret).unwrap();
-				(name, true) // Assume clonable
+				(name, None, None) // Assume clonable
 			} else {
 				// For in-crate supertraits, just store a C-mapped copy of the supertrait as a member.
 				writeln!(w, "\t/// Implementation of {} for this object.", i).unwrap();
-				writeln!(w, "\tpub {}: crate::{},", i, s).unwrap();
 				let is_clonable = types.is_clonable(s);
-				if !is_clonable && requires_clone {
-					writeln!(w, "\t/// Creates a copy of the {}, for a copy of this {}.", i, trait_name).unwrap();
-					writeln!(w, "\t/// Because {} doesn't natively support copying itself, you have to provide a full copy implementation here.", i).unwrap();
-					writeln!(w, "\tpub {}_clone: extern \"C\" fn (orig_{}: &{}) -> {},", i, i, i, i).unwrap();
-				}
-				(format!("{}", i), is_clonable)
+				writeln!(w, "\tpub {}: crate::{},", i, s).unwrap();
+				(format!("{}", i), if !is_clonable {
+					Some(format!("crate::{}_clone_fields", s))
+				} else { None }, None)
 			});
 		}
 	) );
 	writeln!(w, "\t/// Frees any resources associated with this object given its this_arg pointer.").unwrap();
 	writeln!(w, "\t/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.").unwrap();
 	writeln!(w, "\tpub free: Option<extern \"C\" fn(this_arg: *mut c_void)>,").unwrap();
-	generated_fields.push(("free".to_owned(), true));
+	generated_fields.push(("free".to_owned(), None, None));
 	writeln!(w, "}}").unwrap();
 
 	macro_rules! impl_trait_for_c {
@@ -427,7 +431,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						}
 						write_method_var_decl_body(w, &m.sig, "\t", $type_resolver, Some(&meth_gen_types), true);
 						write!(w, "(self{}.{})(", $impl_accessor, m.sig.ident).unwrap();
-						write_method_call_params(w, &m.sig, "\t", $type_resolver, Some(&meth_gen_types), "", true);
+						let mut args = Vec::new();
+						write_method_call_params(&mut args, &m.sig, "\t", $type_resolver, Some(&meth_gen_types), "", true);
+						w.write_all(String::from_utf8(args).unwrap().replace("self", &format!("self{}", $impl_accessor)).as_bytes()).unwrap();
 
 						writeln!(w, "\n\t}}").unwrap();
 					},
@@ -451,6 +457,20 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap();
 	writeln!(w, "unsafe impl Sync for {} {{}}", trait_name).unwrap();
 
+	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "pub(crate) extern \"C\" fn {}_clone_fields(orig: &{}) -> {} {{", trait_name, trait_name, trait_name).unwrap();
+	writeln!(w, "\t{} {{", trait_name).unwrap();
+	writeln!(w, "\t\tthis_arg: orig.this_arg,").unwrap();
+	for (field, clone_fn, _) in generated_fields.iter() {
+		if let Some(f) = clone_fn {
+			// If the field isn't clonable, blindly assume its a trait and hope for the best.
+			writeln!(w, "\t\t{}: {}(&orig.{}),", field, f, field).unwrap();
+		} else {
+			writeln!(w, "\t\t{}: Clone::clone(&orig.{}),", field, field).unwrap();
+		}
+	}
+	writeln!(w, "\t}}\n}}").unwrap();
+
 	// Implement supertraits for the C-mapped struct.
 	walk_supertraits!(t, Some(&types), (
 		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
@@ -467,17 +487,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 			writeln!(w, "#[no_mangle]").unwrap();
 			writeln!(w, "/// Creates a copy of a {}", trait_name).unwrap();
 			writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", trait_name, trait_name, trait_name).unwrap();
-			writeln!(w, "\t{} {{", trait_name).unwrap();
-			writeln!(w, "\t\tthis_arg: if let Some(f) = orig.clone {{ (f)(orig.this_arg) }} else {{ orig.this_arg }},").unwrap();
-			for (field, clonable) in generated_fields.iter() {
-				if *clonable {
-					writeln!(w, "\t\t{}: Clone::clone(&orig.{}),", field, field).unwrap();
-				} else {
-					writeln!(w, "\t\t{}: (orig.{}_clone)(&orig.{}),", field, field, field).unwrap();
-					writeln!(w, "\t\t{}_clone: orig.{}_clone,", field, field).unwrap();
-				}
-			}
-			writeln!(w, "\t}}\n}}").unwrap();
+			writeln!(w, "\tlet mut res = {}_clone_fields(orig);", trait_name).unwrap();
+			writeln!(w, "\tif let Some(f) = orig.cloned {{ (f)(&mut res) }};").unwrap();
+			writeln!(w, "\tres\n}}").unwrap();
 			writeln!(w, "impl Clone for {} {{", trait_name).unwrap();
 			writeln!(w, "\tfn clone(&self) -> Self {{").unwrap();
 			writeln!(w, "\t\t{}_clone(self)", trait_name).unwrap();
@@ -522,7 +534,8 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "\t\t\tf(self.this_arg);").unwrap();
 	writeln!(w, "\t\t}}\n\t}}\n}}").unwrap();
 
-	write_cpp_wrapper(cpp_headers, &trait_name, true);
+	write_cpp_wrapper(cpp_headers, &trait_name, true, Some(generated_fields.drain(..)
+		.filter_map(|(name, _, docs)| if let Some(docs) = docs { Some((name, docs)) } else { None }).collect()));
 }
 
 /// Write out a simple "opaque" type (eg structs) which contain a pointer to the native Rust type
@@ -567,7 +580,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	writeln!(w, "\t\tret").unwrap();
 	writeln!(w, "\t}}\n}}").unwrap();
 
-	write_cpp_wrapper(cpp_headers, &format!("{}", ident), true);
+	write_cpp_wrapper(cpp_headers, &format!("{}", ident), true, None);
 }
 
 /// Writes out all the relevant mappings for a Rust struct, deferring to writeln_opaque to generate
@@ -604,7 +617,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 						and_token: syn::Token!(&)(Span::call_site()), lifetime: None, mutability: None,
 						elem: Box::new(field.ty.clone()) });
 					if types.understood_c_type(&ref_type, Some(&gen_types)) {
-						writeln_docs(w, &field.attrs, "");
+						writeln_arg_docs(w, &field.attrs, "", types, Some(&gen_types), vec![].drain(..), Some(&ref_type));
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> ", struct_name, ident, struct_name).unwrap();
 						types.write_c_type(w, &ref_type, Some(&gen_types), true);
 						write!(w, " {{\n\tlet mut inner_val = &mut unsafe {{ &mut *this_ptr.inner }}.{};\n\t", ident).unwrap();
@@ -617,7 +630,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 					}
 
 					if types.understood_c_type(&field.ty, Some(&gen_types)) {
-						writeln_docs(w, &field.attrs, "");
+						writeln_arg_docs(w, &field.attrs, "", types, Some(&gen_types), vec![("val".to_owned(), &field.ty)].drain(..), None);
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_set_{}(this_ptr: &mut {}, mut val: ", struct_name, ident, struct_name).unwrap();
 						types.write_c_type(w, &field.ty, Some(&gen_types), false);
 						write!(w, ") {{\n\t").unwrap();
@@ -804,12 +817,9 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						}
 						let mut requires_clone = false;
 						walk_supertraits!(trait_obj, Some(&types), (
-							("Clone", _) => requires_clone = true,
-							(_, _) => {}
-						) );
-						walk_supertraits!(trait_obj, Some(&types), (
 							("Clone", _) => {
-								writeln!(w, "\t\tclone: Some({}_clone_void),", ident).unwrap();
+								requires_clone = true;
+								writeln!(w, "\t\tcloned: Some({}_{}_cloned),", trait_obj.ident, ident).unwrap();
 							},
 							("Sync", _) => {}, ("Send", _) => {},
 							("std::marker::Sync", _) => {}, ("std::marker::Send", _) => {},
@@ -827,9 +837,6 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										}
 									}
 									write!(w, "\t\t}},\n").unwrap();
-									if !types.is_clonable(s) && requires_clone {
-										writeln!(w, "\t\t{}_clone: {}_{}_clone,", t, ident, t).unwrap();
-									}
 								} else {
 									write_trait_impl_field_assign(w, s, ident);
 								}
@@ -914,27 +921,21 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 								_ => unimplemented!(),
 							}
 						}
-						walk_supertraits!(trait_obj, Some(&types), (
-							(s, t) => {
-								if let Some(supertrait_obj) = types.crate_types.traits.get(s) {
-									if !types.is_clonable(s) && requires_clone {
-										writeln!(w, "extern \"C\" fn {}_{}_clone(orig: &crate::{}) -> crate::{} {{", ident, t, s, s).unwrap();
-										writeln!(w, "\tcrate::{} {{", s).unwrap();
-										writeln!(w, "\t\tthis_arg: orig.this_arg,").unwrap();
-										writeln!(w, "\t\tfree: None,").unwrap();
-										for item in supertrait_obj.items.iter() {
-											match item {
-												syn::TraitItem::Method(m) => {
-													write_meth!(m, supertrait_obj, "");
-												},
-												_ => {},
-											}
-										}
-										write!(w, "\t}}\n}}\n").unwrap();
+						if requires_clone {
+							writeln!(w, "extern \"C\" fn {}_{}_cloned(new_obj: &mut crate::{}) {{", trait_obj.ident, ident, full_trait_path).unwrap();
+							writeln!(w, "\tnew_obj.this_arg = {}_clone_void(new_obj.this_arg);", ident).unwrap();
+							writeln!(w, "\tnew_obj.free = Some({}_free_void);", ident).unwrap();
+							walk_supertraits!(trait_obj, Some(&types), (
+								(s, t) => {
+									if types.crate_types.traits.get(s).is_some() {
+										assert!(!types.is_clonable(s)); // We don't currently support cloning with a clonable supertrait
+										writeln!(w, "\tnew_obj.{}.this_arg = new_obj.this_arg;", t).unwrap();
+										writeln!(w, "\tnew_obj.{}.free = None;", t).unwrap();
 									}
 								}
-							}
-						) );
+							) );
+							writeln!(w, "}}").unwrap();
+						}
 						write!(w, "\n").unwrap();
 					} else if path_matches_nongeneric(&trait_path.1, &["From"]) {
 					} else if path_matches_nongeneric(&trait_path.1, &["Default"]) {
@@ -1057,8 +1058,10 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										ExportStatus::NoExport|ExportStatus::TestOnly => continue,
 										ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 									}
+									let mut meth_gen_types = gen_types.push_ctx();
+									assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
 									if m.defaultness.is_some() { unimplemented!(); }
-									writeln_docs(w, &m.attrs, "");
+									writeln_fn_docs(w, &m.attrs, "", types, Some(&meth_gen_types), m.sig.inputs.iter(), &m.sig.output);
 									if let syn::ReturnType::Type(_, _) = &m.sig.output {
 										writeln!(w, "#[must_use]").unwrap();
 									}
@@ -1068,8 +1071,6 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										DeclType::StructImported => format!("{}", ident),
 										_ => unimplemented!(),
 									};
-									let mut meth_gen_types = gen_types.push_ctx();
-									assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
 									write_method_params(w, &m.sig, &ret_type, types, Some(&meth_gen_types), false, true);
 									write!(w, " {{\n\t").unwrap();
 									write_method_var_decl_body(w, &m.sig, "", types, Some(&meth_gen_types), false);
@@ -1169,6 +1170,23 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 	}
 }
 
+/// Replaces upper case charachters with underscore followed by lower case except the first
+/// charachter and repeated upper case characthers (which are only made lower case).
+fn camel_to_snake_case(camel: &str) -> String {
+	let mut res = "".to_string();
+	let mut last_upper = -1;
+	for (idx, c) in camel.chars().enumerate() {
+		if c.is_uppercase() {
+			if last_upper != idx as isize - 1 { res.push('_'); }
+			res.push(c.to_lowercase().next().unwrap());
+			last_upper = idx as isize;
+		} else {
+			res.push(c);
+		}
+	}
+	res
+}
+
 
 /// Print a mapping of an enum. If all of the enum's fields are C-mapped in some form (or the enum
 /// is unitary), we generate an equivalent enum with all types replaced with their C mapped
@@ -1192,25 +1210,31 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	assert!(gen_types.learn_generics(&e.generics, types));
 
 	let mut needs_free = false;
+	let mut constr = Vec::new();
 
 	writeln!(w, "#[must_use]\n#[derive(Clone)]\n#[repr(C)]\npub enum {} {{", e.ident).unwrap();
 	for var in e.variants.iter() {
 		assert_eq!(export_status(&var.attrs), ExportStatus::Export); // We can't partially-export a mirrored enum
 		writeln_docs(w, &var.attrs, "\t");
 		write!(w, "\t{}", var.ident).unwrap();
+		writeln!(&mut constr, "#[no_mangle]\n/// Utility method to constructs a new {}-variant {}", var.ident, e.ident).unwrap();
+		let constr_name = camel_to_snake_case(&format!("{}", var.ident));
+		write!(&mut constr, "pub extern \"C\" fn {}_{}(", e.ident, constr_name).unwrap();
+		let mut empty_tuple_variant = false;
 		if let syn::Fields::Named(fields) = &var.fields {
 			needs_free = true;
 			writeln!(w, " {{").unwrap();
-			for field in fields.named.iter() {
+			for (idx, field) in fields.named.iter().enumerate() {
 				if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
-				writeln_docs(w, &field.attrs, "\t\t");
+				writeln_field_docs(w, &field.attrs, "\t\t", types, Some(&gen_types), &field.ty);
 				write!(w, "\t\t{}: ", field.ident.as_ref().unwrap()).unwrap();
+				write!(&mut constr, "{}{}: ", if idx != 0 { ", " } else { "" }, field.ident.as_ref().unwrap()).unwrap();
 				types.write_c_type(w, &field.ty, Some(&gen_types), false);
+				types.write_c_type(&mut constr, &field.ty, Some(&gen_types), false);
 				writeln!(w, ",").unwrap();
 			}
 			write!(w, "\t}}").unwrap();
 		} else if let syn::Fields::Unnamed(fields) = &var.fields {
-			let mut empty_tuple_variant = false;
 			if fields.unnamed.len() == 1 {
 				let mut empty_check = Vec::new();
 				types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), false);
@@ -1223,15 +1247,37 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 				write!(w, "(").unwrap();
 				for (idx, field) in fields.unnamed.iter().enumerate() {
 					if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
+					write!(&mut constr, "{}: ", ('a' as u8 + idx as u8) as char).unwrap();
 					types.write_c_type(w, &field.ty, Some(&gen_types), false);
+					types.write_c_type(&mut constr, &field.ty, Some(&gen_types), false);
 					if idx != fields.unnamed.len() - 1 {
 						write!(w, ",").unwrap();
+						write!(&mut constr, ",").unwrap();
 					}
 				}
 				write!(w, ")").unwrap();
 			}
 		}
 		if var.discriminant.is_some() { unimplemented!(); }
+		write!(&mut constr, ") -> {} {{\n\t{}::{}", e.ident, e.ident, var.ident).unwrap();
+		if let syn::Fields::Named(fields) = &var.fields {
+			writeln!(&mut constr, " {{").unwrap();
+			for field in fields.named.iter() {
+				writeln!(&mut constr, "\t\t{},", field.ident.as_ref().unwrap()).unwrap();
+			}
+			writeln!(&mut constr, "\t}}").unwrap();
+		} else if let syn::Fields::Unnamed(fields) = &var.fields {
+			if !empty_tuple_variant {
+				write!(&mut constr, "(").unwrap();
+				for idx in 0..fields.unnamed.len() {
+					write!(&mut constr, "{}, ", ('a' as u8 + idx as u8) as char).unwrap();
+				}
+				writeln!(&mut constr, ")").unwrap();
+			} else {
+				writeln!(&mut constr, "").unwrap();
+			}
+		}
+		writeln!(&mut constr, "}}").unwrap();
 		writeln!(w, ",").unwrap();
 	}
 	writeln!(w, "}}\nuse {}::{} as native{};\nimpl {} {{", types.module_path, e.ident, e.ident, e.ident).unwrap();
@@ -1372,7 +1418,8 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", e.ident, e.ident, e.ident).unwrap();
 	writeln!(w, "\torig.clone()").unwrap();
 	writeln!(w, "}}").unwrap();
-	write_cpp_wrapper(cpp_headers, &format!("{}", e.ident), needs_free);
+	w.write_all(&constr).unwrap();
+	write_cpp_wrapper(cpp_headers, &format!("{}", e.ident), needs_free, None);
 }
 
 fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &mut TypeResolver<'b, 'a>) {
@@ -1381,10 +1428,10 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
 		ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 	}
-	writeln_docs(w, &f.attrs, "");
-
 	let mut gen_types = GenericTypes::new(None);
 	if !gen_types.learn_generics(&f.sig.generics, types) { return; }
+
+	writeln_fn_docs(w, &f.attrs, "", types, Some(&gen_types), f.sig.inputs.iter(), &f.sig.output);
 
 	write!(w, "#[no_mangle]\npub extern \"C\" fn {}(", f.sig.ident).unwrap();
 	write_method_params(w, &f.sig, "", types, Some(&gen_types), false, true);
@@ -1521,7 +1568,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 						if let syn::Type::Path(p) = &*c.ty {
 							let resolved_path = type_resolver.resolve_path(&p.path, None);
 							if type_resolver.is_primitive(&resolved_path) {
-								writeln_docs(&mut out, &c.attrs, "");
+								writeln_field_docs(&mut out, &c.attrs, "", &mut type_resolver, None, &*c.ty);
 								writeln!(out, "\n#[no_mangle]").unwrap();
 								writeln!(out, "pub static {}: {} = {}::{};", c.ident, resolved_path, module, c.ident).unwrap();
 							}
@@ -1756,7 +1803,7 @@ fn main() {
 	// For container templates which we created while walking the crate, make sure we add C++
 	// mapped types so that C++ users can utilize the auto-destructors available.
 	for (ty, has_destructor) in libtypes.templates_defined.borrow().iter() {
-		write_cpp_wrapper(&mut cpp_header_file, ty, *has_destructor);
+		write_cpp_wrapper(&mut cpp_header_file, ty, *has_destructor, None);
 	}
 	writeln!(cpp_header_file, "}}").unwrap();
 

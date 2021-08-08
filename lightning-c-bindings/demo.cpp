@@ -308,7 +308,7 @@ public:
 			.disconnect_socket = sock_disconnect_socket,
 			.eq = sock_eq,
 			.hash = sock_hash,
-			.clone = NULL,
+			.cloned = NULL,
 			.free = NULL,
 		};
 
@@ -318,7 +318,7 @@ public:
 			.disconnect_socket = sock_disconnect_socket,
 			.eq = sock_eq,
 			.hash = sock_hash,
-			.clone = NULL,
+			.cloned = NULL,
 			.free = NULL,
 		};
 
@@ -637,9 +637,11 @@ int main() {
 			assert(queue.events.size() == 1);
 			assert(queue.events[0]->tag == LDKEvent_PaymentReceived);
 			assert(!memcmp(queue.events[0]->payment_received.payment_hash.data, payment_hash.data, 32));
-			assert(!memcmp(queue.events[0]->payment_received.payment_secret.data, Invoice_payment_secret(invoice->contents.result).data, 32));
+			assert(queue.events[0]->payment_received.purpose.tag == LDKPaymentPurpose_InvoicePayment);
+			assert(!memcmp(queue.events[0]->payment_received.purpose.invoice_payment.payment_secret.data,
+					Invoice_payment_secret(invoice->contents.result).data, 32));
 			assert(queue.events[0]->payment_received.amt == 5000);
-			memcpy(payment_preimage.data, queue.events[0]->payment_received.payment_preimage.data, 32);
+			memcpy(payment_preimage.data, queue.events[0]->payment_received.purpose.invoice_payment.payment_preimage.data, 32);
 			assert(ChannelManager_claim_funds(&cm2, payment_preimage));
 		}
 		PeerManager_process_events(&net2);

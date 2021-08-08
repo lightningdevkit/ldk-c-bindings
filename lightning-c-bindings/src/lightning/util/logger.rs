@@ -82,6 +82,26 @@ impl Level {
 pub extern "C" fn Level_clone(orig: &Level) -> Level {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new Trace-variant Level
+pub extern "C" fn Level_trace() -> Level {
+	Level::Trace}
+#[no_mangle]
+/// Utility method to constructs a new Debug-variant Level
+pub extern "C" fn Level_debug() -> Level {
+	Level::Debug}
+#[no_mangle]
+/// Utility method to constructs a new Info-variant Level
+pub extern "C" fn Level_info() -> Level {
+	Level::Info}
+#[no_mangle]
+/// Utility method to constructs a new Warn-variant Level
+pub extern "C" fn Level_warn() -> Level {
+	Level::Warn}
+#[no_mangle]
+/// Utility method to constructs a new Error-variant Level
+pub extern "C" fn Level_error() -> Level {
+	Level::Error}
 /// Checks if two Levels contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -119,6 +139,14 @@ pub struct Logger {
 }
 unsafe impl Send for Logger {}
 unsafe impl Sync for Logger {}
+#[no_mangle]
+pub(crate) extern "C" fn Logger_clone_fields(orig: &Logger) -> Logger {
+	Logger {
+		this_arg: orig.this_arg,
+		log: Clone::clone(&orig.log),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::util::logger::Logger as rustLogger;
 impl rustLogger for Logger {

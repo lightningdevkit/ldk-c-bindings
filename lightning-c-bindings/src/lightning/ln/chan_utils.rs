@@ -716,6 +716,8 @@ pub extern "C" fn ChannelTransactionParameters_set_is_outbound_from_holder(this_
 }
 /// The late-bound counterparty channel transaction parameters.
 /// These parameters are populated at the point in the protocol where the counterparty provides them.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_get_counterparty_parameters(this_ptr: &ChannelTransactionParameters) -> crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.counterparty_parameters;
@@ -724,12 +726,16 @@ pub extern "C" fn ChannelTransactionParameters_get_counterparty_parameters(this_
 }
 /// The late-bound counterparty channel transaction parameters.
 /// These parameters are populated at the point in the protocol where the counterparty provides them.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_set_counterparty_parameters(this_ptr: &mut ChannelTransactionParameters, mut val: crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *this_ptr.inner }.counterparty_parameters = local_val;
 }
 /// The late-bound funding outpoint
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_get_funding_outpoint(this_ptr: &ChannelTransactionParameters) -> crate::lightning::chain::transaction::OutPoint {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.funding_outpoint;
@@ -737,6 +743,8 @@ pub extern "C" fn ChannelTransactionParameters_get_funding_outpoint(this_ptr: &C
 	local_inner_val
 }
 /// The late-bound funding outpoint
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_set_funding_outpoint(this_ptr: &mut ChannelTransactionParameters, mut val: crate::lightning::chain::transaction::OutPoint) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };

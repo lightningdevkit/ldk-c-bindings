@@ -177,6 +177,14 @@ impl AccessError {
 pub extern "C" fn AccessError_clone(orig: &AccessError) -> AccessError {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new UnknownChain-variant AccessError
+pub extern "C" fn AccessError_unknown_chain() -> AccessError {
+	AccessError::UnknownChain}
+#[no_mangle]
+/// Utility method to constructs a new UnknownTx-variant AccessError
+pub extern "C" fn AccessError_unknown_tx() -> AccessError {
+	AccessError::UnknownTx}
 /// The `Access` trait defines behavior for accessing chain data and state, such as blocks and
 /// UTXOs.
 #[repr(C)]
@@ -197,6 +205,14 @@ pub struct Access {
 }
 unsafe impl Send for Access {}
 unsafe impl Sync for Access {}
+#[no_mangle]
+pub(crate) extern "C" fn Access_clone_fields(orig: &Access) -> Access {
+	Access {
+		this_arg: orig.this_arg,
+		get_utxo: Clone::clone(&orig.get_utxo),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::chain::Access as rustAccess;
 impl rustAccess for Access {
@@ -247,6 +263,15 @@ pub struct Listen {
 }
 unsafe impl Send for Listen {}
 unsafe impl Sync for Listen {}
+#[no_mangle]
+pub(crate) extern "C" fn Listen_clone_fields(orig: &Listen) -> Listen {
+	Listen {
+		this_arg: orig.this_arg,
+		block_connected: Clone::clone(&orig.block_connected),
+		block_disconnected: Clone::clone(&orig.block_disconnected),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::chain::Listen as rustListen;
 impl rustListen for Listen {
@@ -364,6 +389,17 @@ pub struct Confirm {
 }
 unsafe impl Send for Confirm {}
 unsafe impl Sync for Confirm {}
+#[no_mangle]
+pub(crate) extern "C" fn Confirm_clone_fields(orig: &Confirm) -> Confirm {
+	Confirm {
+		this_arg: orig.this_arg,
+		transactions_confirmed: Clone::clone(&orig.transactions_confirmed),
+		transaction_unconfirmed: Clone::clone(&orig.transaction_unconfirmed),
+		best_block_updated: Clone::clone(&orig.best_block_updated),
+		get_relevant_txids: Clone::clone(&orig.get_relevant_txids),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::chain::Confirm as rustConfirm;
 impl rustConfirm for Confirm {
@@ -460,6 +496,16 @@ pub struct Watch {
 }
 unsafe impl Send for Watch {}
 unsafe impl Sync for Watch {}
+#[no_mangle]
+pub(crate) extern "C" fn Watch_clone_fields(orig: &Watch) -> Watch {
+	Watch {
+		this_arg: orig.this_arg,
+		watch_channel: Clone::clone(&orig.watch_channel),
+		update_channel: Clone::clone(&orig.update_channel),
+		release_pending_monitor_events: Clone::clone(&orig.release_pending_monitor_events),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::chain::Watch as rustWatch;
 impl rustWatch<crate::lightning::chain::keysinterface::Sign> for Watch {
@@ -543,6 +589,15 @@ pub struct Filter {
 }
 unsafe impl Send for Filter {}
 unsafe impl Sync for Filter {}
+#[no_mangle]
+pub(crate) extern "C" fn Filter_clone_fields(orig: &Filter) -> Filter {
+	Filter {
+		this_arg: orig.this_arg,
+		register_tx: Clone::clone(&orig.register_tx),
+		register_output: Clone::clone(&orig.register_output),
+		free: Clone::clone(&orig.free),
+	}
+}
 
 use lightning::chain::Filter as rustFilter;
 impl rustFilter for Filter {
@@ -630,6 +685,8 @@ impl WatchedOutput {
 	}
 }
 /// First block where the transaction output may have been spent.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn WatchedOutput_get_block_hash(this_ptr: &WatchedOutput) -> crate::c_types::ThirtyTwoBytes {
 	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.block_hash;
@@ -637,6 +694,8 @@ pub extern "C" fn WatchedOutput_get_block_hash(this_ptr: &WatchedOutput) -> crat
 	local_inner_val
 }
 /// First block where the transaction output may have been spent.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn WatchedOutput_set_block_hash(this_ptr: &mut WatchedOutput, mut val: crate::c_types::ThirtyTwoBytes) {
 	let mut local_val = if val.data == [0; 32] { None } else { Some( { ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap() }) };

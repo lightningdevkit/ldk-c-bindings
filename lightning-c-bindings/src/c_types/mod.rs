@@ -315,6 +315,12 @@ impl TxOut {
 		}
 	}
 }
+
+#[no_mangle]
+/// Convenience function for constructing a new TxOut
+pub extern "C" fn TxOut_new(script_pubkey: derived::CVec_u8Z, value: u64) -> TxOut {
+	TxOut { script_pubkey, value }
+}
 #[no_mangle]
 /// Frees the data pointed to by script_pubkey.
 pub extern "C" fn TxOut_free(_res: TxOut) { }

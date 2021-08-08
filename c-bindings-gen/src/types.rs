@@ -1263,7 +1263,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 	/// Returns true if the path is a "transparent" container, ie an Option or a container which does
 	/// not require a generated continer class.
-	fn is_path_transparent_container(&self, full_path: &syn::Path, generics: Option<&GenericTypes>, is_ref: bool) -> bool {
+	pub fn is_path_transparent_container(&self, full_path: &syn::Path, generics: Option<&GenericTypes>, is_ref: bool) -> bool {
 		let inner_iter = match &full_path.segments.last().unwrap().arguments {
 			syn::PathArguments::None => return false,
 			syn::PathArguments::AngleBracketed(args) => args.args.iter().map(|arg| {

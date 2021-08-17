@@ -1184,6 +1184,114 @@ typedef struct LDKCResult_CVec_SignatureZNoneZ {
    bool result_ok;
 } LDKCResult_CVec_SignatureZNoneZ;
 
+
+
+/**
+ * A script pubkey for shutting down a channel as defined by [BOLT #2].
+ *
+ * [BOLT #2]: https://github.com/lightningnetwork/lightning-rfc/blob/master/02-peer-protocol.md
+ */
+typedef struct MUST_USE_STRUCT LDKShutdownScript {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeShutdownScript *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKShutdownScript;
+
+/**
+ * The contents of CResult_ShutdownScriptDecodeErrorZ
+ */
+typedef union LDKCResult_ShutdownScriptDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKShutdownScript *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_ShutdownScriptDecodeErrorZPtr;
+
+/**
+ * A CResult_ShutdownScriptDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::ln::script::ShutdownScript on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_ShutdownScriptDecodeErrorZ {
+   /**
+    * The contents of this CResult_ShutdownScriptDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_ShutdownScriptDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_ShutdownScriptDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_ShutdownScriptDecodeErrorZ;
+
+
+
+/**
+ * An error occurring when converting from [`Script`] to [`ShutdownScript`].
+ */
+typedef struct MUST_USE_STRUCT LDKInvalidShutdownScript {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeInvalidShutdownScript *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKInvalidShutdownScript;
+
+/**
+ * The contents of CResult_ShutdownScriptInvalidShutdownScriptZ
+ */
+typedef union LDKCResult_ShutdownScriptInvalidShutdownScriptZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKShutdownScript *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKInvalidShutdownScript *err;
+} LDKCResult_ShutdownScriptInvalidShutdownScriptZPtr;
+
+/**
+ * A CResult_ShutdownScriptInvalidShutdownScriptZ represents the result of a fallible operation,
+ * containing a crate::lightning::ln::script::ShutdownScript on success and a crate::lightning::ln::script::InvalidShutdownScript on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_ShutdownScriptInvalidShutdownScriptZ {
+   /**
+    * The contents of this CResult_ShutdownScriptInvalidShutdownScriptZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_ShutdownScriptInvalidShutdownScriptZPtr contents;
+   /**
+    * Whether this CResult_ShutdownScriptInvalidShutdownScriptZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_ShutdownScriptInvalidShutdownScriptZ;
+
 /**
  * The contents of CResult_NoneErrorZ
  */
@@ -1799,8 +1907,8 @@ typedef struct MUST_USE_STRUCT LDKStaticPaymentOutputDescriptor {
 typedef enum LDKSpendableOutputDescriptor_Tag {
    /**
     * An output to a script which was provided via KeysInterface directly, either from
-    * `get_destination_script()` or `get_shutdown_pubkey()`, thus you should already know how to
-    * spend it. No secret keys are provided as rust-lightning was never given any key.
+    * `get_destination_script()` or `get_shutdown_scriptpubkey()`, thus you should already know
+    * how to spend it. No secret keys are provided as rust-lightning was never given any key.
     * These may include outputs from a transaction punishing our counterparty or claiming an HTLC
     * on-chain using the payment preimage or after it has timed out.
     */
@@ -3746,6 +3854,17 @@ typedef enum LDKAPIError_Tag {
     */
    LDKAPIError_MonitorUpdateFailed,
    /**
+    * [`KeysInterface::get_shutdown_scriptpubkey`] returned a shutdown scriptpubkey incompatible
+    * with the channel counterparty as negotiated in [`InitFeatures`].
+    *
+    * Using a SegWit v0 script should resolve this issue. If you cannot, you won't be able to open
+    * a channel or cooperatively close one with this peer (and will have to force-close instead).
+    *
+    * [`KeysInterface::get_shutdown_scriptpubkey`]: crate::chain::keysinterface::KeysInterface::get_shutdown_scriptpubkey
+    * [`InitFeatures`]: crate::ln::features::InitFeatures
+    */
+   LDKAPIError_IncompatibleShutdownScript,
+   /**
     * Must be last for serialization purposes
     */
    LDKAPIError_Sentinel,
@@ -3783,6 +3902,13 @@ typedef struct LDKAPIError_LDKChannelUnavailable_Body {
    struct LDKStr err;
 } LDKAPIError_LDKChannelUnavailable_Body;
 
+typedef struct LDKAPIError_LDKIncompatibleShutdownScript_Body {
+   /**
+    * The incompatible shutdown script.
+    */
+   struct LDKShutdownScript script;
+} LDKAPIError_LDKIncompatibleShutdownScript_Body;
+
 typedef struct MUST_USE_STRUCT LDKAPIError {
    LDKAPIError_Tag tag;
    union {
@@ -3790,6 +3916,7 @@ typedef struct MUST_USE_STRUCT LDKAPIError {
       LDKAPIError_LDKFeeRateTooHigh_Body fee_rate_too_high;
       LDKAPIError_LDKRouteError_Body route_error;
       LDKAPIError_LDKChannelUnavailable_Body channel_unavailable;
+      LDKAPIError_LDKIncompatibleShutdownScript_Body incompatible_shutdown_script;
    };
 } LDKAPIError;
 
@@ -4330,13 +4457,12 @@ typedef struct LDKKeysInterface {
     */
    struct LDKCVec_u8Z (*get_destination_script)(const void *this_arg);
    /**
-    * Get a public key which we will send funds to (in the form of a P2WPKH output) when closing
-    * a channel.
+    * Get a script pubkey which we will send funds to when closing a channel.
     *
     * This method should return a different value each time it is called, to avoid linking
     * on-chain funds across channels as controlled to the same user.
     */
-   struct LDKPublicKey (*get_shutdown_pubkey)(const void *this_arg);
+   struct LDKShutdownScript (*get_shutdown_scriptpubkey)(const void *this_arg);
    /**
     * Get a new set of Sign for per-channel secrets. These MUST be unique even if you
     * restarted with some stale data!
@@ -6746,6 +6872,61 @@ typedef struct LDKCResult_ClosingSignedDecodeErrorZ {
     */
    bool result_ok;
 } LDKCResult_ClosingSignedDecodeErrorZ;
+
+
+
+/**
+ * The minimum and maximum fees which the sender is willing to place on the closing transaction.
+ * This is provided in [`ClosingSigned`] by both sides to indicate the fee range they are willing
+ * to use.
+ */
+typedef struct MUST_USE_STRUCT LDKClosingSignedFeeRange {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeClosingSignedFeeRange *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKClosingSignedFeeRange;
+
+/**
+ * The contents of CResult_ClosingSignedFeeRangeDecodeErrorZ
+ */
+typedef union LDKCResult_ClosingSignedFeeRangeDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKClosingSignedFeeRange *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_ClosingSignedFeeRangeDecodeErrorZPtr;
+
+/**
+ * A CResult_ClosingSignedFeeRangeDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::ln::msgs::ClosingSignedFeeRange on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_ClosingSignedFeeRangeDecodeErrorZ {
+   /**
+    * The contents of this CResult_ClosingSignedFeeRangeDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_ClosingSignedFeeRangeDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_ClosingSignedFeeRangeDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_ClosingSignedFeeRangeDecodeErrorZ;
 
 
 
@@ -9550,6 +9731,42 @@ void CResult_CVec_SignatureZNoneZ_free(struct LDKCResult_CVec_SignatureZNoneZ _r
 struct LDKCResult_CVec_SignatureZNoneZ CResult_CVec_SignatureZNoneZ_clone(const struct LDKCResult_CVec_SignatureZNoneZ *NONNULL_PTR orig);
 
 /**
+ * Creates a new CResult_ShutdownScriptDecodeErrorZ in the success state.
+ */
+struct LDKCResult_ShutdownScriptDecodeErrorZ CResult_ShutdownScriptDecodeErrorZ_ok(struct LDKShutdownScript o);
+
+/**
+ * Creates a new CResult_ShutdownScriptDecodeErrorZ in the error state.
+ */
+struct LDKCResult_ShutdownScriptDecodeErrorZ CResult_ShutdownScriptDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Frees any resources used by the CResult_ShutdownScriptDecodeErrorZ.
+ */
+void CResult_ShutdownScriptDecodeErrorZ_free(struct LDKCResult_ShutdownScriptDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_ShutdownScriptDecodeErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_ShutdownScriptDecodeErrorZ CResult_ShutdownScriptDecodeErrorZ_clone(const struct LDKCResult_ShutdownScriptDecodeErrorZ *NONNULL_PTR orig);
+
+/**
+ * Creates a new CResult_ShutdownScriptInvalidShutdownScriptZ in the success state.
+ */
+struct LDKCResult_ShutdownScriptInvalidShutdownScriptZ CResult_ShutdownScriptInvalidShutdownScriptZ_ok(struct LDKShutdownScript o);
+
+/**
+ * Creates a new CResult_ShutdownScriptInvalidShutdownScriptZ in the error state.
+ */
+struct LDKCResult_ShutdownScriptInvalidShutdownScriptZ CResult_ShutdownScriptInvalidShutdownScriptZ_err(struct LDKInvalidShutdownScript e);
+
+/**
+ * Frees any resources used by the CResult_ShutdownScriptInvalidShutdownScriptZ.
+ */
+void CResult_ShutdownScriptInvalidShutdownScriptZ_free(struct LDKCResult_ShutdownScriptInvalidShutdownScriptZ _res);
+
+/**
  * Creates a new CResult_NoneErrorZ in the success state.
  */
 struct LDKCResult_NoneErrorZ CResult_NoneErrorZ_ok(void);
@@ -11186,6 +11403,27 @@ void CResult_ClosingSignedDecodeErrorZ_free(struct LDKCResult_ClosingSignedDecod
 struct LDKCResult_ClosingSignedDecodeErrorZ CResult_ClosingSignedDecodeErrorZ_clone(const struct LDKCResult_ClosingSignedDecodeErrorZ *NONNULL_PTR orig);
 
 /**
+ * Creates a new CResult_ClosingSignedFeeRangeDecodeErrorZ in the success state.
+ */
+struct LDKCResult_ClosingSignedFeeRangeDecodeErrorZ CResult_ClosingSignedFeeRangeDecodeErrorZ_ok(struct LDKClosingSignedFeeRange o);
+
+/**
+ * Creates a new CResult_ClosingSignedFeeRangeDecodeErrorZ in the error state.
+ */
+struct LDKCResult_ClosingSignedFeeRangeDecodeErrorZ CResult_ClosingSignedFeeRangeDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Frees any resources used by the CResult_ClosingSignedFeeRangeDecodeErrorZ.
+ */
+void CResult_ClosingSignedFeeRangeDecodeErrorZ_free(struct LDKCResult_ClosingSignedFeeRangeDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_ClosingSignedFeeRangeDecodeErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_ClosingSignedFeeRangeDecodeErrorZ CResult_ClosingSignedFeeRangeDecodeErrorZ_clone(const struct LDKCResult_ClosingSignedFeeRangeDecodeErrorZ *NONNULL_PTR orig);
+
+/**
  * Creates a new CResult_CommitmentSignedDecodeErrorZ in the success state.
  */
 struct LDKCResult_CommitmentSignedDecodeErrorZ CResult_CommitmentSignedDecodeErrorZ_ok(struct LDKCommitmentSigned o);
@@ -12004,6 +12242,11 @@ struct LDKAPIError APIError_channel_unavailable(struct LDKStr err);
 struct LDKAPIError APIError_monitor_update_failed(void);
 
 /**
+ * Utility method to constructs a new IncompatibleShutdownScript-variant APIError
+ */
+struct LDKAPIError APIError_incompatible_shutdown_script(struct LDKShutdownScript script);
+
+/**
  * Creates a digital signature of a message given a SecretKey, like the node's secret.
  * A receiver knowing the PublicKey (e.g. the node's id) and the message can be sure that the signature was generated by the caller.
  * Signatures are EC recoverable, meaning that given the message and the signature the PublicKey of the signer can be extracted.
@@ -12502,9 +12745,99 @@ bool ChannelConfig_get_commit_upfront_shutdown_pubkey(const struct LDKChannelCon
 void ChannelConfig_set_commit_upfront_shutdown_pubkey(struct LDKChannelConfig *NONNULL_PTR this_ptr, bool val);
 
 /**
+ * Limit our total exposure to in-flight HTLCs which are burned to fees as they are too
+ * small to claim on-chain.
+ *
+ * When an HTLC present in one of our channels is below a \"dust\" threshold, the HTLC will
+ * not be claimable on-chain, instead being turned into additional miner fees if either
+ * party force-closes the channel. Because the threshold is per-HTLC, our total exposure
+ * to such payments may be sustantial if there are many dust HTLCs present when the
+ * channel is force-closed.
+ *
+ * This limit is applied for sent, forwarded, and received HTLCs and limits the total
+ * exposure across all three types per-channel. Setting this too low may prevent the
+ * sending or receipt of low-value HTLCs on high-traffic nodes, and this limit is very
+ * important to prevent stealing of dust HTLCs by miners.
+ *
+ * Default value: 5_000_000 msat.
+ */
+uint64_t ChannelConfig_get_max_dust_htlc_exposure_msat(const struct LDKChannelConfig *NONNULL_PTR this_ptr);
+
+/**
+ * Limit our total exposure to in-flight HTLCs which are burned to fees as they are too
+ * small to claim on-chain.
+ *
+ * When an HTLC present in one of our channels is below a \"dust\" threshold, the HTLC will
+ * not be claimable on-chain, instead being turned into additional miner fees if either
+ * party force-closes the channel. Because the threshold is per-HTLC, our total exposure
+ * to such payments may be sustantial if there are many dust HTLCs present when the
+ * channel is force-closed.
+ *
+ * This limit is applied for sent, forwarded, and received HTLCs and limits the total
+ * exposure across all three types per-channel. Setting this too low may prevent the
+ * sending or receipt of low-value HTLCs on high-traffic nodes, and this limit is very
+ * important to prevent stealing of dust HTLCs by miners.
+ *
+ * Default value: 5_000_000 msat.
+ */
+void ChannelConfig_set_max_dust_htlc_exposure_msat(struct LDKChannelConfig *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * The additional fee we're willing to pay to avoid waiting for the counterparty's
+ * `to_self_delay` to reclaim funds.
+ *
+ * When we close a channel cooperatively with our counterparty, we negotiate a fee for the
+ * closing transaction which both sides find acceptable, ultimately paid by the channel
+ * funder/initiator.
+ *
+ * When we are the funder, because we have to pay the channel closing fee, we bound the
+ * acceptable fee by our [`Background`] and [`Normal`] fees, with the upper bound increased by
+ * this value. Because the on-chain fee we'd pay to force-close the channel is kept near our
+ * [`Normal`] feerate during normal operation, this value represents the additional fee we're
+ * willing to pay in order to avoid waiting for our counterparty's to_self_delay to reclaim our
+ * funds.
+ *
+ * When we are not the funder, we require the closing transaction fee pay at least our
+ * [`Background`] fee estimate, but allow our counterparty to pay as much fee as they like.
+ * Thus, this value is ignored when we are not the funder.
+ *
+ * Default value: 1000 satoshis.
+ *
+ * [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
+ * [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
+ */
+uint64_t ChannelConfig_get_force_close_avoidance_max_fee_satoshis(const struct LDKChannelConfig *NONNULL_PTR this_ptr);
+
+/**
+ * The additional fee we're willing to pay to avoid waiting for the counterparty's
+ * `to_self_delay` to reclaim funds.
+ *
+ * When we close a channel cooperatively with our counterparty, we negotiate a fee for the
+ * closing transaction which both sides find acceptable, ultimately paid by the channel
+ * funder/initiator.
+ *
+ * When we are the funder, because we have to pay the channel closing fee, we bound the
+ * acceptable fee by our [`Background`] and [`Normal`] fees, with the upper bound increased by
+ * this value. Because the on-chain fee we'd pay to force-close the channel is kept near our
+ * [`Normal`] feerate during normal operation, this value represents the additional fee we're
+ * willing to pay in order to avoid waiting for our counterparty's to_self_delay to reclaim our
+ * funds.
+ *
+ * When we are not the funder, we require the closing transaction fee pay at least our
+ * [`Background`] fee estimate, but allow our counterparty to pay as much fee as they like.
+ * Thus, this value is ignored when we are not the funder.
+ *
+ * Default value: 1000 satoshis.
+ *
+ * [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
+ * [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
+ */
+void ChannelConfig_set_force_close_avoidance_max_fee_satoshis(struct LDKChannelConfig *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
  * Constructs a new ChannelConfig given each field
  */
-MUST_USE_RES struct LDKChannelConfig ChannelConfig_new(uint32_t forwarding_fee_proportional_millionths_arg, uint32_t forwarding_fee_base_msat_arg, uint16_t cltv_expiry_delta_arg, bool announced_channel_arg, bool commit_upfront_shutdown_pubkey_arg);
+MUST_USE_RES struct LDKChannelConfig ChannelConfig_new(uint32_t forwarding_fee_proportional_millionths_arg, uint32_t forwarding_fee_base_msat_arg, uint16_t cltv_expiry_delta_arg, bool announced_channel_arg, bool commit_upfront_shutdown_pubkey_arg, uint64_t max_dust_htlc_exposure_msat_arg, uint64_t force_close_avoidance_max_fee_satoshis_arg);
 
 /**
  * Creates a copy of the ChannelConfig
@@ -12765,6 +13098,12 @@ enum LDKConfirmationTarget ConfirmationTarget_normal(void);
  * Utility method to constructs a new HighPriority-variant ConfirmationTarget
  */
 enum LDKConfirmationTarget ConfirmationTarget_high_priority(void);
+
+/**
+ * Checks if two ConfirmationTargets contain equal inner contents.
+ * This ignores pointers and is_owned flags and looks at the values in fields.
+ */
+bool ConfirmationTarget_eq(const enum LDKConfirmationTarget *NONNULL_PTR a, const enum LDKConfirmationTarget *NONNULL_PTR b);
 
 /**
  * Calls the free function if one is set
@@ -14044,9 +14383,44 @@ MUST_USE_RES struct LDKCVec_ChannelDetailsZ ChannelManager_list_usable_channels(
  * will be accepted on the given channel, and after additional timeout/the closing of all
  * pending HTLCs, the channel will be closed on chain.
  *
+ *  * If we are the channel initiator, we will pay between our [`Background`] and
+ *    [`ChannelConfig::force_close_avoidance_max_fee_satoshis`] plus our [`Normal`] fee
+ *    estimate.
+ *  * If our counterparty is the channel initiator, we will require a channel closing
+ *    transaction feerate of at least our [`Background`] feerate or the feerate which
+ *    would appear on a force-closure transaction, whichever is lower. We will allow our
+ *    counterparty to pay as much fee as they'd like, however.
+ *
  * May generate a SendShutdown message event on success, which should be relayed.
+ *
+ * [`ChannelConfig::force_close_avoidance_max_fee_satoshis`]: crate::util::config::ChannelConfig::force_close_avoidance_max_fee_satoshis
+ * [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
+ * [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
  */
 MUST_USE_RES struct LDKCResult_NoneAPIErrorZ ChannelManager_close_channel(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*channel_id)[32]);
+
+/**
+ * Begins the process of closing a channel. After this call (plus some timeout), no new HTLCs
+ * will be accepted on the given channel, and after additional timeout/the closing of all
+ * pending HTLCs, the channel will be closed on chain.
+ *
+ * `target_feerate_sat_per_1000_weight` has different meanings depending on if we initiated
+ * the channel being closed or not:
+ *  * If we are the channel initiator, we will pay at least this feerate on the closing
+ *    transaction. The upper-bound is set by
+ *    [`ChannelConfig::force_close_avoidance_max_fee_satoshis`] plus our [`Normal`] fee
+ *    estimate (or `target_feerate_sat_per_1000_weight`, if it is greater).
+ *  * If our counterparty is the channel initiator, we will refuse to accept a channel closure
+ *    transaction feerate below `target_feerate_sat_per_1000_weight` (or the feerate which
+ *    will appear on a force-closure transaction, whichever is lower).
+ *
+ * May generate a SendShutdown message event on success, which should be relayed.
+ *
+ * [`ChannelConfig::force_close_avoidance_max_fee_satoshis`]: crate::util::config::ChannelConfig::force_close_avoidance_max_fee_satoshis
+ * [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
+ * [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
+ */
+MUST_USE_RES struct LDKCResult_NoneAPIErrorZ ChannelManager_close_channel_with_target_feerate(const struct LDKChannelManager *NONNULL_PTR this_arg, const uint8_t (*channel_id)[32], uint32_t target_feerate_sats_per_1000_weight);
 
 /**
  * Force closes a channel, immediately broadcasting the latest local commitment transaction to
@@ -14112,8 +14486,12 @@ MUST_USE_RES struct LDKCResult_NonePaymentSendFailureZ ChannelManager_send_payme
  * would be able to guess -- otherwise, an intermediate node may claim the payment and it will
  * never reach the recipient.
  *
+ * See [`send_payment`] documentation for more details on the return value of this function.
+ *
  * Similar to regular payments, you MUST NOT reuse a `payment_preimage` value. See
  * [`send_payment`] for more information about the risks of duplicate preimage usage.
+ *
+ * Note that `route` must have exactly one path.
  *
  * [`send_payment`]: Self::send_payment
  *
@@ -14176,13 +14554,16 @@ void ChannelManager_broadcast_node_announcement(const struct LDKChannelManager *
 void ChannelManager_process_pending_htlc_forwards(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
 /**
- * If a peer is disconnected we mark any channels with that peer as 'disabled'.
- * After some time, if channels are still disabled we need to broadcast a ChannelUpdate
- * to inform the network about the uselessness of these channels.
+ * Performs actions which should happen on startup and roughly once per minute thereafter.
  *
- * This method handles all the details, and must be called roughly once per minute.
+ * This currently includes:
+ *  * Increasing or decreasing the on-chain feerate estimates for our outbound channels,
+ *  * Broadcasting `ChannelUpdate` messages if we've been disconnected from our peer for more
+ *    than a minute, informing the network that they should no longer attempt to route over
+ *    the channel.
  *
- * Note that in some rare cases this may generate a `chain::Watch::update_channel` call.
+ * Note that this may cause reentrancy through `chain::Watch::update_channel` calls or feerate
+ * estimate fetches.
  */
 void ChannelManager_timer_tick_occurred(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
@@ -15111,6 +15492,45 @@ MUST_USE_RES struct LDKShutdown Shutdown_new(struct LDKThirtyTwoBytes channel_id
 struct LDKShutdown Shutdown_clone(const struct LDKShutdown *NONNULL_PTR orig);
 
 /**
+ * Frees any resources used by the ClosingSignedFeeRange, if is_owned is set and inner is non-NULL.
+ */
+void ClosingSignedFeeRange_free(struct LDKClosingSignedFeeRange this_obj);
+
+/**
+ * The minimum absolute fee, in satoshis, which the sender is willing to place on the closing
+ * transaction.
+ */
+uint64_t ClosingSignedFeeRange_get_min_fee_satoshis(const struct LDKClosingSignedFeeRange *NONNULL_PTR this_ptr);
+
+/**
+ * The minimum absolute fee, in satoshis, which the sender is willing to place on the closing
+ * transaction.
+ */
+void ClosingSignedFeeRange_set_min_fee_satoshis(struct LDKClosingSignedFeeRange *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * The maximum absolute fee, in satoshis, which the sender is willing to place on the closing
+ * transaction.
+ */
+uint64_t ClosingSignedFeeRange_get_max_fee_satoshis(const struct LDKClosingSignedFeeRange *NONNULL_PTR this_ptr);
+
+/**
+ * The maximum absolute fee, in satoshis, which the sender is willing to place on the closing
+ * transaction.
+ */
+void ClosingSignedFeeRange_set_max_fee_satoshis(struct LDKClosingSignedFeeRange *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * Constructs a new ClosingSignedFeeRange given each field
+ */
+MUST_USE_RES struct LDKClosingSignedFeeRange ClosingSignedFeeRange_new(uint64_t min_fee_satoshis_arg, uint64_t max_fee_satoshis_arg);
+
+/**
+ * Creates a copy of the ClosingSignedFeeRange
+ */
+struct LDKClosingSignedFeeRange ClosingSignedFeeRange_clone(const struct LDKClosingSignedFeeRange *NONNULL_PTR orig);
+
+/**
  * Frees any resources used by the ClosingSigned, if is_owned is set and inner is non-NULL.
  */
 void ClosingSigned_free(struct LDKClosingSigned this_obj);
@@ -15146,9 +15566,25 @@ struct LDKSignature ClosingSigned_get_signature(const struct LDKClosingSigned *N
 void ClosingSigned_set_signature(struct LDKClosingSigned *NONNULL_PTR this_ptr, struct LDKSignature val);
 
 /**
+ * The minimum and maximum fees which the sender is willing to accept, provided only by new
+ * nodes.
+ *
+ * Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+ */
+struct LDKClosingSignedFeeRange ClosingSigned_get_fee_range(const struct LDKClosingSigned *NONNULL_PTR this_ptr);
+
+/**
+ * The minimum and maximum fees which the sender is willing to accept, provided only by new
+ * nodes.
+ *
+ * Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+ */
+void ClosingSigned_set_fee_range(struct LDKClosingSigned *NONNULL_PTR this_ptr, struct LDKClosingSignedFeeRange val);
+
+/**
  * Constructs a new ClosingSigned given each field
  */
-MUST_USE_RES struct LDKClosingSigned ClosingSigned_new(struct LDKThirtyTwoBytes channel_id_arg, uint64_t fee_satoshis_arg, struct LDKSignature signature_arg);
+MUST_USE_RES struct LDKClosingSigned ClosingSigned_new(struct LDKThirtyTwoBytes channel_id_arg, uint64_t fee_satoshis_arg, struct LDKSignature signature_arg, struct LDKClosingSignedFeeRange fee_range_arg);
 
 /**
  * Creates a copy of the ClosingSigned
@@ -16432,6 +16868,16 @@ struct LDKCVec_u8Z ClosingSigned_write(const struct LDKClosingSigned *NONNULL_PT
 struct LDKCResult_ClosingSignedDecodeErrorZ ClosingSigned_read(struct LDKu8slice ser);
 
 /**
+ * Serialize the ClosingSignedFeeRange object into a byte array which can be read by ClosingSignedFeeRange_read
+ */
+struct LDKCVec_u8Z ClosingSignedFeeRange_write(const struct LDKClosingSignedFeeRange *NONNULL_PTR obj);
+
+/**
+ * Read a ClosingSignedFeeRange from a byte array, created by ClosingSignedFeeRange_write
+ */
+struct LDKCResult_ClosingSignedFeeRangeDecodeErrorZ ClosingSignedFeeRange_read(struct LDKu8slice ser);
+
+/**
  * Serialize the CommitmentSigned object into a byte array which can be read by CommitmentSigned_read
  */
 struct LDKCVec_u8Z CommitmentSigned_write(const struct LDKCommitmentSigned *NONNULL_PTR obj);
@@ -16948,9 +17394,12 @@ void PeerManager_socket_disconnected(const struct LDKPeerManager *NONNULL_PTR th
 void PeerManager_disconnect_by_node_id(const struct LDKPeerManager *NONNULL_PTR this_arg, struct LDKPublicKey node_id, bool no_connection_possible);
 
 /**
- * This function should be called roughly once every 30 seconds.
- * It will send pings to each peer and disconnect those which did not respond to the last
- * round of pings.
+ * Send pings to each peer and disconnect those which did not respond to the last round of
+ * pings.
+ *
+ * This may be called on any timescale you want, however, roughly once every five to ten
+ * seconds is preferred. The call rate determines both how often we send a ping to our peers
+ * and how much time they have to respond before we disconnect them.
  *
  * May call [`send_data`] on all [`SocketDescriptor`]s. Thus, be very careful with reentrancy
  * issues!
@@ -17864,6 +18313,98 @@ struct LDKCResult_ChannelFeaturesDecodeErrorZ ChannelFeatures_read(struct LDKu8s
  * Read a InvoiceFeatures from a byte array, created by InvoiceFeatures_write
  */
 struct LDKCResult_InvoiceFeaturesDecodeErrorZ InvoiceFeatures_read(struct LDKu8slice ser);
+
+/**
+ * Frees any resources used by the ShutdownScript, if is_owned is set and inner is non-NULL.
+ */
+void ShutdownScript_free(struct LDKShutdownScript this_obj);
+
+/**
+ * Creates a copy of the ShutdownScript
+ */
+struct LDKShutdownScript ShutdownScript_clone(const struct LDKShutdownScript *NONNULL_PTR orig);
+
+/**
+ * Frees any resources used by the InvalidShutdownScript, if is_owned is set and inner is non-NULL.
+ */
+void InvalidShutdownScript_free(struct LDKInvalidShutdownScript this_obj);
+
+/**
+ * The script that did not meet the requirements from [BOLT #2].
+ *
+ * [BOLT #2]: https://github.com/lightningnetwork/lightning-rfc/blob/master/02-peer-protocol.md
+ */
+struct LDKu8slice InvalidShutdownScript_get_script(const struct LDKInvalidShutdownScript *NONNULL_PTR this_ptr);
+
+/**
+ * The script that did not meet the requirements from [BOLT #2].
+ *
+ * [BOLT #2]: https://github.com/lightningnetwork/lightning-rfc/blob/master/02-peer-protocol.md
+ */
+void InvalidShutdownScript_set_script(struct LDKInvalidShutdownScript *NONNULL_PTR this_ptr, struct LDKCVec_u8Z val);
+
+/**
+ * Constructs a new InvalidShutdownScript given each field
+ */
+MUST_USE_RES struct LDKInvalidShutdownScript InvalidShutdownScript_new(struct LDKCVec_u8Z script_arg);
+
+/**
+ * Serialize the ShutdownScript object into a byte array which can be read by ShutdownScript_read
+ */
+struct LDKCVec_u8Z ShutdownScript_write(const struct LDKShutdownScript *NONNULL_PTR obj);
+
+/**
+ * Read a ShutdownScript from a byte array, created by ShutdownScript_write
+ */
+struct LDKCResult_ShutdownScriptDecodeErrorZ ShutdownScript_read(struct LDKu8slice ser);
+
+/**
+ * Generates a P2PKH script pubkey from the given [`PubkeyHash`].
+ */
+MUST_USE_RES struct LDKShutdownScript ShutdownScript_new_p2pkh(const uint8_t (*pubkey_hash)[20]);
+
+/**
+ * Generates a P2SH script pubkey from the given [`ScriptHash`].
+ */
+MUST_USE_RES struct LDKShutdownScript ShutdownScript_new_p2sh(const uint8_t (*script_hash)[20]);
+
+/**
+ * Generates a P2WPKH script pubkey from the given [`WPubkeyHash`].
+ */
+MUST_USE_RES struct LDKShutdownScript ShutdownScript_new_p2wpkh(const uint8_t (*pubkey_hash)[20]);
+
+/**
+ * Generates a P2WSH script pubkey from the given [`WScriptHash`].
+ */
+MUST_USE_RES struct LDKShutdownScript ShutdownScript_new_p2wsh(const uint8_t (*script_hash)[32]);
+
+/**
+ * Generates a P2WSH script pubkey from the given segwit version and program.
+ *
+ * # Errors
+ *
+ * This function may return an error if `program` is invalid for the segwit `version`.
+ */
+MUST_USE_RES struct LDKCResult_ShutdownScriptInvalidShutdownScriptZ ShutdownScript_new_witness_program(uint8_t version, struct LDKu8slice program);
+
+/**
+ * Converts the shutdown script into the underlying [`Script`].
+ */
+MUST_USE_RES struct LDKCVec_u8Z ShutdownScript_into_inner(struct LDKShutdownScript this_arg);
+
+/**
+ * Returns the [`PublicKey`] used for a P2WPKH shutdown script if constructed directly from it.
+ *
+ * Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+ */
+MUST_USE_RES struct LDKPublicKey ShutdownScript_as_legacy_pubkey(const struct LDKShutdownScript *NONNULL_PTR this_arg);
+
+/**
+ * Returns whether the shutdown script is compatible with the features as defined by BOLT #2.
+ *
+ * Specifically, checks for compliance with feature `option_shutdown_anysegwit`.
+ */
+MUST_USE_RES bool ShutdownScript_is_compatible(const struct LDKShutdownScript *NONNULL_PTR this_arg, const struct LDKInitFeatures *NONNULL_PTR features);
 
 /**
  * Frees any resources used by the RouteHop, if is_owned is set and inner is non-NULL.

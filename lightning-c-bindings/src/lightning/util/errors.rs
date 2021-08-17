@@ -50,6 +50,18 @@ pub enum APIError {
 	/// An attempt to call watch/update_channel returned an Err (ie you did this!), causing the
 	/// attempted action to fail.
 	MonitorUpdateFailed,
+	/// [`KeysInterface::get_shutdown_scriptpubkey`] returned a shutdown scriptpubkey incompatible
+	/// with the channel counterparty as negotiated in [`InitFeatures`].
+	///
+	/// Using a SegWit v0 script should resolve this issue. If you cannot, you won't be able to open
+	/// a channel or cooperatively close one with this peer (and will have to force-close instead).
+	///
+	/// [`KeysInterface::get_shutdown_scriptpubkey`]: crate::chain::keysinterface::KeysInterface::get_shutdown_scriptpubkey
+	/// [`InitFeatures`]: crate::ln::features::InitFeatures
+	IncompatibleShutdownScript {
+		/// The incompatible shutdown script.
+		script: crate::lightning::ln::script::ShutdownScript,
+	},
 }
 use lightning::util::errors::APIError as nativeAPIError;
 impl APIError {
@@ -83,6 +95,12 @@ impl APIError {
 				}
 			},
 			APIError::MonitorUpdateFailed => nativeAPIError::MonitorUpdateFailed,
+			APIError::IncompatibleShutdownScript {ref script, } => {
+				let mut script_nonref = (*script).clone();
+				nativeAPIError::IncompatibleShutdownScript {
+					script: *unsafe { Box::from_raw(script_nonref.take_inner()) },
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -110,6 +128,11 @@ impl APIError {
 				}
 			},
 			APIError::MonitorUpdateFailed => nativeAPIError::MonitorUpdateFailed,
+			APIError::IncompatibleShutdownScript {mut script, } => {
+				nativeAPIError::IncompatibleShutdownScript {
+					script: *unsafe { Box::from_raw(script.take_inner()) },
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -142,6 +165,12 @@ impl APIError {
 				}
 			},
 			nativeAPIError::MonitorUpdateFailed => APIError::MonitorUpdateFailed,
+			nativeAPIError::IncompatibleShutdownScript {ref script, } => {
+				let mut script_nonref = (*script).clone();
+				APIError::IncompatibleShutdownScript {
+					script: crate::lightning::ln::script::ShutdownScript { inner: Box::into_raw(Box::new(script_nonref)), is_owned: true },
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -169,6 +198,11 @@ impl APIError {
 				}
 			},
 			nativeAPIError::MonitorUpdateFailed => APIError::MonitorUpdateFailed,
+			nativeAPIError::IncompatibleShutdownScript {mut script, } => {
+				APIError::IncompatibleShutdownScript {
+					script: crate::lightning::ln::script::ShutdownScript { inner: Box::into_raw(Box::new(script)), is_owned: true },
+				}
+			},
 		}
 	}
 }
@@ -213,3 +247,10 @@ pub extern "C" fn APIError_channel_unavailable(err: crate::c_types::Str) -> APIE
 /// Utility method to constructs a new MonitorUpdateFailed-variant APIError
 pub extern "C" fn APIError_monitor_update_failed() -> APIError {
 	APIError::MonitorUpdateFailed}
+#[no_mangle]
+/// Utility method to constructs a new IncompatibleShutdownScript-variant APIError
+pub extern "C" fn APIError_incompatible_shutdown_script(script: crate::lightning::ln::script::ShutdownScript) -> APIError {
+	APIError::IncompatibleShutdownScript {
+		script,
+	}
+}

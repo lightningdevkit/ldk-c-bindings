@@ -1220,6 +1220,171 @@ impl Clone for CResult_CVec_SignatureZNoneZ {
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_CVec_SignatureZNoneZ_clone(orig: &CResult_CVec_SignatureZNoneZ) -> CResult_CVec_SignatureZNoneZ { orig.clone() }
 #[repr(C)]
+/// The contents of CResult_ShutdownScriptDecodeErrorZ
+pub union CResult_ShutdownScriptDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::lightning::ln::script::ShutdownScript,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_ShutdownScriptDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning::ln::script::ShutdownScript on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_ShutdownScriptDecodeErrorZ {
+	/// The contents of this CResult_ShutdownScriptDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_ShutdownScriptDecodeErrorZPtr,
+	/// Whether this CResult_ShutdownScriptDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_ShutdownScriptDecodeErrorZ in the success state.
+pub extern "C" fn CResult_ShutdownScriptDecodeErrorZ_ok(o: crate::lightning::ln::script::ShutdownScript) -> CResult_ShutdownScriptDecodeErrorZ {
+	CResult_ShutdownScriptDecodeErrorZ {
+		contents: CResult_ShutdownScriptDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_ShutdownScriptDecodeErrorZ in the error state.
+pub extern "C" fn CResult_ShutdownScriptDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_ShutdownScriptDecodeErrorZ {
+	CResult_ShutdownScriptDecodeErrorZ {
+		contents: CResult_ShutdownScriptDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_ShutdownScriptDecodeErrorZ.
+pub extern "C" fn CResult_ShutdownScriptDecodeErrorZ_free(_res: CResult_ShutdownScriptDecodeErrorZ) { }
+impl Drop for CResult_ShutdownScriptDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::lightning::ln::script::ShutdownScript, crate::lightning::ln::msgs::DecodeError>> for CResult_ShutdownScriptDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::script::ShutdownScript, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_ShutdownScriptDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_ShutdownScriptDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_ShutdownScriptDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_ShutdownScriptDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::lightning::ln::script::ShutdownScript>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_ShutdownScriptDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_ShutdownScriptDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_ShutdownScriptDecodeErrorZ_clone(orig: &CResult_ShutdownScriptDecodeErrorZ) -> CResult_ShutdownScriptDecodeErrorZ { orig.clone() }
+#[repr(C)]
+/// The contents of CResult_ShutdownScriptInvalidShutdownScriptZ
+pub union CResult_ShutdownScriptInvalidShutdownScriptZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::lightning::ln::script::ShutdownScript,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::script::InvalidShutdownScript,
+}
+#[repr(C)]
+/// A CResult_ShutdownScriptInvalidShutdownScriptZ represents the result of a fallible operation,
+/// containing a crate::lightning::ln::script::ShutdownScript on success and a crate::lightning::ln::script::InvalidShutdownScript on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_ShutdownScriptInvalidShutdownScriptZ {
+	/// The contents of this CResult_ShutdownScriptInvalidShutdownScriptZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_ShutdownScriptInvalidShutdownScriptZPtr,
+	/// Whether this CResult_ShutdownScriptInvalidShutdownScriptZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_ShutdownScriptInvalidShutdownScriptZ in the success state.
+pub extern "C" fn CResult_ShutdownScriptInvalidShutdownScriptZ_ok(o: crate::lightning::ln::script::ShutdownScript) -> CResult_ShutdownScriptInvalidShutdownScriptZ {
+	CResult_ShutdownScriptInvalidShutdownScriptZ {
+		contents: CResult_ShutdownScriptInvalidShutdownScriptZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_ShutdownScriptInvalidShutdownScriptZ in the error state.
+pub extern "C" fn CResult_ShutdownScriptInvalidShutdownScriptZ_err(e: crate::lightning::ln::script::InvalidShutdownScript) -> CResult_ShutdownScriptInvalidShutdownScriptZ {
+	CResult_ShutdownScriptInvalidShutdownScriptZ {
+		contents: CResult_ShutdownScriptInvalidShutdownScriptZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_ShutdownScriptInvalidShutdownScriptZ.
+pub extern "C" fn CResult_ShutdownScriptInvalidShutdownScriptZ_free(_res: CResult_ShutdownScriptInvalidShutdownScriptZ) { }
+impl Drop for CResult_ShutdownScriptInvalidShutdownScriptZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::lightning::ln::script::ShutdownScript, crate::lightning::ln::script::InvalidShutdownScript>> for CResult_ShutdownScriptInvalidShutdownScriptZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::script::ShutdownScript, crate::lightning::ln::script::InvalidShutdownScript>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_ShutdownScriptInvalidShutdownScriptZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_ShutdownScriptInvalidShutdownScriptZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+#[repr(C)]
 /// The contents of CResult_NoneErrorZ
 pub union CResult_NoneErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
@@ -8616,6 +8781,97 @@ impl Clone for CResult_ClosingSignedDecodeErrorZ {
 /// Creates a new CResult_ClosingSignedDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ClosingSignedDecodeErrorZ_clone(orig: &CResult_ClosingSignedDecodeErrorZ) -> CResult_ClosingSignedDecodeErrorZ { orig.clone() }
+#[repr(C)]
+/// The contents of CResult_ClosingSignedFeeRangeDecodeErrorZ
+pub union CResult_ClosingSignedFeeRangeDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::lightning::ln::msgs::ClosingSignedFeeRange,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_ClosingSignedFeeRangeDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning::ln::msgs::ClosingSignedFeeRange on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_ClosingSignedFeeRangeDecodeErrorZ {
+	/// The contents of this CResult_ClosingSignedFeeRangeDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_ClosingSignedFeeRangeDecodeErrorZPtr,
+	/// Whether this CResult_ClosingSignedFeeRangeDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_ClosingSignedFeeRangeDecodeErrorZ in the success state.
+pub extern "C" fn CResult_ClosingSignedFeeRangeDecodeErrorZ_ok(o: crate::lightning::ln::msgs::ClosingSignedFeeRange) -> CResult_ClosingSignedFeeRangeDecodeErrorZ {
+	CResult_ClosingSignedFeeRangeDecodeErrorZ {
+		contents: CResult_ClosingSignedFeeRangeDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_ClosingSignedFeeRangeDecodeErrorZ in the error state.
+pub extern "C" fn CResult_ClosingSignedFeeRangeDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_ClosingSignedFeeRangeDecodeErrorZ {
+	CResult_ClosingSignedFeeRangeDecodeErrorZ {
+		contents: CResult_ClosingSignedFeeRangeDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_ClosingSignedFeeRangeDecodeErrorZ.
+pub extern "C" fn CResult_ClosingSignedFeeRangeDecodeErrorZ_free(_res: CResult_ClosingSignedFeeRangeDecodeErrorZ) { }
+impl Drop for CResult_ClosingSignedFeeRangeDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::ClosingSignedFeeRange, crate::lightning::ln::msgs::DecodeError>> for CResult_ClosingSignedFeeRangeDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::ClosingSignedFeeRange, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_ClosingSignedFeeRangeDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_ClosingSignedFeeRangeDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_ClosingSignedFeeRangeDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_ClosingSignedFeeRangeDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::lightning::ln::msgs::ClosingSignedFeeRange>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_ClosingSignedFeeRangeDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_ClosingSignedFeeRangeDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_ClosingSignedFeeRangeDecodeErrorZ_clone(orig: &CResult_ClosingSignedFeeRangeDecodeErrorZ) -> CResult_ClosingSignedFeeRangeDecodeErrorZ { orig.clone() }
 #[repr(C)]
 /// The contents of CResult_CommitmentSignedDecodeErrorZ
 pub union CResult_CommitmentSignedDecodeErrorZPtr {

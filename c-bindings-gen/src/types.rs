@@ -890,6 +890,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::io::Error" => Some("crate::c_types::IOError"),
 
 			"bech32::u5" => Some("crate::c_types::u5"),
+			"core::num::NonZeroU8" => Some("u8"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey"),
@@ -909,6 +910,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref  => Some("*const [u8; 80]"),
 			"bitcoin::blockdata::block::Block" if is_ref  => Some("crate::c_types::u8slice"),
+
+			"bitcoin::hash_types::PubkeyHash"|"bitcoin::hash_types::WPubkeyHash"|"bitcoin::hash_types::ScriptHash"
+				if is_ref => Some("*const [u8; 20]"),
+			"bitcoin::hash_types::WScriptHash"
+				if is_ref => Some("*const [u8; 32]"),
 
 			// Newtypes that we just expose in their original form.
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
@@ -963,6 +969,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::SystemTime" => Some("(::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs("),
 
 			"bech32::u5" => Some(""),
+			"core::num::NonZeroU8" => Some("core::num::NonZeroU8::new("),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				if is_ref => Some("&"),
@@ -983,6 +990,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::network::constants::Network" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" => Some("&::bitcoin::consensus::encode::deserialize(unsafe { &*"),
 			"bitcoin::blockdata::block::Block" if is_ref => Some("&::bitcoin::consensus::encode::deserialize("),
+
+			"bitcoin::hash_types::PubkeyHash" if is_ref =>
+				Some("&bitcoin::hash_types::PubkeyHash::from_hash(bitcoin::hashes::Hash::from_inner(unsafe { *"),
+			"bitcoin::hash_types::WPubkeyHash" if is_ref =>
+				Some("&bitcoin::hash_types::WPubkeyHash::from_hash(bitcoin::hashes::Hash::from_inner(unsafe { *"),
+			"bitcoin::hash_types::ScriptHash" if is_ref =>
+				Some("&bitcoin::hash_types::ScriptHash::from_hash(bitcoin::hashes::Hash::from_inner(unsafe { *"),
+			"bitcoin::hash_types::WScriptHash" if is_ref =>
+				Some("&bitcoin::hash_types::WScriptHash::from_hash(bitcoin::hashes::Hash::from_inner(unsafe { *"),
 
 			// Newtypes that we just expose in their original form.
 			"bitcoin::hash_types::Txid" if is_ref => Some("&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*"),
@@ -1028,6 +1044,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::SystemTime" => Some("))"),
 
 			"bech32::u5" => Some(".into()"),
+			"core::num::NonZeroU8" => Some(").expect(\"Value must be non-zero\")"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(".into_rust()"),
@@ -1044,6 +1061,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::network::constants::Network" => Some(".into_bitcoin()"),
 			"bitcoin::blockdata::block::BlockHeader" => Some(" }).unwrap()"),
 			"bitcoin::blockdata::block::Block" => Some(".to_slice()).unwrap()"),
+
+			"bitcoin::hash_types::PubkeyHash"|"bitcoin::hash_types::WPubkeyHash"|
+			"bitcoin::hash_types::ScriptHash"|"bitcoin::hash_types::WScriptHash"
+				if is_ref => Some(" }.clone()))"),
 
 			// Newtypes that we just expose in their original form.
 			"bitcoin::hash_types::Txid" if is_ref => Some(" }[..]).unwrap()"),

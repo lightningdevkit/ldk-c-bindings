@@ -333,8 +333,8 @@ pub extern "C" fn StaticPaymentOutputDescriptor_read(ser: crate::c_types::u8slic
 #[repr(C)]
 pub enum SpendableOutputDescriptor {
 	/// An output to a script which was provided via KeysInterface directly, either from
-	/// `get_destination_script()` or `get_shutdown_pubkey()`, thus you should already know how to
-	/// spend it. No secret keys are provided as rust-lightning was never given any key.
+	/// `get_destination_script()` or `get_shutdown_scriptpubkey()`, thus you should already know
+	/// how to spend it. No secret keys are provided as rust-lightning was never given any key.
 	/// These may include outputs from a transaction punishing our counterparty or claiming an HTLC
 	/// on-chain using the payment preimage or after it has timed out.
 	StaticOutput {
@@ -914,13 +914,12 @@ pub struct KeysInterface {
 	/// on-chain funds across channels as controlled to the same user.
 	#[must_use]
 	pub get_destination_script: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_u8Z,
-	/// Get a public key which we will send funds to (in the form of a P2WPKH output) when closing
-	/// a channel.
+	/// Get a script pubkey which we will send funds to when closing a channel.
 	///
 	/// This method should return a different value each time it is called, to avoid linking
 	/// on-chain funds across channels as controlled to the same user.
 	#[must_use]
-	pub get_shutdown_pubkey: extern "C" fn (this_arg: *const c_void) -> crate::c_types::PublicKey,
+	pub get_shutdown_scriptpubkey: extern "C" fn (this_arg: *const c_void) -> crate::lightning::ln::script::ShutdownScript,
 	/// Get a new set of Sign for per-channel secrets. These MUST be unique even if you
 	/// restarted with some stale data!
 	///
@@ -960,7 +959,7 @@ pub(crate) extern "C" fn KeysInterface_clone_fields(orig: &KeysInterface) -> Key
 		this_arg: orig.this_arg,
 		get_node_secret: Clone::clone(&orig.get_node_secret),
 		get_destination_script: Clone::clone(&orig.get_destination_script),
-		get_shutdown_pubkey: Clone::clone(&orig.get_shutdown_pubkey),
+		get_shutdown_scriptpubkey: Clone::clone(&orig.get_shutdown_scriptpubkey),
 		get_channel_signer: Clone::clone(&orig.get_channel_signer),
 		get_secure_random_bytes: Clone::clone(&orig.get_secure_random_bytes),
 		read_chan_signer: Clone::clone(&orig.read_chan_signer),
@@ -980,9 +979,9 @@ impl rustKeysInterface for KeysInterface {
 		let mut ret = (self.get_destination_script)(self.this_arg);
 		::bitcoin::blockdata::script::Script::from(ret.into_rust())
 	}
-	fn get_shutdown_pubkey(&self) -> bitcoin::secp256k1::key::PublicKey {
-		let mut ret = (self.get_shutdown_pubkey)(self.this_arg);
-		ret.into_rust()
+	fn get_shutdown_scriptpubkey(&self) -> lightning::ln::script::ShutdownScript {
+		let mut ret = (self.get_shutdown_scriptpubkey)(self.this_arg);
+		*unsafe { Box::from_raw(ret.take_inner()) }
 	}
 	fn get_channel_signer(&self, mut inbound: bool, mut channel_value_satoshis: u64) -> crate::lightning::chain::keysinterface::Sign {
 		let mut ret = (self.get_channel_signer)(self.this_arg, inbound, channel_value_satoshis);
@@ -1551,7 +1550,7 @@ pub extern "C" fn KeysManager_as_KeysInterface(this_arg: &KeysManager) -> crate:
 		free: None,
 		get_node_secret: KeysManager_KeysInterface_get_node_secret,
 		get_destination_script: KeysManager_KeysInterface_get_destination_script,
-		get_shutdown_pubkey: KeysManager_KeysInterface_get_shutdown_pubkey,
+		get_shutdown_scriptpubkey: KeysManager_KeysInterface_get_shutdown_scriptpubkey,
 		get_channel_signer: KeysManager_KeysInterface_get_channel_signer,
 		get_secure_random_bytes: KeysManager_KeysInterface_get_secure_random_bytes,
 		read_chan_signer: KeysManager_KeysInterface_read_chan_signer,
@@ -1570,9 +1569,9 @@ extern "C" fn KeysManager_KeysInterface_get_destination_script(this_arg: *const 
 	ret.into_bytes().into()
 }
 #[must_use]
-extern "C" fn KeysManager_KeysInterface_get_shutdown_pubkey(this_arg: *const c_void) -> crate::c_types::PublicKey {
-	let mut ret = <nativeKeysManager as lightning::chain::keysinterface::KeysInterface<>>::get_shutdown_pubkey(unsafe { &mut *(this_arg as *mut nativeKeysManager) }, );
-	crate::c_types::PublicKey::from_rust(&ret)
+extern "C" fn KeysManager_KeysInterface_get_shutdown_scriptpubkey(this_arg: *const c_void) -> crate::lightning::ln::script::ShutdownScript {
+	let mut ret = <nativeKeysManager as lightning::chain::keysinterface::KeysInterface<>>::get_shutdown_scriptpubkey(unsafe { &mut *(this_arg as *mut nativeKeysManager) }, );
+	crate::lightning::ln::script::ShutdownScript { inner: Box::into_raw(Box::new(ret)), is_owned: true }
 }
 #[must_use]
 extern "C" fn KeysManager_KeysInterface_get_channel_signer(this_arg: *const c_void, mut _inbound: bool, mut channel_value_satoshis: u64) -> crate::lightning::chain::keysinterface::Sign {

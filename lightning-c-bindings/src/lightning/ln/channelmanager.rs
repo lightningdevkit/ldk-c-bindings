@@ -996,11 +996,50 @@ pub extern "C" fn ChannelManager_list_usable_channels(this_arg: &ChannelManager)
 /// will be accepted on the given channel, and after additional timeout/the closing of all
 /// pending HTLCs, the channel will be closed on chain.
 ///
+///  * If we are the channel initiator, we will pay between our [`Background`] and
+///    [`ChannelConfig::force_close_avoidance_max_fee_satoshis`] plus our [`Normal`] fee
+///    estimate.
+///  * If our counterparty is the channel initiator, we will require a channel closing
+///    transaction feerate of at least our [`Background`] feerate or the feerate which
+///    would appear on a force-closure transaction, whichever is lower. We will allow our
+///    counterparty to pay as much fee as they'd like, however.
+///
 /// May generate a SendShutdown message event on success, which should be relayed.
+///
+/// [`ChannelConfig::force_close_avoidance_max_fee_satoshis`]: crate::util::config::ChannelConfig::force_close_avoidance_max_fee_satoshis
+/// [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
+/// [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_close_channel(this_arg: &ChannelManager, channel_id: *const [u8; 32]) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
 	let mut ret = unsafe { &*this_arg.inner }.close_channel(unsafe { &*channel_id});
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
+	local_ret
+}
+
+/// Begins the process of closing a channel. After this call (plus some timeout), no new HTLCs
+/// will be accepted on the given channel, and after additional timeout/the closing of all
+/// pending HTLCs, the channel will be closed on chain.
+///
+/// `target_feerate_sat_per_1000_weight` has different meanings depending on if we initiated
+/// the channel being closed or not:
+///  * If we are the channel initiator, we will pay at least this feerate on the closing
+///    transaction. The upper-bound is set by
+///    [`ChannelConfig::force_close_avoidance_max_fee_satoshis`] plus our [`Normal`] fee
+///    estimate (or `target_feerate_sat_per_1000_weight`, if it is greater).
+///  * If our counterparty is the channel initiator, we will refuse to accept a channel closure
+///    transaction feerate below `target_feerate_sat_per_1000_weight` (or the feerate which
+///    will appear on a force-closure transaction, whichever is lower).
+///
+/// May generate a SendShutdown message event on success, which should be relayed.
+///
+/// [`ChannelConfig::force_close_avoidance_max_fee_satoshis`]: crate::util::config::ChannelConfig::force_close_avoidance_max_fee_satoshis
+/// [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
+/// [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_close_channel_with_target_feerate(this_arg: &ChannelManager, channel_id: *const [u8; 32], mut target_feerate_sats_per_1000_weight: u32) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
+	let mut ret = unsafe { &*this_arg.inner }.close_channel_with_target_feerate(unsafe { &*channel_id}, target_feerate_sats_per_1000_weight);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -1078,8 +1117,12 @@ pub extern "C" fn ChannelManager_send_payment(this_arg: &ChannelManager, route: 
 /// would be able to guess -- otherwise, an intermediate node may claim the payment and it will
 /// never reach the recipient.
 ///
+/// See [`send_payment`] documentation for more details on the return value of this function.
+///
 /// Similar to regular payments, you MUST NOT reuse a `payment_preimage` value. See
 /// [`send_payment`] for more information about the risks of duplicate preimage usage.
+///
+/// Note that `route` must have exactly one path.
 ///
 /// [`send_payment`]: Self::send_payment
 ///
@@ -1154,13 +1197,16 @@ pub extern "C" fn ChannelManager_process_pending_htlc_forwards(this_arg: &Channe
 	unsafe { &*this_arg.inner }.process_pending_htlc_forwards()
 }
 
-/// If a peer is disconnected we mark any channels with that peer as 'disabled'.
-/// After some time, if channels are still disabled we need to broadcast a ChannelUpdate
-/// to inform the network about the uselessness of these channels.
+/// Performs actions which should happen on startup and roughly once per minute thereafter.
 ///
-/// This method handles all the details, and must be called roughly once per minute.
+/// This currently includes:
+///  * Increasing or decreasing the on-chain feerate estimates for our outbound channels,
+///  * Broadcasting `ChannelUpdate` messages if we've been disconnected from our peer for more
+///    than a minute, informing the network that they should no longer attempt to route over
+///    the channel.
 ///
-/// Note that in some rare cases this may generate a `chain::Watch::update_channel` call.
+/// Note that this may cause reentrancy through `chain::Watch::update_channel` calls or feerate
+/// estimate fetches.
 #[no_mangle]
 pub extern "C" fn ChannelManager_timer_tick_occurred(this_arg: &ChannelManager) {
 	unsafe { &*this_arg.inner }.timer_tick_occurred()

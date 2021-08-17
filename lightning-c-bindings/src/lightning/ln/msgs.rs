@@ -1345,6 +1345,107 @@ pub extern "C" fn Shutdown_clone(orig: &Shutdown) -> Shutdown {
 	orig.clone()
 }
 
+use lightning::ln::msgs::ClosingSignedFeeRange as nativeClosingSignedFeeRangeImport;
+type nativeClosingSignedFeeRange = nativeClosingSignedFeeRangeImport;
+
+/// The minimum and maximum fees which the sender is willing to place on the closing transaction.
+/// This is provided in [`ClosingSigned`] by both sides to indicate the fee range they are willing
+/// to use.
+#[must_use]
+#[repr(C)]
+pub struct ClosingSignedFeeRange {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeClosingSignedFeeRange,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for ClosingSignedFeeRange {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeClosingSignedFeeRange>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(self.inner) };
+		}
+	}
+}
+/// Frees any resources used by the ClosingSignedFeeRange, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn ClosingSignedFeeRange_free(this_obj: ClosingSignedFeeRange) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+extern "C" fn ClosingSignedFeeRange_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeClosingSignedFeeRange); }
+}
+#[allow(unused)]
+/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+impl ClosingSignedFeeRange {
+	pub(crate) fn take_inner(mut self) -> *mut nativeClosingSignedFeeRange {
+		assert!(self.is_owned);
+		let ret = self.inner;
+		self.inner = std::ptr::null_mut();
+		ret
+	}
+}
+/// The minimum absolute fee, in satoshis, which the sender is willing to place on the closing
+/// transaction.
+#[no_mangle]
+pub extern "C" fn ClosingSignedFeeRange_get_min_fee_satoshis(this_ptr: &ClosingSignedFeeRange) -> u64 {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.min_fee_satoshis;
+	*inner_val
+}
+/// The minimum absolute fee, in satoshis, which the sender is willing to place on the closing
+/// transaction.
+#[no_mangle]
+pub extern "C" fn ClosingSignedFeeRange_set_min_fee_satoshis(this_ptr: &mut ClosingSignedFeeRange, mut val: u64) {
+	unsafe { &mut *this_ptr.inner }.min_fee_satoshis = val;
+}
+/// The maximum absolute fee, in satoshis, which the sender is willing to place on the closing
+/// transaction.
+#[no_mangle]
+pub extern "C" fn ClosingSignedFeeRange_get_max_fee_satoshis(this_ptr: &ClosingSignedFeeRange) -> u64 {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.max_fee_satoshis;
+	*inner_val
+}
+/// The maximum absolute fee, in satoshis, which the sender is willing to place on the closing
+/// transaction.
+#[no_mangle]
+pub extern "C" fn ClosingSignedFeeRange_set_max_fee_satoshis(this_ptr: &mut ClosingSignedFeeRange, mut val: u64) {
+	unsafe { &mut *this_ptr.inner }.max_fee_satoshis = val;
+}
+/// Constructs a new ClosingSignedFeeRange given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ClosingSignedFeeRange_new(mut min_fee_satoshis_arg: u64, mut max_fee_satoshis_arg: u64) -> ClosingSignedFeeRange {
+	ClosingSignedFeeRange { inner: Box::into_raw(Box::new(nativeClosingSignedFeeRange {
+		min_fee_satoshis: min_fee_satoshis_arg,
+		max_fee_satoshis: max_fee_satoshis_arg,
+	})), is_owned: true }
+}
+impl Clone for ClosingSignedFeeRange {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeClosingSignedFeeRange>::is_null(self.inner) { std::ptr::null_mut() } else {
+				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ClosingSignedFeeRange_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeClosingSignedFeeRange)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the ClosingSignedFeeRange
+pub extern "C" fn ClosingSignedFeeRange_clone(orig: &ClosingSignedFeeRange) -> ClosingSignedFeeRange {
+	orig.clone()
+}
+
 use lightning::ln::msgs::ClosingSigned as nativeClosingSignedImport;
 type nativeClosingSigned = nativeClosingSignedImport;
 
@@ -1422,14 +1523,35 @@ pub extern "C" fn ClosingSigned_get_signature(this_ptr: &ClosingSigned) -> crate
 pub extern "C" fn ClosingSigned_set_signature(this_ptr: &mut ClosingSigned, mut val: crate::c_types::Signature) {
 	unsafe { &mut *this_ptr.inner }.signature = val.into_rust();
 }
+/// The minimum and maximum fees which the sender is willing to accept, provided only by new
+/// nodes.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn ClosingSigned_get_fee_range(this_ptr: &ClosingSigned) -> crate::lightning::ln::msgs::ClosingSignedFeeRange {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.fee_range;
+	let mut local_inner_val = crate::lightning::ln::msgs::ClosingSignedFeeRange { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else {  { (inner_val.as_ref().unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	local_inner_val
+}
+/// The minimum and maximum fees which the sender is willing to accept, provided only by new
+/// nodes.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn ClosingSigned_set_fee_range(this_ptr: &mut ClosingSigned, mut val: crate::lightning::ln::msgs::ClosingSignedFeeRange) {
+	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
+	unsafe { &mut *this_ptr.inner }.fee_range = local_val;
+}
 /// Constructs a new ClosingSigned given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ClosingSigned_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut fee_satoshis_arg: u64, mut signature_arg: crate::c_types::Signature) -> ClosingSigned {
+pub extern "C" fn ClosingSigned_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut fee_satoshis_arg: u64, mut signature_arg: crate::c_types::Signature, mut fee_range_arg: crate::lightning::ln::msgs::ClosingSignedFeeRange) -> ClosingSigned {
+	let mut local_fee_range_arg = if fee_range_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(fee_range_arg.take_inner()) } }) };
 	ClosingSigned { inner: Box::into_raw(Box::new(nativeClosingSigned {
 		channel_id: channel_id_arg.data,
 		fee_satoshis: fee_satoshis_arg,
 		signature: signature_arg.into_rust(),
+		fee_range: local_fee_range_arg,
 	})), is_owned: true }
 }
 impl Clone for ClosingSigned {
@@ -4998,6 +5120,22 @@ pub(crate) extern "C" fn ClosingSigned_write_void(obj: *const c_void) -> crate::
 pub extern "C" fn ClosingSigned_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ClosingSignedDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ClosingSigned { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the ClosingSignedFeeRange object into a byte array which can be read by ClosingSignedFeeRange_read
+pub extern "C" fn ClosingSignedFeeRange_write(obj: &ClosingSignedFeeRange) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+}
+#[no_mangle]
+pub(crate) extern "C" fn ClosingSignedFeeRange_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeClosingSignedFeeRange) })
+}
+#[no_mangle]
+/// Read a ClosingSignedFeeRange from a byte array, created by ClosingSignedFeeRange_write
+pub extern "C" fn ClosingSignedFeeRange_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ClosingSignedFeeRangeDecodeErrorZ {
+	let res = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ClosingSignedFeeRange { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]

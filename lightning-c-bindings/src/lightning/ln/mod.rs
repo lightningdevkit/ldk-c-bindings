@@ -27,6 +27,7 @@ pub mod msgs;
 pub mod peer_handler;
 pub mod chan_utils;
 pub mod features;
+pub mod script;
 mod peer_channel_encryptor {
 
 use std::str::FromStr;

@@ -130,6 +130,12 @@ pub extern "C" fn ConfirmationTarget_normal() -> ConfirmationTarget {
 /// Utility method to constructs a new HighPriority-variant ConfirmationTarget
 pub extern "C" fn ConfirmationTarget_high_priority() -> ConfirmationTarget {
 	ConfirmationTarget::HighPriority}
+/// Checks if two ConfirmationTargets contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn ConfirmationTarget_eq(a: &ConfirmationTarget, b: &ConfirmationTarget) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 /// A trait which should be implemented to provide feerate information on a number of time
 /// horizons.
 ///

@@ -637,16 +637,110 @@ pub extern "C" fn ChannelConfig_get_commit_upfront_shutdown_pubkey(this_ptr: &Ch
 pub extern "C" fn ChannelConfig_set_commit_upfront_shutdown_pubkey(this_ptr: &mut ChannelConfig, mut val: bool) {
 	unsafe { &mut *this_ptr.inner }.commit_upfront_shutdown_pubkey = val;
 }
+/// Limit our total exposure to in-flight HTLCs which are burned to fees as they are too
+/// small to claim on-chain.
+///
+/// When an HTLC present in one of our channels is below a \"dust\" threshold, the HTLC will
+/// not be claimable on-chain, instead being turned into additional miner fees if either
+/// party force-closes the channel. Because the threshold is per-HTLC, our total exposure
+/// to such payments may be sustantial if there are many dust HTLCs present when the
+/// channel is force-closed.
+///
+/// This limit is applied for sent, forwarded, and received HTLCs and limits the total
+/// exposure across all three types per-channel. Setting this too low may prevent the
+/// sending or receipt of low-value HTLCs on high-traffic nodes, and this limit is very
+/// important to prevent stealing of dust HTLCs by miners.
+///
+/// Default value: 5_000_000 msat.
+#[no_mangle]
+pub extern "C" fn ChannelConfig_get_max_dust_htlc_exposure_msat(this_ptr: &ChannelConfig) -> u64 {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.max_dust_htlc_exposure_msat;
+	*inner_val
+}
+/// Limit our total exposure to in-flight HTLCs which are burned to fees as they are too
+/// small to claim on-chain.
+///
+/// When an HTLC present in one of our channels is below a \"dust\" threshold, the HTLC will
+/// not be claimable on-chain, instead being turned into additional miner fees if either
+/// party force-closes the channel. Because the threshold is per-HTLC, our total exposure
+/// to such payments may be sustantial if there are many dust HTLCs present when the
+/// channel is force-closed.
+///
+/// This limit is applied for sent, forwarded, and received HTLCs and limits the total
+/// exposure across all three types per-channel. Setting this too low may prevent the
+/// sending or receipt of low-value HTLCs on high-traffic nodes, and this limit is very
+/// important to prevent stealing of dust HTLCs by miners.
+///
+/// Default value: 5_000_000 msat.
+#[no_mangle]
+pub extern "C" fn ChannelConfig_set_max_dust_htlc_exposure_msat(this_ptr: &mut ChannelConfig, mut val: u64) {
+	unsafe { &mut *this_ptr.inner }.max_dust_htlc_exposure_msat = val;
+}
+/// The additional fee we're willing to pay to avoid waiting for the counterparty's
+/// `to_self_delay` to reclaim funds.
+///
+/// When we close a channel cooperatively with our counterparty, we negotiate a fee for the
+/// closing transaction which both sides find acceptable, ultimately paid by the channel
+/// funder/initiator.
+///
+/// When we are the funder, because we have to pay the channel closing fee, we bound the
+/// acceptable fee by our [`Background`] and [`Normal`] fees, with the upper bound increased by
+/// this value. Because the on-chain fee we'd pay to force-close the channel is kept near our
+/// [`Normal`] feerate during normal operation, this value represents the additional fee we're
+/// willing to pay in order to avoid waiting for our counterparty's to_self_delay to reclaim our
+/// funds.
+///
+/// When we are not the funder, we require the closing transaction fee pay at least our
+/// [`Background`] fee estimate, but allow our counterparty to pay as much fee as they like.
+/// Thus, this value is ignored when we are not the funder.
+///
+/// Default value: 1000 satoshis.
+///
+/// [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
+/// [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
+#[no_mangle]
+pub extern "C" fn ChannelConfig_get_force_close_avoidance_max_fee_satoshis(this_ptr: &ChannelConfig) -> u64 {
+	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.force_close_avoidance_max_fee_satoshis;
+	*inner_val
+}
+/// The additional fee we're willing to pay to avoid waiting for the counterparty's
+/// `to_self_delay` to reclaim funds.
+///
+/// When we close a channel cooperatively with our counterparty, we negotiate a fee for the
+/// closing transaction which both sides find acceptable, ultimately paid by the channel
+/// funder/initiator.
+///
+/// When we are the funder, because we have to pay the channel closing fee, we bound the
+/// acceptable fee by our [`Background`] and [`Normal`] fees, with the upper bound increased by
+/// this value. Because the on-chain fee we'd pay to force-close the channel is kept near our
+/// [`Normal`] feerate during normal operation, this value represents the additional fee we're
+/// willing to pay in order to avoid waiting for our counterparty's to_self_delay to reclaim our
+/// funds.
+///
+/// When we are not the funder, we require the closing transaction fee pay at least our
+/// [`Background`] fee estimate, but allow our counterparty to pay as much fee as they like.
+/// Thus, this value is ignored when we are not the funder.
+///
+/// Default value: 1000 satoshis.
+///
+/// [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
+/// [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
+#[no_mangle]
+pub extern "C" fn ChannelConfig_set_force_close_avoidance_max_fee_satoshis(this_ptr: &mut ChannelConfig, mut val: u64) {
+	unsafe { &mut *this_ptr.inner }.force_close_avoidance_max_fee_satoshis = val;
+}
 /// Constructs a new ChannelConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelConfig_new(mut forwarding_fee_proportional_millionths_arg: u32, mut forwarding_fee_base_msat_arg: u32, mut cltv_expiry_delta_arg: u16, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool) -> ChannelConfig {
+pub extern "C" fn ChannelConfig_new(mut forwarding_fee_proportional_millionths_arg: u32, mut forwarding_fee_base_msat_arg: u32, mut cltv_expiry_delta_arg: u16, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool, mut max_dust_htlc_exposure_msat_arg: u64, mut force_close_avoidance_max_fee_satoshis_arg: u64) -> ChannelConfig {
 	ChannelConfig { inner: Box::into_raw(Box::new(nativeChannelConfig {
 		forwarding_fee_proportional_millionths: forwarding_fee_proportional_millionths_arg,
 		forwarding_fee_base_msat: forwarding_fee_base_msat_arg,
 		cltv_expiry_delta: cltv_expiry_delta_arg,
 		announced_channel: announced_channel_arg,
 		commit_upfront_shutdown_pubkey: commit_upfront_shutdown_pubkey_arg,
+		max_dust_htlc_exposure_msat: max_dust_htlc_exposure_msat_arg,
+		force_close_avoidance_max_fee_satoshis: force_close_avoidance_max_fee_satoshis_arg,
 	})), is_owned: true }
 }
 impl Clone for ChannelConfig {

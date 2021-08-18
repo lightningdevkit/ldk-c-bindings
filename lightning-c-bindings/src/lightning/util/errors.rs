@@ -168,7 +168,7 @@ impl APIError {
 			nativeAPIError::IncompatibleShutdownScript {ref script, } => {
 				let mut script_nonref = (*script).clone();
 				APIError::IncompatibleShutdownScript {
-					script: crate::lightning::ln::script::ShutdownScript { inner: Box::into_raw(Box::new(script_nonref)), is_owned: true },
+					script: crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(script_nonref), is_owned: true },
 				}
 			},
 		}
@@ -200,7 +200,7 @@ impl APIError {
 			nativeAPIError::MonitorUpdateFailed => APIError::MonitorUpdateFailed,
 			nativeAPIError::IncompatibleShutdownScript {mut script, } => {
 				APIError::IncompatibleShutdownScript {
-					script: crate::lightning::ln::script::ShutdownScript { inner: Box::into_raw(Box::new(script)), is_owned: true },
+					script: crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(script), is_owned: true },
 				}
 			},
 		}

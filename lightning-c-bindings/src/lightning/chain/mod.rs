@@ -57,7 +57,7 @@ pub struct BestBlock {
 impl Drop for BestBlock {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeBestBlock>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -70,11 +70,17 @@ extern "C" fn BestBlock_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBestBlock); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl BestBlock {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeBestBlock {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeBestBlock {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeBestBlock {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -83,7 +89,7 @@ impl Clone for BestBlock {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeBestBlock>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -104,7 +110,7 @@ pub extern "C" fn BestBlock_clone(orig: &BestBlock) -> BestBlock {
 #[no_mangle]
 pub extern "C" fn BestBlock_from_genesis(mut network: crate::bitcoin::network::Network) -> BestBlock {
 	let mut ret = lightning::chain::BestBlock::from_genesis(network.into_bitcoin());
-	BestBlock { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns a `BestBlock` as identified by the given block hash and height.
@@ -112,14 +118,14 @@ pub extern "C" fn BestBlock_from_genesis(mut network: crate::bitcoin::network::N
 #[no_mangle]
 pub extern "C" fn BestBlock_new(mut block_hash: crate::c_types::ThirtyTwoBytes, mut height: u32) -> BestBlock {
 	let mut ret = lightning::chain::BestBlock::new(::bitcoin::hash_types::BlockHash::from_slice(&block_hash.data[..]).unwrap(), height);
-	BestBlock { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns the best block hash.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn BestBlock_block_hash(this_arg: &BestBlock) -> crate::c_types::ThirtyTwoBytes {
-	let mut ret = unsafe { &*this_arg.inner }.block_hash();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.block_hash();
 	crate::c_types::ThirtyTwoBytes { data: ret.into_inner() }
 }
 
@@ -127,7 +133,7 @@ pub extern "C" fn BestBlock_block_hash(this_arg: &BestBlock) -> crate::c_types::
 #[must_use]
 #[no_mangle]
 pub extern "C" fn BestBlock_height(this_arg: &BestBlock) -> u32 {
-	let mut ret = unsafe { &*this_arg.inner }.height();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.height();
 	ret
 }
 
@@ -510,12 +516,12 @@ pub(crate) extern "C" fn Watch_clone_fields(orig: &Watch) -> Watch {
 use lightning::chain::Watch as rustWatch;
 impl rustWatch<crate::lightning::chain::keysinterface::Sign> for Watch {
 	fn watch_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
-		let mut ret = (self.watch_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(funding_txo)), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: Box::into_raw(Box::new(monitor)), is_owned: true });
+		let mut ret = (self.watch_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(monitor), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
 	fn update_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut update: lightning::chain::channelmonitor::ChannelMonitorUpdate) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
-		let mut ret = (self.update_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(funding_txo)), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: Box::into_raw(Box::new(update)), is_owned: true });
+		let mut ret = (self.update_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: ObjOps::heap_alloc(update), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
@@ -605,7 +611,7 @@ impl rustFilter for Filter {
 		(self.register_tx)(self.this_arg, txid.as_inner(), crate::c_types::u8slice::from_slice(&script_pubkey[..]))
 	}
 	fn register_output(&self, mut output: lightning::chain::WatchedOutput) -> Option<(usize, bitcoin::blockdata::transaction::Transaction)> {
-		let mut ret = (self.register_output)(self.this_arg, crate::lightning::chain::WatchedOutput { inner: Box::into_raw(Box::new(output)), is_owned: true });
+		let mut ret = (self.register_output)(self.this_arg, crate::lightning::chain::WatchedOutput { inner: ObjOps::heap_alloc(output), is_owned: true });
 		let mut local_ret = if ret.is_some() { Some( { let (mut orig_ret_0_0, mut orig_ret_0_1) = ret.take().to_rust(); let mut local_ret_0 = (orig_ret_0_0, orig_ret_0_1.into_bitcoin()); local_ret_0 }) } else { None };
 		local_ret
 	}
@@ -662,7 +668,7 @@ pub struct WatchedOutput {
 impl Drop for WatchedOutput {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeWatchedOutput>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -675,11 +681,17 @@ extern "C" fn WatchedOutput_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeWatchedOutput); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl WatchedOutput {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeWatchedOutput {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeWatchedOutput {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeWatchedOutput {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -689,7 +701,7 @@ impl WatchedOutput {
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn WatchedOutput_get_block_hash(this_ptr: &WatchedOutput) -> crate::c_types::ThirtyTwoBytes {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.block_hash;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().block_hash;
 	let mut local_inner_val = if inner_val.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (inner_val.unwrap()).into_inner() } } };
 	local_inner_val
 }
@@ -699,46 +711,46 @@ pub extern "C" fn WatchedOutput_get_block_hash(this_ptr: &WatchedOutput) -> crat
 #[no_mangle]
 pub extern "C" fn WatchedOutput_set_block_hash(this_ptr: &mut WatchedOutput, mut val: crate::c_types::ThirtyTwoBytes) {
 	let mut local_val = if val.data == [0; 32] { None } else { Some( { ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap() }) };
-	unsafe { &mut *this_ptr.inner }.block_hash = local_val;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.block_hash = local_val;
 }
 /// Outpoint identifying the transaction output.
 #[no_mangle]
 pub extern "C" fn WatchedOutput_get_outpoint(this_ptr: &WatchedOutput) -> crate::lightning::chain::transaction::OutPoint {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.outpoint;
-	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().outpoint;
+	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
 }
 /// Outpoint identifying the transaction output.
 #[no_mangle]
 pub extern "C" fn WatchedOutput_set_outpoint(this_ptr: &mut WatchedOutput, mut val: crate::lightning::chain::transaction::OutPoint) {
-	unsafe { &mut *this_ptr.inner }.outpoint = *unsafe { Box::from_raw(val.take_inner()) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.outpoint = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Spending condition of the transaction output.
 #[no_mangle]
 pub extern "C" fn WatchedOutput_get_script_pubkey(this_ptr: &WatchedOutput) -> crate::c_types::u8slice {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.script_pubkey;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().script_pubkey;
 	crate::c_types::u8slice::from_slice(&inner_val[..])
 }
 /// Spending condition of the transaction output.
 #[no_mangle]
 pub extern "C" fn WatchedOutput_set_script_pubkey(this_ptr: &mut WatchedOutput, mut val: crate::c_types::derived::CVec_u8Z) {
-	unsafe { &mut *this_ptr.inner }.script_pubkey = ::bitcoin::blockdata::script::Script::from(val.into_rust());
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.script_pubkey = ::bitcoin::blockdata::script::Script::from(val.into_rust());
 }
 /// Constructs a new WatchedOutput given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn WatchedOutput_new(mut block_hash_arg: crate::c_types::ThirtyTwoBytes, mut outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut script_pubkey_arg: crate::c_types::derived::CVec_u8Z) -> WatchedOutput {
 	let mut local_block_hash_arg = if block_hash_arg.data == [0; 32] { None } else { Some( { ::bitcoin::hash_types::BlockHash::from_slice(&block_hash_arg.data[..]).unwrap() }) };
-	WatchedOutput { inner: Box::into_raw(Box::new(nativeWatchedOutput {
+	WatchedOutput { inner: ObjOps::heap_alloc(nativeWatchedOutput {
 		block_hash: local_block_hash_arg,
 		outpoint: *unsafe { Box::from_raw(outpoint_arg.take_inner()) },
 		script_pubkey: ::bitcoin::blockdata::script::Script::from(script_pubkey_arg.into_rust()),
-	})), is_owned: true }
+	}), is_owned: true }
 }
 impl Clone for WatchedOutput {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeWatchedOutput>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -760,6 +772,6 @@ pub extern "C" fn WatchedOutput_hash(o: &WatchedOutput) -> u64 {
 	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(unsafe { &*o.inner }, &mut hasher);
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
 	std::hash::Hasher::finish(&hasher)
 }

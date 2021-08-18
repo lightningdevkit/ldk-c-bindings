@@ -48,7 +48,7 @@ pub struct ChannelMonitorUpdate {
 impl Drop for ChannelMonitorUpdate {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeChannelMonitorUpdate>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -61,11 +61,17 @@ extern "C" fn ChannelMonitorUpdate_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelMonitorUpdate); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl ChannelMonitorUpdate {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeChannelMonitorUpdate {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeChannelMonitorUpdate {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelMonitorUpdate {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -83,7 +89,7 @@ impl ChannelMonitorUpdate {
 /// its docs for more details.
 #[no_mangle]
 pub extern "C" fn ChannelMonitorUpdate_get_update_id(this_ptr: &ChannelMonitorUpdate) -> u64 {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.update_id;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_id;
 	*inner_val
 }
 /// The sequence number of this update. Updates *must* be replayed in-order according to this
@@ -99,13 +105,13 @@ pub extern "C" fn ChannelMonitorUpdate_get_update_id(this_ptr: &ChannelMonitorUp
 /// its docs for more details.
 #[no_mangle]
 pub extern "C" fn ChannelMonitorUpdate_set_update_id(this_ptr: &mut ChannelMonitorUpdate, mut val: u64) {
-	unsafe { &mut *this_ptr.inner }.update_id = val;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.update_id = val;
 }
 impl Clone for ChannelMonitorUpdate {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeChannelMonitorUpdate>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -133,7 +139,7 @@ pub static CLOSED_CHANNEL_UPDATE_ID: u64 = lightning::chain::channelmonitor::CLO
 #[no_mangle]
 /// Serialize the ChannelMonitorUpdate object into a byte array which can be read by ChannelMonitorUpdate_read
 pub extern "C" fn ChannelMonitorUpdate_write(obj: &ChannelMonitorUpdate) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
 pub(crate) extern "C" fn ChannelMonitorUpdate_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
@@ -143,7 +149,7 @@ pub(crate) extern "C" fn ChannelMonitorUpdate_write_void(obj: *const c_void) -> 
 /// Read a ChannelMonitorUpdate from a byte array, created by ChannelMonitorUpdate_write
 pub extern "C" fn ChannelMonitorUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelMonitorUpdateDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 /// An error enum representing a failure to persist a channel monitor update.
@@ -279,7 +285,7 @@ pub struct MonitorUpdateError {
 impl Drop for MonitorUpdateError {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeMonitorUpdateError>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -292,11 +298,17 @@ extern "C" fn MonitorUpdateError_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeMonitorUpdateError); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl MonitorUpdateError {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeMonitorUpdateError {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeMonitorUpdateError {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeMonitorUpdateError {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -305,7 +317,7 @@ impl Clone for MonitorUpdateError {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeMonitorUpdateError>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -370,13 +382,13 @@ impl MonitorEvent {
 			nativeMonitorEvent::HTLCEvent (ref a, ) => {
 				let mut a_nonref = (*a).clone();
 				MonitorEvent::HTLCEvent (
-					crate::lightning::chain::channelmonitor::HTLCUpdate { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
+					crate::lightning::chain::channelmonitor::HTLCUpdate { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
 				)
 			},
 			nativeMonitorEvent::CommitmentTxBroadcasted (ref a, ) => {
 				let mut a_nonref = (*a).clone();
 				MonitorEvent::CommitmentTxBroadcasted (
-					crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
+					crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
 				)
 			},
 		}
@@ -386,12 +398,12 @@ impl MonitorEvent {
 		match native {
 			nativeMonitorEvent::HTLCEvent (mut a, ) => {
 				MonitorEvent::HTLCEvent (
-					crate::lightning::chain::channelmonitor::HTLCUpdate { inner: Box::into_raw(Box::new(a)), is_owned: true },
+					crate::lightning::chain::channelmonitor::HTLCUpdate { inner: ObjOps::heap_alloc(a), is_owned: true },
 				)
 			},
 			nativeMonitorEvent::CommitmentTxBroadcasted (mut a, ) => {
 				MonitorEvent::CommitmentTxBroadcasted (
-					crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(a)), is_owned: true },
+					crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(a), is_owned: true },
 				)
 			},
 		}
@@ -440,7 +452,7 @@ pub struct HTLCUpdate {
 impl Drop for HTLCUpdate {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeHTLCUpdate>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -453,11 +465,17 @@ extern "C" fn HTLCUpdate_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeHTLCUpdate); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl HTLCUpdate {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeHTLCUpdate {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeHTLCUpdate {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeHTLCUpdate {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -466,7 +484,7 @@ impl Clone for HTLCUpdate {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeHTLCUpdate>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -484,7 +502,7 @@ pub extern "C" fn HTLCUpdate_clone(orig: &HTLCUpdate) -> HTLCUpdate {
 #[no_mangle]
 /// Serialize the HTLCUpdate object into a byte array which can be read by HTLCUpdate_read
 pub extern "C" fn HTLCUpdate_write(obj: &HTLCUpdate) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
 pub(crate) extern "C" fn HTLCUpdate_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
@@ -494,7 +512,7 @@ pub(crate) extern "C" fn HTLCUpdate_write_void(obj: *const c_void) -> crate::c_t
 /// Read a HTLCUpdate from a byte array, created by HTLCUpdate_write
 pub extern "C" fn HTLCUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_HTLCUpdateDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::HTLCUpdate { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::HTLCUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 /// Number of blocks we wait on seeing a HTLC output being solved before we fail corresponding inbound
@@ -540,7 +558,7 @@ pub struct ChannelMonitor {
 impl Drop for ChannelMonitor {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeChannelMonitor>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -553,11 +571,17 @@ extern "C" fn ChannelMonitor_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelMonitor); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl ChannelMonitor {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeChannelMonitor {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeChannelMonitor {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelMonitor {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -565,7 +589,7 @@ impl ChannelMonitor {
 #[no_mangle]
 /// Serialize the ChannelMonitor object into a byte array which can be read by ChannelMonitor_read
 pub extern "C" fn ChannelMonitor_write(obj: &ChannelMonitor) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
 pub(crate) extern "C" fn ChannelMonitor_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
@@ -578,8 +602,8 @@ pub(crate) extern "C" fn ChannelMonitor_write_void(obj: *const c_void) -> crate:
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_update_monitor(this_arg: &ChannelMonitor, updates: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, broadcaster: &crate::lightning::chain::chaininterface::BroadcasterInterface, fee_estimator: &crate::lightning::chain::chaininterface::FeeEstimator, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_NoneMonitorUpdateErrorZ {
-	let mut ret = unsafe { &*this_arg.inner }.update_monitor(unsafe { &*updates.inner }, broadcaster, fee_estimator, logger);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::MonitorUpdateError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_monitor(updates.get_native_ref(), broadcaster, fee_estimator, logger);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::MonitorUpdateError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 
@@ -588,7 +612,7 @@ pub extern "C" fn ChannelMonitor_update_monitor(this_arg: &ChannelMonitor, updat
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_latest_update_id(this_arg: &ChannelMonitor) -> u64 {
-	let mut ret = unsafe { &*this_arg.inner }.get_latest_update_id();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_latest_update_id();
 	ret
 }
 
@@ -596,8 +620,8 @@ pub extern "C" fn ChannelMonitor_get_latest_update_id(this_arg: &ChannelMonitor)
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_funding_txo(this_arg: &ChannelMonitor) -> crate::c_types::derived::C2Tuple_OutPointScriptZ {
-	let mut ret = unsafe { &*this_arg.inner }.get_funding_txo();
-	let (mut orig_ret_0, mut orig_ret_1) = ret; let mut local_ret = (crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(orig_ret_0)), is_owned: true }, orig_ret_1.into_bytes().into()).into();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_funding_txo();
+	let (mut orig_ret_0, mut orig_ret_1) = ret; let mut local_ret = (crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(orig_ret_0), is_owned: true }, orig_ret_1.into_bytes().into()).into();
 	local_ret
 }
 
@@ -606,7 +630,7 @@ pub extern "C" fn ChannelMonitor_get_funding_txo(this_arg: &ChannelMonitor) -> c
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_outputs_to_watch(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
-	let mut ret = unsafe { &*this_arg.inner }.get_outputs_to_watch();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_outputs_to_watch();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, orig_orig_ret_0_1_0_1.into_bytes().into()).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
 }
@@ -616,7 +640,7 @@ pub extern "C" fn ChannelMonitor_get_outputs_to_watch(this_arg: &ChannelMonitor)
 /// have been registered.
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_load_outputs_to_watch(this_arg: &ChannelMonitor, filter: &crate::lightning::chain::Filter) {
-	unsafe { &*this_arg.inner }.load_outputs_to_watch(filter)
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.load_outputs_to_watch(filter)
 }
 
 /// Get the list of HTLCs who's status has been updated on chain. This should be called by
@@ -624,7 +648,7 @@ pub extern "C" fn ChannelMonitor_load_outputs_to_watch(this_arg: &ChannelMonitor
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_and_clear_pending_monitor_events(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_MonitorEventZ {
-	let mut ret = unsafe { &*this_arg.inner }.get_and_clear_pending_monitor_events();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_and_clear_pending_monitor_events();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::chain::channelmonitor::MonitorEvent::native_into(item) }); };
 	local_ret.into()
 }
@@ -638,7 +662,7 @@ pub extern "C" fn ChannelMonitor_get_and_clear_pending_monitor_events(this_arg: 
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_and_clear_pending_events(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_EventZ {
-	let mut ret = unsafe { &*this_arg.inner }.get_and_clear_pending_events();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_and_clear_pending_events();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::util::events::Event::native_into(item) }); };
 	local_ret.into()
 }
@@ -655,7 +679,7 @@ pub extern "C" fn ChannelMonitor_get_and_clear_pending_events(this_arg: &Channel
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_latest_holder_commitment_txn(this_arg: &ChannelMonitor, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionZ {
-	let mut ret = unsafe { &*this_arg.inner }.get_latest_holder_commitment_txn(logger);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_latest_holder_commitment_txn(logger);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::Transaction::from_bitcoin(&item) }); };
 	local_ret.into()
 }
@@ -675,7 +699,7 @@ pub extern "C" fn ChannelMonitor_get_latest_holder_commitment_txn(this_arg: &Cha
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_block_connected(this_arg: &ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
 	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
-	let mut ret = unsafe { &*this_arg.inner }.block_connected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height, broadcaster, fee_estimator, logger);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.block_connected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height, broadcaster, fee_estimator, logger);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
 }
@@ -684,7 +708,7 @@ pub extern "C" fn ChannelMonitor_block_connected(this_arg: &ChannelMonitor, head
 /// appropriately.
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_block_disconnected(this_arg: &ChannelMonitor, header: *const [u8; 80], mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) {
-	unsafe { &*this_arg.inner }.block_disconnected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, broadcaster, fee_estimator, logger)
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.block_disconnected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, broadcaster, fee_estimator, logger)
 }
 
 /// Processes transactions confirmed in a block with the given header and height, returning new
@@ -698,7 +722,7 @@ pub extern "C" fn ChannelMonitor_block_disconnected(this_arg: &ChannelMonitor, h
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_transactions_confirmed(this_arg: &ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
 	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
-	let mut ret = unsafe { &*this_arg.inner }.transactions_confirmed(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height, broadcaster, fee_estimator, logger);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.transactions_confirmed(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height, broadcaster, fee_estimator, logger);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
 }
@@ -711,7 +735,7 @@ pub extern "C" fn ChannelMonitor_transactions_confirmed(this_arg: &ChannelMonito
 /// [`block_disconnected`]: Self::block_disconnected
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_transaction_unconfirmed(this_arg: &ChannelMonitor, txid: *const [u8; 32], mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) {
-	unsafe { &*this_arg.inner }.transaction_unconfirmed(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*txid }[..]).unwrap(), broadcaster, fee_estimator, logger)
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.transaction_unconfirmed(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*txid }[..]).unwrap(), broadcaster, fee_estimator, logger)
 }
 
 /// Updates the monitor with the current best chain tip, returning new outputs to watch. See
@@ -724,7 +748,7 @@ pub extern "C" fn ChannelMonitor_transaction_unconfirmed(this_arg: &ChannelMonit
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_best_block_updated(this_arg: &ChannelMonitor, header: *const [u8; 80], mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
-	let mut ret = unsafe { &*this_arg.inner }.best_block_updated(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, broadcaster, fee_estimator, logger);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.best_block_updated(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, broadcaster, fee_estimator, logger);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
 }
@@ -733,7 +757,7 @@ pub extern "C" fn ChannelMonitor_best_block_updated(this_arg: &ChannelMonitor, h
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_TxidZ {
-	let mut ret = unsafe { &*this_arg.inner }.get_relevant_txids();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_relevant_txids();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.into_inner() } }); };
 	local_ret.into()
 }
@@ -743,8 +767,8 @@ pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &ChannelMonitor) -
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_current_best_block(this_arg: &ChannelMonitor) -> crate::lightning::chain::BestBlock {
-	let mut ret = unsafe { &*this_arg.inner }.current_best_block();
-	crate::lightning::chain::BestBlock { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.current_best_block();
+	crate::lightning::chain::BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// `Persist` defines behavior for persisting channel monitors: this could mean
@@ -816,12 +840,12 @@ pub(crate) extern "C" fn Persist_clone_fields(orig: &Persist) -> Persist {
 use lightning::chain::channelmonitor::Persist as rustPersist;
 impl rustPersist<crate::lightning::chain::keysinterface::Sign> for Persist {
 	fn persist_new_channel(&self, mut id: lightning::chain::transaction::OutPoint, mut data: &lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
-		let mut ret = (self.persist_new_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(id)), is_owned: true }, &crate::lightning::chain::channelmonitor::ChannelMonitor { inner: unsafe { (data as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.persist_new_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(id), is_owned: true }, &crate::lightning::chain::channelmonitor::ChannelMonitor { inner: unsafe { ObjOps::nonnull_ptr_to_inner((data as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
 	fn update_persisted_channel(&self, mut id: lightning::chain::transaction::OutPoint, mut update: &lightning::chain::channelmonitor::ChannelMonitorUpdate, mut data: &lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
-		let mut ret = (self.update_persisted_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(id)), is_owned: true }, &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: unsafe { (update as *const _) as *mut _ }, is_owned: false }, &crate::lightning::chain::channelmonitor::ChannelMonitor { inner: unsafe { (data as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.update_persisted_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(id), is_owned: true }, &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: unsafe { ObjOps::nonnull_ptr_to_inner((update as *const _) as *mut _) }, is_owned: false }, &crate::lightning::chain::channelmonitor::ChannelMonitor { inner: unsafe { ObjOps::nonnull_ptr_to_inner((data as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
@@ -850,6 +874,6 @@ impl Drop for Persist {
 pub extern "C" fn C2Tuple_BlockHashChannelMonitorZ_read(ser: crate::c_types::u8slice, arg: &crate::lightning::chain::keysinterface::KeysInterface) -> crate::c_types::derived::CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
 	let arg_conv = arg;
 	let res: Result<(bitcoin::hash_types::BlockHash, lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>), lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_res_0_0, mut orig_res_0_1) = o; let mut local_res_0 = (crate::c_types::ThirtyTwoBytes { data: orig_res_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: Box::into_raw(Box::new(orig_res_0_1)), is_owned: true }).into(); local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_res_0_0, mut orig_res_0_1) = o; let mut local_res_0 = (crate::c_types::ThirtyTwoBytes { data: orig_res_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_res_0_1), is_owned: true }).into(); local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }

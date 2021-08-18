@@ -55,7 +55,7 @@ pub extern "C" fn Invoice_from_str(s: crate::c_types::Str) -> crate::c_types::de
 	match lightning_invoice::Invoice::from_str(s.into_str()) {
 		Ok(r) => {
 			crate::c_types::CResultTempl::ok(
-				crate::lightning_invoice::Invoice { inner: Box::into_raw(Box::new(r)), is_owned: true }
+				crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(r), is_owned: true }
 			)
 		},
 		Err(e) => crate::c_types::CResultTempl::err(()),
@@ -67,7 +67,7 @@ pub extern "C" fn SignedRawInvoice_from_str(s: crate::c_types::Str) -> crate::c_
 	match lightning_invoice::SignedRawInvoice::from_str(s.into_str()) {
 		Ok(r) => {
 			crate::c_types::CResultTempl::ok(
-				crate::lightning_invoice::SignedRawInvoice { inner: Box::into_raw(Box::new(r)), is_owned: true }
+				crate::lightning_invoice::SignedRawInvoice { inner: ObjOps::heap_alloc(r), is_owned: true }
 			)
 		},
 		Err(e) => crate::c_types::CResultTempl::err(()),
@@ -84,12 +84,12 @@ use crate::c_types::*;
 #[no_mangle]
 /// Get the string representation of a Invoice object
 pub extern "C" fn Invoice_to_str(o: &crate::lightning_invoice::Invoice) -> Str {
-	format!("{}", unsafe { &*o.inner }).into()
+	format!("{}", o.get_native_ref()).into()
 }
 #[no_mangle]
 /// Get the string representation of a SignedRawInvoice object
 pub extern "C" fn SignedRawInvoice_to_str(o: &crate::lightning_invoice::SignedRawInvoice) -> Str {
-	format!("{}", unsafe { &*o.inner }).into()
+	format!("{}", o.get_native_ref()).into()
 }
 #[no_mangle]
 /// Get the string representation of a Currency object
@@ -172,7 +172,7 @@ pub struct Invoice {
 impl Drop for Invoice {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeInvoice>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -185,11 +185,17 @@ extern "C" fn Invoice_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInvoice); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl Invoice {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeInvoice {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeInvoice {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeInvoice {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -201,13 +207,13 @@ impl Invoice {
 pub extern "C" fn Invoice_eq(a: &Invoice, b: &Invoice) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for Invoice {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeInvoice>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -249,7 +255,7 @@ pub struct SignedRawInvoice {
 impl Drop for SignedRawInvoice {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeSignedRawInvoice>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -262,11 +268,17 @@ extern "C" fn SignedRawInvoice_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeSignedRawInvoice); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl SignedRawInvoice {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeSignedRawInvoice {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeSignedRawInvoice {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeSignedRawInvoice {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -278,13 +290,13 @@ impl SignedRawInvoice {
 pub extern "C" fn SignedRawInvoice_eq(a: &SignedRawInvoice, b: &SignedRawInvoice) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for SignedRawInvoice {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeSignedRawInvoice>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -326,7 +338,7 @@ pub struct RawInvoice {
 impl Drop for RawInvoice {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeRawInvoice>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -339,11 +351,17 @@ extern "C" fn RawInvoice_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRawInvoice); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl RawInvoice {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeRawInvoice {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeRawInvoice {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeRawInvoice {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -351,13 +369,13 @@ impl RawInvoice {
 /// data part
 #[no_mangle]
 pub extern "C" fn RawInvoice_get_data(this_ptr: &RawInvoice) -> crate::lightning_invoice::RawDataPart {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.data;
-	crate::lightning_invoice::RawDataPart { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().data;
+	crate::lightning_invoice::RawDataPart { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
 }
 /// data part
 #[no_mangle]
 pub extern "C" fn RawInvoice_set_data(this_ptr: &mut RawInvoice, mut val: crate::lightning_invoice::RawDataPart) {
-	unsafe { &mut *this_ptr.inner }.data = *unsafe { Box::from_raw(val.take_inner()) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.data = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Checks if two RawInvoices contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -366,13 +384,13 @@ pub extern "C" fn RawInvoice_set_data(this_ptr: &mut RawInvoice, mut val: crate:
 pub extern "C" fn RawInvoice_eq(a: &RawInvoice, b: &RawInvoice) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for RawInvoice {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeRawInvoice>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -410,7 +428,7 @@ pub struct RawDataPart {
 impl Drop for RawDataPart {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeRawDataPart>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -423,11 +441,17 @@ extern "C" fn RawDataPart_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRawDataPart); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl RawDataPart {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeRawDataPart {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeRawDataPart {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeRawDataPart {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -435,13 +459,13 @@ impl RawDataPart {
 /// generation time of the invoice
 #[no_mangle]
 pub extern "C" fn RawDataPart_get_timestamp(this_ptr: &RawDataPart) -> crate::lightning_invoice::PositiveTimestamp {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.timestamp;
-	crate::lightning_invoice::PositiveTimestamp { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().timestamp;
+	crate::lightning_invoice::PositiveTimestamp { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
 }
 /// generation time of the invoice
 #[no_mangle]
 pub extern "C" fn RawDataPart_set_timestamp(this_ptr: &mut RawDataPart, mut val: crate::lightning_invoice::PositiveTimestamp) {
-	unsafe { &mut *this_ptr.inner }.timestamp = *unsafe { Box::from_raw(val.take_inner()) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.timestamp = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Checks if two RawDataParts contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -450,13 +474,13 @@ pub extern "C" fn RawDataPart_set_timestamp(this_ptr: &mut RawDataPart, mut val:
 pub extern "C" fn RawDataPart_eq(a: &RawDataPart, b: &RawDataPart) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for RawDataPart {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeRawDataPart>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -499,7 +523,7 @@ pub struct PositiveTimestamp {
 impl Drop for PositiveTimestamp {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativePositiveTimestamp>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -512,11 +536,17 @@ extern "C" fn PositiveTimestamp_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePositiveTimestamp); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl PositiveTimestamp {
+	pub(crate) fn get_native_ref(&self) -> &'static nativePositiveTimestamp {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativePositiveTimestamp {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativePositiveTimestamp {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -528,13 +558,13 @@ impl PositiveTimestamp {
 pub extern "C" fn PositiveTimestamp_eq(a: &PositiveTimestamp, b: &PositiveTimestamp) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for PositiveTimestamp {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativePositiveTimestamp>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -751,7 +781,7 @@ pub struct Sha256 {
 impl Drop for Sha256 {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeSha256>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -764,11 +794,17 @@ extern "C" fn Sha256_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeSha256); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl Sha256 {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeSha256 {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeSha256 {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeSha256 {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -780,13 +816,13 @@ impl Sha256 {
 pub extern "C" fn Sha256_eq(a: &Sha256, b: &Sha256) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for Sha256 {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeSha256>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -827,7 +863,7 @@ pub struct Description {
 impl Drop for Description {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeDescription>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -840,11 +876,17 @@ extern "C" fn Description_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDescription); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl Description {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeDescription {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeDescription {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeDescription {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -856,13 +898,13 @@ impl Description {
 pub extern "C" fn Description_eq(a: &Description, b: &Description) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for Description {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeDescription>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -900,7 +942,7 @@ pub struct PayeePubKey {
 impl Drop for PayeePubKey {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativePayeePubKey>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -913,11 +955,17 @@ extern "C" fn PayeePubKey_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePayeePubKey); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl PayeePubKey {
+	pub(crate) fn get_native_ref(&self) -> &'static nativePayeePubKey {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativePayeePubKey {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativePayeePubKey {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -929,13 +977,13 @@ impl PayeePubKey {
 pub extern "C" fn PayeePubKey_eq(a: &PayeePubKey, b: &PayeePubKey) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for PayeePubKey {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativePayeePubKey>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -979,7 +1027,7 @@ pub struct ExpiryTime {
 impl Drop for ExpiryTime {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeExpiryTime>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -992,11 +1040,17 @@ extern "C" fn ExpiryTime_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeExpiryTime); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl ExpiryTime {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeExpiryTime {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeExpiryTime {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeExpiryTime {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -1008,13 +1062,13 @@ impl ExpiryTime {
 pub extern "C" fn ExpiryTime_eq(a: &ExpiryTime, b: &ExpiryTime) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for ExpiryTime {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeExpiryTime>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -1052,7 +1106,7 @@ pub struct MinFinalCltvExpiry {
 impl Drop for MinFinalCltvExpiry {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeMinFinalCltvExpiry>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -1065,11 +1119,17 @@ extern "C" fn MinFinalCltvExpiry_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeMinFinalCltvExpiry); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl MinFinalCltvExpiry {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeMinFinalCltvExpiry {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeMinFinalCltvExpiry {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeMinFinalCltvExpiry {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -1081,13 +1141,13 @@ impl MinFinalCltvExpiry {
 pub extern "C" fn MinFinalCltvExpiry_eq(a: &MinFinalCltvExpiry, b: &MinFinalCltvExpiry) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for MinFinalCltvExpiry {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeMinFinalCltvExpiry>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -1268,7 +1328,7 @@ pub struct InvoiceSignature {
 impl Drop for InvoiceSignature {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeInvoiceSignature>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -1281,11 +1341,17 @@ extern "C" fn InvoiceSignature_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInvoiceSignature); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl InvoiceSignature {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeInvoiceSignature {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeInvoiceSignature {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeInvoiceSignature {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -1297,13 +1363,13 @@ impl InvoiceSignature {
 pub extern "C" fn InvoiceSignature_eq(a: &InvoiceSignature, b: &InvoiceSignature) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for InvoiceSignature {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeInvoiceSignature>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -1345,7 +1411,7 @@ pub struct PrivateRoute {
 impl Drop for PrivateRoute {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativePrivateRoute>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -1358,11 +1424,17 @@ extern "C" fn PrivateRoute_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePrivateRoute); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl PrivateRoute {
+	pub(crate) fn get_native_ref(&self) -> &'static nativePrivateRoute {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativePrivateRoute {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativePrivateRoute {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -1374,13 +1446,13 @@ impl PrivateRoute {
 pub extern "C" fn PrivateRoute_eq(a: &PrivateRoute, b: &PrivateRoute) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for PrivateRoute {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativePrivateRoute>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -1403,7 +1475,7 @@ pub extern "C" fn PrivateRoute_clone(orig: &PrivateRoute) -> PrivateRoute {
 #[no_mangle]
 pub extern "C" fn SignedRawInvoice_into_parts(mut this_arg: SignedRawInvoice) -> crate::c_types::derived::C3Tuple_RawInvoice_u832InvoiceSignatureZ {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).into_parts();
-	let (mut orig_ret_0, mut orig_ret_1, mut orig_ret_2) = ret; let mut local_ret = (crate::lightning_invoice::RawInvoice { inner: Box::into_raw(Box::new(orig_ret_0)), is_owned: true }, crate::c_types::ThirtyTwoBytes { data: orig_ret_1 }, crate::lightning_invoice::InvoiceSignature { inner: Box::into_raw(Box::new(orig_ret_2)), is_owned: true }).into();
+	let (mut orig_ret_0, mut orig_ret_1, mut orig_ret_2) = ret; let mut local_ret = (crate::lightning_invoice::RawInvoice { inner: ObjOps::heap_alloc(orig_ret_0), is_owned: true }, crate::c_types::ThirtyTwoBytes { data: orig_ret_1 }, crate::lightning_invoice::InvoiceSignature { inner: ObjOps::heap_alloc(orig_ret_2), is_owned: true }).into();
 	local_ret
 }
 
@@ -1411,15 +1483,15 @@ pub extern "C" fn SignedRawInvoice_into_parts(mut this_arg: SignedRawInvoice) ->
 #[must_use]
 #[no_mangle]
 pub extern "C" fn SignedRawInvoice_raw_invoice(this_arg: &SignedRawInvoice) -> crate::lightning_invoice::RawInvoice {
-	let mut ret = unsafe { &*this_arg.inner }.raw_invoice();
-	crate::lightning_invoice::RawInvoice { inner: unsafe { ( (&(*ret) as *const _) as *mut _) }, is_owned: false }
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.raw_invoice();
+	crate::lightning_invoice::RawInvoice { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const _) as *mut _) }, is_owned: false }
 }
 
 /// The hash of the `RawInvoice` that was signed.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn SignedRawInvoice_hash(this_arg: &SignedRawInvoice) -> *const [u8; 32] {
-	let mut ret = unsafe { &*this_arg.inner }.hash();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.hash();
 	ret
 }
 
@@ -1427,16 +1499,16 @@ pub extern "C" fn SignedRawInvoice_hash(this_arg: &SignedRawInvoice) -> *const [
 #[must_use]
 #[no_mangle]
 pub extern "C" fn SignedRawInvoice_signature(this_arg: &SignedRawInvoice) -> crate::lightning_invoice::InvoiceSignature {
-	let mut ret = unsafe { &*this_arg.inner }.signature();
-	crate::lightning_invoice::InvoiceSignature { inner: unsafe { ( (&(*ret) as *const _) as *mut _) }, is_owned: false }
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signature();
+	crate::lightning_invoice::InvoiceSignature { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const _) as *mut _) }, is_owned: false }
 }
 
 /// Recovers the public key used for signing the invoice from the recoverable signature.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn SignedRawInvoice_recover_payee_pub_key(this_arg: &SignedRawInvoice) -> crate::c_types::derived::CResult_PayeePubKeyErrorZ {
-	let mut ret = unsafe { &*this_arg.inner }.recover_payee_pub_key();
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PayeePubKey { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.recover_payee_pub_key();
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PayeePubKey { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
 }
 
@@ -1445,7 +1517,7 @@ pub extern "C" fn SignedRawInvoice_recover_payee_pub_key(this_arg: &SignedRawInv
 #[must_use]
 #[no_mangle]
 pub extern "C" fn SignedRawInvoice_check_signature(this_arg: &SignedRawInvoice) -> bool {
-	let mut ret = unsafe { &*this_arg.inner }.check_signature();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.check_signature();
 	ret
 }
 
@@ -1453,7 +1525,7 @@ pub extern "C" fn SignedRawInvoice_check_signature(this_arg: &SignedRawInvoice) 
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_hash(this_arg: &RawInvoice) -> crate::c_types::ThirtyTwoBytes {
-	let mut ret = unsafe { &*this_arg.inner }.hash();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.hash();
 	crate::c_types::ThirtyTwoBytes { data: ret }
 }
 
@@ -1462,8 +1534,8 @@ pub extern "C" fn RawInvoice_hash(this_arg: &RawInvoice) -> crate::c_types::Thir
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_payment_hash(this_arg: &RawInvoice) -> crate::lightning_invoice::Sha256 {
-	let mut ret = unsafe { &*this_arg.inner }.payment_hash();
-	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_hash();
+	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1472,8 +1544,8 @@ pub extern "C" fn RawInvoice_payment_hash(this_arg: &RawInvoice) -> crate::light
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_description(this_arg: &RawInvoice) -> crate::lightning_invoice::Description {
-	let mut ret = unsafe { &*this_arg.inner }.description();
-	let mut local_ret = crate::lightning_invoice::Description { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.description();
+	let mut local_ret = crate::lightning_invoice::Description { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1482,8 +1554,8 @@ pub extern "C" fn RawInvoice_description(this_arg: &RawInvoice) -> crate::lightn
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_payee_pub_key(this_arg: &RawInvoice) -> crate::lightning_invoice::PayeePubKey {
-	let mut ret = unsafe { &*this_arg.inner }.payee_pub_key();
-	let mut local_ret = crate::lightning_invoice::PayeePubKey { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payee_pub_key();
+	let mut local_ret = crate::lightning_invoice::PayeePubKey { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1492,8 +1564,8 @@ pub extern "C" fn RawInvoice_payee_pub_key(this_arg: &RawInvoice) -> crate::ligh
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_description_hash(this_arg: &RawInvoice) -> crate::lightning_invoice::Sha256 {
-	let mut ret = unsafe { &*this_arg.inner }.description_hash();
-	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.description_hash();
+	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1502,8 +1574,8 @@ pub extern "C" fn RawInvoice_description_hash(this_arg: &RawInvoice) -> crate::l
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_expiry_time(this_arg: &RawInvoice) -> crate::lightning_invoice::ExpiryTime {
-	let mut ret = unsafe { &*this_arg.inner }.expiry_time();
-	let mut local_ret = crate::lightning_invoice::ExpiryTime { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.expiry_time();
+	let mut local_ret = crate::lightning_invoice::ExpiryTime { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1512,8 +1584,8 @@ pub extern "C" fn RawInvoice_expiry_time(this_arg: &RawInvoice) -> crate::lightn
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_min_final_cltv_expiry(this_arg: &RawInvoice) -> crate::lightning_invoice::MinFinalCltvExpiry {
-	let mut ret = unsafe { &*this_arg.inner }.min_final_cltv_expiry();
-	let mut local_ret = crate::lightning_invoice::MinFinalCltvExpiry { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.min_final_cltv_expiry();
+	let mut local_ret = crate::lightning_invoice::MinFinalCltvExpiry { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1522,7 +1594,7 @@ pub extern "C" fn RawInvoice_min_final_cltv_expiry(this_arg: &RawInvoice) -> cra
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_payment_secret(this_arg: &RawInvoice) -> crate::c_types::ThirtyTwoBytes {
-	let mut ret = unsafe { &*this_arg.inner }.payment_secret();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_secret();
 	let mut local_ret = if ret.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (ret.unwrap()).0 } } };
 	local_ret
 }
@@ -1532,23 +1604,23 @@ pub extern "C" fn RawInvoice_payment_secret(this_arg: &RawInvoice) -> crate::c_t
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_features(this_arg: &RawInvoice) -> crate::lightning::ln::features::InvoiceFeatures {
-	let mut ret = unsafe { &*this_arg.inner }.features();
-	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.features();
+	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_private_routes(this_arg: &RawInvoice) -> crate::c_types::derived::CVec_PrivateRouteZ {
-	let mut ret = unsafe { &*this_arg.inner }.private_routes();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning_invoice::PrivateRoute { inner: unsafe { ( (&(*item) as *const _) as *mut _) }, is_owned: false } }); };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.private_routes();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning_invoice::PrivateRoute { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); };
 	local_ret.into()
 }
 
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_amount_pico_btc(this_arg: &RawInvoice) -> crate::c_types::derived::COption_u64Z {
-	let mut ret = unsafe { &*this_arg.inner }.amount_pico_btc();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.amount_pico_btc();
 	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(ret.unwrap()) } };
 	local_ret
 }
@@ -1556,7 +1628,7 @@ pub extern "C" fn RawInvoice_amount_pico_btc(this_arg: &RawInvoice) -> crate::c_
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RawInvoice_currency(this_arg: &RawInvoice) -> crate::lightning_invoice::Currency {
-	let mut ret = unsafe { &*this_arg.inner }.currency();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.currency();
 	crate::lightning_invoice::Currency::native_into(ret)
 }
 
@@ -1567,7 +1639,7 @@ pub extern "C" fn RawInvoice_currency(this_arg: &RawInvoice) -> crate::lightning
 #[no_mangle]
 pub extern "C" fn PositiveTimestamp_from_unix_timestamp(mut unix_seconds: u64) -> crate::c_types::derived::CResult_PositiveTimestampCreationErrorZ {
 	let mut ret = lightning_invoice::PositiveTimestamp::from_unix_timestamp(unix_seconds);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PositiveTimestamp { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PositiveTimestamp { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -1578,7 +1650,7 @@ pub extern "C" fn PositiveTimestamp_from_unix_timestamp(mut unix_seconds: u64) -
 #[no_mangle]
 pub extern "C" fn PositiveTimestamp_from_system_time(mut time: u64) -> crate::c_types::derived::CResult_PositiveTimestampCreationErrorZ {
 	let mut ret = lightning_invoice::PositiveTimestamp::from_system_time((::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(time)));
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PositiveTimestamp { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PositiveTimestamp { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -1586,7 +1658,7 @@ pub extern "C" fn PositiveTimestamp_from_system_time(mut time: u64) -> crate::c_
 #[must_use]
 #[no_mangle]
 pub extern "C" fn PositiveTimestamp_as_unix_timestamp(this_arg: &PositiveTimestamp) -> u64 {
-	let mut ret = unsafe { &*this_arg.inner }.as_unix_timestamp();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_unix_timestamp();
 	ret
 }
 
@@ -1594,7 +1666,7 @@ pub extern "C" fn PositiveTimestamp_as_unix_timestamp(this_arg: &PositiveTimesta
 #[must_use]
 #[no_mangle]
 pub extern "C" fn PositiveTimestamp_as_time(this_arg: &PositiveTimestamp) -> u64 {
-	let mut ret = unsafe { &*this_arg.inner }.as_time();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_time();
 	ret.duration_since(::std::time::SystemTime::UNIX_EPOCH).expect("Times must be post-1970").as_secs()
 }
 
@@ -1603,14 +1675,14 @@ pub extern "C" fn PositiveTimestamp_as_time(this_arg: &PositiveTimestamp) -> u64
 #[no_mangle]
 pub extern "C" fn Invoice_into_signed_raw(mut this_arg: Invoice) -> crate::lightning_invoice::SignedRawInvoice {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).into_signed_raw();
-	crate::lightning_invoice::SignedRawInvoice { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	crate::lightning_invoice::SignedRawInvoice { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Check that the invoice is signed correctly and that key recovery works
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_check_signature(this_arg: &Invoice) -> crate::c_types::derived::CResult_NoneSemanticErrorZ {
-	let mut ret = unsafe { &*this_arg.inner }.check_signature();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.check_signature();
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SemanticError::native_into(e) }).into() };
 	local_ret
 }
@@ -1632,7 +1704,7 @@ pub extern "C" fn Invoice_check_signature(this_arg: &Invoice) -> crate::c_types:
 #[no_mangle]
 pub extern "C" fn Invoice_from_signed(mut signed_invoice: crate::lightning_invoice::SignedRawInvoice) -> crate::c_types::derived::CResult_InvoiceSemanticErrorZ {
 	let mut ret = lightning_invoice::Invoice::from_signed(*unsafe { Box::from_raw(signed_invoice.take_inner()) });
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SemanticError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SemanticError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -1640,7 +1712,7 @@ pub extern "C" fn Invoice_from_signed(mut signed_invoice: crate::lightning_invoi
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_timestamp(this_arg: &Invoice) -> u64 {
-	let mut ret = unsafe { &*this_arg.inner }.timestamp();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.timestamp();
 	ret.duration_since(::std::time::SystemTime::UNIX_EPOCH).expect("Times must be post-1970").as_secs()
 }
 
@@ -1648,7 +1720,7 @@ pub extern "C" fn Invoice_timestamp(this_arg: &Invoice) -> u64 {
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_payment_hash(this_arg: &Invoice) -> *const [u8; 32] {
-	let mut ret = unsafe { &*this_arg.inner }.payment_hash();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_hash();
 	ret.as_inner()
 }
 
@@ -1658,7 +1730,7 @@ pub extern "C" fn Invoice_payment_hash(this_arg: &Invoice) -> *const [u8; 32] {
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_payee_pub_key(this_arg: &Invoice) -> crate::c_types::PublicKey {
-	let mut ret = unsafe { &*this_arg.inner }.payee_pub_key();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payee_pub_key();
 	let mut local_ret = if ret.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(ret.unwrap())) } };
 	local_ret
 }
@@ -1669,7 +1741,7 @@ pub extern "C" fn Invoice_payee_pub_key(this_arg: &Invoice) -> crate::c_types::P
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_payment_secret(this_arg: &Invoice) -> crate::c_types::ThirtyTwoBytes {
-	let mut ret = unsafe { &*this_arg.inner }.payment_secret();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_secret();
 	let mut local_ret = if ret.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (ret.unwrap()).0 } } };
 	local_ret
 }
@@ -1680,8 +1752,8 @@ pub extern "C" fn Invoice_payment_secret(this_arg: &Invoice) -> crate::c_types::
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_features(this_arg: &Invoice) -> crate::lightning::ln::features::InvoiceFeatures {
-	let mut ret = unsafe { &*this_arg.inner }.features();
-	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { std::ptr::null() } else {  { (ret.unwrap()) } } as *const _) as *mut _ }, is_owned: false };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.features();
+	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1689,7 +1761,7 @@ pub extern "C" fn Invoice_features(this_arg: &Invoice) -> crate::lightning::ln::
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_recover_payee_pub_key(this_arg: &Invoice) -> crate::c_types::PublicKey {
-	let mut ret = unsafe { &*this_arg.inner }.recover_payee_pub_key();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.recover_payee_pub_key();
 	crate::c_types::PublicKey::from_rust(&ret)
 }
 
@@ -1697,7 +1769,7 @@ pub extern "C" fn Invoice_recover_payee_pub_key(this_arg: &Invoice) -> crate::c_
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_expiry_time(this_arg: &Invoice) -> u64 {
-	let mut ret = unsafe { &*this_arg.inner }.expiry_time();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.expiry_time();
 	ret.as_secs()
 }
 
@@ -1706,7 +1778,7 @@ pub extern "C" fn Invoice_expiry_time(this_arg: &Invoice) -> u64 {
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_min_final_cltv_expiry(this_arg: &Invoice) -> u64 {
-	let mut ret = unsafe { &*this_arg.inner }.min_final_cltv_expiry();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.min_final_cltv_expiry();
 	ret
 }
 
@@ -1714,8 +1786,8 @@ pub extern "C" fn Invoice_min_final_cltv_expiry(this_arg: &Invoice) -> u64 {
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_private_routes(this_arg: &Invoice) -> crate::c_types::derived::CVec_PrivateRouteZ {
-	let mut ret = unsafe { &*this_arg.inner }.private_routes();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning_invoice::PrivateRoute { inner: unsafe { ( (&(*item) as *const _) as *mut _) }, is_owned: false } }); };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.private_routes();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning_invoice::PrivateRoute { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); };
 	local_ret.into()
 }
 
@@ -1723,8 +1795,8 @@ pub extern "C" fn Invoice_private_routes(this_arg: &Invoice) -> crate::c_types::
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_route_hints(this_arg: &Invoice) -> crate::c_types::derived::CVec_RouteHintZ {
-	let mut ret = unsafe { &*this_arg.inner }.route_hints();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::routing::router::RouteHint { inner: unsafe { ( (&(*item) as *const _) as *mut _) }, is_owned: false } }); };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.route_hints();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::routing::router::RouteHint { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); };
 	local_ret.into()
 }
 
@@ -1732,7 +1804,7 @@ pub extern "C" fn Invoice_route_hints(this_arg: &Invoice) -> crate::c_types::der
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_currency(this_arg: &Invoice) -> crate::lightning_invoice::Currency {
-	let mut ret = unsafe { &*this_arg.inner }.currency();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.currency();
 	crate::lightning_invoice::Currency::native_into(ret)
 }
 
@@ -1740,7 +1812,7 @@ pub extern "C" fn Invoice_currency(this_arg: &Invoice) -> crate::lightning_invoi
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_amount_pico_btc(this_arg: &Invoice) -> crate::c_types::derived::COption_u64Z {
-	let mut ret = unsafe { &*this_arg.inner }.amount_pico_btc();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.amount_pico_btc();
 	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(ret.unwrap()) } };
 	local_ret
 }
@@ -1753,7 +1825,7 @@ pub extern "C" fn Invoice_amount_pico_btc(this_arg: &Invoice) -> crate::c_types:
 #[no_mangle]
 pub extern "C" fn Description_new(mut description: crate::c_types::Str) -> crate::c_types::derived::CResult_DescriptionCreationErrorZ {
 	let mut ret = lightning_invoice::Description::new(description.into_string());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Description { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Description { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -1772,7 +1844,7 @@ pub extern "C" fn Description_into_inner(mut this_arg: Description) -> crate::c_
 #[no_mangle]
 pub extern "C" fn ExpiryTime_from_seconds(mut seconds: u64) -> crate::c_types::derived::CResult_ExpiryTimeCreationErrorZ {
 	let mut ret = lightning_invoice::ExpiryTime::from_seconds(seconds);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::ExpiryTime { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::ExpiryTime { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -1783,7 +1855,7 @@ pub extern "C" fn ExpiryTime_from_seconds(mut seconds: u64) -> crate::c_types::d
 #[no_mangle]
 pub extern "C" fn ExpiryTime_from_duration(mut duration: u64) -> crate::c_types::derived::CResult_ExpiryTimeCreationErrorZ {
 	let mut ret = lightning_invoice::ExpiryTime::from_duration(std::time::Duration::from_secs(duration));
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::ExpiryTime { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::ExpiryTime { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -1791,7 +1863,7 @@ pub extern "C" fn ExpiryTime_from_duration(mut duration: u64) -> crate::c_types:
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ExpiryTime_as_seconds(this_arg: &ExpiryTime) -> u64 {
-	let mut ret = unsafe { &*this_arg.inner }.as_seconds();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_seconds();
 	ret
 }
 
@@ -1799,7 +1871,7 @@ pub extern "C" fn ExpiryTime_as_seconds(this_arg: &ExpiryTime) -> u64 {
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ExpiryTime_as_duration(this_arg: &ExpiryTime) -> u64 {
-	let mut ret = unsafe { &*this_arg.inner }.as_duration();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_duration();
 	ret.as_secs()
 }
 
@@ -1808,7 +1880,7 @@ pub extern "C" fn ExpiryTime_as_duration(this_arg: &ExpiryTime) -> u64 {
 #[no_mangle]
 pub extern "C" fn PrivateRoute_new(mut hops: crate::lightning::routing::router::RouteHint) -> crate::c_types::derived::CResult_PrivateRouteCreationErrorZ {
 	let mut ret = lightning_invoice::PrivateRoute::new(*unsafe { Box::from_raw(hops.take_inner()) });
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PrivateRoute { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PrivateRoute { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -1817,7 +1889,7 @@ pub extern "C" fn PrivateRoute_new(mut hops: crate::lightning::routing::router::
 #[no_mangle]
 pub extern "C" fn PrivateRoute_into_inner(mut this_arg: PrivateRoute) -> crate::lightning::routing::router::RouteHint {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).into_inner();
-	crate::lightning::routing::router::RouteHint { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	crate::lightning::routing::router::RouteHint { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Errors that may occur when constructing a new `RawInvoice` or `Invoice`

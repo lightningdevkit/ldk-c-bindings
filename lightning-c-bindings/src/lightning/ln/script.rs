@@ -38,7 +38,7 @@ pub struct ShutdownScript {
 impl Drop for ShutdownScript {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeShutdownScript>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -51,11 +51,17 @@ extern "C" fn ShutdownScript_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeShutdownScript); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl ShutdownScript {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeShutdownScript {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeShutdownScript {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeShutdownScript {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -64,7 +70,7 @@ impl Clone for ShutdownScript {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeShutdownScript>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -102,7 +108,7 @@ pub struct InvalidShutdownScript {
 impl Drop for InvalidShutdownScript {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeInvalidShutdownScript>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -115,11 +121,17 @@ extern "C" fn InvalidShutdownScript_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInvalidShutdownScript); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl InvalidShutdownScript {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeInvalidShutdownScript {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeInvalidShutdownScript {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeInvalidShutdownScript {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -129,7 +141,7 @@ impl InvalidShutdownScript {
 /// [BOLT #2]: https://github.com/lightningnetwork/lightning-rfc/blob/master/02-peer-protocol.md
 #[no_mangle]
 pub extern "C" fn InvalidShutdownScript_get_script(this_ptr: &InvalidShutdownScript) -> crate::c_types::u8slice {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.script;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().script;
 	crate::c_types::u8slice::from_slice(&inner_val[..])
 }
 /// The script that did not meet the requirements from [BOLT #2].
@@ -137,20 +149,20 @@ pub extern "C" fn InvalidShutdownScript_get_script(this_ptr: &InvalidShutdownScr
 /// [BOLT #2]: https://github.com/lightningnetwork/lightning-rfc/blob/master/02-peer-protocol.md
 #[no_mangle]
 pub extern "C" fn InvalidShutdownScript_set_script(this_ptr: &mut InvalidShutdownScript, mut val: crate::c_types::derived::CVec_u8Z) {
-	unsafe { &mut *this_ptr.inner }.script = ::bitcoin::blockdata::script::Script::from(val.into_rust());
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.script = ::bitcoin::blockdata::script::Script::from(val.into_rust());
 }
 /// Constructs a new InvalidShutdownScript given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InvalidShutdownScript_new(mut script_arg: crate::c_types::derived::CVec_u8Z) -> InvalidShutdownScript {
-	InvalidShutdownScript { inner: Box::into_raw(Box::new(nativeInvalidShutdownScript {
+	InvalidShutdownScript { inner: ObjOps::heap_alloc(nativeInvalidShutdownScript {
 		script: ::bitcoin::blockdata::script::Script::from(script_arg.into_rust()),
-	})), is_owned: true }
+	}), is_owned: true }
 }
 #[no_mangle]
 /// Serialize the ShutdownScript object into a byte array which can be read by ShutdownScript_read
 pub extern "C" fn ShutdownScript_write(obj: &ShutdownScript) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
 pub(crate) extern "C" fn ShutdownScript_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
@@ -160,7 +172,7 @@ pub(crate) extern "C" fn ShutdownScript_write_void(obj: *const c_void) -> crate:
 /// Read a ShutdownScript from a byte array, created by ShutdownScript_write
 pub extern "C" fn ShutdownScript_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ShutdownScriptDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::script::ShutdownScript { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 /// Generates a P2PKH script pubkey from the given [`PubkeyHash`].
@@ -168,7 +180,7 @@ pub extern "C" fn ShutdownScript_read(ser: crate::c_types::u8slice) -> crate::c_
 #[no_mangle]
 pub extern "C" fn ShutdownScript_new_p2pkh(pubkey_hash: *const [u8; 20]) -> ShutdownScript {
 	let mut ret = lightning::ln::script::ShutdownScript::new_p2pkh(&bitcoin::hash_types::PubkeyHash::from_hash(bitcoin::hashes::Hash::from_inner(unsafe { *pubkey_hash }.clone())));
-	ShutdownScript { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	ShutdownScript { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Generates a P2SH script pubkey from the given [`ScriptHash`].
@@ -176,7 +188,7 @@ pub extern "C" fn ShutdownScript_new_p2pkh(pubkey_hash: *const [u8; 20]) -> Shut
 #[no_mangle]
 pub extern "C" fn ShutdownScript_new_p2sh(script_hash: *const [u8; 20]) -> ShutdownScript {
 	let mut ret = lightning::ln::script::ShutdownScript::new_p2sh(&bitcoin::hash_types::ScriptHash::from_hash(bitcoin::hashes::Hash::from_inner(unsafe { *script_hash }.clone())));
-	ShutdownScript { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	ShutdownScript { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Generates a P2WPKH script pubkey from the given [`WPubkeyHash`].
@@ -184,7 +196,7 @@ pub extern "C" fn ShutdownScript_new_p2sh(script_hash: *const [u8; 20]) -> Shutd
 #[no_mangle]
 pub extern "C" fn ShutdownScript_new_p2wpkh(pubkey_hash: *const [u8; 20]) -> ShutdownScript {
 	let mut ret = lightning::ln::script::ShutdownScript::new_p2wpkh(&bitcoin::hash_types::WPubkeyHash::from_hash(bitcoin::hashes::Hash::from_inner(unsafe { *pubkey_hash }.clone())));
-	ShutdownScript { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	ShutdownScript { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Generates a P2WSH script pubkey from the given [`WScriptHash`].
@@ -192,7 +204,7 @@ pub extern "C" fn ShutdownScript_new_p2wpkh(pubkey_hash: *const [u8; 20]) -> Shu
 #[no_mangle]
 pub extern "C" fn ShutdownScript_new_p2wsh(script_hash: *const [u8; 32]) -> ShutdownScript {
 	let mut ret = lightning::ln::script::ShutdownScript::new_p2wsh(&bitcoin::hash_types::WScriptHash::from_hash(bitcoin::hashes::Hash::from_inner(unsafe { *script_hash }.clone())));
-	ShutdownScript { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	ShutdownScript { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Generates a P2WSH script pubkey from the given segwit version and program.
@@ -204,7 +216,7 @@ pub extern "C" fn ShutdownScript_new_p2wsh(script_hash: *const [u8; 32]) -> Shut
 #[no_mangle]
 pub extern "C" fn ShutdownScript_new_witness_program(mut version: u8, mut program: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ShutdownScriptInvalidShutdownScriptZ {
 	let mut ret = lightning::ln::script::ShutdownScript::new_witness_program(core::num::NonZeroU8::new(version).expect("Value must be non-zero"), program.to_slice());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::script::ShutdownScript { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::script::InvalidShutdownScript { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::script::InvalidShutdownScript { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 
@@ -222,7 +234,7 @@ pub extern "C" fn ShutdownScript_into_inner(mut this_arg: ShutdownScript) -> cra
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ShutdownScript_as_legacy_pubkey(this_arg: &ShutdownScript) -> crate::c_types::PublicKey {
-	let mut ret = unsafe { &*this_arg.inner }.as_legacy_pubkey();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_legacy_pubkey();
 	let mut local_ret = if ret.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(ret.unwrap())) } };
 	local_ret
 }
@@ -233,7 +245,7 @@ pub extern "C" fn ShutdownScript_as_legacy_pubkey(this_arg: &ShutdownScript) -> 
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ShutdownScript_is_compatible(this_arg: &ShutdownScript, features: &crate::lightning::ln::features::InitFeatures) -> bool {
-	let mut ret = unsafe { &*this_arg.inner }.is_compatible(unsafe { &*features.inner });
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_compatible(features.get_native_ref());
 	ret
 }
 

@@ -41,7 +41,7 @@ use crate::c_types::*;
 pub extern "C" fn InitFeatures_eq(a: &InitFeatures, b: &InitFeatures) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 /// Checks if two NodeFeaturess contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -50,7 +50,7 @@ pub extern "C" fn InitFeatures_eq(a: &InitFeatures, b: &InitFeatures) -> bool {
 pub extern "C" fn NodeFeatures_eq(a: &NodeFeatures, b: &NodeFeatures) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 /// Checks if two ChannelFeaturess contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -59,7 +59,7 @@ pub extern "C" fn NodeFeatures_eq(a: &NodeFeatures, b: &NodeFeatures) -> bool {
 pub extern "C" fn ChannelFeatures_eq(a: &ChannelFeatures, b: &ChannelFeatures) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 /// Checks if two InvoiceFeaturess contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -68,13 +68,13 @@ pub extern "C" fn ChannelFeatures_eq(a: &ChannelFeatures, b: &ChannelFeatures) -
 pub extern "C" fn InvoiceFeatures_eq(a: &InvoiceFeatures, b: &InvoiceFeatures) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if unsafe { &*a.inner } == unsafe { &*b.inner } { true } else { false }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 impl Clone for InitFeatures {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeInitFeatures>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -93,7 +93,7 @@ impl Clone for NodeFeatures {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeNodeFeatures>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -112,7 +112,7 @@ impl Clone for ChannelFeatures {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeChannelFeatures>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -131,7 +131,7 @@ impl Clone for InvoiceFeatures {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeInvoiceFeatures>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -169,7 +169,7 @@ pub struct InitFeatures {
 impl Drop for InitFeatures {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeInitFeatures>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -182,11 +182,17 @@ extern "C" fn InitFeatures_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInitFeatures); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl InitFeatures {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeInitFeatures {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeInitFeatures {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeInitFeatures {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -214,7 +220,7 @@ pub struct NodeFeatures {
 impl Drop for NodeFeatures {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeNodeFeatures>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -227,11 +233,17 @@ extern "C" fn NodeFeatures_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeFeatures); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl NodeFeatures {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeNodeFeatures {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeNodeFeatures {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeNodeFeatures {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -259,7 +271,7 @@ pub struct ChannelFeatures {
 impl Drop for ChannelFeatures {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeChannelFeatures>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -272,11 +284,17 @@ extern "C" fn ChannelFeatures_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelFeatures); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl ChannelFeatures {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeChannelFeatures {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeChannelFeatures {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelFeatures {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -304,7 +322,7 @@ pub struct InvoiceFeatures {
 impl Drop for InvoiceFeatures {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeInvoiceFeatures>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -317,11 +335,17 @@ extern "C" fn InvoiceFeatures_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInvoiceFeatures); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl InvoiceFeatures {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeInvoiceFeatures {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeInvoiceFeatures {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeInvoiceFeatures {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -331,7 +355,7 @@ impl InvoiceFeatures {
 #[no_mangle]
 pub extern "C" fn InitFeatures_empty() -> InitFeatures {
 	let mut ret = lightning::ln::features::InitFeatures::empty();
-	InitFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a Features with the bits set which are known by the implementation
@@ -339,7 +363,7 @@ pub extern "C" fn InitFeatures_empty() -> InitFeatures {
 #[no_mangle]
 pub extern "C" fn InitFeatures_known() -> InitFeatures {
 	let mut ret = lightning::ln::features::InitFeatures::known();
-	InitFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Create a blank Features with no features set
@@ -347,7 +371,7 @@ pub extern "C" fn InitFeatures_known() -> InitFeatures {
 #[no_mangle]
 pub extern "C" fn NodeFeatures_empty() -> NodeFeatures {
 	let mut ret = lightning::ln::features::NodeFeatures::empty();
-	NodeFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a Features with the bits set which are known by the implementation
@@ -355,7 +379,7 @@ pub extern "C" fn NodeFeatures_empty() -> NodeFeatures {
 #[no_mangle]
 pub extern "C" fn NodeFeatures_known() -> NodeFeatures {
 	let mut ret = lightning::ln::features::NodeFeatures::known();
-	NodeFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Create a blank Features with no features set
@@ -363,7 +387,7 @@ pub extern "C" fn NodeFeatures_known() -> NodeFeatures {
 #[no_mangle]
 pub extern "C" fn ChannelFeatures_empty() -> ChannelFeatures {
 	let mut ret = lightning::ln::features::ChannelFeatures::empty();
-	ChannelFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a Features with the bits set which are known by the implementation
@@ -371,7 +395,7 @@ pub extern "C" fn ChannelFeatures_empty() -> ChannelFeatures {
 #[no_mangle]
 pub extern "C" fn ChannelFeatures_known() -> ChannelFeatures {
 	let mut ret = lightning::ln::features::ChannelFeatures::known();
-	ChannelFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Create a blank Features with no features set
@@ -379,7 +403,7 @@ pub extern "C" fn ChannelFeatures_known() -> ChannelFeatures {
 #[no_mangle]
 pub extern "C" fn InvoiceFeatures_empty() -> InvoiceFeatures {
 	let mut ret = lightning::ln::features::InvoiceFeatures::empty();
-	InvoiceFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a Features with the bits set which are known by the implementation
@@ -387,14 +411,14 @@ pub extern "C" fn InvoiceFeatures_empty() -> InvoiceFeatures {
 #[no_mangle]
 pub extern "C" fn InvoiceFeatures_known() -> InvoiceFeatures {
 	let mut ret = lightning::ln::features::InvoiceFeatures::known();
-	InvoiceFeatures { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns whether the `payment_secret` feature is supported.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InitFeatures_supports_payment_secret(this_arg: &InitFeatures) -> bool {
-	let mut ret = unsafe { &*this_arg.inner }.supports_payment_secret();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_payment_secret();
 	ret
 }
 
@@ -402,7 +426,7 @@ pub extern "C" fn InitFeatures_supports_payment_secret(this_arg: &InitFeatures) 
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NodeFeatures_supports_payment_secret(this_arg: &NodeFeatures) -> bool {
-	let mut ret = unsafe { &*this_arg.inner }.supports_payment_secret();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_payment_secret();
 	ret
 }
 
@@ -410,14 +434,14 @@ pub extern "C" fn NodeFeatures_supports_payment_secret(this_arg: &NodeFeatures) 
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InvoiceFeatures_supports_payment_secret(this_arg: &InvoiceFeatures) -> bool {
-	let mut ret = unsafe { &*this_arg.inner }.supports_payment_secret();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_payment_secret();
 	ret
 }
 
 #[no_mangle]
 /// Serialize the InitFeatures object into a byte array which can be read by InitFeatures_read
 pub extern "C" fn InitFeatures_write(obj: &InitFeatures) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
 pub(crate) extern "C" fn InitFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
@@ -426,7 +450,7 @@ pub(crate) extern "C" fn InitFeatures_write_void(obj: *const c_void) -> crate::c
 #[no_mangle]
 /// Serialize the NodeFeatures object into a byte array which can be read by NodeFeatures_read
 pub extern "C" fn NodeFeatures_write(obj: &NodeFeatures) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
 pub(crate) extern "C" fn NodeFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
@@ -435,7 +459,7 @@ pub(crate) extern "C" fn NodeFeatures_write_void(obj: *const c_void) -> crate::c
 #[no_mangle]
 /// Serialize the ChannelFeatures object into a byte array which can be read by ChannelFeatures_read
 pub extern "C" fn ChannelFeatures_write(obj: &ChannelFeatures) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
 pub(crate) extern "C" fn ChannelFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
@@ -444,7 +468,7 @@ pub(crate) extern "C" fn ChannelFeatures_write_void(obj: *const c_void) -> crate
 #[no_mangle]
 /// Serialize the InvoiceFeatures object into a byte array which can be read by InvoiceFeatures_read
 pub extern "C" fn InvoiceFeatures_write(obj: &InvoiceFeatures) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
 pub(crate) extern "C" fn InvoiceFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
@@ -454,27 +478,27 @@ pub(crate) extern "C" fn InvoiceFeatures_write_void(obj: *const c_void) -> crate
 /// Read a InitFeatures from a byte array, created by InitFeatures_write
 pub extern "C" fn InitFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_InitFeaturesDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::InitFeatures { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
 /// Read a NodeFeatures from a byte array, created by NodeFeatures_write
 pub extern "C" fn NodeFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeFeaturesDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::NodeFeatures { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
 /// Read a ChannelFeatures from a byte array, created by ChannelFeatures_write
 pub extern "C" fn ChannelFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelFeaturesDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::ChannelFeatures { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::ChannelFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
 /// Read a InvoiceFeatures from a byte array, created by InvoiceFeatures_write
 pub extern "C" fn InvoiceFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_InvoiceFeaturesDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::InvoiceFeatures { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::InvoiceFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }

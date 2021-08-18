@@ -527,3 +527,51 @@ impl<T> TakePointer<*mut T> for *mut T {
 		ret
 	}
 }
+
+
+pub(crate) mod ObjOps {
+	#[inline]
+	#[must_use = "returns new dangling pointer"]
+	pub(crate) fn heap_alloc<T>(obj: T) -> *mut T {
+		let ptr = Box::into_raw(Box::new(obj));
+		nonnull_ptr_to_inner(ptr)
+	}
+	#[inline]
+	pub(crate) fn nonnull_ptr_to_inner<T>(ptr: *const T) -> *mut T {
+		if core::mem::size_of::<T>() == 0 {
+			// We map `None::<T>` as `T { inner: null, .. }` which works great for all
+			// non-Zero-Sized-Types `T`.
+			// For ZSTs, we need to differentiate between null implying `None` and null implying
+			// `Some` with no allocation.
+			// Thus, for ZSTs, we add one (usually) page here, which should always be aligned.
+			// Note that this relies on undefined behavior! A pointer to NULL may be valid, but a
+			// pointer to NULL + 4096 is almost certainly not. That said, Rust's existing use of
+			// `(*mut T)1` for the pointer we're adding to is also not defined, so we should be
+			// fine.
+			// Note that we add 4095 here as at least the Java client assumes that the low bit on
+			// any heap pointer is 0, which is generally provided by malloc, but which is not true
+			// for ZSTs "allocated" by `Box::new`.
+			debug_assert_eq!(ptr as usize, 1);
+			unsafe { (ptr as *mut T).cast::<u8>().add(4096 - 1).cast::<T>() }
+		} else {
+			// In order to get better test coverage, also increment non-ZST pointers with
+			// --cfg=test_mod_pointers, which is set in genbindings.sh for debug builds.
+			#[cfg(test_mod_pointers)]
+			unsafe { (ptr as *mut T).cast::<u8>().add(4096).cast::<T>() }
+			#[cfg(not(test_mod_pointers))]
+			unsafe { ptr as *mut T }
+		}
+	}
+	#[inline]
+	/// Invert nonnull_ptr_to_inner
+	pub(crate) fn untweak_ptr<T>(ptr: *mut T) -> *mut T {
+		if core::mem::size_of::<T>() == 0 {
+			unsafe { ptr.cast::<u8>().sub(4096 - 1).cast::<T>() }
+		} else {
+			#[cfg(test_mod_pointers)]
+			unsafe { ptr.cast::<u8>().sub(4096).cast::<T>() }
+			#[cfg(not(test_mod_pointers))]
+			ptr
+		}
+	}
+}

@@ -563,7 +563,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	writeln!(w, "}}\n").unwrap();
 	writeln!(w, "impl Drop for {} {{\n\tfn drop(&mut self) {{", struct_name).unwrap();
 	writeln!(w, "\t\tif self.is_owned && !<*mut native{}>::is_null(self.inner) {{", ident).unwrap();
-	writeln!(w, "\t\t\tlet _ = unsafe {{ Box::from_raw(self.inner) }};\n\t\t}}\n\t}}\n}}").unwrap();
+	writeln!(w, "\t\t\tlet _ = unsafe {{ Box::from_raw(ObjOps::untweak_ptr(self.inner)) }};\n\t\t}}\n\t}}\n}}").unwrap();
 	writeln!(w, "/// Frees any resources used by the {}, if is_owned is set and inner is non-NULL.", struct_name).unwrap();
 	writeln!(w, "#[no_mangle]\npub extern \"C\" fn {}_free(this_obj: {}) {{ }}", struct_name, struct_name).unwrap();
 	writeln!(w, "#[allow(unused)]").unwrap();
@@ -571,11 +571,17 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	writeln!(w, "extern \"C\" fn {}_free_void(this_ptr: *mut c_void) {{", struct_name).unwrap();
 	writeln!(w, "\tunsafe {{ let _ = Box::from_raw(this_ptr as *mut native{}); }}\n}}", struct_name).unwrap();
 	writeln!(w, "#[allow(unused)]").unwrap();
-	writeln!(w, "/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy").unwrap();
 	writeln!(w, "impl {} {{", struct_name).unwrap();
+	writeln!(w, "\tpub(crate) fn get_native_ref(&self) -> &'static native{} {{", struct_name).unwrap();
+	writeln!(w, "\t\tunsafe {{ &*ObjOps::untweak_ptr(self.inner) }}").unwrap();
+	writeln!(w, "\t}}").unwrap();
+	writeln!(w, "\tpub(crate) fn get_native_mut_ref(&self) -> &'static mut native{} {{", struct_name).unwrap();
+	writeln!(w, "\t\tunsafe {{ &mut *ObjOps::untweak_ptr(self.inner) }}").unwrap();
+	writeln!(w, "\t}}").unwrap();
+	writeln!(w, "\t/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy").unwrap();
 	writeln!(w, "\tpub(crate) fn take_inner(mut self) -> *mut native{} {{", struct_name).unwrap();
 	writeln!(w, "\t\tassert!(self.is_owned);").unwrap();
-	writeln!(w, "\t\tlet ret = self.inner;").unwrap();
+	writeln!(w, "\t\tlet ret = ObjOps::untweak_ptr(self.inner);").unwrap();
 	writeln!(w, "\t\tself.inner = std::ptr::null_mut();").unwrap();
 	writeln!(w, "\t\tret").unwrap();
 	writeln!(w, "\t}}\n}}").unwrap();
@@ -620,7 +626,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 						writeln_arg_docs(w, &field.attrs, "", types, Some(&gen_types), vec![].drain(..), Some(&ref_type));
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> ", struct_name, ident, struct_name).unwrap();
 						types.write_c_type(w, &ref_type, Some(&gen_types), true);
-						write!(w, " {{\n\tlet mut inner_val = &mut unsafe {{ &mut *this_ptr.inner }}.{};\n\t", ident).unwrap();
+						write!(w, " {{\n\tlet mut inner_val = &mut this_ptr.get_native_mut_ref().{};\n\t", ident).unwrap();
 						let local_var = types.write_to_c_conversion_new_var(w, &format_ident!("inner_val"), &ref_type, Some(&gen_types), true);
 						if local_var { write!(w, "\n\t").unwrap(); }
 						types.write_to_c_conversion_inline_prefix(w, &ref_type, Some(&gen_types), true);
@@ -636,7 +642,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 						write!(w, ") {{\n\t").unwrap();
 						let local_var = types.write_from_c_conversion_new_var(w, &format_ident!("val"), &field.ty, Some(&gen_types));
 						if local_var { write!(w, "\n\t").unwrap(); }
-						write!(w, "unsafe {{ &mut *this_ptr.inner }}.{} = ", ident).unwrap();
+						write!(w, "unsafe {{ &mut *ObjOps::untweak_ptr(this_ptr.inner) }}.{} = ", ident).unwrap();
 						types.write_from_c_conversion_prefix(w, &field.ty, Some(&gen_types));
 						write!(w, "val").unwrap();
 						types.write_from_c_conversion_suffix(w, &field.ty, Some(&gen_types));
@@ -662,7 +668,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 					write!(w, "\n\t").unwrap();
 				}
 			}
-			writeln!(w, "{} {{ inner: Box::into_raw(Box::new(native{} {{", struct_name, s.ident).unwrap();
+			writeln!(w, "{} {{ inner: ObjOps::heap_alloc(native{} {{", struct_name, s.ident).unwrap();
 			for field in fields.named.iter() {
 				write!(w, "\t\t{}: ", field.ident.as_ref().unwrap()).unwrap();
 				types.write_from_c_conversion_prefix(w, &field.ty, Some(&gen_types));
@@ -670,7 +676,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 				types.write_from_c_conversion_suffix(w, &field.ty, Some(&gen_types));
 				writeln!(w, ",").unwrap();
 			}
-			writeln!(w, "\t}})), is_owned: true }}\n}}").unwrap();
+			writeln!(w, "\t}}), is_owned: true }}\n}}").unwrap();
 		}
 	}
 }
@@ -764,7 +770,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						// type-conversion logic without actually knowing the concrete native type.
 						writeln!(w, "impl From<native{}> for crate::{} {{", ident, full_trait_path).unwrap();
 						writeln!(w, "\tfn from(obj: native{}) -> Self {{", ident).unwrap();
-						writeln!(w, "\t\tlet mut rust_obj = {} {{ inner: Box::into_raw(Box::new(obj)), is_owned: true }};", ident).unwrap();
+						writeln!(w, "\t\tlet mut rust_obj = {} {{ inner: ObjOps::heap_alloc(obj), is_owned: true }};", ident).unwrap();
 						writeln!(w, "\t\tlet mut ret = {}_as_{}(&rust_obj);", ident, trait_obj.ident).unwrap();
 						writeln!(w, "\t\t// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn").unwrap();
 						writeln!(w, "\t\trust_obj.inner = std::ptr::null_mut();").unwrap();
@@ -775,7 +781,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						writeln!(w, "/// This copies the `inner` pointer in this_arg and thus the returned {} must be freed before this_arg is", trait_obj.ident).unwrap();
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_as_{}(this_arg: &{}) -> crate::{} {{\n", ident, trait_obj.ident, ident, full_trait_path).unwrap();
 						writeln!(w, "\tcrate::{} {{", full_trait_path).unwrap();
-						writeln!(w, "\t\tthis_arg: unsafe {{ (*this_arg).inner as *mut c_void }},").unwrap();
+						writeln!(w, "\t\tthis_arg: unsafe {{ ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void }},").unwrap();
 						writeln!(w, "\t\tfree: None,").unwrap();
 
 						macro_rules! write_meth {
@@ -826,7 +832,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							(s, t) => {
 								if let Some(supertrait_obj) = types.crate_types.traits.get(s) {
 									writeln!(w, "\t\t{}: crate::{} {{", t, s).unwrap();
-									writeln!(w, "\t\t\tthis_arg: unsafe {{ (*this_arg).inner as *mut c_void }},").unwrap();
+									writeln!(w, "\t\t\tthis_arg: unsafe {{ ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void }},").unwrap();
 									writeln!(w, "\t\t\tfree: None,").unwrap();
 									for item in supertrait_obj.items.iter() {
 										match item {
@@ -941,7 +947,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 					} else if path_matches_nongeneric(&trait_path.1, &["Default"]) {
 						writeln!(w, "/// Creates a \"default\" {}. See struct and individual field documentaiton for details on which values are used.", ident).unwrap();
 						write!(w, "#[must_use]\n#[no_mangle]\npub extern \"C\" fn {}_default() -> {} {{\n", ident, ident).unwrap();
-						write!(w, "\t{} {{ inner: Box::into_raw(Box::new(Default::default())), is_owned: true }}\n", ident).unwrap();
+						write!(w, "\t{} {{ inner: ObjOps::heap_alloc(Default::default()), is_owned: true }}\n", ident).unwrap();
 						write!(w, "}}\n").unwrap();
 					} else if path_matches_nongeneric(&trait_path.1, &["core", "cmp", "PartialEq"]) {
 					} else if path_matches_nongeneric(&trait_path.1, &["core", "cmp", "Eq"]) {
@@ -996,7 +1002,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						writeln!(w, "\tfn clone(&self) -> Self {{").unwrap();
 						writeln!(w, "\t\tSelf {{").unwrap();
 						writeln!(w, "\t\t\tinner: if <*mut native{}>::is_null(self.inner) {{ std::ptr::null_mut() }} else {{", ident).unwrap();
-						writeln!(w, "\t\t\t\tBox::into_raw(Box::new(unsafe {{ &*self.inner }}.clone())) }},").unwrap();
+						writeln!(w, "\t\t\t\tObjOps::heap_alloc(unsafe {{ &*ObjOps::untweak_ptr(self.inner) }}.clone()) }},").unwrap();
 						writeln!(w, "\t\t\tis_owned: true,").unwrap();
 						writeln!(w, "\t\t}}\n\t}}\n}}").unwrap();
 						writeln!(w, "#[allow(unused)]").unwrap();
@@ -1093,9 +1099,9 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 												if takes_owned_self {
 													write!(w, "(*unsafe {{ Box::from_raw(this_arg.take_inner()) }}).{}(", m.sig.ident).unwrap();
 												} else if takes_mut_self {
-													write!(w, "unsafe {{ &mut (*(this_arg.inner as *mut native{})) }}.{}(", ident, m.sig.ident).unwrap();
+													write!(w, "unsafe {{ &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut native{})) }}.{}(", ident, m.sig.ident).unwrap();
 												} else {
-													write!(w, "unsafe {{ &*this_arg.inner }}.{}(", m.sig.ident).unwrap();
+													write!(w, "unsafe {{ &*ObjOps::untweak_ptr(this_arg.inner) }}.{}(", m.sig.ident).unwrap();
 												}
 											},
 											_ => unimplemented!(),

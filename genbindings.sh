@@ -183,7 +183,7 @@ echo -e '}' >> lightning-c-bindings/src/version.rs
 # Now cd to lightning-c-bindings, build the generated bindings, and call cbindgen to build a C header file
 cd lightning-c-bindings
 
-cargo build
+RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" cargo build
 if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
 	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" cargo build --target aarch64-apple-darwin
 fi
@@ -403,7 +403,7 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "
 		if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
 			RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" RUSTC_BOOTSTRAP=1 cargo rustc --target aarch64-apple-darwin -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
 		fi
-		RUSTC_BOOTSTRAP=1 cargo rustc -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
+		RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" RUSTC_BOOTSTRAP=1 cargo rustc -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
 		mv Cargo.toml.bk Cargo.toml
 
 		# First the C demo app...

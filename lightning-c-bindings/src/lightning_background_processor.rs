@@ -52,7 +52,7 @@ pub struct BackgroundProcessor {
 impl Drop for BackgroundProcessor {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeBackgroundProcessor>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -65,11 +65,17 @@ extern "C" fn BackgroundProcessor_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBackgroundProcessor); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl BackgroundProcessor {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeBackgroundProcessor {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeBackgroundProcessor {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeBackgroundProcessor {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -106,7 +112,7 @@ pub(crate) extern "C" fn ChannelManagerPersister_clone_fields(orig: &ChannelMana
 use lightning_background_processor::ChannelManagerPersister as rustChannelManagerPersister;
 impl rustChannelManagerPersister<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger> for ChannelManagerPersister {
 	fn persist_manager(&self, mut channel_manager: &lightning::ln::channelmanager::ChannelManager<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>) -> Result<(), std::io::Error> {
-		let mut ret = (self.persist_manager)(self.this_arg, &crate::lightning::ln::channelmanager::ChannelManager { inner: unsafe { (channel_manager as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.persist_manager)(self.this_arg, &crate::lightning::ln::channelmanager::ChannelManager { inner: unsafe { ObjOps::nonnull_ptr_to_inner((channel_manager as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).to_rust() })};
 		local_ret
 	}
@@ -155,8 +161,8 @@ impl Drop for ChannelManagerPersister {
 #[must_use]
 #[no_mangle]
 pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning_background_processor::ChannelManagerPersister, mut event_handler: crate::lightning::util::events::EventHandler, chain_monitor: &crate::lightning::chain::chainmonitor::ChainMonitor, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager, peer_manager: &crate::lightning::ln::peer_handler::PeerManager, mut logger: crate::lightning::util::logger::Logger) -> BackgroundProcessor {
-	let mut ret = lightning_background_processor::BackgroundProcessor::start(persister, event_handler, unsafe { &*chain_monitor.inner }, unsafe { &*channel_manager.inner }, unsafe { &*peer_manager.inner }, logger);
-	BackgroundProcessor { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	let mut ret = lightning_background_processor::BackgroundProcessor::start(persister, event_handler, chain_monitor.get_native_ref(), channel_manager.get_native_ref(), peer_manager.get_native_ref(), logger);
+	BackgroundProcessor { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Join `BackgroundProcessor`'s thread, returning any error that occurred while persisting

@@ -697,7 +697,7 @@ pub fn write_method_call_params<W: std::io::Write>(w: &mut W, sig: &syn::Signatu
 				write!(w, "ret").unwrap();
 			} else if !to_c && self_segs_iter.is_some() && self_segs_iter.unwrap().next().is_none() {
 				// If we're returning "Self" (and not "Self::X"), just do it manually
-				write!(w, "{} {{ inner: Box::into_raw(Box::new(ret)), is_owned: true }}", this_type).unwrap();
+				write!(w, "{} {{ inner: ObjOps::heap_alloc(ret), is_owned: true }}", this_type).unwrap();
 			} else if to_c {
 				let new_var = types.write_from_c_conversion_new_var(w, &format_ident!("ret"), rtype, generics);
 				if new_var {

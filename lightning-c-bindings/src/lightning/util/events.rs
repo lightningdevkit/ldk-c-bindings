@@ -1013,7 +1013,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendAcceptChannel {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::AcceptChannel { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::AcceptChannel { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendOpenChannel {ref node_id, ref msg, } => {
@@ -1021,7 +1021,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendOpenChannel {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::OpenChannel { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::OpenChannel { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingCreated {ref node_id, ref msg, } => {
@@ -1029,7 +1029,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendFundingCreated {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::FundingCreated { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingCreated { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingSigned {ref node_id, ref msg, } => {
@@ -1037,7 +1037,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendFundingSigned {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::FundingSigned { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingSigned { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingLocked {ref node_id, ref msg, } => {
@@ -1045,7 +1045,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendFundingLocked {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::FundingLocked { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingLocked { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendAnnouncementSignatures {ref node_id, ref msg, } => {
@@ -1053,7 +1053,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendAnnouncementSignatures {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::AnnouncementSignatures { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::AnnouncementSignatures { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::UpdateHTLCs {ref node_id, ref updates, } => {
@@ -1061,7 +1061,7 @@ impl MessageSendEvent {
 				let mut updates_nonref = (*updates).clone();
 				MessageSendEvent::UpdateHTLCs {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					updates: crate::lightning::ln::msgs::CommitmentUpdate { inner: Box::into_raw(Box::new(updates_nonref)), is_owned: true },
+					updates: crate::lightning::ln::msgs::CommitmentUpdate { inner: ObjOps::heap_alloc(updates_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendRevokeAndACK {ref node_id, ref msg, } => {
@@ -1069,7 +1069,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendRevokeAndACK {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::RevokeAndACK { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::RevokeAndACK { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendClosingSigned {ref node_id, ref msg, } => {
@@ -1077,7 +1077,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendClosingSigned {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::ClosingSigned { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ClosingSigned { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendShutdown {ref node_id, ref msg, } => {
@@ -1085,7 +1085,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendShutdown {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::Shutdown { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::Shutdown { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendChannelReestablish {ref node_id, ref msg, } => {
@@ -1093,27 +1093,27 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendChannelReestablish {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::ChannelReestablish { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelReestablish { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelAnnouncement {ref msg, ref update_msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				let mut update_msg_nonref = (*update_msg).clone();
 				MessageSendEvent::BroadcastChannelAnnouncement {
-					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
-					update_msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(update_msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
+					update_msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(update_msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastNodeAnnouncement {ref msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::BroadcastNodeAnnouncement {
-					msg: crate::lightning::ln::msgs::NodeAnnouncement { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::NodeAnnouncement { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelUpdate {ref msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::BroadcastChannelUpdate {
-					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendChannelUpdate {ref node_id, ref msg, } => {
@@ -1121,7 +1121,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendChannelUpdate {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::HandleError {ref node_id, ref action, } => {
@@ -1143,7 +1143,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendChannelRangeQuery {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::QueryChannelRange { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::QueryChannelRange { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendShortIdsQuery {ref node_id, ref msg, } => {
@@ -1151,7 +1151,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendShortIdsQuery {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::QueryShortChannelIds { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::QueryShortChannelIds { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendReplyChannelRange {ref node_id, ref msg, } => {
@@ -1159,7 +1159,7 @@ impl MessageSendEvent {
 				let mut msg_nonref = (*msg).clone();
 				MessageSendEvent::SendReplyChannelRange {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					msg: crate::lightning::ln::msgs::ReplyChannelRange { inner: Box::into_raw(Box::new(msg_nonref)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ReplyChannelRange { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 		}
@@ -1170,89 +1170,89 @@ impl MessageSendEvent {
 			nativeMessageSendEvent::SendAcceptChannel {mut node_id, mut msg, } => {
 				MessageSendEvent::SendAcceptChannel {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::AcceptChannel { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::AcceptChannel { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendOpenChannel {mut node_id, mut msg, } => {
 				MessageSendEvent::SendOpenChannel {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::OpenChannel { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::OpenChannel { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingCreated {mut node_id, mut msg, } => {
 				MessageSendEvent::SendFundingCreated {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::FundingCreated { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingCreated { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingSigned {mut node_id, mut msg, } => {
 				MessageSendEvent::SendFundingSigned {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::FundingSigned { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingSigned { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingLocked {mut node_id, mut msg, } => {
 				MessageSendEvent::SendFundingLocked {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::FundingLocked { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::FundingLocked { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendAnnouncementSignatures {mut node_id, mut msg, } => {
 				MessageSendEvent::SendAnnouncementSignatures {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::AnnouncementSignatures { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::AnnouncementSignatures { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::UpdateHTLCs {mut node_id, mut updates, } => {
 				MessageSendEvent::UpdateHTLCs {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					updates: crate::lightning::ln::msgs::CommitmentUpdate { inner: Box::into_raw(Box::new(updates)), is_owned: true },
+					updates: crate::lightning::ln::msgs::CommitmentUpdate { inner: ObjOps::heap_alloc(updates), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendRevokeAndACK {mut node_id, mut msg, } => {
 				MessageSendEvent::SendRevokeAndACK {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::RevokeAndACK { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::RevokeAndACK { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendClosingSigned {mut node_id, mut msg, } => {
 				MessageSendEvent::SendClosingSigned {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::ClosingSigned { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ClosingSigned { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendShutdown {mut node_id, mut msg, } => {
 				MessageSendEvent::SendShutdown {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::Shutdown { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::Shutdown { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendChannelReestablish {mut node_id, mut msg, } => {
 				MessageSendEvent::SendChannelReestablish {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::ChannelReestablish { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelReestablish { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelAnnouncement {mut msg, mut update_msg, } => {
 				MessageSendEvent::BroadcastChannelAnnouncement {
-					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: Box::into_raw(Box::new(msg)), is_owned: true },
-					update_msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(update_msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(msg), is_owned: true },
+					update_msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(update_msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastNodeAnnouncement {mut msg, } => {
 				MessageSendEvent::BroadcastNodeAnnouncement {
-					msg: crate::lightning::ln::msgs::NodeAnnouncement { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::NodeAnnouncement { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelUpdate {mut msg, } => {
 				MessageSendEvent::BroadcastChannelUpdate {
-					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendChannelUpdate {mut node_id, mut msg, } => {
 				MessageSendEvent::SendChannelUpdate {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::HandleError {mut node_id, mut action, } => {
@@ -1269,19 +1269,19 @@ impl MessageSendEvent {
 			nativeMessageSendEvent::SendChannelRangeQuery {mut node_id, mut msg, } => {
 				MessageSendEvent::SendChannelRangeQuery {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::QueryChannelRange { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::QueryChannelRange { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendShortIdsQuery {mut node_id, mut msg, } => {
 				MessageSendEvent::SendShortIdsQuery {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::QueryShortChannelIds { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::QueryShortChannelIds { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendReplyChannelRange {mut node_id, mut msg, } => {
 				MessageSendEvent::SendReplyChannelRange {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					msg: crate::lightning::ln::msgs::ReplyChannelRange { inner: Box::into_raw(Box::new(msg)), is_owned: true },
+					msg: crate::lightning::ln::msgs::ReplyChannelRange { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 		}

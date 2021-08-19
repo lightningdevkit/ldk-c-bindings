@@ -21,8 +21,8 @@ use crate::c_types::*;
 #[no_mangle]
 pub extern "C" fn create_invoice_from_channelmanager(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description: crate::c_types::Str) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
 	let mut local_amt_msat = if amt_msat.is_some() { Some( { amt_msat.take() }) } else { None };
-	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager(unsafe { &*channelmanager.inner }, keys_manager, network.into_native(), local_amt_msat, description.into_string());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
+	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager(channelmanager.get_native_ref(), keys_manager, network.into_native(), local_amt_msat, description.into_string());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
 	local_ret
 }
 

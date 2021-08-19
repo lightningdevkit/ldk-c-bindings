@@ -39,7 +39,7 @@ pub struct DelayedPaymentOutputDescriptor {
 impl Drop for DelayedPaymentOutputDescriptor {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeDelayedPaymentOutputDescriptor>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -52,11 +52,17 @@ extern "C" fn DelayedPaymentOutputDescriptor_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDelayedPaymentOutputDescriptor); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl DelayedPaymentOutputDescriptor {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeDelayedPaymentOutputDescriptor {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeDelayedPaymentOutputDescriptor {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeDelayedPaymentOutputDescriptor {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -64,62 +70,62 @@ impl DelayedPaymentOutputDescriptor {
 /// The outpoint which is spendable
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_outpoint(this_ptr: &DelayedPaymentOutputDescriptor) -> crate::lightning::chain::transaction::OutPoint {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.outpoint;
-	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().outpoint;
+	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
 }
 /// The outpoint which is spendable
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_set_outpoint(this_ptr: &mut DelayedPaymentOutputDescriptor, mut val: crate::lightning::chain::transaction::OutPoint) {
-	unsafe { &mut *this_ptr.inner }.outpoint = *unsafe { Box::from_raw(val.take_inner()) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.outpoint = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Per commitment point to derive delayed_payment_key by key holder
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_per_commitment_point(this_ptr: &DelayedPaymentOutputDescriptor) -> crate::c_types::PublicKey {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.per_commitment_point;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().per_commitment_point;
 	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// Per commitment point to derive delayed_payment_key by key holder
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_set_per_commitment_point(this_ptr: &mut DelayedPaymentOutputDescriptor, mut val: crate::c_types::PublicKey) {
-	unsafe { &mut *this_ptr.inner }.per_commitment_point = val.into_rust();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.per_commitment_point = val.into_rust();
 }
 /// The nSequence value which must be set in the spending input to satisfy the OP_CSV in
 /// the witness_script.
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_to_self_delay(this_ptr: &DelayedPaymentOutputDescriptor) -> u16 {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.to_self_delay;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().to_self_delay;
 	*inner_val
 }
 /// The nSequence value which must be set in the spending input to satisfy the OP_CSV in
 /// the witness_script.
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_set_to_self_delay(this_ptr: &mut DelayedPaymentOutputDescriptor, mut val: u16) {
-	unsafe { &mut *this_ptr.inner }.to_self_delay = val;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.to_self_delay = val;
 }
 /// The output which is referenced by the given outpoint
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_set_output(this_ptr: &mut DelayedPaymentOutputDescriptor, mut val: crate::c_types::TxOut) {
-	unsafe { &mut *this_ptr.inner }.output = val.into_rust();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.output = val.into_rust();
 }
 /// The revocation point specific to the commitment transaction which was broadcast. Used to
 /// derive the witnessScript for this output.
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_revocation_pubkey(this_ptr: &DelayedPaymentOutputDescriptor) -> crate::c_types::PublicKey {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.revocation_pubkey;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().revocation_pubkey;
 	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The revocation point specific to the commitment transaction which was broadcast. Used to
 /// derive the witnessScript for this output.
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_set_revocation_pubkey(this_ptr: &mut DelayedPaymentOutputDescriptor, mut val: crate::c_types::PublicKey) {
-	unsafe { &mut *this_ptr.inner }.revocation_pubkey = val.into_rust();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.revocation_pubkey = val.into_rust();
 }
 /// Arbitrary identification information returned by a call to
 /// `Sign::channel_keys_id()`. This may be useful in re-deriving keys used in
 /// the channel to spend the output.
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_channel_keys_id(this_ptr: &DelayedPaymentOutputDescriptor) -> *const [u8; 32] {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_keys_id;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_keys_id;
 	inner_val
 }
 /// Arbitrary identification information returned by a call to
@@ -127,24 +133,24 @@ pub extern "C" fn DelayedPaymentOutputDescriptor_get_channel_keys_id(this_ptr: &
 /// the channel to spend the output.
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_set_channel_keys_id(this_ptr: &mut DelayedPaymentOutputDescriptor, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *this_ptr.inner }.channel_keys_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_keys_id = val.data;
 }
 /// The value of the channel which this output originated from, possibly indirectly.
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_get_channel_value_satoshis(this_ptr: &DelayedPaymentOutputDescriptor) -> u64 {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_value_satoshis;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_value_satoshis;
 	*inner_val
 }
 /// The value of the channel which this output originated from, possibly indirectly.
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_set_channel_value_satoshis(this_ptr: &mut DelayedPaymentOutputDescriptor, mut val: u64) {
-	unsafe { &mut *this_ptr.inner }.channel_value_satoshis = val;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_value_satoshis = val;
 }
 /// Constructs a new DelayedPaymentOutputDescriptor given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_new(mut outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut per_commitment_point_arg: crate::c_types::PublicKey, mut to_self_delay_arg: u16, mut output_arg: crate::c_types::TxOut, mut revocation_pubkey_arg: crate::c_types::PublicKey, mut channel_keys_id_arg: crate::c_types::ThirtyTwoBytes, mut channel_value_satoshis_arg: u64) -> DelayedPaymentOutputDescriptor {
-	DelayedPaymentOutputDescriptor { inner: Box::into_raw(Box::new(nativeDelayedPaymentOutputDescriptor {
+	DelayedPaymentOutputDescriptor { inner: ObjOps::heap_alloc(nativeDelayedPaymentOutputDescriptor {
 		outpoint: *unsafe { Box::from_raw(outpoint_arg.take_inner()) },
 		per_commitment_point: per_commitment_point_arg.into_rust(),
 		to_self_delay: to_self_delay_arg,
@@ -152,13 +158,13 @@ pub extern "C" fn DelayedPaymentOutputDescriptor_new(mut outpoint_arg: crate::li
 		revocation_pubkey: revocation_pubkey_arg.into_rust(),
 		channel_keys_id: channel_keys_id_arg.data,
 		channel_value_satoshis: channel_value_satoshis_arg,
-	})), is_owned: true }
+	}), is_owned: true }
 }
 impl Clone for DelayedPaymentOutputDescriptor {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeDelayedPaymentOutputDescriptor>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -176,7 +182,7 @@ pub extern "C" fn DelayedPaymentOutputDescriptor_clone(orig: &DelayedPaymentOutp
 #[no_mangle]
 /// Serialize the DelayedPaymentOutputDescriptor object into a byte array which can be read by DelayedPaymentOutputDescriptor_read
 pub extern "C" fn DelayedPaymentOutputDescriptor_write(obj: &DelayedPaymentOutputDescriptor) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
 pub(crate) extern "C" fn DelayedPaymentOutputDescriptor_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
@@ -186,7 +192,7 @@ pub(crate) extern "C" fn DelayedPaymentOutputDescriptor_write_void(obj: *const c
 /// Read a DelayedPaymentOutputDescriptor from a byte array, created by DelayedPaymentOutputDescriptor_write
 pub extern "C" fn DelayedPaymentOutputDescriptor_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 
@@ -213,7 +219,7 @@ pub struct StaticPaymentOutputDescriptor {
 impl Drop for StaticPaymentOutputDescriptor {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeStaticPaymentOutputDescriptor>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -226,11 +232,17 @@ extern "C" fn StaticPaymentOutputDescriptor_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeStaticPaymentOutputDescriptor); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl StaticPaymentOutputDescriptor {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeStaticPaymentOutputDescriptor {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeStaticPaymentOutputDescriptor {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeStaticPaymentOutputDescriptor {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -238,25 +250,25 @@ impl StaticPaymentOutputDescriptor {
 /// The outpoint which is spendable
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_get_outpoint(this_ptr: &StaticPaymentOutputDescriptor) -> crate::lightning::chain::transaction::OutPoint {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.outpoint;
-	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ( (&(*inner_val) as *const _) as *mut _) }, is_owned: false }
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().outpoint;
+	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
 }
 /// The outpoint which is spendable
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_set_outpoint(this_ptr: &mut StaticPaymentOutputDescriptor, mut val: crate::lightning::chain::transaction::OutPoint) {
-	unsafe { &mut *this_ptr.inner }.outpoint = *unsafe { Box::from_raw(val.take_inner()) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.outpoint = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// The output which is referenced by the given outpoint
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_set_output(this_ptr: &mut StaticPaymentOutputDescriptor, mut val: crate::c_types::TxOut) {
-	unsafe { &mut *this_ptr.inner }.output = val.into_rust();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.output = val.into_rust();
 }
 /// Arbitrary identification information returned by a call to
 /// `Sign::channel_keys_id()`. This may be useful in re-deriving keys used in
 /// the channel to spend the output.
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_get_channel_keys_id(this_ptr: &StaticPaymentOutputDescriptor) -> *const [u8; 32] {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_keys_id;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_keys_id;
 	inner_val
 }
 /// Arbitrary identification information returned by a call to
@@ -264,35 +276,35 @@ pub extern "C" fn StaticPaymentOutputDescriptor_get_channel_keys_id(this_ptr: &S
 /// the channel to spend the output.
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_set_channel_keys_id(this_ptr: &mut StaticPaymentOutputDescriptor, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *this_ptr.inner }.channel_keys_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_keys_id = val.data;
 }
 /// The value of the channel which this transactions spends.
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_get_channel_value_satoshis(this_ptr: &StaticPaymentOutputDescriptor) -> u64 {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.channel_value_satoshis;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_value_satoshis;
 	*inner_val
 }
 /// The value of the channel which this transactions spends.
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_set_channel_value_satoshis(this_ptr: &mut StaticPaymentOutputDescriptor, mut val: u64) {
-	unsafe { &mut *this_ptr.inner }.channel_value_satoshis = val;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_value_satoshis = val;
 }
 /// Constructs a new StaticPaymentOutputDescriptor given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_new(mut outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut output_arg: crate::c_types::TxOut, mut channel_keys_id_arg: crate::c_types::ThirtyTwoBytes, mut channel_value_satoshis_arg: u64) -> StaticPaymentOutputDescriptor {
-	StaticPaymentOutputDescriptor { inner: Box::into_raw(Box::new(nativeStaticPaymentOutputDescriptor {
+	StaticPaymentOutputDescriptor { inner: ObjOps::heap_alloc(nativeStaticPaymentOutputDescriptor {
 		outpoint: *unsafe { Box::from_raw(outpoint_arg.take_inner()) },
 		output: output_arg.into_rust(),
 		channel_keys_id: channel_keys_id_arg.data,
 		channel_value_satoshis: channel_value_satoshis_arg,
-	})), is_owned: true }
+	}), is_owned: true }
 }
 impl Clone for StaticPaymentOutputDescriptor {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeStaticPaymentOutputDescriptor>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -310,7 +322,7 @@ pub extern "C" fn StaticPaymentOutputDescriptor_clone(orig: &StaticPaymentOutput
 #[no_mangle]
 /// Serialize the StaticPaymentOutputDescriptor object into a byte array which can be read by StaticPaymentOutputDescriptor_read
 pub extern "C" fn StaticPaymentOutputDescriptor_write(obj: &StaticPaymentOutputDescriptor) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
 pub(crate) extern "C" fn StaticPaymentOutputDescriptor_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
@@ -320,7 +332,7 @@ pub(crate) extern "C" fn StaticPaymentOutputDescriptor_write_void(obj: *const c_
 /// Read a StaticPaymentOutputDescriptor from a byte array, created by StaticPaymentOutputDescriptor_write
 pub extern "C" fn StaticPaymentOutputDescriptor_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_StaticPaymentOutputDescriptorDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 /// When on-chain outputs are created by rust-lightning (which our counterparty is not able to
@@ -436,20 +448,20 @@ impl SpendableOutputDescriptor {
 				let mut outpoint_nonref = (*outpoint).clone();
 				let mut output_nonref = (*output).clone();
 				SpendableOutputDescriptor::StaticOutput {
-					outpoint: crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(outpoint_nonref)), is_owned: true },
+					outpoint: crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(outpoint_nonref), is_owned: true },
 					output: crate::c_types::TxOut::from_rust(output_nonref),
 				}
 			},
 			nativeSpendableOutputDescriptor::DelayedPaymentOutput (ref a, ) => {
 				let mut a_nonref = (*a).clone();
 				SpendableOutputDescriptor::DelayedPaymentOutput (
-					crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
+					crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
 				)
 			},
 			nativeSpendableOutputDescriptor::StaticPaymentOutput (ref a, ) => {
 				let mut a_nonref = (*a).clone();
 				SpendableOutputDescriptor::StaticPaymentOutput (
-					crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor { inner: Box::into_raw(Box::new(a_nonref)), is_owned: true },
+					crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
 				)
 			},
 		}
@@ -459,18 +471,18 @@ impl SpendableOutputDescriptor {
 		match native {
 			nativeSpendableOutputDescriptor::StaticOutput {mut outpoint, mut output, } => {
 				SpendableOutputDescriptor::StaticOutput {
-					outpoint: crate::lightning::chain::transaction::OutPoint { inner: Box::into_raw(Box::new(outpoint)), is_owned: true },
+					outpoint: crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(outpoint), is_owned: true },
 					output: crate::c_types::TxOut::from_rust(output),
 				}
 			},
 			nativeSpendableOutputDescriptor::DelayedPaymentOutput (mut a, ) => {
 				SpendableOutputDescriptor::DelayedPaymentOutput (
-					crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor { inner: Box::into_raw(Box::new(a)), is_owned: true },
+					crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor { inner: ObjOps::heap_alloc(a), is_owned: true },
 				)
 			},
 			nativeSpendableOutputDescriptor::StaticPaymentOutput (mut a, ) => {
 				SpendableOutputDescriptor::StaticPaymentOutput (
-					crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor { inner: Box::into_raw(Box::new(a)), is_owned: true },
+					crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor { inner: ObjOps::heap_alloc(a), is_owned: true },
 				)
 			},
 		}
@@ -511,7 +523,7 @@ pub extern "C" fn SpendableOutputDescriptor_write(obj: &SpendableOutputDescripto
 /// Read a SpendableOutputDescriptor from a byte array, created by SpendableOutputDescriptor_write
 pub extern "C" fn SpendableOutputDescriptor_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_SpendableOutputDescriptorDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::keysinterface::SpendableOutputDescriptor::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::keysinterface::SpendableOutputDescriptor::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 /// A trait to sign lightning channel transactions as described in BOLT 3.
@@ -700,19 +712,19 @@ impl rustBaseSign for BaseSign {
 		if let Some(f) = self.set_pubkeys {
 			(f)(&self);
 		}
-		unsafe { &*self.pubkeys.inner }
+		self.pubkeys.get_native_ref()
 	}
 	fn channel_keys_id(&self) -> [u8; 32] {
 		let mut ret = (self.channel_keys_id)(self.this_arg);
 		ret.data
 	}
 	fn sign_counterparty_commitment(&self, mut commitment_tx: &lightning::ln::chan_utils::CommitmentTransaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<(bitcoin::secp256k1::Signature, Vec<bitcoin::secp256k1::Signature>), ()> {
-		let mut ret = (self.sign_counterparty_commitment)(self.this_arg, &crate::lightning::ln::chan_utils::CommitmentTransaction { inner: unsafe { (commitment_tx as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.sign_counterparty_commitment)(self.this_arg, &crate::lightning::ln::chan_utils::CommitmentTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((commitment_tx as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).to_rust(); let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.into_rust().drain(..) { local_orig_ret_0_1.push( { item.into_rust() }); }; let mut local_ret_0 = (orig_ret_0_0.into_rust(), local_orig_ret_0_1); local_ret_0 }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn sign_holder_commitment_and_htlcs(&self, mut commitment_tx: &lightning::ln::chan_utils::HolderCommitmentTransaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<(bitcoin::secp256k1::Signature, Vec<bitcoin::secp256k1::Signature>), ()> {
-		let mut ret = (self.sign_holder_commitment_and_htlcs)(self.this_arg, &crate::lightning::ln::chan_utils::HolderCommitmentTransaction { inner: unsafe { (commitment_tx as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.sign_holder_commitment_and_htlcs)(self.this_arg, &crate::lightning::ln::chan_utils::HolderCommitmentTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((commitment_tx as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).to_rust(); let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.into_rust().drain(..) { local_orig_ret_0_1.push( { item.into_rust() }); }; let mut local_ret_0 = (orig_ret_0_0.into_rust(), local_orig_ret_0_1); local_ret_0 }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
@@ -722,12 +734,12 @@ impl rustBaseSign for BaseSign {
 		local_ret
 	}
 	fn sign_justice_revoked_htlc(&self, mut justice_tx: &bitcoin::blockdata::transaction::Transaction, mut input: usize, mut amount: u64, mut per_commitment_key: &bitcoin::secp256k1::key::SecretKey, mut htlc: &lightning::ln::chan_utils::HTLCOutputInCommitment, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut ret = (self.sign_justice_revoked_htlc)(self.this_arg, crate::c_types::Transaction::from_bitcoin(justice_tx), input, amount, per_commitment_key.as_ref(), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { (htlc as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.sign_justice_revoked_htlc)(self.this_arg, crate::c_types::Transaction::from_bitcoin(justice_tx), input, amount, per_commitment_key.as_ref(), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { ObjOps::nonnull_ptr_to_inner((htlc as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn sign_counterparty_htlc_transaction(&self, mut htlc_tx: &bitcoin::blockdata::transaction::Transaction, mut input: usize, mut amount: u64, mut per_commitment_point: &bitcoin::secp256k1::key::PublicKey, mut htlc: &lightning::ln::chan_utils::HTLCOutputInCommitment, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut ret = (self.sign_counterparty_htlc_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(htlc_tx), input, amount, crate::c_types::PublicKey::from_rust(&per_commitment_point), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { (htlc as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.sign_counterparty_htlc_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(htlc_tx), input, amount, crate::c_types::PublicKey::from_rust(&per_commitment_point), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { ObjOps::nonnull_ptr_to_inner((htlc as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
@@ -737,12 +749,12 @@ impl rustBaseSign for BaseSign {
 		local_ret
 	}
 	fn sign_channel_announcement(&self, mut msg: &lightning::ln::msgs::UnsignedChannelAnnouncement, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut ret = (self.sign_channel_announcement)(self.this_arg, &crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.sign_channel_announcement)(self.this_arg, &crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn ready_channel(&mut self, mut channel_parameters: &lightning::ln::chan_utils::ChannelTransactionParameters) {
-		(self.ready_channel)(self.this_arg, &crate::lightning::ln::chan_utils::ChannelTransactionParameters { inner: unsafe { (channel_parameters as *const _) as *mut _ }, is_owned: false })
+		(self.ready_channel)(self.this_arg, &crate::lightning::ln::chan_utils::ChannelTransactionParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((channel_parameters as *const _) as *mut _) }, is_owned: false })
 	}
 }
 
@@ -811,19 +823,19 @@ impl lightning::chain::keysinterface::BaseSign for Sign {
 		if let Some(f) = self.BaseSign.set_pubkeys {
 			(f)(&self.BaseSign);
 		}
-		unsafe { &*self.BaseSign.pubkeys.inner }
+		self.BaseSign.pubkeys.get_native_ref()
 	}
 	fn channel_keys_id(&self) -> [u8; 32] {
 		let mut ret = (self.BaseSign.channel_keys_id)(self.BaseSign.this_arg);
 		ret.data
 	}
 	fn sign_counterparty_commitment(&self, mut commitment_tx: &lightning::ln::chan_utils::CommitmentTransaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<(bitcoin::secp256k1::Signature, Vec<bitcoin::secp256k1::Signature>), ()> {
-		let mut ret = (self.BaseSign.sign_counterparty_commitment)(self.BaseSign.this_arg, &crate::lightning::ln::chan_utils::CommitmentTransaction { inner: unsafe { (commitment_tx as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.BaseSign.sign_counterparty_commitment)(self.BaseSign.this_arg, &crate::lightning::ln::chan_utils::CommitmentTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((commitment_tx as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).to_rust(); let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.into_rust().drain(..) { local_orig_ret_0_1.push( { item.into_rust() }); }; let mut local_ret_0 = (orig_ret_0_0.into_rust(), local_orig_ret_0_1); local_ret_0 }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn sign_holder_commitment_and_htlcs(&self, mut commitment_tx: &lightning::ln::chan_utils::HolderCommitmentTransaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<(bitcoin::secp256k1::Signature, Vec<bitcoin::secp256k1::Signature>), ()> {
-		let mut ret = (self.BaseSign.sign_holder_commitment_and_htlcs)(self.BaseSign.this_arg, &crate::lightning::ln::chan_utils::HolderCommitmentTransaction { inner: unsafe { (commitment_tx as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.BaseSign.sign_holder_commitment_and_htlcs)(self.BaseSign.this_arg, &crate::lightning::ln::chan_utils::HolderCommitmentTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((commitment_tx as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).to_rust(); let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.into_rust().drain(..) { local_orig_ret_0_1.push( { item.into_rust() }); }; let mut local_ret_0 = (orig_ret_0_0.into_rust(), local_orig_ret_0_1); local_ret_0 }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
@@ -833,12 +845,12 @@ impl lightning::chain::keysinterface::BaseSign for Sign {
 		local_ret
 	}
 	fn sign_justice_revoked_htlc(&self, mut justice_tx: &bitcoin::blockdata::transaction::Transaction, mut input: usize, mut amount: u64, mut per_commitment_key: &bitcoin::secp256k1::key::SecretKey, mut htlc: &lightning::ln::chan_utils::HTLCOutputInCommitment, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut ret = (self.BaseSign.sign_justice_revoked_htlc)(self.BaseSign.this_arg, crate::c_types::Transaction::from_bitcoin(justice_tx), input, amount, per_commitment_key.as_ref(), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { (htlc as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.BaseSign.sign_justice_revoked_htlc)(self.BaseSign.this_arg, crate::c_types::Transaction::from_bitcoin(justice_tx), input, amount, per_commitment_key.as_ref(), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { ObjOps::nonnull_ptr_to_inner((htlc as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn sign_counterparty_htlc_transaction(&self, mut htlc_tx: &bitcoin::blockdata::transaction::Transaction, mut input: usize, mut amount: u64, mut per_commitment_point: &bitcoin::secp256k1::key::PublicKey, mut htlc: &lightning::ln::chan_utils::HTLCOutputInCommitment, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut ret = (self.BaseSign.sign_counterparty_htlc_transaction)(self.BaseSign.this_arg, crate::c_types::Transaction::from_bitcoin(htlc_tx), input, amount, crate::c_types::PublicKey::from_rust(&per_commitment_point), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { (htlc as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.BaseSign.sign_counterparty_htlc_transaction)(self.BaseSign.this_arg, crate::c_types::Transaction::from_bitcoin(htlc_tx), input, amount, crate::c_types::PublicKey::from_rust(&per_commitment_point), &crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { ObjOps::nonnull_ptr_to_inner((htlc as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
@@ -848,12 +860,12 @@ impl lightning::chain::keysinterface::BaseSign for Sign {
 		local_ret
 	}
 	fn sign_channel_announcement(&self, mut msg: &lightning::ln::msgs::UnsignedChannelAnnouncement, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut ret = (self.BaseSign.sign_channel_announcement)(self.BaseSign.this_arg, &crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: unsafe { (msg as *const _) as *mut _ }, is_owned: false });
+		let mut ret = (self.BaseSign.sign_channel_announcement)(self.BaseSign.this_arg, &crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn ready_channel(&mut self, mut channel_parameters: &lightning::ln::chan_utils::ChannelTransactionParameters) {
-		(self.BaseSign.ready_channel)(self.BaseSign.this_arg, &crate::lightning::ln::chan_utils::ChannelTransactionParameters { inner: unsafe { (channel_parameters as *const _) as *mut _ }, is_owned: false })
+		(self.BaseSign.ready_channel)(self.BaseSign.this_arg, &crate::lightning::ln::chan_utils::ChannelTransactionParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((channel_parameters as *const _) as *mut _) }, is_owned: false })
 	}
 }
 impl lightning::util::ser::Writeable for Sign {
@@ -1049,7 +1061,7 @@ pub struct InMemorySigner {
 impl Drop for InMemorySigner {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeInMemorySigner>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -1062,11 +1074,17 @@ extern "C" fn InMemorySigner_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInMemorySigner); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl InMemorySigner {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeInMemorySigner {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeInMemorySigner {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeInMemorySigner {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -1074,74 +1092,74 @@ impl InMemorySigner {
 /// Private key of anchor tx
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_funding_key(this_ptr: &InMemorySigner) -> *const [u8; 32] {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.funding_key;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().funding_key;
 	inner_val.as_ref()
 }
 /// Private key of anchor tx
 #[no_mangle]
 pub extern "C" fn InMemorySigner_set_funding_key(this_ptr: &mut InMemorySigner, mut val: crate::c_types::SecretKey) {
-	unsafe { &mut *this_ptr.inner }.funding_key = val.into_rust();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.funding_key = val.into_rust();
 }
 /// Holder secret key for blinded revocation pubkey
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_revocation_base_key(this_ptr: &InMemorySigner) -> *const [u8; 32] {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.revocation_base_key;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().revocation_base_key;
 	inner_val.as_ref()
 }
 /// Holder secret key for blinded revocation pubkey
 #[no_mangle]
 pub extern "C" fn InMemorySigner_set_revocation_base_key(this_ptr: &mut InMemorySigner, mut val: crate::c_types::SecretKey) {
-	unsafe { &mut *this_ptr.inner }.revocation_base_key = val.into_rust();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.revocation_base_key = val.into_rust();
 }
 /// Holder secret key used for our balance in counterparty-broadcasted commitment transactions
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_payment_key(this_ptr: &InMemorySigner) -> *const [u8; 32] {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.payment_key;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().payment_key;
 	inner_val.as_ref()
 }
 /// Holder secret key used for our balance in counterparty-broadcasted commitment transactions
 #[no_mangle]
 pub extern "C" fn InMemorySigner_set_payment_key(this_ptr: &mut InMemorySigner, mut val: crate::c_types::SecretKey) {
-	unsafe { &mut *this_ptr.inner }.payment_key = val.into_rust();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.payment_key = val.into_rust();
 }
 /// Holder secret key used in HTLC tx
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_delayed_payment_base_key(this_ptr: &InMemorySigner) -> *const [u8; 32] {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.delayed_payment_base_key;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().delayed_payment_base_key;
 	inner_val.as_ref()
 }
 /// Holder secret key used in HTLC tx
 #[no_mangle]
 pub extern "C" fn InMemorySigner_set_delayed_payment_base_key(this_ptr: &mut InMemorySigner, mut val: crate::c_types::SecretKey) {
-	unsafe { &mut *this_ptr.inner }.delayed_payment_base_key = val.into_rust();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.delayed_payment_base_key = val.into_rust();
 }
 /// Holder htlc secret key used in commitment tx htlc outputs
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_htlc_base_key(this_ptr: &InMemorySigner) -> *const [u8; 32] {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.htlc_base_key;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().htlc_base_key;
 	inner_val.as_ref()
 }
 /// Holder htlc secret key used in commitment tx htlc outputs
 #[no_mangle]
 pub extern "C" fn InMemorySigner_set_htlc_base_key(this_ptr: &mut InMemorySigner, mut val: crate::c_types::SecretKey) {
-	unsafe { &mut *this_ptr.inner }.htlc_base_key = val.into_rust();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc_base_key = val.into_rust();
 }
 /// Commitment seed
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_commitment_seed(this_ptr: &InMemorySigner) -> *const [u8; 32] {
-	let mut inner_val = &mut unsafe { &mut *this_ptr.inner }.commitment_seed;
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().commitment_seed;
 	inner_val
 }
 /// Commitment seed
 #[no_mangle]
 pub extern "C" fn InMemorySigner_set_commitment_seed(this_ptr: &mut InMemorySigner, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *this_ptr.inner }.commitment_seed = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.commitment_seed = val.data;
 }
 impl Clone for InMemorySigner {
 	fn clone(&self) -> Self {
 		Self {
 			inner: if <*mut nativeInMemorySigner>::is_null(self.inner) { std::ptr::null_mut() } else {
-				Box::into_raw(Box::new(unsafe { &*self.inner }.clone())) },
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
 	}
@@ -1161,7 +1179,7 @@ pub extern "C" fn InMemorySigner_clone(orig: &InMemorySigner) -> InMemorySigner 
 #[no_mangle]
 pub extern "C" fn InMemorySigner_new(mut funding_key: crate::c_types::SecretKey, mut revocation_base_key: crate::c_types::SecretKey, mut payment_key: crate::c_types::SecretKey, mut delayed_payment_base_key: crate::c_types::SecretKey, mut htlc_base_key: crate::c_types::SecretKey, mut commitment_seed: crate::c_types::ThirtyTwoBytes, mut channel_value_satoshis: u64, mut channel_keys_id: crate::c_types::ThirtyTwoBytes) -> crate::lightning::chain::keysinterface::InMemorySigner {
 	let mut ret = lightning::chain::keysinterface::InMemorySigner::new(secp256k1::SECP256K1, funding_key.into_rust(), revocation_base_key.into_rust(), payment_key.into_rust(), delayed_payment_base_key.into_rust(), htlc_base_key.into_rust(), commitment_seed.data, channel_value_satoshis, channel_keys_id.data);
-	crate::lightning::chain::keysinterface::InMemorySigner { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	crate::lightning::chain::keysinterface::InMemorySigner { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Counterparty pubkeys.
@@ -1169,8 +1187,8 @@ pub extern "C" fn InMemorySigner_new(mut funding_key: crate::c_types::SecretKey,
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InMemorySigner_counterparty_pubkeys(this_arg: &InMemorySigner) -> crate::lightning::ln::chan_utils::ChannelPublicKeys {
-	let mut ret = unsafe { &*this_arg.inner }.counterparty_pubkeys();
-	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ( (&(*ret) as *const _) as *mut _) }, is_owned: false }
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.counterparty_pubkeys();
+	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const _) as *mut _) }, is_owned: false }
 }
 
 /// The contest_delay value specified by our counterparty and applied on holder-broadcastable
@@ -1180,7 +1198,7 @@ pub extern "C" fn InMemorySigner_counterparty_pubkeys(this_arg: &InMemorySigner)
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InMemorySigner_counterparty_selected_contest_delay(this_arg: &InMemorySigner) -> u16 {
-	let mut ret = unsafe { &*this_arg.inner }.counterparty_selected_contest_delay();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.counterparty_selected_contest_delay();
 	ret
 }
 
@@ -1191,7 +1209,7 @@ pub extern "C" fn InMemorySigner_counterparty_selected_contest_delay(this_arg: &
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InMemorySigner_holder_selected_contest_delay(this_arg: &InMemorySigner) -> u16 {
-	let mut ret = unsafe { &*this_arg.inner }.holder_selected_contest_delay();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.holder_selected_contest_delay();
 	ret
 }
 
@@ -1200,7 +1218,7 @@ pub extern "C" fn InMemorySigner_holder_selected_contest_delay(this_arg: &InMemo
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InMemorySigner_is_outbound(this_arg: &InMemorySigner) -> bool {
-	let mut ret = unsafe { &*this_arg.inner }.is_outbound();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_outbound();
 	ret
 }
 
@@ -1209,8 +1227,8 @@ pub extern "C" fn InMemorySigner_is_outbound(this_arg: &InMemorySigner) -> bool 
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InMemorySigner_funding_outpoint(this_arg: &InMemorySigner) -> crate::lightning::chain::transaction::OutPoint {
-	let mut ret = unsafe { &*this_arg.inner }.funding_outpoint();
-	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ( (&(*ret) as *const _) as *mut _) }, is_owned: false }
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.funding_outpoint();
+	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const _) as *mut _) }, is_owned: false }
 }
 
 /// Obtain a ChannelTransactionParameters for this channel, to be used when verifying or
@@ -1220,8 +1238,8 @@ pub extern "C" fn InMemorySigner_funding_outpoint(this_arg: &InMemorySigner) -> 
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InMemorySigner_get_channel_parameters(this_arg: &InMemorySigner) -> crate::lightning::ln::chan_utils::ChannelTransactionParameters {
-	let mut ret = unsafe { &*this_arg.inner }.get_channel_parameters();
-	crate::lightning::ln::chan_utils::ChannelTransactionParameters { inner: unsafe { ( (&(*ret) as *const _) as *mut _) }, is_owned: false }
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_channel_parameters();
+	crate::lightning::ln::chan_utils::ChannelTransactionParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const _) as *mut _) }, is_owned: false }
 }
 
 /// Sign the single input of spend_tx at index `input_idx` which spends the output
@@ -1232,7 +1250,7 @@ pub extern "C" fn InMemorySigner_get_channel_parameters(this_arg: &InMemorySigne
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InMemorySigner_sign_counterparty_payment_input(this_arg: &InMemorySigner, mut spend_tx: crate::c_types::Transaction, mut input_idx: usize, descriptor: &crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor) -> crate::c_types::derived::CResult_CVec_CVec_u8ZZNoneZ {
-	let mut ret = unsafe { &*this_arg.inner }.sign_counterparty_payment_input(&spend_tx.into_bitcoin(), input_idx, unsafe { &*descriptor.inner }, secp256k1::SECP256K1);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign_counterparty_payment_input(&spend_tx.into_bitcoin(), input_idx, descriptor.get_native_ref(), secp256k1::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let mut local_ret_0_0 = Vec::new(); for mut item in item.drain(..) { local_ret_0_0.push( { item }); }; local_ret_0_0.into() }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
@@ -1246,14 +1264,14 @@ pub extern "C" fn InMemorySigner_sign_counterparty_payment_input(this_arg: &InMe
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InMemorySigner_sign_dynamic_p2wsh_input(this_arg: &InMemorySigner, mut spend_tx: crate::c_types::Transaction, mut input_idx: usize, descriptor: &crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor) -> crate::c_types::derived::CResult_CVec_CVec_u8ZZNoneZ {
-	let mut ret = unsafe { &*this_arg.inner }.sign_dynamic_p2wsh_input(&spend_tx.into_bitcoin(), input_idx, unsafe { &*descriptor.inner }, secp256k1::SECP256K1);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign_dynamic_p2wsh_input(&spend_tx.into_bitcoin(), input_idx, descriptor.get_native_ref(), secp256k1::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let mut local_ret_0_0 = Vec::new(); for mut item in item.drain(..) { local_ret_0_0.push( { item }); }; local_ret_0_0.into() }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 
 impl From<nativeInMemorySigner> for crate::lightning::chain::keysinterface::BaseSign {
 	fn from(obj: nativeInMemorySigner) -> Self {
-		let mut rust_obj = InMemorySigner { inner: Box::into_raw(Box::new(obj)), is_owned: true };
+		let mut rust_obj = InMemorySigner { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = InMemorySigner_as_BaseSign(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
 		rust_obj.inner = std::ptr::null_mut();
@@ -1266,7 +1284,7 @@ impl From<nativeInMemorySigner> for crate::lightning::chain::keysinterface::Base
 #[no_mangle]
 pub extern "C" fn InMemorySigner_as_BaseSign(this_arg: &InMemorySigner) -> crate::lightning::chain::keysinterface::BaseSign {
 	crate::lightning::chain::keysinterface::BaseSign {
-		this_arg: unsafe { (*this_arg).inner as *mut c_void },
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		get_per_commitment_point: InMemorySigner_BaseSign_get_per_commitment_point,
 		release_commitment_secret: InMemorySigner_BaseSign_release_commitment_secret,
@@ -1298,7 +1316,7 @@ extern "C" fn InMemorySigner_BaseSign_release_commitment_secret(this_arg: *const
 #[must_use]
 extern "C" fn InMemorySigner_BaseSign_pubkeys(this_arg: *const c_void) -> crate::lightning::ln::chan_utils::ChannelPublicKeys {
 	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::pubkeys(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, );
-	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ( (&(*ret) as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const _) as *mut _) }, is_owned: false }
 }
 extern "C" fn InMemorySigner_BaseSign_set_pubkeys(trait_self_arg: &BaseSign) {
 	// This is a bit race-y in the general case, but for our specific use-cases today, we're safe
@@ -1314,13 +1332,13 @@ extern "C" fn InMemorySigner_BaseSign_channel_keys_id(this_arg: *const c_void) -
 }
 #[must_use]
 extern "C" fn InMemorySigner_BaseSign_sign_counterparty_commitment(this_arg: *const c_void, commitment_tx: &crate::lightning::ln::chan_utils::CommitmentTransaction) -> crate::c_types::derived::CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
-	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_counterparty_commitment(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, unsafe { &*commitment_tx.inner }, secp256k1::SECP256K1);
+	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_counterparty_commitment(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, commitment_tx.get_native_ref(), secp256k1::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { crate::c_types::Signature::from_rust(&item) }); }; let mut local_ret_0 = (crate::c_types::Signature::from_rust(&orig_ret_0_0), local_orig_ret_0_1.into()).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 #[must_use]
 extern "C" fn InMemorySigner_BaseSign_sign_holder_commitment_and_htlcs(this_arg: *const c_void, commitment_tx: &crate::lightning::ln::chan_utils::HolderCommitmentTransaction) -> crate::c_types::derived::CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
-	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_holder_commitment_and_htlcs(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, unsafe { &*commitment_tx.inner }, secp256k1::SECP256K1);
+	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_holder_commitment_and_htlcs(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, commitment_tx.get_native_ref(), secp256k1::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { crate::c_types::Signature::from_rust(&item) }); }; let mut local_ret_0 = (crate::c_types::Signature::from_rust(&orig_ret_0_0), local_orig_ret_0_1.into()).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
@@ -1332,13 +1350,13 @@ extern "C" fn InMemorySigner_BaseSign_sign_justice_revoked_output(this_arg: *con
 }
 #[must_use]
 extern "C" fn InMemorySigner_BaseSign_sign_justice_revoked_htlc(this_arg: *const c_void, mut justice_tx: crate::c_types::Transaction, mut input: usize, mut amount: u64, per_commitment_key: *const [u8; 32], htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment) -> crate::c_types::derived::CResult_SignatureNoneZ {
-	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_justice_revoked_htlc(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, &justice_tx.into_bitcoin(), input, amount, &::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *per_commitment_key}[..]).unwrap(), unsafe { &*htlc.inner }, secp256k1::SECP256K1);
+	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_justice_revoked_htlc(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, &justice_tx.into_bitcoin(), input, amount, &::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *per_commitment_key}[..]).unwrap(), htlc.get_native_ref(), secp256k1::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::Signature::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 #[must_use]
 extern "C" fn InMemorySigner_BaseSign_sign_counterparty_htlc_transaction(this_arg: *const c_void, mut htlc_tx: crate::c_types::Transaction, mut input: usize, mut amount: u64, mut per_commitment_point: crate::c_types::PublicKey, htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment) -> crate::c_types::derived::CResult_SignatureNoneZ {
-	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_counterparty_htlc_transaction(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, &htlc_tx.into_bitcoin(), input, amount, &per_commitment_point.into_rust(), unsafe { &*htlc.inner }, secp256k1::SECP256K1);
+	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_counterparty_htlc_transaction(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, &htlc_tx.into_bitcoin(), input, amount, &per_commitment_point.into_rust(), htlc.get_native_ref(), secp256k1::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::Signature::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
@@ -1350,17 +1368,17 @@ extern "C" fn InMemorySigner_BaseSign_sign_closing_transaction(this_arg: *const 
 }
 #[must_use]
 extern "C" fn InMemorySigner_BaseSign_sign_channel_announcement(this_arg: *const c_void, msg: &crate::lightning::ln::msgs::UnsignedChannelAnnouncement) -> crate::c_types::derived::CResult_SignatureNoneZ {
-	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_channel_announcement(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, unsafe { &*msg.inner }, secp256k1::SECP256K1);
+	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_channel_announcement(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, msg.get_native_ref(), secp256k1::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::Signature::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 extern "C" fn InMemorySigner_BaseSign_ready_channel(this_arg: *mut c_void, channel_parameters: &crate::lightning::ln::chan_utils::ChannelTransactionParameters) {
-	<nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::ready_channel(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, unsafe { &*channel_parameters.inner })
+	<nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::ready_channel(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, channel_parameters.get_native_ref())
 }
 
 impl From<nativeInMemorySigner> for crate::lightning::chain::keysinterface::Sign {
 	fn from(obj: nativeInMemorySigner) -> Self {
-		let mut rust_obj = InMemorySigner { inner: Box::into_raw(Box::new(obj)), is_owned: true };
+		let mut rust_obj = InMemorySigner { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = InMemorySigner_as_Sign(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
 		rust_obj.inner = std::ptr::null_mut();
@@ -1373,10 +1391,10 @@ impl From<nativeInMemorySigner> for crate::lightning::chain::keysinterface::Sign
 #[no_mangle]
 pub extern "C" fn InMemorySigner_as_Sign(this_arg: &InMemorySigner) -> crate::lightning::chain::keysinterface::Sign {
 	crate::lightning::chain::keysinterface::Sign {
-		this_arg: unsafe { (*this_arg).inner as *mut c_void },
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		BaseSign: crate::lightning::chain::keysinterface::BaseSign {
-			this_arg: unsafe { (*this_arg).inner as *mut c_void },
+			this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 			free: None,
 			get_per_commitment_point: InMemorySigner_BaseSign_get_per_commitment_point,
 			release_commitment_secret: InMemorySigner_BaseSign_release_commitment_secret,
@@ -1408,7 +1426,7 @@ extern "C" fn Sign_InMemorySigner_cloned(new_obj: &mut crate::lightning::chain::
 #[no_mangle]
 /// Serialize the InMemorySigner object into a byte array which can be read by InMemorySigner_read
 pub extern "C" fn InMemorySigner_write(obj: &InMemorySigner) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*unsafe { &*obj }.inner })
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
 pub(crate) extern "C" fn InMemorySigner_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
@@ -1418,7 +1436,7 @@ pub(crate) extern "C" fn InMemorySigner_write_void(obj: *const c_void) -> crate:
 /// Read a InMemorySigner from a byte array, created by InMemorySigner_write
 pub extern "C" fn InMemorySigner_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_InMemorySignerDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::keysinterface::InMemorySigner { inner: Box::into_raw(Box::new(o)), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::keysinterface::InMemorySigner { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 
@@ -1450,7 +1468,7 @@ pub struct KeysManager {
 impl Drop for KeysManager {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeKeysManager>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -1463,11 +1481,17 @@ extern "C" fn KeysManager_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeKeysManager); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl KeysManager {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeKeysManager {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeKeysManager {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeKeysManager {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -1495,7 +1519,7 @@ impl KeysManager {
 #[no_mangle]
 pub extern "C" fn KeysManager_new(seed: *const [u8; 32], mut starting_time_secs: u64, mut starting_time_nanos: u32) -> KeysManager {
 	let mut ret = lightning::chain::keysinterface::KeysManager::new(unsafe { &*seed}, starting_time_secs, starting_time_nanos);
-	KeysManager { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	KeysManager { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Derive an old Sign containing per-channel secrets based on a key derivation parameters.
@@ -1506,8 +1530,8 @@ pub extern "C" fn KeysManager_new(seed: *const [u8; 32], mut starting_time_secs:
 #[must_use]
 #[no_mangle]
 pub extern "C" fn KeysManager_derive_channel_keys(this_arg: &KeysManager, mut channel_value_satoshis: u64, params: *const [u8; 32]) -> crate::lightning::chain::keysinterface::InMemorySigner {
-	let mut ret = unsafe { &*this_arg.inner }.derive_channel_keys(channel_value_satoshis, unsafe { &*params});
-	crate::lightning::chain::keysinterface::InMemorySigner { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.derive_channel_keys(channel_value_satoshis, unsafe { &*params});
+	crate::lightning::chain::keysinterface::InMemorySigner { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a Transaction which spends the given descriptors to the given outputs, plus an
@@ -1526,14 +1550,14 @@ pub extern "C" fn KeysManager_derive_channel_keys(this_arg: &KeysManager, mut ch
 pub extern "C" fn KeysManager_spend_spendable_outputs(this_arg: &KeysManager, mut descriptors: crate::c_types::derived::CVec_SpendableOutputDescriptorZ, mut outputs: crate::c_types::derived::CVec_TxOutZ, mut change_destination_script: crate::c_types::derived::CVec_u8Z, mut feerate_sat_per_1000_weight: u32) -> crate::c_types::derived::CResult_TransactionNoneZ {
 	let mut local_descriptors = Vec::new(); for mut item in descriptors.into_rust().drain(..) { local_descriptors.push( { item.into_native() }); };
 	let mut local_outputs = Vec::new(); for mut item in outputs.into_rust().drain(..) { local_outputs.push( { item.into_rust() }); };
-	let mut ret = unsafe { &*this_arg.inner }.spend_spendable_outputs(&local_descriptors.iter().collect::<Vec<_>>()[..], local_outputs, ::bitcoin::blockdata::script::Script::from(change_destination_script.into_rust()), feerate_sat_per_1000_weight, secp256k1::SECP256K1);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.spend_spendable_outputs(&local_descriptors.iter().collect::<Vec<_>>()[..], local_outputs, ::bitcoin::blockdata::script::Script::from(change_destination_script.into_rust()), feerate_sat_per_1000_weight, secp256k1::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::Transaction::from_bitcoin(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 
 impl From<nativeKeysManager> for crate::lightning::chain::keysinterface::KeysInterface {
 	fn from(obj: nativeKeysManager) -> Self {
-		let mut rust_obj = KeysManager { inner: Box::into_raw(Box::new(obj)), is_owned: true };
+		let mut rust_obj = KeysManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = KeysManager_as_KeysInterface(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
 		rust_obj.inner = std::ptr::null_mut();
@@ -1546,7 +1570,7 @@ impl From<nativeKeysManager> for crate::lightning::chain::keysinterface::KeysInt
 #[no_mangle]
 pub extern "C" fn KeysManager_as_KeysInterface(this_arg: &KeysManager) -> crate::lightning::chain::keysinterface::KeysInterface {
 	crate::lightning::chain::keysinterface::KeysInterface {
-		this_arg: unsafe { (*this_arg).inner as *mut c_void },
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		get_node_secret: KeysManager_KeysInterface_get_node_secret,
 		get_destination_script: KeysManager_KeysInterface_get_destination_script,
@@ -1571,7 +1595,7 @@ extern "C" fn KeysManager_KeysInterface_get_destination_script(this_arg: *const 
 #[must_use]
 extern "C" fn KeysManager_KeysInterface_get_shutdown_scriptpubkey(this_arg: *const c_void) -> crate::lightning::ln::script::ShutdownScript {
 	let mut ret = <nativeKeysManager as lightning::chain::keysinterface::KeysInterface<>>::get_shutdown_scriptpubkey(unsafe { &mut *(this_arg as *mut nativeKeysManager) }, );
-	crate::lightning::ln::script::ShutdownScript { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 #[must_use]
 extern "C" fn KeysManager_KeysInterface_get_channel_signer(this_arg: *const c_void, mut _inbound: bool, mut channel_value_satoshis: u64) -> crate::lightning::chain::keysinterface::Sign {
@@ -1586,7 +1610,7 @@ extern "C" fn KeysManager_KeysInterface_get_secure_random_bytes(this_arg: *const
 #[must_use]
 extern "C" fn KeysManager_KeysInterface_read_chan_signer(this_arg: *const c_void, mut reader: crate::c_types::u8slice) -> crate::c_types::derived::CResult_SignDecodeErrorZ {
 	let mut ret = <nativeKeysManager as lightning::chain::keysinterface::KeysInterface<>>::read_chan_signer(unsafe { &mut *(this_arg as *mut nativeKeysManager) }, reader.to_slice());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: Box::into_raw(Box::new(e)), is_owned: true } }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]

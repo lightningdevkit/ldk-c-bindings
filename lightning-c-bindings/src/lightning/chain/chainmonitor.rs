@@ -58,7 +58,7 @@ pub struct ChainMonitor {
 impl Drop for ChainMonitor {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeChainMonitor>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -71,11 +71,17 @@ extern "C" fn ChainMonitor_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChainMonitor); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl ChainMonitor {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeChainMonitor {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeChainMonitor {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeChainMonitor {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -94,12 +100,12 @@ impl ChainMonitor {
 pub extern "C" fn ChainMonitor_new(chain_source: *mut crate::lightning::chain::Filter, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut logger: crate::lightning::util::logger::Logger, mut feeest: crate::lightning::chain::chaininterface::FeeEstimator, mut persister: crate::lightning::chain::channelmonitor::Persist) -> ChainMonitor {
 	let mut local_chain_source = if chain_source == std::ptr::null_mut() { None } else { Some( { unsafe { *Box::from_raw(chain_source) } }) };
 	let mut ret = lightning::chain::chainmonitor::ChainMonitor::new(local_chain_source, broadcaster, logger, feeest, persister);
-	ChainMonitor { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	ChainMonitor { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 impl From<nativeChainMonitor> for crate::lightning::chain::Listen {
 	fn from(obj: nativeChainMonitor) -> Self {
-		let mut rust_obj = ChainMonitor { inner: Box::into_raw(Box::new(obj)), is_owned: true };
+		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_Listen(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
 		rust_obj.inner = std::ptr::null_mut();
@@ -112,7 +118,7 @@ impl From<nativeChainMonitor> for crate::lightning::chain::Listen {
 #[no_mangle]
 pub extern "C" fn ChainMonitor_as_Listen(this_arg: &ChainMonitor) -> crate::lightning::chain::Listen {
 	crate::lightning::chain::Listen {
-		this_arg: unsafe { (*this_arg).inner as *mut c_void },
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		block_connected: ChainMonitor_Listen_block_connected,
 		block_disconnected: ChainMonitor_Listen_block_disconnected,
@@ -128,7 +134,7 @@ extern "C" fn ChainMonitor_Listen_block_disconnected(this_arg: *const c_void, he
 
 impl From<nativeChainMonitor> for crate::lightning::chain::Confirm {
 	fn from(obj: nativeChainMonitor) -> Self {
-		let mut rust_obj = ChainMonitor { inner: Box::into_raw(Box::new(obj)), is_owned: true };
+		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_Confirm(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
 		rust_obj.inner = std::ptr::null_mut();
@@ -141,7 +147,7 @@ impl From<nativeChainMonitor> for crate::lightning::chain::Confirm {
 #[no_mangle]
 pub extern "C" fn ChainMonitor_as_Confirm(this_arg: &ChainMonitor) -> crate::lightning::chain::Confirm {
 	crate::lightning::chain::Confirm {
-		this_arg: unsafe { (*this_arg).inner as *mut c_void },
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		transactions_confirmed: ChainMonitor_Confirm_transactions_confirmed,
 		transaction_unconfirmed: ChainMonitor_Confirm_transaction_unconfirmed,
@@ -169,7 +175,7 @@ extern "C" fn ChainMonitor_Confirm_get_relevant_txids(this_arg: *const c_void) -
 
 impl From<nativeChainMonitor> for crate::lightning::chain::Watch {
 	fn from(obj: nativeChainMonitor) -> Self {
-		let mut rust_obj = ChainMonitor { inner: Box::into_raw(Box::new(obj)), is_owned: true };
+		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_Watch(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
 		rust_obj.inner = std::ptr::null_mut();
@@ -182,7 +188,7 @@ impl From<nativeChainMonitor> for crate::lightning::chain::Watch {
 #[no_mangle]
 pub extern "C" fn ChainMonitor_as_Watch(this_arg: &ChainMonitor) -> crate::lightning::chain::Watch {
 	crate::lightning::chain::Watch {
-		this_arg: unsafe { (*this_arg).inner as *mut c_void },
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		watch_channel: ChainMonitor_Watch_watch_channel,
 		update_channel: ChainMonitor_Watch_update_channel,
@@ -211,7 +217,7 @@ extern "C" fn ChainMonitor_Watch_release_pending_monitor_events(this_arg: *const
 
 impl From<nativeChainMonitor> for crate::lightning::util::events::EventsProvider {
 	fn from(obj: nativeChainMonitor) -> Self {
-		let mut rust_obj = ChainMonitor { inner: Box::into_raw(Box::new(obj)), is_owned: true };
+		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_EventsProvider(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
 		rust_obj.inner = std::ptr::null_mut();
@@ -224,7 +230,7 @@ impl From<nativeChainMonitor> for crate::lightning::util::events::EventsProvider
 #[no_mangle]
 pub extern "C" fn ChainMonitor_as_EventsProvider(this_arg: &ChainMonitor) -> crate::lightning::util::events::EventsProvider {
 	crate::lightning::util::events::EventsProvider {
-		this_arg: unsafe { (*this_arg).inner as *mut c_void },
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		process_pending_events: ChainMonitor_EventsProvider_process_pending_events,
 	}

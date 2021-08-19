@@ -55,7 +55,7 @@ pub struct FilesystemPersister {
 impl Drop for FilesystemPersister {
 	fn drop(&mut self) {
 		if self.is_owned && !<*mut nativeFilesystemPersister>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(self.inner) };
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
@@ -68,11 +68,17 @@ extern "C" fn FilesystemPersister_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeFilesystemPersister); }
 }
 #[allow(unused)]
-/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 impl FilesystemPersister {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeFilesystemPersister {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeFilesystemPersister {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeFilesystemPersister {
 		assert!(self.is_owned);
-		let ret = self.inner;
+		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = std::ptr::null_mut();
 		ret
 	}
@@ -83,14 +89,14 @@ impl FilesystemPersister {
 #[no_mangle]
 pub extern "C" fn FilesystemPersister_new(mut path_to_channel_data: crate::c_types::Str) -> FilesystemPersister {
 	let mut ret = lightning_persister::FilesystemPersister::new(path_to_channel_data.into_string());
-	FilesystemPersister { inner: Box::into_raw(Box::new(ret)), is_owned: true }
+	FilesystemPersister { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Get the directory which was provided when this persister was initialized.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn FilesystemPersister_get_data_dir(this_arg: &FilesystemPersister) -> crate::c_types::Str {
-	let mut ret = unsafe { &*this_arg.inner }.get_data_dir();
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_data_dir();
 	ret.into()
 }
 
@@ -99,7 +105,7 @@ pub extern "C" fn FilesystemPersister_get_data_dir(this_arg: &FilesystemPersiste
 #[must_use]
 #[no_mangle]
 pub extern "C" fn FilesystemPersister_persist_manager(mut data_dir: crate::c_types::Str, manager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NoneErrorZ {
-	let mut ret = lightning_persister::FilesystemPersister::persist_manager(data_dir.into_string(), unsafe { &*manager.inner });
+	let mut ret = lightning_persister::FilesystemPersister::persist_manager(data_dir.into_string(), manager.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
 	local_ret
 }
@@ -108,14 +114,14 @@ pub extern "C" fn FilesystemPersister_persist_manager(mut data_dir: crate::c_typ
 #[must_use]
 #[no_mangle]
 pub extern "C" fn FilesystemPersister_read_channelmonitors(this_arg: &FilesystemPersister, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface) -> crate::c_types::derived::CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
-	let mut ret = unsafe { &*this_arg.inner }.read_channelmonitors(keys_manager);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let (mut orig_ret_0_0_0, mut orig_ret_0_0_1) = item; let mut local_ret_0_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: Box::into_raw(Box::new(orig_ret_0_0_1)), is_owned: true }).into(); local_ret_0_0 }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.read_channelmonitors(keys_manager);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let (mut orig_ret_0_0_0, mut orig_ret_0_0_1) = item; let mut local_ret_0_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_ret_0_0_1), is_owned: true }).into(); local_ret_0_0 }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
 	local_ret
 }
 
 impl From<nativeFilesystemPersister> for crate::lightning::chain::channelmonitor::Persist {
 	fn from(obj: nativeFilesystemPersister) -> Self {
-		let mut rust_obj = FilesystemPersister { inner: Box::into_raw(Box::new(obj)), is_owned: true };
+		let mut rust_obj = FilesystemPersister { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = FilesystemPersister_as_Persist(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
 		rust_obj.inner = std::ptr::null_mut();
@@ -128,7 +134,7 @@ impl From<nativeFilesystemPersister> for crate::lightning::chain::channelmonitor
 #[no_mangle]
 pub extern "C" fn FilesystemPersister_as_Persist(this_arg: &FilesystemPersister) -> crate::lightning::chain::channelmonitor::Persist {
 	crate::lightning::chain::channelmonitor::Persist {
-		this_arg: unsafe { (*this_arg).inner as *mut c_void },
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		persist_new_channel: FilesystemPersister_Persist_persist_new_channel,
 		update_persisted_channel: FilesystemPersister_Persist_update_persisted_channel,
@@ -137,13 +143,13 @@ pub extern "C" fn FilesystemPersister_as_Persist(this_arg: &FilesystemPersister)
 
 #[must_use]
 extern "C" fn FilesystemPersister_Persist_persist_new_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, monitor: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
-	let mut ret = <nativeFilesystemPersister as lightning::chain::channelmonitor::Persist<_>>::persist_new_channel(unsafe { &mut *(this_arg as *mut nativeFilesystemPersister) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, unsafe { &*monitor.inner });
+	let mut ret = <nativeFilesystemPersister as lightning::chain::channelmonitor::Persist<_>>::persist_new_channel(unsafe { &mut *(this_arg as *mut nativeFilesystemPersister) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, monitor.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdateErr::native_into(e) }).into() };
 	local_ret
 }
 #[must_use]
 extern "C" fn FilesystemPersister_Persist_update_persisted_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, _update: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, monitor: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
-	let mut ret = <nativeFilesystemPersister as lightning::chain::channelmonitor::Persist<_>>::update_persisted_channel(unsafe { &mut *(this_arg as *mut nativeFilesystemPersister) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, unsafe { &*_update.inner }, unsafe { &*monitor.inner });
+	let mut ret = <nativeFilesystemPersister as lightning::chain::channelmonitor::Persist<_>>::update_persisted_channel(unsafe { &mut *(this_arg as *mut nativeFilesystemPersister) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, _update.get_native_ref(), monitor.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdateErr::native_into(e) }).into() };
 	local_ret
 }

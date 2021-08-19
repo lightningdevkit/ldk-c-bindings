@@ -207,7 +207,10 @@ pub extern "C" fn ShutdownScript_new_p2wsh(script_hash: *const [u8; 32]) -> Shut
 	ShutdownScript { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Generates a P2WSH script pubkey from the given segwit version and program.
+/// Generates a witness script pubkey from the given segwit version and program.
+///
+/// Note for version-zero witness scripts you must use [`ShutdownScript::new_p2wpkh`] or
+/// [`ShutdownScript::new_p2wsh`] instead.
 ///
 /// # Errors
 ///

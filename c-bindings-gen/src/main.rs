@@ -618,20 +618,19 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 				}
 
 				if let Some(ident) = &field.ident {
-					let ref_type = syn::Type::Reference(syn::TypeReference {
-						and_token: syn::Token!(&)(Span::call_site()), lifetime: None, mutability: None,
-						elem: Box::new(field.ty.clone()) });
-					if types.understood_c_type(&ref_type, Some(&gen_types)) {
-						writeln_arg_docs(w, &field.attrs, "", types, Some(&gen_types), vec![].drain(..), Some(&ref_type));
-						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> ", struct_name, ident, struct_name).unwrap();
-						types.write_c_type(w, &ref_type, Some(&gen_types), true);
-						write!(w, " {{\n\tlet mut inner_val = &mut this_ptr.get_native_mut_ref().{};\n\t", ident).unwrap();
-						let local_var = types.write_to_c_conversion_new_var(w, &format_ident!("inner_val"), &ref_type, Some(&gen_types), true);
-						if local_var { write!(w, "\n\t").unwrap(); }
-						types.write_to_c_conversion_inline_prefix(w, &ref_type, Some(&gen_types), true);
-						write!(w, "inner_val").unwrap();
-						types.write_to_c_conversion_inline_suffix(w, &ref_type, Some(&gen_types), true);
-						writeln!(w, "\n}}").unwrap();
+					if let Some(ref_type) = types.create_ownable_reference(&field.ty, Some(&gen_types)) {
+						if types.understood_c_type(&ref_type, Some(&gen_types)) {
+							writeln_arg_docs(w, &field.attrs, "", types, Some(&gen_types), vec![].drain(..), Some(&ref_type));
+							write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> ", struct_name, ident, struct_name).unwrap();
+							types.write_c_type(w, &ref_type, Some(&gen_types), true);
+							write!(w, " {{\n\tlet mut inner_val = &mut this_ptr.get_native_mut_ref().{};\n\t", ident).unwrap();
+							let local_var = types.write_to_c_conversion_new_var(w, &format_ident!("inner_val"), &ref_type, Some(&gen_types), true);
+							if local_var { write!(w, "\n\t").unwrap(); }
+							types.write_to_c_conversion_inline_prefix(w, &ref_type, Some(&gen_types), true);
+							write!(w, "inner_val").unwrap();
+							types.write_to_c_conversion_inline_suffix(w, &ref_type, Some(&gen_types), true);
+							writeln!(w, "\n}}").unwrap();
+						}
 					}
 
 					if types.understood_c_type(&field.ty, Some(&gen_types)) {

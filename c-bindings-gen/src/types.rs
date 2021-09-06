@@ -1431,6 +1431,49 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 
+	/// Constructs a reference to the given type, possibly tweaking the type if relevant to make it
+	/// convertable to C.
+	pub fn create_ownable_reference(&self, t: &syn::Type, generics: Option<&GenericTypes>) -> Option<syn::Type> {
+		let default_value = Some(syn::Type::Reference(syn::TypeReference {
+			and_token: syn::Token!(&)(Span::call_site()), lifetime: None, mutability: None,
+			elem: Box::new(t.clone()) }));
+		match t {
+			syn::Type::Path(p) => {
+				if let Some(resolved_path) = self.maybe_resolve_path(&p.path, generics) {
+					if resolved_path != "Vec" { return default_value; }
+					if p.path.segments.len() != 1 { unimplemented!(); }
+					let only_seg = p.path.segments.iter().next().unwrap();
+					if let syn::PathArguments::AngleBracketed(args) = &only_seg.arguments {
+						if args.args.len() != 1 { unimplemented!(); }
+						let inner_arg = args.args.iter().next().unwrap();
+						if let syn::GenericArgument::Type(ty) = &inner_arg {
+							let mut can_create = self.c_type_has_inner(&ty);
+							if let syn::Type::Path(inner) = ty {
+								if inner.path.segments.len() == 1 &&
+										format!("{}", inner.path.segments[0].ident) == "Vec" {
+									can_create = true;
+								}
+							}
+							if !can_create { return default_value; }
+							if let Some(inner_ty) = self.create_ownable_reference(&ty, generics) {
+								return Some(syn::Type::Reference(syn::TypeReference {
+									and_token: syn::Token![&](Span::call_site()),
+									lifetime: None,
+									mutability: None,
+									elem: Box::new(syn::Type::Slice(syn::TypeSlice {
+										bracket_token: syn::token::Bracket { span: Span::call_site() },
+										elem: Box::new(inner_ty)
+									}))
+								}));
+							} else { return default_value; }
+						} else { unimplemented!(); }
+					} else { unimplemented!(); }
+				} else { return None; }
+			},
+			_ => default_value,
+		}
+	}
+
 	// *************************************************
 	// *** Type definition during main.rs processing ***
 	// *************************************************
@@ -1442,12 +1485,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	pub fn c_type_has_inner_from_path(&self, full_path: &str) -> bool {
 		self.crate_types.opaques.get(full_path).is_some()
 	}
+
 	/// Returns true if the object at the given path is mapped as X { inner: *mut origX, .. }.
 	pub fn c_type_has_inner(&self, ty: &syn::Type) -> bool {
 		match ty {
 			syn::Type::Path(p) => {
-				let full_path = self.resolve_path(&p.path, None);
-				self.c_type_has_inner_from_path(&full_path)
+				if let Some(full_path) = self.maybe_resolve_path(&p.path, None) {
+					self.c_type_has_inner_from_path(&full_path)
+				} else { false }
 			},
 			syn::Type::Reference(r) => {
 				self.c_type_has_inner(&*r.elem)

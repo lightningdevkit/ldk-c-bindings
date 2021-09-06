@@ -15,6 +15,7 @@
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -165,6 +166,183 @@ pub extern "C" fn PaymentPurpose_invoice_payment(payment_preimage: crate::c_type
 pub extern "C" fn PaymentPurpose_spontaneous_payment(a: crate::c_types::ThirtyTwoBytes) -> PaymentPurpose {
 	PaymentPurpose::SpontaneousPayment(a, )
 }
+/// The reason the channel was closed. See individual variants more details.
+#[must_use]
+#[derive(Clone)]
+#[repr(C)]
+pub enum ClosureReason {
+	/// Closure generated from receiving a peer error message.
+	///
+	/// Our counterparty may have broadcasted their latest commitment state, and we have
+	/// as well.
+	CounterpartyForceClosed {
+		/// The error which the peer sent us.
+		///
+		/// The string should be sanitized before it is used (e.g emitted to logs
+		/// or printed to stdout). Otherwise, a well crafted error message may exploit
+		/// a security vulnerability in the terminal emulator or the logging subsystem.
+		peer_msg: crate::c_types::Str,
+	},
+	/// Closure generated from [`ChannelManager::force_close_channel`], called by the user.
+	///
+	/// [`ChannelManager::force_close_channel`]: crate::ln::channelmanager::ChannelManager::force_close_channel.
+	HolderForceClosed,
+	/// The channel was closed after negotiating a cooperative close and we've now broadcasted
+	/// the cooperative close transaction. Note the shutdown may have been initiated by us.
+	CooperativeClosure,
+	/// A commitment transaction was confirmed on chain, closing the channel. Most likely this
+	/// commitment transaction came from our counterparty, but it may also have come from
+	/// a copy of our own `ChannelMonitor`.
+	CommitmentTxConfirmed,
+	/// Closure generated from processing an event, likely a HTLC forward/relay/reception.
+	ProcessingError {
+		/// A developer-readable error message which we generated.
+		err: crate::c_types::Str,
+	},
+	/// The `PeerManager` informed us that we've disconnected from the peer. We close channels
+	/// if the `PeerManager` informed us that it is unlikely we'll be able to connect to the
+	/// peer again in the future or if the peer disconnected before we finished negotiating
+	/// the channel open. The first case may be caused by incompatible features which our
+	/// counterparty, or we, require.
+	DisconnectedPeer,
+	/// Closure generated from `ChannelManager::read` if the ChannelMonitor is newer than
+	/// the ChannelManager deserialized.
+	OutdatedChannelManager,
+}
+use lightning::util::events::ClosureReason as nativeClosureReason;
+impl ClosureReason {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeClosureReason {
+		match self {
+			ClosureReason::CounterpartyForceClosed {ref peer_msg, } => {
+				let mut peer_msg_nonref = (*peer_msg).clone();
+				nativeClosureReason::CounterpartyForceClosed {
+					peer_msg: peer_msg_nonref.into_string(),
+				}
+			},
+			ClosureReason::HolderForceClosed => nativeClosureReason::HolderForceClosed,
+			ClosureReason::CooperativeClosure => nativeClosureReason::CooperativeClosure,
+			ClosureReason::CommitmentTxConfirmed => nativeClosureReason::CommitmentTxConfirmed,
+			ClosureReason::ProcessingError {ref err, } => {
+				let mut err_nonref = (*err).clone();
+				nativeClosureReason::ProcessingError {
+					err: err_nonref.into_string(),
+				}
+			},
+			ClosureReason::DisconnectedPeer => nativeClosureReason::DisconnectedPeer,
+			ClosureReason::OutdatedChannelManager => nativeClosureReason::OutdatedChannelManager,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeClosureReason {
+		match self {
+			ClosureReason::CounterpartyForceClosed {mut peer_msg, } => {
+				nativeClosureReason::CounterpartyForceClosed {
+					peer_msg: peer_msg.into_string(),
+				}
+			},
+			ClosureReason::HolderForceClosed => nativeClosureReason::HolderForceClosed,
+			ClosureReason::CooperativeClosure => nativeClosureReason::CooperativeClosure,
+			ClosureReason::CommitmentTxConfirmed => nativeClosureReason::CommitmentTxConfirmed,
+			ClosureReason::ProcessingError {mut err, } => {
+				nativeClosureReason::ProcessingError {
+					err: err.into_string(),
+				}
+			},
+			ClosureReason::DisconnectedPeer => nativeClosureReason::DisconnectedPeer,
+			ClosureReason::OutdatedChannelManager => nativeClosureReason::OutdatedChannelManager,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeClosureReason) -> Self {
+		match native {
+			nativeClosureReason::CounterpartyForceClosed {ref peer_msg, } => {
+				let mut peer_msg_nonref = (*peer_msg).clone();
+				ClosureReason::CounterpartyForceClosed {
+					peer_msg: peer_msg_nonref.into(),
+				}
+			},
+			nativeClosureReason::HolderForceClosed => ClosureReason::HolderForceClosed,
+			nativeClosureReason::CooperativeClosure => ClosureReason::CooperativeClosure,
+			nativeClosureReason::CommitmentTxConfirmed => ClosureReason::CommitmentTxConfirmed,
+			nativeClosureReason::ProcessingError {ref err, } => {
+				let mut err_nonref = (*err).clone();
+				ClosureReason::ProcessingError {
+					err: err_nonref.into(),
+				}
+			},
+			nativeClosureReason::DisconnectedPeer => ClosureReason::DisconnectedPeer,
+			nativeClosureReason::OutdatedChannelManager => ClosureReason::OutdatedChannelManager,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeClosureReason) -> Self {
+		match native {
+			nativeClosureReason::CounterpartyForceClosed {mut peer_msg, } => {
+				ClosureReason::CounterpartyForceClosed {
+					peer_msg: peer_msg.into(),
+				}
+			},
+			nativeClosureReason::HolderForceClosed => ClosureReason::HolderForceClosed,
+			nativeClosureReason::CooperativeClosure => ClosureReason::CooperativeClosure,
+			nativeClosureReason::CommitmentTxConfirmed => ClosureReason::CommitmentTxConfirmed,
+			nativeClosureReason::ProcessingError {mut err, } => {
+				ClosureReason::ProcessingError {
+					err: err.into(),
+				}
+			},
+			nativeClosureReason::DisconnectedPeer => ClosureReason::DisconnectedPeer,
+			nativeClosureReason::OutdatedChannelManager => ClosureReason::OutdatedChannelManager,
+		}
+	}
+}
+/// Frees any resources used by the ClosureReason
+#[no_mangle]
+pub extern "C" fn ClosureReason_free(this_ptr: ClosureReason) { }
+/// Creates a copy of the ClosureReason
+#[no_mangle]
+pub extern "C" fn ClosureReason_clone(orig: &ClosureReason) -> ClosureReason {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new CounterpartyForceClosed-variant ClosureReason
+pub extern "C" fn ClosureReason_counterparty_force_closed(peer_msg: crate::c_types::Str) -> ClosureReason {
+	ClosureReason::CounterpartyForceClosed {
+		peer_msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new HolderForceClosed-variant ClosureReason
+pub extern "C" fn ClosureReason_holder_force_closed() -> ClosureReason {
+	ClosureReason::HolderForceClosed}
+#[no_mangle]
+/// Utility method to constructs a new CooperativeClosure-variant ClosureReason
+pub extern "C" fn ClosureReason_cooperative_closure() -> ClosureReason {
+	ClosureReason::CooperativeClosure}
+#[no_mangle]
+/// Utility method to constructs a new CommitmentTxConfirmed-variant ClosureReason
+pub extern "C" fn ClosureReason_commitment_tx_confirmed() -> ClosureReason {
+	ClosureReason::CommitmentTxConfirmed}
+#[no_mangle]
+/// Utility method to constructs a new ProcessingError-variant ClosureReason
+pub extern "C" fn ClosureReason_processing_error(err: crate::c_types::Str) -> ClosureReason {
+	ClosureReason::ProcessingError {
+		err,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new DisconnectedPeer-variant ClosureReason
+pub extern "C" fn ClosureReason_disconnected_peer() -> ClosureReason {
+	ClosureReason::DisconnectedPeer}
+#[no_mangle]
+/// Utility method to constructs a new OutdatedChannelManager-variant ClosureReason
+pub extern "C" fn ClosureReason_outdated_channel_manager() -> ClosureReason {
+	ClosureReason::OutdatedChannelManager}
+#[no_mangle]
+/// Serialize the ClosureReason object into a byte array which can be read by ClosureReason_read
+pub extern "C" fn ClosureReason_write(obj: &ClosureReason) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
 /// An Event which you should probably take some action in response to.
 ///
 /// Note that while Writeable and Readable are implemented for Event, you probably shouldn't use
@@ -211,8 +389,11 @@ pub enum Event {
 		/// payment is to pay an invoice or to send a spontaneous payment.
 		purpose: crate::lightning::util::events::PaymentPurpose,
 	},
-	/// Indicates an outbound payment we made succeeded (ie it made it all the way to its target
+	/// Indicates an outbound payment we made succeeded (i.e. it made it all the way to its target
 	/// and we got back the payment preimage for it).
+	///
+	/// Note for MPP payments: in rare cases, this event may be preceded by a `PaymentPathFailed`
+	/// event. In this situation, you SHOULD treat this payment as having succeeded.
 	PaymentSent {
 		/// The preimage to the hash given to ChannelManager::send_payment.
 		/// Note that this serves as a payment receipt, if you wish to have such a thing, you must
@@ -221,13 +402,28 @@ pub enum Event {
 	},
 	/// Indicates an outbound payment we made failed. Probably some intermediary node dropped
 	/// something. You may wish to retry with a different route.
-	PaymentFailed {
+	PaymentPathFailed {
 		/// The hash which was given to ChannelManager::send_payment.
 		payment_hash: crate::c_types::ThirtyTwoBytes,
 		/// Indicates the payment was rejected for some reason by the recipient. This implies that
 		/// the payment has failed, not just the route in question. If this is not set, you may
 		/// retry the payment via a different route.
 		rejected_by_dest: bool,
+		/// Any failure information conveyed via the Onion return packet by a node along the failed
+		/// payment route.
+		///
+		/// Should be applied to the [`NetworkGraph`] so that routing decisions can take into
+		/// account the update. [`NetGraphMsgHandler`] is capable of doing this.
+		///
+		/// [`NetworkGraph`]: crate::routing::network_graph::NetworkGraph
+		/// [`NetGraphMsgHandler`]: crate::routing::network_graph::NetGraphMsgHandler
+		network_update: crate::c_types::derived::COption_NetworkUpdateZ,
+		/// For both single-path and multi-path payments, this is set if all paths of the payment have
+		/// failed. This will be set to false if (1) this is an MPP payment and (2) other parts of the
+		/// larger MPP payment were still in flight when this event was generated.
+		all_paths_failed: bool,
+		/// The payment path that failed.
+		path: crate::c_types::derived::CVec_RouteHopZ,
 	},
 	/// Used to indicate that ChannelManager::process_pending_htlc_forwards should be called at a
 	/// time in the future.
@@ -268,6 +464,14 @@ pub enum Event {
 		/// transaction.
 		claim_from_onchain_tx: bool,
 	},
+	/// Used to indicate that a channel with the given `channel_id` is in the process of closure.
+	ChannelClosed {
+		/// The channel_id of the channel which has been closed. Note that on-chain transactions
+		/// resolving the channel are likely still awaiting confirmation.
+		channel_id: crate::c_types::ThirtyTwoBytes,
+		/// The reason the channel was closed.
+		reason: crate::lightning::util::events::ClosureReason,
+	},
 }
 use lightning::util::events::Event as nativeEvent;
 impl Event {
@@ -302,12 +506,20 @@ impl Event {
 					payment_preimage: ::lightning::ln::PaymentPreimage(payment_preimage_nonref.data),
 				}
 			},
-			Event::PaymentFailed {ref payment_hash, ref rejected_by_dest, } => {
+			Event::PaymentPathFailed {ref payment_hash, ref rejected_by_dest, ref network_update, ref all_paths_failed, ref path, } => {
 				let mut payment_hash_nonref = (*payment_hash).clone();
 				let mut rejected_by_dest_nonref = (*rejected_by_dest).clone();
-				nativeEvent::PaymentFailed {
+				let mut network_update_nonref = (*network_update).clone();
+				let mut local_network_update_nonref = { /* network_update_nonref*/ let network_update_nonref_opt = network_update_nonref; { } if network_update_nonref_opt.is_none() { None } else { Some({ network_update_nonref_opt.take().into_native() }) } };
+				let mut all_paths_failed_nonref = (*all_paths_failed).clone();
+				let mut path_nonref = (*path).clone();
+				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.into_rust().drain(..) { local_path_nonref.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+				nativeEvent::PaymentPathFailed {
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 					rejected_by_dest: rejected_by_dest_nonref,
+					network_update: local_network_update_nonref,
+					all_paths_failed: all_paths_failed_nonref,
+					path: local_path_nonref,
 				}
 			},
 			Event::PendingHTLCsForwardable {ref time_forwardable, } => {
@@ -330,6 +542,14 @@ impl Event {
 				nativeEvent::PaymentForwarded {
 					fee_earned_msat: local_fee_earned_msat_nonref,
 					claim_from_onchain_tx: claim_from_onchain_tx_nonref,
+				}
+			},
+			Event::ChannelClosed {ref channel_id, ref reason, } => {
+				let mut channel_id_nonref = (*channel_id).clone();
+				let mut reason_nonref = (*reason).clone();
+				nativeEvent::ChannelClosed {
+					channel_id: channel_id_nonref.data,
+					reason: reason_nonref.into_native(),
 				}
 			},
 		}
@@ -357,10 +577,15 @@ impl Event {
 					payment_preimage: ::lightning::ln::PaymentPreimage(payment_preimage.data),
 				}
 			},
-			Event::PaymentFailed {mut payment_hash, mut rejected_by_dest, } => {
-				nativeEvent::PaymentFailed {
+			Event::PaymentPathFailed {mut payment_hash, mut rejected_by_dest, mut network_update, mut all_paths_failed, mut path, } => {
+				let mut local_network_update = { /* network_update*/ let network_update_opt = network_update; { } if network_update_opt.is_none() { None } else { Some({ network_update_opt.take().into_native() }) } };
+				let mut local_path = Vec::new(); for mut item in path.into_rust().drain(..) { local_path.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+				nativeEvent::PaymentPathFailed {
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
 					rejected_by_dest: rejected_by_dest,
+					network_update: local_network_update,
+					all_paths_failed: all_paths_failed,
+					path: local_path,
 				}
 			},
 			Event::PendingHTLCsForwardable {mut time_forwardable, } => {
@@ -379,6 +604,12 @@ impl Event {
 				nativeEvent::PaymentForwarded {
 					fee_earned_msat: local_fee_earned_msat,
 					claim_from_onchain_tx: claim_from_onchain_tx,
+				}
+			},
+			Event::ChannelClosed {mut channel_id, mut reason, } => {
+				nativeEvent::ChannelClosed {
+					channel_id: channel_id.data,
+					reason: reason.into_native(),
 				}
 			},
 		}
@@ -414,12 +645,20 @@ impl Event {
 					payment_preimage: crate::c_types::ThirtyTwoBytes { data: payment_preimage_nonref.0 },
 				}
 			},
-			nativeEvent::PaymentFailed {ref payment_hash, ref rejected_by_dest, } => {
+			nativeEvent::PaymentPathFailed {ref payment_hash, ref rejected_by_dest, ref network_update, ref all_paths_failed, ref path, } => {
 				let mut payment_hash_nonref = (*payment_hash).clone();
 				let mut rejected_by_dest_nonref = (*rejected_by_dest).clone();
-				Event::PaymentFailed {
+				let mut network_update_nonref = (*network_update).clone();
+				let mut local_network_update_nonref = if network_update_nonref.is_none() { crate::c_types::derived::COption_NetworkUpdateZ::None } else { crate::c_types::derived::COption_NetworkUpdateZ::Some( { crate::lightning::routing::network_graph::NetworkUpdate::native_into(network_update_nonref.unwrap()) }) };
+				let mut all_paths_failed_nonref = (*all_paths_failed).clone();
+				let mut path_nonref = (*path).clone();
+				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.drain(..) { local_path_nonref.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+				Event::PaymentPathFailed {
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
 					rejected_by_dest: rejected_by_dest_nonref,
+					network_update: local_network_update_nonref,
+					all_paths_failed: all_paths_failed_nonref,
+					path: local_path_nonref.into(),
 				}
 			},
 			nativeEvent::PendingHTLCsForwardable {ref time_forwardable, } => {
@@ -437,11 +676,19 @@ impl Event {
 			},
 			nativeEvent::PaymentForwarded {ref fee_earned_msat, ref claim_from_onchain_tx, } => {
 				let mut fee_earned_msat_nonref = (*fee_earned_msat).clone();
-				let mut local_fee_earned_msat_nonref = if fee_earned_msat_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(fee_earned_msat_nonref.unwrap()) } };
+				let mut local_fee_earned_msat_nonref = if fee_earned_msat_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { fee_earned_msat_nonref.unwrap() }) };
 				let mut claim_from_onchain_tx_nonref = (*claim_from_onchain_tx).clone();
 				Event::PaymentForwarded {
 					fee_earned_msat: local_fee_earned_msat_nonref,
 					claim_from_onchain_tx: claim_from_onchain_tx_nonref,
+				}
+			},
+			nativeEvent::ChannelClosed {ref channel_id, ref reason, } => {
+				let mut channel_id_nonref = (*channel_id).clone();
+				let mut reason_nonref = (*reason).clone();
+				Event::ChannelClosed {
+					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id_nonref },
+					reason: crate::lightning::util::events::ClosureReason::native_into(reason_nonref),
 				}
 			},
 		}
@@ -469,10 +716,15 @@ impl Event {
 					payment_preimage: crate::c_types::ThirtyTwoBytes { data: payment_preimage.0 },
 				}
 			},
-			nativeEvent::PaymentFailed {mut payment_hash, mut rejected_by_dest, } => {
-				Event::PaymentFailed {
+			nativeEvent::PaymentPathFailed {mut payment_hash, mut rejected_by_dest, mut network_update, mut all_paths_failed, mut path, } => {
+				let mut local_network_update = if network_update.is_none() { crate::c_types::derived::COption_NetworkUpdateZ::None } else { crate::c_types::derived::COption_NetworkUpdateZ::Some( { crate::lightning::routing::network_graph::NetworkUpdate::native_into(network_update.unwrap()) }) };
+				let mut local_path = Vec::new(); for mut item in path.drain(..) { local_path.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+				Event::PaymentPathFailed {
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
 					rejected_by_dest: rejected_by_dest,
+					network_update: local_network_update,
+					all_paths_failed: all_paths_failed,
+					path: local_path.into(),
 				}
 			},
 			nativeEvent::PendingHTLCsForwardable {mut time_forwardable, } => {
@@ -487,10 +739,16 @@ impl Event {
 				}
 			},
 			nativeEvent::PaymentForwarded {mut fee_earned_msat, mut claim_from_onchain_tx, } => {
-				let mut local_fee_earned_msat = if fee_earned_msat.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(fee_earned_msat.unwrap()) } };
+				let mut local_fee_earned_msat = if fee_earned_msat.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { fee_earned_msat.unwrap() }) };
 				Event::PaymentForwarded {
 					fee_earned_msat: local_fee_earned_msat,
 					claim_from_onchain_tx: claim_from_onchain_tx,
+				}
+			},
+			nativeEvent::ChannelClosed {mut channel_id, mut reason, } => {
+				Event::ChannelClosed {
+					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id },
+					reason: crate::lightning::util::events::ClosureReason::native_into(reason),
 				}
 			},
 		}
@@ -531,11 +789,14 @@ pub extern "C" fn Event_payment_sent(payment_preimage: crate::c_types::ThirtyTwo
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new PaymentFailed-variant Event
-pub extern "C" fn Event_payment_failed(payment_hash: crate::c_types::ThirtyTwoBytes, rejected_by_dest: bool) -> Event {
-	Event::PaymentFailed {
+/// Utility method to constructs a new PaymentPathFailed-variant Event
+pub extern "C" fn Event_payment_path_failed(payment_hash: crate::c_types::ThirtyTwoBytes, rejected_by_dest: bool, network_update: crate::c_types::derived::COption_NetworkUpdateZ, all_paths_failed: bool, path: crate::c_types::derived::CVec_RouteHopZ) -> Event {
+	Event::PaymentPathFailed {
 		payment_hash,
 		rejected_by_dest,
+		network_update,
+		all_paths_failed,
+		path,
 	}
 }
 #[no_mangle]
@@ -558,6 +819,14 @@ pub extern "C" fn Event_payment_forwarded(fee_earned_msat: crate::c_types::deriv
 	Event::PaymentForwarded {
 		fee_earned_msat,
 		claim_from_onchain_tx,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new ChannelClosed-variant Event
+pub extern "C" fn Event_channel_closed(channel_id: crate::c_types::ThirtyTwoBytes, reason: crate::lightning::util::events::ClosureReason) -> Event {
+	Event::ChannelClosed {
+		channel_id,
+		reason,
 	}
 }
 #[no_mangle]
@@ -691,12 +960,6 @@ pub enum MessageSendEvent {
 		node_id: crate::c_types::PublicKey,
 		/// The action which should be taken.
 		action: crate::lightning::ln::msgs::ErrorAction,
-	},
-	/// When a payment fails we may receive updates back from the hop where it failed. In such
-	/// cases this event is generated so that we can inform the network graph of this information.
-	PaymentFailureNetworkUpdate {
-		/// The channel/node update which should be sent to NetGraphMsgHandler
-		update: crate::lightning::ln::msgs::HTLCFailChannelUpdate,
 	},
 	/// Query a peer for channels with funding transaction UTXOs in a block range.
 	SendChannelRangeQuery {
@@ -851,12 +1114,6 @@ impl MessageSendEvent {
 					action: action_nonref.into_native(),
 				}
 			},
-			MessageSendEvent::PaymentFailureNetworkUpdate {ref update, } => {
-				let mut update_nonref = (*update).clone();
-				nativeMessageSendEvent::PaymentFailureNetworkUpdate {
-					update: update_nonref.into_native(),
-				}
-			},
 			MessageSendEvent::SendChannelRangeQuery {ref node_id, ref msg, } => {
 				let mut node_id_nonref = (*node_id).clone();
 				let mut msg_nonref = (*msg).clone();
@@ -978,11 +1235,6 @@ impl MessageSendEvent {
 				nativeMessageSendEvent::HandleError {
 					node_id: node_id.into_rust(),
 					action: action.into_native(),
-				}
-			},
-			MessageSendEvent::PaymentFailureNetworkUpdate {mut update, } => {
-				nativeMessageSendEvent::PaymentFailureNetworkUpdate {
-					update: update.into_native(),
 				}
 			},
 			MessageSendEvent::SendChannelRangeQuery {mut node_id, mut msg, } => {
@@ -1132,12 +1384,6 @@ impl MessageSendEvent {
 					action: crate::lightning::ln::msgs::ErrorAction::native_into(action_nonref),
 				}
 			},
-			nativeMessageSendEvent::PaymentFailureNetworkUpdate {ref update, } => {
-				let mut update_nonref = (*update).clone();
-				MessageSendEvent::PaymentFailureNetworkUpdate {
-					update: crate::lightning::ln::msgs::HTLCFailChannelUpdate::native_into(update_nonref),
-				}
-			},
 			nativeMessageSendEvent::SendChannelRangeQuery {ref node_id, ref msg, } => {
 				let mut node_id_nonref = (*node_id).clone();
 				let mut msg_nonref = (*msg).clone();
@@ -1259,11 +1505,6 @@ impl MessageSendEvent {
 				MessageSendEvent::HandleError {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
 					action: crate::lightning::ln::msgs::ErrorAction::native_into(action),
-				}
-			},
-			nativeMessageSendEvent::PaymentFailureNetworkUpdate {mut update, } => {
-				MessageSendEvent::PaymentFailureNetworkUpdate {
-					update: crate::lightning::ln::msgs::HTLCFailChannelUpdate::native_into(update),
 				}
 			},
 			nativeMessageSendEvent::SendChannelRangeQuery {mut node_id, mut msg, } => {
@@ -1422,13 +1663,6 @@ pub extern "C" fn MessageSendEvent_handle_error(node_id: crate::c_types::PublicK
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new PaymentFailureNetworkUpdate-variant MessageSendEvent
-pub extern "C" fn MessageSendEvent_payment_failure_network_update(update: crate::lightning::ln::msgs::HTLCFailChannelUpdate) -> MessageSendEvent {
-	MessageSendEvent::PaymentFailureNetworkUpdate {
-		update,
-	}
-}
-#[no_mangle]
 /// Utility method to constructs a new SendChannelRangeQuery-variant MessageSendEvent
 pub extern "C" fn MessageSendEvent_send_channel_range_query(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::QueryChannelRange) -> MessageSendEvent {
 	MessageSendEvent::SendChannelRangeQuery {
@@ -1574,7 +1808,7 @@ pub struct EventHandler {
 	/// Handles the given [`Event`].
 	///
 	/// See [`EventsProvider`] for details that must be considered when implementing this method.
-	pub handle_event: extern "C" fn (this_arg: *const c_void, event: crate::lightning::util::events::Event),
+	pub handle_event: extern "C" fn (this_arg: *const c_void, event: &crate::lightning::util::events::Event),
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -1592,8 +1826,8 @@ pub(crate) extern "C" fn EventHandler_clone_fields(orig: &EventHandler) -> Event
 
 use lightning::util::events::EventHandler as rustEventHandler;
 impl rustEventHandler for EventHandler {
-	fn handle_event(&self, mut event: lightning::util::events::Event) {
-		(self.handle_event)(self.this_arg, crate::lightning::util::events::Event::native_into(event))
+	fn handle_event(&self, mut event: &lightning::util::events::Event) {
+		(self.handle_event)(self.this_arg, &crate::lightning::util::events::Event::from_native(event))
 	}
 }
 

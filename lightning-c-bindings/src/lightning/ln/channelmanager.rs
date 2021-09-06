@@ -19,6 +19,7 @@
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -242,6 +243,123 @@ pub static MIN_CLTV_EXPIRY_DELTA: u16 = lightning::ln::channelmanager::MIN_CLTV_
 #[no_mangle]
 pub static MIN_FINAL_CLTV_EXPIRY: u32 = lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY;
 
+use lightning::ln::channelmanager::CounterpartyForwardingInfo as nativeCounterpartyForwardingInfoImport;
+type nativeCounterpartyForwardingInfo = nativeCounterpartyForwardingInfoImport;
+
+/// Information needed for constructing an invoice route hint for this channel.
+#[must_use]
+#[repr(C)]
+pub struct CounterpartyForwardingInfo {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeCounterpartyForwardingInfo,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for CounterpartyForwardingInfo {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeCounterpartyForwardingInfo>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the CounterpartyForwardingInfo, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn CounterpartyForwardingInfo_free(this_obj: CounterpartyForwardingInfo) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+extern "C" fn CounterpartyForwardingInfo_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeCounterpartyForwardingInfo); }
+}
+#[allow(unused)]
+impl CounterpartyForwardingInfo {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeCounterpartyForwardingInfo {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeCounterpartyForwardingInfo {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeCounterpartyForwardingInfo {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = std::ptr::null_mut();
+		ret
+	}
+}
+/// Base routing fee in millisatoshis.
+#[no_mangle]
+pub extern "C" fn CounterpartyForwardingInfo_get_fee_base_msat(this_ptr: &CounterpartyForwardingInfo) -> u32 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().fee_base_msat;
+	*inner_val
+}
+/// Base routing fee in millisatoshis.
+#[no_mangle]
+pub extern "C" fn CounterpartyForwardingInfo_set_fee_base_msat(this_ptr: &mut CounterpartyForwardingInfo, mut val: u32) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.fee_base_msat = val;
+}
+/// Amount in millionths of a satoshi the channel will charge per transferred satoshi.
+#[no_mangle]
+pub extern "C" fn CounterpartyForwardingInfo_get_fee_proportional_millionths(this_ptr: &CounterpartyForwardingInfo) -> u32 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().fee_proportional_millionths;
+	*inner_val
+}
+/// Amount in millionths of a satoshi the channel will charge per transferred satoshi.
+#[no_mangle]
+pub extern "C" fn CounterpartyForwardingInfo_set_fee_proportional_millionths(this_ptr: &mut CounterpartyForwardingInfo, mut val: u32) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.fee_proportional_millionths = val;
+}
+/// The minimum difference in cltv_expiry between an ingoing HTLC and its outgoing counterpart,
+/// such that the outgoing HTLC is forwardable to this counterparty. See `msgs::ChannelUpdate`'s
+/// `cltv_expiry_delta` for more details.
+#[no_mangle]
+pub extern "C" fn CounterpartyForwardingInfo_get_cltv_expiry_delta(this_ptr: &CounterpartyForwardingInfo) -> u16 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().cltv_expiry_delta;
+	*inner_val
+}
+/// The minimum difference in cltv_expiry between an ingoing HTLC and its outgoing counterpart,
+/// such that the outgoing HTLC is forwardable to this counterparty. See `msgs::ChannelUpdate`'s
+/// `cltv_expiry_delta` for more details.
+#[no_mangle]
+pub extern "C" fn CounterpartyForwardingInfo_set_cltv_expiry_delta(this_ptr: &mut CounterpartyForwardingInfo, mut val: u16) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.cltv_expiry_delta = val;
+}
+/// Constructs a new CounterpartyForwardingInfo given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn CounterpartyForwardingInfo_new(mut fee_base_msat_arg: u32, mut fee_proportional_millionths_arg: u32, mut cltv_expiry_delta_arg: u16) -> CounterpartyForwardingInfo {
+	CounterpartyForwardingInfo { inner: ObjOps::heap_alloc(nativeCounterpartyForwardingInfo {
+		fee_base_msat: fee_base_msat_arg,
+		fee_proportional_millionths: fee_proportional_millionths_arg,
+		cltv_expiry_delta: cltv_expiry_delta_arg,
+	}), is_owned: true }
+}
+impl Clone for CounterpartyForwardingInfo {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeCounterpartyForwardingInfo>::is_null(self.inner) { std::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn CounterpartyForwardingInfo_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCounterpartyForwardingInfo)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the CounterpartyForwardingInfo
+pub extern "C" fn CounterpartyForwardingInfo_clone(orig: &CounterpartyForwardingInfo) -> CounterpartyForwardingInfo {
+	orig.clone()
+}
+
 use lightning::ln::channelmanager::ChannelCounterparty as nativeChannelCounterpartyImport;
 type nativeChannelCounterparty = nativeChannelCounterpartyImport;
 
@@ -341,6 +459,37 @@ pub extern "C" fn ChannelCounterparty_get_unspendable_punishment_reserve(this_pt
 #[no_mangle]
 pub extern "C" fn ChannelCounterparty_set_unspendable_punishment_reserve(this_ptr: &mut ChannelCounterparty, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.unspendable_punishment_reserve = val;
+}
+/// Information on the fees and requirements that the counterparty requires when forwarding
+/// payments to us through this channel.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn ChannelCounterparty_get_forwarding_info(this_ptr: &ChannelCounterparty) -> crate::lightning::ln::channelmanager::CounterpartyForwardingInfo {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().forwarding_info;
+	let mut local_inner_val = crate::lightning::ln::channelmanager::CounterpartyForwardingInfo { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	local_inner_val
+}
+/// Information on the fees and requirements that the counterparty requires when forwarding
+/// payments to us through this channel.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn ChannelCounterparty_set_forwarding_info(this_ptr: &mut ChannelCounterparty, mut val: crate::lightning::ln::channelmanager::CounterpartyForwardingInfo) {
+	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.forwarding_info = local_val;
+}
+/// Constructs a new ChannelCounterparty given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelCounterparty_new(mut node_id_arg: crate::c_types::PublicKey, mut features_arg: crate::lightning::ln::features::InitFeatures, mut unspendable_punishment_reserve_arg: u64, mut forwarding_info_arg: crate::lightning::ln::channelmanager::CounterpartyForwardingInfo) -> ChannelCounterparty {
+	let mut local_forwarding_info_arg = if forwarding_info_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(forwarding_info_arg.take_inner()) } }) };
+	ChannelCounterparty { inner: ObjOps::heap_alloc(nativeChannelCounterparty {
+		node_id: node_id_arg.into_rust(),
+		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
+		unspendable_punishment_reserve: unspendable_punishment_reserve_arg,
+		forwarding_info: local_forwarding_info_arg,
+	}), is_owned: true }
 }
 impl Clone for ChannelCounterparty {
 	fn clone(&self) -> Self {
@@ -470,7 +619,7 @@ pub extern "C" fn ChannelDetails_set_funding_txo(this_ptr: &mut ChannelDetails, 
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_short_channel_id(this_ptr: &ChannelDetails) -> crate::c_types::derived::COption_u64Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().short_channel_id;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(inner_val.unwrap()) } };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { inner_val.unwrap() }) };
 	local_inner_val
 }
 /// The position of the funding transaction in the chain. None if the funding transaction has
@@ -503,7 +652,7 @@ pub extern "C" fn ChannelDetails_set_channel_value_satoshis(this_ptr: &mut Chann
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_unspendable_punishment_reserve(this_ptr: &ChannelDetails) -> crate::c_types::derived::COption_u64Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().unspendable_punishment_reserve;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(inner_val.unwrap()) } };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { inner_val.unwrap() }) };
 	local_inner_val
 }
 /// The value, in satoshis, that must always be held in the channel for us. This value ensures
@@ -597,7 +746,7 @@ pub extern "C" fn ChannelDetails_set_inbound_capacity_msat(this_ptr: &mut Channe
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_confirmations_required(this_ptr: &ChannelDetails) -> crate::c_types::derived::COption_u32Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().confirmations_required;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u32Z::None } else {  { crate::c_types::derived::COption_u32Z::Some(inner_val.unwrap()) } };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u32Z::None } else { crate::c_types::derived::COption_u32Z::Some( { inner_val.unwrap() }) };
 	local_inner_val
 }
 /// The number of required confirmations on the funding transaction before the funding will be
@@ -626,7 +775,7 @@ pub extern "C" fn ChannelDetails_set_confirmations_required(this_ptr: &mut Chann
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_force_close_spend_delay(this_ptr: &ChannelDetails) -> crate::c_types::derived::COption_u16Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().force_close_spend_delay;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u16Z::None } else {  { crate::c_types::derived::COption_u16Z::Some(inner_val.unwrap()) } };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u16Z::None } else { crate::c_types::derived::COption_u16Z::Some( { inner_val.unwrap() }) };
 	local_inner_val
 }
 /// The number of blocks (after our commitment transaction confirms) that we will need to wait

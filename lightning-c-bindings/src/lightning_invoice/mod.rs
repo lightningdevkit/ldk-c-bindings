@@ -17,6 +17,7 @@
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -26,6 +27,7 @@ mod de {
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -33,6 +35,7 @@ mod hrp_sm {
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -78,6 +81,7 @@ mod ser {
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -106,6 +110,7 @@ mod tb {
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -753,6 +758,15 @@ pub extern "C" fn Currency_simnet() -> Currency {
 pub extern "C" fn Currency_signet() -> Currency {
 	Currency::Signet}
 /// Checks if two Currencys contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn Currency_hash(o: &Currency) -> u64 {
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(&o.to_native(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two Currencys contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
 pub extern "C" fn Currency_eq(a: &Currency, b: &Currency) -> bool {
@@ -809,15 +823,6 @@ impl Sha256 {
 		ret
 	}
 }
-/// Checks if two Sha256s contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
-#[no_mangle]
-pub extern "C" fn Sha256_eq(a: &Sha256, b: &Sha256) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
-}
 impl Clone for Sha256 {
 	fn clone(&self) -> Self {
 		Self {
@@ -836,6 +841,25 @@ pub(crate) extern "C" fn Sha256_clone_void(this_ptr: *const c_void) -> *mut c_vo
 /// Creates a copy of the Sha256
 pub extern "C" fn Sha256_clone(orig: &Sha256) -> Sha256 {
 	orig.clone()
+}
+/// Checks if two Sha256s contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn Sha256_hash(o: &Sha256) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two Sha256s contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Sha256_eq(a: &Sha256, b: &Sha256) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning_invoice::Description as nativeDescriptionImport;
@@ -891,15 +915,6 @@ impl Description {
 		ret
 	}
 }
-/// Checks if two Descriptions contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
-#[no_mangle]
-pub extern "C" fn Description_eq(a: &Description, b: &Description) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
-}
 impl Clone for Description {
 	fn clone(&self) -> Self {
 		Self {
@@ -918,6 +933,25 @@ pub(crate) extern "C" fn Description_clone_void(this_ptr: *const c_void) -> *mut
 /// Creates a copy of the Description
 pub extern "C" fn Description_clone(orig: &Description) -> Description {
 	orig.clone()
+}
+/// Checks if two Descriptions contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn Description_hash(o: &Description) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two Descriptions contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Description_eq(a: &Description, b: &Description) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning_invoice::PayeePubKey as nativePayeePubKeyImport;
@@ -970,15 +1004,6 @@ impl PayeePubKey {
 		ret
 	}
 }
-/// Checks if two PayeePubKeys contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
-#[no_mangle]
-pub extern "C" fn PayeePubKey_eq(a: &PayeePubKey, b: &PayeePubKey) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
-}
 impl Clone for PayeePubKey {
 	fn clone(&self) -> Self {
 		Self {
@@ -997,6 +1022,25 @@ pub(crate) extern "C" fn PayeePubKey_clone_void(this_ptr: *const c_void) -> *mut
 /// Creates a copy of the PayeePubKey
 pub extern "C" fn PayeePubKey_clone(orig: &PayeePubKey) -> PayeePubKey {
 	orig.clone()
+}
+/// Checks if two PayeePubKeys contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn PayeePubKey_hash(o: &PayeePubKey) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two PayeePubKeys contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn PayeePubKey_eq(a: &PayeePubKey, b: &PayeePubKey) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning_invoice::ExpiryTime as nativeExpiryTimeImport;
@@ -1055,15 +1099,6 @@ impl ExpiryTime {
 		ret
 	}
 }
-/// Checks if two ExpiryTimes contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
-#[no_mangle]
-pub extern "C" fn ExpiryTime_eq(a: &ExpiryTime, b: &ExpiryTime) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
-}
 impl Clone for ExpiryTime {
 	fn clone(&self) -> Self {
 		Self {
@@ -1082,6 +1117,25 @@ pub(crate) extern "C" fn ExpiryTime_clone_void(this_ptr: *const c_void) -> *mut 
 /// Creates a copy of the ExpiryTime
 pub extern "C" fn ExpiryTime_clone(orig: &ExpiryTime) -> ExpiryTime {
 	orig.clone()
+}
+/// Checks if two ExpiryTimes contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn ExpiryTime_hash(o: &ExpiryTime) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two ExpiryTimes contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ExpiryTime_eq(a: &ExpiryTime, b: &ExpiryTime) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning_invoice::MinFinalCltvExpiry as nativeMinFinalCltvExpiryImport;
@@ -1134,15 +1188,6 @@ impl MinFinalCltvExpiry {
 		ret
 	}
 }
-/// Checks if two MinFinalCltvExpirys contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
-#[no_mangle]
-pub extern "C" fn MinFinalCltvExpiry_eq(a: &MinFinalCltvExpiry, b: &MinFinalCltvExpiry) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
-}
 impl Clone for MinFinalCltvExpiry {
 	fn clone(&self) -> Self {
 		Self {
@@ -1161,6 +1206,25 @@ pub(crate) extern "C" fn MinFinalCltvExpiry_clone_void(this_ptr: *const c_void) 
 /// Creates a copy of the MinFinalCltvExpiry
 pub extern "C" fn MinFinalCltvExpiry_clone(orig: &MinFinalCltvExpiry) -> MinFinalCltvExpiry {
 	orig.clone()
+}
+/// Checks if two MinFinalCltvExpirys contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn MinFinalCltvExpiry_hash(o: &MinFinalCltvExpiry) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two MinFinalCltvExpirys contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn MinFinalCltvExpiry_eq(a: &MinFinalCltvExpiry, b: &MinFinalCltvExpiry) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 /// Fallback address in case no LN payment is possible
 #[must_use]
@@ -1300,6 +1364,15 @@ pub extern "C" fn Fallback_script_hash(a: crate::c_types::TwentyBytes) -> Fallba
 	Fallback::ScriptHash(a, )
 }
 /// Checks if two Fallbacks contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn Fallback_hash(o: &Fallback) -> u64 {
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(&o.to_native(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two Fallbacks contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
 pub extern "C" fn Fallback_eq(a: &Fallback, b: &Fallback) -> bool {
@@ -1356,15 +1429,6 @@ impl InvoiceSignature {
 		ret
 	}
 }
-/// Checks if two InvoiceSignatures contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
-#[no_mangle]
-pub extern "C" fn InvoiceSignature_eq(a: &InvoiceSignature, b: &InvoiceSignature) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
-}
 impl Clone for InvoiceSignature {
 	fn clone(&self) -> Self {
 		Self {
@@ -1383,6 +1447,15 @@ pub(crate) extern "C" fn InvoiceSignature_clone_void(this_ptr: *const c_void) ->
 /// Creates a copy of the InvoiceSignature
 pub extern "C" fn InvoiceSignature_clone(orig: &InvoiceSignature) -> InvoiceSignature {
 	orig.clone()
+}
+/// Checks if two InvoiceSignatures contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn InvoiceSignature_eq(a: &InvoiceSignature, b: &InvoiceSignature) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning_invoice::PrivateRoute as nativePrivateRouteImport;
@@ -1439,15 +1512,6 @@ impl PrivateRoute {
 		ret
 	}
 }
-/// Checks if two PrivateRoutes contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
-#[no_mangle]
-pub extern "C" fn PrivateRoute_eq(a: &PrivateRoute, b: &PrivateRoute) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
-}
 impl Clone for PrivateRoute {
 	fn clone(&self) -> Self {
 		Self {
@@ -1466,6 +1530,25 @@ pub(crate) extern "C" fn PrivateRoute_clone_void(this_ptr: *const c_void) -> *mu
 /// Creates a copy of the PrivateRoute
 pub extern "C" fn PrivateRoute_clone(orig: &PrivateRoute) -> PrivateRoute {
 	orig.clone()
+}
+/// Checks if two PrivateRoutes contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn PrivateRoute_hash(o: &PrivateRoute) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two PrivateRoutes contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn PrivateRoute_eq(a: &PrivateRoute, b: &PrivateRoute) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 /// Disassembles the `SignedRawInvoice` into its three parts:
 ///  1. raw invoice
@@ -1621,7 +1704,7 @@ pub extern "C" fn RawInvoice_private_routes(this_arg: &RawInvoice) -> crate::c_t
 #[no_mangle]
 pub extern "C" fn RawInvoice_amount_pico_btc(this_arg: &RawInvoice) -> crate::c_types::derived::COption_u64Z {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.amount_pico_btc();
-	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(ret.unwrap()) } };
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { ret.unwrap() }) };
 	local_ret
 }
 
@@ -1691,10 +1774,17 @@ pub extern "C" fn Invoice_check_signature(this_arg: &Invoice) -> crate::c_types:
 /// ```
 /// use lightning_invoice::*;
 ///
-/// let invoice = \"lnbc1pvjluezpp5qqqsyqcyq5rqwzqfqqqsyqcyq5rqwzqfqqqsyqcyq5rqwzqfqypqdp\\
-/// \tl2pkx2ctnv5sxxmmwwd5kgetjypeh2ursdae8g6twvus8g6rfwvs8qun0dfjkxaq8rkx3yf5tcsyz3d7\\
-/// \t3gafnh3cax9rn449d9p5uxz9ezhhypd0elx87sjle52x86fux2ypatgddc6k63n7erqz25le42c4u4ec\\
-/// \tky03ylcqca784w\";
+/// let invoice = \"lnbc100p1psj9jhxdqud3jxktt5w46x7unfv9kz6mn0v3jsnp4q0d3p2sfluzdx45tqcs\\
+/// h2pu5qc7lgq0xs578ngs6s0s68ua4h7cvspp5q6rmq35js88zp5dvwrv9m459tnk2zunwj5jalqtyxqulh0l\\
+/// 5gflssp5nf55ny5gcrfl30xuhzj3nphgj27rstekmr9fw3ny5989s300gyus9qyysgqcqpcrzjqw2sxwe993\\
+/// h5pcm4dxzpvttgza8zhkqxpgffcrf5v25nwpr3cmfg7z54kuqq8rgqqqqqqqq2qqqqq9qq9qrzjqd0ylaqcl\\
+/// j9424x9m8h2vcukcgnm6s56xfgu3j78zyqzhgs4hlpzvznlugqq9vsqqqqqqqlgqqqqqeqq9qrzjqwldmj9d\\
+/// ha74df76zhx6l9we0vjdquygcdt3kssupehe64g6yyp5yz5rhuqqwccqqyqqqqlgqqqqjcqq9qrzjqf9e58a\\
+/// guqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2z55qsqqg6qqqyqqqrtnqqqzq3cqygrzjqvphms\\
+/// ywntrrhqjcraumvc4y6r8v4z5v593trte429v4hredj7ms5z52usqq9ngqqqqqqqlgqqqqqqgq9qrzjq2v0v\\
+/// p62g49p7569ev48cmulecsxe59lvaw3wlxm7r982zxa9zzj7z5l0cqqxusqqyqqqqlgqqqqqzsqygarl9fh3\\
+/// 8s0gyuxjjgux34w75dnc6xp2l35j7es3jd4ugt3lu0xzre26yg5m7ke54n2d5sym4xcmxtl8238xxvw5h5h5\\
+/// j5r6drg6k6zcqj0fcwg\";
 ///
 /// let signed = invoice.parse::<SignedRawInvoice>().unwrap();
 ///
@@ -1736,14 +1826,11 @@ pub extern "C" fn Invoice_payee_pub_key(this_arg: &Invoice) -> crate::c_types::P
 }
 
 /// Get the payment secret if one was included in the invoice
-///
-/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_payment_secret(this_arg: &Invoice) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_secret();
-	let mut local_ret = if ret.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (ret.unwrap()).0 } } };
-	local_ret
+	crate::c_types::ThirtyTwoBytes { data: ret.0 }
 }
 
 /// Get the invoice features if they were included in the invoice
@@ -1813,7 +1900,7 @@ pub extern "C" fn Invoice_currency(this_arg: &Invoice) -> crate::lightning_invoi
 #[no_mangle]
 pub extern "C" fn Invoice_amount_pico_btc(this_arg: &Invoice) -> crate::c_types::derived::COption_u64Z {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.amount_pico_btc();
-	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(ret.unwrap()) } };
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { ret.unwrap() }) };
 	local_ret
 }
 
@@ -1991,6 +2078,9 @@ pub enum SemanticError {
 	NoDescription,
 	/// The invoice contains multiple descriptions and/or description hashes which isn't allowed
 	MultipleDescriptions,
+	/// The invoice is missing the mandatory payment secret, which all modern lightning nodes
+	/// should provide.
+	NoPaymentSecret,
 	/// The invoice contains multiple payment secrets
 	MultiplePaymentSecrets,
 	/// The invoice's features are invalid
@@ -1999,6 +2089,8 @@ pub enum SemanticError {
 	InvalidRecoveryId,
 	/// The invoice's signature is invalid
 	InvalidSignature,
+	/// The invoice's amount was not a whole number of millisatoshis
+	ImpreciseAmount,
 }
 use lightning_invoice::SemanticError as nativeSemanticError;
 impl SemanticError {
@@ -2009,10 +2101,12 @@ impl SemanticError {
 			SemanticError::MultiplePaymentHashes => nativeSemanticError::MultiplePaymentHashes,
 			SemanticError::NoDescription => nativeSemanticError::NoDescription,
 			SemanticError::MultipleDescriptions => nativeSemanticError::MultipleDescriptions,
+			SemanticError::NoPaymentSecret => nativeSemanticError::NoPaymentSecret,
 			SemanticError::MultiplePaymentSecrets => nativeSemanticError::MultiplePaymentSecrets,
 			SemanticError::InvalidFeatures => nativeSemanticError::InvalidFeatures,
 			SemanticError::InvalidRecoveryId => nativeSemanticError::InvalidRecoveryId,
 			SemanticError::InvalidSignature => nativeSemanticError::InvalidSignature,
+			SemanticError::ImpreciseAmount => nativeSemanticError::ImpreciseAmount,
 		}
 	}
 	#[allow(unused)]
@@ -2022,10 +2116,12 @@ impl SemanticError {
 			SemanticError::MultiplePaymentHashes => nativeSemanticError::MultiplePaymentHashes,
 			SemanticError::NoDescription => nativeSemanticError::NoDescription,
 			SemanticError::MultipleDescriptions => nativeSemanticError::MultipleDescriptions,
+			SemanticError::NoPaymentSecret => nativeSemanticError::NoPaymentSecret,
 			SemanticError::MultiplePaymentSecrets => nativeSemanticError::MultiplePaymentSecrets,
 			SemanticError::InvalidFeatures => nativeSemanticError::InvalidFeatures,
 			SemanticError::InvalidRecoveryId => nativeSemanticError::InvalidRecoveryId,
 			SemanticError::InvalidSignature => nativeSemanticError::InvalidSignature,
+			SemanticError::ImpreciseAmount => nativeSemanticError::ImpreciseAmount,
 		}
 	}
 	#[allow(unused)]
@@ -2035,10 +2131,12 @@ impl SemanticError {
 			nativeSemanticError::MultiplePaymentHashes => SemanticError::MultiplePaymentHashes,
 			nativeSemanticError::NoDescription => SemanticError::NoDescription,
 			nativeSemanticError::MultipleDescriptions => SemanticError::MultipleDescriptions,
+			nativeSemanticError::NoPaymentSecret => SemanticError::NoPaymentSecret,
 			nativeSemanticError::MultiplePaymentSecrets => SemanticError::MultiplePaymentSecrets,
 			nativeSemanticError::InvalidFeatures => SemanticError::InvalidFeatures,
 			nativeSemanticError::InvalidRecoveryId => SemanticError::InvalidRecoveryId,
 			nativeSemanticError::InvalidSignature => SemanticError::InvalidSignature,
+			nativeSemanticError::ImpreciseAmount => SemanticError::ImpreciseAmount,
 		}
 	}
 	#[allow(unused)]
@@ -2048,10 +2146,12 @@ impl SemanticError {
 			nativeSemanticError::MultiplePaymentHashes => SemanticError::MultiplePaymentHashes,
 			nativeSemanticError::NoDescription => SemanticError::NoDescription,
 			nativeSemanticError::MultipleDescriptions => SemanticError::MultipleDescriptions,
+			nativeSemanticError::NoPaymentSecret => SemanticError::NoPaymentSecret,
 			nativeSemanticError::MultiplePaymentSecrets => SemanticError::MultiplePaymentSecrets,
 			nativeSemanticError::InvalidFeatures => SemanticError::InvalidFeatures,
 			nativeSemanticError::InvalidRecoveryId => SemanticError::InvalidRecoveryId,
 			nativeSemanticError::InvalidSignature => SemanticError::InvalidSignature,
+			nativeSemanticError::ImpreciseAmount => SemanticError::ImpreciseAmount,
 		}
 	}
 }
@@ -2077,6 +2177,10 @@ pub extern "C" fn SemanticError_no_description() -> SemanticError {
 pub extern "C" fn SemanticError_multiple_descriptions() -> SemanticError {
 	SemanticError::MultipleDescriptions}
 #[no_mangle]
+/// Utility method to constructs a new NoPaymentSecret-variant SemanticError
+pub extern "C" fn SemanticError_no_payment_secret() -> SemanticError {
+	SemanticError::NoPaymentSecret}
+#[no_mangle]
 /// Utility method to constructs a new MultiplePaymentSecrets-variant SemanticError
 pub extern "C" fn SemanticError_multiple_payment_secrets() -> SemanticError {
 	SemanticError::MultiplePaymentSecrets}
@@ -2092,6 +2196,10 @@ pub extern "C" fn SemanticError_invalid_recovery_id() -> SemanticError {
 /// Utility method to constructs a new InvalidSignature-variant SemanticError
 pub extern "C" fn SemanticError_invalid_signature() -> SemanticError {
 	SemanticError::InvalidSignature}
+#[no_mangle]
+/// Utility method to constructs a new ImpreciseAmount-variant SemanticError
+pub extern "C" fn SemanticError_imprecise_amount() -> SemanticError {
+	SemanticError::ImpreciseAmount}
 /// Checks if two SemanticErrors contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]

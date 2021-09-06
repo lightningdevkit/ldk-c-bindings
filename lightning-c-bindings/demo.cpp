@@ -553,6 +553,7 @@ int main() {
 		PeerManager_process_events(&net2);
 
 		// Now send funds from 1 to 2!
+		uint64_t channel_scid;
 		while (true) {
 			LDK::CVec_ChannelDetailsZ outbound_channels = ChannelManager_list_usable_channels(&cm1);
 			if (outbound_channels->datalen == 1) {
@@ -573,6 +574,9 @@ int main() {
 				if (inbound_capacity < 0) inbound_capacity = 0;
 				assert(ChannelDetails_get_inbound_capacity_msat(channel) == (uint64_t)inbound_capacity);
 				assert(ChannelDetails_get_is_usable(channel));
+				LDK::COption_u64Z scid_opt = ChannelDetails_get_short_channel_id(channel);
+				assert(scid_opt->some);
+				channel_scid = scid_opt->some;
 				break;
 			}
 			std::this_thread::yield();
@@ -603,6 +607,12 @@ int main() {
 				}, &outbound_channels, Invoice_route_hints(invoice->contents.result),
 				5000, Invoice_min_final_cltv_expiry(invoice->contents.result), logger1);
 			assert(route->result_ok);
+			LDK::CVec_CVec_RouteHopZZ paths = Route_get_paths(route->contents.result);
+			assert(paths->datalen == 1);
+			assert(paths->data[0].datalen == 1);
+			assert(!memcmp(RouteHop_get_pubkey(&paths->data[0].data[0]).compressed_form,
+				ChannelManager_get_our_node_id(&cm2).compressed_form, 33));
+			assert(RouteHop_get_short_channel_id(&paths->data[0].data[0]) == channel_scid);
 			LDK::CResult_NonePaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash, Invoice_payment_secret(invoice->contents.result));
 			assert(send_res->result_ok);
 		}

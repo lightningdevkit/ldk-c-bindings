@@ -1854,6 +1854,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				} else if let syn::Type::Reference(r) = &*s.elem {
 					if let syn::Type::Path(p) = &*r.elem {
 						write!(w, "{}", sliceconv(self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)), None)).unwrap();
+					} else if let syn::Type::Slice(_) = &*r.elem {
+						write!(w, "{}", sliceconv(false, None)).unwrap();
 					} else { unimplemented!(); }
 				} else if let syn::Type::Tuple(t) = &*s.elem {
 					assert!(!t.elems.is_empty());
@@ -2643,6 +2645,20 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						} else { return false; };
 						write!(w, "{}::{}", Self::generated_container_path(), mangled_container).unwrap();
 						self.check_create_container(mangled_container, "Vec", vec![&*r.elem], generics, false)
+					} else if let syn::Type::Slice(sl2) = &*r.elem {
+						if let syn::Type::Reference(r2) = &*sl2.elem {
+							if let syn::Type::Path(p) = &*r2.elem {
+								// Slices with slices with opaque types (with is_owned flags) are mapped as non-ref Vecs
+								let resolved = self.resolve_path(&p.path, generics);
+								let mangled_container = if let Some(ident) = self.crate_types.opaques.get(&resolved) {
+									format!("CVec_CVec_{}ZZ", ident)
+								} else { return false; };
+								write!(w, "{}::{}", Self::generated_container_path(), mangled_container).unwrap();
+								let inner = &r2.elem;
+								let vec_ty: syn::Type = syn::parse_quote!(Vec<#inner>);
+								self.check_create_container(mangled_container, "Vec", vec![&vec_ty], generics, false)
+							} else { false }
+						} else { false }
 					} else { false }
 				} else if let syn::Type::Tuple(_) = &*s.elem {
 					let mut args = syn::punctuated::Punctuated::<_, syn::token::Comma>::new();

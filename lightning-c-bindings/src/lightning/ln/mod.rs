@@ -19,6 +19,7 @@
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -28,10 +29,12 @@ pub mod peer_handler;
 pub mod chan_utils;
 pub mod features;
 pub mod script;
+pub mod wire;
 mod peer_channel_encryptor {
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -40,6 +43,7 @@ mod channel {
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -48,14 +52,7 @@ mod onion_utils {
 
 use std::str::FromStr;
 use std::ffi::c_void;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-
-}
-mod wire {
-
-use std::str::FromStr;
-use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 

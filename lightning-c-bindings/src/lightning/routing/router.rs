@@ -13,6 +13,7 @@
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -175,6 +176,25 @@ pub(crate) extern "C" fn RouteHop_clone_void(this_ptr: *const c_void) -> *mut c_
 pub extern "C" fn RouteHop_clone(orig: &RouteHop) -> RouteHop {
 	orig.clone()
 }
+/// Checks if two RouteHops contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn RouteHop_hash(o: &RouteHop) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two RouteHops contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RouteHop_eq(a: &RouteHop, b: &RouteHop) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the RouteHop object into a byte array which can be read by RouteHop_read
 pub extern "C" fn RouteHop_write(obj: &RouteHop) -> crate::c_types::derived::CVec_u8Z {
@@ -250,6 +270,18 @@ impl Route {
 /// given path is variable, keeping the length of any path to less than 20 should currently
 /// ensure it is viable.
 #[no_mangle]
+pub extern "C" fn Route_get_paths(this_ptr: &Route) -> crate::c_types::derived::CVec_CVec_RouteHopZZ {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().paths;
+	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { let mut local_inner_val_0 = Vec::new(); for item in item.iter() { local_inner_val_0.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); }; local_inner_val_0.into() }); };
+	local_inner_val.into()
+}
+/// The list of routes taken for a single (potentially-)multi-part payment. The pubkey of the
+/// last RouteHop in each path must be the same.
+/// Each entry represents a list of hops, NOT INCLUDING our own, where the last hop is the
+/// destination. Thus, this must always be at least length one. While the maximum length of any
+/// given path is variable, keeping the length of any path to less than 20 should currently
+/// ensure it is viable.
+#[no_mangle]
 pub extern "C" fn Route_set_paths(this_ptr: &mut Route, mut val: crate::c_types::derived::CVec_CVec_RouteHopZZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { let mut local_val_0 = Vec::new(); for mut item in item.into_rust().drain(..) { local_val_0.push( { *unsafe { Box::from_raw(item.take_inner()) } }); }; local_val_0 }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.paths = local_val;
@@ -282,6 +314,44 @@ pub(crate) extern "C" fn Route_clone_void(this_ptr: *const c_void) -> *mut c_voi
 pub extern "C" fn Route_clone(orig: &Route) -> Route {
 	orig.clone()
 }
+/// Checks if two Routes contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn Route_hash(o: &Route) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two Routes contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Route_eq(a: &Route, b: &Route) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+/// Returns the total amount of fees paid on this [`Route`].
+///
+/// This doesn't include any extra payment made to the recipient, which can happen in excess of
+/// the amount passed to [`get_route`]'s `final_value_msat`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Route_get_total_fees(this_arg: &Route) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_total_fees();
+	ret
+}
+
+/// Returns the total amount paid on this [`Route`], excluding the fees.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Route_get_total_amount(this_arg: &Route) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_total_amount();
+	ret
+}
+
 #[no_mangle]
 /// Serialize the Route object into a byte array which can be read by Route_read
 pub extern "C" fn Route_write(obj: &Route) -> crate::c_types::derived::CVec_u8Z {
@@ -349,15 +419,6 @@ impl RouteHint {
 		ret
 	}
 }
-/// Checks if two RouteHints contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
-#[no_mangle]
-pub extern "C" fn RouteHint_eq(a: &RouteHint, b: &RouteHint) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
-}
 impl Clone for RouteHint {
 	fn clone(&self) -> Self {
 		Self {
@@ -376,6 +437,25 @@ pub(crate) extern "C" fn RouteHint_clone_void(this_ptr: *const c_void) -> *mut c
 /// Creates a copy of the RouteHint
 pub extern "C" fn RouteHint_clone(orig: &RouteHint) -> RouteHint {
 	orig.clone()
+}
+/// Checks if two RouteHints contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn RouteHint_hash(o: &RouteHint) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two RouteHints contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RouteHint_eq(a: &RouteHint, b: &RouteHint) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::routing::router::RouteHintHop as nativeRouteHintHopImport;
@@ -476,7 +556,7 @@ pub extern "C" fn RouteHintHop_set_cltv_expiry_delta(this_ptr: &mut RouteHintHop
 #[no_mangle]
 pub extern "C" fn RouteHintHop_get_htlc_minimum_msat(this_ptr: &RouteHintHop) -> crate::c_types::derived::COption_u64Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().htlc_minimum_msat;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(inner_val.unwrap()) } };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { inner_val.unwrap() }) };
 	local_inner_val
 }
 /// The minimum value, in msat, which must be relayed to the next hop.
@@ -489,7 +569,7 @@ pub extern "C" fn RouteHintHop_set_htlc_minimum_msat(this_ptr: &mut RouteHintHop
 #[no_mangle]
 pub extern "C" fn RouteHintHop_get_htlc_maximum_msat(this_ptr: &RouteHintHop) -> crate::c_types::derived::COption_u64Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().htlc_maximum_msat;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else {  { crate::c_types::derived::COption_u64Z::Some(inner_val.unwrap()) } };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { inner_val.unwrap() }) };
 	local_inner_val
 }
 /// The maximum value in msat available for routing with a single HTLC.
@@ -513,15 +593,6 @@ pub extern "C" fn RouteHintHop_new(mut src_node_id_arg: crate::c_types::PublicKe
 		htlc_maximum_msat: local_htlc_maximum_msat_arg,
 	}), is_owned: true }
 }
-/// Checks if two RouteHintHops contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
-#[no_mangle]
-pub extern "C" fn RouteHintHop_eq(a: &RouteHintHop, b: &RouteHintHop) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
-}
 impl Clone for RouteHintHop {
 	fn clone(&self) -> Self {
 		Self {
@@ -540,6 +611,25 @@ pub(crate) extern "C" fn RouteHintHop_clone_void(this_ptr: *const c_void) -> *mu
 /// Creates a copy of the RouteHintHop
 pub extern "C" fn RouteHintHop_clone(orig: &RouteHintHop) -> RouteHintHop {
 	orig.clone()
+}
+/// Checks if two RouteHintHops contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn RouteHintHop_hash(o: &RouteHintHop) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+/// Checks if two RouteHintHops contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RouteHintHop_eq(a: &RouteHintHop, b: &RouteHintHop) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 /// Gets a keysend route from us (payer) to the given target node (payee). This is needed because
 /// keysend payments do not have an invoice from which to pull the payee's supported features, which

@@ -23,6 +23,7 @@
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -30,6 +31,7 @@ mod sealed {
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -366,6 +368,15 @@ pub extern "C" fn InitFeatures_known() -> InitFeatures {
 	InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
+/// Returns true if this `Features` object contains unknown feature flags which are set as
+/// \"required\".
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_unknown_bits(this_arg: &InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
+	ret
+}
+
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
@@ -380,6 +391,15 @@ pub extern "C" fn NodeFeatures_empty() -> NodeFeatures {
 pub extern "C" fn NodeFeatures_known() -> NodeFeatures {
 	let mut ret = lightning::ln::features::NodeFeatures::known();
 	NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains unknown feature flags which are set as
+/// \"required\".
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_unknown_bits(this_arg: &NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
+	ret
 }
 
 /// Create a blank Features with no features set
@@ -398,6 +418,15 @@ pub extern "C" fn ChannelFeatures_known() -> ChannelFeatures {
 	ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
+/// Returns true if this `Features` object contains unknown feature flags which are set as
+/// \"required\".
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelFeatures_requires_unknown_bits(this_arg: &ChannelFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
+	ret
+}
+
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
@@ -412,6 +441,15 @@ pub extern "C" fn InvoiceFeatures_empty() -> InvoiceFeatures {
 pub extern "C" fn InvoiceFeatures_known() -> InvoiceFeatures {
 	let mut ret = lightning::ln::features::InvoiceFeatures::known();
 	InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains unknown feature flags which are set as
+/// \"required\".
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_requires_unknown_bits(this_arg: &InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
+	ret
 }
 
 /// Returns whether the `payment_secret` feature is supported.

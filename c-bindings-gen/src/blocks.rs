@@ -349,6 +349,9 @@ pub fn write_option_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	writeln!(w, "\t#[allow(unused)] pub(crate) fn is_some(&self) -> bool {{").unwrap();
 	writeln!(w, "\t\tif let Self::Some(_) = self {{ true }} else {{ false }}").unwrap();
 	writeln!(w, "\t}}").unwrap();
+	writeln!(w, "\t#[allow(unused)] pub(crate) fn is_none(&self) -> bool {{").unwrap();
+	writeln!(w, "\t\t!self.is_some()").unwrap();
+	writeln!(w, "\t}}").unwrap();
 	writeln!(w, "\t#[allow(unused)] pub(crate) fn take(mut self) -> {} {{", inner_type).unwrap();
 	writeln!(w, "\t\tif let Self::Some(v) = self {{ v }} else {{ unreachable!() }}").unwrap();
 	writeln!(w, "\t}}").unwrap();

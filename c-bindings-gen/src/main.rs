@@ -329,6 +329,13 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				Some(format!("\t/**\n\t * {}\n\t * {}\n\t */\n", hash_docs_a, hash_docs_b))));
 		},
 		("Send", _) => {}, ("Sync", _) => {},
+		("std::fmt::Debug", _)|("core::fmt::Debug", _) => {
+			let debug_docs = "Return a human-readable \"debug\" string describing this object";
+			writeln!(w, "\t/// {}", debug_docs).unwrap();
+			writeln!(w, "\tpub debug_str: extern \"C\" fn (this_arg: *const c_void) -> crate::c_types::Str,").unwrap();
+			generated_fields.push(("debug_str".to_owned(), None,
+				Some(format!("\t/**\n\t * {}\n\t */\n", debug_docs))));
+		},
 		(s, i) => {
 			// TODO: Both of the below should expose supertrait methods in C++, but doing so is
 			// nontrivial.
@@ -493,6 +500,13 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 			writeln!(w, "\tfn clone(&self) -> Self {{").unwrap();
 			writeln!(w, "\t\t{}_clone(self)", trait_name).unwrap();
 			writeln!(w, "\t}}\n}}").unwrap();
+		},
+		("std::fmt::Debug", _)|("core::fmt::Debug", _) => {
+			writeln!(w, "impl core::fmt::Debug for {} {{", trait_name).unwrap();
+			writeln!(w, "\tfn fmt(&self, f: &mut core::fmt::Formatter) -> Result<(), core::fmt::Error> {{").unwrap();
+			writeln!(w, "\t\tf.write_str((self.debug_str)(self.this_arg).into_str())").unwrap();
+			writeln!(w, "\t}}").unwrap();
+			writeln!(w, "}}").unwrap();
 		},
 		(s, i) => {
 			if let Some(supertrait) = types.crate_types.traits.get(s) {
@@ -827,6 +841,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							},
 							("Sync", _) => {}, ("Send", _) => {},
 							("std::marker::Sync", _) => {}, ("std::marker::Send", _) => {},
+							("core::fmt::Debug", _) => {},
 							(s, t) => {
 								if let Some(supertrait_obj) = types.crate_types.traits.get(s) {
 									writeln!(w, "\t\t{}: crate::{} {{", t, s).unwrap();

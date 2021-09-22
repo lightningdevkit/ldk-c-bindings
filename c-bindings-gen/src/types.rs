@@ -1922,7 +1922,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						DeclType::EnumIgnored|DeclType::StructImported if !is_ref =>
 							write!(w, "crate::{} {{ inner: ObjOps::heap_alloc(", decl_path).unwrap(),
 						DeclType::Trait(_) if is_ref => write!(w, "").unwrap(),
-						DeclType::Trait(_) if !is_ref => {},
+						DeclType::Trait(_) if !is_ref => write!(w, "Into::into(").unwrap(),
 						_ => panic!("{:?}", decl_path),
 					}
 				});
@@ -1948,7 +1948,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						// for use when a Rust trait method returns an associated type.
 						// Because all of our C traits implement From<RustTypesImplementingTraits>
 						// we can just call .into() here and be done.
-						write!(w, ".into()").unwrap()
+						write!(w, ")").unwrap()
 					},
 					_ => unimplemented!(),
 				});

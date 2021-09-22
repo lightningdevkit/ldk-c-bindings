@@ -889,6 +889,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::SystemTime" => Some("u64"),
 			"std::io::Error" => Some("crate::c_types::IOError"),
 
+			"core::convert::Infallible" => Some("crate::c_types::NotConstructable"),
+
 			"bech32::u5" => Some("crate::c_types::u5"),
 			"core::num::NonZeroU8" => Some("u8"),
 
@@ -967,6 +969,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// Note that we'll panic for String if is_ref, as we only have non-owned memory, we
 			// cannot create a &String.
 
+			"core::convert::Infallible" => Some("panic!(\"You must never construct a NotConstructable! : "),
+
 			"std::time::Duration"|"core::time::Duration" => Some("std::time::Duration::from_secs("),
 			"std::time::SystemTime" => Some("(::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs("),
 
@@ -1044,6 +1048,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"str" if is_ref => Some(".into_str()"),
 			"alloc::string::String"|"String" => Some(".into_string()"),
 			"std::io::Error" if !is_ref => Some(".to_rust()"),
+
+			"core::convert::Infallible" => Some("\")"),
 
 			"std::time::Duration"|"core::time::Duration" => Some(")"),
 			"std::time::SystemTime" => Some("))"),
@@ -1136,6 +1142,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::SystemTime" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
 
+			"core::convert::Infallible" => Some("panic!(\"Cannot construct an Infallible: "),
+
 			"bech32::u5" => Some(""),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
@@ -1207,6 +1215,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some(".as_secs()"),
 			"std::time::SystemTime" => Some(".duration_since(::std::time::SystemTime::UNIX_EPOCH).expect(\"Times must be post-1970\").as_secs()"),
 			"std::io::Error" if !is_ref => Some(")"),
+
+			"core::convert::Infallible" => Some("\")"),
 
 			"bech32::u5" => Some(".into()"),
 

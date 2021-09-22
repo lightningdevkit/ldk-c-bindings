@@ -17,6 +17,16 @@ use std::convert::TryInto; // Bindings need at least rustc 1.34
 
 use std::io::{Cursor, Read}; // TODO: We should use core2 here when we support no_std
 
+#[repr(C)]
+/// A dummy struct of which an instance must never exist.
+/// This corresponds to the Rust type `Infallible`, or, in unstable rust, `!`
+pub struct NotConstructable {
+	_priv_thing: core::convert::Infallible,
+}
+impl From<core::convert::Infallible> for NotConstructable {
+	fn from(_: core::convert::Infallible) -> Self { unreachable!(); }
+}
+
 /// Integer in the range `0..32`
 #[derive(PartialEq, Eq, Copy, Clone)]
 #[allow(non_camel_case_types)]

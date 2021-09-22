@@ -33,7 +33,7 @@ mod blocks;
 use types::*;
 use blocks::*;
 
-const DEFAULT_IMPORTS: &'static str = "\nuse std::str::FromStr;\nuse std::ffi::c_void;\nuse bitcoin::hashes::Hash;\nuse crate::c_types::*;\n";
+const DEFAULT_IMPORTS: &'static str = "\nuse std::str::FromStr;\nuse std::ffi::c_void;\nuse core::convert::Infallible;\nuse bitcoin::hashes::Hash;\nuse crate::c_types::*;\n";
 
 // *************************************
 // *** Manually-expanded conversions ***

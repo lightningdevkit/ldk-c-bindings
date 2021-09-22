@@ -737,7 +737,7 @@ pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generi
 					for bound in type_param.bounds.iter() {
 						if let syn::TypeParamBound::Trait(trait_bound) = bound {
 							assert_simple_bound(&trait_bound);
-							write!(w, "{}{}", if idx != 0 { ", " } else { "" }, gen_types.maybe_resolve_ident(&type_param.ident).unwrap()).unwrap();
+							write!(w, "{}crate::{}", if idx != 0 { ", " } else { "" }, gen_types.maybe_resolve_ident(&type_param.ident).unwrap()).unwrap();
 							if printed_param {
 								unimplemented!("Can't print generic params that have multiple non-lifetime bounds");
 							}

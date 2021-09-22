@@ -205,13 +205,12 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 							if path_matches_nongeneric(&trait_bound.path, &["core", "clone", "Clone"]) { continue; }
 
 							assert_simple_bound(&trait_bound);
-							if let Some(mut path) = types.maybe_resolve_path(&trait_bound.path, None) {
+							if let Some(path) = types.maybe_resolve_path(&trait_bound.path, None) {
 								if types.skip_path(&path) { continue; }
 								if path == "Sized" { continue; }
 								if non_lifetimes_processed { return false; }
 								non_lifetimes_processed = true;
 								let new_ident = if path != "std::ops::Deref" && path != "core::ops::Deref" {
-									path = "crate::".to_string() + &path;
 									Some(&trait_bound.path)
 								} else if trait_bound.path.segments.len() == 1 {
 									// If we're templated on Deref<Target = ConcreteThing>, store
@@ -267,7 +266,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 									if non_lifetimes_processed { return false; }
 									non_lifetimes_processed = true;
 									assert_simple_bound(&trait_bound);
-									*gen = ("crate::".to_string() + &types.resolve_path(&trait_bound.path, None),
+									*gen = (types.resolve_path(&trait_bound.path, None),
 										Some(&trait_bound.path));
 								}
 							}
@@ -292,14 +291,13 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 					match bounds_iter.next().unwrap() {
 						syn::TypeParamBound::Trait(tr) => {
 							assert_simple_bound(&tr);
-							if let Some(mut path) = types.maybe_resolve_path(&tr.path, None) {
+							if let Some(path) = types.maybe_resolve_path(&tr.path, None) {
 								if types.skip_path(&path) { continue; }
 								// In general we handle Deref<Target=X> as if it were just X (and
 								// implement Deref<Target=Self> for relevant types). We don't
 								// bother to implement it for associated types, however, so we just
 								// ignore such bounds.
 								let new_ident = if path != "std::ops::Deref" && path != "core::ops::Deref" {
-									path = "crate::".to_string() + &path;
 									Some(&tr.path)
 								} else { None };
 								self.typed_generics.insert(&t.ident, (path, new_ident));
@@ -581,12 +579,12 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		} else { None }
 	}
 
-	pub fn maybe_resolve_path(&self, p_arg: &syn::Path, generics: Option<&GenericTypes>) -> Option<String> {
-		let p = if let Some(gen_types) = generics {
-			if let Some((_, synpath)) = gen_types.maybe_resolve_path(p_arg) {
-				synpath
-			} else { p_arg }
-		} else { p_arg };
+	pub fn maybe_resolve_path(&self, p: &syn::Path, generics: Option<&GenericTypes>) -> Option<String> {
+		if let Some(gen_types) = generics {
+			if let Some((resp, _)) = gen_types.maybe_resolve_path(p) {
+				return Some(resp.clone());
+			}
+		}
 
 		if p.leading_colon.is_some() {
 			let mut res: String = p.segments.iter().enumerate().map(|(idx, seg)| {

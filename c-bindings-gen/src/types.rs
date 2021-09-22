@@ -1437,7 +1437,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		let default_value = Some(syn::Type::Reference(syn::TypeReference {
 			and_token: syn::Token!(&)(Span::call_site()), lifetime: None, mutability: None,
 			elem: Box::new(t.clone()) }));
-		match t {
+		match generics.resolve_type(t) {
 			syn::Type::Path(p) => {
 				if let Some(resolved_path) = self.maybe_resolve_path(&p.path, generics) {
 					if resolved_path != "Vec" { return default_value; }
@@ -2156,7 +2156,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					if let syn::PathArguments::AngleBracketed(args) = &p.path.segments.iter().next().unwrap().arguments {
 						convert_container!(resolved_path, args.args.len(), || args.args.iter().map(|arg| {
 							if let syn::GenericArgument::Type(ty) = arg {
-								ty
+								generics.resolve_type(ty)
 							} else { unimplemented!(); }
 						}));
 					} else { unimplemented!(); }
@@ -2189,7 +2189,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				} else if let syn::Type::Reference(ty) = &*s.elem {
 					let tyref = [&*ty.elem];
 					is_ref = true;
-					convert_container!("Slice", 1, || tyref.iter().map(|t| *t));
+					convert_container!("Slice", 1, || tyref.iter().map(|t| generics.resolve_type(*t)));
 					unimplemented!("convert_container should return true as container_lookup should succeed for slices");
 				} else if let syn::Type::Tuple(t) = &*s.elem {
 					// When mapping into a temporary new var, we need to own all the underlying objects.
@@ -2464,62 +2464,68 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					} else { return false; }
 				}
 			}
-			if let syn::Type::Tuple(tuple) = arg {
-				if tuple.elems.len() == 0 {
-					write!(w, "None").unwrap();
-					write!(mangled_type, "None").unwrap();
-				} else {
-					let mut mangled_tuple_type: Vec<u8> = Vec::new();
+			match generics.resolve_type(arg) {
+				syn::Type::Tuple(tuple) => {
+					if tuple.elems.len() == 0 {
+						write!(w, "None").unwrap();
+						write!(mangled_type, "None").unwrap();
+					} else {
+						let mut mangled_tuple_type: Vec<u8> = Vec::new();
 
-					// Figure out what the mangled type should look like. To disambiguate
-					// ((A, B), C) and (A, B, C) we prefix the generic args with a _ and suffix
-					// them with a Z. Ideally we wouldn't use Z, but not many special chars are
-					// available for use in type names.
-					write!(w, "C{}Tuple_", tuple.elems.len()).unwrap();
-					write!(mangled_type, "C{}Tuple_", tuple.elems.len()).unwrap();
-					write!(mangled_tuple_type, "C{}Tuple_", tuple.elems.len()).unwrap();
-					for elem in tuple.elems.iter() {
-						if let syn::Type::Path(p) = elem {
-							write_path!(p, Some(&mut mangled_tuple_type));
-						} else if let syn::Type::Reference(refelem) = elem {
-							if let syn::Type::Path(p) = &*refelem.elem {
+						// Figure out what the mangled type should look like. To disambiguate
+						// ((A, B), C) and (A, B, C) we prefix the generic args with a _ and suffix
+						// them with a Z. Ideally we wouldn't use Z, but not many special chars are
+						// available for use in type names.
+						write!(w, "C{}Tuple_", tuple.elems.len()).unwrap();
+						write!(mangled_type, "C{}Tuple_", tuple.elems.len()).unwrap();
+						write!(mangled_tuple_type, "C{}Tuple_", tuple.elems.len()).unwrap();
+						for elem in tuple.elems.iter() {
+							if let syn::Type::Path(p) = elem {
 								write_path!(p, Some(&mut mangled_tuple_type));
+							} else if let syn::Type::Reference(refelem) = elem {
+								if let syn::Type::Path(p) = &*refelem.elem {
+									write_path!(p, Some(&mut mangled_tuple_type));
+								} else { return false; }
 							} else { return false; }
-						} else { return false; }
+						}
+						write!(w, "Z").unwrap();
+						write!(mangled_type, "Z").unwrap();
+						write!(mangled_tuple_type, "Z").unwrap();
+						if !self.check_create_container(String::from_utf8(mangled_tuple_type).unwrap(),
+								&format!("{}Tuple", tuple.elems.len()), tuple.elems.iter().collect(), generics, is_ref) {
+							return false;
+						}
 					}
-					write!(w, "Z").unwrap();
-					write!(mangled_type, "Z").unwrap();
-					write!(mangled_tuple_type, "Z").unwrap();
-					if !self.check_create_container(String::from_utf8(mangled_tuple_type).unwrap(),
-							&format!("{}Tuple", tuple.elems.len()), tuple.elems.iter().collect(), generics, is_ref) {
-						return false;
-					}
-				}
-			} else if let syn::Type::Path(p_arg) = arg {
-				write_path!(p_arg, None);
-			} else if let syn::Type::Reference(refty) = arg {
-				if let syn::Type::Path(p_arg) = &*refty.elem {
+				},
+				syn::Type::Path(p_arg) => {
 					write_path!(p_arg, None);
-				} else if let syn::Type::Slice(_) = &*refty.elem {
-					// write_c_type will actually do exactly what we want here, we just need to
-					// make it a pointer so that its an option. Note that we cannot always convert
-					// the Vec-as-slice (ie non-ref types) containers, so sometimes need to be able
-					// to edit it, hence we use *mut here instead of *const.
-					if args.len() != 1 { return false; }
-					write!(w, "*mut ").unwrap();
-					self.write_c_type(w, arg, None, true);
-				} else { return false; }
-			} else if let syn::Type::Array(a) = arg {
-				if let syn::Type::Path(p_arg) = &*a.elem {
-					let resolved = self.resolve_path(&p_arg.path, generics);
-					if !self.is_primitive(&resolved) { return false; }
-					if let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Int(len), .. }) = &a.len {
-						if self.c_type_from_path(&format!("[{}; {}]", resolved, len.base10_digits()), is_ref, ptr_for_ref).is_none() { return false; }
-						write!(w, "_{}{}", resolved, len.base10_digits()).unwrap();
-						write!(mangled_type, "_{}{}", resolved, len.base10_digits()).unwrap();
+				},
+				syn::Type::Reference(refty) => {
+					if let syn::Type::Path(p_arg) = &*refty.elem {
+						write_path!(p_arg, None);
+					} else if let syn::Type::Slice(_) = &*refty.elem {
+						// write_c_type will actually do exactly what we want here, we just need to
+						// make it a pointer so that its an option. Note that we cannot always convert
+						// the Vec-as-slice (ie non-ref types) containers, so sometimes need to be able
+						// to edit it, hence we use *mut here instead of *const.
+						if args.len() != 1 { return false; }
+						write!(w, "*mut ").unwrap();
+						self.write_c_type(w, arg, None, true);
 					} else { return false; }
-				} else { return false; }
-			} else { return false; }
+				},
+				syn::Type::Array(a) => {
+					if let syn::Type::Path(p_arg) = &*a.elem {
+						let resolved = self.resolve_path(&p_arg.path, generics);
+						if !self.is_primitive(&resolved) { return false; }
+						if let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Int(len), .. }) = &a.len {
+							if self.c_type_from_path(&format!("[{}; {}]", resolved, len.base10_digits()), is_ref, ptr_for_ref).is_none() { return false; }
+							write!(w, "_{}{}", resolved, len.base10_digits()).unwrap();
+							write!(mangled_type, "_{}{}", resolved, len.base10_digits()).unwrap();
+						} else { return false; }
+					} else { return false; }
+				},
+				_ => { return false; },
+			}
 		}
 		if self.is_transparent_container(ident, is_ref, args.iter().map(|a| *a)) { return true; }
 		// Push the "end of type" Z

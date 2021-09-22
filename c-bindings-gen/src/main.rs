@@ -402,8 +402,11 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						}
 						let mut meth_gen_types = gen_types.push_ctx();
 						assert!(meth_gen_types.learn_generics(&m.sig.generics, $type_resolver));
+						// Note that we do *not* use the method generics when printing "native"
+						// rust parts - if the method is generic, we need to print a generic
+						// method.
 						write!(w, "\tfn {}", m.sig.ident).unwrap();
-						$type_resolver.write_rust_generic_param(w, Some(&meth_gen_types), m.sig.generics.params.iter());
+						$type_resolver.write_rust_generic_param(w, Some(&gen_types), m.sig.generics.params.iter());
 						write!(w, "(").unwrap();
 						for inp in m.sig.inputs.iter() {
 							match inp {
@@ -431,7 +434,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 										}
 										_ => unimplemented!(),
 									}
-									$type_resolver.write_rust_type(w, Some(&meth_gen_types), &*arg.ty);
+									$type_resolver.write_rust_type(w, Some(&gen_types), &*arg.ty);
 								}
 							}
 						}
@@ -439,7 +442,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						match &m.sig.output {
 							syn::ReturnType::Type(_, rtype) => {
 								write!(w, " -> ").unwrap();
-								$type_resolver.write_rust_type(w, Some(&meth_gen_types), &*rtype)
+								$type_resolver.write_rust_type(w, Some(&gen_types), &*rtype)
 							},
 							_ => {},
 						}

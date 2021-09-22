@@ -1271,6 +1271,18 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 
+	/// When printing a reference to the source crate's rust type, if we need to map it to a
+	/// different "real" type, it can be done so here.
+	/// This is useful to work around limitations in the binding type resolver, where we reference
+	/// a non-public `use` alias.
+	/// TODO: We should never need to use this!
+	fn real_rust_type_mapping<'equiv>(&self, thing: &'equiv str) -> &'equiv str {
+		match thing {
+			"lightning::io::Read" => "std::io::Read",
+			_ => thing,
+		}
+	}
+
 	// ****************************
 	// *** Container Processing ***
 	// ****************************
@@ -1567,7 +1579,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// If we're printing a generic argument, it needs to reference the crate, otherwise
 				// the original crate:
 				} else if self.maybe_resolve_path(&path, None).as_ref() == Some(&resolved) {
-					write!(w, "{}", resolved).unwrap();
+					write!(w, "{}", self.real_rust_type_mapping(&resolved)).unwrap();
 				} else {
 					write!(w, "crate::{}", resolved).unwrap();
 				}

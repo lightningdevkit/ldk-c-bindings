@@ -163,7 +163,6 @@ fn write_trait_impl_field_assign<W: std::io::Write>(w: &mut W, trait_path: &str,
 
 /// Write out the impl block for a defined trait struct which has a supertrait
 fn do_write_impl_trait<W: std::io::Write>(w: &mut W, trait_path: &str, _trait_name: &syn::Ident, for_obj: &str) {
-eprintln!("{}", trait_path);
 	match trait_path {
 		"lightning::util::ser::Writeable" => {
 			writeln!(w, "impl {} for {} {{", trait_path, for_obj).unwrap();

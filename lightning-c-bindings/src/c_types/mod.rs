@@ -289,6 +289,13 @@ pub extern "C" fn Transaction_free(_res: Transaction) { }
 pub(crate) fn bitcoin_to_C_outpoint(outpoint: ::bitcoin::blockdata::transaction::OutPoint) -> crate::lightning::chain::transaction::OutPoint {
 	crate::lightning::chain::transaction::OutPoint_new(ThirtyTwoBytes { data: outpoint.txid.into_inner() }, outpoint.vout.try_into().unwrap())
 }
+pub(crate) fn C_to_bitcoin_outpoint(outpoint: crate::lightning::chain::transaction::OutPoint) -> ::bitcoin::blockdata::transaction::OutPoint {
+	unsafe {
+		::bitcoin::blockdata::transaction::OutPoint {
+			txid: (*outpoint.inner).txid, vout: (*outpoint.inner).index as u32
+		}
+	}
+}
 
 #[repr(C)]
 #[derive(Clone)]

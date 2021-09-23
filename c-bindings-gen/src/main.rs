@@ -175,6 +175,11 @@ fn do_write_impl_trait<W: std::io::Write>(w: &mut W, trait_path: &str, _trait_na
 	}
 }
 
+/// Returns true if an instance of the given type must never exist
+fn is_type_unconstructable(path: &str) -> bool {
+	path == "core::convert::Infallible" || path == "crate::c_types::NotConstructable"
+}
+
 // *******************************
 // *** Per-Type Printing Logic ***
 // *******************************
@@ -821,14 +826,27 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						// From<> implementation which does all the work to ensure free is handled
 						// properly. This way we can call this method from deep in the
 						// type-conversion logic without actually knowing the concrete native type.
+						if !resolved_path.starts_with(types.module_path) {
+							writeln!(w, "use {} as native{};", resolved_path, ident).unwrap();
+						}
 						writeln!(w, "impl From<native{}> for crate::{} {{", ident, full_trait_path).unwrap();
 						writeln!(w, "\tfn from(obj: native{}) -> Self {{", ident).unwrap();
-						writeln!(w, "\t\tlet mut rust_obj = {} {{ inner: ObjOps::heap_alloc(obj), is_owned: true }};", ident).unwrap();
-						writeln!(w, "\t\tlet mut ret = {}_as_{}(&rust_obj);", ident, trait_obj.ident).unwrap();
-						writeln!(w, "\t\t// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn").unwrap();
-						writeln!(w, "\t\trust_obj.inner = std::ptr::null_mut();").unwrap();
-						writeln!(w, "\t\tret.free = Some({}_free_void);", ident).unwrap();
-						writeln!(w, "\t\tret\n\t}}\n}}").unwrap();
+						if is_type_unconstructable(&resolved_path) {
+							writeln!(w, "\t\tunreachable!();").unwrap();
+						} else {
+							writeln!(w, "\t\tlet mut rust_obj = {} {{ inner: ObjOps::heap_alloc(obj), is_owned: true }};", ident).unwrap();
+							writeln!(w, "\t\tlet mut ret = {}_as_{}(&rust_obj);", ident, trait_obj.ident).unwrap();
+							writeln!(w, "\t\t// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn").unwrap();
+							writeln!(w, "\t\trust_obj.inner = std::ptr::null_mut();").unwrap();
+							writeln!(w, "\t\tret.free = Some({}_free_void);", ident).unwrap();
+							writeln!(w, "\t\tret").unwrap();
+						}
+						writeln!(w, "\t}}\n}}").unwrap();
+						if is_type_unconstructable(&resolved_path) {
+							// We don't bother with Struct_as_Trait conversion for types which must
+							// never be instantiated, so just return early.
+							return;
+						}
 
 						writeln!(w, "/// Constructs a new {} which calls the relevant methods on this_arg.", trait_obj.ident).unwrap();
 						writeln!(w, "/// This copies the `inner` pointer in this_arg and thus the returned {} must be freed before this_arg is", trait_obj.ident).unwrap();
@@ -905,7 +923,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						writeln!(w, "\t}}\n}}\n").unwrap();
 
 						macro_rules! impl_meth {
-							($m: expr, $trait_path: expr, $trait: expr, $indent: expr) => {
+							($m: expr, $trait_meth: expr, $trait_path: expr, $trait: expr, $indent: expr) => {
 								let trait_method = $trait.items.iter().filter_map(|item| {
 									if let syn::TraitItem::Method(t_m) = item { Some(t_m) } else { None }
 								}).find(|trait_meth| trait_meth.sig.ident == $m.sig.ident).unwrap();
@@ -921,39 +939,62 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 								write!(w, "extern \"C\" fn {}_{}_{}(", ident, $trait.ident, $m.sig.ident).unwrap();
 								let mut meth_gen_types = gen_types.push_ctx();
 								assert!(meth_gen_types.learn_generics(&$m.sig.generics, types));
-								write_method_params(w, &$m.sig, "c_void", types, Some(&meth_gen_types), true, true);
-								write!(w, " {{\n\t").unwrap();
-								write_method_var_decl_body(w, &$m.sig, "", types, Some(&meth_gen_types), false);
-								let mut takes_self = false;
+								let mut uncallable_function = false;
 								for inp in $m.sig.inputs.iter() {
-									if let syn::FnArg::Receiver(_) = inp {
-										takes_self = true;
-									}
-								}
-
-								let mut t_gen_args = String::new();
-								for (idx, _) in $trait.generics.params.iter().enumerate() {
-									if idx != 0 { t_gen_args += ", " };
-									t_gen_args += "_"
-								}
-								if takes_self {
-									write!(w, "<native{} as {}<{}>>::{}(unsafe {{ &mut *(this_arg as *mut native{}) }}, ", ident, $trait_path, t_gen_args, $m.sig.ident, ident).unwrap();
-								} else {
-									write!(w, "<native{} as {}<{}>>::{}(", ident, $trait_path, t_gen_args, $m.sig.ident).unwrap();
-								}
-
-								let mut real_type = "".to_string();
-								match &$m.sig.output {
-									syn::ReturnType::Type(_, rtype) => {
-										if let Some(mut remaining_path) = first_seg_self(&*rtype) {
-											if let Some(associated_seg) = get_single_remaining_path_seg(&mut remaining_path) {
-												real_type = format!("{}", impl_associated_types.get(associated_seg).unwrap());
+									match inp {
+										syn::FnArg::Typed(arg) => {
+											if types.skip_arg(&*arg.ty, Some(&meth_gen_types)) { continue; }
+											let mut c_type = Vec::new();
+											types.write_c_type(&mut c_type, &*arg.ty, Some(&meth_gen_types), false);
+											if is_type_unconstructable(&String::from_utf8(c_type).unwrap()) {
+												uncallable_function = true;
 											}
 										}
-									},
-									_ => {},
+										_ => {}
+									}
 								}
-								write_method_call_params(w, &$m.sig, "", types, Some(&meth_gen_types), &real_type, false);
+								if uncallable_function {
+									let mut trait_resolver = get_module_type_resolver!(full_trait_path, types.crate_libs, types.crate_types);
+									write_method_params(w, &$trait_meth.sig, "c_void", &mut trait_resolver, Some(&meth_gen_types), true, true);
+								} else {
+									write_method_params(w, &$m.sig, "c_void", types, Some(&meth_gen_types), true, true);
+								}
+								write!(w, " {{\n\t").unwrap();
+								if uncallable_function {
+									write!(w, "unreachable!();").unwrap();
+								} else {
+									write_method_var_decl_body(w, &$m.sig, "", types, Some(&meth_gen_types), false);
+									let mut takes_self = false;
+									for inp in $m.sig.inputs.iter() {
+										if let syn::FnArg::Receiver(_) = inp {
+											takes_self = true;
+										}
+									}
+
+									let mut t_gen_args = String::new();
+									for (idx, _) in $trait.generics.params.iter().enumerate() {
+										if idx != 0 { t_gen_args += ", " };
+										t_gen_args += "_"
+									}
+									if takes_self {
+										write!(w, "<native{} as {}<{}>>::{}(unsafe {{ &mut *(this_arg as *mut native{}) }}, ", ident, $trait_path, t_gen_args, $m.sig.ident, ident).unwrap();
+									} else {
+										write!(w, "<native{} as {}<{}>>::{}(", ident, $trait_path, t_gen_args, $m.sig.ident).unwrap();
+									}
+
+									let mut real_type = "".to_string();
+									match &$m.sig.output {
+										syn::ReturnType::Type(_, rtype) => {
+											if let Some(mut remaining_path) = first_seg_self(&*rtype) {
+												if let Some(associated_seg) = get_single_remaining_path_seg(&mut remaining_path) {
+													real_type = format!("{}", impl_associated_types.get(associated_seg).unwrap());
+												}
+											}
+										},
+										_ => {},
+									}
+									write_method_call_params(w, &$m.sig, "", types, Some(&meth_gen_types), &real_type, false);
+								}
 								write!(w, "\n}}\n").unwrap();
 								if let syn::ReturnType::Type(_, rtype) = &$m.sig.output {
 									if let syn::Type::Reference(r) = &**rtype {
@@ -972,10 +1013,21 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							}
 						}
 
-						for item in i.items.iter() {
+						'impl_item_loop: for item in i.items.iter() {
 							match item {
 								syn::ImplItem::Method(m) => {
-									impl_meth!(m, full_trait_path, trait_obj, "");
+									for trait_item in trait_obj.items.iter() {
+										match trait_item {
+											syn::TraitItem::Method(meth) => {
+												if meth.sig.ident == m.sig.ident {
+													impl_meth!(m, meth, full_trait_path, trait_obj, "");
+													continue 'impl_item_loop;
+												}
+											},
+											_ => {},
+										}
+									}
+									unreachable!();
 								},
 								syn::ImplItem::Type(_) => {},
 								_ => unimplemented!(),
@@ -997,7 +1049,14 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							writeln!(w, "}}").unwrap();
 						}
 						write!(w, "\n").unwrap();
-					} else if path_matches_nongeneric(&trait_path.1, &["From"]) {
+						return;
+					}
+					if is_type_unconstructable(&resolved_path) {
+						// Don't bother exposing trait implementations for objects which cannot be
+						// instantiated.
+						return;
+					}
+					if path_matches_nongeneric(&trait_path.1, &["From"]) {
 					} else if path_matches_nongeneric(&trait_path.1, &["Default"]) {
 						writeln!(w, "/// Creates a \"default\" {}. See struct and individual field documentaiton for details on which values are used.", ident).unwrap();
 						write!(w, "#[must_use]\n#[no_mangle]\npub extern \"C\" fn {}_default() -> {} {{\n", ident, ident).unwrap();

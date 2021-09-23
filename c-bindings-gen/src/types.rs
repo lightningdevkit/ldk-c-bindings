@@ -931,6 +931,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some("*const std::os::raw::c_char"),
 
+			"lightning::io::Read" => Some("crate::c_types::u8slice"),
+
 			_ => None,
 		}
 	}
@@ -1014,6 +1016,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// List of traits we map (possibly during processing of other files):
 			"crate::util::logger::Logger" => Some(""),
 
+			"lightning::io::Read" => Some("&mut "),
+
 			_ => None,
 		}.map(|s| s.to_owned())
 	}
@@ -1080,6 +1084,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			// List of traits we map (possibly during processing of other files):
 			"crate::util::logger::Logger" => Some(""),
+
+			"lightning::io::Read" => Some(".to_reader()"),
 
 			_ => None,
 		}.map(|s| s.to_owned())
@@ -1169,6 +1175,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some("local_"),
 
+			"lightning::io::Read" => Some("crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec("),
+
 			_ => None,
 		}.map(|s| s.to_owned())
 	}
@@ -1237,6 +1245,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some(".as_ptr()"),
+
+			"lightning::io::Read" => Some("))"),
 
 			_ => None,
 		}.map(|s| s.to_owned())

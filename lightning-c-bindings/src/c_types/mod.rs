@@ -15,6 +15,8 @@ use bitcoin::bech32;
 
 use std::convert::TryInto; // Bindings need at least rustc 1.34
 
+use std::io::{Cursor, Read}; // TODO: We should use core2 here when we support no_std
+
 /// Integer in the range `0..32`
 #[derive(PartialEq, Eq, Copy, Clone)]
 #[allow(non_camel_case_types)]
@@ -355,6 +357,18 @@ impl u8slice {
 		if self.datalen == 0 { return &[]; }
 		unsafe { std::slice::from_raw_parts(self.data, self.datalen) }
 	}
+	pub(crate) fn to_reader<'a>(&'a self) -> Cursor<&'a [u8]> {
+		let sl = self.to_slice();
+		Cursor::new(sl)
+	}
+	pub(crate) fn from_vec(v: &derived::CVec_u8Z) -> u8slice {
+		Self::from_slice(v.as_slice())
+	}
+}
+pub(crate) fn reader_to_vec<R: Read>(r: &mut R) -> derived::CVec_u8Z {
+	let mut res = Vec::new();
+	r.read_to_end(&mut res).unwrap();
+	derived::CVec_u8Z::from(res)
 }
 
 #[repr(C)]

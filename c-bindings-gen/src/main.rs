@@ -1904,6 +1904,9 @@ fn main() {
 	writeln!(header_file, "#endif").unwrap();
 	writeln!(cpp_header_file, "#include <string.h>\nnamespace LDK {{").unwrap();
 
+	// Write a few manually-defined types into the C++ header file
+	write_cpp_wrapper(&mut cpp_header_file, "Str", true, None);
+
 	// First parse the full crate's ASTs, caching them so that we can hold references to the AST
 	// objects in other datastructures:
 	let mut lib_src = String::new();

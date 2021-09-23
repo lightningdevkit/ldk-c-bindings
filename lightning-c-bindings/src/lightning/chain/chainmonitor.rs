@@ -24,6 +24,7 @@
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -93,14 +94,30 @@ impl ChainMonitor {
 /// pre-filter blocks or only fetch blocks matching a compact filter. Otherwise, clients may
 /// always need to fetch full blocks absent another means for determining which blocks contain
 /// transactions relevant to the watched channels.
-///
-/// Note that chain_source (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChainMonitor_new(chain_source: *mut crate::lightning::chain::Filter, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut logger: crate::lightning::util::logger::Logger, mut feeest: crate::lightning::chain::chaininterface::FeeEstimator, mut persister: crate::lightning::chain::channelmonitor::Persist) -> ChainMonitor {
-	let mut local_chain_source = if chain_source == std::ptr::null_mut() { None } else { Some( { unsafe { *Box::from_raw(chain_source) } }) };
+pub extern "C" fn ChainMonitor_new(mut chain_source: crate::c_types::derived::COption_FilterZ, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut logger: crate::lightning::util::logger::Logger, mut feeest: crate::lightning::chain::chaininterface::FeeEstimator, mut persister: crate::lightning::chain::channelmonitor::Persist) -> ChainMonitor {
+	let mut local_chain_source = { /* chain_source*/ let chain_source_opt = chain_source; { } if chain_source_opt.is_none() { None } else { Some({ chain_source_opt.take() }) } };
 	let mut ret = lightning::chain::chainmonitor::ChainMonitor::new(local_chain_source, broadcaster, logger, feeest, persister);
 	ChainMonitor { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Gets the balances in the contained [`ChannelMonitor`]s which are claimable on-chain or
+/// claims which are awaiting confirmation.
+///
+/// Includes the balances from each [`ChannelMonitor`] *except* those included in
+/// `ignored_channels`, allowing you to filter out balances from channels which are still open
+/// (and whose balance should likely be pulled from the [`ChannelDetails`]).
+///
+/// See [`ChannelMonitor::get_claimable_balances`] for more details on the exact criteria for
+/// inclusion in the return value.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChainMonitor_get_claimable_balances(this_arg: &ChainMonitor, mut ignored_channels: crate::c_types::derived::CVec_ChannelDetailsZ) -> crate::c_types::derived::CVec_BalanceZ {
+	let mut local_ignored_channels = Vec::new(); for mut item in ignored_channels.as_slice().iter() { local_ignored_channels.push( { item.get_native_ref() }); };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_claimable_balances(&local_ignored_channels[..]);
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::chain::channelmonitor::Balance::native_into(item) }); };
+	local_ret.into()
 }
 
 impl From<nativeChainMonitor> for crate::lightning::chain::Listen {

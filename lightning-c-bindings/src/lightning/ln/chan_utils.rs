@@ -11,6 +11,7 @@
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -19,6 +20,13 @@ use crate::c_types::*;
 pub extern "C" fn build_commitment_secret(commitment_seed: *const [u8; 32], mut idx: u64) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = lightning::ln::chan_utils::build_commitment_secret(unsafe { &*commitment_seed}, idx);
 	crate::c_types::ThirtyTwoBytes { data: ret }
+}
+
+/// Build a closing transaction
+#[no_mangle]
+pub extern "C" fn build_closing_transaction(mut to_holder_value_sat: u64, mut to_counterparty_value_sat: u64, mut to_holder_script: crate::c_types::derived::CVec_u8Z, mut to_counterparty_script: crate::c_types::derived::CVec_u8Z, mut funding_outpoint: crate::lightning::chain::transaction::OutPoint) -> crate::c_types::Transaction {
+	let mut ret = lightning::ln::chan_utils::build_closing_transaction(to_holder_value_sat, to_counterparty_value_sat, ::bitcoin::blockdata::script::Script::from(to_holder_script.into_rust()), ::bitcoin::blockdata::script::Script::from(to_counterparty_script.into_rust()), crate::c_types::C_to_bitcoin_outpoint(funding_outpoint));
+	crate::c_types::Transaction::from_bitcoin(&ret)
 }
 
 /// Derives a per-commitment-transaction private key (eg an htlc key or delayed_payment key)
@@ -560,7 +568,7 @@ pub extern "C" fn HTLCOutputInCommitment_set_payment_hash(this_ptr: &mut HTLCOut
 #[no_mangle]
 pub extern "C" fn HTLCOutputInCommitment_get_transaction_output_index(this_ptr: &HTLCOutputInCommitment) -> crate::c_types::derived::COption_u32Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().transaction_output_index;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u32Z::None } else {  { crate::c_types::derived::COption_u32Z::Some(inner_val.unwrap()) } };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u32Z::None } else { crate::c_types::derived::COption_u32Z::Some( { inner_val.unwrap() }) };
 	local_inner_val
 }
 /// The position within the commitment transactions' outputs. This may be None if the value is
@@ -1327,10 +1335,215 @@ pub extern "C" fn BuiltCommitmentTransaction_sign(this_arg: &BuiltCommitmentTran
 }
 
 
+use lightning::ln::chan_utils::ClosingTransaction as nativeClosingTransactionImport;
+type nativeClosingTransaction = nativeClosingTransactionImport;
+
+/// This class tracks the per-transaction information needed to build a closing transaction and will
+/// actually build it and sign.
+///
+/// This class can be used inside a signer implementation to generate a signature given the relevant
+/// secret key.
+#[must_use]
+#[repr(C)]
+pub struct ClosingTransaction {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeClosingTransaction,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for ClosingTransaction {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeClosingTransaction>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the ClosingTransaction, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn ClosingTransaction_free(this_obj: ClosingTransaction) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+extern "C" fn ClosingTransaction_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeClosingTransaction); }
+}
+#[allow(unused)]
+impl ClosingTransaction {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeClosingTransaction {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeClosingTransaction {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeClosingTransaction {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = std::ptr::null_mut();
+		ret
+	}
+}
+/// Construct an object of the class
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ClosingTransaction_new(mut to_holder_value_sat: u64, mut to_counterparty_value_sat: u64, mut to_holder_script: crate::c_types::derived::CVec_u8Z, mut to_counterparty_script: crate::c_types::derived::CVec_u8Z, mut funding_outpoint: crate::lightning::chain::transaction::OutPoint) -> ClosingTransaction {
+	let mut ret = lightning::ln::chan_utils::ClosingTransaction::new(to_holder_value_sat, to_counterparty_value_sat, ::bitcoin::blockdata::script::Script::from(to_holder_script.into_rust()), ::bitcoin::blockdata::script::Script::from(to_counterparty_script.into_rust()), crate::c_types::C_to_bitcoin_outpoint(funding_outpoint));
+	ClosingTransaction { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Trust our pre-built transaction.
+///
+/// Applies a wrapper which allows access to the transaction.
+///
+/// This should only be used if you fully trust the builder of this object. It should not
+/// be used by an external signer - instead use the verify function.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ClosingTransaction_trust(this_arg: &ClosingTransaction) -> crate::lightning::ln::chan_utils::TrustedClosingTransaction {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.trust();
+	crate::lightning::ln::chan_utils::TrustedClosingTransaction { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Verify our pre-built transaction.
+///
+/// Applies a wrapper which allows access to the transaction.
+///
+/// An external validating signer must call this method before signing
+/// or using the built transaction.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ClosingTransaction_verify(this_arg: &ClosingTransaction, mut funding_outpoint: crate::lightning::chain::transaction::OutPoint) -> crate::c_types::derived::CResult_TrustedClosingTransactionNoneZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.verify(crate::c_types::C_to_bitcoin_outpoint(funding_outpoint));
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::TrustedClosingTransaction { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// The value to be sent to the holder, or zero if the output will be omitted
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ClosingTransaction_to_holder_value_sat(this_arg: &ClosingTransaction) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.to_holder_value_sat();
+	ret
+}
+
+/// The value to be sent to the counterparty, or zero if the output will be omitted
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ClosingTransaction_to_counterparty_value_sat(this_arg: &ClosingTransaction) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.to_counterparty_value_sat();
+	ret
+}
+
+/// The destination of the holder's output
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ClosingTransaction_to_holder_script(this_arg: &ClosingTransaction) -> crate::c_types::u8slice {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.to_holder_script();
+	crate::c_types::u8slice::from_slice(&ret[..])
+}
+
+/// The destination of the counterparty's output
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ClosingTransaction_to_counterparty_script(this_arg: &ClosingTransaction) -> crate::c_types::u8slice {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.to_counterparty_script();
+	crate::c_types::u8slice::from_slice(&ret[..])
+}
+
+
+use lightning::ln::chan_utils::TrustedClosingTransaction as nativeTrustedClosingTransactionImport;
+type nativeTrustedClosingTransaction = nativeTrustedClosingTransactionImport<'static>;
+
+/// A wrapper on ClosingTransaction indicating that the built bitcoin
+/// transaction is trusted.
+///
+/// See trust() and verify() functions on CommitmentTransaction.
+///
+/// This structure implements Deref.
+#[must_use]
+#[repr(C)]
+pub struct TrustedClosingTransaction {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeTrustedClosingTransaction,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for TrustedClosingTransaction {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeTrustedClosingTransaction>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the TrustedClosingTransaction, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn TrustedClosingTransaction_free(this_obj: TrustedClosingTransaction) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+extern "C" fn TrustedClosingTransaction_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeTrustedClosingTransaction); }
+}
+#[allow(unused)]
+impl TrustedClosingTransaction {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeTrustedClosingTransaction {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeTrustedClosingTransaction {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeTrustedClosingTransaction {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = std::ptr::null_mut();
+		ret
+	}
+}
+/// The pre-built Bitcoin commitment transaction
+#[must_use]
+#[no_mangle]
+pub extern "C" fn TrustedClosingTransaction_built_transaction(this_arg: &TrustedClosingTransaction) -> crate::c_types::Transaction {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.built_transaction();
+	crate::c_types::Transaction::from_bitcoin(ret)
+}
+
+/// Get the SIGHASH_ALL sighash value of the transaction.
+///
+/// This can be used to verify a signature.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn TrustedClosingTransaction_get_sighash_all(this_arg: &TrustedClosingTransaction, mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_sighash_all(&::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis);
+	crate::c_types::ThirtyTwoBytes { data: ret.as_ref().clone() }
+}
+
+/// Sign a transaction, either because we are counter-signing the counterparty's transaction or
+/// because we are about to broadcast a holder transaction.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn TrustedClosingTransaction_sign(this_arg: &TrustedClosingTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64) -> crate::c_types::Signature {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign(&::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, secp256k1::SECP256K1);
+	crate::c_types::Signature::from_rust(&ret)
+}
+
+
 use lightning::ln::chan_utils::CommitmentTransaction as nativeCommitmentTransactionImport;
 type nativeCommitmentTransaction = nativeCommitmentTransactionImport;
 
-/// This class tracks the per-transaction information needed to build a commitment transaction and to
+/// This class tracks the per-transaction information needed to build a commitment transaction and will
 /// actually build it and sign.  It is used for holder transactions that we sign only when needed
 /// and for transactions we sign for the counterparty.
 ///
@@ -1454,7 +1667,7 @@ pub extern "C" fn CommitmentTransaction_feerate_per_kw(this_arg: &CommitmentTran
 /// Applies a wrapper which allows access to these fields.
 ///
 /// This should only be used if you fully trust the builder of this object.  It should not
-///\tbe used by an external signer - instead use the verify function.
+/// be used by an external signer - instead use the verify function.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn CommitmentTransaction_trust(this_arg: &CommitmentTransaction) -> crate::lightning::ln::chan_utils::TrustedCommitmentTransaction {

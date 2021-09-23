@@ -21,6 +21,7 @@
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -339,8 +340,8 @@ pub extern "C" fn MonitorUpdateError_clone(orig: &MonitorUpdateError) -> Monitor
 pub enum MonitorEvent {
 	/// A monitor event containing an HTLCUpdate.
 	HTLCEvent(crate::lightning::chain::channelmonitor::HTLCUpdate),
-	/// A monitor event that the Channel's commitment transaction was broadcasted.
-	CommitmentTxBroadcasted(crate::lightning::chain::transaction::OutPoint),
+	/// A monitor event that the Channel's commitment transaction was confirmed.
+	CommitmentTxConfirmed(crate::lightning::chain::transaction::OutPoint),
 }
 use lightning::chain::channelmonitor::MonitorEvent as nativeMonitorEvent;
 impl MonitorEvent {
@@ -353,9 +354,9 @@ impl MonitorEvent {
 					*unsafe { Box::from_raw(a_nonref.take_inner()) },
 				)
 			},
-			MonitorEvent::CommitmentTxBroadcasted (ref a, ) => {
+			MonitorEvent::CommitmentTxConfirmed (ref a, ) => {
 				let mut a_nonref = (*a).clone();
-				nativeMonitorEvent::CommitmentTxBroadcasted (
+				nativeMonitorEvent::CommitmentTxConfirmed (
 					*unsafe { Box::from_raw(a_nonref.take_inner()) },
 				)
 			},
@@ -369,8 +370,8 @@ impl MonitorEvent {
 					*unsafe { Box::from_raw(a.take_inner()) },
 				)
 			},
-			MonitorEvent::CommitmentTxBroadcasted (mut a, ) => {
-				nativeMonitorEvent::CommitmentTxBroadcasted (
+			MonitorEvent::CommitmentTxConfirmed (mut a, ) => {
+				nativeMonitorEvent::CommitmentTxConfirmed (
 					*unsafe { Box::from_raw(a.take_inner()) },
 				)
 			},
@@ -385,9 +386,9 @@ impl MonitorEvent {
 					crate::lightning::chain::channelmonitor::HTLCUpdate { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
 				)
 			},
-			nativeMonitorEvent::CommitmentTxBroadcasted (ref a, ) => {
+			nativeMonitorEvent::CommitmentTxConfirmed (ref a, ) => {
 				let mut a_nonref = (*a).clone();
-				MonitorEvent::CommitmentTxBroadcasted (
+				MonitorEvent::CommitmentTxConfirmed (
 					crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
 				)
 			},
@@ -401,8 +402,8 @@ impl MonitorEvent {
 					crate::lightning::chain::channelmonitor::HTLCUpdate { inner: ObjOps::heap_alloc(a), is_owned: true },
 				)
 			},
-			nativeMonitorEvent::CommitmentTxBroadcasted (mut a, ) => {
-				MonitorEvent::CommitmentTxBroadcasted (
+			nativeMonitorEvent::CommitmentTxConfirmed (mut a, ) => {
+				MonitorEvent::CommitmentTxConfirmed (
 					crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(a), is_owned: true },
 				)
 			},
@@ -423,9 +424,9 @@ pub extern "C" fn MonitorEvent_htlcevent(a: crate::lightning::chain::channelmoni
 	MonitorEvent::HTLCEvent(a, )
 }
 #[no_mangle]
-/// Utility method to constructs a new CommitmentTxBroadcasted-variant MonitorEvent
-pub extern "C" fn MonitorEvent_commitment_tx_broadcasted(a: crate::lightning::chain::transaction::OutPoint) -> MonitorEvent {
-	MonitorEvent::CommitmentTxBroadcasted(a, )
+/// Utility method to constructs a new CommitmentTxConfirmed-variant MonitorEvent
+pub extern "C" fn MonitorEvent_commitment_tx_confirmed(a: crate::lightning::chain::transaction::OutPoint) -> MonitorEvent {
+	MonitorEvent::CommitmentTxConfirmed(a, )
 }
 
 use lightning::chain::channelmonitor::HTLCUpdate as nativeHTLCUpdateImport;
@@ -515,11 +516,243 @@ pub extern "C" fn HTLCUpdate_read(ser: crate::c_types::u8slice) -> crate::c_type
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::HTLCUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
-/// Number of blocks we wait on seeing a HTLC output being solved before we fail corresponding inbound
-/// HTLCs. This prevents us from failing backwards and then getting a reorg resulting in us losing money.
+/// Number of blocks we wait on seeing a HTLC output being solved before we fail corresponding
+/// inbound HTLCs. This prevents us from failing backwards and then getting a reorg resulting in us
+/// losing money.
+///
+/// Note that this is a library-wide security assumption. If a reorg deeper than this number of
+/// blocks occurs, counterparties may be able to steal funds or claims made by and balances exposed
+/// by a  [`ChannelMonitor`] may be incorrect.
 
 #[no_mangle]
 pub static ANTI_REORG_DELAY: u32 = lightning::chain::channelmonitor::ANTI_REORG_DELAY;
+/// Details about the balance(s) available for spending once the channel appears on chain.
+///
+/// See [`ChannelMonitor::get_claimable_balances`] for more details on when these will or will not
+/// be provided.
+#[must_use]
+#[derive(Clone)]
+#[repr(C)]
+pub enum Balance {
+	/// The channel is not yet closed (or the commitment or closing transaction has not yet
+	/// appeared in a block). The given balance is claimable (less on-chain fees) if the channel is
+	/// force-closed now.
+	ClaimableOnChannelClose {
+		/// The amount available to claim, in satoshis, excluding the on-chain fees which will be
+		/// required to do so.
+		claimable_amount_satoshis: u64,
+	},
+	/// The channel has been closed, and the given balance is ours but awaiting confirmations until
+	/// we consider it spendable.
+	ClaimableAwaitingConfirmations {
+		/// The amount available to claim, in satoshis, possibly excluding the on-chain fees which
+		/// were spent in broadcasting the transaction.
+		claimable_amount_satoshis: u64,
+		/// The height at which an [`Event::SpendableOutputs`] event will be generated for this
+		/// amount.
+		confirmation_height: u32,
+	},
+	/// The channel has been closed, and the given balance should be ours but awaiting spending
+	/// transaction confirmation. If the spending transaction does not confirm in time, it is
+	/// possible our counterparty can take the funds by broadcasting an HTLC timeout on-chain.
+	///
+	/// Once the spending transaction confirms, before it has reached enough confirmations to be
+	/// considered safe from chain reorganizations, the balance will instead be provided via
+	/// [`Balance::ClaimableAwaitingConfirmations`].
+	ContentiousClaimable {
+		/// The amount available to claim, in satoshis, excluding the on-chain fees which will be
+		/// required to do so.
+		claimable_amount_satoshis: u64,
+		/// The height at which the counterparty may be able to claim the balance if we have not
+		/// done so.
+		timeout_height: u32,
+	},
+	/// HTLCs which we sent to our counterparty which are claimable after a timeout (less on-chain
+	/// fees) if the counterparty does not know the preimage for the HTLCs. These are somewhat
+	/// likely to be claimed by our counterparty before we do.
+	MaybeClaimableHTLCAwaitingTimeout {
+		/// The amount available to claim, in satoshis, excluding the on-chain fees which will be
+		/// required to do so.
+		claimable_amount_satoshis: u64,
+		/// The height at which we will be able to claim the balance if our counterparty has not
+		/// done so.
+		claimable_height: u32,
+	},
+}
+use lightning::chain::channelmonitor::Balance as nativeBalance;
+impl Balance {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeBalance {
+		match self {
+			Balance::ClaimableOnChannelClose {ref claimable_amount_satoshis, } => {
+				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				nativeBalance::ClaimableOnChannelClose {
+					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
+				}
+			},
+			Balance::ClaimableAwaitingConfirmations {ref claimable_amount_satoshis, ref confirmation_height, } => {
+				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				let mut confirmation_height_nonref = (*confirmation_height).clone();
+				nativeBalance::ClaimableAwaitingConfirmations {
+					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
+					confirmation_height: confirmation_height_nonref,
+				}
+			},
+			Balance::ContentiousClaimable {ref claimable_amount_satoshis, ref timeout_height, } => {
+				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				let mut timeout_height_nonref = (*timeout_height).clone();
+				nativeBalance::ContentiousClaimable {
+					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
+					timeout_height: timeout_height_nonref,
+				}
+			},
+			Balance::MaybeClaimableHTLCAwaitingTimeout {ref claimable_amount_satoshis, ref claimable_height, } => {
+				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				let mut claimable_height_nonref = (*claimable_height).clone();
+				nativeBalance::MaybeClaimableHTLCAwaitingTimeout {
+					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
+					claimable_height: claimable_height_nonref,
+				}
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeBalance {
+		match self {
+			Balance::ClaimableOnChannelClose {mut claimable_amount_satoshis, } => {
+				nativeBalance::ClaimableOnChannelClose {
+					claimable_amount_satoshis: claimable_amount_satoshis,
+				}
+			},
+			Balance::ClaimableAwaitingConfirmations {mut claimable_amount_satoshis, mut confirmation_height, } => {
+				nativeBalance::ClaimableAwaitingConfirmations {
+					claimable_amount_satoshis: claimable_amount_satoshis,
+					confirmation_height: confirmation_height,
+				}
+			},
+			Balance::ContentiousClaimable {mut claimable_amount_satoshis, mut timeout_height, } => {
+				nativeBalance::ContentiousClaimable {
+					claimable_amount_satoshis: claimable_amount_satoshis,
+					timeout_height: timeout_height,
+				}
+			},
+			Balance::MaybeClaimableHTLCAwaitingTimeout {mut claimable_amount_satoshis, mut claimable_height, } => {
+				nativeBalance::MaybeClaimableHTLCAwaitingTimeout {
+					claimable_amount_satoshis: claimable_amount_satoshis,
+					claimable_height: claimable_height,
+				}
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeBalance) -> Self {
+		match native {
+			nativeBalance::ClaimableOnChannelClose {ref claimable_amount_satoshis, } => {
+				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				Balance::ClaimableOnChannelClose {
+					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
+				}
+			},
+			nativeBalance::ClaimableAwaitingConfirmations {ref claimable_amount_satoshis, ref confirmation_height, } => {
+				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				let mut confirmation_height_nonref = (*confirmation_height).clone();
+				Balance::ClaimableAwaitingConfirmations {
+					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
+					confirmation_height: confirmation_height_nonref,
+				}
+			},
+			nativeBalance::ContentiousClaimable {ref claimable_amount_satoshis, ref timeout_height, } => {
+				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				let mut timeout_height_nonref = (*timeout_height).clone();
+				Balance::ContentiousClaimable {
+					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
+					timeout_height: timeout_height_nonref,
+				}
+			},
+			nativeBalance::MaybeClaimableHTLCAwaitingTimeout {ref claimable_amount_satoshis, ref claimable_height, } => {
+				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				let mut claimable_height_nonref = (*claimable_height).clone();
+				Balance::MaybeClaimableHTLCAwaitingTimeout {
+					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
+					claimable_height: claimable_height_nonref,
+				}
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeBalance) -> Self {
+		match native {
+			nativeBalance::ClaimableOnChannelClose {mut claimable_amount_satoshis, } => {
+				Balance::ClaimableOnChannelClose {
+					claimable_amount_satoshis: claimable_amount_satoshis,
+				}
+			},
+			nativeBalance::ClaimableAwaitingConfirmations {mut claimable_amount_satoshis, mut confirmation_height, } => {
+				Balance::ClaimableAwaitingConfirmations {
+					claimable_amount_satoshis: claimable_amount_satoshis,
+					confirmation_height: confirmation_height,
+				}
+			},
+			nativeBalance::ContentiousClaimable {mut claimable_amount_satoshis, mut timeout_height, } => {
+				Balance::ContentiousClaimable {
+					claimable_amount_satoshis: claimable_amount_satoshis,
+					timeout_height: timeout_height,
+				}
+			},
+			nativeBalance::MaybeClaimableHTLCAwaitingTimeout {mut claimable_amount_satoshis, mut claimable_height, } => {
+				Balance::MaybeClaimableHTLCAwaitingTimeout {
+					claimable_amount_satoshis: claimable_amount_satoshis,
+					claimable_height: claimable_height,
+				}
+			},
+		}
+	}
+}
+/// Frees any resources used by the Balance
+#[no_mangle]
+pub extern "C" fn Balance_free(this_ptr: Balance) { }
+/// Creates a copy of the Balance
+#[no_mangle]
+pub extern "C" fn Balance_clone(orig: &Balance) -> Balance {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new ClaimableOnChannelClose-variant Balance
+pub extern "C" fn Balance_claimable_on_channel_close(claimable_amount_satoshis: u64) -> Balance {
+	Balance::ClaimableOnChannelClose {
+		claimable_amount_satoshis,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new ClaimableAwaitingConfirmations-variant Balance
+pub extern "C" fn Balance_claimable_awaiting_confirmations(claimable_amount_satoshis: u64, confirmation_height: u32) -> Balance {
+	Balance::ClaimableAwaitingConfirmations {
+		claimable_amount_satoshis,
+		confirmation_height,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new ContentiousClaimable-variant Balance
+pub extern "C" fn Balance_contentious_claimable(claimable_amount_satoshis: u64, timeout_height: u32) -> Balance {
+	Balance::ContentiousClaimable {
+		claimable_amount_satoshis,
+		timeout_height,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new MaybeClaimableHTLCAwaitingTimeout-variant Balance
+pub extern "C" fn Balance_maybe_claimable_htlcawaiting_timeout(claimable_amount_satoshis: u64, claimable_height: u32) -> Balance {
+	Balance::MaybeClaimableHTLCAwaitingTimeout {
+		claimable_amount_satoshis,
+		claimable_height,
+	}
+}
+/// Checks if two Balances contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn Balance_eq(a: &Balance, b: &Balance) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 
 use lightning::chain::channelmonitor::ChannelMonitor as nativeChannelMonitorImport;
 type nativeChannelMonitor = nativeChannelMonitorImport<crate::lightning::chain::keysinterface::Sign>;
@@ -769,6 +1002,28 @@ pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &ChannelMonitor) -
 pub extern "C" fn ChannelMonitor_current_best_block(this_arg: &ChannelMonitor) -> crate::lightning::chain::BestBlock {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.current_best_block();
 	crate::lightning::chain::BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Gets the balances in this channel which are either claimable by us if we were to
+/// force-close the channel now or which are claimable on-chain (possibly awaiting
+/// confirmation).
+///
+/// Any balances in the channel which are available on-chain (excluding on-chain fees) are
+/// included here until an [`Event::SpendableOutputs`] event has been generated for the
+/// balance, or until our counterparty has claimed the balance and accrued several
+/// confirmations on the claim transaction.
+///
+/// Note that the balances available when you or your counterparty have broadcasted revoked
+/// state(s) may not be fully captured here.
+///
+/// See [`Balance`] for additional details on the types of claimable balances which
+/// may be returned here and their meanings.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelMonitor_get_claimable_balances(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_BalanceZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_claimable_balances();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::chain::channelmonitor::Balance::native_into(item) }); };
+	local_ret.into()
 }
 
 /// `Persist` defines behavior for persisting channel monitors: this could mean

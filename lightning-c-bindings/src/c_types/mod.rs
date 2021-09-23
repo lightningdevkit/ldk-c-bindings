@@ -15,6 +15,18 @@ use bitcoin::bech32;
 
 use std::convert::TryInto; // Bindings need at least rustc 1.34
 
+use std::io::{Cursor, Read}; // TODO: We should use core2 here when we support no_std
+
+#[repr(C)]
+/// A dummy struct of which an instance must never exist.
+/// This corresponds to the Rust type `Infallible`, or, in unstable rust, `!`
+pub struct NotConstructable {
+	_priv_thing: core::convert::Infallible,
+}
+impl From<core::convert::Infallible> for NotConstructable {
+	fn from(_: core::convert::Infallible) -> Self { unreachable!(); }
+}
+
 /// Integer in the range `0..32`
 #[derive(PartialEq, Eq, Copy, Clone)]
 #[allow(non_camel_case_types)]
@@ -289,6 +301,13 @@ pub extern "C" fn Transaction_free(_res: Transaction) { }
 pub(crate) fn bitcoin_to_C_outpoint(outpoint: ::bitcoin::blockdata::transaction::OutPoint) -> crate::lightning::chain::transaction::OutPoint {
 	crate::lightning::chain::transaction::OutPoint_new(ThirtyTwoBytes { data: outpoint.txid.into_inner() }, outpoint.vout.try_into().unwrap())
 }
+pub(crate) fn C_to_bitcoin_outpoint(outpoint: crate::lightning::chain::transaction::OutPoint) -> ::bitcoin::blockdata::transaction::OutPoint {
+	unsafe {
+		::bitcoin::blockdata::transaction::OutPoint {
+			txid: (*outpoint.inner).txid, vout: (*outpoint.inner).index as u32
+		}
+	}
+}
 
 #[repr(C)]
 #[derive(Clone)]
@@ -348,6 +367,18 @@ impl u8slice {
 		if self.datalen == 0 { return &[]; }
 		unsafe { std::slice::from_raw_parts(self.data, self.datalen) }
 	}
+	pub(crate) fn to_reader<'a>(&'a self) -> Cursor<&'a [u8]> {
+		let sl = self.to_slice();
+		Cursor::new(sl)
+	}
+	pub(crate) fn from_vec(v: &derived::CVec_u8Z) -> u8slice {
+		Self::from_slice(v.as_slice())
+	}
+}
+pub(crate) fn reader_to_vec<R: Read>(r: &mut R) -> derived::CVec_u8Z {
+	let mut res = Vec::new();
+	r.read_to_end(&mut res).unwrap();
+	derived::CVec_u8Z::from(res)
 }
 
 #[repr(C)]
@@ -389,9 +420,6 @@ impl lightning::util::ser::Writer for VecWriter {
 	fn write_all(&mut self, buf: &[u8]) -> Result<(), ::std::io::Error> {
 		self.0.extend_from_slice(buf);
 		Ok(())
-	}
-	fn size_hint(&mut self, size: usize) {
-		self.0.reserve_exact(size);
 	}
 }
 pub(crate) fn serialize_obj<I: lightning::util::ser::Writeable>(i: &I) -> derived::CVec_u8Z {

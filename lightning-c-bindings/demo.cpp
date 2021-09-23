@@ -194,9 +194,9 @@ LDKCVec_MonitorEventZ monitors_pending_monitor_events(const void *this_arg) {
 struct EventQueue {
 	std::vector<LDK::Event> events;
 };
-void handle_event(const void *this_arg, LDKEvent event) {
+void handle_event(const void *this_arg, const LDKEvent *event) {
 	EventQueue* arg = (EventQueue*) this_arg;
-	arg->events.push_back(std::move(event));
+	arg->events.push_back(Event_clone(event));
 }
 
 #ifdef REAL_NET
@@ -354,6 +354,68 @@ public:
 };
 #endif // !REAL_NET
 
+struct CustomMsgQueue {
+	std::vector<LDK::Type> msgs;
+};
+
+uint16_t custom_msg_type_id(const void *this_arg) {
+	return 8888;
+}
+LDKCVec_u8Z custom_msg_bytes(const void *this_arg) {
+	uint8_t *bytes = (uint8_t *) malloc(1024);
+	memset(bytes, 42, 1024);
+	return LDKCVec_u8Z {
+		.data = bytes, .datalen = 1024
+	};
+}
+LDKStr custom_msg_debug(const void *this_arg) {
+	return LDKStr {
+		.chars = NULL, .len = 0, .chars_is_owned = false
+	};
+}
+
+LDKCResult_COption_TypeZDecodeErrorZ read_custom_message(const void* this_arg, uint16_t type_id, LDKu8slice buf) {
+	assert(type_id == 8888);
+	assert(buf.datalen == 1024);
+	uint8_t cmp[1024];
+	memset(cmp, 42, 1024);
+	assert(!memcmp(cmp, buf.data, 1024));
+	return CResult_COption_TypeZDecodeErrorZ_ok(COption_TypeZ_some(LDKType {
+		.this_arg = NULL,
+		.type_id = custom_msg_type_id,
+		.debug_str = custom_msg_debug,
+		.free = NULL,
+	}));
+}
+
+LDKCResult_NoneLightningErrorZ handle_custom_message(const void* this_arg, struct LDKType msg, struct LDKPublicKey _sender_node_id) {
+	CustomMsgQueue* arg = (CustomMsgQueue*) this_arg;
+	arg->msgs.push_back(std::move(msg));
+	return CResult_NoneLightningErrorZ_ok();
+}
+LDKCVec_C2Tuple_PublicKeyTypeZZ never_send_custom_msgs(const void* this_arg) {
+	return LDKCVec_C2Tuple_PublicKeyTypeZZ {
+		.data = NULL, .datalen = 0
+	};
+}
+
+LDKCVec_C2Tuple_PublicKeyTypeZZ create_custom_msg(const void* this_arg) {
+	const LDKPublicKey *counterparty_node_id = (const LDKPublicKey *)this_arg;
+	LDKCVec_C2Tuple_PublicKeyTypeZZ ret = {
+		.data = ((LDKC2Tuple_PublicKeyTypeZ*)malloc(sizeof(LDKC2Tuple_PublicKeyTypeZ))),
+		.datalen = 1
+	};
+	ret.data[0].a = *counterparty_node_id;
+	ret.data[0].b = LDKType {
+		.this_arg = NULL,
+		.type_id = custom_msg_type_id,
+		.debug_str = custom_msg_debug,
+		.write = custom_msg_bytes,
+		.free = NULL,
+	};
+	return ret;
+}
+
 int main() {
 	uint8_t channel_open_header[80];
 	uint8_t header_1[80];
@@ -395,7 +457,7 @@ int main() {
 		.free = NULL,
 	};
 
-	LDK::NetGraphMsgHandler net_graph1 = NetGraphMsgHandler_new(genesis_hash, NULL, logger1);
+	LDK::NetGraphMsgHandler net_graph1 = NetGraphMsgHandler_new(NetworkGraph_new(genesis_hash), COption_AccessZ_none(), logger1);
 	LDKSecretKey node_secret1;
 
 	LDKLogger logger2 {
@@ -414,7 +476,7 @@ int main() {
 		.free = NULL,
 	};
 
-	LDK::NetGraphMsgHandler net_graph2 = NetGraphMsgHandler_new(genesis_hash, NULL, logger2);
+	LDK::NetGraphMsgHandler net_graph2 = NetGraphMsgHandler_new(NetworkGraph_new(genesis_hash), COption_AccessZ_none(), logger2);
 	LDKSecretKey node_secret2;
 
 	LDK::CVec_u8Z cm1_ser = LDKCVec_u8Z {}; // ChannelManager 1 serialization at the end of the ser-des scope
@@ -435,8 +497,11 @@ int main() {
 
 		LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), NetGraphMsgHandler_as_RoutingMessageHandler(&net_graph1));
 
+		LDK::IgnoringMessageHandler ignoring_handler1 = IgnoringMessageHandler_new();
+		LDK::CustomMessageHandler custom_msg_handler1 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler1);
+
 		random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
-		LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, &random_bytes.data, logger1);
+		LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, &random_bytes.data, logger1, std::move(custom_msg_handler1));
 
 		// Demo getting a channel key and check that its returning real pubkeys:
 		LDK::Sign chan_signer1 = keys_source1->get_channel_signer(keys_source1->this_arg, false, 42);
@@ -468,8 +533,11 @@ int main() {
 
 		LDK::MessageHandler msg_handler2 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm2), std::move(net_msgs2));
 
+		LDK::IgnoringMessageHandler ignoring_handler2 = IgnoringMessageHandler_new();
+		LDK::CustomMessageHandler custom_msg_handler2 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler2);
+
 		random_bytes = keys_source2->get_secure_random_bytes(keys_source2->this_arg);
-		LDK::PeerManager net2 = PeerManager_new(std::move(msg_handler2), node_secret2, &random_bytes.data, logger2);
+		LDK::PeerManager net2 = PeerManager_new(std::move(msg_handler2), node_secret2, &random_bytes.data, logger2, std::move(custom_msg_handler2));
 
 		// Open a connection!
 		PeersConnection conn(cm1, cm2, net1, net2);
@@ -553,6 +621,7 @@ int main() {
 		PeerManager_process_events(&net2);
 
 		// Now send funds from 1 to 2!
+		uint64_t channel_scid;
 		while (true) {
 			LDK::CVec_ChannelDetailsZ outbound_channels = ChannelManager_list_usable_channels(&cm1);
 			if (outbound_channels->datalen == 1) {
@@ -573,6 +642,9 @@ int main() {
 				if (inbound_capacity < 0) inbound_capacity = 0;
 				assert(ChannelDetails_get_inbound_capacity_msat(channel) == (uint64_t)inbound_capacity);
 				assert(ChannelDetails_get_is_usable(channel));
+				LDK::COption_u64Z scid_opt = ChannelDetails_get_short_channel_id(channel);
+				assert(scid_opt->some);
+				channel_scid = scid_opt->some;
 				break;
 			}
 			std::this_thread::yield();
@@ -596,13 +668,18 @@ int main() {
 
 		{
 			LDK::CVec_ChannelDetailsZ outbound_channels = ChannelManager_list_usable_channels(&cm1);
-			LDK::LockedNetworkGraph graph_2_locked = NetGraphMsgHandler_read_locked_graph(&net_graph2);
-			LDK::NetworkGraph graph_2_ref = LockedNetworkGraph_graph(&graph_2_locked);
+			LDK::NetworkGraph graph_2_ref = NetGraphMsgHandler_get_network_graph(&net_graph2);
 			LDK::CResult_RouteLightningErrorZ route = get_route(ChannelManager_get_our_node_id(&cm1), &graph_2_ref, ChannelManager_get_our_node_id(&cm2), LDKInvoiceFeatures {
 					.inner = NULL, .is_owned = false
 				}, &outbound_channels, Invoice_route_hints(invoice->contents.result),
 				5000, Invoice_min_final_cltv_expiry(invoice->contents.result), logger1);
 			assert(route->result_ok);
+			LDK::CVec_CVec_RouteHopZZ paths = Route_get_paths(route->contents.result);
+			assert(paths->datalen == 1);
+			assert(paths->data[0].datalen == 1);
+			assert(!memcmp(RouteHop_get_pubkey(&paths->data[0].data[0]).compressed_form,
+				ChannelManager_get_our_node_id(&cm2).compressed_form, 33));
+			assert(RouteHop_get_short_channel_id(&paths->data[0].data[0]) == channel_scid);
 			LDK::CResult_NonePaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash, Invoice_payment_secret(invoice->contents.result));
 			assert(send_res->result_ok);
 		}
@@ -701,11 +778,36 @@ int main() {
 	// Open a connection!
 	LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), NetGraphMsgHandler_as_RoutingMessageHandler(&net_graph1));
 	random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
-	LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, &random_bytes.data, logger1);
+
+	LDKPublicKey chan_2_node_id = ChannelManager_get_our_node_id(&cm2);
+	LDKCustomMessageHandler custom_msg_handler1 = {
+		.this_arg = &chan_2_node_id,
+		.handle_custom_message = NULL, // We only create custom messages, not handle them
+		.get_and_clear_pending_msg = create_custom_msg,
+		.CustomMessageReader = LDKCustomMessageReader {
+			.this_arg = NULL,
+			.read = read_custom_message,
+			.free = NULL,
+		},
+		.free = NULL,
+	};
+	LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, &random_bytes.data, logger1, std::move(custom_msg_handler1));
 
 	LDK::MessageHandler msg_handler2 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm2), NetGraphMsgHandler_as_RoutingMessageHandler(&net_graph2));
+	CustomMsgQueue peer_2_custom_messages;
+	LDKCustomMessageHandler custom_msg_handler2 = {
+		.this_arg = &peer_2_custom_messages,
+		.handle_custom_message = handle_custom_message,
+		.get_and_clear_pending_msg = never_send_custom_msgs,
+		.CustomMessageReader = LDKCustomMessageReader {
+			.this_arg = NULL,
+			.read = read_custom_message,
+			.free = NULL,
+		},
+		.free = NULL,
+	};
 	random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
-	LDK::PeerManager net2 = PeerManager_new(std::move(msg_handler2), node_secret2, &random_bytes.data, logger2);
+	LDK::PeerManager net2 = PeerManager_new(std::move(msg_handler2), node_secret2, &random_bytes.data, logger2, std::move(custom_msg_handler2));
 
 	PeersConnection conn(cm1, cm2, net1, net2);
 
@@ -731,6 +833,8 @@ int main() {
 	assert(chans_after_close2->datalen == 0);
 
 	conn.stop();
+
+	assert(peer_2_custom_messages.msgs.size() != 0);
 
 	// Few extra random tests:
 	LDKSecretKey sk;

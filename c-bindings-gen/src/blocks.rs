@@ -349,6 +349,9 @@ pub fn write_option_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	writeln!(w, "\t#[allow(unused)] pub(crate) fn is_some(&self) -> bool {{").unwrap();
 	writeln!(w, "\t\tif let Self::Some(_) = self {{ true }} else {{ false }}").unwrap();
 	writeln!(w, "\t}}").unwrap();
+	writeln!(w, "\t#[allow(unused)] pub(crate) fn is_none(&self) -> bool {{").unwrap();
+	writeln!(w, "\t\t!self.is_some()").unwrap();
+	writeln!(w, "\t}}").unwrap();
 	writeln!(w, "\t#[allow(unused)] pub(crate) fn take(mut self) -> {} {{", inner_type).unwrap();
 	writeln!(w, "\t\tif let Self::Some(v) = self {{ v }} else {{ unreachable!() }}").unwrap();
 	writeln!(w, "\t}}").unwrap();
@@ -734,7 +737,7 @@ pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generi
 					for bound in type_param.bounds.iter() {
 						if let syn::TypeParamBound::Trait(trait_bound) = bound {
 							assert_simple_bound(&trait_bound);
-							write!(w, "{}{}", if idx != 0 { ", " } else { "" }, gen_types.maybe_resolve_ident(&type_param.ident).unwrap()).unwrap();
+							write!(w, "{}crate::{}", if idx != 0 { ", " } else { "" }, gen_types.maybe_resolve_ident(&type_param.ident).unwrap()).unwrap();
 							if printed_param {
 								unimplemented!("Can't print generic params that have multiple non-lifetime bounds");
 							}

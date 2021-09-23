@@ -212,6 +212,18 @@ macro_rules! walk_supertraits { ($t: expr, $types: expr, ($( $($pat: pat)|* => $
 	}
 } } }
 
+macro_rules! get_module_type_resolver {
+	($module: expr, $crate_libs: expr, $crate_types: expr) => { {
+		let module: &str = &$module;
+		let mut module_iter = module.rsplitn(2, "::");
+		module_iter.next().unwrap();
+		let module = module_iter.next().unwrap();
+		let imports = ImportResolver::new(module.splitn(2, "::").next().unwrap(), &$crate_types.lib_ast.dependencies,
+				module, &$crate_types.lib_ast.modules.get(module).unwrap().items);
+		TypeResolver::new(module, imports, $crate_types)
+	} }
+}
+
 /// Prints a C-mapped trait object containing a void pointer and a jump table for each function in
 /// the original trait.
 /// Implements the native Rust trait and relevant parent traits for the new C-mapped trait.
@@ -510,12 +522,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		},
 		(s, i) => {
 			if let Some(supertrait) = types.crate_types.traits.get(s) {
-				let mut module_iter = s.rsplitn(2, "::");
-				module_iter.next().unwrap();
-				let supertrait_module = module_iter.next().unwrap();
-				let imports = ImportResolver::new(supertrait_module.splitn(2, "::").next().unwrap(), &types.crate_types.lib_ast.dependencies,
-					supertrait_module, &types.crate_types.lib_ast.modules.get(supertrait_module).unwrap().items);
-				let resolver = TypeResolver::new(&supertrait_module, imports, types.crate_types);
+				let resolver = get_module_type_resolver!(s, types.crate_libs, types.crate_types);
 				writeln!(w, "impl {} for {} {{", s, trait_name).unwrap();
 				impl_trait_for_c!(supertrait, format!(".{}", i), &resolver);
 				writeln!(w, "}}").unwrap();

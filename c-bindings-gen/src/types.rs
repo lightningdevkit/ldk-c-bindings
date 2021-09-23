@@ -173,13 +173,13 @@ pub fn is_enum_opaque(e: &syn::ItemEnum) -> bool {
 /// concrete C container struct, etc).
 #[must_use]
 pub struct GenericTypes<'a, 'b> {
-	self_ty: Option<(String, &'a syn::Path)>,
+	self_ty: Option<String>,
 	parent: Option<&'b GenericTypes<'b, 'b>>,
-	typed_generics: HashMap<&'a syn::Ident, (String, Option<&'a syn::Path>)>,
+	typed_generics: HashMap<&'a syn::Ident, String>,
 	default_generics: HashMap<&'a syn::Ident, (syn::Type, syn::Type)>,
 }
 impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
-	pub fn new(self_ty: Option<(String, &'a syn::Path)>) -> Self {
+	pub fn new(self_ty: Option<String>) -> Self {
 		Self { self_ty, parent: None, typed_generics: HashMap::new(), default_generics: HashMap::new(), }
 	}
 
@@ -192,6 +192,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 
 	/// Learn the generics in generics in the current context, given a TypeResolver.
 	pub fn learn_generics<'b, 'c>(&mut self, generics: &'a syn::Generics, types: &'b TypeResolver<'a, 'c>) -> bool {
+		let mut new_typed_generics = HashMap::new();
 		// First learn simple generics...
 		for generic in generics.params.iter() {
 			match generic {
@@ -210,8 +211,8 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								if path == "Sized" { continue; }
 								if non_lifetimes_processed { return false; }
 								non_lifetimes_processed = true;
-								let new_ident = if path != "std::ops::Deref" && path != "core::ops::Deref" {
-									Some(&trait_bound.path)
+								if path != "std::ops::Deref" && path != "core::ops::Deref" {
+									new_typed_generics.insert(&type_param.ident, Some(path));
 								} else if trait_bound.path.segments.len() == 1 {
 									// If we're templated on Deref<Target = ConcreteThing>, store
 									// the reference type in `default_generics` which handles full
@@ -230,11 +231,11 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 												_ => unimplemented!(),
 											}
 										}
-										None
-									} else { None }
-								} else { None };
-								self.typed_generics.insert(&type_param.ident, (path, new_ident));
-							} else { return false; }
+									} else {
+										new_typed_generics.insert(&type_param.ident, None);
+									}
+								}
+							}
 						}
 					}
 					if let Some(default) = type_param.default.as_ref() {
@@ -253,9 +254,9 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 						if p.qself.is_some() { return false; }
 						if p.path.leading_colon.is_some() { return false; }
 						let mut p_iter = p.path.segments.iter();
-						if let Some(gen) = self.typed_generics.get_mut(&p_iter.next().unwrap().ident) {
-							if gen.0 != "std::ops::Deref" && gen.0 != "core::ops::Deref" { return false; }
-							if &format!("{}", p_iter.next().unwrap().ident) != "Target" { return false; }
+						if let Some(gen) = new_typed_generics.get_mut(&p_iter.next().unwrap().ident) {
+							if gen.is_some() { return false; }
+							if &format!("{}", p_iter.next().unwrap().ident) != "Target" {return false; }
 
 							let mut non_lifetimes_processed = false;
 							for bound in t.bounds.iter() {
@@ -266,8 +267,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 									if non_lifetimes_processed { return false; }
 									non_lifetimes_processed = true;
 									assert_simple_bound(&trait_bound);
-									*gen = (types.resolve_path(&trait_bound.path, None),
-										Some(&trait_bound.path));
+									*gen = Some(types.resolve_path(&trait_bound.path, None));
 								}
 							}
 						} else { return false; }
@@ -275,8 +275,10 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 				}
 			}
 		}
-		for (_, (_, ident)) in self.typed_generics.iter() {
-			if ident.is_none() { return false; }
+		for (key, value) in new_typed_generics.drain() {
+			if let Some(v) = value {
+				assert!(self.typed_generics.insert(key, v).is_none());
+			} else { return false; }
 		}
 		true
 	}
@@ -297,10 +299,9 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								// implement Deref<Target=Self> for relevant types). We don't
 								// bother to implement it for associated types, however, so we just
 								// ignore such bounds.
-								let new_ident = if path != "std::ops::Deref" && path != "core::ops::Deref" {
-									Some(&tr.path)
-								} else { None };
-								self.typed_generics.insert(&t.ident, (path, new_ident));
+								if path != "std::ops::Deref" && path != "core::ops::Deref" {
+									self.typed_generics.insert(&t.ident, path);
+								}
 							} else { unimplemented!(); }
 						},
 						_ => unimplemented!(),
@@ -316,10 +317,10 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 	pub fn maybe_resolve_ident<'b>(&'b self, ident: &syn::Ident) -> Option<&'b String> {
 		if let Some(ty) = &self.self_ty {
 			if format!("{}", ident) == "Self" {
-				return Some(&ty.0);
+				return Some(&ty);
 			}
 		}
-		if let Some(res) = self.typed_generics.get(ident).map(|(a, _)| a) {
+		if let Some(res) = self.typed_generics.get(ident) {
 			return Some(res);
 		}
 		if let Some(parent) = self.parent {
@@ -331,14 +332,14 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 
 	/// Attempt to resolve a Path as a generic parameter and return the full path. as both a string
 	/// and syn::Path.
-	pub fn maybe_resolve_path<'b>(&'b self, path: &syn::Path) -> Option<(&'b String, &'a syn::Path)> {
+	pub fn maybe_resolve_path<'b>(&'b self, path: &syn::Path) -> Option<&'b String> {
 		if let Some(ident) = path.get_ident() {
 			if let Some(ty) = &self.self_ty {
 				if format!("{}", ident) == "Self" {
-					return Some((&ty.0, ty.1));
+					return Some(&ty);
 				}
 			}
-			if let Some(res) = self.typed_generics.get(ident).map(|(a, b)| (a, b.unwrap())) {
+			if let Some(res) = self.typed_generics.get(ident) {
 				return Some(res);
 			}
 		} else {
@@ -347,7 +348,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 			let mut it = path.segments.iter();
 			if path.segments.len() == 2 && format!("{}", it.next().unwrap().ident) == "Self" {
 				let ident = &it.next().unwrap().ident;
-				if let Some(res) = self.typed_generics.get(ident).map(|(a, b)| (a, b.unwrap())) {
+				if let Some(res) = self.typed_generics.get(ident) {
 					return Some(res);
 				}
 			}
@@ -581,7 +582,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 
 	pub fn maybe_resolve_path(&self, p: &syn::Path, generics: Option<&GenericTypes>) -> Option<String> {
 		if let Some(gen_types) = generics {
-			if let Some((resp, _)) = gen_types.maybe_resolve_path(p) {
+			if let Some(resp) = gen_types.maybe_resolve_path(p) {
 				return Some(resp.clone());
 			}
 		}

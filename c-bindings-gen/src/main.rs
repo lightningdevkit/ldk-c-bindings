@@ -646,7 +646,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 		let mut self_path_segs = syn::punctuated::Punctuated::new();
 		self_path_segs.push(s.ident.clone().into());
 		let self_path = syn::Path { leading_colon: None, segments: self_path_segs};
-		let mut gen_types = GenericTypes::new(Some((types.resolve_path(&self_path, None), &self_path)));
+		let mut gen_types = GenericTypes::new(Some(types.resolve_path(&self_path, None)));
 		assert!(gen_types.learn_generics(&s.generics, types));
 
 		let mut all_fields_settable = true;
@@ -769,7 +769,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 		if p.qself.is_some() { unimplemented!(); }
 		if let Some(ident) = single_ident_generic_path_to_ident(&p.path) {
 			if let Some(resolved_path) = types.maybe_resolve_non_ignored_ident(&ident) {
-				let mut gen_types = GenericTypes::new(Some((resolved_path.clone(), &p.path)));
+				let mut gen_types = GenericTypes::new(Some(resolved_path.clone()));
 				if !gen_types.learn_generics(&i.generics, types) {
 					eprintln!("Not implementing anything for impl {} due to not understood generics", ident);
 					return;

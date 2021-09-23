@@ -390,9 +390,6 @@ impl lightning::util::ser::Writer for VecWriter {
 		self.0.extend_from_slice(buf);
 		Ok(())
 	}
-	fn size_hint(&mut self, size: usize) {
-		self.0.reserve_exact(size);
-	}
 }
 pub(crate) fn serialize_obj<I: lightning::util::ser::Writeable>(i: &I) -> derived::CVec_u8Z {
 	let mut out = VecWriter(Vec::new());

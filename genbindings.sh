@@ -273,7 +273,7 @@ mv include/lightningpp_new.hpp include/lightningpp.hpp
 
 # Finally, sanity-check the generated C and C++ bindings with demo apps:
 # Naively run the C demo app:
-gcc $LOCAL_CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl
+gcc $LOCAL_CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl -lm
 ./a.out
 
 # And run the C++ demo app
@@ -283,7 +283,7 @@ LD_LIBRARY_PATH=target/debug/ ./a.out > /dev/null
 # Finally, run the C++ demo app with our native networking library
 # in valgrind to test memory model correctness and lack of leaks.
 gcc $LOCAL_CFLAGS -fPIC -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
-g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
+g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl -lm
 if [ -x "`which valgrind`" ]; then
 	valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
 	echo

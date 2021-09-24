@@ -12,6 +12,7 @@
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -563,6 +564,14 @@ pub struct BaseSign {
 	/// Note that the commitment number starts at (1 << 48) - 1 and counts backwards.
 	#[must_use]
 	pub release_commitment_secret: extern "C" fn (this_arg: *const c_void, idx: u64) -> crate::c_types::ThirtyTwoBytes,
+	/// Validate the counterparty's signatures on the holder commitment transaction and HTLCs.
+	///
+	/// This is required in order for the signer to make sure that releasing a commitment
+	/// secret won't leave us without a broadcastable holder transaction.
+	/// Policy checks should be implemented in this function, including checking the amount
+	/// sent to us and checking the HTLCs.
+	#[must_use]
+	pub validate_holder_commitment: extern "C" fn (this_arg: *const c_void, holder_tx: &crate::lightning::ln::chan_utils::HolderCommitmentTransaction) -> crate::c_types::derived::CResult_NoneNoneZ,
 	/// Gets the holder's channel public keys and basepoints
 	pub pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys,
 	/// Fill in the pubkeys field as a reference to it will be given to Rust after this returns
@@ -577,8 +586,17 @@ pub struct BaseSign {
 	/// Create a signature for a counterparty's commitment transaction and associated HTLC transactions.
 	///
 	/// Note that if signing fails or is rejected, the channel will be force-closed.
+	///
+	/// Policy checks should be implemented in this function, including checking the amount
+	/// sent to us and checking the HTLCs.
 	#[must_use]
 	pub sign_counterparty_commitment: extern "C" fn (this_arg: *const c_void, commitment_tx: &crate::lightning::ln::chan_utils::CommitmentTransaction) -> crate::c_types::derived::CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ,
+	/// Validate the counterparty's revocation.
+	///
+	/// This is required in order for the signer to make sure that the state has moved
+	/// forward and it is safe to sign the next counterparty commitment.
+	#[must_use]
+	pub validate_counterparty_revocation: extern "C" fn (this_arg: *const c_void, idx: u64, secret: *const [u8; 32]) -> crate::c_types::derived::CResult_NoneNoneZ,
 	/// Create a signatures for a holder's commitment transaction and its claiming HTLC transactions.
 	/// This will only ever be called with a non-revoked commitment_tx.  This will be called with the
 	/// latest commitment_tx when we initiate a force-close.
@@ -651,7 +669,7 @@ pub struct BaseSign {
 	/// Note that, due to rounding, there may be one \"missing\" satoshi, and either party may have
 	/// chosen to forgo their output as dust.
 	#[must_use]
-	pub sign_closing_transaction: extern "C" fn (this_arg: *const c_void, closing_tx: crate::c_types::Transaction) -> crate::c_types::derived::CResult_SignatureNoneZ,
+	pub sign_closing_transaction: extern "C" fn (this_arg: *const c_void, closing_tx: &crate::lightning::ln::chan_utils::ClosingTransaction) -> crate::c_types::derived::CResult_SignatureNoneZ,
 	/// Signs a channel announcement message with our funding key, proving it comes from one
 	/// of the channel participants.
 	///
@@ -683,10 +701,12 @@ pub(crate) extern "C" fn BaseSign_clone_fields(orig: &BaseSign) -> BaseSign {
 		this_arg: orig.this_arg,
 		get_per_commitment_point: Clone::clone(&orig.get_per_commitment_point),
 		release_commitment_secret: Clone::clone(&orig.release_commitment_secret),
+		validate_holder_commitment: Clone::clone(&orig.validate_holder_commitment),
 		pubkeys: Clone::clone(&orig.pubkeys),
 		set_pubkeys: Clone::clone(&orig.set_pubkeys),
 		channel_keys_id: Clone::clone(&orig.channel_keys_id),
 		sign_counterparty_commitment: Clone::clone(&orig.sign_counterparty_commitment),
+		validate_counterparty_revocation: Clone::clone(&orig.validate_counterparty_revocation),
 		sign_holder_commitment_and_htlcs: Clone::clone(&orig.sign_holder_commitment_and_htlcs),
 		sign_justice_revoked_output: Clone::clone(&orig.sign_justice_revoked_output),
 		sign_justice_revoked_htlc: Clone::clone(&orig.sign_justice_revoked_htlc),
@@ -708,6 +728,11 @@ impl rustBaseSign for BaseSign {
 		let mut ret = (self.release_commitment_secret)(self.this_arg, idx);
 		ret.data
 	}
+	fn validate_holder_commitment(&self, mut holder_tx: &lightning::ln::chan_utils::HolderCommitmentTransaction) -> Result<(), ()> {
+		let mut ret = (self.validate_holder_commitment)(self.this_arg, &crate::lightning::ln::chan_utils::HolderCommitmentTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((holder_tx as *const _) as *mut _) }, is_owned: false });
+		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
+		local_ret
+	}
 	fn pubkeys(&self) -> &lightning::ln::chan_utils::ChannelPublicKeys {
 		if let Some(f) = self.set_pubkeys {
 			(f)(&self);
@@ -721,6 +746,11 @@ impl rustBaseSign for BaseSign {
 	fn sign_counterparty_commitment(&self, mut commitment_tx: &lightning::ln::chan_utils::CommitmentTransaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<(bitcoin::secp256k1::Signature, Vec<bitcoin::secp256k1::Signature>), ()> {
 		let mut ret = (self.sign_counterparty_commitment)(self.this_arg, &crate::lightning::ln::chan_utils::CommitmentTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((commitment_tx as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).to_rust(); let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.into_rust().drain(..) { local_orig_ret_0_1.push( { item.into_rust() }); }; let mut local_ret_0 = (orig_ret_0_0.into_rust(), local_orig_ret_0_1); local_ret_0 }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
+		local_ret
+	}
+	fn validate_counterparty_revocation(&self, mut idx: u64, mut secret: &bitcoin::secp256k1::key::SecretKey) -> Result<(), ()> {
+		let mut ret = (self.validate_counterparty_revocation)(self.this_arg, idx, secret.as_ref());
+		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn sign_holder_commitment_and_htlcs(&self, mut commitment_tx: &lightning::ln::chan_utils::HolderCommitmentTransaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<(bitcoin::secp256k1::Signature, Vec<bitcoin::secp256k1::Signature>), ()> {
@@ -743,8 +773,8 @@ impl rustBaseSign for BaseSign {
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
-	fn sign_closing_transaction(&self, mut closing_tx: &bitcoin::blockdata::transaction::Transaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut ret = (self.sign_closing_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(closing_tx));
+	fn sign_closing_transaction(&self, mut closing_tx: &lightning::ln::chan_utils::ClosingTransaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
+		let mut ret = (self.sign_closing_transaction)(self.this_arg, &crate::lightning::ln::chan_utils::ClosingTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((closing_tx as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
@@ -819,6 +849,11 @@ impl lightning::chain::keysinterface::BaseSign for Sign {
 		let mut ret = (self.BaseSign.release_commitment_secret)(self.BaseSign.this_arg, idx);
 		ret.data
 	}
+	fn validate_holder_commitment(&self, mut holder_tx: &lightning::ln::chan_utils::HolderCommitmentTransaction) -> Result<(), ()> {
+		let mut ret = (self.BaseSign.validate_holder_commitment)(self.BaseSign.this_arg, &crate::lightning::ln::chan_utils::HolderCommitmentTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((holder_tx as *const _) as *mut _) }, is_owned: false });
+		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
+		local_ret
+	}
 	fn pubkeys(&self) -> &lightning::ln::chan_utils::ChannelPublicKeys {
 		if let Some(f) = self.BaseSign.set_pubkeys {
 			(f)(&self.BaseSign);
@@ -832,6 +867,11 @@ impl lightning::chain::keysinterface::BaseSign for Sign {
 	fn sign_counterparty_commitment(&self, mut commitment_tx: &lightning::ln::chan_utils::CommitmentTransaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<(bitcoin::secp256k1::Signature, Vec<bitcoin::secp256k1::Signature>), ()> {
 		let mut ret = (self.BaseSign.sign_counterparty_commitment)(self.BaseSign.this_arg, &crate::lightning::ln::chan_utils::CommitmentTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((commitment_tx as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).to_rust(); let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.into_rust().drain(..) { local_orig_ret_0_1.push( { item.into_rust() }); }; let mut local_ret_0 = (orig_ret_0_0.into_rust(), local_orig_ret_0_1); local_ret_0 }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
+		local_ret
+	}
+	fn validate_counterparty_revocation(&self, mut idx: u64, mut secret: &bitcoin::secp256k1::key::SecretKey) -> Result<(), ()> {
+		let mut ret = (self.BaseSign.validate_counterparty_revocation)(self.BaseSign.this_arg, idx, secret.as_ref());
+		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
 	fn sign_holder_commitment_and_htlcs(&self, mut commitment_tx: &lightning::ln::chan_utils::HolderCommitmentTransaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<(bitcoin::secp256k1::Signature, Vec<bitcoin::secp256k1::Signature>), ()> {
@@ -854,8 +894,8 @@ impl lightning::chain::keysinterface::BaseSign for Sign {
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
-	fn sign_closing_transaction(&self, mut closing_tx: &bitcoin::blockdata::transaction::Transaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
-		let mut ret = (self.BaseSign.sign_closing_transaction)(self.BaseSign.this_arg, crate::c_types::Transaction::from_bitcoin(closing_tx));
+	fn sign_closing_transaction(&self, mut closing_tx: &lightning::ln::chan_utils::ClosingTransaction, mut _secp_ctx: &bitcoin::secp256k1::Secp256k1<bitcoin::secp256k1::All>) -> Result<bitcoin::secp256k1::Signature, ()> {
+		let mut ret = (self.BaseSign.sign_closing_transaction)(self.BaseSign.this_arg, &crate::lightning::ln::chan_utils::ClosingTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((closing_tx as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
@@ -1288,11 +1328,13 @@ pub extern "C" fn InMemorySigner_as_BaseSign(this_arg: &InMemorySigner) -> crate
 		free: None,
 		get_per_commitment_point: InMemorySigner_BaseSign_get_per_commitment_point,
 		release_commitment_secret: InMemorySigner_BaseSign_release_commitment_secret,
+		validate_holder_commitment: InMemorySigner_BaseSign_validate_holder_commitment,
 
 		pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: std::ptr::null_mut(), is_owned: true },
 		set_pubkeys: Some(InMemorySigner_BaseSign_set_pubkeys),
 		channel_keys_id: InMemorySigner_BaseSign_channel_keys_id,
 		sign_counterparty_commitment: InMemorySigner_BaseSign_sign_counterparty_commitment,
+		validate_counterparty_revocation: InMemorySigner_BaseSign_validate_counterparty_revocation,
 		sign_holder_commitment_and_htlcs: InMemorySigner_BaseSign_sign_holder_commitment_and_htlcs,
 		sign_justice_revoked_output: InMemorySigner_BaseSign_sign_justice_revoked_output,
 		sign_justice_revoked_htlc: InMemorySigner_BaseSign_sign_justice_revoked_htlc,
@@ -1312,6 +1354,12 @@ extern "C" fn InMemorySigner_BaseSign_get_per_commitment_point(this_arg: *const 
 extern "C" fn InMemorySigner_BaseSign_release_commitment_secret(this_arg: *const c_void, mut idx: u64) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::release_commitment_secret(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, idx);
 	crate::c_types::ThirtyTwoBytes { data: ret }
+}
+#[must_use]
+extern "C" fn InMemorySigner_BaseSign_validate_holder_commitment(this_arg: *const c_void, _holder_tx: &crate::lightning::ln::chan_utils::HolderCommitmentTransaction) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::validate_holder_commitment(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, _holder_tx.get_native_ref());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
 }
 #[must_use]
 extern "C" fn InMemorySigner_BaseSign_pubkeys(this_arg: *const c_void) -> crate::lightning::ln::chan_utils::ChannelPublicKeys {
@@ -1334,6 +1382,12 @@ extern "C" fn InMemorySigner_BaseSign_channel_keys_id(this_arg: *const c_void) -
 extern "C" fn InMemorySigner_BaseSign_sign_counterparty_commitment(this_arg: *const c_void, commitment_tx: &crate::lightning::ln::chan_utils::CommitmentTransaction) -> crate::c_types::derived::CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
 	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_counterparty_commitment(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, commitment_tx.get_native_ref(), secp256k1::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { crate::c_types::Signature::from_rust(&item) }); }; let mut local_ret_0 = (crate::c_types::Signature::from_rust(&orig_ret_0_0), local_orig_ret_0_1.into()).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+#[must_use]
+extern "C" fn InMemorySigner_BaseSign_validate_counterparty_revocation(this_arg: *const c_void, mut _idx: u64, _secret: *const [u8; 32]) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::validate_counterparty_revocation(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, _idx, &::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *_secret}[..]).unwrap());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 #[must_use]
@@ -1361,8 +1415,8 @@ extern "C" fn InMemorySigner_BaseSign_sign_counterparty_htlc_transaction(this_ar
 	local_ret
 }
 #[must_use]
-extern "C" fn InMemorySigner_BaseSign_sign_closing_transaction(this_arg: *const c_void, mut closing_tx: crate::c_types::Transaction) -> crate::c_types::derived::CResult_SignatureNoneZ {
-	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_closing_transaction(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, &closing_tx.into_bitcoin(), secp256k1::SECP256K1);
+extern "C" fn InMemorySigner_BaseSign_sign_closing_transaction(this_arg: *const c_void, closing_tx: &crate::lightning::ln::chan_utils::ClosingTransaction) -> crate::c_types::derived::CResult_SignatureNoneZ {
+	let mut ret = <nativeInMemorySigner as lightning::chain::keysinterface::BaseSign<>>::sign_closing_transaction(unsafe { &mut *(this_arg as *mut nativeInMemorySigner) }, closing_tx.get_native_ref(), secp256k1::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::Signature::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
@@ -1398,11 +1452,13 @@ pub extern "C" fn InMemorySigner_as_Sign(this_arg: &InMemorySigner) -> crate::li
 			free: None,
 			get_per_commitment_point: InMemorySigner_BaseSign_get_per_commitment_point,
 			release_commitment_secret: InMemorySigner_BaseSign_release_commitment_secret,
+			validate_holder_commitment: InMemorySigner_BaseSign_validate_holder_commitment,
 
 			pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: std::ptr::null_mut(), is_owned: true },
 			set_pubkeys: Some(InMemorySigner_BaseSign_set_pubkeys),
 			channel_keys_id: InMemorySigner_BaseSign_channel_keys_id,
 			sign_counterparty_commitment: InMemorySigner_BaseSign_sign_counterparty_commitment,
+			validate_counterparty_revocation: InMemorySigner_BaseSign_validate_counterparty_revocation,
 			sign_holder_commitment_and_htlcs: InMemorySigner_BaseSign_sign_holder_commitment_and_htlcs,
 			sign_justice_revoked_output: InMemorySigner_BaseSign_sign_justice_revoked_output,
 			sign_justice_revoked_htlc: InMemorySigner_BaseSign_sign_justice_revoked_htlc,
@@ -1600,7 +1656,7 @@ extern "C" fn KeysManager_KeysInterface_get_shutdown_scriptpubkey(this_arg: *con
 #[must_use]
 extern "C" fn KeysManager_KeysInterface_get_channel_signer(this_arg: *const c_void, mut _inbound: bool, mut channel_value_satoshis: u64) -> crate::lightning::chain::keysinterface::Sign {
 	let mut ret = <nativeKeysManager as lightning::chain::keysinterface::KeysInterface<>>::get_channel_signer(unsafe { &mut *(this_arg as *mut nativeKeysManager) }, _inbound, channel_value_satoshis);
-	ret.into()
+	Into::into(ret)
 }
 #[must_use]
 extern "C" fn KeysManager_KeysInterface_get_secure_random_bytes(this_arg: *const c_void) -> crate::c_types::ThirtyTwoBytes {
@@ -1610,7 +1666,7 @@ extern "C" fn KeysManager_KeysInterface_get_secure_random_bytes(this_arg: *const
 #[must_use]
 extern "C" fn KeysManager_KeysInterface_read_chan_signer(this_arg: *const c_void, mut reader: crate::c_types::u8slice) -> crate::c_types::derived::CResult_SignDecodeErrorZ {
 	let mut ret = <nativeKeysManager as lightning::chain::keysinterface::KeysInterface<>>::read_chan_signer(unsafe { &mut *(this_arg as *mut nativeKeysManager) }, reader.to_slice());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { Into::into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]

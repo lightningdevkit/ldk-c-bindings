@@ -25,6 +25,7 @@
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -1064,13 +1065,13 @@ pub extern "C" fn FundingCreated_get_funding_output_index(this_ptr: &FundingCrea
 pub extern "C" fn FundingCreated_set_funding_output_index(this_ptr: &mut FundingCreated, mut val: u16) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.funding_output_index = val;
 }
-/// The signature of the channel initiator (funder) on the funding transaction
+/// The signature of the channel initiator (funder) on the initial commitment transaction
 #[no_mangle]
 pub extern "C" fn FundingCreated_get_signature(this_ptr: &FundingCreated) -> crate::c_types::Signature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().signature;
 	crate::c_types::Signature::from_rust(&inner_val)
 }
-/// The signature of the channel initiator (funder) on the funding transaction
+/// The signature of the channel initiator (funder) on the initial commitment transaction
 #[no_mangle]
 pub extern "C" fn FundingCreated_set_signature(this_ptr: &mut FundingCreated, mut val: crate::c_types::Signature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.signature = val.into_rust();
@@ -1167,13 +1168,13 @@ pub extern "C" fn FundingSigned_get_channel_id(this_ptr: &FundingSigned) -> *con
 pub extern "C" fn FundingSigned_set_channel_id(this_ptr: &mut FundingSigned, mut val: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
 }
-/// The signature of the channel acceptor (fundee) on the funding transaction
+/// The signature of the channel acceptor (fundee) on the initial commitment transaction
 #[no_mangle]
 pub extern "C" fn FundingSigned_get_signature(this_ptr: &FundingSigned) -> crate::c_types::Signature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().signature;
 	crate::c_types::Signature::from_rust(&inner_val)
 }
-/// The signature of the channel acceptor (fundee) on the funding transaction
+/// The signature of the channel acceptor (fundee) on the initial commitment transaction
 #[no_mangle]
 pub extern "C" fn FundingSigned_set_signature(this_ptr: &mut FundingSigned, mut val: crate::c_types::Signature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.signature = val.into_rust();
@@ -4668,9 +4669,23 @@ impl CommitmentUpdate {
 }
 /// update_add_htlc messages which should be sent
 #[no_mangle]
+pub extern "C" fn CommitmentUpdate_get_update_add_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateAddHTLCZ {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_add_htlcs;
+	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateAddHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); };
+	local_inner_val.into()
+}
+/// update_add_htlc messages which should be sent
+#[no_mangle]
 pub extern "C" fn CommitmentUpdate_set_update_add_htlcs(this_ptr: &mut CommitmentUpdate, mut val: crate::c_types::derived::CVec_UpdateAddHTLCZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.update_add_htlcs = local_val;
+}
+/// update_fulfill_htlc messages which should be sent
+#[no_mangle]
+pub extern "C" fn CommitmentUpdate_get_update_fulfill_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateFulfillHTLCZ {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_fulfill_htlcs;
+	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFulfillHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); };
+	local_inner_val.into()
 }
 /// update_fulfill_htlc messages which should be sent
 #[no_mangle]
@@ -4680,9 +4695,23 @@ pub extern "C" fn CommitmentUpdate_set_update_fulfill_htlcs(this_ptr: &mut Commi
 }
 /// update_fail_htlc messages which should be sent
 #[no_mangle]
+pub extern "C" fn CommitmentUpdate_get_update_fail_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateFailHTLCZ {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_fail_htlcs;
+	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFailHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); };
+	local_inner_val.into()
+}
+/// update_fail_htlc messages which should be sent
+#[no_mangle]
 pub extern "C" fn CommitmentUpdate_set_update_fail_htlcs(this_ptr: &mut CommitmentUpdate, mut val: crate::c_types::derived::CVec_UpdateFailHTLCZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.update_fail_htlcs = local_val;
+}
+/// update_fail_malformed_htlc messages which should be sent
+#[no_mangle]
+pub extern "C" fn CommitmentUpdate_get_update_fail_malformed_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateFailMalformedHTLCZ {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_fail_malformed_htlcs;
+	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFailMalformedHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); };
+	local_inner_val.into()
 }
 /// update_fail_malformed_htlc messages which should be sent
 #[no_mangle]
@@ -4754,168 +4783,6 @@ pub(crate) extern "C" fn CommitmentUpdate_clone_void(this_ptr: *const c_void) ->
 /// Creates a copy of the CommitmentUpdate
 pub extern "C" fn CommitmentUpdate_clone(orig: &CommitmentUpdate) -> CommitmentUpdate {
 	orig.clone()
-}
-/// The information we received from a peer along the route of a payment we originated. This is
-/// returned by ChannelMessageHandler::handle_update_fail_htlc to be passed into
-/// RoutingMessageHandler::handle_htlc_fail_channel_update to update our network map.
-#[must_use]
-#[derive(Clone)]
-#[repr(C)]
-pub enum HTLCFailChannelUpdate {
-	/// We received an error which included a full ChannelUpdate message.
-	ChannelUpdateMessage {
-		/// The unwrapped message we received
-		msg: crate::lightning::ln::msgs::ChannelUpdate,
-	},
-	/// We received an error which indicated only that a channel has been closed
-	ChannelClosed {
-		/// The short_channel_id which has now closed.
-		short_channel_id: u64,
-		/// when this true, this channel should be permanently removed from the
-		/// consideration. Otherwise, this channel can be restored as new channel_update is received
-		is_permanent: bool,
-	},
-	/// We received an error which indicated only that a node has failed
-	NodeFailure {
-		/// The node_id that has failed.
-		node_id: crate::c_types::PublicKey,
-		/// when this true, node should be permanently removed from the
-		/// consideration. Otherwise, the channels connected to this node can be
-		/// restored as new channel_update is received
-		is_permanent: bool,
-	},
-}
-use lightning::ln::msgs::HTLCFailChannelUpdate as nativeHTLCFailChannelUpdate;
-impl HTLCFailChannelUpdate {
-	#[allow(unused)]
-	pub(crate) fn to_native(&self) -> nativeHTLCFailChannelUpdate {
-		match self {
-			HTLCFailChannelUpdate::ChannelUpdateMessage {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
-				nativeHTLCFailChannelUpdate::ChannelUpdateMessage {
-					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
-				}
-			},
-			HTLCFailChannelUpdate::ChannelClosed {ref short_channel_id, ref is_permanent, } => {
-				let mut short_channel_id_nonref = (*short_channel_id).clone();
-				let mut is_permanent_nonref = (*is_permanent).clone();
-				nativeHTLCFailChannelUpdate::ChannelClosed {
-					short_channel_id: short_channel_id_nonref,
-					is_permanent: is_permanent_nonref,
-				}
-			},
-			HTLCFailChannelUpdate::NodeFailure {ref node_id, ref is_permanent, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut is_permanent_nonref = (*is_permanent).clone();
-				nativeHTLCFailChannelUpdate::NodeFailure {
-					node_id: node_id_nonref.into_rust(),
-					is_permanent: is_permanent_nonref,
-				}
-			},
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn into_native(self) -> nativeHTLCFailChannelUpdate {
-		match self {
-			HTLCFailChannelUpdate::ChannelUpdateMessage {mut msg, } => {
-				nativeHTLCFailChannelUpdate::ChannelUpdateMessage {
-					msg: *unsafe { Box::from_raw(msg.take_inner()) },
-				}
-			},
-			HTLCFailChannelUpdate::ChannelClosed {mut short_channel_id, mut is_permanent, } => {
-				nativeHTLCFailChannelUpdate::ChannelClosed {
-					short_channel_id: short_channel_id,
-					is_permanent: is_permanent,
-				}
-			},
-			HTLCFailChannelUpdate::NodeFailure {mut node_id, mut is_permanent, } => {
-				nativeHTLCFailChannelUpdate::NodeFailure {
-					node_id: node_id.into_rust(),
-					is_permanent: is_permanent,
-				}
-			},
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeHTLCFailChannelUpdate) -> Self {
-		match native {
-			nativeHTLCFailChannelUpdate::ChannelUpdateMessage {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
-				HTLCFailChannelUpdate::ChannelUpdateMessage {
-					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
-				}
-			},
-			nativeHTLCFailChannelUpdate::ChannelClosed {ref short_channel_id, ref is_permanent, } => {
-				let mut short_channel_id_nonref = (*short_channel_id).clone();
-				let mut is_permanent_nonref = (*is_permanent).clone();
-				HTLCFailChannelUpdate::ChannelClosed {
-					short_channel_id: short_channel_id_nonref,
-					is_permanent: is_permanent_nonref,
-				}
-			},
-			nativeHTLCFailChannelUpdate::NodeFailure {ref node_id, ref is_permanent, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut is_permanent_nonref = (*is_permanent).clone();
-				HTLCFailChannelUpdate::NodeFailure {
-					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
-					is_permanent: is_permanent_nonref,
-				}
-			},
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn native_into(native: nativeHTLCFailChannelUpdate) -> Self {
-		match native {
-			nativeHTLCFailChannelUpdate::ChannelUpdateMessage {mut msg, } => {
-				HTLCFailChannelUpdate::ChannelUpdateMessage {
-					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(msg), is_owned: true },
-				}
-			},
-			nativeHTLCFailChannelUpdate::ChannelClosed {mut short_channel_id, mut is_permanent, } => {
-				HTLCFailChannelUpdate::ChannelClosed {
-					short_channel_id: short_channel_id,
-					is_permanent: is_permanent,
-				}
-			},
-			nativeHTLCFailChannelUpdate::NodeFailure {mut node_id, mut is_permanent, } => {
-				HTLCFailChannelUpdate::NodeFailure {
-					node_id: crate::c_types::PublicKey::from_rust(&node_id),
-					is_permanent: is_permanent,
-				}
-			},
-		}
-	}
-}
-/// Frees any resources used by the HTLCFailChannelUpdate
-#[no_mangle]
-pub extern "C" fn HTLCFailChannelUpdate_free(this_ptr: HTLCFailChannelUpdate) { }
-/// Creates a copy of the HTLCFailChannelUpdate
-#[no_mangle]
-pub extern "C" fn HTLCFailChannelUpdate_clone(orig: &HTLCFailChannelUpdate) -> HTLCFailChannelUpdate {
-	orig.clone()
-}
-#[no_mangle]
-/// Utility method to constructs a new ChannelUpdateMessage-variant HTLCFailChannelUpdate
-pub extern "C" fn HTLCFailChannelUpdate_channel_update_message(msg: crate::lightning::ln::msgs::ChannelUpdate) -> HTLCFailChannelUpdate {
-	HTLCFailChannelUpdate::ChannelUpdateMessage {
-		msg,
-	}
-}
-#[no_mangle]
-/// Utility method to constructs a new ChannelClosed-variant HTLCFailChannelUpdate
-pub extern "C" fn HTLCFailChannelUpdate_channel_closed(short_channel_id: u64, is_permanent: bool) -> HTLCFailChannelUpdate {
-	HTLCFailChannelUpdate::ChannelClosed {
-		short_channel_id,
-		is_permanent,
-	}
-}
-#[no_mangle]
-/// Utility method to constructs a new NodeFailure-variant HTLCFailChannelUpdate
-pub extern "C" fn HTLCFailChannelUpdate_node_failure(node_id: crate::c_types::PublicKey, is_permanent: bool) -> HTLCFailChannelUpdate {
-	HTLCFailChannelUpdate::NodeFailure {
-		node_id,
-		is_permanent,
-	}
 }
 /// A trait to describe an object which can receive channel messages.
 ///
@@ -5119,8 +4986,6 @@ pub struct RoutingMessageHandler {
 	/// false or returning an Err otherwise.
 	#[must_use]
 	pub handle_channel_update: extern "C" fn (this_arg: *const c_void, msg: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CResult_boolLightningErrorZ,
-	/// Handle some updates to the route graph that we learned due to an outbound failed payment.
-	pub handle_htlc_fail_channel_update: extern "C" fn (this_arg: *const c_void, update: &crate::lightning::ln::msgs::HTLCFailChannelUpdate),
 	/// Gets a subset of the channel announcements and updates required to dump our routing table
 	/// to a remote node, starting at the short_channel_id indicated by starting_point and
 	/// including the batch_amount entries immediately higher in numerical value than starting_point.
@@ -5172,7 +5037,6 @@ pub(crate) extern "C" fn RoutingMessageHandler_clone_fields(orig: &RoutingMessag
 		handle_node_announcement: Clone::clone(&orig.handle_node_announcement),
 		handle_channel_announcement: Clone::clone(&orig.handle_channel_announcement),
 		handle_channel_update: Clone::clone(&orig.handle_channel_update),
-		handle_htlc_fail_channel_update: Clone::clone(&orig.handle_htlc_fail_channel_update),
 		get_next_channel_announcements: Clone::clone(&orig.get_next_channel_announcements),
 		get_next_node_announcements: Clone::clone(&orig.get_next_node_announcements),
 		sync_routing_table: Clone::clone(&orig.sync_routing_table),
@@ -5208,9 +5072,6 @@ impl rustRoutingMessageHandler for RoutingMessageHandler {
 		let mut ret = (self.handle_channel_update)(self.this_arg, &crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }) }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
-	}
-	fn handle_htlc_fail_channel_update(&self, mut update: &lightning::ln::msgs::HTLCFailChannelUpdate) {
-		(self.handle_htlc_fail_channel_update)(self.this_arg, &crate::lightning::ln::msgs::HTLCFailChannelUpdate::from_native(update))
 	}
 	fn get_next_channel_announcements(&self, mut starting_point: u64, mut batch_amount: u8) -> Vec<(lightning::ln::msgs::ChannelAnnouncement, Option<lightning::ln::msgs::ChannelUpdate>, Option<lightning::ln::msgs::ChannelUpdate>)> {
 		let mut ret = (self.get_next_channel_announcements)(self.this_arg, starting_point, batch_amount);
@@ -5270,6 +5131,7 @@ mod fuzzy_internal_msgs {
 
 use std::str::FromStr;
 use std::ffi::c_void;
+use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
@@ -5723,13 +5585,6 @@ pub(crate) extern "C" fn QueryShortChannelIds_write_void(obj: *const c_void) -> 
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeQueryShortChannelIds) })
 }
 #[no_mangle]
-/// Read a ReplyShortChannelIdsEnd from a byte array, created by ReplyShortChannelIdsEnd_write
-pub extern "C" fn ReplyShortChannelIdsEnd_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ReplyShortChannelIdsEndDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ReplyShortChannelIdsEnd { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
-	local_res
-}
-#[no_mangle]
 /// Serialize the ReplyShortChannelIdsEnd object into a byte array which can be read by ReplyShortChannelIdsEnd_read
 pub extern "C" fn ReplyShortChannelIdsEnd_write(obj: &ReplyShortChannelIdsEnd) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
@@ -5737,6 +5592,13 @@ pub extern "C" fn ReplyShortChannelIdsEnd_write(obj: &ReplyShortChannelIdsEnd) -
 #[no_mangle]
 pub(crate) extern "C" fn ReplyShortChannelIdsEnd_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeReplyShortChannelIdsEnd) })
+}
+#[no_mangle]
+/// Read a ReplyShortChannelIdsEnd from a byte array, created by ReplyShortChannelIdsEnd_write
+pub extern "C" fn ReplyShortChannelIdsEnd_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ReplyShortChannelIdsEndDecodeErrorZ {
+	let res = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ReplyShortChannelIdsEnd { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
 }
 ///\n\t * Calculates the overflow safe ending block height for the query.\n\t * Overflow returns `0xffffffff`, otherwise returns `first_blocknum + number_of_blocks`\n\t 
 #[must_use]
@@ -5747,13 +5609,6 @@ pub extern "C" fn QueryChannelRange_end_blocknum(this_arg: &QueryChannelRange) -
 }
 
 #[no_mangle]
-/// Read a QueryChannelRange from a byte array, created by QueryChannelRange_write
-pub extern "C" fn QueryChannelRange_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_QueryChannelRangeDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::QueryChannelRange { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
-	local_res
-}
-#[no_mangle]
 /// Serialize the QueryChannelRange object into a byte array which can be read by QueryChannelRange_read
 pub extern "C" fn QueryChannelRange_write(obj: &QueryChannelRange) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
@@ -5761,6 +5616,13 @@ pub extern "C" fn QueryChannelRange_write(obj: &QueryChannelRange) -> crate::c_t
 #[no_mangle]
 pub(crate) extern "C" fn QueryChannelRange_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeQueryChannelRange) })
+}
+#[no_mangle]
+/// Read a QueryChannelRange from a byte array, created by QueryChannelRange_write
+pub extern "C" fn QueryChannelRange_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_QueryChannelRangeDecodeErrorZ {
+	let res = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::QueryChannelRange { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
 }
 #[no_mangle]
 /// Read a ReplyChannelRange from a byte array, created by ReplyChannelRange_write
@@ -5779,13 +5641,6 @@ pub(crate) extern "C" fn ReplyChannelRange_write_void(obj: *const c_void) -> cra
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeReplyChannelRange) })
 }
 #[no_mangle]
-/// Read a GossipTimestampFilter from a byte array, created by GossipTimestampFilter_write
-pub extern "C" fn GossipTimestampFilter_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_GossipTimestampFilterDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::GossipTimestampFilter { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
-	local_res
-}
-#[no_mangle]
 /// Serialize the GossipTimestampFilter object into a byte array which can be read by GossipTimestampFilter_read
 pub extern "C" fn GossipTimestampFilter_write(obj: &GossipTimestampFilter) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
@@ -5793,4 +5648,11 @@ pub extern "C" fn GossipTimestampFilter_write(obj: &GossipTimestampFilter) -> cr
 #[no_mangle]
 pub(crate) extern "C" fn GossipTimestampFilter_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeGossipTimestampFilter) })
+}
+#[no_mangle]
+/// Read a GossipTimestampFilter from a byte array, created by GossipTimestampFilter_write
+pub extern "C" fn GossipTimestampFilter_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_GossipTimestampFilterDecodeErrorZ {
+	let res = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::GossipTimestampFilter { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
 }

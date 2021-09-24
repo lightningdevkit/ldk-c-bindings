@@ -35,7 +35,7 @@ LDKCVec_MonitorEventZ monitors_pending_monitor_events(const void *this_arg) {
 	return empty_htlc_vec;
 }
 
-void never_handle_event(const void *this_arg, struct LDKEvent event) {
+void never_handle_event(const void *this_arg, const struct LDKEvent* event) {
 	// Note that we never actually generate any events to handle in the code below.
 	assert(false);
 }

@@ -162,7 +162,7 @@ impl Clone for CResult_PublicKeyErrorZ {
 #[no_mangle]
 /// Creates a new CResult_PublicKeyErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_PublicKeyErrorZ_clone(orig: &CResult_PublicKeyErrorZ) -> CResult_PublicKeyErrorZ { orig.clone() }
+pub extern "C" fn CResult_PublicKeyErrorZ_clone(orig: &CResult_PublicKeyErrorZ) -> CResult_PublicKeyErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_TxCreationKeysDecodeErrorZ
 pub union CResult_TxCreationKeysDecodeErrorZPtr {
@@ -253,7 +253,7 @@ impl Clone for CResult_TxCreationKeysDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_TxCreationKeysDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_TxCreationKeysDecodeErrorZ_clone(orig: &CResult_TxCreationKeysDecodeErrorZ) -> CResult_TxCreationKeysDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_TxCreationKeysDecodeErrorZ_clone(orig: &CResult_TxCreationKeysDecodeErrorZ) -> CResult_TxCreationKeysDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ChannelPublicKeysDecodeErrorZ
 pub union CResult_ChannelPublicKeysDecodeErrorZPtr {
@@ -344,7 +344,7 @@ impl Clone for CResult_ChannelPublicKeysDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ChannelPublicKeysDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ChannelPublicKeysDecodeErrorZ_clone(orig: &CResult_ChannelPublicKeysDecodeErrorZ) -> CResult_ChannelPublicKeysDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ChannelPublicKeysDecodeErrorZ_clone(orig: &CResult_ChannelPublicKeysDecodeErrorZ) -> CResult_ChannelPublicKeysDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_TxCreationKeysErrorZ
 pub union CResult_TxCreationKeysErrorZPtr {
@@ -435,7 +435,7 @@ impl Clone for CResult_TxCreationKeysErrorZ {
 #[no_mangle]
 /// Creates a new CResult_TxCreationKeysErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_TxCreationKeysErrorZ_clone(orig: &CResult_TxCreationKeysErrorZ) -> CResult_TxCreationKeysErrorZ { orig.clone() }
+pub extern "C" fn CResult_TxCreationKeysErrorZ_clone(orig: &CResult_TxCreationKeysErrorZ) -> CResult_TxCreationKeysErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 #[derive(Clone)]
 /// An enum which can either contain a u32 or not
@@ -448,6 +448,9 @@ pub enum COption_u32Z {
 impl COption_u32Z {
 	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
 		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
 	}
 	#[allow(unused)] pub(crate) fn take(mut self) -> u32 {
 		if let Self::Some(v) = self { v } else { unreachable!() }
@@ -469,7 +472,7 @@ pub extern "C" fn COption_u32Z_free(_res: COption_u32Z) { }
 #[no_mangle]
 /// Creates a new COption_u32Z which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn COption_u32Z_clone(orig: &COption_u32Z) -> COption_u32Z { orig.clone() }
+pub extern "C" fn COption_u32Z_clone(orig: &COption_u32Z) -> COption_u32Z { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_HTLCOutputInCommitmentDecodeErrorZ
 pub union CResult_HTLCOutputInCommitmentDecodeErrorZPtr {
@@ -560,7 +563,7 @@ impl Clone for CResult_HTLCOutputInCommitmentDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_HTLCOutputInCommitmentDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_HTLCOutputInCommitmentDecodeErrorZ_clone(orig: &CResult_HTLCOutputInCommitmentDecodeErrorZ) -> CResult_HTLCOutputInCommitmentDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_HTLCOutputInCommitmentDecodeErrorZ_clone(orig: &CResult_HTLCOutputInCommitmentDecodeErrorZ) -> CResult_HTLCOutputInCommitmentDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_CounterpartyChannelTransactionParametersDecodeErrorZ
 pub union CResult_CounterpartyChannelTransactionParametersDecodeErrorZPtr {
@@ -651,7 +654,7 @@ impl Clone for CResult_CounterpartyChannelTransactionParametersDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_CounterpartyChannelTransactionParametersDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_CounterpartyChannelTransactionParametersDecodeErrorZ_clone(orig: &CResult_CounterpartyChannelTransactionParametersDecodeErrorZ) -> CResult_CounterpartyChannelTransactionParametersDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_CounterpartyChannelTransactionParametersDecodeErrorZ_clone(orig: &CResult_CounterpartyChannelTransactionParametersDecodeErrorZ) -> CResult_CounterpartyChannelTransactionParametersDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ChannelTransactionParametersDecodeErrorZ
 pub union CResult_ChannelTransactionParametersDecodeErrorZPtr {
@@ -742,7 +745,7 @@ impl Clone for CResult_ChannelTransactionParametersDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ChannelTransactionParametersDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ChannelTransactionParametersDecodeErrorZ_clone(orig: &CResult_ChannelTransactionParametersDecodeErrorZ) -> CResult_ChannelTransactionParametersDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ChannelTransactionParametersDecodeErrorZ_clone(orig: &CResult_ChannelTransactionParametersDecodeErrorZ) -> CResult_ChannelTransactionParametersDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::c_types::Signatures of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -879,7 +882,7 @@ impl Clone for CResult_HolderCommitmentTransactionDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_HolderCommitmentTransactionDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_HolderCommitmentTransactionDecodeErrorZ_clone(orig: &CResult_HolderCommitmentTransactionDecodeErrorZ) -> CResult_HolderCommitmentTransactionDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_HolderCommitmentTransactionDecodeErrorZ_clone(orig: &CResult_HolderCommitmentTransactionDecodeErrorZ) -> CResult_HolderCommitmentTransactionDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_BuiltCommitmentTransactionDecodeErrorZ
 pub union CResult_BuiltCommitmentTransactionDecodeErrorZPtr {
@@ -970,7 +973,77 @@ impl Clone for CResult_BuiltCommitmentTransactionDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_BuiltCommitmentTransactionDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_BuiltCommitmentTransactionDecodeErrorZ_clone(orig: &CResult_BuiltCommitmentTransactionDecodeErrorZ) -> CResult_BuiltCommitmentTransactionDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_BuiltCommitmentTransactionDecodeErrorZ_clone(orig: &CResult_BuiltCommitmentTransactionDecodeErrorZ) -> CResult_BuiltCommitmentTransactionDecodeErrorZ { Clone::clone(&orig) }
+#[repr(C)]
+/// The contents of CResult_TrustedClosingTransactionNoneZ
+pub union CResult_TrustedClosingTransactionNoneZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::lightning::ln::chan_utils::TrustedClosingTransaction,
+	/// Note that this value is always NULL, as there are no contents in the Err variant
+	pub err: *mut std::ffi::c_void,
+}
+#[repr(C)]
+/// A CResult_TrustedClosingTransactionNoneZ represents the result of a fallible operation,
+/// containing a crate::lightning::ln::chan_utils::TrustedClosingTransaction on success and a () on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_TrustedClosingTransactionNoneZ {
+	/// The contents of this CResult_TrustedClosingTransactionNoneZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_TrustedClosingTransactionNoneZPtr,
+	/// Whether this CResult_TrustedClosingTransactionNoneZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_TrustedClosingTransactionNoneZ in the success state.
+pub extern "C" fn CResult_TrustedClosingTransactionNoneZ_ok(o: crate::lightning::ln::chan_utils::TrustedClosingTransaction) -> CResult_TrustedClosingTransactionNoneZ {
+	CResult_TrustedClosingTransactionNoneZ {
+		contents: CResult_TrustedClosingTransactionNoneZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_TrustedClosingTransactionNoneZ in the error state.
+pub extern "C" fn CResult_TrustedClosingTransactionNoneZ_err() -> CResult_TrustedClosingTransactionNoneZ {
+	CResult_TrustedClosingTransactionNoneZ {
+		contents: CResult_TrustedClosingTransactionNoneZPtr {
+			err: std::ptr::null_mut(),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_TrustedClosingTransactionNoneZ.
+pub extern "C" fn CResult_TrustedClosingTransactionNoneZ_free(_res: CResult_TrustedClosingTransactionNoneZ) { }
+impl Drop for CResult_TrustedClosingTransactionNoneZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::TrustedClosingTransaction, ()>> for CResult_TrustedClosingTransactionNoneZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::TrustedClosingTransaction, ()>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_TrustedClosingTransactionNoneZPtr { result }
+		} else {
+			let _ = unsafe { Box::from_raw(o.contents.err) };
+			o.contents.err = std::ptr::null_mut();
+			CResult_TrustedClosingTransactionNoneZPtr { err: std::ptr::null_mut() }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
 #[repr(C)]
 /// The contents of CResult_CommitmentTransactionDecodeErrorZ
 pub union CResult_CommitmentTransactionDecodeErrorZPtr {
@@ -1061,7 +1134,7 @@ impl Clone for CResult_CommitmentTransactionDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_CommitmentTransactionDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_CommitmentTransactionDecodeErrorZ_clone(orig: &CResult_CommitmentTransactionDecodeErrorZ) -> CResult_CommitmentTransactionDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_CommitmentTransactionDecodeErrorZ_clone(orig: &CResult_CommitmentTransactionDecodeErrorZ) -> CResult_CommitmentTransactionDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_TrustedCommitmentTransactionNoneZ
 pub union CResult_TrustedCommitmentTransactionNoneZPtr {
@@ -1218,7 +1291,7 @@ impl Clone for CResult_CVec_SignatureZNoneZ {
 #[no_mangle]
 /// Creates a new CResult_CVec_SignatureZNoneZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_CVec_SignatureZNoneZ_clone(orig: &CResult_CVec_SignatureZNoneZ) -> CResult_CVec_SignatureZNoneZ { orig.clone() }
+pub extern "C" fn CResult_CVec_SignatureZNoneZ_clone(orig: &CResult_CVec_SignatureZNoneZ) -> CResult_CVec_SignatureZNoneZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ShutdownScriptDecodeErrorZ
 pub union CResult_ShutdownScriptDecodeErrorZPtr {
@@ -1309,7 +1382,7 @@ impl Clone for CResult_ShutdownScriptDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ShutdownScriptDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ShutdownScriptDecodeErrorZ_clone(orig: &CResult_ShutdownScriptDecodeErrorZ) -> CResult_ShutdownScriptDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ShutdownScriptDecodeErrorZ_clone(orig: &CResult_ShutdownScriptDecodeErrorZ) -> CResult_ShutdownScriptDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ShutdownScriptInvalidShutdownScriptZ
 pub union CResult_ShutdownScriptInvalidShutdownScriptZPtr {
@@ -1470,7 +1543,7 @@ impl Clone for CResult_NoneErrorZ {
 #[no_mangle]
 /// Creates a new CResult_NoneErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NoneErrorZ_clone(orig: &CResult_NoneErrorZ) -> CResult_NoneErrorZ { orig.clone() }
+pub extern "C" fn CResult_NoneErrorZ_clone(orig: &CResult_NoneErrorZ) -> CResult_NoneErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_RouteHopDecodeErrorZ
 pub union CResult_RouteHopDecodeErrorZPtr {
@@ -1561,7 +1634,7 @@ impl Clone for CResult_RouteHopDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_RouteHopDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_RouteHopDecodeErrorZ_clone(orig: &CResult_RouteHopDecodeErrorZ) -> CResult_RouteHopDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_RouteHopDecodeErrorZ_clone(orig: &CResult_RouteHopDecodeErrorZ) -> CResult_RouteHopDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::lightning::routing::router::RouteHops of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -1744,7 +1817,7 @@ impl Clone for CResult_RouteDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_RouteDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_RouteDecodeErrorZ_clone(orig: &CResult_RouteDecodeErrorZ) -> CResult_RouteDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_RouteDecodeErrorZ_clone(orig: &CResult_RouteDecodeErrorZ) -> CResult_RouteDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 #[derive(Clone)]
 /// An enum which can either contain a u64 or not
@@ -1757,6 +1830,9 @@ pub enum COption_u64Z {
 impl COption_u64Z {
 	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
 		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
 	}
 	#[allow(unused)] pub(crate) fn take(mut self) -> u64 {
 		if let Self::Some(v) = self { v } else { unreachable!() }
@@ -1778,7 +1854,7 @@ pub extern "C" fn COption_u64Z_free(_res: COption_u64Z) { }
 #[no_mangle]
 /// Creates a new COption_u64Z which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn COption_u64Z_clone(orig: &COption_u64Z) -> COption_u64Z { orig.clone() }
+pub extern "C" fn COption_u64Z_clone(orig: &COption_u64Z) -> COption_u64Z { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::lightning::ln::channelmanager::ChannelDetailss of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -1961,7 +2037,7 @@ impl Clone for CResult_RouteLightningErrorZ {
 #[no_mangle]
 /// Creates a new CResult_RouteLightningErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_RouteLightningErrorZ_clone(orig: &CResult_RouteLightningErrorZ) -> CResult_RouteLightningErrorZ { orig.clone() }
+pub extern "C" fn CResult_RouteLightningErrorZ_clone(orig: &CResult_RouteLightningErrorZ) -> CResult_RouteLightningErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_TxOutAccessErrorZ
 pub union CResult_TxOutAccessErrorZPtr {
@@ -2052,7 +2128,7 @@ impl Clone for CResult_TxOutAccessErrorZ {
 #[no_mangle]
 /// Creates a new CResult_TxOutAccessErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_TxOutAccessErrorZ_clone(orig: &CResult_TxOutAccessErrorZ) -> CResult_TxOutAccessErrorZ { orig.clone() }
+pub extern "C" fn CResult_TxOutAccessErrorZ_clone(orig: &CResult_TxOutAccessErrorZ) -> CResult_TxOutAccessErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_usizeTransactionZ {
@@ -2077,15 +2153,15 @@ impl C2Tuple_usizeTransactionZ {
 impl Clone for C2Tuple_usizeTransactionZ {
 	fn clone(&self) -> Self {
 		Self {
-			a: self.a.clone(),
-			b: self.b.clone(),
+			a: Clone::clone(&self.a),
+			b: Clone::clone(&self.b),
 		}
 	}
 }
 #[no_mangle]
 /// Creates a new tuple which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C2Tuple_usizeTransactionZ_clone(orig: &C2Tuple_usizeTransactionZ) -> C2Tuple_usizeTransactionZ { orig.clone() }
+pub extern "C" fn C2Tuple_usizeTransactionZ_clone(orig: &C2Tuple_usizeTransactionZ) -> C2Tuple_usizeTransactionZ { Clone::clone(&orig) }
 /// Creates a new C2Tuple_usizeTransactionZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_usizeTransactionZ_new(a: usize, b: crate::c_types::Transaction) -> C2Tuple_usizeTransactionZ {
@@ -2273,7 +2349,7 @@ impl Clone for CResult_NoneChannelMonitorUpdateErrZ {
 #[no_mangle]
 /// Creates a new CResult_NoneChannelMonitorUpdateErrZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_clone(orig: &CResult_NoneChannelMonitorUpdateErrZ) -> CResult_NoneChannelMonitorUpdateErrZ { orig.clone() }
+pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_clone(orig: &CResult_NoneChannelMonitorUpdateErrZ) -> CResult_NoneChannelMonitorUpdateErrZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::lightning::chain::channelmonitor::MonitorEvents of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -2333,6 +2409,9 @@ impl COption_C2Tuple_usizeTransactionZZ {
 	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
 		if let Self::Some(_) = self { true } else { false }
 	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
+	}
 	#[allow(unused)] pub(crate) fn take(mut self) -> crate::c_types::derived::C2Tuple_usizeTransactionZ {
 		if let Self::Some(v) = self { v } else { unreachable!() }
 	}
@@ -2353,7 +2432,44 @@ pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_free(_res: COption_C2Tuple_
 #[no_mangle]
 /// Creates a new COption_C2Tuple_usizeTransactionZZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_clone(orig: &COption_C2Tuple_usizeTransactionZZ) -> COption_C2Tuple_usizeTransactionZZ { orig.clone() }
+pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_clone(orig: &COption_C2Tuple_usizeTransactionZZ) -> COption_C2Tuple_usizeTransactionZZ { Clone::clone(&orig) }
+#[repr(C)]
+#[derive(Clone)]
+/// An enum which can either contain a crate::lightning::routing::network_graph::NetworkUpdate or not
+pub enum COption_NetworkUpdateZ {
+	/// When we're in this state, this COption_NetworkUpdateZ contains a crate::lightning::routing::network_graph::NetworkUpdate
+	Some(crate::lightning::routing::network_graph::NetworkUpdate),
+	/// When we're in this state, this COption_NetworkUpdateZ contains nothing
+	None
+}
+impl COption_NetworkUpdateZ {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> crate::lightning::routing::network_graph::NetworkUpdate {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+/// Constructs a new COption_NetworkUpdateZ containing a crate::lightning::routing::network_graph::NetworkUpdate
+pub extern "C" fn COption_NetworkUpdateZ_some(o: crate::lightning::routing::network_graph::NetworkUpdate) -> COption_NetworkUpdateZ {
+	COption_NetworkUpdateZ::Some(o)
+}
+#[no_mangle]
+/// Constructs a new COption_NetworkUpdateZ containing nothing
+pub extern "C" fn COption_NetworkUpdateZ_none() -> COption_NetworkUpdateZ {
+	COption_NetworkUpdateZ::None
+}
+#[no_mangle]
+/// Frees any resources associated with the crate::lightning::routing::network_graph::NetworkUpdate, if we are in the Some state
+pub extern "C" fn COption_NetworkUpdateZ_free(_res: COption_NetworkUpdateZ) { }
+#[no_mangle]
+/// Creates a new COption_NetworkUpdateZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn COption_NetworkUpdateZ_clone(orig: &COption_NetworkUpdateZ) -> COption_NetworkUpdateZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::lightning::chain::keysinterface::SpendableOutputDescriptors of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -2832,7 +2948,7 @@ impl Clone for CResult_DelayedPaymentOutputDescriptorDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_DelayedPaymentOutputDescriptorDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_clone(orig: &CResult_DelayedPaymentOutputDescriptorDecodeErrorZ) -> CResult_DelayedPaymentOutputDescriptorDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_clone(orig: &CResult_DelayedPaymentOutputDescriptorDecodeErrorZ) -> CResult_DelayedPaymentOutputDescriptorDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_StaticPaymentOutputDescriptorDecodeErrorZ
 pub union CResult_StaticPaymentOutputDescriptorDecodeErrorZPtr {
@@ -2923,7 +3039,7 @@ impl Clone for CResult_StaticPaymentOutputDescriptorDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_StaticPaymentOutputDescriptorDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_StaticPaymentOutputDescriptorDecodeErrorZ_clone(orig: &CResult_StaticPaymentOutputDescriptorDecodeErrorZ) -> CResult_StaticPaymentOutputDescriptorDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_StaticPaymentOutputDescriptorDecodeErrorZ_clone(orig: &CResult_StaticPaymentOutputDescriptorDecodeErrorZ) -> CResult_StaticPaymentOutputDescriptorDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_SpendableOutputDescriptorDecodeErrorZ
 pub union CResult_SpendableOutputDescriptorDecodeErrorZPtr {
@@ -3014,7 +3130,90 @@ impl Clone for CResult_SpendableOutputDescriptorDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_SpendableOutputDescriptorDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_clone(orig: &CResult_SpendableOutputDescriptorDecodeErrorZ) -> CResult_SpendableOutputDescriptorDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_clone(orig: &CResult_SpendableOutputDescriptorDecodeErrorZ) -> CResult_SpendableOutputDescriptorDecodeErrorZ { Clone::clone(&orig) }
+#[repr(C)]
+/// The contents of CResult_NoneNoneZ
+pub union CResult_NoneNoneZPtr {
+	/// Note that this value is always NULL, as there are no contents in the OK variant
+	pub result: *mut std::ffi::c_void,
+	/// Note that this value is always NULL, as there are no contents in the Err variant
+	pub err: *mut std::ffi::c_void,
+}
+#[repr(C)]
+/// A CResult_NoneNoneZ represents the result of a fallible operation,
+/// containing a () on success and a () on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_NoneNoneZ {
+	/// The contents of this CResult_NoneNoneZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_NoneNoneZPtr,
+	/// Whether this CResult_NoneNoneZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_NoneNoneZ in the success state.
+pub extern "C" fn CResult_NoneNoneZ_ok() -> CResult_NoneNoneZ {
+	CResult_NoneNoneZ {
+		contents: CResult_NoneNoneZPtr {
+			result: std::ptr::null_mut(),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_NoneNoneZ in the error state.
+pub extern "C" fn CResult_NoneNoneZ_err() -> CResult_NoneNoneZ {
+	CResult_NoneNoneZ {
+		contents: CResult_NoneNoneZPtr {
+			err: std::ptr::null_mut(),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_NoneNoneZ.
+pub extern "C" fn CResult_NoneNoneZ_free(_res: CResult_NoneNoneZ) { }
+impl Drop for CResult_NoneNoneZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+		} else {
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<(), ()>> for CResult_NoneNoneZ {
+	fn from(mut o: crate::c_types::CResultTempl<(), ()>) -> Self {
+		let contents = if o.result_ok {
+			let _ = unsafe { Box::from_raw(o.contents.result) };
+			o.contents.result = std::ptr::null_mut();
+			CResult_NoneNoneZPtr { result: std::ptr::null_mut() }
+		} else {
+			let _ = unsafe { Box::from_raw(o.contents.err) };
+			o.contents.err = std::ptr::null_mut();
+			CResult_NoneNoneZPtr { err: std::ptr::null_mut() }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_NoneNoneZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_NoneNoneZPtr {
+				result: std::ptr::null_mut()
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_NoneNoneZPtr {
+				err: std::ptr::null_mut()
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_NoneNoneZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_NoneNoneZ_clone(orig: &CResult_NoneNoneZ) -> CResult_NoneNoneZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_SignatureCVec_SignatureZZ {
@@ -3039,15 +3238,15 @@ impl C2Tuple_SignatureCVec_SignatureZZ {
 impl Clone for C2Tuple_SignatureCVec_SignatureZZ {
 	fn clone(&self) -> Self {
 		Self {
-			a: self.a.clone(),
-			b: self.b.clone(),
+			a: Clone::clone(&self.a),
+			b: Clone::clone(&self.b),
 		}
 	}
 }
 #[no_mangle]
 /// Creates a new tuple which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C2Tuple_SignatureCVec_SignatureZZ_clone(orig: &C2Tuple_SignatureCVec_SignatureZZ) -> C2Tuple_SignatureCVec_SignatureZZ { orig.clone() }
+pub extern "C" fn C2Tuple_SignatureCVec_SignatureZZ_clone(orig: &C2Tuple_SignatureCVec_SignatureZZ) -> C2Tuple_SignatureCVec_SignatureZZ { Clone::clone(&orig) }
 /// Creates a new C2Tuple_SignatureCVec_SignatureZZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_SignatureCVec_SignatureZZ_new(a: crate::c_types::Signature, b: crate::c_types::derived::CVec_SignatureZ) -> C2Tuple_SignatureCVec_SignatureZZ {
@@ -3143,7 +3342,7 @@ impl Clone for CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
 #[no_mangle]
 /// Creates a new CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_clone(orig: &CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ) -> CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ { orig.clone() }
+pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_clone(orig: &CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ) -> CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_SignatureNoneZ
 pub union CResult_SignatureNoneZPtr {
@@ -3230,7 +3429,7 @@ impl Clone for CResult_SignatureNoneZ {
 #[no_mangle]
 /// Creates a new CResult_SignatureNoneZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_SignatureNoneZ_clone(orig: &CResult_SignatureNoneZ) -> CResult_SignatureNoneZ { orig.clone() }
+pub extern "C" fn CResult_SignatureNoneZ_clone(orig: &CResult_SignatureNoneZ) -> CResult_SignatureNoneZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_SignDecodeErrorZ
 pub union CResult_SignDecodeErrorZPtr {
@@ -3321,7 +3520,7 @@ impl Clone for CResult_SignDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_SignDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_SignDecodeErrorZ_clone(orig: &CResult_SignDecodeErrorZ) -> CResult_SignDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_SignDecodeErrorZ_clone(orig: &CResult_SignDecodeErrorZ) -> CResult_SignDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of u8s of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -3454,7 +3653,7 @@ impl Clone for CResult_RecoverableSignatureNoneZ {
 #[no_mangle]
 /// Creates a new CResult_RecoverableSignatureNoneZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_RecoverableSignatureNoneZ_clone(orig: &CResult_RecoverableSignatureNoneZ) -> CResult_RecoverableSignatureNoneZ { orig.clone() }
+pub extern "C" fn CResult_RecoverableSignatureNoneZ_clone(orig: &CResult_RecoverableSignatureNoneZ) -> CResult_RecoverableSignatureNoneZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::c_types::derived::CVec_u8Zs of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -3587,7 +3786,7 @@ impl Clone for CResult_CVec_CVec_u8ZZNoneZ {
 #[no_mangle]
 /// Creates a new CResult_CVec_CVec_u8ZZNoneZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_clone(orig: &CResult_CVec_CVec_u8ZZNoneZ) -> CResult_CVec_CVec_u8ZZNoneZ { orig.clone() }
+pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_clone(orig: &CResult_CVec_CVec_u8ZZNoneZ) -> CResult_CVec_CVec_u8ZZNoneZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_InMemorySignerDecodeErrorZ
 pub union CResult_InMemorySignerDecodeErrorZPtr {
@@ -3678,7 +3877,7 @@ impl Clone for CResult_InMemorySignerDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_InMemorySignerDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_InMemorySignerDecodeErrorZ_clone(orig: &CResult_InMemorySignerDecodeErrorZ) -> CResult_InMemorySignerDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_InMemorySignerDecodeErrorZ_clone(orig: &CResult_InMemorySignerDecodeErrorZ) -> CResult_InMemorySignerDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::c_types::TxOuts of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -3811,7 +4010,7 @@ impl Clone for CResult_TransactionNoneZ {
 #[no_mangle]
 /// Creates a new CResult_TransactionNoneZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_TransactionNoneZ_clone(orig: &CResult_TransactionNoneZ) -> CResult_TransactionNoneZ { orig.clone() }
+pub extern "C" fn CResult_TransactionNoneZ_clone(orig: &CResult_TransactionNoneZ) -> CResult_TransactionNoneZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_BlockHashChannelMonitorZ {
@@ -3967,6 +4166,9 @@ impl COption_u16Z {
 	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
 		if let Self::Some(_) = self { true } else { false }
 	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
+	}
 	#[allow(unused)] pub(crate) fn take(mut self) -> u16 {
 		if let Self::Some(v) = self { v } else { unreachable!() }
 	}
@@ -3987,7 +4189,7 @@ pub extern "C" fn COption_u16Z_free(_res: COption_u16Z) { }
 #[no_mangle]
 /// Creates a new COption_u16Z which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn COption_u16Z_clone(orig: &COption_u16Z) -> COption_u16Z { orig.clone() }
+pub extern "C" fn COption_u16Z_clone(orig: &COption_u16Z) -> COption_u16Z { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_NoneAPIErrorZ
 pub union CResult_NoneAPIErrorZPtr {
@@ -4074,7 +4276,7 @@ impl Clone for CResult_NoneAPIErrorZ {
 #[no_mangle]
 /// Creates a new CResult_NoneAPIErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NoneAPIErrorZ_clone(orig: &CResult_NoneAPIErrorZ) -> CResult_NoneAPIErrorZ { orig.clone() }
+pub extern "C" fn CResult_NoneAPIErrorZ_clone(orig: &CResult_NoneAPIErrorZ) -> CResult_NoneAPIErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::c_types::derived::CResult_NoneAPIErrorZs of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -4253,7 +4455,7 @@ impl Clone for CResult_NonePaymentSendFailureZ {
 #[no_mangle]
 /// Creates a new CResult_NonePaymentSendFailureZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NonePaymentSendFailureZ_clone(orig: &CResult_NonePaymentSendFailureZ) -> CResult_NonePaymentSendFailureZ { orig.clone() }
+pub extern "C" fn CResult_NonePaymentSendFailureZ_clone(orig: &CResult_NonePaymentSendFailureZ) -> CResult_NonePaymentSendFailureZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_PaymentHashPaymentSendFailureZ
 pub union CResult_PaymentHashPaymentSendFailureZPtr {
@@ -4344,7 +4546,7 @@ impl Clone for CResult_PaymentHashPaymentSendFailureZ {
 #[no_mangle]
 /// Creates a new CResult_PaymentHashPaymentSendFailureZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_PaymentHashPaymentSendFailureZ_clone(orig: &CResult_PaymentHashPaymentSendFailureZ) -> CResult_PaymentHashPaymentSendFailureZ { orig.clone() }
+pub extern "C" fn CResult_PaymentHashPaymentSendFailureZ_clone(orig: &CResult_PaymentHashPaymentSendFailureZ) -> CResult_PaymentHashPaymentSendFailureZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::lightning::ln::msgs::NetAddresss of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -4415,15 +4617,15 @@ impl C2Tuple_PaymentHashPaymentSecretZ {
 impl Clone for C2Tuple_PaymentHashPaymentSecretZ {
 	fn clone(&self) -> Self {
 		Self {
-			a: self.a.clone(),
-			b: self.b.clone(),
+			a: Clone::clone(&self.a),
+			b: Clone::clone(&self.b),
 		}
 	}
 }
 #[no_mangle]
 /// Creates a new tuple which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C2Tuple_PaymentHashPaymentSecretZ_clone(orig: &C2Tuple_PaymentHashPaymentSecretZ) -> C2Tuple_PaymentHashPaymentSecretZ { orig.clone() }
+pub extern "C" fn C2Tuple_PaymentHashPaymentSecretZ_clone(orig: &C2Tuple_PaymentHashPaymentSecretZ) -> C2Tuple_PaymentHashPaymentSecretZ { Clone::clone(&orig) }
 /// Creates a new C2Tuple_PaymentHashPaymentSecretZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_PaymentHashPaymentSecretZ_new(a: crate::c_types::ThirtyTwoBytes, b: crate::c_types::ThirtyTwoBytes) -> C2Tuple_PaymentHashPaymentSecretZ {
@@ -4523,7 +4725,7 @@ impl Clone for CResult_PaymentSecretAPIErrorZ {
 #[no_mangle]
 /// Creates a new CResult_PaymentSecretAPIErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_PaymentSecretAPIErrorZ_clone(orig: &CResult_PaymentSecretAPIErrorZ) -> CResult_PaymentSecretAPIErrorZ { orig.clone() }
+pub extern "C" fn CResult_PaymentSecretAPIErrorZ_clone(orig: &CResult_PaymentSecretAPIErrorZ) -> CResult_PaymentSecretAPIErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::lightning::chain::channelmonitor::ChannelMonitors of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -4756,7 +4958,7 @@ impl Clone for CResult_ChannelConfigDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ChannelConfigDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ChannelConfigDecodeErrorZ_clone(orig: &CResult_ChannelConfigDecodeErrorZ) -> CResult_ChannelConfigDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ChannelConfigDecodeErrorZ_clone(orig: &CResult_ChannelConfigDecodeErrorZ) -> CResult_ChannelConfigDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_OutPointDecodeErrorZ
 pub union CResult_OutPointDecodeErrorZPtr {
@@ -4847,7 +5049,113 @@ impl Clone for CResult_OutPointDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_OutPointDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_OutPointDecodeErrorZ_clone(orig: &CResult_OutPointDecodeErrorZ) -> CResult_OutPointDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_OutPointDecodeErrorZ_clone(orig: &CResult_OutPointDecodeErrorZ) -> CResult_OutPointDecodeErrorZ { Clone::clone(&orig) }
+#[repr(C)]
+/// An enum which can either contain a crate::lightning::ln::wire::Type or not
+pub enum COption_TypeZ {
+	/// When we're in this state, this COption_TypeZ contains a crate::lightning::ln::wire::Type
+	Some(crate::lightning::ln::wire::Type),
+	/// When we're in this state, this COption_TypeZ contains nothing
+	None
+}
+impl COption_TypeZ {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> crate::lightning::ln::wire::Type {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+/// Constructs a new COption_TypeZ containing a crate::lightning::ln::wire::Type
+pub extern "C" fn COption_TypeZ_some(o: crate::lightning::ln::wire::Type) -> COption_TypeZ {
+	COption_TypeZ::Some(o)
+}
+#[no_mangle]
+/// Constructs a new COption_TypeZ containing nothing
+pub extern "C" fn COption_TypeZ_none() -> COption_TypeZ {
+	COption_TypeZ::None
+}
+#[no_mangle]
+/// Frees any resources associated with the crate::lightning::ln::wire::Type, if we are in the Some state
+pub extern "C" fn COption_TypeZ_free(_res: COption_TypeZ) { }
+#[repr(C)]
+/// The contents of CResult_COption_TypeZDecodeErrorZ
+pub union CResult_COption_TypeZDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::c_types::derived::COption_TypeZ,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_COption_TypeZDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::COption_TypeZ on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_COption_TypeZDecodeErrorZ {
+	/// The contents of this CResult_COption_TypeZDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_COption_TypeZDecodeErrorZPtr,
+	/// Whether this CResult_COption_TypeZDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_COption_TypeZDecodeErrorZ in the success state.
+pub extern "C" fn CResult_COption_TypeZDecodeErrorZ_ok(o: crate::c_types::derived::COption_TypeZ) -> CResult_COption_TypeZDecodeErrorZ {
+	CResult_COption_TypeZDecodeErrorZ {
+		contents: CResult_COption_TypeZDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_COption_TypeZDecodeErrorZ in the error state.
+pub extern "C" fn CResult_COption_TypeZDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_COption_TypeZDecodeErrorZ {
+	CResult_COption_TypeZDecodeErrorZ {
+		contents: CResult_COption_TypeZDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_COption_TypeZDecodeErrorZ.
+pub extern "C" fn CResult_COption_TypeZDecodeErrorZ_free(_res: CResult_COption_TypeZDecodeErrorZ) { }
+impl Drop for CResult_COption_TypeZDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::c_types::derived::COption_TypeZ, crate::lightning::ln::msgs::DecodeError>> for CResult_COption_TypeZDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::COption_TypeZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_COption_TypeZDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_COption_TypeZDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
 #[repr(C)]
 /// The contents of CResult_SiPrefixNoneZ
 pub union CResult_SiPrefixNoneZPtr {
@@ -4934,7 +5242,7 @@ impl Clone for CResult_SiPrefixNoneZ {
 #[no_mangle]
 /// Creates a new CResult_SiPrefixNoneZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_SiPrefixNoneZ_clone(orig: &CResult_SiPrefixNoneZ) -> CResult_SiPrefixNoneZ { orig.clone() }
+pub extern "C" fn CResult_SiPrefixNoneZ_clone(orig: &CResult_SiPrefixNoneZ) -> CResult_SiPrefixNoneZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_InvoiceNoneZ
 pub union CResult_InvoiceNoneZPtr {
@@ -5021,7 +5329,7 @@ impl Clone for CResult_InvoiceNoneZ {
 #[no_mangle]
 /// Creates a new CResult_InvoiceNoneZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_InvoiceNoneZ_clone(orig: &CResult_InvoiceNoneZ) -> CResult_InvoiceNoneZ { orig.clone() }
+pub extern "C" fn CResult_InvoiceNoneZ_clone(orig: &CResult_InvoiceNoneZ) -> CResult_InvoiceNoneZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_SignedRawInvoiceNoneZ
 pub union CResult_SignedRawInvoiceNoneZPtr {
@@ -5108,7 +5416,7 @@ impl Clone for CResult_SignedRawInvoiceNoneZ {
 #[no_mangle]
 /// Creates a new CResult_SignedRawInvoiceNoneZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_SignedRawInvoiceNoneZ_clone(orig: &CResult_SignedRawInvoiceNoneZ) -> CResult_SignedRawInvoiceNoneZ { orig.clone() }
+pub extern "C" fn CResult_SignedRawInvoiceNoneZ_clone(orig: &CResult_SignedRawInvoiceNoneZ) -> CResult_SignedRawInvoiceNoneZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A tuple of 3 elements. See the individual fields for the types contained.
 pub struct C3Tuple_RawInvoice_u832InvoiceSignatureZ {
@@ -5136,16 +5444,16 @@ impl C3Tuple_RawInvoice_u832InvoiceSignatureZ {
 impl Clone for C3Tuple_RawInvoice_u832InvoiceSignatureZ {
 	fn clone(&self) -> Self {
 		Self {
-			a: self.a.clone(),
-			b: self.b.clone(),
-			c: self.c.clone(),
+			a: Clone::clone(&self.a),
+			b: Clone::clone(&self.b),
+			c: Clone::clone(&self.c),
 		}
 	}
 }
 #[no_mangle]
 /// Creates a new tuple which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C3Tuple_RawInvoice_u832InvoiceSignatureZ_clone(orig: &C3Tuple_RawInvoice_u832InvoiceSignatureZ) -> C3Tuple_RawInvoice_u832InvoiceSignatureZ { orig.clone() }
+pub extern "C" fn C3Tuple_RawInvoice_u832InvoiceSignatureZ_clone(orig: &C3Tuple_RawInvoice_u832InvoiceSignatureZ) -> C3Tuple_RawInvoice_u832InvoiceSignatureZ { Clone::clone(&orig) }
 /// Creates a new C3Tuple_RawInvoice_u832InvoiceSignatureZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C3Tuple_RawInvoice_u832InvoiceSignatureZ_new(a: crate::lightning_invoice::RawInvoice, b: crate::c_types::ThirtyTwoBytes, c: crate::lightning_invoice::InvoiceSignature) -> C3Tuple_RawInvoice_u832InvoiceSignatureZ {
@@ -5245,7 +5553,7 @@ impl Clone for CResult_PayeePubKeyErrorZ {
 #[no_mangle]
 /// Creates a new CResult_PayeePubKeyErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_PayeePubKeyErrorZ_clone(orig: &CResult_PayeePubKeyErrorZ) -> CResult_PayeePubKeyErrorZ { orig.clone() }
+pub extern "C" fn CResult_PayeePubKeyErrorZ_clone(orig: &CResult_PayeePubKeyErrorZ) -> CResult_PayeePubKeyErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::lightning_invoice::PrivateRoutes of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -5382,7 +5690,7 @@ impl Clone for CResult_PositiveTimestampCreationErrorZ {
 #[no_mangle]
 /// Creates a new CResult_PositiveTimestampCreationErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_PositiveTimestampCreationErrorZ_clone(orig: &CResult_PositiveTimestampCreationErrorZ) -> CResult_PositiveTimestampCreationErrorZ { orig.clone() }
+pub extern "C" fn CResult_PositiveTimestampCreationErrorZ_clone(orig: &CResult_PositiveTimestampCreationErrorZ) -> CResult_PositiveTimestampCreationErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_NoneSemanticErrorZ
 pub union CResult_NoneSemanticErrorZPtr {
@@ -5469,7 +5777,7 @@ impl Clone for CResult_NoneSemanticErrorZ {
 #[no_mangle]
 /// Creates a new CResult_NoneSemanticErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NoneSemanticErrorZ_clone(orig: &CResult_NoneSemanticErrorZ) -> CResult_NoneSemanticErrorZ { orig.clone() }
+pub extern "C" fn CResult_NoneSemanticErrorZ_clone(orig: &CResult_NoneSemanticErrorZ) -> CResult_NoneSemanticErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_InvoiceSemanticErrorZ
 pub union CResult_InvoiceSemanticErrorZPtr {
@@ -5560,7 +5868,7 @@ impl Clone for CResult_InvoiceSemanticErrorZ {
 #[no_mangle]
 /// Creates a new CResult_InvoiceSemanticErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_InvoiceSemanticErrorZ_clone(orig: &CResult_InvoiceSemanticErrorZ) -> CResult_InvoiceSemanticErrorZ { orig.clone() }
+pub extern "C" fn CResult_InvoiceSemanticErrorZ_clone(orig: &CResult_InvoiceSemanticErrorZ) -> CResult_InvoiceSemanticErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_DescriptionCreationErrorZ
 pub union CResult_DescriptionCreationErrorZPtr {
@@ -5651,7 +5959,7 @@ impl Clone for CResult_DescriptionCreationErrorZ {
 #[no_mangle]
 /// Creates a new CResult_DescriptionCreationErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_DescriptionCreationErrorZ_clone(orig: &CResult_DescriptionCreationErrorZ) -> CResult_DescriptionCreationErrorZ { orig.clone() }
+pub extern "C" fn CResult_DescriptionCreationErrorZ_clone(orig: &CResult_DescriptionCreationErrorZ) -> CResult_DescriptionCreationErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ExpiryTimeCreationErrorZ
 pub union CResult_ExpiryTimeCreationErrorZPtr {
@@ -5742,7 +6050,7 @@ impl Clone for CResult_ExpiryTimeCreationErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ExpiryTimeCreationErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ExpiryTimeCreationErrorZ_clone(orig: &CResult_ExpiryTimeCreationErrorZ) -> CResult_ExpiryTimeCreationErrorZ { orig.clone() }
+pub extern "C" fn CResult_ExpiryTimeCreationErrorZ_clone(orig: &CResult_ExpiryTimeCreationErrorZ) -> CResult_ExpiryTimeCreationErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_PrivateRouteCreationErrorZ
 pub union CResult_PrivateRouteCreationErrorZPtr {
@@ -5833,7 +6141,7 @@ impl Clone for CResult_PrivateRouteCreationErrorZ {
 #[no_mangle]
 /// Creates a new CResult_PrivateRouteCreationErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_PrivateRouteCreationErrorZ_clone(orig: &CResult_PrivateRouteCreationErrorZ) -> CResult_PrivateRouteCreationErrorZ { orig.clone() }
+pub extern "C" fn CResult_PrivateRouteCreationErrorZ_clone(orig: &CResult_PrivateRouteCreationErrorZ) -> CResult_PrivateRouteCreationErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_StringErrorZ
 pub union CResult_StringErrorZPtr {
@@ -5998,7 +6306,7 @@ impl Clone for CResult_ChannelMonitorUpdateDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ChannelMonitorUpdateDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_clone(orig: &CResult_ChannelMonitorUpdateDecodeErrorZ) -> CResult_ChannelMonitorUpdateDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_clone(orig: &CResult_ChannelMonitorUpdateDecodeErrorZ) -> CResult_ChannelMonitorUpdateDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_HTLCUpdateDecodeErrorZ
 pub union CResult_HTLCUpdateDecodeErrorZPtr {
@@ -6089,7 +6397,7 @@ impl Clone for CResult_HTLCUpdateDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_HTLCUpdateDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_HTLCUpdateDecodeErrorZ_clone(orig: &CResult_HTLCUpdateDecodeErrorZ) -> CResult_HTLCUpdateDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_HTLCUpdateDecodeErrorZ_clone(orig: &CResult_HTLCUpdateDecodeErrorZ) -> CResult_HTLCUpdateDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_NoneMonitorUpdateErrorZ
 pub union CResult_NoneMonitorUpdateErrorZPtr {
@@ -6176,7 +6484,7 @@ impl Clone for CResult_NoneMonitorUpdateErrorZ {
 #[no_mangle]
 /// Creates a new CResult_NoneMonitorUpdateErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NoneMonitorUpdateErrorZ_clone(orig: &CResult_NoneMonitorUpdateErrorZ) -> CResult_NoneMonitorUpdateErrorZ { orig.clone() }
+pub extern "C" fn CResult_NoneMonitorUpdateErrorZ_clone(orig: &CResult_NoneMonitorUpdateErrorZ) -> CResult_NoneMonitorUpdateErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_OutPointScriptZ {
@@ -6201,15 +6509,15 @@ impl C2Tuple_OutPointScriptZ {
 impl Clone for C2Tuple_OutPointScriptZ {
 	fn clone(&self) -> Self {
 		Self {
-			a: self.a.clone(),
-			b: self.b.clone(),
+			a: Clone::clone(&self.a),
+			b: Clone::clone(&self.b),
 		}
 	}
 }
 #[no_mangle]
 /// Creates a new tuple which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C2Tuple_OutPointScriptZ_clone(orig: &C2Tuple_OutPointScriptZ) -> C2Tuple_OutPointScriptZ { orig.clone() }
+pub extern "C" fn C2Tuple_OutPointScriptZ_clone(orig: &C2Tuple_OutPointScriptZ) -> C2Tuple_OutPointScriptZ { Clone::clone(&orig) }
 /// Creates a new C2Tuple_OutPointScriptZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_OutPointScriptZ_new(a: crate::lightning::chain::transaction::OutPoint, b: crate::c_types::derived::CVec_u8Z) -> C2Tuple_OutPointScriptZ {
@@ -6243,15 +6551,15 @@ impl C2Tuple_u32ScriptZ {
 impl Clone for C2Tuple_u32ScriptZ {
 	fn clone(&self) -> Self {
 		Self {
-			a: self.a.clone(),
-			b: self.b.clone(),
+			a: Clone::clone(&self.a),
+			b: Clone::clone(&self.b),
 		}
 	}
 }
 #[no_mangle]
 /// Creates a new tuple which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C2Tuple_u32ScriptZ_clone(orig: &C2Tuple_u32ScriptZ) -> C2Tuple_u32ScriptZ { orig.clone() }
+pub extern "C" fn C2Tuple_u32ScriptZ_clone(orig: &C2Tuple_u32ScriptZ) -> C2Tuple_u32ScriptZ { Clone::clone(&orig) }
 /// Creates a new C2Tuple_u32ScriptZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_u32ScriptZ_new(a: u32, b: crate::c_types::derived::CVec_u8Z) -> C2Tuple_u32ScriptZ {
@@ -6331,15 +6639,15 @@ impl C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
 impl Clone for C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
 	fn clone(&self) -> Self {
 		Self {
-			a: self.a.clone(),
-			b: self.b.clone(),
+			a: Clone::clone(&self.a),
+			b: Clone::clone(&self.b),
 		}
 	}
 }
 #[no_mangle]
 /// Creates a new tuple which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ_clone(orig: &C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ) -> C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ { orig.clone() }
+pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ_clone(orig: &C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ) -> C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ { Clone::clone(&orig) }
 /// Creates a new C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ_new(a: crate::c_types::ThirtyTwoBytes, b: crate::c_types::derived::CVec_C2Tuple_u32ScriptZZ) -> C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ {
@@ -6511,15 +6819,15 @@ impl C2Tuple_u32TxOutZ {
 impl Clone for C2Tuple_u32TxOutZ {
 	fn clone(&self) -> Self {
 		Self {
-			a: self.a.clone(),
-			b: self.b.clone(),
+			a: Clone::clone(&self.a),
+			b: Clone::clone(&self.b),
 		}
 	}
 }
 #[no_mangle]
 /// Creates a new tuple which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C2Tuple_u32TxOutZ_clone(orig: &C2Tuple_u32TxOutZ) -> C2Tuple_u32TxOutZ { orig.clone() }
+pub extern "C" fn C2Tuple_u32TxOutZ_clone(orig: &C2Tuple_u32TxOutZ) -> C2Tuple_u32TxOutZ { Clone::clone(&orig) }
 /// Creates a new C2Tuple_u32TxOutZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_u32TxOutZ_new(a: u32, b: crate::c_types::TxOut) -> C2Tuple_u32TxOutZ {
@@ -6599,15 +6907,15 @@ impl C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ {
 impl Clone for C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ {
 	fn clone(&self) -> Self {
 		Self {
-			a: self.a.clone(),
-			b: self.b.clone(),
+			a: Clone::clone(&self.a),
+			b: Clone::clone(&self.b),
 		}
 	}
 }
 #[no_mangle]
 /// Creates a new tuple which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ_clone(orig: &C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ) -> C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ { orig.clone() }
+pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ_clone(orig: &C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ) -> C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ { Clone::clone(&orig) }
 /// Creates a new C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ_new(a: crate::c_types::ThirtyTwoBytes, b: crate::c_types::derived::CVec_C2Tuple_u32TxOutZZ) -> C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ {
@@ -6656,6 +6964,52 @@ impl Drop for CVec_TransactionOutputsZ {
 	}
 }
 impl Clone for CVec_TransactionOutputsZ {
+	fn clone(&self) -> Self {
+		let mut res = Vec::new();
+		if self.datalen == 0 { return Self::from(res); }
+		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		Self::from(res)
+	}
+}
+#[repr(C)]
+/// A dynamically-allocated array of crate::lightning::chain::channelmonitor::Balances of arbitrary size.
+/// This corresponds to std::vector in C++
+pub struct CVec_BalanceZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+	pub data: *mut crate::lightning::chain::channelmonitor::Balance,
+	/// The number of elements pointed to by `data`.
+	pub datalen: usize
+}
+impl CVec_BalanceZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::chain::channelmonitor::Balance> {
+		if self.datalen == 0 { return Vec::new(); }
+		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = std::ptr::null_mut();
+		self.datalen = 0;
+		ret
+	}
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::chain::channelmonitor::Balance] {
+		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+	}
+}
+impl From<Vec<crate::lightning::chain::channelmonitor::Balance>> for CVec_BalanceZ {
+	fn from(v: Vec<crate::lightning::chain::channelmonitor::Balance>) -> Self {
+		let datalen = v.len();
+		let data = Box::into_raw(v.into_boxed_slice());
+		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
+	}
+}
+#[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
+pub extern "C" fn CVec_BalanceZ_free(_res: CVec_BalanceZ) { }
+impl Drop for CVec_BalanceZ {
+	fn drop(&mut self) {
+		if self.datalen == 0 { return; }
+		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+	}
+}
+impl Clone for CVec_BalanceZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
@@ -6735,6 +7089,161 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_BlockHas
 			contents,
 			result_ok: o.result_ok,
 		}
+	}
+}
+#[repr(C)]
+/// The contents of CResult_NoneLightningErrorZ
+pub union CResult_NoneLightningErrorZPtr {
+	/// Note that this value is always NULL, as there are no contents in the OK variant
+	pub result: *mut std::ffi::c_void,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::LightningError,
+}
+#[repr(C)]
+/// A CResult_NoneLightningErrorZ represents the result of a fallible operation,
+/// containing a () on success and a crate::lightning::ln::msgs::LightningError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_NoneLightningErrorZ {
+	/// The contents of this CResult_NoneLightningErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_NoneLightningErrorZPtr,
+	/// Whether this CResult_NoneLightningErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_NoneLightningErrorZ in the success state.
+pub extern "C" fn CResult_NoneLightningErrorZ_ok() -> CResult_NoneLightningErrorZ {
+	CResult_NoneLightningErrorZ {
+		contents: CResult_NoneLightningErrorZPtr {
+			result: std::ptr::null_mut(),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_NoneLightningErrorZ in the error state.
+pub extern "C" fn CResult_NoneLightningErrorZ_err(e: crate::lightning::ln::msgs::LightningError) -> CResult_NoneLightningErrorZ {
+	CResult_NoneLightningErrorZ {
+		contents: CResult_NoneLightningErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_NoneLightningErrorZ.
+pub extern "C" fn CResult_NoneLightningErrorZ_free(_res: CResult_NoneLightningErrorZ) { }
+impl Drop for CResult_NoneLightningErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<(), crate::lightning::ln::msgs::LightningError>> for CResult_NoneLightningErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<(), crate::lightning::ln::msgs::LightningError>) -> Self {
+		let contents = if o.result_ok {
+			let _ = unsafe { Box::from_raw(o.contents.result) };
+			o.contents.result = std::ptr::null_mut();
+			CResult_NoneLightningErrorZPtr { result: std::ptr::null_mut() }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_NoneLightningErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_NoneLightningErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_NoneLightningErrorZPtr {
+				result: std::ptr::null_mut()
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_NoneLightningErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::LightningError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_NoneLightningErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_NoneLightningErrorZ_clone(orig: &CResult_NoneLightningErrorZ) -> CResult_NoneLightningErrorZ { Clone::clone(&orig) }
+#[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
+pub struct C2Tuple_PublicKeyTypeZ {
+	/// The element at position 0
+	pub a: crate::c_types::PublicKey,
+	/// The element at position 1
+	pub b: crate::lightning::ln::wire::Type,
+}
+impl From<(crate::c_types::PublicKey, crate::lightning::ln::wire::Type)> for C2Tuple_PublicKeyTypeZ {
+	fn from (tup: (crate::c_types::PublicKey, crate::lightning::ln::wire::Type)) -> Self {
+		Self {
+			a: tup.0,
+			b: tup.1,
+		}
+	}
+}
+impl C2Tuple_PublicKeyTypeZ {
+	#[allow(unused)] pub(crate) fn to_rust(mut self) -> (crate::c_types::PublicKey, crate::lightning::ln::wire::Type) {
+		(self.a, self.b)
+	}
+}
+/// Creates a new C2Tuple_PublicKeyTypeZ from the contained elements.
+#[no_mangle]
+pub extern "C" fn C2Tuple_PublicKeyTypeZ_new(a: crate::c_types::PublicKey, b: crate::lightning::ln::wire::Type) -> C2Tuple_PublicKeyTypeZ {
+	C2Tuple_PublicKeyTypeZ { a, b, }
+}
+
+#[no_mangle]
+/// Frees any resources used by the C2Tuple_PublicKeyTypeZ.
+pub extern "C" fn C2Tuple_PublicKeyTypeZ_free(_res: C2Tuple_PublicKeyTypeZ) { }
+#[repr(C)]
+/// A dynamically-allocated array of crate::c_types::derived::C2Tuple_PublicKeyTypeZs of arbitrary size.
+/// This corresponds to std::vector in C++
+pub struct CVec_C2Tuple_PublicKeyTypeZZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+	pub data: *mut crate::c_types::derived::C2Tuple_PublicKeyTypeZ,
+	/// The number of elements pointed to by `data`.
+	pub datalen: usize
+}
+impl CVec_C2Tuple_PublicKeyTypeZZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_PublicKeyTypeZ> {
+		if self.datalen == 0 { return Vec::new(); }
+		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = std::ptr::null_mut();
+		self.datalen = 0;
+		ret
+	}
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_PublicKeyTypeZ] {
+		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+	}
+}
+impl From<Vec<crate::c_types::derived::C2Tuple_PublicKeyTypeZ>> for CVec_C2Tuple_PublicKeyTypeZZ {
+	fn from(v: Vec<crate::c_types::derived::C2Tuple_PublicKeyTypeZ>) -> Self {
+		let datalen = v.len();
+		let data = Box::into_raw(v.into_boxed_slice());
+		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
+	}
+}
+#[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
+pub extern "C" fn CVec_C2Tuple_PublicKeyTypeZZ_free(_res: CVec_C2Tuple_PublicKeyTypeZZ) { }
+impl Drop for CVec_C2Tuple_PublicKeyTypeZZ {
+	fn drop(&mut self) {
+		if self.datalen == 0 { return; }
+		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 #[repr(C)]
@@ -6827,7 +7336,7 @@ impl Clone for CResult_boolLightningErrorZ {
 #[no_mangle]
 /// Creates a new CResult_boolLightningErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_boolLightningErrorZ_clone(orig: &CResult_boolLightningErrorZ) -> CResult_boolLightningErrorZ { orig.clone() }
+pub extern "C" fn CResult_boolLightningErrorZ_clone(orig: &CResult_boolLightningErrorZ) -> CResult_boolLightningErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A tuple of 3 elements. See the individual fields for the types contained.
 pub struct C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ {
@@ -6855,16 +7364,16 @@ impl C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ {
 impl Clone for C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ {
 	fn clone(&self) -> Self {
 		Self {
-			a: self.a.clone(),
-			b: self.b.clone(),
-			c: self.c.clone(),
+			a: Clone::clone(&self.a),
+			b: Clone::clone(&self.b),
+			c: Clone::clone(&self.c),
 		}
 	}
 }
 #[no_mangle]
 /// Creates a new tuple which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ_clone(orig: &C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ) -> C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ { orig.clone() }
+pub extern "C" fn C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ_clone(orig: &C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ) -> C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ { Clone::clone(&orig) }
 /// Creates a new C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ_new(a: crate::lightning::ln::msgs::ChannelAnnouncement, b: crate::lightning::ln::msgs::ChannelUpdate, c: crate::lightning::ln::msgs::ChannelUpdate) -> C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ {
@@ -6966,93 +7475,6 @@ impl Clone for CVec_NodeAnnouncementZ {
 		Self::from(res)
 	}
 }
-#[repr(C)]
-/// The contents of CResult_NoneLightningErrorZ
-pub union CResult_NoneLightningErrorZPtr {
-	/// Note that this value is always NULL, as there are no contents in the OK variant
-	pub result: *mut std::ffi::c_void,
-	/// A pointer to the contents in the error state.
-	/// Reading from this pointer when `result_ok` is set is undefined.
-	pub err: *mut crate::lightning::ln::msgs::LightningError,
-}
-#[repr(C)]
-/// A CResult_NoneLightningErrorZ represents the result of a fallible operation,
-/// containing a () on success and a crate::lightning::ln::msgs::LightningError on failure.
-/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
-pub struct CResult_NoneLightningErrorZ {
-	/// The contents of this CResult_NoneLightningErrorZ, accessible via either
-	/// `err` or `result` depending on the state of `result_ok`.
-	pub contents: CResult_NoneLightningErrorZPtr,
-	/// Whether this CResult_NoneLightningErrorZ represents a success state.
-	pub result_ok: bool,
-}
-#[no_mangle]
-/// Creates a new CResult_NoneLightningErrorZ in the success state.
-pub extern "C" fn CResult_NoneLightningErrorZ_ok() -> CResult_NoneLightningErrorZ {
-	CResult_NoneLightningErrorZ {
-		contents: CResult_NoneLightningErrorZPtr {
-			result: std::ptr::null_mut(),
-		},
-		result_ok: true,
-	}
-}
-#[no_mangle]
-/// Creates a new CResult_NoneLightningErrorZ in the error state.
-pub extern "C" fn CResult_NoneLightningErrorZ_err(e: crate::lightning::ln::msgs::LightningError) -> CResult_NoneLightningErrorZ {
-	CResult_NoneLightningErrorZ {
-		contents: CResult_NoneLightningErrorZPtr {
-			err: Box::into_raw(Box::new(e)),
-		},
-		result_ok: false,
-	}
-}
-#[no_mangle]
-/// Frees any resources used by the CResult_NoneLightningErrorZ.
-pub extern "C" fn CResult_NoneLightningErrorZ_free(_res: CResult_NoneLightningErrorZ) { }
-impl Drop for CResult_NoneLightningErrorZ {
-	fn drop(&mut self) {
-		if self.result_ok {
-		} else {
-			if unsafe { !(self.contents.err as *mut ()).is_null() } {
-				let _ = unsafe { Box::from_raw(self.contents.err) };
-			}
-		}
-	}
-}
-impl From<crate::c_types::CResultTempl<(), crate::lightning::ln::msgs::LightningError>> for CResult_NoneLightningErrorZ {
-	fn from(mut o: crate::c_types::CResultTempl<(), crate::lightning::ln::msgs::LightningError>) -> Self {
-		let contents = if o.result_ok {
-			let _ = unsafe { Box::from_raw(o.contents.result) };
-			o.contents.result = std::ptr::null_mut();
-			CResult_NoneLightningErrorZPtr { result: std::ptr::null_mut() }
-		} else {
-			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
-			CResult_NoneLightningErrorZPtr { err }
-		};
-		Self {
-			contents,
-			result_ok: o.result_ok,
-		}
-	}
-}
-impl Clone for CResult_NoneLightningErrorZ {
-	fn clone(&self) -> Self {
-		if self.result_ok {
-			Self { result_ok: true, contents: CResult_NoneLightningErrorZPtr {
-				result: std::ptr::null_mut()
-			} }
-		} else {
-			Self { result_ok: false, contents: CResult_NoneLightningErrorZPtr {
-				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::LightningError>::clone(unsafe { &*self.contents.err })))
-			} }
-		}
-	}
-}
-#[no_mangle]
-/// Creates a new CResult_NoneLightningErrorZ which has the same data as `orig`
-/// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NoneLightningErrorZ_clone(orig: &CResult_NoneLightningErrorZ) -> CResult_NoneLightningErrorZ { orig.clone() }
 #[repr(C)]
 /// A dynamically-allocated array of crate::c_types::PublicKeys of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -7189,7 +7611,7 @@ impl Clone for CResult_CVec_u8ZPeerHandleErrorZ {
 #[no_mangle]
 /// Creates a new CResult_CVec_u8ZPeerHandleErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_clone(orig: &CResult_CVec_u8ZPeerHandleErrorZ) -> CResult_CVec_u8ZPeerHandleErrorZ { orig.clone() }
+pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_clone(orig: &CResult_CVec_u8ZPeerHandleErrorZ) -> CResult_CVec_u8ZPeerHandleErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_NonePeerHandleErrorZ
 pub union CResult_NonePeerHandleErrorZPtr {
@@ -7276,7 +7698,7 @@ impl Clone for CResult_NonePeerHandleErrorZ {
 #[no_mangle]
 /// Creates a new CResult_NonePeerHandleErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NonePeerHandleErrorZ_clone(orig: &CResult_NonePeerHandleErrorZ) -> CResult_NonePeerHandleErrorZ { orig.clone() }
+pub extern "C" fn CResult_NonePeerHandleErrorZ_clone(orig: &CResult_NonePeerHandleErrorZ) -> CResult_NonePeerHandleErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_boolPeerHandleErrorZ
 pub union CResult_boolPeerHandleErrorZPtr {
@@ -7367,7 +7789,39 @@ impl Clone for CResult_boolPeerHandleErrorZ {
 #[no_mangle]
 /// Creates a new CResult_boolPeerHandleErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_boolPeerHandleErrorZ_clone(orig: &CResult_boolPeerHandleErrorZ) -> CResult_boolPeerHandleErrorZ { orig.clone() }
+pub extern "C" fn CResult_boolPeerHandleErrorZ_clone(orig: &CResult_boolPeerHandleErrorZ) -> CResult_boolPeerHandleErrorZ { Clone::clone(&orig) }
+#[repr(C)]
+/// An enum which can either contain a crate::lightning::chain::Access or not
+pub enum COption_AccessZ {
+	/// When we're in this state, this COption_AccessZ contains a crate::lightning::chain::Access
+	Some(crate::lightning::chain::Access),
+	/// When we're in this state, this COption_AccessZ contains nothing
+	None
+}
+impl COption_AccessZ {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> crate::lightning::chain::Access {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+/// Constructs a new COption_AccessZ containing a crate::lightning::chain::Access
+pub extern "C" fn COption_AccessZ_some(o: crate::lightning::chain::Access) -> COption_AccessZ {
+	COption_AccessZ::Some(o)
+}
+#[no_mangle]
+/// Constructs a new COption_AccessZ containing nothing
+pub extern "C" fn COption_AccessZ_none() -> COption_AccessZ {
+	COption_AccessZ::None
+}
+#[no_mangle]
+/// Frees any resources associated with the crate::lightning::chain::Access, if we are in the Some state
+pub extern "C" fn COption_AccessZ_free(_res: COption_AccessZ) { }
 #[repr(C)]
 /// The contents of CResult_DirectionalChannelInfoDecodeErrorZ
 pub union CResult_DirectionalChannelInfoDecodeErrorZPtr {
@@ -7458,7 +7912,7 @@ impl Clone for CResult_DirectionalChannelInfoDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_DirectionalChannelInfoDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_DirectionalChannelInfoDecodeErrorZ_clone(orig: &CResult_DirectionalChannelInfoDecodeErrorZ) -> CResult_DirectionalChannelInfoDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_DirectionalChannelInfoDecodeErrorZ_clone(orig: &CResult_DirectionalChannelInfoDecodeErrorZ) -> CResult_DirectionalChannelInfoDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ChannelInfoDecodeErrorZ
 pub union CResult_ChannelInfoDecodeErrorZPtr {
@@ -7549,7 +8003,7 @@ impl Clone for CResult_ChannelInfoDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ChannelInfoDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ChannelInfoDecodeErrorZ_clone(orig: &CResult_ChannelInfoDecodeErrorZ) -> CResult_ChannelInfoDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ChannelInfoDecodeErrorZ_clone(orig: &CResult_ChannelInfoDecodeErrorZ) -> CResult_ChannelInfoDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_RoutingFeesDecodeErrorZ
 pub union CResult_RoutingFeesDecodeErrorZPtr {
@@ -7640,7 +8094,7 @@ impl Clone for CResult_RoutingFeesDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_RoutingFeesDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_RoutingFeesDecodeErrorZ_clone(orig: &CResult_RoutingFeesDecodeErrorZ) -> CResult_RoutingFeesDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_RoutingFeesDecodeErrorZ_clone(orig: &CResult_RoutingFeesDecodeErrorZ) -> CResult_RoutingFeesDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_NodeAnnouncementInfoDecodeErrorZ
 pub union CResult_NodeAnnouncementInfoDecodeErrorZPtr {
@@ -7731,7 +8185,7 @@ impl Clone for CResult_NodeAnnouncementInfoDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_NodeAnnouncementInfoDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NodeAnnouncementInfoDecodeErrorZ_clone(orig: &CResult_NodeAnnouncementInfoDecodeErrorZ) -> CResult_NodeAnnouncementInfoDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_NodeAnnouncementInfoDecodeErrorZ_clone(orig: &CResult_NodeAnnouncementInfoDecodeErrorZ) -> CResult_NodeAnnouncementInfoDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of u64s of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -7868,7 +8322,7 @@ impl Clone for CResult_NodeInfoDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_NodeInfoDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NodeInfoDecodeErrorZ_clone(orig: &CResult_NodeInfoDecodeErrorZ) -> CResult_NodeInfoDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_NodeInfoDecodeErrorZ_clone(orig: &CResult_NodeInfoDecodeErrorZ) -> CResult_NodeInfoDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_NetworkGraphDecodeErrorZ
 pub union CResult_NetworkGraphDecodeErrorZPtr {
@@ -7943,23 +8397,6 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::network_graph:
 		}
 	}
 }
-impl Clone for CResult_NetworkGraphDecodeErrorZ {
-	fn clone(&self) -> Self {
-		if self.result_ok {
-			Self { result_ok: true, contents: CResult_NetworkGraphDecodeErrorZPtr {
-				result: Box::into_raw(Box::new(<crate::lightning::routing::network_graph::NetworkGraph>::clone(unsafe { &*self.contents.result })))
-			} }
-		} else {
-			Self { result_ok: false, contents: CResult_NetworkGraphDecodeErrorZPtr {
-				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
-			} }
-		}
-	}
-}
-#[no_mangle]
-/// Creates a new CResult_NetworkGraphDecodeErrorZ which has the same data as `orig`
-/// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NetworkGraphDecodeErrorZ_clone(orig: &CResult_NetworkGraphDecodeErrorZ) -> CResult_NetworkGraphDecodeErrorZ { orig.clone() }
 #[repr(C)]
 /// The contents of CResult_NetAddressu8Z
 pub union CResult_NetAddressu8ZPtr {
@@ -8050,7 +8487,7 @@ impl Clone for CResult_NetAddressu8Z {
 #[no_mangle]
 /// Creates a new CResult_NetAddressu8Z which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NetAddressu8Z_clone(orig: &CResult_NetAddressu8Z) -> CResult_NetAddressu8Z { orig.clone() }
+pub extern "C" fn CResult_NetAddressu8Z_clone(orig: &CResult_NetAddressu8Z) -> CResult_NetAddressu8Z { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_CResult_NetAddressu8ZDecodeErrorZ
 pub union CResult_CResult_NetAddressu8ZDecodeErrorZPtr {
@@ -8141,7 +8578,7 @@ impl Clone for CResult_CResult_NetAddressu8ZDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_CResult_NetAddressu8ZDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_CResult_NetAddressu8ZDecodeErrorZ_clone(orig: &CResult_CResult_NetAddressu8ZDecodeErrorZ) -> CResult_CResult_NetAddressu8ZDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_CResult_NetAddressu8ZDecodeErrorZ_clone(orig: &CResult_CResult_NetAddressu8ZDecodeErrorZ) -> CResult_CResult_NetAddressu8ZDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_NetAddressDecodeErrorZ
 pub union CResult_NetAddressDecodeErrorZPtr {
@@ -8232,7 +8669,7 @@ impl Clone for CResult_NetAddressDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_NetAddressDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NetAddressDecodeErrorZ_clone(orig: &CResult_NetAddressDecodeErrorZ) -> CResult_NetAddressDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_NetAddressDecodeErrorZ_clone(orig: &CResult_NetAddressDecodeErrorZ) -> CResult_NetAddressDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::lightning::ln::msgs::UpdateAddHTLCs of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -8507,7 +8944,7 @@ impl Clone for CResult_AcceptChannelDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_AcceptChannelDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_AcceptChannelDecodeErrorZ_clone(orig: &CResult_AcceptChannelDecodeErrorZ) -> CResult_AcceptChannelDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_AcceptChannelDecodeErrorZ_clone(orig: &CResult_AcceptChannelDecodeErrorZ) -> CResult_AcceptChannelDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_AnnouncementSignaturesDecodeErrorZ
 pub union CResult_AnnouncementSignaturesDecodeErrorZPtr {
@@ -8598,7 +9035,7 @@ impl Clone for CResult_AnnouncementSignaturesDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_AnnouncementSignaturesDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_AnnouncementSignaturesDecodeErrorZ_clone(orig: &CResult_AnnouncementSignaturesDecodeErrorZ) -> CResult_AnnouncementSignaturesDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_AnnouncementSignaturesDecodeErrorZ_clone(orig: &CResult_AnnouncementSignaturesDecodeErrorZ) -> CResult_AnnouncementSignaturesDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ChannelReestablishDecodeErrorZ
 pub union CResult_ChannelReestablishDecodeErrorZPtr {
@@ -8689,7 +9126,7 @@ impl Clone for CResult_ChannelReestablishDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ChannelReestablishDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ChannelReestablishDecodeErrorZ_clone(orig: &CResult_ChannelReestablishDecodeErrorZ) -> CResult_ChannelReestablishDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ChannelReestablishDecodeErrorZ_clone(orig: &CResult_ChannelReestablishDecodeErrorZ) -> CResult_ChannelReestablishDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ClosingSignedDecodeErrorZ
 pub union CResult_ClosingSignedDecodeErrorZPtr {
@@ -8780,7 +9217,7 @@ impl Clone for CResult_ClosingSignedDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ClosingSignedDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ClosingSignedDecodeErrorZ_clone(orig: &CResult_ClosingSignedDecodeErrorZ) -> CResult_ClosingSignedDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ClosingSignedDecodeErrorZ_clone(orig: &CResult_ClosingSignedDecodeErrorZ) -> CResult_ClosingSignedDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ClosingSignedFeeRangeDecodeErrorZ
 pub union CResult_ClosingSignedFeeRangeDecodeErrorZPtr {
@@ -8871,7 +9308,7 @@ impl Clone for CResult_ClosingSignedFeeRangeDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ClosingSignedFeeRangeDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ClosingSignedFeeRangeDecodeErrorZ_clone(orig: &CResult_ClosingSignedFeeRangeDecodeErrorZ) -> CResult_ClosingSignedFeeRangeDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ClosingSignedFeeRangeDecodeErrorZ_clone(orig: &CResult_ClosingSignedFeeRangeDecodeErrorZ) -> CResult_ClosingSignedFeeRangeDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_CommitmentSignedDecodeErrorZ
 pub union CResult_CommitmentSignedDecodeErrorZPtr {
@@ -8962,7 +9399,7 @@ impl Clone for CResult_CommitmentSignedDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_CommitmentSignedDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_CommitmentSignedDecodeErrorZ_clone(orig: &CResult_CommitmentSignedDecodeErrorZ) -> CResult_CommitmentSignedDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_CommitmentSignedDecodeErrorZ_clone(orig: &CResult_CommitmentSignedDecodeErrorZ) -> CResult_CommitmentSignedDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_FundingCreatedDecodeErrorZ
 pub union CResult_FundingCreatedDecodeErrorZPtr {
@@ -9053,7 +9490,7 @@ impl Clone for CResult_FundingCreatedDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_FundingCreatedDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_FundingCreatedDecodeErrorZ_clone(orig: &CResult_FundingCreatedDecodeErrorZ) -> CResult_FundingCreatedDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_FundingCreatedDecodeErrorZ_clone(orig: &CResult_FundingCreatedDecodeErrorZ) -> CResult_FundingCreatedDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_FundingSignedDecodeErrorZ
 pub union CResult_FundingSignedDecodeErrorZPtr {
@@ -9144,7 +9581,7 @@ impl Clone for CResult_FundingSignedDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_FundingSignedDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_FundingSignedDecodeErrorZ_clone(orig: &CResult_FundingSignedDecodeErrorZ) -> CResult_FundingSignedDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_FundingSignedDecodeErrorZ_clone(orig: &CResult_FundingSignedDecodeErrorZ) -> CResult_FundingSignedDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_FundingLockedDecodeErrorZ
 pub union CResult_FundingLockedDecodeErrorZPtr {
@@ -9235,7 +9672,7 @@ impl Clone for CResult_FundingLockedDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_FundingLockedDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_FundingLockedDecodeErrorZ_clone(orig: &CResult_FundingLockedDecodeErrorZ) -> CResult_FundingLockedDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_FundingLockedDecodeErrorZ_clone(orig: &CResult_FundingLockedDecodeErrorZ) -> CResult_FundingLockedDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_InitDecodeErrorZ
 pub union CResult_InitDecodeErrorZPtr {
@@ -9326,7 +9763,7 @@ impl Clone for CResult_InitDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_InitDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_InitDecodeErrorZ_clone(orig: &CResult_InitDecodeErrorZ) -> CResult_InitDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_InitDecodeErrorZ_clone(orig: &CResult_InitDecodeErrorZ) -> CResult_InitDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_OpenChannelDecodeErrorZ
 pub union CResult_OpenChannelDecodeErrorZPtr {
@@ -9417,7 +9854,7 @@ impl Clone for CResult_OpenChannelDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_OpenChannelDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_OpenChannelDecodeErrorZ_clone(orig: &CResult_OpenChannelDecodeErrorZ) -> CResult_OpenChannelDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_OpenChannelDecodeErrorZ_clone(orig: &CResult_OpenChannelDecodeErrorZ) -> CResult_OpenChannelDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_RevokeAndACKDecodeErrorZ
 pub union CResult_RevokeAndACKDecodeErrorZPtr {
@@ -9508,7 +9945,7 @@ impl Clone for CResult_RevokeAndACKDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_RevokeAndACKDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_RevokeAndACKDecodeErrorZ_clone(orig: &CResult_RevokeAndACKDecodeErrorZ) -> CResult_RevokeAndACKDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_RevokeAndACKDecodeErrorZ_clone(orig: &CResult_RevokeAndACKDecodeErrorZ) -> CResult_RevokeAndACKDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ShutdownDecodeErrorZ
 pub union CResult_ShutdownDecodeErrorZPtr {
@@ -9599,7 +10036,7 @@ impl Clone for CResult_ShutdownDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ShutdownDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ShutdownDecodeErrorZ_clone(orig: &CResult_ShutdownDecodeErrorZ) -> CResult_ShutdownDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ShutdownDecodeErrorZ_clone(orig: &CResult_ShutdownDecodeErrorZ) -> CResult_ShutdownDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_UpdateFailHTLCDecodeErrorZ
 pub union CResult_UpdateFailHTLCDecodeErrorZPtr {
@@ -9690,7 +10127,7 @@ impl Clone for CResult_UpdateFailHTLCDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_UpdateFailHTLCDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_UpdateFailHTLCDecodeErrorZ_clone(orig: &CResult_UpdateFailHTLCDecodeErrorZ) -> CResult_UpdateFailHTLCDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_UpdateFailHTLCDecodeErrorZ_clone(orig: &CResult_UpdateFailHTLCDecodeErrorZ) -> CResult_UpdateFailHTLCDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_UpdateFailMalformedHTLCDecodeErrorZ
 pub union CResult_UpdateFailMalformedHTLCDecodeErrorZPtr {
@@ -9781,7 +10218,7 @@ impl Clone for CResult_UpdateFailMalformedHTLCDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_UpdateFailMalformedHTLCDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_UpdateFailMalformedHTLCDecodeErrorZ_clone(orig: &CResult_UpdateFailMalformedHTLCDecodeErrorZ) -> CResult_UpdateFailMalformedHTLCDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_UpdateFailMalformedHTLCDecodeErrorZ_clone(orig: &CResult_UpdateFailMalformedHTLCDecodeErrorZ) -> CResult_UpdateFailMalformedHTLCDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_UpdateFeeDecodeErrorZ
 pub union CResult_UpdateFeeDecodeErrorZPtr {
@@ -9872,7 +10309,7 @@ impl Clone for CResult_UpdateFeeDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_UpdateFeeDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_UpdateFeeDecodeErrorZ_clone(orig: &CResult_UpdateFeeDecodeErrorZ) -> CResult_UpdateFeeDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_UpdateFeeDecodeErrorZ_clone(orig: &CResult_UpdateFeeDecodeErrorZ) -> CResult_UpdateFeeDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_UpdateFulfillHTLCDecodeErrorZ
 pub union CResult_UpdateFulfillHTLCDecodeErrorZPtr {
@@ -9963,7 +10400,7 @@ impl Clone for CResult_UpdateFulfillHTLCDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_UpdateFulfillHTLCDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_UpdateFulfillHTLCDecodeErrorZ_clone(orig: &CResult_UpdateFulfillHTLCDecodeErrorZ) -> CResult_UpdateFulfillHTLCDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_UpdateFulfillHTLCDecodeErrorZ_clone(orig: &CResult_UpdateFulfillHTLCDecodeErrorZ) -> CResult_UpdateFulfillHTLCDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_UpdateAddHTLCDecodeErrorZ
 pub union CResult_UpdateAddHTLCDecodeErrorZPtr {
@@ -10054,7 +10491,7 @@ impl Clone for CResult_UpdateAddHTLCDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_UpdateAddHTLCDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_UpdateAddHTLCDecodeErrorZ_clone(orig: &CResult_UpdateAddHTLCDecodeErrorZ) -> CResult_UpdateAddHTLCDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_UpdateAddHTLCDecodeErrorZ_clone(orig: &CResult_UpdateAddHTLCDecodeErrorZ) -> CResult_UpdateAddHTLCDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_PingDecodeErrorZ
 pub union CResult_PingDecodeErrorZPtr {
@@ -10145,7 +10582,7 @@ impl Clone for CResult_PingDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_PingDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_PingDecodeErrorZ_clone(orig: &CResult_PingDecodeErrorZ) -> CResult_PingDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_PingDecodeErrorZ_clone(orig: &CResult_PingDecodeErrorZ) -> CResult_PingDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_PongDecodeErrorZ
 pub union CResult_PongDecodeErrorZPtr {
@@ -10236,7 +10673,7 @@ impl Clone for CResult_PongDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_PongDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_PongDecodeErrorZ_clone(orig: &CResult_PongDecodeErrorZ) -> CResult_PongDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_PongDecodeErrorZ_clone(orig: &CResult_PongDecodeErrorZ) -> CResult_PongDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_UnsignedChannelAnnouncementDecodeErrorZ
 pub union CResult_UnsignedChannelAnnouncementDecodeErrorZPtr {
@@ -10327,7 +10764,7 @@ impl Clone for CResult_UnsignedChannelAnnouncementDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_UnsignedChannelAnnouncementDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_UnsignedChannelAnnouncementDecodeErrorZ_clone(orig: &CResult_UnsignedChannelAnnouncementDecodeErrorZ) -> CResult_UnsignedChannelAnnouncementDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_UnsignedChannelAnnouncementDecodeErrorZ_clone(orig: &CResult_UnsignedChannelAnnouncementDecodeErrorZ) -> CResult_UnsignedChannelAnnouncementDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ChannelAnnouncementDecodeErrorZ
 pub union CResult_ChannelAnnouncementDecodeErrorZPtr {
@@ -10418,7 +10855,7 @@ impl Clone for CResult_ChannelAnnouncementDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ChannelAnnouncementDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ChannelAnnouncementDecodeErrorZ_clone(orig: &CResult_ChannelAnnouncementDecodeErrorZ) -> CResult_ChannelAnnouncementDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ChannelAnnouncementDecodeErrorZ_clone(orig: &CResult_ChannelAnnouncementDecodeErrorZ) -> CResult_ChannelAnnouncementDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_UnsignedChannelUpdateDecodeErrorZ
 pub union CResult_UnsignedChannelUpdateDecodeErrorZPtr {
@@ -10509,7 +10946,7 @@ impl Clone for CResult_UnsignedChannelUpdateDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_UnsignedChannelUpdateDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_UnsignedChannelUpdateDecodeErrorZ_clone(orig: &CResult_UnsignedChannelUpdateDecodeErrorZ) -> CResult_UnsignedChannelUpdateDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_UnsignedChannelUpdateDecodeErrorZ_clone(orig: &CResult_UnsignedChannelUpdateDecodeErrorZ) -> CResult_UnsignedChannelUpdateDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ChannelUpdateDecodeErrorZ
 pub union CResult_ChannelUpdateDecodeErrorZPtr {
@@ -10600,7 +11037,7 @@ impl Clone for CResult_ChannelUpdateDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ChannelUpdateDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ChannelUpdateDecodeErrorZ_clone(orig: &CResult_ChannelUpdateDecodeErrorZ) -> CResult_ChannelUpdateDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ChannelUpdateDecodeErrorZ_clone(orig: &CResult_ChannelUpdateDecodeErrorZ) -> CResult_ChannelUpdateDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ErrorMessageDecodeErrorZ
 pub union CResult_ErrorMessageDecodeErrorZPtr {
@@ -10691,7 +11128,7 @@ impl Clone for CResult_ErrorMessageDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ErrorMessageDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ErrorMessageDecodeErrorZ_clone(orig: &CResult_ErrorMessageDecodeErrorZ) -> CResult_ErrorMessageDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ErrorMessageDecodeErrorZ_clone(orig: &CResult_ErrorMessageDecodeErrorZ) -> CResult_ErrorMessageDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_UnsignedNodeAnnouncementDecodeErrorZ
 pub union CResult_UnsignedNodeAnnouncementDecodeErrorZPtr {
@@ -10782,7 +11219,7 @@ impl Clone for CResult_UnsignedNodeAnnouncementDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_UnsignedNodeAnnouncementDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_UnsignedNodeAnnouncementDecodeErrorZ_clone(orig: &CResult_UnsignedNodeAnnouncementDecodeErrorZ) -> CResult_UnsignedNodeAnnouncementDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_UnsignedNodeAnnouncementDecodeErrorZ_clone(orig: &CResult_UnsignedNodeAnnouncementDecodeErrorZ) -> CResult_UnsignedNodeAnnouncementDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_NodeAnnouncementDecodeErrorZ
 pub union CResult_NodeAnnouncementDecodeErrorZPtr {
@@ -10873,7 +11310,7 @@ impl Clone for CResult_NodeAnnouncementDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_NodeAnnouncementDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_NodeAnnouncementDecodeErrorZ_clone(orig: &CResult_NodeAnnouncementDecodeErrorZ) -> CResult_NodeAnnouncementDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_NodeAnnouncementDecodeErrorZ_clone(orig: &CResult_NodeAnnouncementDecodeErrorZ) -> CResult_NodeAnnouncementDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_QueryShortChannelIdsDecodeErrorZ
 pub union CResult_QueryShortChannelIdsDecodeErrorZPtr {
@@ -10964,7 +11401,7 @@ impl Clone for CResult_QueryShortChannelIdsDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_QueryShortChannelIdsDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_QueryShortChannelIdsDecodeErrorZ_clone(orig: &CResult_QueryShortChannelIdsDecodeErrorZ) -> CResult_QueryShortChannelIdsDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_QueryShortChannelIdsDecodeErrorZ_clone(orig: &CResult_QueryShortChannelIdsDecodeErrorZ) -> CResult_QueryShortChannelIdsDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ReplyShortChannelIdsEndDecodeErrorZ
 pub union CResult_ReplyShortChannelIdsEndDecodeErrorZPtr {
@@ -11055,7 +11492,7 @@ impl Clone for CResult_ReplyShortChannelIdsEndDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ReplyShortChannelIdsEndDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ReplyShortChannelIdsEndDecodeErrorZ_clone(orig: &CResult_ReplyShortChannelIdsEndDecodeErrorZ) -> CResult_ReplyShortChannelIdsEndDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ReplyShortChannelIdsEndDecodeErrorZ_clone(orig: &CResult_ReplyShortChannelIdsEndDecodeErrorZ) -> CResult_ReplyShortChannelIdsEndDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_QueryChannelRangeDecodeErrorZ
 pub union CResult_QueryChannelRangeDecodeErrorZPtr {
@@ -11146,7 +11583,7 @@ impl Clone for CResult_QueryChannelRangeDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_QueryChannelRangeDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_QueryChannelRangeDecodeErrorZ_clone(orig: &CResult_QueryChannelRangeDecodeErrorZ) -> CResult_QueryChannelRangeDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_QueryChannelRangeDecodeErrorZ_clone(orig: &CResult_QueryChannelRangeDecodeErrorZ) -> CResult_QueryChannelRangeDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_ReplyChannelRangeDecodeErrorZ
 pub union CResult_ReplyChannelRangeDecodeErrorZPtr {
@@ -11237,7 +11674,7 @@ impl Clone for CResult_ReplyChannelRangeDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_ReplyChannelRangeDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_ReplyChannelRangeDecodeErrorZ_clone(orig: &CResult_ReplyChannelRangeDecodeErrorZ) -> CResult_ReplyChannelRangeDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_ReplyChannelRangeDecodeErrorZ_clone(orig: &CResult_ReplyChannelRangeDecodeErrorZ) -> CResult_ReplyChannelRangeDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_GossipTimestampFilterDecodeErrorZ
 pub union CResult_GossipTimestampFilterDecodeErrorZPtr {
@@ -11328,7 +11765,7 @@ impl Clone for CResult_GossipTimestampFilterDecodeErrorZ {
 #[no_mangle]
 /// Creates a new CResult_GossipTimestampFilterDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_GossipTimestampFilterDecodeErrorZ_clone(orig: &CResult_GossipTimestampFilterDecodeErrorZ) -> CResult_GossipTimestampFilterDecodeErrorZ { orig.clone() }
+pub extern "C" fn CResult_GossipTimestampFilterDecodeErrorZ_clone(orig: &CResult_GossipTimestampFilterDecodeErrorZ) -> CResult_GossipTimestampFilterDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_InvoiceSignOrCreationErrorZ
 pub union CResult_InvoiceSignOrCreationErrorZPtr {
@@ -11419,4 +11856,36 @@ impl Clone for CResult_InvoiceSignOrCreationErrorZ {
 #[no_mangle]
 /// Creates a new CResult_InvoiceSignOrCreationErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_InvoiceSignOrCreationErrorZ_clone(orig: &CResult_InvoiceSignOrCreationErrorZ) -> CResult_InvoiceSignOrCreationErrorZ { orig.clone() }
+pub extern "C" fn CResult_InvoiceSignOrCreationErrorZ_clone(orig: &CResult_InvoiceSignOrCreationErrorZ) -> CResult_InvoiceSignOrCreationErrorZ { Clone::clone(&orig) }
+#[repr(C)]
+/// An enum which can either contain a crate::lightning::chain::Filter or not
+pub enum COption_FilterZ {
+	/// When we're in this state, this COption_FilterZ contains a crate::lightning::chain::Filter
+	Some(crate::lightning::chain::Filter),
+	/// When we're in this state, this COption_FilterZ contains nothing
+	None
+}
+impl COption_FilterZ {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> crate::lightning::chain::Filter {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+/// Constructs a new COption_FilterZ containing a crate::lightning::chain::Filter
+pub extern "C" fn COption_FilterZ_some(o: crate::lightning::chain::Filter) -> COption_FilterZ {
+	COption_FilterZ::Some(o)
+}
+#[no_mangle]
+/// Constructs a new COption_FilterZ containing nothing
+pub extern "C" fn COption_FilterZ_none() -> COption_FilterZ {
+	COption_FilterZ::None
+}
+#[no_mangle]
+/// Frees any resources associated with the crate::lightning::chain::Filter, if we are in the Some state
+pub extern "C" fn COption_FilterZ_free(_res: COption_FilterZ) { }

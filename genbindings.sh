@@ -230,9 +230,12 @@ while read LINE; do
 			# We'll print this at the end
 			;;
 		"XXX"*)
-			STRUCT_NAME="$(echo "$LINE" | awk '{ print $2 }')"
+			NEW_STRUCT_NAME="$(echo "$LINE" | awk '{ print $2 }')"
+			if [ "$NEW_STRUCT_NAME" != "$STRUCT_NAME" ]; then
+				STRUCT_CONTENTS="$(cat include/lightning.h  | sed -n -e "/struct LDK$NEW_STRUCT_NAME/{:s" -e "/\} LDK$NEW_STRUCT_NAME;/!{N" -e "b s" -e "}" -e p -e "}")"
+			fi
+			STRUCT_NAME="$NEW_STRUCT_NAME"
 			METHOD_NAME="$(echo "$LINE" | awk '{ print $3 }')"
-			STRUCT_CONTENTS="$(cat include/lightning.h  | sed -n -e "/struct LDK$STRUCT_NAME/{:s" -e "/\} LDK$STRUCT_NAME;/!{N" -e "b s" -e "}" -e p -e "}")"
 			METHOD="$(echo "$STRUCT_CONTENTS" | grep "(\*$METHOD_NAME)")"
 			if [ "$METHOD" = "" ]; then
 				echo "Unable to find method declaration for $LINE"

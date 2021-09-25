@@ -242,6 +242,9 @@ public:
 			if (peers_1->datalen == 0 && peers_2->datalen == 0) { break; }
 			std::this_thread::yield();
 		}
+		// Note that the above is somewhat race-y, as node 2 may still think its connected.
+		// Thus, make sure any connections are disconnected on its end as well.
+		PeerManager_disconnect_by_node_id(&net2, ChannelManager_get_our_node_id(&cm1), false);
 
 		// Finally make an actual connection and keep it this time
 		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));

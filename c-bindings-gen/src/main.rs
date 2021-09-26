@@ -1853,7 +1853,8 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 				syn::Item::Impl(i) => {
 					if let &syn::Type::Path(ref p) = &*i.self_ty {
 						if let Some(trait_path) = i.trait_.as_ref() {
-							if path_matches_nongeneric(&trait_path.1, &["core", "clone", "Clone"]) {
+							if path_matches_nongeneric(&trait_path.1, &["core", "clone", "Clone"]) ||
+							   path_matches_nongeneric(&trait_path.1, &["Clone"]) {
 								if let Some(full_path) = import_resolver.maybe_resolve_path(&p.path, None) {
 									crate_types.set_clonable("crate::".to_owned() + &full_path);
 								}

@@ -8397,6 +8397,23 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::network_graph:
 		}
 	}
 }
+impl Clone for CResult_NetworkGraphDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_NetworkGraphDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::lightning::routing::network_graph::NetworkGraph>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_NetworkGraphDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_NetworkGraphDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_NetworkGraphDecodeErrorZ_clone(orig: &CResult_NetworkGraphDecodeErrorZ) -> CResult_NetworkGraphDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_NetAddressu8Z
 pub union CResult_NetAddressu8ZPtr {

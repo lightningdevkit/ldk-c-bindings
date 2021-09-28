@@ -11995,6 +11995,12 @@ struct LDKCResult_NetworkGraphDecodeErrorZ CResult_NetworkGraphDecodeErrorZ_err(
 void CResult_NetworkGraphDecodeErrorZ_free(struct LDKCResult_NetworkGraphDecodeErrorZ _res);
 
 /**
+ * Creates a new CResult_NetworkGraphDecodeErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_NetworkGraphDecodeErrorZ CResult_NetworkGraphDecodeErrorZ_clone(const struct LDKCResult_NetworkGraphDecodeErrorZ *NONNULL_PTR orig);
+
+/**
  * Creates a new CResult_NetAddressu8Z in the success state.
  */
 struct LDKCResult_NetAddressu8Z CResult_NetAddressu8Z_ok(struct LDKNetAddress o);
@@ -19435,16 +19441,6 @@ struct LDKCVec_u8Z ShutdownScript_write(const struct LDKShutdownScript *NONNULL_
 struct LDKCResult_ShutdownScriptDecodeErrorZ ShutdownScript_read(struct LDKu8slice ser);
 
 /**
- * Generates a P2PKH script pubkey from the given [`PubkeyHash`].
- */
-MUST_USE_RES struct LDKShutdownScript ShutdownScript_new_p2pkh(const uint8_t (*pubkey_hash)[20]);
-
-/**
- * Generates a P2SH script pubkey from the given [`ScriptHash`].
- */
-MUST_USE_RES struct LDKShutdownScript ShutdownScript_new_p2sh(const uint8_t (*script_hash)[20]);
-
-/**
  * Generates a P2WPKH script pubkey from the given [`WPubkeyHash`].
  */
 MUST_USE_RES struct LDKShutdownScript ShutdownScript_new_p2wpkh(const uint8_t (*pubkey_hash)[20]);
@@ -19820,6 +19816,11 @@ struct LDKCResult_RouteLightningErrorZ get_route(struct LDKPublicKey our_node_id
  * Frees any resources used by the NetworkGraph, if is_owned is set and inner is non-NULL.
  */
 void NetworkGraph_free(struct LDKNetworkGraph this_obj);
+
+/**
+ * Creates a copy of the NetworkGraph
+ */
+struct LDKNetworkGraph NetworkGraph_clone(const struct LDKNetworkGraph *NONNULL_PTR orig);
 
 /**
  * Frees any resources used by the ReadOnlyNetworkGraph, if is_owned is set and inner is non-NULL.

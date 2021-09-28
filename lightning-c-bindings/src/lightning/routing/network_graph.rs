@@ -65,6 +65,25 @@ impl NetworkGraph {
 		ret
 	}
 }
+impl Clone for NetworkGraph {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeNetworkGraph>::is_null(self.inner) { std::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn NetworkGraph_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNetworkGraph)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the NetworkGraph
+pub extern "C" fn NetworkGraph_clone(orig: &NetworkGraph) -> NetworkGraph {
+	orig.clone()
+}
 
 use lightning::routing::network_graph::ReadOnlyNetworkGraph as nativeReadOnlyNetworkGraphImport;
 type nativeReadOnlyNetworkGraph = nativeReadOnlyNetworkGraphImport<'static>;

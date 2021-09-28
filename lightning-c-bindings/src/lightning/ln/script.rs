@@ -176,22 +176,6 @@ pub extern "C" fn ShutdownScript_read(ser: crate::c_types::u8slice) -> crate::c_
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
-/// Generates a P2PKH script pubkey from the given [`PubkeyHash`].
-#[must_use]
-#[no_mangle]
-pub extern "C" fn ShutdownScript_new_p2pkh(pubkey_hash: *const [u8; 20]) -> ShutdownScript {
-	let mut ret = lightning::ln::script::ShutdownScript::new_p2pkh(&bitcoin::hash_types::PubkeyHash::from_hash(bitcoin::hashes::Hash::from_inner(unsafe { *pubkey_hash }.clone())));
-	ShutdownScript { inner: ObjOps::heap_alloc(ret), is_owned: true }
-}
-
-/// Generates a P2SH script pubkey from the given [`ScriptHash`].
-#[must_use]
-#[no_mangle]
-pub extern "C" fn ShutdownScript_new_p2sh(script_hash: *const [u8; 20]) -> ShutdownScript {
-	let mut ret = lightning::ln::script::ShutdownScript::new_p2sh(&bitcoin::hash_types::ScriptHash::from_hash(bitcoin::hashes::Hash::from_inner(unsafe { *script_hash }.clone())));
-	ShutdownScript { inner: ObjOps::heap_alloc(ret), is_owned: true }
-}
-
 /// Generates a P2WPKH script pubkey from the given [`WPubkeyHash`].
 #[must_use]
 #[no_mangle]

@@ -435,7 +435,6 @@ pub(crate) fn deserialize_obj_arg<A, I: lightning::util::ser::ReadableArgs<A>>(s
 }
 
 #[repr(C)]
-#[derive(Clone)]
 /// A Rust str object, ie a reference to a UTF8-valid string.
 /// This is *not* null-terminated so cannot be used directly as a C string!
 pub struct Str {
@@ -477,6 +476,11 @@ impl Into<Str> for String {
 	fn into(self) -> Str {
 		let s = Box::leak(self.into_boxed_str());
 		Str { chars: s.as_ptr(), len: s.len(), chars_is_owned: true }
+	}
+}
+impl Clone for Str {
+	fn clone(&self) -> Self {
+		self.into_str().clone().into()
 	}
 }
 

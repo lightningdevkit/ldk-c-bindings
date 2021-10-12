@@ -867,10 +867,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			return Some(full_path);
 		}
 		match full_path {
-			"Result" => Some("crate::c_types::derived::CResult"),
-			"Vec" if !is_ref => Some("crate::c_types::derived::CVec"),
-			"Option" => Some(""),
-
 			// Note that no !is_ref types can map to an array because Rust and C's call semantics
 			// for arrays are different (https://github.com/eqrion/cbindgen/issues/528)
 

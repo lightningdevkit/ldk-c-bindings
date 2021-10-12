@@ -1374,10 +1374,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 								], " }", ContainerPrefixLocation::OutsideConv));
 						}
 					} else if self.is_primitive(&inner_path) || self.c_type_from_path(&inner_path, false, false).is_none() {
-						let inner_name = inner_path.rsplit("::").next().unwrap();
+						let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
 						return Some(("if ", vec![
-							(format!(".is_none() {{ {}::COption_{}Z::None }} else {{ {}::COption_{}Z::Some(",
-								Self::generated_container_path(), inner_name, Self::generated_container_path(), inner_name),
+							(format!(".is_none() {{ {}::None }} else {{ {}::Some(",
+								inner_name, inner_name),
 							 format!("{}.unwrap()", var_access))
 							], ") }", ContainerPrefixLocation::PerConv));
 					} else {

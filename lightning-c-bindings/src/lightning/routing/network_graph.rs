@@ -15,6 +15,119 @@ use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
 
+use lightning::routing::network_graph::NodeId as nativeNodeIdImport;
+type nativeNodeId = nativeNodeIdImport;
+
+/// Represents the compressed public key of a node
+#[must_use]
+#[repr(C)]
+pub struct NodeId {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeNodeId,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for NodeId {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeNodeId>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the NodeId, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn NodeId_free(this_obj: NodeId) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+extern "C" fn NodeId_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeId); }
+}
+#[allow(unused)]
+impl NodeId {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeNodeId {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeNodeId {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeNodeId {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = std::ptr::null_mut();
+		ret
+	}
+}
+impl Clone for NodeId {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeNodeId>::is_null(self.inner) { std::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn NodeId_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNodeId)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the NodeId
+pub extern "C" fn NodeId_clone(orig: &NodeId) -> NodeId {
+	orig.clone()
+}
+/// Create a new NodeId from a public key
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeId_from_pubkey(mut pubkey: crate::c_types::PublicKey) -> NodeId {
+	let mut ret = lightning::routing::network_graph::NodeId::from_pubkey(&pubkey.into_rust());
+	NodeId { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Get the public key slice from this NodeId
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeId_as_slice(this_arg: &NodeId) -> crate::c_types::u8slice {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_slice();
+	let mut local_ret = crate::c_types::u8slice::from_slice(ret);
+	local_ret
+}
+
+/// Checks if two NodeIds contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn NodeId_hash(o: &NodeId) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
+}
+#[no_mangle]
+/// Serialize the NodeId object into a byte array which can be read by NodeId_read
+pub extern "C" fn NodeId_write(obj: &NodeId) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn NodeId_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNodeId) })
+}
+#[no_mangle]
+/// Read a NodeId from a byte array, created by NodeId_write
+pub extern "C" fn NodeId_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeIdDecodeErrorZ {
+	let res = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::NodeId { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
+
 use lightning::routing::network_graph::NetworkGraph as nativeNetworkGraphImport;
 type nativeNetworkGraph = nativeNetworkGraphImport;
 
@@ -804,14 +917,14 @@ pub extern "C" fn ChannelInfo_set_features(this_ptr: &mut ChannelInfo, mut val: 
 }
 /// Source node of the first direction of a channel
 #[no_mangle]
-pub extern "C" fn ChannelInfo_get_node_one(this_ptr: &ChannelInfo) -> crate::c_types::PublicKey {
+pub extern "C" fn ChannelInfo_get_node_one(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::NodeId {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_one;
-	crate::c_types::PublicKey::from_rust(&inner_val)
+	crate::lightning::routing::network_graph::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
 }
 /// Source node of the first direction of a channel
 #[no_mangle]
-pub extern "C" fn ChannelInfo_set_node_one(this_ptr: &mut ChannelInfo, mut val: crate::c_types::PublicKey) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_one = val.into_rust();
+pub extern "C" fn ChannelInfo_set_node_one(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::NodeId) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_one = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Details about the first direction of a channel
 ///
@@ -832,14 +945,14 @@ pub extern "C" fn ChannelInfo_set_one_to_two(this_ptr: &mut ChannelInfo, mut val
 }
 /// Source node of the second direction of a channel
 #[no_mangle]
-pub extern "C" fn ChannelInfo_get_node_two(this_ptr: &ChannelInfo) -> crate::c_types::PublicKey {
+pub extern "C" fn ChannelInfo_get_node_two(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::NodeId {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_two;
-	crate::c_types::PublicKey::from_rust(&inner_val)
+	crate::lightning::routing::network_graph::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
 }
 /// Source node of the second direction of a channel
 #[no_mangle]
-pub extern "C" fn ChannelInfo_set_node_two(this_ptr: &mut ChannelInfo, mut val: crate::c_types::PublicKey) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_two = val.into_rust();
+pub extern "C" fn ChannelInfo_set_node_two(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::NodeId) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_two = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Details about the second direction of a channel
 ///
@@ -897,16 +1010,16 @@ pub extern "C" fn ChannelInfo_set_announcement_message(this_ptr: &mut ChannelInf
 /// Constructs a new ChannelInfo given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelInfo_new(mut features_arg: crate::lightning::ln::features::ChannelFeatures, mut node_one_arg: crate::c_types::PublicKey, mut one_to_two_arg: crate::lightning::routing::network_graph::DirectionalChannelInfo, mut node_two_arg: crate::c_types::PublicKey, mut two_to_one_arg: crate::lightning::routing::network_graph::DirectionalChannelInfo, mut capacity_sats_arg: crate::c_types::derived::COption_u64Z, mut announcement_message_arg: crate::lightning::ln::msgs::ChannelAnnouncement) -> ChannelInfo {
+pub extern "C" fn ChannelInfo_new(mut features_arg: crate::lightning::ln::features::ChannelFeatures, mut node_one_arg: crate::lightning::routing::network_graph::NodeId, mut one_to_two_arg: crate::lightning::routing::network_graph::DirectionalChannelInfo, mut node_two_arg: crate::lightning::routing::network_graph::NodeId, mut two_to_one_arg: crate::lightning::routing::network_graph::DirectionalChannelInfo, mut capacity_sats_arg: crate::c_types::derived::COption_u64Z, mut announcement_message_arg: crate::lightning::ln::msgs::ChannelAnnouncement) -> ChannelInfo {
 	let mut local_one_to_two_arg = if one_to_two_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(one_to_two_arg.take_inner()) } }) };
 	let mut local_two_to_one_arg = if two_to_one_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(two_to_one_arg.take_inner()) } }) };
 	let mut local_capacity_sats_arg = if capacity_sats_arg.is_some() { Some( { capacity_sats_arg.take() }) } else { None };
 	let mut local_announcement_message_arg = if announcement_message_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(announcement_message_arg.take_inner()) } }) };
 	ChannelInfo { inner: ObjOps::heap_alloc(nativeChannelInfo {
 		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
-		node_one: node_one_arg.into_rust(),
+		node_one: *unsafe { Box::from_raw(node_one_arg.take_inner()) },
 		one_to_two: local_one_to_two_arg,
-		node_two: node_two_arg.into_rust(),
+		node_two: *unsafe { Box::from_raw(node_two_arg.take_inner()) },
 		two_to_one: local_two_to_one_arg,
 		capacity_sats: local_capacity_sats_arg,
 		announcement_message: local_announcement_message_arg,
@@ -1539,6 +1652,17 @@ pub extern "C" fn NetworkGraph_update_channel(this_arg: &NetworkGraph, msg: &cra
 pub extern "C" fn NetworkGraph_update_channel_unsigned(this_arg: &NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelUpdate) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_unsigned(msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_ret
+}
+
+/// Get network addresses by node id.
+/// Returns None if the requested node is completely unknown,
+/// or if node announcement for the node was never received.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ReadOnlyNetworkGraph_get_addresses(this_arg: &ReadOnlyNetworkGraph, mut pubkey: crate::c_types::PublicKey) -> crate::c_types::derived::COption_CVec_NetAddressZZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_addresses(&pubkey.into_rust());
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_NetAddressZZ::None } else { crate::c_types::derived::COption_CVec_NetAddressZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::lightning::ln::msgs::NetAddress::native_into(item) }); }; local_ret_0.into() }) };
 	local_ret
 }
 

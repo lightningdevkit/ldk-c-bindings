@@ -449,6 +449,112 @@ impl Drop for Confirm {
 		}
 	}
 }
+/// An error enum representing a failure to persist a channel monitor update.
+#[must_use]
+#[derive(Clone)]
+#[repr(C)]
+pub enum ChannelMonitorUpdateErr {
+	/// Used to indicate a temporary failure (eg connection to a watchtower or remote backup of
+	/// our state failed, but is expected to succeed at some point in the future).
+	///
+	/// Such a failure will \"freeze\" a channel, preventing us from revoking old states or
+	/// submitting new commitment transactions to the counterparty. Once the update(s) which failed
+	/// have been successfully applied, ChannelManager::channel_monitor_updated can be used to
+	/// restore the channel to an operational state.
+	///
+	/// Note that a given ChannelManager will *never* re-generate a given ChannelMonitorUpdate. If
+	/// you return a TemporaryFailure you must ensure that it is written to disk safely before
+	/// writing out the latest ChannelManager state.
+	///
+	/// Even when a channel has been \"frozen\" updates to the ChannelMonitor can continue to occur
+	/// (eg if an inbound HTLC which we forwarded was claimed upstream resulting in us attempting
+	/// to claim it on this channel) and those updates must be applied wherever they can be. At
+	/// least one such updated ChannelMonitor must be persisted otherwise PermanentFailure should
+	/// be returned to get things on-chain ASAP using only the in-memory copy. Obviously updates to
+	/// the channel which would invalidate previous ChannelMonitors are not made when a channel has
+	/// been \"frozen\".
+	///
+	/// Note that even if updates made after TemporaryFailure succeed you must still call
+	/// channel_monitor_updated to ensure you have the latest monitor and re-enable normal channel
+	/// operation.
+	///
+	/// Note that the update being processed here will not be replayed for you when you call
+	/// ChannelManager::channel_monitor_updated, so you must store the update itself along
+	/// with the persisted ChannelMonitor on your own local disk prior to returning a
+	/// TemporaryFailure. You may, of course, employ a journaling approach, storing only the
+	/// ChannelMonitorUpdate on disk without updating the monitor itself, replaying the journal at
+	/// reload-time.
+	///
+	/// For deployments where a copy of ChannelMonitors and other local state are backed up in a
+	/// remote location (with local copies persisted immediately), it is anticipated that all
+	/// updates will return TemporaryFailure until the remote copies could be updated.
+	TemporaryFailure,
+	/// Used to indicate no further channel monitor updates will be allowed (eg we've moved on to a
+	/// different watchtower and cannot update with all watchtowers that were previously informed
+	/// of this channel).
+	///
+	/// At reception of this error, ChannelManager will force-close the channel and return at
+	/// least a final ChannelMonitorUpdate::ChannelForceClosed which must be delivered to at
+	/// least one ChannelMonitor copy. Revocation secret MUST NOT be released and offchain channel
+	/// update must be rejected.
+	///
+	/// This failure may also signal a failure to update the local persisted copy of one of
+	/// the channel monitor instance.
+	///
+	/// Note that even when you fail a holder commitment transaction update, you must store the
+	/// update to ensure you can claim from it in case of a duplicate copy of this ChannelMonitor
+	/// broadcasts it (e.g distributed channel-monitor deployment)
+	///
+	/// In case of distributed watchtowers deployment, the new version must be written to disk, as
+	/// state may have been stored but rejected due to a block forcing a commitment broadcast. This
+	/// storage is used to claim outputs of rejected state confirmed onchain by another watchtower,
+	/// lagging behind on block processing.
+	PermanentFailure,
+}
+use lightning::chain::ChannelMonitorUpdateErr as nativeChannelMonitorUpdateErr;
+impl ChannelMonitorUpdateErr {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeChannelMonitorUpdateErr {
+		match self {
+			ChannelMonitorUpdateErr::TemporaryFailure => nativeChannelMonitorUpdateErr::TemporaryFailure,
+			ChannelMonitorUpdateErr::PermanentFailure => nativeChannelMonitorUpdateErr::PermanentFailure,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeChannelMonitorUpdateErr {
+		match self {
+			ChannelMonitorUpdateErr::TemporaryFailure => nativeChannelMonitorUpdateErr::TemporaryFailure,
+			ChannelMonitorUpdateErr::PermanentFailure => nativeChannelMonitorUpdateErr::PermanentFailure,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeChannelMonitorUpdateErr) -> Self {
+		match native {
+			nativeChannelMonitorUpdateErr::TemporaryFailure => ChannelMonitorUpdateErr::TemporaryFailure,
+			nativeChannelMonitorUpdateErr::PermanentFailure => ChannelMonitorUpdateErr::PermanentFailure,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeChannelMonitorUpdateErr) -> Self {
+		match native {
+			nativeChannelMonitorUpdateErr::TemporaryFailure => ChannelMonitorUpdateErr::TemporaryFailure,
+			nativeChannelMonitorUpdateErr::PermanentFailure => ChannelMonitorUpdateErr::PermanentFailure,
+		}
+	}
+}
+/// Creates a copy of the ChannelMonitorUpdateErr
+#[no_mangle]
+pub extern "C" fn ChannelMonitorUpdateErr_clone(orig: &ChannelMonitorUpdateErr) -> ChannelMonitorUpdateErr {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new TemporaryFailure-variant ChannelMonitorUpdateErr
+pub extern "C" fn ChannelMonitorUpdateErr_temporary_failure() -> ChannelMonitorUpdateErr {
+	ChannelMonitorUpdateErr::TemporaryFailure}
+#[no_mangle]
+/// Utility method to constructs a new PermanentFailure-variant ChannelMonitorUpdateErr
+pub extern "C" fn ChannelMonitorUpdateErr_permanent_failure() -> ChannelMonitorUpdateErr {
+	ChannelMonitorUpdateErr::PermanentFailure}
 /// The `Watch` trait defines behavior for watching on-chain activity pertaining to channels as
 /// blocks are connected and disconnected.
 ///
@@ -467,9 +573,7 @@ impl Drop for Confirm {
 /// funds in the channel. See [`ChannelMonitorUpdateErr`] for more details about how to handle
 /// multiple instances.
 ///
-/// [`ChannelMonitor`]: channelmonitor::ChannelMonitor
-/// [`ChannelMonitorUpdateErr`]: channelmonitor::ChannelMonitorUpdateErr
-/// [`PermanentFailure`]: channelmonitor::ChannelMonitorUpdateErr::PermanentFailure
+/// [`PermanentFailure`]: ChannelMonitorUpdateErr::PermanentFailure
 #[repr(C)]
 pub struct Watch {
 	/// An opaque pointer which is passed to your function implementations as an argument.
@@ -480,6 +584,9 @@ pub struct Watch {
 	/// Implementations are responsible for watching the chain for the funding transaction along
 	/// with any spends of outputs returned by [`get_outputs_to_watch`]. In practice, this means
 	/// calling [`block_connected`] and [`block_disconnected`] on the monitor.
+	///
+	/// Note: this interface MUST error with `ChannelMonitorUpdateErr::PermanentFailure` if
+	/// the given `funding_txo` has previously been registered via `watch_channel`.
 	///
 	/// [`get_outputs_to_watch`]: channelmonitor::ChannelMonitor::get_outputs_to_watch
 	/// [`block_connected`]: channelmonitor::ChannelMonitor::block_connected
@@ -492,7 +599,6 @@ pub struct Watch {
 	/// [`ChannelMonitorUpdateErr`] for invariants around returning an error.
 	///
 	/// [`update_monitor`]: channelmonitor::ChannelMonitor::update_monitor
-	/// [`ChannelMonitorUpdateErr`]: channelmonitor::ChannelMonitorUpdateErr
 	#[must_use]
 	pub update_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::lightning::chain::transaction::OutPoint, update: crate::lightning::chain::channelmonitor::ChannelMonitorUpdate) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
 	/// Returns any monitor events since the last call. Subsequent calls must only return new
@@ -518,12 +624,12 @@ pub(crate) extern "C" fn Watch_clone_fields(orig: &Watch) -> Watch {
 
 use lightning::chain::Watch as rustWatch;
 impl rustWatch<crate::lightning::chain::keysinterface::Sign> for Watch {
-	fn watch_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
+	fn watch_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> Result<(), lightning::chain::ChannelMonitorUpdateErr> {
 		let mut ret = (self.watch_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(monitor), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
-	fn update_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut update: lightning::chain::channelmonitor::ChannelMonitorUpdate) -> Result<(), lightning::chain::channelmonitor::ChannelMonitorUpdateErr> {
+	fn update_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut update: lightning::chain::channelmonitor::ChannelMonitorUpdate) -> Result<(), lightning::chain::ChannelMonitorUpdateErr> {
 		let mut ret = (self.update_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: ObjOps::heap_alloc(update), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
@@ -570,7 +676,7 @@ impl Drop for Watch {
 /// processed later. Then, in order to block until the data has been processed, any [`Watch`]
 /// invocation that has called the `Filter` must return [`TemporaryFailure`].
 ///
-/// [`TemporaryFailure`]: channelmonitor::ChannelMonitorUpdateErr::TemporaryFailure
+/// [`TemporaryFailure`]: ChannelMonitorUpdateErr::TemporaryFailure
 /// [BIP 157]: https://github.com/bitcoin/bips/blob/master/bip-0157.mediawiki
 /// [BIP 158]: https://github.com/bitcoin/bips/blob/master/bip-0158.mediawiki
 #[repr(C)]

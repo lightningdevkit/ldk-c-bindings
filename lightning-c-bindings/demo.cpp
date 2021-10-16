@@ -419,6 +419,8 @@ LDKCVec_C2Tuple_PublicKeyTypeZZ create_custom_msg(const void* this_arg) {
 	return ret;
 }
 
+uint64_t get_chan_score(const void *this_arg, uint64_t scid) { return 42; }
+
 int main() {
 	uint8_t channel_open_header[80];
 	uint8_t header_1[80];
@@ -546,7 +548,7 @@ int main() {
 		PeersConnection conn(cm1, cm2, net1, net2);
 
 		// Note that we have to bind the result to a C++ class to make sure it gets free'd
-		LDK::CResult_NoneAPIErrorZ res = ChannelManager_create_channel(&cm1, ChannelManager_get_our_node_id(&cm2), 40000, 1000, 42, UserConfig_default());
+		LDK::CResult__u832APIErrorZ res = ChannelManager_create_channel(&cm1, ChannelManager_get_our_node_id(&cm2), 40000, 1000, 42, UserConfig_default());
 		assert(res->result_ok);
 		PeerManager_process_events(&net1);
 
@@ -672,10 +674,13 @@ int main() {
 		{
 			LDK::CVec_ChannelDetailsZ outbound_channels = ChannelManager_list_usable_channels(&cm1);
 			LDK::NetworkGraph graph_2_ref = NetGraphMsgHandler_get_network_graph(&net_graph2);
+			LDK::Score chan_scorer = LDKScore {
+				.this_arg = NULL, .channel_penalty_msat = get_chan_score, .free = NULL
+			};
 			LDK::CResult_RouteLightningErrorZ route = get_route(ChannelManager_get_our_node_id(&cm1), &graph_2_ref, ChannelManager_get_our_node_id(&cm2), LDKInvoiceFeatures {
 					.inner = NULL, .is_owned = false
 				}, &outbound_channels, Invoice_route_hints(invoice->contents.result),
-				5000, Invoice_min_final_cltv_expiry(invoice->contents.result), logger1);
+				5000, Invoice_min_final_cltv_expiry(invoice->contents.result), logger1, &chan_scorer);
 			assert(route->result_ok);
 			LDK::CVec_CVec_RouteHopZZ paths = Route_get_paths(route->contents.result);
 			assert(paths->datalen == 1);
@@ -683,7 +688,7 @@ int main() {
 			assert(!memcmp(RouteHop_get_pubkey(&paths->data[0].data[0]).compressed_form,
 				ChannelManager_get_our_node_id(&cm2).compressed_form, 33));
 			assert(RouteHop_get_short_channel_id(&paths->data[0].data[0]) == channel_scid);
-			LDK::CResult_NonePaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash, Invoice_payment_secret(invoice->contents.result));
+			LDK::CResult_PaymentIdPaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash, Invoice_payment_secret(invoice->contents.result));
 			assert(send_res->result_ok);
 		}
 

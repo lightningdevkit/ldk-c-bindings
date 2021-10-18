@@ -867,10 +867,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			return Some(full_path);
 		}
 		match full_path {
-			"Result" => Some("crate::c_types::derived::CResult"),
-			"Vec" if !is_ref => Some("crate::c_types::derived::CVec"),
-			"Option" => Some(""),
-
 			// Note that no !is_ref types can map to an array because Rust and C's call semantics
 			// for arrays are different (https://github.com/eqrion/cbindgen/issues/528)
 
@@ -906,7 +902,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
-			"bitcoin::blockdata::transaction::Transaction" => Some("crate::c_types::Transaction"),
+			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut"),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref  => Some("*const [u8; 80]"),
@@ -989,8 +985,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if !is_ref => Some(""),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("&::bitcoin::blockdata::script::Script::from(Vec::from("),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("::bitcoin::blockdata::script::Script::from("),
-			"bitcoin::blockdata::transaction::Transaction" if is_ref => Some("&"),
-			"bitcoin::blockdata::transaction::Transaction" => Some(""),
+			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("&"),
+			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(""),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::C_to_bitcoin_outpoint("),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(""),
 			"bitcoin::network::constants::Network" => Some(""),
@@ -1066,7 +1062,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref => Some("}[..]).unwrap()"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some(".to_slice()))"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_rust())"),
-			"bitcoin::blockdata::transaction::Transaction" => Some(".into_bitcoin()"),
+			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(".into_bitcoin()"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(".into_rust()"),
 			"bitcoin::network::constants::Network" => Some(".into_bitcoin()"),
@@ -1157,8 +1153,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if !is_ref => Some("crate::c_types::Secp256k1Error::from_rust("),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
-			"bitcoin::blockdata::transaction::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
-			"bitcoin::blockdata::transaction::Transaction" => Some("crate::c_types::Transaction::from_bitcoin(&"),
+			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
+			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction::from_bitcoin(&"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::bitcoin_to_C_outpoint("),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network::from_bitcoin("),
@@ -1231,7 +1227,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if !is_ref => Some(")"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),
-			"bitcoin::blockdata::transaction::Transaction" => Some(")"),
+			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(")"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(")"),
 			"bitcoin::network::constants::Network" => Some(")"),
@@ -1378,10 +1374,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 								], " }", ContainerPrefixLocation::OutsideConv));
 						}
 					} else if self.is_primitive(&inner_path) || self.c_type_from_path(&inner_path, false, false).is_none() {
-						let inner_name = inner_path.rsplit("::").next().unwrap();
+						let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
 						return Some(("if ", vec![
-							(format!(".is_none() {{ {}::COption_{}Z::None }} else {{ {}::COption_{}Z::Some(",
-								Self::generated_container_path(), inner_name, Self::generated_container_path(), inner_name),
+							(format!(".is_none() {{ {}::None }} else {{ {}::Some(",
+								inner_name, inner_name),
 							 format!("{}.unwrap()", var_access))
 							], ") }", ContainerPrefixLocation::PerConv));
 					} else {

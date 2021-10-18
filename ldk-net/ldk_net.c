@@ -111,10 +111,9 @@ static uintptr_t sock_send_data(void* desc, struct LDKu8slice data, bool resume_
 		for (int i = 0; i < descriptor->handler->sockcount; i++) {
 			if (descriptor->handler->pollfds[i].fd == descriptor->fd) {
 				if (pause_read) {
-					descriptor->handler->pollfds[i].events &= POLLIN;
-					descriptor->handler->pollfds[i].events |= POLLOUT;
+					descriptor->handler->pollfds[i].events = POLLOUT;
 				} else {
-					descriptor->handler->pollfds[i].events |= POLLIN;
+					descriptor->handler->pollfds[i].events = POLLIN;
 				}
 				break;
 			}
@@ -243,8 +242,7 @@ static void *sock_thread_fn(void* arg) {
 									lockres = pthread_mutex_lock(&handler->sockets_mutex);
 									assert(lockres == 0);
 									assert(handler->pollfds[i - 1].fd == pollfds[i].fd); // Only we change fd order!
-									handler->pollfds[i - 1].events &= POLLIN;
-									handler->pollfds[i - 1].events |= POLLOUT;
+									handler->pollfds[i - 1].events = POLLOUT;
 									lockres = pthread_mutex_unlock(&handler->sockets_mutex);
 									assert(lockres == 0);
 								}

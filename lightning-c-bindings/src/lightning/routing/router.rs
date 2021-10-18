@@ -637,10 +637,10 @@ pub extern "C" fn RouteHintHop_eq(a: &RouteHintHop, b: &RouteHintHop) -> bool {
 ///
 /// Note that first_hops (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn get_keysend_route(mut our_node_id: crate::c_types::PublicKey, network: &crate::lightning::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+pub extern "C" fn get_keysend_route(mut our_node_pubkey: crate::c_types::PublicKey, network: &crate::lightning::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::lightning::util::logger::Logger, scorer: &crate::lightning::routing::Score) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
 	let mut local_first_hops_base = if first_hops == std::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { item.get_native_ref() }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
 	let mut local_last_hops = Vec::new(); for mut item in last_hops.as_slice().iter() { local_last_hops.push( { item.get_native_ref() }); };
-	let mut ret = lightning::routing::router::get_keysend_route(&our_node_id.into_rust(), network.get_native_ref(), &payee.into_rust(), local_first_hops, &local_last_hops[..], final_value_msat, final_cltv, logger);
+	let mut ret = lightning::routing::router::get_keysend_route(&our_node_pubkey.into_rust(), network.get_native_ref(), &payee.into_rust(), local_first_hops, &local_last_hops[..], final_value_msat, final_cltv, logger, scorer);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
@@ -668,11 +668,11 @@ pub extern "C" fn get_keysend_route(mut our_node_id: crate::c_types::PublicKey, 
 /// Note that payee_features (or a relevant inner pointer) may be NULL or all-0s to represent None
 /// Note that first_hops (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn get_route(mut our_node_id: crate::c_types::PublicKey, network: &crate::lightning::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, mut payee_features: crate::lightning::ln::features::InvoiceFeatures, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+pub extern "C" fn get_route(mut our_node_pubkey: crate::c_types::PublicKey, network: &crate::lightning::routing::network_graph::NetworkGraph, mut payee: crate::c_types::PublicKey, mut payee_features: crate::lightning::ln::features::InvoiceFeatures, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut last_hops: crate::c_types::derived::CVec_RouteHintZ, mut final_value_msat: u64, mut final_cltv: u32, mut logger: crate::lightning::util::logger::Logger, scorer: &crate::lightning::routing::Score) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
 	let mut local_payee_features = if payee_features.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(payee_features.take_inner()) } }) };
 	let mut local_first_hops_base = if first_hops == std::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { item.get_native_ref() }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
 	let mut local_last_hops = Vec::new(); for mut item in last_hops.as_slice().iter() { local_last_hops.push( { item.get_native_ref() }); };
-	let mut ret = lightning::routing::router::get_route(&our_node_id.into_rust(), network.get_native_ref(), &payee.into_rust(), local_payee_features, local_first_hops, &local_last_hops[..], final_value_msat, final_cltv, logger);
+	let mut ret = lightning::routing::router::get_route(&our_node_pubkey.into_rust(), network.get_native_ref(), &payee.into_rust(), local_payee_features, local_first_hops, &local_last_hops[..], final_value_msat, final_cltv, logger, scorer);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }

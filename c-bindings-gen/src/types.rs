@@ -294,23 +294,28 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 				&syn::TraitItem::Type(ref t) => {
 					if t.default.is_some() || t.generics.lt_token.is_some() { unimplemented!(); }
 					let mut bounds_iter = t.bounds.iter();
-					match bounds_iter.next().unwrap() {
-						syn::TypeParamBound::Trait(tr) => {
-							assert_simple_bound(&tr);
-							if let Some(path) = types.maybe_resolve_path(&tr.path, None) {
-								if types.skip_path(&path) { continue; }
-								// In general we handle Deref<Target=X> as if it were just X (and
-								// implement Deref<Target=Self> for relevant types). We don't
-								// bother to implement it for associated types, however, so we just
-								// ignore such bounds.
-								if path != "std::ops::Deref" && path != "core::ops::Deref" {
-									self.typed_generics.insert(&t.ident, path);
+					loop {
+						match bounds_iter.next().unwrap() {
+							syn::TypeParamBound::Trait(tr) => {
+								assert_simple_bound(&tr);
+								if let Some(path) = types.maybe_resolve_path(&tr.path, None) {
+									if types.skip_path(&path) { continue; }
+									// In general we handle Deref<Target=X> as if it were just X (and
+									// implement Deref<Target=Self> for relevant types). We don't
+									// bother to implement it for associated types, however, so we just
+									// ignore such bounds.
+									if path != "std::ops::Deref" && path != "core::ops::Deref" {
+										self.typed_generics.insert(&t.ident, path);
+									}
+								} else { unimplemented!(); }
+								for bound in bounds_iter {
+									if let syn::TypeParamBound::Trait(_) = bound { unimplemented!(); }
 								}
-							} else { unimplemented!(); }
-						},
-						_ => unimplemented!(),
+								break;
+							},
+							syn::TypeParamBound::Lifetime(_) => {},
+						}
 					}
-					if bounds_iter.next().is_some() { unimplemented!(); }
 				},
 				_ => {},
 			}

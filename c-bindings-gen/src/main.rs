@@ -491,13 +491,18 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 					&syn::TraitItem::Type(ref t) => {
 						if t.default.is_some() || t.generics.lt_token.is_some() { unimplemented!(); }
 						let mut bounds_iter = t.bounds.iter();
-						match bounds_iter.next().unwrap() {
-							syn::TypeParamBound::Trait(tr) => {
-								writeln!(w, "\ttype {} = crate::{};", t.ident, $type_resolver.resolve_path(&tr.path, Some(&gen_types))).unwrap();
-							},
-							_ => unimplemented!(),
+						loop {
+							match bounds_iter.next().unwrap() {
+								syn::TypeParamBound::Trait(tr) => {
+									writeln!(w, "\ttype {} = crate::{};", t.ident, $type_resolver.resolve_path(&tr.path, Some(&gen_types))).unwrap();
+									for bound in bounds_iter {
+										if let syn::TypeParamBound::Trait(_) = bound { unimplemented!(); }
+									}
+									break;
+								},
+								syn::TypeParamBound::Lifetime(_) => {},
+							}
 						}
-						if bounds_iter.next().is_some() { unimplemented!(); }
 					},
 					_ => unimplemented!(),
 				}

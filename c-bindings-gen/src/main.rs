@@ -559,7 +559,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	// Finally, implement the original Rust trait for the newly created mapped trait.
 	writeln!(w, "\nuse {}::{} as rust{};", types.module_path, t.ident, trait_name).unwrap();
 	if implementable {
-		write!(w, "impl rust{}", t.ident).unwrap();
+		write!(w, "impl").unwrap();
+		maybe_write_lifetime_generics(w, &t.generics, types);
+		write!(w, " rust{}", t.ident).unwrap();
 		maybe_write_generics(w, &t.generics, types, false);
 		writeln!(w, " for {} {{", trait_name).unwrap();
 		impl_trait_for_c!(t, "", types);

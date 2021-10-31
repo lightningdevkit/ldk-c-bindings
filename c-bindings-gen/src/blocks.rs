@@ -751,4 +751,20 @@ pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generi
 	}
 }
 
-
+pub fn maybe_write_lifetime_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generics, types: &TypeResolver) {
+	let mut gen_types = GenericTypes::new(None);
+	assert!(gen_types.learn_generics(generics, types));
+	if generics.params.iter().any(|param| if let syn::GenericParam::Lifetime(_) = param { true } else { false }) {
+		write!(w, "<").unwrap();
+		for (idx, generic) in generics.params.iter().enumerate() {
+			match generic {
+				syn::GenericParam::Type(_) => {},
+				syn::GenericParam::Lifetime(lt) => {
+					write!(w, "{}'{}", if idx != 0 { ", " } else { "" }, lt.lifetime.ident).unwrap();
+				},
+				_ => unimplemented!(),
+			}
+		}
+		write!(w, ">").unwrap();
+	}
+}

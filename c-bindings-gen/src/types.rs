@@ -906,11 +906,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::PaymentHash" if is_ref => Some("*const [u8; 32]"),
-			"lightning::ln::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::PaymentPreimage" if is_ref => Some("*const [u8; 32]"),
-			"lightning::ln::PaymentPreimage" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::PaymentSecret" => Some("crate::c_types::ThirtyTwoBytes"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if is_ref => Some("*const [u8; 32]"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some("*const std::os::raw::c_char"),
@@ -997,7 +996,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentHash" if is_ref => Some("&::lightning::ln::PaymentHash(unsafe { *"),
 			"lightning::ln::PaymentPreimage" if !is_ref => Some("::lightning::ln::PaymentPreimage("),
 			"lightning::ln::PaymentPreimage" if is_ref => Some("&::lightning::ln::PaymentPreimage(unsafe { *"),
-			"lightning::ln::PaymentSecret" => Some("::lightning::ln::PaymentSecret("),
+			"lightning::ln::PaymentSecret" if !is_ref => Some("::lightning::ln::PaymentSecret("),
+			"lightning::ln::channelmanager::PaymentId" if !is_ref => Some("::lightning::ln::channelmanager::PaymentId("),
+			"lightning::ln::channelmanager::PaymentId" if is_ref=> Some("&::lightning::ln::channelmanager::PaymentId( unsafe { *"),
 
 			// List of traits we map (possibly during processing of other files):
 			"crate::util::logger::Logger" => Some(""),
@@ -1064,11 +1065,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if is_ref => Some(" }[..]).unwrap()"),
 			"bitcoin::hash_types::Txid" => Some(".data[..]).unwrap()"),
 			"bitcoin::hash_types::BlockHash" if !is_ref => Some(".data[..]).unwrap()"),
-			"lightning::ln::PaymentHash" if !is_ref => Some(".data)"),
-			"lightning::ln::PaymentHash" if is_ref => Some(" })"),
-			"lightning::ln::PaymentPreimage" if !is_ref => Some(".data)"),
-			"lightning::ln::PaymentPreimage" if is_ref => Some(" })"),
-			"lightning::ln::PaymentSecret" => Some(".data)"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if !is_ref => Some(".data)"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if is_ref => Some(" })"),
 
 			// List of traits we map (possibly during processing of other files):
 			"crate::util::logger::Logger" => Some(""),
@@ -1156,11 +1156,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"lightning::ln::PaymentHash" if is_ref => Some("&"),
-			"lightning::ln::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"lightning::ln::PaymentPreimage" if is_ref => Some("&"),
-			"lightning::ln::PaymentPreimage" => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"lightning::ln::PaymentSecret" => Some("crate::c_types::ThirtyTwoBytes { data: "),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if is_ref => Some("&"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some("local_"),
@@ -1229,11 +1228,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some(".into_inner() }"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
-			"lightning::ln::PaymentHash" if is_ref => Some(".0"),
-			"lightning::ln::PaymentHash" => Some(".0 }"),
-			"lightning::ln::PaymentPreimage" if is_ref => Some(".0"),
-			"lightning::ln::PaymentPreimage" => Some(".0 }"),
-			"lightning::ln::PaymentSecret" => Some(".0 }"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if is_ref => Some(".0"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if !is_ref => Some(".0 }"),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some(".as_ptr()"),

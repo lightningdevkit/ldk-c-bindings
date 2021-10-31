@@ -1373,6 +1373,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					}
 				}
 				if let Some(t) = single_contained {
+					if let syn::Type::Reference(syn::TypeReference { elem, .. }) = t {
+						if let syn::Type::Slice(_) = &**elem {
+							return Some(("if ", vec![
+									(".is_none() { SmartPtr::null() } else { SmartPtr::from_obj(".to_string(),
+									 format!("({}.unwrap())", var_access))
+								], ") }", ContainerPrefixLocation::PerConv));
+						}
+					}
 					let mut v = Vec::new();
 					self.write_empty_rust_val(generics, &mut v, t);
 					let s = String::from_utf8(v).unwrap();
@@ -2106,7 +2114,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 				if let Some((prefix, conversions, suffix, prefix_location)) = container_lookup(&$container_type, is_ref && ty_has_inner, only_contained_type, ident, var) {
 					assert_eq!(conversions.len(), $args_len);
-					write!(w, "let mut local_{}{} = ", ident, if !to_c && needs_ref_map {"_base"} else { "" }).unwrap();
+					write!(w, "let mut local_{}{} = ", ident,
+						if (!to_c && needs_ref_map) || (to_c && $container_type == "Option" && contains_slice) {"_base"} else { "" }).unwrap();
 					if prefix_location == ContainerPrefixLocation::OutsideConv {
 						var_prefix(w, $args_iter().next().unwrap(), generics, is_ref, ptr_for_ref, true);
 					}
@@ -2131,7 +2140,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							write!(w, "ObjOps::heap_alloc(").unwrap();
 						}
 
-						write!(w, "{}{}", if contains_slice { "local_" } else { "" }, if new_var { new_var_name } else { var_access }).unwrap();
+						write!(w, "{}{}", if contains_slice && !to_c { "local_" } else { "" }, if new_var { new_var_name } else { var_access }).unwrap();
 						if prefix_location == ContainerPrefixLocation::PerConv {
 							var_suffix(w, conv_ty, generics, is_ref && ty_has_inner, ptr_for_ref, false);
 						} else if !is_ref && !needs_ref_map && to_c && only_contained_has_inner {
@@ -2150,6 +2159,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							write!(w, ".map(|a| &a[..])").unwrap();
 						}
 						write!(w, ";").unwrap();
+					} else if to_c && $container_type == "Option" && contains_slice {
+						write!(w, " let mut local_{} = *local_{}_base;", ident, ident).unwrap();
 					}
 					return true;
 				}

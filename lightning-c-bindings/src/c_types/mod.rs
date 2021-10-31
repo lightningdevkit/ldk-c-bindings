@@ -607,3 +607,28 @@ pub(crate) mod ObjOps {
 		}
 	}
 }
+
+pub(crate) struct SmartPtr<T> {
+	ptr: *mut T,
+}
+impl<T> SmartPtr<T> {
+	pub(crate) fn from_obj(o: T) -> Self {
+		Self { ptr: Box::into_raw(Box::new(o)) }
+	}
+	pub(crate) fn null() -> Self {
+		Self { ptr: std::ptr::null_mut() }
+	}
+}
+impl<T> Drop for SmartPtr<T> {
+	fn drop(&mut self) {
+		if self.ptr != std::ptr::null_mut() {
+			unsafe { Box::from_raw(self.ptr); }
+		}
+	}
+}
+impl<T> std::ops::Deref for SmartPtr<T> {
+	type Target = *mut T;
+	fn deref(&self) -> &*mut T {
+		&self.ptr
+	}
+}

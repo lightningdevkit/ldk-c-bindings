@@ -410,6 +410,10 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 					for module in super_mod.split("::") {
 						path.push(syn::PathSegment { ident: syn::Ident::new(module, Span::call_site()), arguments: syn::PathArguments::None });
 					}
+				} else if partial_path == "" && format!("{}", $ident) == "crate" {
+					new_path = format!("{}{}", crate_name, $path_suffix);
+					let crate_name_ident = format_ident!("{}", crate_name);
+					path.push(parse_quote!(#crate_name_ident));
 				} else if partial_path == "" && !dependencies.contains(&$ident) {
 					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
 					let crate_name_ident = format_ident!("{}", crate_name);

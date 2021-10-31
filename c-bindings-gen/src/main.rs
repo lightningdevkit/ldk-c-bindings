@@ -771,6 +771,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 		if p.qself.is_some() { unimplemented!(); }
 		if let Some(ident) = single_ident_generic_path_to_ident(&p.path) {
 			if let Some(resolved_path) = types.maybe_resolve_non_ignored_ident(&ident) {
+				if !types.understood_c_path(&p.path) {
+					eprintln!("Not implementing anything for impl {} as the type is not understood (probably C-not exported)", ident);
+					return;
+				}
+
 				let mut gen_types = GenericTypes::new(Some(resolved_path.clone()));
 				if !gen_types.learn_generics(&i.generics, types) {
 					eprintln!("Not implementing anything for impl {} due to not understood generics", ident);

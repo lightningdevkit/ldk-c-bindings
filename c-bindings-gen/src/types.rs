@@ -46,6 +46,10 @@ pub fn get_single_remaining_path_seg<'a, I: Iterator<Item=&'a syn::PathSegment>>
 	} else { None }
 }
 
+pub fn first_seg_is_stdlib(first_seg_str: &str) -> bool {
+	first_seg_str == "std" || first_seg_str == "core" || first_seg_str == "alloc"
+}
+
 pub fn single_ident_generic_path_to_ident(p: &syn::Path) -> Option<&syn::Ident> {
 	if p.segments.len() == 1 {
 		Some(&p.segments.iter().next().unwrap().ident)
@@ -600,7 +604,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				}
 			} else if let Some(_) = self.priv_modules.get(&first_seg.ident) {
 				Some(format!("{}::{}{}", self.module_path, first_seg.ident, remaining))
-			} else if first_seg_str == "std" || first_seg_str == "core" || self.dependencies.contains(&first_seg.ident) {
+			} else if first_seg_is_stdlib(&first_seg_str) || self.dependencies.contains(&first_seg.ident) {
 				Some(first_seg_str + &remaining)
 			} else { None }
 		}

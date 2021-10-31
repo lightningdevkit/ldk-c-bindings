@@ -592,7 +592,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	// If we directly read the original type by its original name, cbindgen hits
 	// https://github.com/eqrion/cbindgen/issues/286 Thus, instead, we import it as a temporary
 	// name and then reference it by that name, which works around the issue.
-	write!(w, "\nuse {}::{} as native{}Import;\ntype native{} = native{}Import", types.module_path, ident, ident, ident, ident).unwrap();
+	write!(w, "\nuse {}::{} as native{}Import;\npub(crate) type native{} = native{}Import", types.module_path, ident, ident, ident, ident).unwrap();
 	maybe_write_generics(w, &generics, &types, true);
 	writeln!(w, ";\n").unwrap();
 	writeln!(extra_headers, "struct native{}Opaque;\ntypedef struct native{}Opaque LDKnative{};", ident, ident, ident).unwrap();
@@ -614,7 +614,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	writeln!(w, "#[no_mangle]\npub extern \"C\" fn {}_free(this_obj: {}) {{ }}", struct_name, struct_name).unwrap();
 	writeln!(w, "#[allow(unused)]").unwrap();
 	writeln!(w, "/// Used only if an object of this type is returned as a trait impl by a method").unwrap();
-	writeln!(w, "extern \"C\" fn {}_free_void(this_ptr: *mut c_void) {{", struct_name).unwrap();
+	writeln!(w, "pub(crate) extern \"C\" fn {}_free_void(this_ptr: *mut c_void) {{", struct_name).unwrap();
 	writeln!(w, "\tunsafe {{ let _ = Box::from_raw(this_ptr as *mut native{}); }}\n}}", struct_name).unwrap();
 	writeln!(w, "#[allow(unused)]").unwrap();
 	writeln!(w, "impl {} {{", struct_name).unwrap();
@@ -829,7 +829,13 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						// properly. This way we can call this method from deep in the
 						// type-conversion logic without actually knowing the concrete native type.
 						if !resolved_path.starts_with(types.module_path) {
-							writeln!(w, "use {} as native{};", resolved_path, ident).unwrap();
+							if !first_seg_is_stdlib(resolved_path.split("::").next().unwrap()) {
+								writeln!(w, "use crate::{}::native{} as native{};", resolved_path.rsplitn(2, "::").skip(1).next().unwrap(), ident, ident).unwrap();
+								writeln!(w, "use crate::{};", resolved_path).unwrap();
+								writeln!(w, "use crate::{}_free_void;", resolved_path).unwrap();
+							} else {
+								writeln!(w, "use {} as native{};", resolved_path, ident).unwrap();
+							}
 						}
 						writeln!(w, "impl From<native{}> for crate::{} {{", ident, full_trait_path).unwrap();
 						writeln!(w, "\tfn from(obj: native{}) -> Self {{", ident).unwrap();

@@ -371,8 +371,8 @@ impl<'a, 'b, 'c: 'a + 'b> ResolveType<'c> for Option<&GenericTypes<'a, 'b>> {
 				}
 				_ => {},
 			}
-		}
-		ty
+			us.parent.resolve_type(ty)
+		} else { ty }
 	}
 }
 

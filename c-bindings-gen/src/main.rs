@@ -644,17 +644,17 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 	let struct_name = &format!("{}", s.ident);
 	writeln_opaque(w, &s.ident, struct_name, &s.generics, &s.attrs, types, extra_headers, cpp_headers);
 
-	if let syn::Fields::Named(fields) = &s.fields {
-		let mut self_path_segs = syn::punctuated::Punctuated::new();
-		self_path_segs.push(s.ident.clone().into());
-		let self_path = syn::Path { leading_colon: None, segments: self_path_segs};
-		let mut gen_types = GenericTypes::new(Some(types.resolve_path(&self_path, None)));
-		assert!(gen_types.learn_generics(&s.generics, types));
+	let mut self_path_segs = syn::punctuated::Punctuated::new();
+	self_path_segs.push(s.ident.clone().into());
+	let self_path = syn::Path { leading_colon: None, segments: self_path_segs};
+	let mut gen_types = GenericTypes::new(Some(types.resolve_path(&self_path, None)));
+	assert!(gen_types.learn_generics(&s.generics, types));
 
-		let mut all_fields_settable = true;
-		for field in fields.named.iter() {
-			if let syn::Visibility::Public(_) = field.vis {
-				let export = export_status(&field.attrs);
+	let mut all_fields_settable = true;
+	macro_rules! define_field {
+		($new_name: expr, $real_name: expr, $field: expr) => {
+			if let syn::Visibility::Public(_) = $field.vis {
+				let export = export_status(&$field.attrs);
 				match export {
 					ExportStatus::Export => {},
 					ExportStatus::NoExport|ExportStatus::TestOnly => {
@@ -664,65 +664,124 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 					ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 				}
 
-				if let Some(ident) = &field.ident {
-					if let Some(ref_type) = types.create_ownable_reference(&field.ty, Some(&gen_types)) {
-						if types.understood_c_type(&ref_type, Some(&gen_types)) {
-							writeln_arg_docs(w, &field.attrs, "", types, Some(&gen_types), vec![].drain(..), Some(&ref_type));
-							write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> ", struct_name, ident, struct_name).unwrap();
-							types.write_c_type(w, &ref_type, Some(&gen_types), true);
-							write!(w, " {{\n\tlet mut inner_val = &mut this_ptr.get_native_mut_ref().{};\n\t", ident).unwrap();
-							let local_var = types.write_to_c_conversion_new_var(w, &format_ident!("inner_val"), &ref_type, Some(&gen_types), true);
-							if local_var { write!(w, "\n\t").unwrap(); }
-							types.write_to_c_conversion_inline_prefix(w, &ref_type, Some(&gen_types), true);
-							write!(w, "inner_val").unwrap();
-							types.write_to_c_conversion_inline_suffix(w, &ref_type, Some(&gen_types), true);
-							writeln!(w, "\n}}").unwrap();
-						}
-					}
-
-					if types.understood_c_type(&field.ty, Some(&gen_types)) {
-						writeln_arg_docs(w, &field.attrs, "", types, Some(&gen_types), vec![("val".to_owned(), &field.ty)].drain(..), None);
-						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_set_{}(this_ptr: &mut {}, mut val: ", struct_name, ident, struct_name).unwrap();
-						types.write_c_type(w, &field.ty, Some(&gen_types), false);
-						write!(w, ") {{\n\t").unwrap();
-						let local_var = types.write_from_c_conversion_new_var(w, &format_ident!("val"), &field.ty, Some(&gen_types));
+				if let Some(ref_type) = types.create_ownable_reference(&$field.ty, Some(&gen_types)) {
+					if types.understood_c_type(&ref_type, Some(&gen_types)) {
+						writeln_arg_docs(w, &$field.attrs, "", types, Some(&gen_types), vec![].drain(..), Some(&ref_type));
+						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> ", struct_name, $new_name, struct_name).unwrap();
+						types.write_c_type(w, &ref_type, Some(&gen_types), true);
+						write!(w, " {{\n\tlet mut inner_val = &mut this_ptr.get_native_mut_ref().{};\n\t", $real_name).unwrap();
+						let local_var = types.write_to_c_conversion_new_var(w, &format_ident!("inner_val"), &ref_type, Some(&gen_types), true);
 						if local_var { write!(w, "\n\t").unwrap(); }
-						write!(w, "unsafe {{ &mut *ObjOps::untweak_ptr(this_ptr.inner) }}.{} = ", ident).unwrap();
-						types.write_from_c_conversion_prefix(w, &field.ty, Some(&gen_types));
-						write!(w, "val").unwrap();
-						types.write_from_c_conversion_suffix(w, &field.ty, Some(&gen_types));
-						writeln!(w, ";\n}}").unwrap();
-					} else { all_fields_settable = false; }
+						types.write_to_c_conversion_inline_prefix(w, &ref_type, Some(&gen_types), true);
+						write!(w, "inner_val").unwrap();
+						types.write_to_c_conversion_inline_suffix(w, &ref_type, Some(&gen_types), true);
+						writeln!(w, "\n}}").unwrap();
+					}
+				}
+
+				if types.understood_c_type(&$field.ty, Some(&gen_types)) {
+					writeln_arg_docs(w, &$field.attrs, "", types, Some(&gen_types), vec![("val".to_owned(), &$field.ty)].drain(..), None);
+					write!(w, "#[no_mangle]\npub extern \"C\" fn {}_set_{}(this_ptr: &mut {}, mut val: ", struct_name, $new_name, struct_name).unwrap();
+					types.write_c_type(w, &$field.ty, Some(&gen_types), false);
+					write!(w, ") {{\n\t").unwrap();
+					let local_var = types.write_from_c_conversion_new_var(w, &format_ident!("val"), &$field.ty, Some(&gen_types));
+					if local_var { write!(w, "\n\t").unwrap(); }
+					write!(w, "unsafe {{ &mut *ObjOps::untweak_ptr(this_ptr.inner) }}.{} = ", $real_name).unwrap();
+					types.write_from_c_conversion_prefix(w, &$field.ty, Some(&gen_types));
+					write!(w, "val").unwrap();
+					types.write_from_c_conversion_suffix(w, &$field.ty, Some(&gen_types));
+					writeln!(w, ";\n}}").unwrap();
 				} else { all_fields_settable = false; }
 			} else { all_fields_settable = false; }
 		}
+	}
 
-		if all_fields_settable {
-			// Build a constructor!
-			writeln!(w, "/// Constructs a new {} given each field", struct_name).unwrap();
-			write!(w, "#[must_use]\n#[no_mangle]\npub extern \"C\" fn {}_new(", struct_name).unwrap();
-			for (idx, field) in fields.named.iter().enumerate() {
-				if idx != 0 { write!(w, ", ").unwrap(); }
-				write!(w, "mut {}_arg: ", field.ident.as_ref().unwrap()).unwrap();
-				types.write_c_type(w, &field.ty, Some(&gen_types), false);
-			}
-			write!(w, ") -> {} {{\n\t", struct_name).unwrap();
+	match &s.fields {
+		syn::Fields::Named(fields) => {
 			for field in fields.named.iter() {
-				let field_ident = format_ident!("{}_arg", field.ident.as_ref().unwrap());
-				if types.write_from_c_conversion_new_var(w, &field_ident, &field.ty, Some(&gen_types)) {
-					write!(w, "\n\t").unwrap();
+				if let Some(ident) = &field.ident {
+					define_field!(ident, ident, field);
+				} else { all_fields_settable = false; }
+			}
+		}
+		syn::Fields::Unnamed(fields) => {
+			for (idx, field) in fields.unnamed.iter().enumerate() {
+				define_field!(('a' as u8 + idx as u8) as char, ('0' as u8 + idx as u8) as char, field);
+			}
+		}
+		_ => unimplemented!()
+	}
+
+	if all_fields_settable {
+		// Build a constructor!
+		writeln!(w, "/// Constructs a new {} given each field", struct_name).unwrap();
+		write!(w, "#[must_use]\n#[no_mangle]\npub extern \"C\" fn {}_new(", struct_name).unwrap();
+
+		match &s.fields {
+			syn::Fields::Named(fields) => {
+				for (idx, field) in fields.named.iter().enumerate() {
+					if idx != 0 { write!(w, ", ").unwrap(); }
+					write!(w, "mut {}_arg: ", field.ident.as_ref().unwrap()).unwrap();
+					types.write_c_type(w, &field.ty, Some(&gen_types), false);
 				}
 			}
-			writeln!(w, "{} {{ inner: ObjOps::heap_alloc(native{} {{", struct_name, s.ident).unwrap();
-			for field in fields.named.iter() {
-				write!(w, "\t\t{}: ", field.ident.as_ref().unwrap()).unwrap();
-				types.write_from_c_conversion_prefix(w, &field.ty, Some(&gen_types));
-				write!(w, "{}_arg", field.ident.as_ref().unwrap()).unwrap();
-				types.write_from_c_conversion_suffix(w, &field.ty, Some(&gen_types));
-				writeln!(w, ",").unwrap();
+			syn::Fields::Unnamed(fields) => {
+				for (idx, field) in fields.unnamed.iter().enumerate() {
+					if idx != 0 { write!(w, ", ").unwrap(); }
+					write!(w, "mut {}_arg: ", ('a' as u8 + idx as u8) as char).unwrap();
+					types.write_c_type(w, &field.ty, Some(&gen_types), false);
+				}
 			}
-			writeln!(w, "\t}}), is_owned: true }}\n}}").unwrap();
+			_ => unreachable!()
 		}
+		write!(w, ") -> {} {{\n\t", struct_name).unwrap();
+		match &s.fields {
+			syn::Fields::Named(fields) => {
+				for field in fields.named.iter() {
+					let field_ident = format_ident!("{}_arg", field.ident.as_ref().unwrap());
+					if types.write_from_c_conversion_new_var(w, &field_ident, &field.ty, Some(&gen_types)) {
+						write!(w, "\n\t").unwrap();
+					}
+				}
+			},
+			syn::Fields::Unnamed(fields) => {
+				for (idx, field) in fields.unnamed.iter().enumerate() {
+					let field_ident = format_ident!("{}_arg", ('a' as u8 + idx as u8) as char);
+					if types.write_from_c_conversion_new_var(w, &field_ident, &field.ty, Some(&gen_types)) {
+						write!(w, "\n\t").unwrap();
+					}
+				}
+			},
+			_ => unreachable!()
+		}
+		write!(w, "{} {{ inner: ObjOps::heap_alloc(", struct_name).unwrap();
+		match &s.fields {
+			syn::Fields::Named(fields) => {
+				writeln!(w, "native{} {{", s.ident).unwrap();
+				for field in fields.named.iter() {
+					write!(w, "\t\t{}: ", field.ident.as_ref().unwrap()).unwrap();
+					types.write_from_c_conversion_prefix(w, &field.ty, Some(&gen_types));
+					write!(w, "{}_arg", field.ident.as_ref().unwrap()).unwrap();
+					types.write_from_c_conversion_suffix(w, &field.ty, Some(&gen_types));
+					writeln!(w, ",").unwrap();
+				}
+				write!(w, "\t}}").unwrap();
+			},
+			syn::Fields::Unnamed(fields) => {
+				assert!(s.generics.lt_token.is_none());
+				writeln!(w, "{} (", types.maybe_resolve_ident(&s.ident).unwrap()).unwrap();
+				for (idx, field) in fields.unnamed.iter().enumerate() {
+					write!(w, "\t\t").unwrap();
+					types.write_from_c_conversion_prefix(w, &field.ty, Some(&gen_types));
+					write!(w, "{}_arg", ('a' as u8 + idx as u8) as char).unwrap();
+					types.write_from_c_conversion_suffix(w, &field.ty, Some(&gen_types));
+					writeln!(w, ",").unwrap();
+				}
+				write!(w, "\t)").unwrap();
+			},
+			_ => unreachable!()
+		}
+		writeln!(w, "), is_owned: true }}\n}}").unwrap();
 	}
 }
 

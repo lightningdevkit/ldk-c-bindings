@@ -17,7 +17,7 @@ use crate::c_types::*;
 
 
 use lightning::util::config::ChannelHandshakeConfig as nativeChannelHandshakeConfigImport;
-type nativeChannelHandshakeConfig = nativeChannelHandshakeConfigImport;
+pub(crate) type nativeChannelHandshakeConfig = nativeChannelHandshakeConfigImport;
 
 /// Configuration we set when applicable.
 ///
@@ -49,7 +49,7 @@ impl Drop for ChannelHandshakeConfig {
 pub extern "C" fn ChannelHandshakeConfig_free(this_obj: ChannelHandshakeConfig) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ChannelHandshakeConfig_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ChannelHandshakeConfig_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelHandshakeConfig); }
 }
 #[allow(unused)]
@@ -186,7 +186,7 @@ pub extern "C" fn ChannelHandshakeConfig_default() -> ChannelHandshakeConfig {
 }
 
 use lightning::util::config::ChannelHandshakeLimits as nativeChannelHandshakeLimitsImport;
-type nativeChannelHandshakeLimits = nativeChannelHandshakeLimitsImport;
+pub(crate) type nativeChannelHandshakeLimits = nativeChannelHandshakeLimitsImport;
 
 /// Optional channel limits which are applied during channel creation.
 ///
@@ -226,7 +226,7 @@ impl Drop for ChannelHandshakeLimits {
 pub extern "C" fn ChannelHandshakeLimits_free(this_obj: ChannelHandshakeLimits) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ChannelHandshakeLimits_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ChannelHandshakeLimits_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelHandshakeLimits); }
 }
 #[allow(unused)]
@@ -443,7 +443,7 @@ pub extern "C" fn ChannelHandshakeLimits_default() -> ChannelHandshakeLimits {
 }
 
 use lightning::util::config::ChannelConfig as nativeChannelConfigImport;
-type nativeChannelConfig = nativeChannelConfigImport;
+pub(crate) type nativeChannelConfig = nativeChannelConfigImport;
 
 /// Options which apply on a per-channel basis and may change at runtime or based on negotiation
 /// with our counterparty.
@@ -474,7 +474,7 @@ impl Drop for ChannelConfig {
 pub extern "C" fn ChannelConfig_free(this_obj: ChannelConfig) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ChannelConfig_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ChannelConfig_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelConfig); }
 }
 #[allow(unused)]
@@ -805,7 +805,7 @@ pub extern "C" fn ChannelConfig_read(ser: crate::c_types::u8slice) -> crate::c_t
 }
 
 use lightning::util::config::UserConfig as nativeUserConfigImport;
-type nativeUserConfig = nativeUserConfigImport;
+pub(crate) type nativeUserConfig = nativeUserConfigImport;
 
 /// Top-level config which holds ChannelHandshakeLimits and ChannelConfig.
 ///
@@ -838,7 +838,7 @@ impl Drop for UserConfig {
 pub extern "C" fn UserConfig_free(this_obj: UserConfig) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn UserConfig_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn UserConfig_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUserConfig); }
 }
 #[allow(unused)]
@@ -861,7 +861,7 @@ impl UserConfig {
 #[no_mangle]
 pub extern "C" fn UserConfig_get_own_channel_config(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelHandshakeConfig {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().own_channel_config;
-	crate::lightning::util::config::ChannelHandshakeConfig { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::util::config::ChannelHandshakeConfig { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::util::config::ChannelHandshakeConfig<>) as *mut _) }, is_owned: false }
 }
 /// Channel config that we propose to our counterparty.
 #[no_mangle]
@@ -872,7 +872,7 @@ pub extern "C" fn UserConfig_set_own_channel_config(this_ptr: &mut UserConfig, m
 #[no_mangle]
 pub extern "C" fn UserConfig_get_peer_channel_config_limits(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelHandshakeLimits {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().peer_channel_config_limits;
-	crate::lightning::util::config::ChannelHandshakeLimits { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::util::config::ChannelHandshakeLimits { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::util::config::ChannelHandshakeLimits<>) as *mut _) }, is_owned: false }
 }
 /// Limits applied to our counterparty's proposed channel config settings.
 #[no_mangle]
@@ -883,7 +883,7 @@ pub extern "C" fn UserConfig_set_peer_channel_config_limits(this_ptr: &mut UserC
 #[no_mangle]
 pub extern "C" fn UserConfig_get_channel_options(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelConfig {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_options;
-	crate::lightning::util::config::ChannelConfig { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::util::config::ChannelConfig { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::util::config::ChannelConfig<>) as *mut _) }, is_owned: false }
 }
 /// Channel config which affects behavior during channel lifetime.
 #[no_mangle]

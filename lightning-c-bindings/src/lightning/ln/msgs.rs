@@ -31,7 +31,7 @@ use crate::c_types::*;
 
 
 use lightning::ln::msgs::DecodeError as nativeDecodeErrorImport;
-type nativeDecodeError = nativeDecodeErrorImport;
+pub(crate) type nativeDecodeError = nativeDecodeErrorImport;
 
 /// An error in decoding a message or struct.
 #[must_use]
@@ -61,7 +61,7 @@ impl Drop for DecodeError {
 pub extern "C" fn DecodeError_free(this_obj: DecodeError) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn DecodeError_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn DecodeError_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDecodeError); }
 }
 #[allow(unused)]
@@ -101,7 +101,7 @@ pub extern "C" fn DecodeError_clone(orig: &DecodeError) -> DecodeError {
 }
 
 use lightning::ln::msgs::Init as nativeInitImport;
-type nativeInit = nativeInitImport;
+pub(crate) type nativeInit = nativeInitImport;
 
 /// An init message to be sent or received from a peer
 #[must_use]
@@ -131,7 +131,7 @@ impl Drop for Init {
 pub extern "C" fn Init_free(this_obj: Init) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn Init_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn Init_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInit); }
 }
 #[allow(unused)]
@@ -154,7 +154,7 @@ impl Init {
 #[no_mangle]
 pub extern "C" fn Init_get_features(this_ptr: &Init) -> crate::lightning::ln::features::InitFeatures {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().features;
-	crate::lightning::ln::features::InitFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::InitFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::features::InitFeatures<>) as *mut _) }, is_owned: false }
 }
 /// The relevant features which the sender supports
 #[no_mangle]
@@ -190,7 +190,7 @@ pub extern "C" fn Init_clone(orig: &Init) -> Init {
 }
 
 use lightning::ln::msgs::ErrorMessage as nativeErrorMessageImport;
-type nativeErrorMessage = nativeErrorMessageImport;
+pub(crate) type nativeErrorMessage = nativeErrorMessageImport;
 
 /// An error message to be sent or received from a peer
 #[must_use]
@@ -220,7 +220,7 @@ impl Drop for ErrorMessage {
 pub extern "C" fn ErrorMessage_free(this_obj: ErrorMessage) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ErrorMessage_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ErrorMessage_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeErrorMessage); }
 }
 #[allow(unused)]
@@ -297,7 +297,7 @@ pub extern "C" fn ErrorMessage_clone(orig: &ErrorMessage) -> ErrorMessage {
 }
 
 use lightning::ln::msgs::Ping as nativePingImport;
-type nativePing = nativePingImport;
+pub(crate) type nativePing = nativePingImport;
 
 /// A ping message to be sent or received from a peer
 #[must_use]
@@ -327,7 +327,7 @@ impl Drop for Ping {
 pub extern "C" fn Ping_free(this_obj: Ping) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn Ping_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn Ping_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePing); }
 }
 #[allow(unused)]
@@ -400,7 +400,7 @@ pub extern "C" fn Ping_clone(orig: &Ping) -> Ping {
 }
 
 use lightning::ln::msgs::Pong as nativePongImport;
-type nativePong = nativePongImport;
+pub(crate) type nativePong = nativePongImport;
 
 /// A pong message to be sent or received from a peer
 #[must_use]
@@ -430,7 +430,7 @@ impl Drop for Pong {
 pub extern "C" fn Pong_free(this_obj: Pong) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn Pong_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn Pong_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePong); }
 }
 #[allow(unused)]
@@ -491,7 +491,7 @@ pub extern "C" fn Pong_clone(orig: &Pong) -> Pong {
 }
 
 use lightning::ln::msgs::OpenChannel as nativeOpenChannelImport;
-type nativeOpenChannel = nativeOpenChannelImport;
+pub(crate) type nativeOpenChannel = nativeOpenChannelImport;
 
 /// An open_channel message to be sent or received from a peer
 #[must_use]
@@ -521,7 +521,7 @@ impl Drop for OpenChannel {
 pub extern "C" fn OpenChannel_free(this_obj: OpenChannel) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn OpenChannel_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn OpenChannel_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeOpenChannel); }
 }
 #[allow(unused)]
@@ -759,7 +759,7 @@ pub extern "C" fn OpenChannel_clone(orig: &OpenChannel) -> OpenChannel {
 }
 
 use lightning::ln::msgs::AcceptChannel as nativeAcceptChannelImport;
-type nativeAcceptChannel = nativeAcceptChannelImport;
+pub(crate) type nativeAcceptChannel = nativeAcceptChannelImport;
 
 /// An accept_channel message to be sent or received from a peer
 #[must_use]
@@ -789,7 +789,7 @@ impl Drop for AcceptChannel {
 pub extern "C" fn AcceptChannel_free(this_obj: AcceptChannel) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn AcceptChannel_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn AcceptChannel_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeAcceptChannel); }
 }
 #[allow(unused)]
@@ -983,7 +983,7 @@ pub extern "C" fn AcceptChannel_clone(orig: &AcceptChannel) -> AcceptChannel {
 }
 
 use lightning::ln::msgs::FundingCreated as nativeFundingCreatedImport;
-type nativeFundingCreated = nativeFundingCreatedImport;
+pub(crate) type nativeFundingCreated = nativeFundingCreatedImport;
 
 /// A funding_created message to be sent or received from a peer
 #[must_use]
@@ -1013,7 +1013,7 @@ impl Drop for FundingCreated {
 pub extern "C" fn FundingCreated_free(this_obj: FundingCreated) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn FundingCreated_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn FundingCreated_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeFundingCreated); }
 }
 #[allow(unused)]
@@ -1108,7 +1108,7 @@ pub extern "C" fn FundingCreated_clone(orig: &FundingCreated) -> FundingCreated 
 }
 
 use lightning::ln::msgs::FundingSigned as nativeFundingSignedImport;
-type nativeFundingSigned = nativeFundingSignedImport;
+pub(crate) type nativeFundingSigned = nativeFundingSignedImport;
 
 /// A funding_signed message to be sent or received from a peer
 #[must_use]
@@ -1138,7 +1138,7 @@ impl Drop for FundingSigned {
 pub extern "C" fn FundingSigned_free(this_obj: FundingSigned) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn FundingSigned_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn FundingSigned_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeFundingSigned); }
 }
 #[allow(unused)]
@@ -1209,7 +1209,7 @@ pub extern "C" fn FundingSigned_clone(orig: &FundingSigned) -> FundingSigned {
 }
 
 use lightning::ln::msgs::FundingLocked as nativeFundingLockedImport;
-type nativeFundingLocked = nativeFundingLockedImport;
+pub(crate) type nativeFundingLocked = nativeFundingLockedImport;
 
 /// A funding_locked message to be sent or received from a peer
 #[must_use]
@@ -1239,7 +1239,7 @@ impl Drop for FundingLocked {
 pub extern "C" fn FundingLocked_free(this_obj: FundingLocked) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn FundingLocked_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn FundingLocked_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeFundingLocked); }
 }
 #[allow(unused)]
@@ -1310,7 +1310,7 @@ pub extern "C" fn FundingLocked_clone(orig: &FundingLocked) -> FundingLocked {
 }
 
 use lightning::ln::msgs::Shutdown as nativeShutdownImport;
-type nativeShutdown = nativeShutdownImport;
+pub(crate) type nativeShutdown = nativeShutdownImport;
 
 /// A shutdown message to be sent or received from a peer
 #[must_use]
@@ -1340,7 +1340,7 @@ impl Drop for Shutdown {
 pub extern "C" fn Shutdown_free(this_obj: Shutdown) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn Shutdown_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn Shutdown_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeShutdown); }
 }
 #[allow(unused)]
@@ -1413,7 +1413,7 @@ pub extern "C" fn Shutdown_clone(orig: &Shutdown) -> Shutdown {
 }
 
 use lightning::ln::msgs::ClosingSignedFeeRange as nativeClosingSignedFeeRangeImport;
-type nativeClosingSignedFeeRange = nativeClosingSignedFeeRangeImport;
+pub(crate) type nativeClosingSignedFeeRange = nativeClosingSignedFeeRangeImport;
 
 /// The minimum and maximum fees which the sender is willing to place on the closing transaction.
 /// This is provided in [`ClosingSigned`] by both sides to indicate the fee range they are willing
@@ -1445,7 +1445,7 @@ impl Drop for ClosingSignedFeeRange {
 pub extern "C" fn ClosingSignedFeeRange_free(this_obj: ClosingSignedFeeRange) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ClosingSignedFeeRange_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ClosingSignedFeeRange_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeClosingSignedFeeRange); }
 }
 #[allow(unused)]
@@ -1520,7 +1520,7 @@ pub extern "C" fn ClosingSignedFeeRange_clone(orig: &ClosingSignedFeeRange) -> C
 }
 
 use lightning::ln::msgs::ClosingSigned as nativeClosingSignedImport;
-type nativeClosingSigned = nativeClosingSignedImport;
+pub(crate) type nativeClosingSigned = nativeClosingSignedImport;
 
 /// A closing_signed message to be sent or received from a peer
 #[must_use]
@@ -1550,7 +1550,7 @@ impl Drop for ClosingSigned {
 pub extern "C" fn ClosingSigned_free(this_obj: ClosingSigned) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ClosingSigned_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ClosingSigned_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeClosingSigned); }
 }
 #[allow(unused)]
@@ -1609,7 +1609,7 @@ pub extern "C" fn ClosingSigned_set_signature(this_ptr: &mut ClosingSigned, mut 
 #[no_mangle]
 pub extern "C" fn ClosingSigned_get_fee_range(this_ptr: &ClosingSigned) -> crate::lightning::ln::msgs::ClosingSignedFeeRange {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().fee_range;
-	let mut local_inner_val = crate::lightning::ln::msgs::ClosingSignedFeeRange { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::msgs::ClosingSignedFeeRange { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::ClosingSignedFeeRange<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// The minimum and maximum fees which the sender is willing to accept, provided only by new
@@ -1654,7 +1654,7 @@ pub extern "C" fn ClosingSigned_clone(orig: &ClosingSigned) -> ClosingSigned {
 }
 
 use lightning::ln::msgs::UpdateAddHTLC as nativeUpdateAddHTLCImport;
-type nativeUpdateAddHTLC = nativeUpdateAddHTLCImport;
+pub(crate) type nativeUpdateAddHTLC = nativeUpdateAddHTLCImport;
 
 /// An update_add_htlc message to be sent or received from a peer
 #[must_use]
@@ -1684,7 +1684,7 @@ impl Drop for UpdateAddHTLC {
 pub extern "C" fn UpdateAddHTLC_free(this_obj: UpdateAddHTLC) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn UpdateAddHTLC_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn UpdateAddHTLC_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUpdateAddHTLC); }
 }
 #[allow(unused)]
@@ -1779,7 +1779,7 @@ pub extern "C" fn UpdateAddHTLC_clone(orig: &UpdateAddHTLC) -> UpdateAddHTLC {
 }
 
 use lightning::ln::msgs::UpdateFulfillHTLC as nativeUpdateFulfillHTLCImport;
-type nativeUpdateFulfillHTLC = nativeUpdateFulfillHTLCImport;
+pub(crate) type nativeUpdateFulfillHTLC = nativeUpdateFulfillHTLCImport;
 
 /// An update_fulfill_htlc message to be sent or received from a peer
 #[must_use]
@@ -1809,7 +1809,7 @@ impl Drop for UpdateFulfillHTLC {
 pub extern "C" fn UpdateFulfillHTLC_free(this_obj: UpdateFulfillHTLC) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn UpdateFulfillHTLC_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn UpdateFulfillHTLC_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUpdateFulfillHTLC); }
 }
 #[allow(unused)]
@@ -1892,7 +1892,7 @@ pub extern "C" fn UpdateFulfillHTLC_clone(orig: &UpdateFulfillHTLC) -> UpdateFul
 }
 
 use lightning::ln::msgs::UpdateFailHTLC as nativeUpdateFailHTLCImport;
-type nativeUpdateFailHTLC = nativeUpdateFailHTLCImport;
+pub(crate) type nativeUpdateFailHTLC = nativeUpdateFailHTLCImport;
 
 /// An update_fail_htlc message to be sent or received from a peer
 #[must_use]
@@ -1922,7 +1922,7 @@ impl Drop for UpdateFailHTLC {
 pub extern "C" fn UpdateFailHTLC_free(this_obj: UpdateFailHTLC) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn UpdateFailHTLC_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn UpdateFailHTLC_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUpdateFailHTLC); }
 }
 #[allow(unused)]
@@ -1984,7 +1984,7 @@ pub extern "C" fn UpdateFailHTLC_clone(orig: &UpdateFailHTLC) -> UpdateFailHTLC 
 }
 
 use lightning::ln::msgs::UpdateFailMalformedHTLC as nativeUpdateFailMalformedHTLCImport;
-type nativeUpdateFailMalformedHTLC = nativeUpdateFailMalformedHTLCImport;
+pub(crate) type nativeUpdateFailMalformedHTLC = nativeUpdateFailMalformedHTLCImport;
 
 /// An update_fail_malformed_htlc message to be sent or received from a peer
 #[must_use]
@@ -2014,7 +2014,7 @@ impl Drop for UpdateFailMalformedHTLC {
 pub extern "C" fn UpdateFailMalformedHTLC_free(this_obj: UpdateFailMalformedHTLC) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn UpdateFailMalformedHTLC_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn UpdateFailMalformedHTLC_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUpdateFailMalformedHTLC); }
 }
 #[allow(unused)]
@@ -2087,7 +2087,7 @@ pub extern "C" fn UpdateFailMalformedHTLC_clone(orig: &UpdateFailMalformedHTLC) 
 }
 
 use lightning::ln::msgs::CommitmentSigned as nativeCommitmentSignedImport;
-type nativeCommitmentSigned = nativeCommitmentSignedImport;
+pub(crate) type nativeCommitmentSigned = nativeCommitmentSignedImport;
 
 /// A commitment_signed message to be sent or received from a peer
 #[must_use]
@@ -2117,7 +2117,7 @@ impl Drop for CommitmentSigned {
 pub extern "C" fn CommitmentSigned_free(this_obj: CommitmentSigned) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn CommitmentSigned_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn CommitmentSigned_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeCommitmentSigned); }
 }
 #[allow(unused)]
@@ -2196,7 +2196,7 @@ pub extern "C" fn CommitmentSigned_clone(orig: &CommitmentSigned) -> CommitmentS
 }
 
 use lightning::ln::msgs::RevokeAndACK as nativeRevokeAndACKImport;
-type nativeRevokeAndACK = nativeRevokeAndACKImport;
+pub(crate) type nativeRevokeAndACK = nativeRevokeAndACKImport;
 
 /// A revoke_and_ack message to be sent or received from a peer
 #[must_use]
@@ -2226,7 +2226,7 @@ impl Drop for RevokeAndACK {
 pub extern "C" fn RevokeAndACK_free(this_obj: RevokeAndACK) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn RevokeAndACK_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn RevokeAndACK_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRevokeAndACK); }
 }
 #[allow(unused)]
@@ -2309,7 +2309,7 @@ pub extern "C" fn RevokeAndACK_clone(orig: &RevokeAndACK) -> RevokeAndACK {
 }
 
 use lightning::ln::msgs::UpdateFee as nativeUpdateFeeImport;
-type nativeUpdateFee = nativeUpdateFeeImport;
+pub(crate) type nativeUpdateFee = nativeUpdateFeeImport;
 
 /// An update_fee message to be sent or received from a peer
 #[must_use]
@@ -2339,7 +2339,7 @@ impl Drop for UpdateFee {
 pub extern "C" fn UpdateFee_free(this_obj: UpdateFee) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn UpdateFee_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn UpdateFee_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUpdateFee); }
 }
 #[allow(unused)]
@@ -2410,7 +2410,7 @@ pub extern "C" fn UpdateFee_clone(orig: &UpdateFee) -> UpdateFee {
 }
 
 use lightning::ln::msgs::DataLossProtect as nativeDataLossProtectImport;
-type nativeDataLossProtect = nativeDataLossProtectImport;
+pub(crate) type nativeDataLossProtect = nativeDataLossProtectImport;
 
 /// Proof that the sender knows the per-commitment secret of the previous commitment transaction.
 /// This is used to convince the recipient that the channel is at a certain commitment
@@ -2443,7 +2443,7 @@ impl Drop for DataLossProtect {
 pub extern "C" fn DataLossProtect_free(this_obj: DataLossProtect) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn DataLossProtect_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn DataLossProtect_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDataLossProtect); }
 }
 #[allow(unused)]
@@ -2516,7 +2516,7 @@ pub extern "C" fn DataLossProtect_clone(orig: &DataLossProtect) -> DataLossProte
 }
 
 use lightning::ln::msgs::ChannelReestablish as nativeChannelReestablishImport;
-type nativeChannelReestablish = nativeChannelReestablishImport;
+pub(crate) type nativeChannelReestablish = nativeChannelReestablishImport;
 
 /// A channel_reestablish message to be sent or received from a peer
 #[must_use]
@@ -2546,7 +2546,7 @@ impl Drop for ChannelReestablish {
 pub extern "C" fn ChannelReestablish_free(this_obj: ChannelReestablish) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ChannelReestablish_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ChannelReestablish_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelReestablish); }
 }
 #[allow(unused)]
@@ -2619,7 +2619,7 @@ pub extern "C" fn ChannelReestablish_clone(orig: &ChannelReestablish) -> Channel
 }
 
 use lightning::ln::msgs::AnnouncementSignatures as nativeAnnouncementSignaturesImport;
-type nativeAnnouncementSignatures = nativeAnnouncementSignaturesImport;
+pub(crate) type nativeAnnouncementSignatures = nativeAnnouncementSignaturesImport;
 
 /// An announcement_signatures message to be sent or received from a peer
 #[must_use]
@@ -2649,7 +2649,7 @@ impl Drop for AnnouncementSignatures {
 pub extern "C" fn AnnouncementSignatures_free(this_obj: AnnouncementSignatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn AnnouncementSignatures_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn AnnouncementSignatures_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeAnnouncementSignatures); }
 }
 #[allow(unused)]
@@ -2977,13 +2977,6 @@ pub extern "C" fn NetAddress_write(obj: &NetAddress) -> crate::c_types::derived:
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
 }
 #[no_mangle]
-/// Read a Result from a byte array, created by Result_write
-pub extern "C" fn Result_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CResult_NetAddressu8ZDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = match o { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::NetAddress::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { e }).into() }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
-	local_res
-}
-#[no_mangle]
 /// Read a NetAddress from a byte array, created by NetAddress_write
 pub extern "C" fn NetAddress_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NetAddressDecodeErrorZ {
 	let res = crate::c_types::deserialize_obj(ser);
@@ -2992,7 +2985,7 @@ pub extern "C" fn NetAddress_read(ser: crate::c_types::u8slice) -> crate::c_type
 }
 
 use lightning::ln::msgs::UnsignedNodeAnnouncement as nativeUnsignedNodeAnnouncementImport;
-type nativeUnsignedNodeAnnouncement = nativeUnsignedNodeAnnouncementImport;
+pub(crate) type nativeUnsignedNodeAnnouncement = nativeUnsignedNodeAnnouncementImport;
 
 /// The unsigned part of a node_announcement
 #[must_use]
@@ -3022,7 +3015,7 @@ impl Drop for UnsignedNodeAnnouncement {
 pub extern "C" fn UnsignedNodeAnnouncement_free(this_obj: UnsignedNodeAnnouncement) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn UnsignedNodeAnnouncement_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn UnsignedNodeAnnouncement_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUnsignedNodeAnnouncement); }
 }
 #[allow(unused)]
@@ -3045,7 +3038,7 @@ impl UnsignedNodeAnnouncement {
 #[no_mangle]
 pub extern "C" fn UnsignedNodeAnnouncement_get_features(this_ptr: &UnsignedNodeAnnouncement) -> crate::lightning::ln::features::NodeFeatures {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().features;
-	crate::lightning::ln::features::NodeFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::NodeFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::features::NodeFeatures<>) as *mut _) }, is_owned: false }
 }
 /// The advertised features
 #[no_mangle]
@@ -3127,7 +3120,7 @@ pub extern "C" fn UnsignedNodeAnnouncement_clone(orig: &UnsignedNodeAnnouncement
 }
 
 use lightning::ln::msgs::NodeAnnouncement as nativeNodeAnnouncementImport;
-type nativeNodeAnnouncement = nativeNodeAnnouncementImport;
+pub(crate) type nativeNodeAnnouncement = nativeNodeAnnouncementImport;
 
 /// A node_announcement message to be sent or received from a peer
 #[must_use]
@@ -3157,7 +3150,7 @@ impl Drop for NodeAnnouncement {
 pub extern "C" fn NodeAnnouncement_free(this_obj: NodeAnnouncement) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn NodeAnnouncement_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn NodeAnnouncement_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeAnnouncement); }
 }
 #[allow(unused)]
@@ -3191,7 +3184,7 @@ pub extern "C" fn NodeAnnouncement_set_signature(this_ptr: &mut NodeAnnouncement
 #[no_mangle]
 pub extern "C" fn NodeAnnouncement_get_contents(this_ptr: &NodeAnnouncement) -> crate::lightning::ln::msgs::UnsignedNodeAnnouncement {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().contents;
-	crate::lightning::ln::msgs::UnsignedNodeAnnouncement { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::msgs::UnsignedNodeAnnouncement { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::msgs::UnsignedNodeAnnouncement<>) as *mut _) }, is_owned: false }
 }
 /// The actual content of the announcement
 #[no_mangle]
@@ -3228,7 +3221,7 @@ pub extern "C" fn NodeAnnouncement_clone(orig: &NodeAnnouncement) -> NodeAnnounc
 }
 
 use lightning::ln::msgs::UnsignedChannelAnnouncement as nativeUnsignedChannelAnnouncementImport;
-type nativeUnsignedChannelAnnouncement = nativeUnsignedChannelAnnouncementImport;
+pub(crate) type nativeUnsignedChannelAnnouncement = nativeUnsignedChannelAnnouncementImport;
 
 /// The unsigned part of a channel_announcement
 #[must_use]
@@ -3258,7 +3251,7 @@ impl Drop for UnsignedChannelAnnouncement {
 pub extern "C" fn UnsignedChannelAnnouncement_free(this_obj: UnsignedChannelAnnouncement) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn UnsignedChannelAnnouncement_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn UnsignedChannelAnnouncement_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUnsignedChannelAnnouncement); }
 }
 #[allow(unused)]
@@ -3281,7 +3274,7 @@ impl UnsignedChannelAnnouncement {
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_get_features(this_ptr: &UnsignedChannelAnnouncement) -> crate::lightning::ln::features::ChannelFeatures {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().features;
-	crate::lightning::ln::features::ChannelFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::ChannelFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::features::ChannelFeatures<>) as *mut _) }, is_owned: false }
 }
 /// The advertised channel features
 #[no_mangle]
@@ -3375,7 +3368,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_clone(orig: &UnsignedChannelAnnoun
 }
 
 use lightning::ln::msgs::ChannelAnnouncement as nativeChannelAnnouncementImport;
-type nativeChannelAnnouncement = nativeChannelAnnouncementImport;
+pub(crate) type nativeChannelAnnouncement = nativeChannelAnnouncementImport;
 
 /// A channel_announcement message to be sent or received from a peer
 #[must_use]
@@ -3405,7 +3398,7 @@ impl Drop for ChannelAnnouncement {
 pub extern "C" fn ChannelAnnouncement_free(this_obj: ChannelAnnouncement) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ChannelAnnouncement_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ChannelAnnouncement_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelAnnouncement); }
 }
 #[allow(unused)]
@@ -3472,7 +3465,7 @@ pub extern "C" fn ChannelAnnouncement_set_bitcoin_signature_2(this_ptr: &mut Cha
 #[no_mangle]
 pub extern "C" fn ChannelAnnouncement_get_contents(this_ptr: &ChannelAnnouncement) -> crate::lightning::ln::msgs::UnsignedChannelAnnouncement {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().contents;
-	crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::msgs::UnsignedChannelAnnouncement<>) as *mut _) }, is_owned: false }
 }
 /// The actual announcement
 #[no_mangle]
@@ -3512,7 +3505,7 @@ pub extern "C" fn ChannelAnnouncement_clone(orig: &ChannelAnnouncement) -> Chann
 }
 
 use lightning::ln::msgs::UnsignedChannelUpdate as nativeUnsignedChannelUpdateImport;
-type nativeUnsignedChannelUpdate = nativeUnsignedChannelUpdateImport;
+pub(crate) type nativeUnsignedChannelUpdate = nativeUnsignedChannelUpdateImport;
 
 /// The unsigned part of a channel_update
 #[must_use]
@@ -3542,7 +3535,7 @@ impl Drop for UnsignedChannelUpdate {
 pub extern "C" fn UnsignedChannelUpdate_free(this_obj: UnsignedChannelUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn UnsignedChannelUpdate_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn UnsignedChannelUpdate_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUnsignedChannelUpdate); }
 }
 #[allow(unused)]
@@ -3684,7 +3677,7 @@ pub extern "C" fn UnsignedChannelUpdate_clone(orig: &UnsignedChannelUpdate) -> U
 }
 
 use lightning::ln::msgs::ChannelUpdate as nativeChannelUpdateImport;
-type nativeChannelUpdate = nativeChannelUpdateImport;
+pub(crate) type nativeChannelUpdate = nativeChannelUpdateImport;
 
 /// A channel_update message to be sent or received from a peer
 #[must_use]
@@ -3714,7 +3707,7 @@ impl Drop for ChannelUpdate {
 pub extern "C" fn ChannelUpdate_free(this_obj: ChannelUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ChannelUpdate_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ChannelUpdate_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelUpdate); }
 }
 #[allow(unused)]
@@ -3748,7 +3741,7 @@ pub extern "C" fn ChannelUpdate_set_signature(this_ptr: &mut ChannelUpdate, mut 
 #[no_mangle]
 pub extern "C" fn ChannelUpdate_get_contents(this_ptr: &ChannelUpdate) -> crate::lightning::ln::msgs::UnsignedChannelUpdate {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().contents;
-	crate::lightning::ln::msgs::UnsignedChannelUpdate { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::msgs::UnsignedChannelUpdate { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::msgs::UnsignedChannelUpdate<>) as *mut _) }, is_owned: false }
 }
 /// The actual channel update
 #[no_mangle]
@@ -3785,7 +3778,7 @@ pub extern "C" fn ChannelUpdate_clone(orig: &ChannelUpdate) -> ChannelUpdate {
 }
 
 use lightning::ln::msgs::QueryChannelRange as nativeQueryChannelRangeImport;
-type nativeQueryChannelRange = nativeQueryChannelRangeImport;
+pub(crate) type nativeQueryChannelRange = nativeQueryChannelRangeImport;
 
 /// A query_channel_range message is used to query a peer for channel
 /// UTXOs in a range of blocks. The recipient of a query makes a best
@@ -3818,7 +3811,7 @@ impl Drop for QueryChannelRange {
 pub extern "C" fn QueryChannelRange_free(this_obj: QueryChannelRange) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn QueryChannelRange_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn QueryChannelRange_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeQueryChannelRange); }
 }
 #[allow(unused)]
@@ -3901,7 +3894,7 @@ pub extern "C" fn QueryChannelRange_clone(orig: &QueryChannelRange) -> QueryChan
 }
 
 use lightning::ln::msgs::ReplyChannelRange as nativeReplyChannelRangeImport;
-type nativeReplyChannelRange = nativeReplyChannelRangeImport;
+pub(crate) type nativeReplyChannelRange = nativeReplyChannelRangeImport;
 
 /// A reply_channel_range message is a reply to a query_channel_range
 /// message. Multiple reply_channel_range messages can be sent in reply
@@ -3937,7 +3930,7 @@ impl Drop for ReplyChannelRange {
 pub extern "C" fn ReplyChannelRange_free(this_obj: ReplyChannelRange) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ReplyChannelRange_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ReplyChannelRange_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeReplyChannelRange); }
 }
 #[allow(unused)]
@@ -4040,7 +4033,7 @@ pub extern "C" fn ReplyChannelRange_clone(orig: &ReplyChannelRange) -> ReplyChan
 }
 
 use lightning::ln::msgs::QueryShortChannelIds as nativeQueryShortChannelIdsImport;
-type nativeQueryShortChannelIds = nativeQueryShortChannelIdsImport;
+pub(crate) type nativeQueryShortChannelIds = nativeQueryShortChannelIdsImport;
 
 /// A query_short_channel_ids message is used to query a peer for
 /// routing gossip messages related to one or more short_channel_ids.
@@ -4077,7 +4070,7 @@ impl Drop for QueryShortChannelIds {
 pub extern "C" fn QueryShortChannelIds_free(this_obj: QueryShortChannelIds) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn QueryShortChannelIds_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn QueryShortChannelIds_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeQueryShortChannelIds); }
 }
 #[allow(unused)]
@@ -4144,7 +4137,7 @@ pub extern "C" fn QueryShortChannelIds_clone(orig: &QueryShortChannelIds) -> Que
 }
 
 use lightning::ln::msgs::ReplyShortChannelIdsEnd as nativeReplyShortChannelIdsEndImport;
-type nativeReplyShortChannelIdsEnd = nativeReplyShortChannelIdsEndImport;
+pub(crate) type nativeReplyShortChannelIdsEnd = nativeReplyShortChannelIdsEndImport;
 
 /// A reply_short_channel_ids_end message is sent as a reply to a
 /// query_short_channel_ids message. The query recipient makes a best
@@ -4177,7 +4170,7 @@ impl Drop for ReplyShortChannelIdsEnd {
 pub extern "C" fn ReplyShortChannelIdsEnd_free(this_obj: ReplyShortChannelIdsEnd) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ReplyShortChannelIdsEnd_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ReplyShortChannelIdsEnd_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeReplyShortChannelIdsEnd); }
 }
 #[allow(unused)]
@@ -4250,7 +4243,7 @@ pub extern "C" fn ReplyShortChannelIdsEnd_clone(orig: &ReplyShortChannelIdsEnd) 
 }
 
 use lightning::ln::msgs::GossipTimestampFilter as nativeGossipTimestampFilterImport;
-type nativeGossipTimestampFilter = nativeGossipTimestampFilterImport;
+pub(crate) type nativeGossipTimestampFilter = nativeGossipTimestampFilterImport;
 
 /// A gossip_timestamp_filter message is used by a node to request
 /// gossip relay for messages in the requested time range when the
@@ -4282,7 +4275,7 @@ impl Drop for GossipTimestampFilter {
 pub extern "C" fn GossipTimestampFilter_free(this_obj: GossipTimestampFilter) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn GossipTimestampFilter_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn GossipTimestampFilter_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeGossipTimestampFilter); }
 }
 #[allow(unused)]
@@ -4516,7 +4509,7 @@ pub extern "C" fn ErrorAction_send_error_message(msg: crate::lightning::ln::msgs
 }
 
 use lightning::ln::msgs::LightningError as nativeLightningErrorImport;
-type nativeLightningError = nativeLightningErrorImport;
+pub(crate) type nativeLightningError = nativeLightningErrorImport;
 
 /// An Err type for failure to process messages.
 #[must_use]
@@ -4546,7 +4539,7 @@ impl Drop for LightningError {
 pub extern "C" fn LightningError_free(this_obj: LightningError) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn LightningError_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn LightningError_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeLightningError); }
 }
 #[allow(unused)]
@@ -4617,7 +4610,7 @@ pub extern "C" fn LightningError_clone(orig: &LightningError) -> LightningError 
 }
 
 use lightning::ln::msgs::CommitmentUpdate as nativeCommitmentUpdateImport;
-type nativeCommitmentUpdate = nativeCommitmentUpdateImport;
+pub(crate) type nativeCommitmentUpdate = nativeCommitmentUpdateImport;
 
 /// Struct used to return values from revoke_and_ack messages, containing a bunch of commitment
 /// transaction updates if they were pending.
@@ -4648,7 +4641,7 @@ impl Drop for CommitmentUpdate {
 pub extern "C" fn CommitmentUpdate_free(this_obj: CommitmentUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn CommitmentUpdate_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn CommitmentUpdate_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeCommitmentUpdate); }
 }
 #[allow(unused)]
@@ -4671,7 +4664,7 @@ impl CommitmentUpdate {
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_update_add_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateAddHTLCZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_add_htlcs;
-	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateAddHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); };
+	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateAddHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning::ln::msgs::UpdateAddHTLC<>) as *mut _) }, is_owned: false } }); };
 	local_inner_val.into()
 }
 /// update_add_htlc messages which should be sent
@@ -4684,7 +4677,7 @@ pub extern "C" fn CommitmentUpdate_set_update_add_htlcs(this_ptr: &mut Commitmen
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_update_fulfill_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateFulfillHTLCZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_fulfill_htlcs;
-	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFulfillHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); };
+	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFulfillHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning::ln::msgs::UpdateFulfillHTLC<>) as *mut _) }, is_owned: false } }); };
 	local_inner_val.into()
 }
 /// update_fulfill_htlc messages which should be sent
@@ -4697,7 +4690,7 @@ pub extern "C" fn CommitmentUpdate_set_update_fulfill_htlcs(this_ptr: &mut Commi
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_update_fail_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateFailHTLCZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_fail_htlcs;
-	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFailHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); };
+	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFailHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning::ln::msgs::UpdateFailHTLC<>) as *mut _) }, is_owned: false } }); };
 	local_inner_val.into()
 }
 /// update_fail_htlc messages which should be sent
@@ -4710,7 +4703,7 @@ pub extern "C" fn CommitmentUpdate_set_update_fail_htlcs(this_ptr: &mut Commitme
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_update_fail_malformed_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateFailMalformedHTLCZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_fail_malformed_htlcs;
-	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFailMalformedHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const _) as *mut _) }, is_owned: false } }); };
+	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFailMalformedHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning::ln::msgs::UpdateFailMalformedHTLC<>) as *mut _) }, is_owned: false } }); };
 	local_inner_val.into()
 }
 /// update_fail_malformed_htlc messages which should be sent
@@ -4725,7 +4718,7 @@ pub extern "C" fn CommitmentUpdate_set_update_fail_malformed_htlcs(this_ptr: &mu
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_update_fee(this_ptr: &CommitmentUpdate) -> crate::lightning::ln::msgs::UpdateFee {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_fee;
-	let mut local_inner_val = crate::lightning::ln::msgs::UpdateFee { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::msgs::UpdateFee { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::UpdateFee<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// An update_fee message which should be sent
@@ -4740,7 +4733,7 @@ pub extern "C" fn CommitmentUpdate_set_update_fee(this_ptr: &mut CommitmentUpdat
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_commitment_signed(this_ptr: &CommitmentUpdate) -> crate::lightning::ln::msgs::CommitmentSigned {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().commitment_signed;
-	crate::lightning::ln::msgs::CommitmentSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::msgs::CommitmentSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::msgs::CommitmentSigned<>) as *mut _) }, is_owned: false }
 }
 /// Finally, the commitment_signed message which should be sent
 #[no_mangle]
@@ -4883,64 +4876,64 @@ impl lightning::util::events::MessageSendEventsProvider for ChannelMessageHandle
 use lightning::ln::msgs::ChannelMessageHandler as rustChannelMessageHandler;
 impl rustChannelMessageHandler for ChannelMessageHandler {
 	fn handle_open_channel(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut their_features: lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::OpenChannel) {
-		(self.handle_open_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(their_features), is_owned: true }, &crate::lightning::ln::msgs::OpenChannel { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_open_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(their_features), is_owned: true }, &crate::lightning::ln::msgs::OpenChannel { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::OpenChannel<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_accept_channel(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut their_features: lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::AcceptChannel) {
-		(self.handle_accept_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(their_features), is_owned: true }, &crate::lightning::ln::msgs::AcceptChannel { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_accept_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(their_features), is_owned: true }, &crate::lightning::ln::msgs::AcceptChannel { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::AcceptChannel<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_funding_created(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::FundingCreated) {
-		(self.handle_funding_created)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingCreated { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_funding_created)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingCreated { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::FundingCreated<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_funding_signed(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::FundingSigned) {
-		(self.handle_funding_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_funding_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::FundingSigned<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_funding_locked(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::FundingLocked) {
-		(self.handle_funding_locked)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingLocked { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_funding_locked)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingLocked { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::FundingLocked<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_shutdown(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut their_features: &lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::Shutdown) {
-		(self.handle_shutdown)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::features::InitFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((their_features as *const _) as *mut _) }, is_owned: false }, &crate::lightning::ln::msgs::Shutdown { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_shutdown)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::features::InitFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((their_features as *const lightning::ln::features::InitFeatures<>) as *mut _) }, is_owned: false }, &crate::lightning::ln::msgs::Shutdown { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Shutdown<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_closing_signed(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ClosingSigned) {
-		(self.handle_closing_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ClosingSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_closing_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ClosingSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ClosingSigned<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_update_add_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateAddHTLC) {
-		(self.handle_update_add_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateAddHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_update_add_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateAddHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::UpdateAddHTLC<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_update_fulfill_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFulfillHTLC) {
-		(self.handle_update_fulfill_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFulfillHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_update_fulfill_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFulfillHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::UpdateFulfillHTLC<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_update_fail_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFailHTLC) {
-		(self.handle_update_fail_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFailHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_update_fail_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFailHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::UpdateFailHTLC<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_update_fail_malformed_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFailMalformedHTLC) {
-		(self.handle_update_fail_malformed_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFailMalformedHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_update_fail_malformed_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFailMalformedHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::UpdateFailMalformedHTLC<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_commitment_signed(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::CommitmentSigned) {
-		(self.handle_commitment_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::CommitmentSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_commitment_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::CommitmentSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::CommitmentSigned<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_revoke_and_ack(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::RevokeAndACK) {
-		(self.handle_revoke_and_ack)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::RevokeAndACK { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_revoke_and_ack)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::RevokeAndACK { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::RevokeAndACK<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_update_fee(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFee) {
-		(self.handle_update_fee)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFee { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_update_fee)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFee { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::UpdateFee<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_announcement_signatures(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::AnnouncementSignatures) {
-		(self.handle_announcement_signatures)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::AnnouncementSignatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_announcement_signatures)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::AnnouncementSignatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::AnnouncementSignatures<>) as *mut _) }, is_owned: false })
 	}
 	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut no_connection_possible: bool) {
 		(self.peer_disconnected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), no_connection_possible)
 	}
 	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::Init) {
-		(self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_channel_reestablish(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ChannelReestablish) {
-		(self.handle_channel_reestablish)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ChannelReestablish { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_channel_reestablish)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ChannelReestablish { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ChannelReestablish<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_channel_update(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ChannelUpdate) {
-		(self.handle_channel_update)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_channel_update)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ChannelUpdate<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_error(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ErrorMessage) {
-		(self.handle_error)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ErrorMessage { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false })
+		(self.handle_error)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ErrorMessage { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ErrorMessage<>) as *mut _) }, is_owned: false })
 	}
 }
 
@@ -5059,17 +5052,17 @@ impl lightning::util::events::MessageSendEventsProvider for RoutingMessageHandle
 use lightning::ln::msgs::RoutingMessageHandler as rustRoutingMessageHandler;
 impl rustRoutingMessageHandler for RoutingMessageHandler {
 	fn handle_node_announcement(&self, mut msg: &lightning::ln::msgs::NodeAnnouncement) -> Result<bool, lightning::ln::msgs::LightningError> {
-		let mut ret = (self.handle_node_announcement)(self.this_arg, &crate::lightning::ln::msgs::NodeAnnouncement { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false });
+		let mut ret = (self.handle_node_announcement)(self.this_arg, &crate::lightning::ln::msgs::NodeAnnouncement { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::NodeAnnouncement<>) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }) }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
 	fn handle_channel_announcement(&self, mut msg: &lightning::ln::msgs::ChannelAnnouncement) -> Result<bool, lightning::ln::msgs::LightningError> {
-		let mut ret = (self.handle_channel_announcement)(self.this_arg, &crate::lightning::ln::msgs::ChannelAnnouncement { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false });
+		let mut ret = (self.handle_channel_announcement)(self.this_arg, &crate::lightning::ln::msgs::ChannelAnnouncement { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ChannelAnnouncement<>) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }) }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
 	fn handle_channel_update(&self, mut msg: &lightning::ln::msgs::ChannelUpdate) -> Result<bool, lightning::ln::msgs::LightningError> {
-		let mut ret = (self.handle_channel_update)(self.this_arg, &crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const _) as *mut _) }, is_owned: false });
+		let mut ret = (self.handle_channel_update)(self.this_arg, &crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ChannelUpdate<>) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }) }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
@@ -5085,7 +5078,7 @@ impl rustRoutingMessageHandler for RoutingMessageHandler {
 		local_ret
 	}
 	fn sync_routing_table(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut init: &lightning::ln::msgs::Init) {
-		(self.sync_routing_table)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const _) as *mut _) }, is_owned: false })
+		(self.sync_routing_table)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_reply_channel_range(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: lightning::ln::msgs::ReplyChannelRange) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_reply_channel_range)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::ReplyChannelRange { inner: ObjOps::heap_alloc(msg), is_owned: true });

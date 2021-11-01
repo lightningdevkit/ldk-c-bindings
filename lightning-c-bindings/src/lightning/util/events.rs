@@ -397,6 +397,14 @@ pub enum Event {
 	/// Note for MPP payments: in rare cases, this event may be preceded by a `PaymentPathFailed`
 	/// event. In this situation, you SHOULD treat this payment as having succeeded.
 	PaymentSent {
+		/// The id returned by [`ChannelManager::send_payment`] and used with
+		/// [`ChannelManager::retry_payment`].
+		///
+		/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+		/// [`ChannelManager::retry_payment`]: crate::ln::channelmanager::ChannelManager::retry_payment
+		///
+		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+		payment_id: crate::c_types::ThirtyTwoBytes,
 		/// The preimage to the hash given to ChannelManager::send_payment.
 		/// Note that this serves as a payment receipt, if you wish to have such a thing, you must
 		/// store it somehow!
@@ -405,10 +413,28 @@ pub enum Event {
 		///
 		/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
 		payment_hash: crate::c_types::ThirtyTwoBytes,
+		/// The total fee which was spent at intermediate hops in this payment, across all paths.
+		///
+		/// Note that, like [`Route::get_total_fees`] this does *not* include any potential
+		/// overpayment to the recipient node.
+		///
+		/// If the recipient or an intermediate node misbehaves and gives us free money, this may
+		/// overstate the amount paid, though this is unlikely.
+		///
+		/// [`Route::get_total_fees`]: crate::routing::router::Route::get_total_fees
+		fee_paid_msat: crate::c_types::derived::COption_u64Z,
 	},
 	/// Indicates an outbound payment we made failed. Probably some intermediary node dropped
 	/// something. You may wish to retry with a different route.
 	PaymentPathFailed {
+		/// The id returned by [`ChannelManager::send_payment`] and used with
+		/// [`ChannelManager::retry_payment`].
+		///
+		/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+		/// [`ChannelManager::retry_payment`]: crate::ln::channelmanager::ChannelManager::retry_payment
+		///
+		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+		payment_id: crate::c_types::ThirtyTwoBytes,
 		/// The hash which was given to ChannelManager::send_payment.
 		payment_hash: crate::c_types::ThirtyTwoBytes,
 		/// Indicates the payment was rejected for some reason by the recipient. This implies that
@@ -435,6 +461,15 @@ pub enum Event {
 		/// If this is `Some`, then the corresponding channel should be avoided when the payment is
 		/// retried. May be `None` for older [`Event`] serializations.
 		short_channel_id: crate::c_types::derived::COption_u64Z,
+		/// Parameters needed to compute a new [`Route`] when retrying the failed payment path.
+		///
+		/// See [`find_route`] for details.
+		///
+		/// [`Route`]: crate::routing::router::Route
+		/// [`find_route`]: crate::routing::router::find_route
+		///
+		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+		retry: crate::lightning::routing::router::RouteParameters,
 	},
 	/// Used to indicate that ChannelManager::process_pending_htlc_forwards should be called at a
 	/// time in the future.
@@ -525,15 +560,23 @@ impl Event {
 					purpose: purpose_nonref.into_native(),
 				}
 			},
-			Event::PaymentSent {ref payment_preimage, ref payment_hash, } => {
+			Event::PaymentSent {ref payment_id, ref payment_preimage, ref payment_hash, ref fee_paid_msat, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut local_payment_id_nonref = if payment_id_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data) }) };
 				let mut payment_preimage_nonref = (*payment_preimage).clone();
 				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut fee_paid_msat_nonref = (*fee_paid_msat).clone();
+				let mut local_fee_paid_msat_nonref = if fee_paid_msat_nonref.is_some() { Some( { fee_paid_msat_nonref.take() }) } else { None };
 				nativeEvent::PaymentSent {
+					payment_id: local_payment_id_nonref,
 					payment_preimage: ::lightning::ln::PaymentPreimage(payment_preimage_nonref.data),
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
+					fee_paid_msat: local_fee_paid_msat_nonref,
 				}
 			},
-			Event::PaymentPathFailed {ref payment_hash, ref rejected_by_dest, ref network_update, ref all_paths_failed, ref path, ref short_channel_id, } => {
+			Event::PaymentPathFailed {ref payment_id, ref payment_hash, ref rejected_by_dest, ref network_update, ref all_paths_failed, ref path, ref short_channel_id, ref retry, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut local_payment_id_nonref = if payment_id_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data) }) };
 				let mut payment_hash_nonref = (*payment_hash).clone();
 				let mut rejected_by_dest_nonref = (*rejected_by_dest).clone();
 				let mut network_update_nonref = (*network_update).clone();
@@ -543,13 +586,17 @@ impl Event {
 				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.into_rust().drain(..) { local_path_nonref.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 				let mut short_channel_id_nonref = (*short_channel_id).clone();
 				let mut local_short_channel_id_nonref = if short_channel_id_nonref.is_some() { Some( { short_channel_id_nonref.take() }) } else { None };
+				let mut retry_nonref = (*retry).clone();
+				let mut local_retry_nonref = if retry_nonref.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(retry_nonref.take_inner()) } }) };
 				nativeEvent::PaymentPathFailed {
+					payment_id: local_payment_id_nonref,
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 					rejected_by_dest: rejected_by_dest_nonref,
 					network_update: local_network_update_nonref,
 					all_paths_failed: all_paths_failed_nonref,
 					path: local_path_nonref,
 					short_channel_id: local_short_channel_id_nonref,
+					retry: local_retry_nonref,
 				}
 			},
 			Event::PendingHTLCsForwardable {ref time_forwardable, } => {
@@ -612,23 +659,31 @@ impl Event {
 					purpose: purpose.into_native(),
 				}
 			},
-			Event::PaymentSent {mut payment_preimage, mut payment_hash, } => {
+			Event::PaymentSent {mut payment_id, mut payment_preimage, mut payment_hash, mut fee_paid_msat, } => {
+				let mut local_payment_id = if payment_id.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentId(payment_id.data) }) };
+				let mut local_fee_paid_msat = if fee_paid_msat.is_some() { Some( { fee_paid_msat.take() }) } else { None };
 				nativeEvent::PaymentSent {
+					payment_id: local_payment_id,
 					payment_preimage: ::lightning::ln::PaymentPreimage(payment_preimage.data),
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
+					fee_paid_msat: local_fee_paid_msat,
 				}
 			},
-			Event::PaymentPathFailed {mut payment_hash, mut rejected_by_dest, mut network_update, mut all_paths_failed, mut path, mut short_channel_id, } => {
+			Event::PaymentPathFailed {mut payment_id, mut payment_hash, mut rejected_by_dest, mut network_update, mut all_paths_failed, mut path, mut short_channel_id, mut retry, } => {
+				let mut local_payment_id = if payment_id.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentId(payment_id.data) }) };
 				let mut local_network_update = { /* network_update*/ let network_update_opt = network_update; { } if network_update_opt.is_none() { None } else { Some({ network_update_opt.take().into_native() }) } };
 				let mut local_path = Vec::new(); for mut item in path.into_rust().drain(..) { local_path.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 				let mut local_short_channel_id = if short_channel_id.is_some() { Some( { short_channel_id.take() }) } else { None };
+				let mut local_retry = if retry.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(retry.take_inner()) } }) };
 				nativeEvent::PaymentPathFailed {
+					payment_id: local_payment_id,
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
 					rejected_by_dest: rejected_by_dest,
 					network_update: local_network_update,
 					all_paths_failed: all_paths_failed,
 					path: local_path,
 					short_channel_id: local_short_channel_id,
+					retry: local_retry,
 				}
 			},
 			Event::PendingHTLCsForwardable {mut time_forwardable, } => {
@@ -689,15 +744,23 @@ impl Event {
 					purpose: crate::lightning::util::events::PaymentPurpose::native_into(purpose_nonref),
 				}
 			},
-			nativeEvent::PaymentSent {ref payment_preimage, ref payment_hash, } => {
+			nativeEvent::PaymentSent {ref payment_id, ref payment_preimage, ref payment_hash, ref fee_paid_msat, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut local_payment_id_nonref = if payment_id_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_id_nonref.unwrap()).0 } } };
 				let mut payment_preimage_nonref = (*payment_preimage).clone();
 				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut fee_paid_msat_nonref = (*fee_paid_msat).clone();
+				let mut local_fee_paid_msat_nonref = if fee_paid_msat_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { fee_paid_msat_nonref.unwrap() }) };
 				Event::PaymentSent {
+					payment_id: local_payment_id_nonref,
 					payment_preimage: crate::c_types::ThirtyTwoBytes { data: payment_preimage_nonref.0 },
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
+					fee_paid_msat: local_fee_paid_msat_nonref,
 				}
 			},
-			nativeEvent::PaymentPathFailed {ref payment_hash, ref rejected_by_dest, ref network_update, ref all_paths_failed, ref path, ref short_channel_id, } => {
+			nativeEvent::PaymentPathFailed {ref payment_id, ref payment_hash, ref rejected_by_dest, ref network_update, ref all_paths_failed, ref path, ref short_channel_id, ref retry, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut local_payment_id_nonref = if payment_id_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_id_nonref.unwrap()).0 } } };
 				let mut payment_hash_nonref = (*payment_hash).clone();
 				let mut rejected_by_dest_nonref = (*rejected_by_dest).clone();
 				let mut network_update_nonref = (*network_update).clone();
@@ -707,13 +770,17 @@ impl Event {
 				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.drain(..) { local_path_nonref.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
 				let mut short_channel_id_nonref = (*short_channel_id).clone();
 				let mut local_short_channel_id_nonref = if short_channel_id_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { short_channel_id_nonref.unwrap() }) };
+				let mut retry_nonref = (*retry).clone();
+				let mut local_retry_nonref = crate::lightning::routing::router::RouteParameters { inner: if retry_nonref.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((retry_nonref.unwrap())) } }, is_owned: true };
 				Event::PaymentPathFailed {
+					payment_id: local_payment_id_nonref,
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
 					rejected_by_dest: rejected_by_dest_nonref,
 					network_update: local_network_update_nonref,
 					all_paths_failed: all_paths_failed_nonref,
 					path: local_path_nonref.into(),
 					short_channel_id: local_short_channel_id_nonref,
+					retry: local_retry_nonref,
 				}
 			},
 			nativeEvent::PendingHTLCsForwardable {ref time_forwardable, } => {
@@ -776,23 +843,31 @@ impl Event {
 					purpose: crate::lightning::util::events::PaymentPurpose::native_into(purpose),
 				}
 			},
-			nativeEvent::PaymentSent {mut payment_preimage, mut payment_hash, } => {
+			nativeEvent::PaymentSent {mut payment_id, mut payment_preimage, mut payment_hash, mut fee_paid_msat, } => {
+				let mut local_payment_id = if payment_id.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_id.unwrap()).0 } } };
+				let mut local_fee_paid_msat = if fee_paid_msat.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { fee_paid_msat.unwrap() }) };
 				Event::PaymentSent {
+					payment_id: local_payment_id,
 					payment_preimage: crate::c_types::ThirtyTwoBytes { data: payment_preimage.0 },
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
+					fee_paid_msat: local_fee_paid_msat,
 				}
 			},
-			nativeEvent::PaymentPathFailed {mut payment_hash, mut rejected_by_dest, mut network_update, mut all_paths_failed, mut path, mut short_channel_id, } => {
+			nativeEvent::PaymentPathFailed {mut payment_id, mut payment_hash, mut rejected_by_dest, mut network_update, mut all_paths_failed, mut path, mut short_channel_id, mut retry, } => {
+				let mut local_payment_id = if payment_id.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_id.unwrap()).0 } } };
 				let mut local_network_update = if network_update.is_none() { crate::c_types::derived::COption_NetworkUpdateZ::None } else { crate::c_types::derived::COption_NetworkUpdateZ::Some( { crate::lightning::routing::network_graph::NetworkUpdate::native_into(network_update.unwrap()) }) };
 				let mut local_path = Vec::new(); for mut item in path.drain(..) { local_path.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
 				let mut local_short_channel_id = if short_channel_id.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { short_channel_id.unwrap() }) };
+				let mut local_retry = crate::lightning::routing::router::RouteParameters { inner: if retry.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((retry.unwrap())) } }, is_owned: true };
 				Event::PaymentPathFailed {
+					payment_id: local_payment_id,
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
 					rejected_by_dest: rejected_by_dest,
 					network_update: local_network_update,
 					all_paths_failed: all_paths_failed,
 					path: local_path.into(),
 					short_channel_id: local_short_channel_id,
+					retry: local_retry,
 				}
 			},
 			nativeEvent::PendingHTLCsForwardable {mut time_forwardable, } => {
@@ -858,22 +933,26 @@ pub extern "C" fn Event_payment_received(payment_hash: crate::c_types::ThirtyTwo
 }
 #[no_mangle]
 /// Utility method to constructs a new PaymentSent-variant Event
-pub extern "C" fn Event_payment_sent(payment_preimage: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::ThirtyTwoBytes) -> Event {
+pub extern "C" fn Event_payment_sent(payment_id: crate::c_types::ThirtyTwoBytes, payment_preimage: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::ThirtyTwoBytes, fee_paid_msat: crate::c_types::derived::COption_u64Z) -> Event {
 	Event::PaymentSent {
+		payment_id,
 		payment_preimage,
 		payment_hash,
+		fee_paid_msat,
 	}
 }
 #[no_mangle]
 /// Utility method to constructs a new PaymentPathFailed-variant Event
-pub extern "C" fn Event_payment_path_failed(payment_hash: crate::c_types::ThirtyTwoBytes, rejected_by_dest: bool, network_update: crate::c_types::derived::COption_NetworkUpdateZ, all_paths_failed: bool, path: crate::c_types::derived::CVec_RouteHopZ, short_channel_id: crate::c_types::derived::COption_u64Z) -> Event {
+pub extern "C" fn Event_payment_path_failed(payment_id: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::ThirtyTwoBytes, rejected_by_dest: bool, network_update: crate::c_types::derived::COption_NetworkUpdateZ, all_paths_failed: bool, path: crate::c_types::derived::CVec_RouteHopZ, short_channel_id: crate::c_types::derived::COption_u64Z, retry: crate::lightning::routing::router::RouteParameters) -> Event {
 	Event::PaymentPathFailed {
+		payment_id,
 		payment_hash,
 		rejected_by_dest,
 		network_update,
 		all_paths_failed,
 		path,
 		short_channel_id,
+		retry,
 	}
 }
 #[no_mangle]

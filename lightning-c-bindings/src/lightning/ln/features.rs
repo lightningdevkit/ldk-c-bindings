@@ -150,7 +150,7 @@ pub extern "C" fn InvoiceFeatures_clone(orig: &InvoiceFeatures) -> InvoiceFeatur
 }
 
 use lightning::ln::features::InitFeatures as nativeInitFeaturesImport;
-type nativeInitFeatures = nativeInitFeaturesImport;
+pub(crate) type nativeInitFeatures = nativeInitFeaturesImport;
 
 /// Features used within an `init` message.
 #[must_use]
@@ -180,7 +180,7 @@ impl Drop for InitFeatures {
 pub extern "C" fn InitFeatures_free(this_obj: InitFeatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn InitFeatures_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn InitFeatures_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInitFeatures); }
 }
 #[allow(unused)]
@@ -201,7 +201,7 @@ impl InitFeatures {
 }
 
 use lightning::ln::features::NodeFeatures as nativeNodeFeaturesImport;
-type nativeNodeFeatures = nativeNodeFeaturesImport;
+pub(crate) type nativeNodeFeatures = nativeNodeFeaturesImport;
 
 /// Features used within a `node_announcement` message.
 #[must_use]
@@ -231,7 +231,7 @@ impl Drop for NodeFeatures {
 pub extern "C" fn NodeFeatures_free(this_obj: NodeFeatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn NodeFeatures_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn NodeFeatures_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeFeatures); }
 }
 #[allow(unused)]
@@ -252,7 +252,7 @@ impl NodeFeatures {
 }
 
 use lightning::ln::features::ChannelFeatures as nativeChannelFeaturesImport;
-type nativeChannelFeatures = nativeChannelFeaturesImport;
+pub(crate) type nativeChannelFeatures = nativeChannelFeaturesImport;
 
 /// Features used within a `channel_announcement` message.
 #[must_use]
@@ -282,7 +282,7 @@ impl Drop for ChannelFeatures {
 pub extern "C" fn ChannelFeatures_free(this_obj: ChannelFeatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ChannelFeatures_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ChannelFeatures_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelFeatures); }
 }
 #[allow(unused)]
@@ -303,7 +303,7 @@ impl ChannelFeatures {
 }
 
 use lightning::ln::features::InvoiceFeatures as nativeInvoiceFeaturesImport;
-type nativeInvoiceFeatures = nativeInvoiceFeaturesImport;
+pub(crate) type nativeInvoiceFeatures = nativeInvoiceFeaturesImport;
 
 /// Features used within an invoice.
 #[must_use]
@@ -333,7 +333,7 @@ impl Drop for InvoiceFeatures {
 pub extern "C" fn InvoiceFeatures_free(this_obj: InvoiceFeatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn InvoiceFeatures_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn InvoiceFeatures_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInvoiceFeatures); }
 }
 #[allow(unused)]

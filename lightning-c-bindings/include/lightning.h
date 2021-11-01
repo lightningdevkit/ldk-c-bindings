@@ -37,9 +37,10 @@ typedef enum LDKChannelMonitorUpdateErr {
     * our state failed, but is expected to succeed at some point in the future).
     *
     * Such a failure will \"freeze\" a channel, preventing us from revoking old states or
-    * submitting new commitment transactions to the counterparty. Once the update(s) which failed
-    * have been successfully applied, ChannelManager::channel_monitor_updated can be used to
-    * restore the channel to an operational state.
+    * submitting new commitment transactions to the counterparty. Once the update(s) that failed
+    * have been successfully applied, a [`MonitorEvent::UpdateCompleted`] event should be returned
+    * via [`Watch::release_pending_monitor_events`] which will then restore the channel to an
+    * operational state.
     *
     * Note that a given ChannelManager will *never* re-generate a given ChannelMonitorUpdate. If
     * you return a TemporaryFailure you must ensure that it is written to disk safely before
@@ -53,13 +54,14 @@ typedef enum LDKChannelMonitorUpdateErr {
     * the channel which would invalidate previous ChannelMonitors are not made when a channel has
     * been \"frozen\".
     *
-    * Note that even if updates made after TemporaryFailure succeed you must still call
-    * channel_monitor_updated to ensure you have the latest monitor and re-enable normal channel
-    * operation.
+    * Note that even if updates made after TemporaryFailure succeed you must still provide a
+    * [`MonitorEvent::UpdateCompleted`] to ensure you have the latest monitor and re-enable
+    * normal channel operation. Note that this is normally generated through a call to
+    * [`ChainMonitor::channel_monitor_updated`].
     *
-    * Note that the update being processed here will not be replayed for you when you call
-    * ChannelManager::channel_monitor_updated, so you must store the update itself along
-    * with the persisted ChannelMonitor on your own local disk prior to returning a
+    * Note that the update being processed here will not be replayed for you when you return a
+    * [`MonitorEvent::UpdateCompleted`] event via [`Watch::release_pending_monitor_events`], so
+    * you must store the update itself on your own local disk prior to returning a
     * TemporaryFailure. You may, of course, employ a journaling approach, storing only the
     * ChannelMonitorUpdate on disk without updating the monitor itself, replaying the journal at
     * reload-time.
@@ -67,6 +69,8 @@ typedef enum LDKChannelMonitorUpdateErr {
     * For deployments where a copy of ChannelMonitors and other local state are backed up in a
     * remote location (with local copies persisted immediately), it is anticipated that all
     * updates will return TemporaryFailure until the remote copies could be updated.
+    *
+    * [`ChainMonitor::channel_monitor_updated`]: chainmonitor::ChainMonitor::channel_monitor_updated
     */
    LDKChannelMonitorUpdateErr_TemporaryFailure,
    /**
@@ -1529,68 +1533,63 @@ typedef struct LDKCResult_RouteDecodeErrorZ {
    bool result_ok;
 } LDKCResult_RouteDecodeErrorZ;
 
-/**
- * An enum which can either contain a u64 or not
- */
-typedef enum LDKCOption_u64Z_Tag {
-   /**
-    * When we're in this state, this COption_u64Z contains a u64
-    */
-   LDKCOption_u64Z_Some,
-   /**
-    * When we're in this state, this COption_u64Z contains nothing
-    */
-   LDKCOption_u64Z_None,
-   /**
-    * Must be last for serialization purposes
-    */
-   LDKCOption_u64Z_Sentinel,
-} LDKCOption_u64Z_Tag;
-
-typedef struct LDKCOption_u64Z {
-   LDKCOption_u64Z_Tag tag;
-   union {
-      struct {
-         uint64_t some;
-      };
-   };
-} LDKCOption_u64Z;
-
 
 
 /**
- * Details of a channel, as returned by ChannelManager::list_channels and ChannelManager::list_usable_channels
+ * Parameters needed to find a [`Route`] for paying a [`Payee`].
+ *
+ * Passed to [`find_route`] and also provided in [`Event::PaymentPathFailed`] for retrying a failed
+ * payment path.
+ *
+ * [`Event::PaymentPathFailed`]: crate::util::events::Event::PaymentPathFailed
  */
-typedef struct MUST_USE_STRUCT LDKChannelDetails {
+typedef struct MUST_USE_STRUCT LDKRouteParameters {
    /**
     * A pointer to the opaque Rust object.
     * Nearly everywhere, inner must be non-null, however in places where
     * the Rust equivalent takes an Option, it may be set to null to indicate None.
     */
-   LDKnativeChannelDetails *inner;
+   LDKnativeRouteParameters *inner;
    /**
     * Indicates that this is the only struct which contains the same pointer.
     * Rust functions which take ownership of an object provided via an argument require
     * this to be true and invalidate the object pointed to by inner.
     */
    bool is_owned;
-} LDKChannelDetails;
+} LDKRouteParameters;
 
 /**
- * A dynamically-allocated array of crate::lightning::ln::channelmanager::ChannelDetailss of arbitrary size.
- * This corresponds to std::vector in C++
+ * The contents of CResult_RouteParametersDecodeErrorZ
  */
-typedef struct LDKCVec_ChannelDetailsZ {
+typedef union LDKCResult_RouteParametersDecodeErrorZPtr {
    /**
-    * The elements in the array.
-    * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
     */
-   struct LDKChannelDetails *data;
+   struct LDKRouteParameters *result;
    /**
-    * The number of elements pointed to by `data`.
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
     */
-   uintptr_t datalen;
-} LDKCVec_ChannelDetailsZ;
+   struct LDKDecodeError *err;
+} LDKCResult_RouteParametersDecodeErrorZPtr;
+
+/**
+ * A CResult_RouteParametersDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::routing::router::RouteParameters on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_RouteParametersDecodeErrorZ {
+   /**
+    * The contents of this CResult_RouteParametersDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_RouteParametersDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_RouteParametersDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_RouteParametersDecodeErrorZ;
 
 
 
@@ -1627,6 +1626,224 @@ typedef struct LDKCVec_RouteHintZ {
     */
    uintptr_t datalen;
 } LDKCVec_RouteHintZ;
+
+/**
+ * An enum which can either contain a u64 or not
+ */
+typedef enum LDKCOption_u64Z_Tag {
+   /**
+    * When we're in this state, this COption_u64Z contains a u64
+    */
+   LDKCOption_u64Z_Some,
+   /**
+    * When we're in this state, this COption_u64Z contains nothing
+    */
+   LDKCOption_u64Z_None,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKCOption_u64Z_Sentinel,
+} LDKCOption_u64Z_Tag;
+
+typedef struct LDKCOption_u64Z {
+   LDKCOption_u64Z_Tag tag;
+   union {
+      struct {
+         uint64_t some;
+      };
+   };
+} LDKCOption_u64Z;
+
+
+
+/**
+ * The recipient of a payment.
+ */
+typedef struct MUST_USE_STRUCT LDKPayee {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativePayee *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKPayee;
+
+/**
+ * The contents of CResult_PayeeDecodeErrorZ
+ */
+typedef union LDKCResult_PayeeDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKPayee *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_PayeeDecodeErrorZPtr;
+
+/**
+ * A CResult_PayeeDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::routing::router::Payee on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_PayeeDecodeErrorZ {
+   /**
+    * The contents of this CResult_PayeeDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_PayeeDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_PayeeDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_PayeeDecodeErrorZ;
+
+
+
+/**
+ * A channel descriptor for a hop along a payment path.
+ */
+typedef struct MUST_USE_STRUCT LDKRouteHintHop {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeRouteHintHop *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKRouteHintHop;
+
+/**
+ * A dynamically-allocated array of crate::lightning::routing::router::RouteHintHops of arbitrary size.
+ * This corresponds to std::vector in C++
+ */
+typedef struct LDKCVec_RouteHintHopZ {
+   /**
+    * The elements in the array.
+    * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+    */
+   struct LDKRouteHintHop *data;
+   /**
+    * The number of elements pointed to by `data`.
+    */
+   uintptr_t datalen;
+} LDKCVec_RouteHintHopZ;
+
+/**
+ * The contents of CResult_RouteHintDecodeErrorZ
+ */
+typedef union LDKCResult_RouteHintDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKRouteHint *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_RouteHintDecodeErrorZPtr;
+
+/**
+ * A CResult_RouteHintDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::routing::router::RouteHint on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_RouteHintDecodeErrorZ {
+   /**
+    * The contents of this CResult_RouteHintDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_RouteHintDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_RouteHintDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_RouteHintDecodeErrorZ;
+
+/**
+ * The contents of CResult_RouteHintHopDecodeErrorZ
+ */
+typedef union LDKCResult_RouteHintHopDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKRouteHintHop *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_RouteHintHopDecodeErrorZPtr;
+
+/**
+ * A CResult_RouteHintHopDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::routing::router::RouteHintHop on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_RouteHintHopDecodeErrorZ {
+   /**
+    * The contents of this CResult_RouteHintHopDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_RouteHintHopDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_RouteHintHopDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_RouteHintHopDecodeErrorZ;
+
+
+
+/**
+ * Details of a channel, as returned by ChannelManager::list_channels and ChannelManager::list_usable_channels
+ */
+typedef struct MUST_USE_STRUCT LDKChannelDetails {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeChannelDetails *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKChannelDetails;
+
+/**
+ * A dynamically-allocated array of crate::lightning::ln::channelmanager::ChannelDetailss of arbitrary size.
+ * This corresponds to std::vector in C++
+ */
+typedef struct LDKCVec_ChannelDetailsZ {
+   /**
+    * The elements in the array.
+    * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+    */
+   struct LDKChannelDetails *data;
+   /**
+    * The number of elements pointed to by `data`.
+    */
+   uintptr_t datalen;
+} LDKCVec_ChannelDetailsZ;
 
 
 
@@ -1861,10 +2078,39 @@ typedef enum LDKMonitorEvent_Tag {
     */
    LDKMonitorEvent_CommitmentTxConfirmed,
    /**
+    * Indicates a [`ChannelMonitor`] update has completed. See
+    * [`ChannelMonitorUpdateErr::TemporaryFailure`] for more information on how this is used.
+    *
+    * [`ChannelMonitorUpdateErr::TemporaryFailure`]: super::ChannelMonitorUpdateErr::TemporaryFailure
+    */
+   LDKMonitorEvent_UpdateCompleted,
+   /**
+    * Indicates a [`ChannelMonitor`] update has failed. See
+    * [`ChannelMonitorUpdateErr::PermanentFailure`] for more information on how this is used.
+    *
+    * [`ChannelMonitorUpdateErr::PermanentFailure`]: super::ChannelMonitorUpdateErr::PermanentFailure
+    */
+   LDKMonitorEvent_UpdateFailed,
+   /**
     * Must be last for serialization purposes
     */
    LDKMonitorEvent_Sentinel,
 } LDKMonitorEvent_Tag;
+
+typedef struct LDKMonitorEvent_LDKUpdateCompleted_Body {
+   /**
+    * The funding outpoint of the [`ChannelMonitor`] that was updated
+    */
+   struct LDKOutPoint funding_txo;
+   /**
+    * The Update ID from [`ChannelMonitorUpdate::update_id`] which was applied or
+    * [`ChannelMonitor::get_latest_update_id`].
+    *
+    * Note that this should only be set to a given update's ID if all previous updates for the
+    * same [`ChannelMonitor`] have been applied and persisted.
+    */
+   uint64_t monitor_update_id;
+} LDKMonitorEvent_LDKUpdateCompleted_Body;
 
 typedef struct MUST_USE_STRUCT LDKMonitorEvent {
    LDKMonitorEvent_Tag tag;
@@ -1874,6 +2120,10 @@ typedef struct MUST_USE_STRUCT LDKMonitorEvent {
       };
       struct {
          struct LDKOutPoint commitment_tx_confirmed;
+      };
+      LDKMonitorEvent_LDKUpdateCompleted_Body update_completed;
+      struct {
+         struct LDKOutPoint update_failed;
       };
    };
 } LDKMonitorEvent;
@@ -3148,6 +3398,119 @@ typedef struct LDKCResult_InvoiceFeaturesDecodeErrorZ {
    bool result_ok;
 } LDKCResult_InvoiceFeaturesDecodeErrorZ;
 
+
+
+/**
+ * Parameters for configuring [`Scorer`].
+ */
+typedef struct MUST_USE_STRUCT LDKScoringParameters {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeScoringParameters *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKScoringParameters;
+
+/**
+ * The contents of CResult_ScoringParametersDecodeErrorZ
+ */
+typedef union LDKCResult_ScoringParametersDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKScoringParameters *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_ScoringParametersDecodeErrorZPtr;
+
+/**
+ * A CResult_ScoringParametersDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::routing::scorer::ScoringParameters on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_ScoringParametersDecodeErrorZ {
+   /**
+    * The contents of this CResult_ScoringParametersDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_ScoringParametersDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_ScoringParametersDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_ScoringParametersDecodeErrorZ;
+
+
+
+/**
+ * [`routing::Score`] implementation that provides reasonable default behavior.
+ *
+ * Used to apply a fixed penalty to each channel, thus avoiding long paths when shorter paths with
+ * slightly higher fees are available. Will further penalize channels that fail to relay payments.
+ *
+ * See [module-level documentation] for usage.
+ *
+ * [module-level documentation]: crate::routing::scorer
+ */
+typedef struct MUST_USE_STRUCT LDKScorer {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeScorer *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKScorer;
+
+/**
+ * The contents of CResult_ScorerDecodeErrorZ
+ */
+typedef union LDKCResult_ScorerDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKScorer *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_ScorerDecodeErrorZPtr;
+
+/**
+ * A CResult_ScorerDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::routing::scorer::Scorer on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_ScorerDecodeErrorZ {
+   /**
+    * The contents of this CResult_ScorerDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_ScorerDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_ScorerDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_ScorerDecodeErrorZ;
+
 /**
  * The contents of CResult_DelayedPaymentOutputDescriptorDecodeErrorZ
  */
@@ -3951,59 +4314,6 @@ typedef struct LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
    bool result_ok;
 } LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ;
 
-
-
-/**
- * A payment identifier used to uniquely identify a payment to LDK.
- */
-typedef struct MUST_USE_STRUCT LDKPaymentId {
-   /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
-    */
-   LDKnativePaymentId *inner;
-   /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
-    */
-   bool is_owned;
-} LDKPaymentId;
-
-/**
- * The contents of CResult_PaymentIdDecodeErrorZ
- */
-typedef union LDKCResult_PaymentIdDecodeErrorZPtr {
-   /**
-    * A pointer to the contents in the success state.
-    * Reading from this pointer when `result_ok` is not set is undefined.
-    */
-   struct LDKPaymentId *result;
-   /**
-    * A pointer to the contents in the error state.
-    * Reading from this pointer when `result_ok` is set is undefined.
-    */
-   struct LDKDecodeError *err;
-} LDKCResult_PaymentIdDecodeErrorZPtr;
-
-/**
- * A CResult_PaymentIdDecodeErrorZ represents the result of a fallible operation,
- * containing a crate::lightning::ln::channelmanager::PaymentId on success and a crate::lightning::ln::msgs::DecodeError on failure.
- * `result_ok` indicates the overall state, and the contents are provided via `contents`.
- */
-typedef struct LDKCResult_PaymentIdDecodeErrorZ {
-   /**
-    * The contents of this CResult_PaymentIdDecodeErrorZ, accessible via either
-    * `err` or `result` depending on the state of `result_ok`.
-    */
-   union LDKCResult_PaymentIdDecodeErrorZPtr contents;
-   /**
-    * Whether this CResult_PaymentIdDecodeErrorZ represents a success state.
-    */
-   bool result_ok;
-} LDKCResult_PaymentIdDecodeErrorZ;
-
 /**
  * An enum which can either contain a u16 or not
  */
@@ -4276,6 +4586,25 @@ typedef enum LDKPaymentSendFailure_Tag {
    LDKPaymentSendFailure_Sentinel,
 } LDKPaymentSendFailure_Tag;
 
+typedef struct LDKPaymentSendFailure_LDKPartialFailure_Body {
+   /**
+    * The errors themselves, in the same order as the route hops.
+    */
+   struct LDKCVec_CResult_NoneAPIErrorZZ results;
+   /**
+    * If some paths failed without irrevocably committing to the new HTLC(s), this will
+    * contain a [`RouteParameters`] object which can be used to calculate a new route that
+    * will pay all remaining unpaid balance.
+    *
+    * Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+    */
+   struct LDKRouteParameters failed_paths_retry;
+   /**
+    * The payment id for the payment, which is now at least partially pending.
+    */
+   struct LDKThirtyTwoBytes payment_id;
+} LDKPaymentSendFailure_LDKPartialFailure_Body;
+
 typedef struct MUST_USE_STRUCT LDKPaymentSendFailure {
    LDKPaymentSendFailure_Tag tag;
    union {
@@ -4288,9 +4617,7 @@ typedef struct MUST_USE_STRUCT LDKPaymentSendFailure {
       struct {
          struct LDKCVec_APIErrorZ all_failed_retry_safe;
       };
-      struct {
-         struct LDKCVec_CResult_NoneAPIErrorZZ partial_failure;
-      };
+      LDKPaymentSendFailure_LDKPartialFailure_Body partial_failure;
    };
 } LDKPaymentSendFailure;
 
@@ -4302,7 +4629,7 @@ typedef union LDKCResult_PaymentIdPaymentSendFailureZPtr {
     * A pointer to the contents in the success state.
     * Reading from this pointer when `result_ok` is not set is undefined.
     */
-   struct LDKPaymentId *result;
+   struct LDKThirtyTwoBytes *result;
    /**
     * A pointer to the contents in the error state.
     * Reading from this pointer when `result_ok` is set is undefined.
@@ -4312,7 +4639,7 @@ typedef union LDKCResult_PaymentIdPaymentSendFailureZPtr {
 
 /**
  * A CResult_PaymentIdPaymentSendFailureZ represents the result of a fallible operation,
- * containing a crate::lightning::ln::channelmanager::PaymentId on success and a crate::lightning::ln::channelmanager::PaymentSendFailure on failure.
+ * containing a crate::c_types::ThirtyTwoBytes on success and a crate::lightning::ln::channelmanager::PaymentSendFailure on failure.
  * `result_ok` indicates the overall state, and the contents are provided via `contents`.
  */
 typedef struct LDKCResult_PaymentIdPaymentSendFailureZ {
@@ -4370,7 +4697,7 @@ typedef struct LDKC2Tuple_PaymentHashPaymentIdZ {
    /**
     * The element at position 1
     */
-   struct LDKPaymentId b;
+   struct LDKThirtyTwoBytes b;
 } LDKC2Tuple_PaymentHashPaymentIdZ;
 
 /**
@@ -4680,6 +5007,13 @@ typedef struct LDKWatch {
    /**
     * Returns any monitor events since the last call. Subsequent calls must only return new
     * events.
+    *
+    * Note that after any block- or transaction-connection calls to a [`ChannelMonitor`], no
+    * further events may be returned here until the [`ChannelMonitor`] has been fully persisted
+    * to disk.
+    *
+    * For details on asynchronous [`ChannelMonitor`] updating and returning
+    * [`MonitorEvent::UpdateCompleted`] here, see [`ChannelMonitorUpdateErr::TemporaryFailure`].
     */
    struct LDKCVec_MonitorEventZ (*release_pending_monitor_events)(const void *this_arg);
    /**
@@ -5120,6 +5454,76 @@ typedef struct LDKCResult_COption_TypeZDecodeErrorZ {
     */
    bool result_ok;
 } LDKCResult_COption_TypeZDecodeErrorZ;
+
+/**
+ * An error that may occur when making a payment.
+ */
+typedef enum LDKPaymentError_Tag {
+   /**
+    * An error resulting from the provided [`Invoice`] or payment hash.
+    */
+   LDKPaymentError_Invoice,
+   /**
+    * An error occurring when finding a route.
+    */
+   LDKPaymentError_Routing,
+   /**
+    * An error occurring when sending a payment.
+    */
+   LDKPaymentError_Sending,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKPaymentError_Sentinel,
+} LDKPaymentError_Tag;
+
+typedef struct MUST_USE_STRUCT LDKPaymentError {
+   LDKPaymentError_Tag tag;
+   union {
+      struct {
+         struct LDKStr invoice;
+      };
+      struct {
+         struct LDKLightningError routing;
+      };
+      struct {
+         struct LDKPaymentSendFailure sending;
+      };
+   };
+} LDKPaymentError;
+
+/**
+ * The contents of CResult_PaymentIdPaymentErrorZ
+ */
+typedef union LDKCResult_PaymentIdPaymentErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKThirtyTwoBytes *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKPaymentError *err;
+} LDKCResult_PaymentIdPaymentErrorZPtr;
+
+/**
+ * A CResult_PaymentIdPaymentErrorZ represents the result of a fallible operation,
+ * containing a crate::c_types::ThirtyTwoBytes on success and a crate::lightning_invoice::payment::PaymentError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_PaymentIdPaymentErrorZ {
+   /**
+    * The contents of this CResult_PaymentIdPaymentErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_PaymentIdPaymentErrorZPtr contents;
+   /**
+    * Whether this CResult_PaymentIdPaymentErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_PaymentIdPaymentErrorZ;
 
 /**
  * The contents of CResult_SiPrefixNoneZ
@@ -6183,6 +6587,16 @@ typedef struct LDKEvent_LDKPaymentReceived_Body {
 
 typedef struct LDKEvent_LDKPaymentSent_Body {
    /**
+    * The id returned by [`ChannelManager::send_payment`] and used with
+    * [`ChannelManager::retry_payment`].
+    *
+    * [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+    * [`ChannelManager::retry_payment`]: crate::ln::channelmanager::ChannelManager::retry_payment
+    *
+    * Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+    */
+   struct LDKThirtyTwoBytes payment_id;
+   /**
     * The preimage to the hash given to ChannelManager::send_payment.
     * Note that this serves as a payment receipt, if you wish to have such a thing, you must
     * store it somehow!
@@ -6194,9 +6608,31 @@ typedef struct LDKEvent_LDKPaymentSent_Body {
     * [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
     */
    struct LDKThirtyTwoBytes payment_hash;
+   /**
+    * The total fee which was spent at intermediate hops in this payment, across all paths.
+    *
+    * Note that, like [`Route::get_total_fees`] this does *not* include any potential
+    * overpayment to the recipient node.
+    *
+    * If the recipient or an intermediate node misbehaves and gives us free money, this may
+    * overstate the amount paid, though this is unlikely.
+    *
+    * [`Route::get_total_fees`]: crate::routing::router::Route::get_total_fees
+    */
+   struct LDKCOption_u64Z fee_paid_msat;
 } LDKEvent_LDKPaymentSent_Body;
 
 typedef struct LDKEvent_LDKPaymentPathFailed_Body {
+   /**
+    * The id returned by [`ChannelManager::send_payment`] and used with
+    * [`ChannelManager::retry_payment`].
+    *
+    * [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+    * [`ChannelManager::retry_payment`]: crate::ln::channelmanager::ChannelManager::retry_payment
+    *
+    * Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+    */
+   struct LDKThirtyTwoBytes payment_id;
    /**
     * The hash which was given to ChannelManager::send_payment.
     */
@@ -6235,6 +6671,17 @@ typedef struct LDKEvent_LDKPaymentPathFailed_Body {
     * retried. May be `None` for older [`Event`] serializations.
     */
    struct LDKCOption_u64Z short_channel_id;
+   /**
+    * Parameters needed to compute a new [`Route`] when retrying the failed payment path.
+    *
+    * See [`find_route`] for details.
+    *
+    * [`Route`]: crate::routing::router::Route
+    * [`find_route`]: crate::routing::router::find_route
+    *
+    * Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+    */
+   struct LDKRouteParameters retry;
 } LDKEvent_LDKPaymentPathFailed_Body;
 
 typedef struct LDKEvent_LDKPendingHTLCsForwardable_Body {
@@ -7310,72 +7757,6 @@ typedef struct LDKCOption_CVec_NetAddressZZ {
       };
    };
 } LDKCOption_CVec_NetAddressZZ;
-
-/**
- * The contents of CResult_NetAddressu8Z
- */
-typedef union LDKCResult_NetAddressu8ZPtr {
-   /**
-    * A pointer to the contents in the success state.
-    * Reading from this pointer when `result_ok` is not set is undefined.
-    */
-   struct LDKNetAddress *result;
-   /**
-    * A pointer to the contents in the error state.
-    * Reading from this pointer when `result_ok` is set is undefined.
-    */
-   uint8_t *err;
-} LDKCResult_NetAddressu8ZPtr;
-
-/**
- * A CResult_NetAddressu8Z represents the result of a fallible operation,
- * containing a crate::lightning::ln::msgs::NetAddress on success and a u8 on failure.
- * `result_ok` indicates the overall state, and the contents are provided via `contents`.
- */
-typedef struct LDKCResult_NetAddressu8Z {
-   /**
-    * The contents of this CResult_NetAddressu8Z, accessible via either
-    * `err` or `result` depending on the state of `result_ok`.
-    */
-   union LDKCResult_NetAddressu8ZPtr contents;
-   /**
-    * Whether this CResult_NetAddressu8Z represents a success state.
-    */
-   bool result_ok;
-} LDKCResult_NetAddressu8Z;
-
-/**
- * The contents of CResult_CResult_NetAddressu8ZDecodeErrorZ
- */
-typedef union LDKCResult_CResult_NetAddressu8ZDecodeErrorZPtr {
-   /**
-    * A pointer to the contents in the success state.
-    * Reading from this pointer when `result_ok` is not set is undefined.
-    */
-   struct LDKCResult_NetAddressu8Z *result;
-   /**
-    * A pointer to the contents in the error state.
-    * Reading from this pointer when `result_ok` is set is undefined.
-    */
-   struct LDKDecodeError *err;
-} LDKCResult_CResult_NetAddressu8ZDecodeErrorZPtr;
-
-/**
- * A CResult_CResult_NetAddressu8ZDecodeErrorZ represents the result of a fallible operation,
- * containing a crate::c_types::derived::CResult_NetAddressu8Z on success and a crate::lightning::ln::msgs::DecodeError on failure.
- * `result_ok` indicates the overall state, and the contents are provided via `contents`.
- */
-typedef struct LDKCResult_CResult_NetAddressu8ZDecodeErrorZ {
-   /**
-    * The contents of this CResult_CResult_NetAddressu8ZDecodeErrorZ, accessible via either
-    * `err` or `result` depending on the state of `result_ok`.
-    */
-   union LDKCResult_CResult_NetAddressu8ZDecodeErrorZPtr contents;
-   /**
-    * Whether this CResult_CResult_NetAddressu8ZDecodeErrorZ represents a success state.
-    */
-   bool result_ok;
-} LDKCResult_CResult_NetAddressu8ZDecodeErrorZ;
 
 /**
  * The contents of CResult_NetAddressDecodeErrorZ
@@ -9370,18 +9751,46 @@ typedef struct LDKConfirm {
    void (*free)(void *this_arg);
 } LDKConfirm;
 
+
+
+/**
+ * An opaque identifier describing a specific [`Persist`] method call.
+ */
+typedef struct MUST_USE_STRUCT LDKMonitorUpdateId {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeMonitorUpdateId *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKMonitorUpdateId;
+
 /**
  * `Persist` defines behavior for persisting channel monitors: this could mean
  * writing once to disk, and/or uploading to one or more backup services.
  *
- * Note that for every new monitor, you **must** persist the new `ChannelMonitor`
- * to disk/backups. And, on every update, you **must** persist either the
- * `ChannelMonitorUpdate` or the updated monitor itself. Otherwise, there is risk
- * of situations such as revoking a transaction, then crashing before this
- * revocation can be persisted, then unintentionally broadcasting a revoked
- * transaction and losing money. This is a risk because previous channel states
- * are toxic, so it's important that whatever channel state is persisted is
- * kept up-to-date.
+ * Each method can return three possible values:
+ *  * If persistence (including any relevant `fsync()` calls) happens immediately, the
+ *    implementation should return `Ok(())`, indicating normal channel operation should continue.
+ *  * If persistence happens asynchronously, implementations should first ensure the
+ *    [`ChannelMonitor`] or [`ChannelMonitorUpdate`] are written durably to disk, and then return
+ *    `Err(ChannelMonitorUpdateErr::TemporaryFailure)` while the update continues in the
+ *    background. Once the update completes, [`ChainMonitor::channel_monitor_updated`] should be
+ *    called with the corresponding [`MonitorUpdateId`].
+ *
+ *    Note that unlike the direct [`chain::Watch`] interface,
+ *    [`ChainMonitor::channel_monitor_updated`] must be called once for *each* update which occurs.
+ *
+ *  * If persistence fails for some reason, implementations should return
+ *    `Err(ChannelMonitorUpdateErr::PermanentFailure)`, in which case the channel will likely be
+ *    closed without broadcasting the latest state. See
+ *    [`ChannelMonitorUpdateErr::PermanentFailure`] for more details.
  */
 typedef struct LDKPersist {
    /**
@@ -9390,25 +9799,36 @@ typedef struct LDKPersist {
     */
    void *this_arg;
    /**
-    * Persist a new channel's data. The data can be stored any way you want, but
-    * the identifier provided by Rust-Lightning is the channel's outpoint (and
-    * it is up to you to maintain a correct mapping between the outpoint and the
-    * stored channel data). Note that you **must** persist every new monitor to
-    * disk. See the `Persist` trait documentation for more details.
+    * Persist a new channel's data in response to a [`chain::Watch::watch_channel`] call. This is
+    * called by [`ChannelManager`] for new channels, or may be called directly, e.g. on startup.
+    *
+    * The data can be stored any way you want, but the identifier provided by LDK is the
+    * channel's outpoint (and it is up to you to maintain a correct mapping between the outpoint
+    * and the stored channel data). Note that you **must** persist every new monitor to disk.
+    *
+    * The `update_id` is used to identify this call to [`ChainMonitor::channel_monitor_updated`],
+    * if you return [`ChannelMonitorUpdateErr::TemporaryFailure`].
     *
     * See [`Writeable::write`] on [`ChannelMonitor`] for writing out a `ChannelMonitor`
     * and [`ChannelMonitorUpdateErr`] for requirements when returning errors.
     *
+    * [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
     * [`Writeable::write`]: crate::util::ser::Writeable::write
     */
-   struct LDKCResult_NoneChannelMonitorUpdateErrZ (*persist_new_channel)(const void *this_arg, struct LDKOutPoint id, const struct LDKChannelMonitor *NONNULL_PTR data);
+   struct LDKCResult_NoneChannelMonitorUpdateErrZ (*persist_new_channel)(const void *this_arg, struct LDKOutPoint channel_id, const struct LDKChannelMonitor *NONNULL_PTR data, struct LDKMonitorUpdateId update_id);
    /**
-    * Update one channel's data. The provided `ChannelMonitor` has already
-    * applied the given update.
+    * Update one channel's data. The provided [`ChannelMonitor`] has already applied the given
+    * update.
     *
-    * Note that on every update, you **must** persist either the
-    * `ChannelMonitorUpdate` or the updated monitor itself to disk/backups. See
-    * the `Persist` trait documentation for more details.
+    * Note that on every update, you **must** persist either the [`ChannelMonitorUpdate`] or the
+    * updated monitor itself to disk/backups. See the [`Persist`] trait documentation for more
+    * details.
+    *
+    * During blockchain synchronization operations, this may be called with no
+    * [`ChannelMonitorUpdate`], in which case the full [`ChannelMonitor`] needs to be persisted.
+    * Note that after the full [`ChannelMonitor`] is persisted any previous
+    * [`ChannelMonitorUpdate`]s which were persisted should be discarded - they can no longer be
+    * applied to the persisted [`ChannelMonitor`] as they were already applied.
     *
     * If an implementer chooses to persist the updates only, they need to make
     * sure that all the updates are applied to the `ChannelMonitors` *before*
@@ -9422,13 +9842,18 @@ typedef struct LDKPersist {
     * them in batches. The size of each monitor grows `O(number of state updates)`
     * whereas updates are small and `O(1)`.
     *
+    * The `update_id` is used to identify this call to [`ChainMonitor::channel_monitor_updated`],
+    * if you return [`ChannelMonitorUpdateErr::TemporaryFailure`].
+    *
     * See [`Writeable::write`] on [`ChannelMonitor`] for writing out a `ChannelMonitor`,
     * [`Writeable::write`] on [`ChannelMonitorUpdate`] for writing out an update, and
     * [`ChannelMonitorUpdateErr`] for requirements when returning errors.
     *
     * [`Writeable::write`]: crate::util::ser::Writeable::write
+    *
+    * Note that update (or a relevant inner pointer) may be NULL or all-0s to represent None
     */
-   struct LDKCResult_NoneChannelMonitorUpdateErrZ (*update_persisted_channel)(const void *this_arg, struct LDKOutPoint id, const struct LDKChannelMonitorUpdate *NONNULL_PTR update, const struct LDKChannelMonitor *NONNULL_PTR data);
+   struct LDKCResult_NoneChannelMonitorUpdateErrZ (*update_persisted_channel)(const void *this_arg, struct LDKOutPoint channel_id, const struct LDKChannelMonitorUpdate *NONNULL_PTR update, const struct LDKChannelMonitor *NONNULL_PTR data, struct LDKMonitorUpdateId update_id);
    /**
     * Frees any resources associated with this object given its this_arg pointer.
     * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -9678,20 +10103,25 @@ typedef struct LDKChannelMessageHandler {
  *
  * At a high-level, the process for deserializing a ChannelManager and resuming normal operation
  * is:
- * 1) Deserialize all stored ChannelMonitors.
- * 2) Deserialize the ChannelManager by filling in this struct and calling:
- *    <(BlockHash, ChannelManager)>::read(reader, args)
- *    This may result in closing some Channels if the ChannelMonitor is newer than the stored
- *    ChannelManager state to ensure no loss of funds. Thus, transactions may be broadcasted.
- * 3) If you are not fetching full blocks, register all relevant ChannelMonitor outpoints the same
- *    way you would handle a `chain::Filter` call using ChannelMonitor::get_outputs_to_watch() and
- *    ChannelMonitor::get_funding_txo().
- * 4) Reconnect blocks on your ChannelMonitors.
- * 5) Disconnect/connect blocks on the ChannelManager.
- * 6) Move the ChannelMonitors into your local chain::Watch.
+ * 1) Deserialize all stored [`ChannelMonitor`]s.
+ * 2) Deserialize the [`ChannelManager`] by filling in this struct and calling:
+ *    `<(BlockHash, ChannelManager)>::read(reader, args)`
+ *    This may result in closing some channels if the [`ChannelMonitor`] is newer than the stored
+ *    [`ChannelManager`] state to ensure no loss of funds. Thus, transactions may be broadcasted.
+ * 3) If you are not fetching full blocks, register all relevant [`ChannelMonitor`] outpoints the
+ *    same way you would handle a [`chain::Filter`] call using
+ *    [`ChannelMonitor::get_outputs_to_watch`] and [`ChannelMonitor::get_funding_txo`].
+ * 4) Reconnect blocks on your [`ChannelMonitor`]s.
+ * 5) Disconnect/connect blocks on the [`ChannelManager`].
+ * 6) Re-persist the [`ChannelMonitor`]s to ensure the latest state is on disk.
+ *    Note that if you're using a [`ChainMonitor`] for your [`chain::Watch`] implementation, you
+ *    will likely accomplish this as a side-effect of calling [`chain::Watch::watch_channel`] in
+ *    the next step.
+ * 7) Move the [`ChannelMonitor`]s into your local [`chain::Watch`]. If you're using a
+ *    [`ChainMonitor`], this is done by calling [`chain::Watch::watch_channel`].
  *
- * Note that the ordering of #4-6 is not of importance, however all three must occur before you
- * call any other methods on the newly-deserialized ChannelManager.
+ * Note that the ordering of #4-7 is not of importance, however all four must occur before you
+ * call any other methods on the newly-deserialized [`ChannelManager`].
  *
  * Note that because some channels may be closed during deserialization, it is critical that you
  * always deserialize only the latest version of a ChannelManager and ChannelMonitors available to
@@ -9699,6 +10129,8 @@ typedef struct LDKChannelMessageHandler {
  * broadcast), and then later deserialize a newer version of the same ChannelManager (which will
  * not force-close the same channels but consider them live), you may end up revoking a state for
  * which you've already broadcasted the transaction.
+ *
+ * [`ChainMonitor`]: crate::chain::chainmonitor::ChainMonitor
  */
 typedef struct MUST_USE_STRUCT LDKChannelManagerReadArgs {
    /**
@@ -10084,15 +10516,51 @@ typedef struct LDKScore {
     */
    void *this_arg;
    /**
-    * Returns the fee in msats willing to be paid to avoid routing through the given channel.
+    * Returns the fee in msats willing to be paid to avoid routing through the given channel
+    * in the direction from `source` to `target`.
     */
-   uint64_t (*channel_penalty_msat)(const void *this_arg, uint64_t short_channel_id);
+   uint64_t (*channel_penalty_msat)(const void *this_arg, uint64_t short_channel_id, const struct LDKNodeId *NONNULL_PTR source, const struct LDKNodeId *NONNULL_PTR target);
+   /**
+    * Handles updating channel penalties after failing to route through a channel.
+    */
+   void (*payment_path_failed)(void *this_arg, struct LDKCVec_RouteHopZ path, uint64_t short_channel_id);
+   /**
+    * Serialize the object into a byte array
+    */
+   struct LDKCVec_u8Z (*write)(const void *this_arg);
    /**
     * Frees any resources associated with this object given its this_arg pointer.
     * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
     */
    void (*free)(void *this_arg);
 } LDKScore;
+
+
+
+/**
+ * A scorer that is accessed under a lock.
+ *
+ * Needed so that calls to [`Score::channel_penalty_msat`] in [`find_route`] can be made while
+ * having shared ownership of a scorer but without requiring internal locking in [`Score`]
+ * implementations. Internal locking would be detrimental to route finding performance and could
+ * result in [`Score::channel_penalty_msat`] returning a different value for the same channel.
+ *
+ * [`find_route`]: crate::routing::router::find_route
+ */
+typedef struct MUST_USE_STRUCT LDKLockableScore {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeLockableScore *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKLockableScore;
 
 
 
@@ -10140,53 +10608,6 @@ typedef struct MUST_USE_STRUCT LDKNetGraphMsgHandler {
     */
    bool is_owned;
 } LDKNetGraphMsgHandler;
-
-
-
-/**
- * A channel descriptor for a hop along a payment path.
- */
-typedef struct MUST_USE_STRUCT LDKRouteHintHop {
-   /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
-    */
-   LDKnativeRouteHintHop *inner;
-   /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
-    */
-   bool is_owned;
-} LDKRouteHintHop;
-
-
-
-/**
- * [`routing::Score`] implementation that provides reasonable default behavior.
- *
- * Used to apply a fixed penalty to each channel, thus avoiding long paths when shorter paths with
- * slightly higher fees are available.
- *
- * See [module-level documentation] for usage.
- *
- * [module-level documentation]: crate::routing::scorer
- */
-typedef struct MUST_USE_STRUCT LDKScorer {
-   /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
-    */
-   LDKnativeScorer *inner;
-   /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
-    */
-   bool is_owned;
-} LDKScorer;
 
 
 
@@ -10393,6 +10814,126 @@ typedef struct MUST_USE_STRUCT LDKFallback {
       };
    };
 } LDKFallback;
+
+/**
+ * A trait defining behavior of an [`Invoice`] payer.
+ */
+typedef struct LDKPayer {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
+   void *this_arg;
+   /**
+    * Returns the payer's node id.
+    */
+   struct LDKPublicKey (*node_id)(const void *this_arg);
+   /**
+    * Returns the payer's channels.
+    */
+   struct LDKCVec_ChannelDetailsZ (*first_hops)(const void *this_arg);
+   /**
+    * Sends a payment over the Lightning Network using the given [`Route`].
+    *
+    * Note that payment_secret (or a relevant inner pointer) may be NULL or all-0s to represent None
+    */
+   struct LDKCResult_PaymentIdPaymentSendFailureZ (*send_payment)(const void *this_arg, const struct LDKRoute *NONNULL_PTR route, struct LDKThirtyTwoBytes payment_hash, struct LDKThirtyTwoBytes payment_secret);
+   /**
+    * Retries a failed payment path for the [`PaymentId`] using the given [`Route`].
+    */
+   struct LDKCResult_NonePaymentSendFailureZ (*retry_payment)(const void *this_arg, const struct LDKRoute *NONNULL_PTR route, struct LDKThirtyTwoBytes payment_id);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
+   void (*free)(void *this_arg);
+} LDKPayer;
+
+/**
+ * A trait defining behavior for routing an [`Invoice`] payment.
+ */
+typedef struct LDKRouter {
+   /**
+    * An opaque pointer which is passed to your function implementations as an argument.
+    * This has no meaning in the LDK, and can be NULL or any other value.
+    */
+   void *this_arg;
+   /**
+    * Finds a [`Route`] between `payer` and `payee` for a payment with the given values.
+    *
+    * Note that first_hops (or a relevant inner pointer) may be NULL or all-0s to represent None
+    */
+   struct LDKCResult_RouteLightningErrorZ (*find_route)(const void *this_arg, struct LDKPublicKey payer, const struct LDKRouteParameters *NONNULL_PTR params, struct LDKCVec_ChannelDetailsZ *first_hops, const struct LDKScore *NONNULL_PTR scorer);
+   /**
+    * Frees any resources associated with this object given its this_arg pointer.
+    * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+    */
+   void (*free)(void *this_arg);
+} LDKRouter;
+
+
+
+/**
+ * A utility for paying [`Invoice]`s.
+ */
+typedef struct MUST_USE_STRUCT LDKInvoicePayer {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeInvoicePayer *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKInvoicePayer;
+
+
+
+/**
+ * Number of attempts to retry payment path failures for an [`Invoice`].
+ *
+ * Note that this is the number of *path* failures, not full payment retries. For multi-path
+ * payments, if this is less than the total number of paths, we will never even retry all of the
+ * payment's paths.
+ */
+typedef struct MUST_USE_STRUCT LDKRetryAttempts {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeRetryAttempts *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKRetryAttempts;
+
+
+
+/**
+ * A [`Router`] implemented using [`find_route`].
+ */
+typedef struct MUST_USE_STRUCT LDKDefaultRouter {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeDefaultRouter *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKDefaultRouter;
 
 extern const uintptr_t MAX_BUF_SIZE;
 
@@ -10875,6 +11416,32 @@ void CResult_RouteDecodeErrorZ_free(struct LDKCResult_RouteDecodeErrorZ _res);
 struct LDKCResult_RouteDecodeErrorZ CResult_RouteDecodeErrorZ_clone(const struct LDKCResult_RouteDecodeErrorZ *NONNULL_PTR orig);
 
 /**
+ * Creates a new CResult_RouteParametersDecodeErrorZ in the success state.
+ */
+struct LDKCResult_RouteParametersDecodeErrorZ CResult_RouteParametersDecodeErrorZ_ok(struct LDKRouteParameters o);
+
+/**
+ * Creates a new CResult_RouteParametersDecodeErrorZ in the error state.
+ */
+struct LDKCResult_RouteParametersDecodeErrorZ CResult_RouteParametersDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Frees any resources used by the CResult_RouteParametersDecodeErrorZ.
+ */
+void CResult_RouteParametersDecodeErrorZ_free(struct LDKCResult_RouteParametersDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_RouteParametersDecodeErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_RouteParametersDecodeErrorZ CResult_RouteParametersDecodeErrorZ_clone(const struct LDKCResult_RouteParametersDecodeErrorZ *NONNULL_PTR orig);
+
+/**
+ * Frees the buffer pointed to by `data` if `datalen` is non-0.
+ */
+void CVec_RouteHintZ_free(struct LDKCVec_RouteHintZ _res);
+
+/**
  * Constructs a new COption_u64Z containing a u64
  */
 struct LDKCOption_u64Z COption_u64Z_some(uint64_t o);
@@ -10896,14 +11463,77 @@ void COption_u64Z_free(struct LDKCOption_u64Z _res);
 struct LDKCOption_u64Z COption_u64Z_clone(const struct LDKCOption_u64Z *NONNULL_PTR orig);
 
 /**
- * Frees the buffer pointed to by `data` if `datalen` is non-0.
+ * Creates a new CResult_PayeeDecodeErrorZ in the success state.
  */
-void CVec_ChannelDetailsZ_free(struct LDKCVec_ChannelDetailsZ _res);
+struct LDKCResult_PayeeDecodeErrorZ CResult_PayeeDecodeErrorZ_ok(struct LDKPayee o);
+
+/**
+ * Creates a new CResult_PayeeDecodeErrorZ in the error state.
+ */
+struct LDKCResult_PayeeDecodeErrorZ CResult_PayeeDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Frees any resources used by the CResult_PayeeDecodeErrorZ.
+ */
+void CResult_PayeeDecodeErrorZ_free(struct LDKCResult_PayeeDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_PayeeDecodeErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_PayeeDecodeErrorZ CResult_PayeeDecodeErrorZ_clone(const struct LDKCResult_PayeeDecodeErrorZ *NONNULL_PTR orig);
 
 /**
  * Frees the buffer pointed to by `data` if `datalen` is non-0.
  */
-void CVec_RouteHintZ_free(struct LDKCVec_RouteHintZ _res);
+void CVec_RouteHintHopZ_free(struct LDKCVec_RouteHintHopZ _res);
+
+/**
+ * Creates a new CResult_RouteHintDecodeErrorZ in the success state.
+ */
+struct LDKCResult_RouteHintDecodeErrorZ CResult_RouteHintDecodeErrorZ_ok(struct LDKRouteHint o);
+
+/**
+ * Creates a new CResult_RouteHintDecodeErrorZ in the error state.
+ */
+struct LDKCResult_RouteHintDecodeErrorZ CResult_RouteHintDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Frees any resources used by the CResult_RouteHintDecodeErrorZ.
+ */
+void CResult_RouteHintDecodeErrorZ_free(struct LDKCResult_RouteHintDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_RouteHintDecodeErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_RouteHintDecodeErrorZ CResult_RouteHintDecodeErrorZ_clone(const struct LDKCResult_RouteHintDecodeErrorZ *NONNULL_PTR orig);
+
+/**
+ * Creates a new CResult_RouteHintHopDecodeErrorZ in the success state.
+ */
+struct LDKCResult_RouteHintHopDecodeErrorZ CResult_RouteHintHopDecodeErrorZ_ok(struct LDKRouteHintHop o);
+
+/**
+ * Creates a new CResult_RouteHintHopDecodeErrorZ in the error state.
+ */
+struct LDKCResult_RouteHintHopDecodeErrorZ CResult_RouteHintHopDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Frees any resources used by the CResult_RouteHintHopDecodeErrorZ.
+ */
+void CResult_RouteHintHopDecodeErrorZ_free(struct LDKCResult_RouteHintHopDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_RouteHintHopDecodeErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_RouteHintHopDecodeErrorZ CResult_RouteHintHopDecodeErrorZ_clone(const struct LDKCResult_RouteHintHopDecodeErrorZ *NONNULL_PTR orig);
+
+/**
+ * Frees the buffer pointed to by `data` if `datalen` is non-0.
+ */
+void CVec_ChannelDetailsZ_free(struct LDKCVec_ChannelDetailsZ _res);
 
 /**
  * Creates a new CResult_RouteLightningErrorZ in the success state.
@@ -11110,6 +11740,36 @@ struct LDKCResult_InvoiceFeaturesDecodeErrorZ CResult_InvoiceFeaturesDecodeError
  * Frees any resources used by the CResult_InvoiceFeaturesDecodeErrorZ.
  */
 void CResult_InvoiceFeaturesDecodeErrorZ_free(struct LDKCResult_InvoiceFeaturesDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_ScoringParametersDecodeErrorZ in the success state.
+ */
+struct LDKCResult_ScoringParametersDecodeErrorZ CResult_ScoringParametersDecodeErrorZ_ok(struct LDKScoringParameters o);
+
+/**
+ * Creates a new CResult_ScoringParametersDecodeErrorZ in the error state.
+ */
+struct LDKCResult_ScoringParametersDecodeErrorZ CResult_ScoringParametersDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Frees any resources used by the CResult_ScoringParametersDecodeErrorZ.
+ */
+void CResult_ScoringParametersDecodeErrorZ_free(struct LDKCResult_ScoringParametersDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_ScorerDecodeErrorZ in the success state.
+ */
+struct LDKCResult_ScorerDecodeErrorZ CResult_ScorerDecodeErrorZ_ok(struct LDKScorer o);
+
+/**
+ * Creates a new CResult_ScorerDecodeErrorZ in the error state.
+ */
+struct LDKCResult_ScorerDecodeErrorZ CResult_ScorerDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Frees any resources used by the CResult_ScorerDecodeErrorZ.
+ */
+void CResult_ScorerDecodeErrorZ_free(struct LDKCResult_ScorerDecodeErrorZ _res);
 
 /**
  * Creates a new CResult_DelayedPaymentOutputDescriptorDecodeErrorZ in the success state.
@@ -11404,27 +12064,6 @@ struct LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ CResult_CVec_C2Tu
 void CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ_free(struct LDKCResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ _res);
 
 /**
- * Creates a new CResult_PaymentIdDecodeErrorZ in the success state.
- */
-struct LDKCResult_PaymentIdDecodeErrorZ CResult_PaymentIdDecodeErrorZ_ok(struct LDKPaymentId o);
-
-/**
- * Creates a new CResult_PaymentIdDecodeErrorZ in the error state.
- */
-struct LDKCResult_PaymentIdDecodeErrorZ CResult_PaymentIdDecodeErrorZ_err(struct LDKDecodeError e);
-
-/**
- * Frees any resources used by the CResult_PaymentIdDecodeErrorZ.
- */
-void CResult_PaymentIdDecodeErrorZ_free(struct LDKCResult_PaymentIdDecodeErrorZ _res);
-
-/**
- * Creates a new CResult_PaymentIdDecodeErrorZ which has the same data as `orig`
- * but with all dynamically-allocated buffers duplicated in new buffers.
- */
-struct LDKCResult_PaymentIdDecodeErrorZ CResult_PaymentIdDecodeErrorZ_clone(const struct LDKCResult_PaymentIdDecodeErrorZ *NONNULL_PTR orig);
-
-/**
  * Constructs a new COption_u16Z containing a u16
  */
 struct LDKCOption_u16Z COption_u16Z_some(uint16_t o);
@@ -11500,7 +12139,7 @@ struct LDKCResult__u832APIErrorZ CResult__u832APIErrorZ_clone(const struct LDKCR
 /**
  * Creates a new CResult_PaymentIdPaymentSendFailureZ in the success state.
  */
-struct LDKCResult_PaymentIdPaymentSendFailureZ CResult_PaymentIdPaymentSendFailureZ_ok(struct LDKPaymentId o);
+struct LDKCResult_PaymentIdPaymentSendFailureZ CResult_PaymentIdPaymentSendFailureZ_ok(struct LDKThirtyTwoBytes o);
 
 /**
  * Creates a new CResult_PaymentIdPaymentSendFailureZ in the error state.
@@ -11548,7 +12187,7 @@ struct LDKC2Tuple_PaymentHashPaymentIdZ C2Tuple_PaymentHashPaymentIdZ_clone(cons
 /**
  * Creates a new C2Tuple_PaymentHashPaymentIdZ from the contained elements.
  */
-struct LDKC2Tuple_PaymentHashPaymentIdZ C2Tuple_PaymentHashPaymentIdZ_new(struct LDKThirtyTwoBytes a, struct LDKPaymentId b);
+struct LDKC2Tuple_PaymentHashPaymentIdZ C2Tuple_PaymentHashPaymentIdZ_new(struct LDKThirtyTwoBytes a, struct LDKThirtyTwoBytes b);
 
 /**
  * Frees any resources used by the C2Tuple_PaymentHashPaymentIdZ.
@@ -11719,6 +12358,27 @@ struct LDKCResult_COption_TypeZDecodeErrorZ CResult_COption_TypeZDecodeErrorZ_er
  * Frees any resources used by the CResult_COption_TypeZDecodeErrorZ.
  */
 void CResult_COption_TypeZDecodeErrorZ_free(struct LDKCResult_COption_TypeZDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_PaymentIdPaymentErrorZ in the success state.
+ */
+struct LDKCResult_PaymentIdPaymentErrorZ CResult_PaymentIdPaymentErrorZ_ok(struct LDKThirtyTwoBytes o);
+
+/**
+ * Creates a new CResult_PaymentIdPaymentErrorZ in the error state.
+ */
+struct LDKCResult_PaymentIdPaymentErrorZ CResult_PaymentIdPaymentErrorZ_err(struct LDKPaymentError e);
+
+/**
+ * Frees any resources used by the CResult_PaymentIdPaymentErrorZ.
+ */
+void CResult_PaymentIdPaymentErrorZ_free(struct LDKCResult_PaymentIdPaymentErrorZ _res);
+
+/**
+ * Creates a new CResult_PaymentIdPaymentErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_PaymentIdPaymentErrorZ CResult_PaymentIdPaymentErrorZ_clone(const struct LDKCResult_PaymentIdPaymentErrorZ *NONNULL_PTR orig);
 
 /**
  * Creates a new CResult_SiPrefixNoneZ in the success state.
@@ -12497,48 +13157,6 @@ void COption_CVec_NetAddressZZ_free(struct LDKCOption_CVec_NetAddressZZ _res);
  * but with all dynamically-allocated buffers duplicated in new buffers.
  */
 struct LDKCOption_CVec_NetAddressZZ COption_CVec_NetAddressZZ_clone(const struct LDKCOption_CVec_NetAddressZZ *NONNULL_PTR orig);
-
-/**
- * Creates a new CResult_NetAddressu8Z in the success state.
- */
-struct LDKCResult_NetAddressu8Z CResult_NetAddressu8Z_ok(struct LDKNetAddress o);
-
-/**
- * Creates a new CResult_NetAddressu8Z in the error state.
- */
-struct LDKCResult_NetAddressu8Z CResult_NetAddressu8Z_err(uint8_t e);
-
-/**
- * Frees any resources used by the CResult_NetAddressu8Z.
- */
-void CResult_NetAddressu8Z_free(struct LDKCResult_NetAddressu8Z _res);
-
-/**
- * Creates a new CResult_NetAddressu8Z which has the same data as `orig`
- * but with all dynamically-allocated buffers duplicated in new buffers.
- */
-struct LDKCResult_NetAddressu8Z CResult_NetAddressu8Z_clone(const struct LDKCResult_NetAddressu8Z *NONNULL_PTR orig);
-
-/**
- * Creates a new CResult_CResult_NetAddressu8ZDecodeErrorZ in the success state.
- */
-struct LDKCResult_CResult_NetAddressu8ZDecodeErrorZ CResult_CResult_NetAddressu8ZDecodeErrorZ_ok(struct LDKCResult_NetAddressu8Z o);
-
-/**
- * Creates a new CResult_CResult_NetAddressu8ZDecodeErrorZ in the error state.
- */
-struct LDKCResult_CResult_NetAddressu8ZDecodeErrorZ CResult_CResult_NetAddressu8ZDecodeErrorZ_err(struct LDKDecodeError e);
-
-/**
- * Frees any resources used by the CResult_CResult_NetAddressu8ZDecodeErrorZ.
- */
-void CResult_CResult_NetAddressu8ZDecodeErrorZ_free(struct LDKCResult_CResult_NetAddressu8ZDecodeErrorZ _res);
-
-/**
- * Creates a new CResult_CResult_NetAddressu8ZDecodeErrorZ which has the same data as `orig`
- * but with all dynamically-allocated buffers duplicated in new buffers.
- */
-struct LDKCResult_CResult_NetAddressu8ZDecodeErrorZ CResult_CResult_NetAddressu8ZDecodeErrorZ_clone(const struct LDKCResult_CResult_NetAddressu8ZDecodeErrorZ *NONNULL_PTR orig);
 
 /**
  * Creates a new CResult_NetAddressDecodeErrorZ in the success state.
@@ -13402,12 +14020,12 @@ struct LDKEvent Event_payment_received(struct LDKThirtyTwoBytes payment_hash, ui
 /**
  * Utility method to constructs a new PaymentSent-variant Event
  */
-struct LDKEvent Event_payment_sent(struct LDKThirtyTwoBytes payment_preimage, struct LDKThirtyTwoBytes payment_hash);
+struct LDKEvent Event_payment_sent(struct LDKThirtyTwoBytes payment_id, struct LDKThirtyTwoBytes payment_preimage, struct LDKThirtyTwoBytes payment_hash, struct LDKCOption_u64Z fee_paid_msat);
 
 /**
  * Utility method to constructs a new PaymentPathFailed-variant Event
  */
-struct LDKEvent Event_payment_path_failed(struct LDKThirtyTwoBytes payment_hash, bool rejected_by_dest, struct LDKCOption_NetworkUpdateZ network_update, bool all_paths_failed, struct LDKCVec_RouteHopZ path, struct LDKCOption_u64Z short_channel_id);
+struct LDKEvent Event_payment_path_failed(struct LDKThirtyTwoBytes payment_id, struct LDKThirtyTwoBytes payment_hash, bool rejected_by_dest, struct LDKCOption_NetworkUpdateZ network_update, bool all_paths_failed, struct LDKCVec_RouteHopZ path, struct LDKCOption_u64Z short_channel_id, struct LDKRouteParameters retry);
 
 /**
  * Utility method to constructs a new PendingHTLCsForwardable-variant Event
@@ -14479,6 +15097,28 @@ bool ConfirmationTarget_eq(const enum LDKConfirmationTarget *NONNULL_PTR a, cons
 void FeeEstimator_free(struct LDKFeeEstimator this_ptr);
 
 /**
+ * Frees any resources used by the MonitorUpdateId, if is_owned is set and inner is non-NULL.
+ */
+void MonitorUpdateId_free(struct LDKMonitorUpdateId this_obj);
+
+/**
+ * Creates a copy of the MonitorUpdateId
+ */
+struct LDKMonitorUpdateId MonitorUpdateId_clone(const struct LDKMonitorUpdateId *NONNULL_PTR orig);
+
+/**
+ * Checks if two MonitorUpdateIds contain equal inner contents.
+ */
+uint64_t MonitorUpdateId_hash(const struct LDKMonitorUpdateId *NONNULL_PTR o);
+
+/**
+ * Checks if two MonitorUpdateIds contain equal inner contents.
+ * This ignores pointers and is_owned flags and looks at the values in fields.
+ * Two objects with NULL inner values will be considered "equal" here.
+ */
+bool MonitorUpdateId_eq(const struct LDKMonitorUpdateId *NONNULL_PTR a, const struct LDKMonitorUpdateId *NONNULL_PTR b);
+
+/**
  * Calls the free function if one is set
  */
 void Persist_free(struct LDKPersist this_ptr);
@@ -14533,6 +15173,23 @@ MUST_USE_RES struct LDKCResult_LockedChannelMonitorNoneZ ChainMonitor_get_monito
  * monitoring for on-chain state resolutions.
  */
 MUST_USE_RES struct LDKCVec_OutPointZ ChainMonitor_list_monitors(const struct LDKChainMonitor *NONNULL_PTR this_arg);
+
+/**
+ * Indicates the persistence of a [`ChannelMonitor`] has completed after
+ * [`ChannelMonitorUpdateErr::TemporaryFailure`] was returned from an update operation.
+ *
+ * Thus, the anticipated use is, at a high level:
+ *  1) This [`ChainMonitor`] calls [`Persist::update_persisted_channel`] which stores the
+ *     update to disk and begins updating any remote (e.g. watchtower/backup) copies,
+ *     returning [`ChannelMonitorUpdateErr::TemporaryFailure`],
+ *  2) once all remote copies are updated, you call this function with the
+ *     `completed_update_id` that completed, and once all pending updates have completed the
+ *     channel will be re-enabled.
+ *
+ * Returns an [`APIError::APIMisuseError`] if `funding_txo` does not match any currently
+ * registered [`ChannelMonitor`]s.
+ */
+MUST_USE_RES struct LDKCResult_NoneAPIErrorZ ChainMonitor_channel_monitor_updated(const struct LDKChainMonitor *NONNULL_PTR this_arg, struct LDKOutPoint funding_txo, struct LDKMonitorUpdateId completed_update_id);
 
 /**
  * Constructs a new Listen which calls the relevant methods on this_arg.
@@ -14613,6 +15270,15 @@ struct LDKCResult_ChannelMonitorUpdateDecodeErrorZ ChannelMonitorUpdate_read(str
  */
 void MonitorUpdateError_free(struct LDKMonitorUpdateError this_obj);
 
+struct LDKStr MonitorUpdateError_get_a(const struct LDKMonitorUpdateError *NONNULL_PTR this_ptr);
+
+void MonitorUpdateError_set_a(struct LDKMonitorUpdateError *NONNULL_PTR this_ptr, struct LDKStr val);
+
+/**
+ * Constructs a new MonitorUpdateError given each field
+ */
+MUST_USE_RES struct LDKMonitorUpdateError MonitorUpdateError_new(struct LDKStr a_arg);
+
 /**
  * Creates a copy of the MonitorUpdateError
  */
@@ -14637,6 +15303,21 @@ struct LDKMonitorEvent MonitorEvent_htlcevent(struct LDKHTLCUpdate a);
  * Utility method to constructs a new CommitmentTxConfirmed-variant MonitorEvent
  */
 struct LDKMonitorEvent MonitorEvent_commitment_tx_confirmed(struct LDKOutPoint a);
+
+/**
+ * Utility method to constructs a new UpdateCompleted-variant MonitorEvent
+ */
+struct LDKMonitorEvent MonitorEvent_update_completed(struct LDKOutPoint funding_txo, uint64_t monitor_update_id);
+
+/**
+ * Utility method to constructs a new UpdateFailed-variant MonitorEvent
+ */
+struct LDKMonitorEvent MonitorEvent_update_failed(struct LDKOutPoint a);
+
+/**
+ * Serialize the MonitorEvent object into a byte array which can be read by MonitorEvent_read
+ */
+struct LDKCVec_u8Z MonitorEvent_write(const struct LDKMonitorEvent *NONNULL_PTR obj);
 
 /**
  * Frees any resources used by the HTLCUpdate, if is_owned is set and inner is non-NULL.
@@ -15348,38 +16029,6 @@ MUST_USE_RES struct LDKCResult_TransactionNoneZ KeysManager_spend_spendable_outp
 struct LDKKeysInterface KeysManager_as_KeysInterface(const struct LDKKeysManager *NONNULL_PTR this_arg);
 
 /**
- * Frees any resources used by the PaymentId, if is_owned is set and inner is non-NULL.
- */
-void PaymentId_free(struct LDKPaymentId this_obj);
-
-/**
- * Checks if two PaymentIds contain equal inner contents.
- */
-uint64_t PaymentId_hash(const struct LDKPaymentId *NONNULL_PTR o);
-
-/**
- * Creates a copy of the PaymentId
- */
-struct LDKPaymentId PaymentId_clone(const struct LDKPaymentId *NONNULL_PTR orig);
-
-/**
- * Checks if two PaymentIds contain equal inner contents.
- * This ignores pointers and is_owned flags and looks at the values in fields.
- * Two objects with NULL inner values will be considered "equal" here.
- */
-bool PaymentId_eq(const struct LDKPaymentId *NONNULL_PTR a, const struct LDKPaymentId *NONNULL_PTR b);
-
-/**
- * Serialize the PaymentId object into a byte array which can be read by PaymentId_read
- */
-struct LDKCVec_u8Z PaymentId_write(const struct LDKPaymentId *NONNULL_PTR obj);
-
-/**
- * Read a PaymentId from a byte array, created by PaymentId_write
- */
-struct LDKCResult_PaymentIdDecodeErrorZ PaymentId_read(struct LDKu8slice ser);
-
-/**
  * Frees any resources used by the ChannelManager, if is_owned is set and inner is non-NULL.
  */
 void ChannelManager_free(struct LDKChannelManager this_obj);
@@ -15858,7 +16507,7 @@ struct LDKPaymentSendFailure PaymentSendFailure_all_failed_retry_safe(struct LDK
 /**
  * Utility method to constructs a new PartialFailure-variant PaymentSendFailure
  */
-struct LDKPaymentSendFailure PaymentSendFailure_partial_failure(struct LDKCVec_CResult_NoneAPIErrorZZ a);
+struct LDKPaymentSendFailure PaymentSendFailure_partial_failure(struct LDKCVec_CResult_NoneAPIErrorZZ results, struct LDKRouteParameters failed_paths_retry, struct LDKThirtyTwoBytes payment_id);
 
 /**
  * Constructs a new ChannelManager to hold several channels and route between them.
@@ -16040,7 +16689,7 @@ MUST_USE_RES struct LDKCResult_PaymentIdPaymentSendFailureZ ChannelManager_send_
  *
  * [`send_payment`]: [`ChannelManager::send_payment`]
  */
-MUST_USE_RES struct LDKCResult_NonePaymentSendFailureZ ChannelManager_retry_payment(const struct LDKChannelManager *NONNULL_PTR this_arg, const struct LDKRoute *NONNULL_PTR route, struct LDKPaymentId payment_id);
+MUST_USE_RES struct LDKCResult_NonePaymentSendFailureZ ChannelManager_retry_payment(const struct LDKChannelManager *NONNULL_PTR this_arg, const struct LDKRoute *NONNULL_PTR route, struct LDKThirtyTwoBytes payment_id);
 
 /**
  * Send a spontaneous payment, which is a payment that does not require the recipient to have
@@ -16160,30 +16809,6 @@ MUST_USE_RES bool ChannelManager_claim_funds(const struct LDKChannelManager *NON
  * Gets the node_id held by this ChannelManager
  */
 MUST_USE_RES struct LDKPublicKey ChannelManager_get_our_node_id(const struct LDKChannelManager *NONNULL_PTR this_arg);
-
-/**
- * Restores a single, given channel to normal operation after a
- * ChannelMonitorUpdateErr::TemporaryFailure was returned from a channel monitor update
- * operation.
- *
- * All ChannelMonitor updates up to and including highest_applied_update_id must have been
- * fully committed in every copy of the given channels' ChannelMonitors.
- *
- * Note that there is no effect to calling with a highest_applied_update_id other than the
- * current latest ChannelMonitorUpdate and one call to this function after multiple
- * ChannelMonitorUpdateErr::TemporaryFailures is fine. The highest_applied_update_id field
- * exists largely only to prevent races between this and concurrent update_monitor calls.
- *
- * Thus, the anticipated use is, at a high level:
- *  1) You register a chain::Watch with this ChannelManager,
- *  2) it stores each update to disk, and begins updating any remote (eg watchtower) copies of
- *     said ChannelMonitors as it can, returning ChannelMonitorUpdateErr::TemporaryFailures
- *     any time it cannot do so instantly,
- *  3) update(s) are applied to each remote copy of a ChannelMonitor,
- *  4) once all remote copies are updated, you call this function with the update_id that
- *     completed, and once it is the latest the Channel will be re-enabled.
- */
-void ChannelManager_channel_monitor_updated(const struct LDKChannelManager *NONNULL_PTR this_arg, const struct LDKOutPoint *NONNULL_PTR funding_txo, uint64_t highest_applied_update_id);
 
 /**
  * Gets a payment secret and payment hash for use in an invoice given to a third party wishing
@@ -17617,11 +18242,6 @@ struct LDKNetAddress NetAddress_onion_v3(struct LDKThirtyTwoBytes ed25519_pubkey
 struct LDKCVec_u8Z NetAddress_write(const struct LDKNetAddress *NONNULL_PTR obj);
 
 /**
- * Read a Result from a byte array, created by Result_write
- */
-struct LDKCResult_CResult_NetAddressu8ZDecodeErrorZ Result_read(struct LDKu8slice ser);
-
-/**
  * Read a NetAddress from a byte array, created by NetAddress_write
  */
 struct LDKCResult_NetAddressDecodeErrorZ NetAddress_read(struct LDKu8slice ser);
@@ -18972,6 +19592,13 @@ void PeerManager_socket_disconnected(const struct LDKPeerManager *NONNULL_PTR th
 void PeerManager_disconnect_by_node_id(const struct LDKPeerManager *NONNULL_PTR this_arg, struct LDKPublicKey node_id, bool no_connection_possible);
 
 /**
+ * Disconnects all currently-connected peers. This is useful on platforms where there may be
+ * an indication that TCP sockets have stalled even if we weren't around to time them out
+ * using regular ping/pongs.
+ */
+void PeerManager_disconnect_all_peers(const struct LDKPeerManager *NONNULL_PTR this_arg);
+
+/**
  * Send pings to each peer and disconnect those which did not respond to the last round of
  * pings.
  *
@@ -20095,6 +20722,21 @@ void Type_free(struct LDKType this_ptr);
 void Score_free(struct LDKScore this_ptr);
 
 /**
+ * Frees any resources used by the LockableScore, if is_owned is set and inner is non-NULL.
+ */
+void LockableScore_free(struct LDKLockableScore this_obj);
+
+/**
+ * Constructs a new LockableScore from a Score
+ */
+MUST_USE_RES struct LDKLockableScore LockableScore_new(struct LDKScore score);
+
+/**
+ * Serialize the LockableScore object into a byte array which can be read by LockableScore_read
+ */
+struct LDKCVec_u8Z LockableScore_write(const struct LDKLockableScore *NONNULL_PTR obj);
+
+/**
  * Frees any resources used by the NodeId, if is_owned is set and inner is non-NULL.
  */
 void NodeId_free(struct LDKNodeId this_obj);
@@ -20186,23 +20828,13 @@ struct LDKEventHandler NetGraphMsgHandler_as_EventHandler(const struct LDKNetGra
 void NetGraphMsgHandler_free(struct LDKNetGraphMsgHandler this_obj);
 
 /**
- * Representation of the payment channel network
- */
-struct LDKNetworkGraph NetGraphMsgHandler_get_network_graph(const struct LDKNetGraphMsgHandler *NONNULL_PTR this_ptr);
-
-/**
- * Representation of the payment channel network
- */
-void NetGraphMsgHandler_set_network_graph(struct LDKNetGraphMsgHandler *NONNULL_PTR this_ptr, struct LDKNetworkGraph val);
-
-/**
  * Creates a new tracker of the actual state of the network of channels and nodes,
  * assuming an existing Network Graph.
  * Chain monitor is used to make sure announced channels exist on-chain,
  * channel data is correct, and that the announcement is signed with
  * channel owners' keys.
  */
-MUST_USE_RES struct LDKNetGraphMsgHandler NetGraphMsgHandler_new(struct LDKNetworkGraph network_graph, struct LDKCOption_AccessZ chain_access, struct LDKLogger logger);
+MUST_USE_RES struct LDKNetGraphMsgHandler NetGraphMsgHandler_new(const struct LDKNetworkGraph *NONNULL_PTR network_graph, struct LDKCOption_AccessZ chain_access, struct LDKLogger logger);
 
 /**
  * Adds a provider used to check new announcements. Does not affect
@@ -20894,9 +21526,31 @@ struct LDKCVec_CVec_RouteHopZZ Route_get_paths(const struct LDKRoute *NONNULL_PT
 void Route_set_paths(struct LDKRoute *NONNULL_PTR this_ptr, struct LDKCVec_CVec_RouteHopZZ val);
 
 /**
+ * The `payee` parameter passed to [`find_route`].
+ * This is used by `ChannelManager` to track information which may be required for retries,
+ * provided back to you via [`Event::PaymentPathFailed`].
+ *
+ * [`Event::PaymentPathFailed`]: crate::util::events::Event::PaymentPathFailed
+ *
+ * Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+ */
+struct LDKPayee Route_get_payee(const struct LDKRoute *NONNULL_PTR this_ptr);
+
+/**
+ * The `payee` parameter passed to [`find_route`].
+ * This is used by `ChannelManager` to track information which may be required for retries,
+ * provided back to you via [`Event::PaymentPathFailed`].
+ *
+ * [`Event::PaymentPathFailed`]: crate::util::events::Event::PaymentPathFailed
+ *
+ * Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+ */
+void Route_set_payee(struct LDKRoute *NONNULL_PTR this_ptr, struct LDKPayee val);
+
+/**
  * Constructs a new Route given each field
  */
-MUST_USE_RES struct LDKRoute Route_new(struct LDKCVec_CVec_RouteHopZZ paths_arg);
+MUST_USE_RES struct LDKRoute Route_new(struct LDKCVec_CVec_RouteHopZZ paths_arg, struct LDKPayee payee_arg);
 
 /**
  * Creates a copy of the Route
@@ -20919,7 +21573,7 @@ bool Route_eq(const struct LDKRoute *NONNULL_PTR a, const struct LDKRoute *NONNU
  * Returns the total amount of fees paid on this [`Route`].
  *
  * This doesn't include any extra payment made to the recipient, which can happen in excess of
- * the amount passed to [`get_route`]'s `final_value_msat`.
+ * the amount passed to [`find_route`]'s `params.final_value_msat`.
  */
 MUST_USE_RES uint64_t Route_get_total_fees(const struct LDKRoute *NONNULL_PTR this_arg);
 
@@ -20939,9 +21593,174 @@ struct LDKCVec_u8Z Route_write(const struct LDKRoute *NONNULL_PTR obj);
 struct LDKCResult_RouteDecodeErrorZ Route_read(struct LDKu8slice ser);
 
 /**
+ * Frees any resources used by the RouteParameters, if is_owned is set and inner is non-NULL.
+ */
+void RouteParameters_free(struct LDKRouteParameters this_obj);
+
+/**
+ * The recipient of the failed payment path.
+ */
+struct LDKPayee RouteParameters_get_payee(const struct LDKRouteParameters *NONNULL_PTR this_ptr);
+
+/**
+ * The recipient of the failed payment path.
+ */
+void RouteParameters_set_payee(struct LDKRouteParameters *NONNULL_PTR this_ptr, struct LDKPayee val);
+
+/**
+ * The amount in msats sent on the failed payment path.
+ */
+uint64_t RouteParameters_get_final_value_msat(const struct LDKRouteParameters *NONNULL_PTR this_ptr);
+
+/**
+ * The amount in msats sent on the failed payment path.
+ */
+void RouteParameters_set_final_value_msat(struct LDKRouteParameters *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * The CLTV on the final hop of the failed payment path.
+ */
+uint32_t RouteParameters_get_final_cltv_expiry_delta(const struct LDKRouteParameters *NONNULL_PTR this_ptr);
+
+/**
+ * The CLTV on the final hop of the failed payment path.
+ */
+void RouteParameters_set_final_cltv_expiry_delta(struct LDKRouteParameters *NONNULL_PTR this_ptr, uint32_t val);
+
+/**
+ * Constructs a new RouteParameters given each field
+ */
+MUST_USE_RES struct LDKRouteParameters RouteParameters_new(struct LDKPayee payee_arg, uint64_t final_value_msat_arg, uint32_t final_cltv_expiry_delta_arg);
+
+/**
+ * Creates a copy of the RouteParameters
+ */
+struct LDKRouteParameters RouteParameters_clone(const struct LDKRouteParameters *NONNULL_PTR orig);
+
+/**
+ * Serialize the RouteParameters object into a byte array which can be read by RouteParameters_read
+ */
+struct LDKCVec_u8Z RouteParameters_write(const struct LDKRouteParameters *NONNULL_PTR obj);
+
+/**
+ * Read a RouteParameters from a byte array, created by RouteParameters_write
+ */
+struct LDKCResult_RouteParametersDecodeErrorZ RouteParameters_read(struct LDKu8slice ser);
+
+/**
+ * Frees any resources used by the Payee, if is_owned is set and inner is non-NULL.
+ */
+void Payee_free(struct LDKPayee this_obj);
+
+/**
+ * The node id of the payee.
+ */
+struct LDKPublicKey Payee_get_pubkey(const struct LDKPayee *NONNULL_PTR this_ptr);
+
+/**
+ * The node id of the payee.
+ */
+void Payee_set_pubkey(struct LDKPayee *NONNULL_PTR this_ptr, struct LDKPublicKey val);
+
+/**
+ * Features supported by the payee.
+ *
+ * May be set from the payee's invoice or via [`for_keysend`]. May be `None` if the invoice
+ * does not contain any features.
+ *
+ * [`for_keysend`]: Self::for_keysend
+ *
+ * Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+ */
+struct LDKInvoiceFeatures Payee_get_features(const struct LDKPayee *NONNULL_PTR this_ptr);
+
+/**
+ * Features supported by the payee.
+ *
+ * May be set from the payee's invoice or via [`for_keysend`]. May be `None` if the invoice
+ * does not contain any features.
+ *
+ * [`for_keysend`]: Self::for_keysend
+ *
+ * Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+ */
+void Payee_set_features(struct LDKPayee *NONNULL_PTR this_ptr, struct LDKInvoiceFeatures val);
+
+/**
+ * Hints for routing to the payee, containing channels connecting the payee to public nodes.
+ */
+struct LDKCVec_RouteHintZ Payee_get_route_hints(const struct LDKPayee *NONNULL_PTR this_ptr);
+
+/**
+ * Hints for routing to the payee, containing channels connecting the payee to public nodes.
+ */
+void Payee_set_route_hints(struct LDKPayee *NONNULL_PTR this_ptr, struct LDKCVec_RouteHintZ val);
+
+/**
+ * Expiration of a payment to the payee, in seconds relative to the UNIX epoch.
+ */
+struct LDKCOption_u64Z Payee_get_expiry_time(const struct LDKPayee *NONNULL_PTR this_ptr);
+
+/**
+ * Expiration of a payment to the payee, in seconds relative to the UNIX epoch.
+ */
+void Payee_set_expiry_time(struct LDKPayee *NONNULL_PTR this_ptr, struct LDKCOption_u64Z val);
+
+/**
+ * Constructs a new Payee given each field
+ */
+MUST_USE_RES struct LDKPayee Payee_new(struct LDKPublicKey pubkey_arg, struct LDKInvoiceFeatures features_arg, struct LDKCVec_RouteHintZ route_hints_arg, struct LDKCOption_u64Z expiry_time_arg);
+
+/**
+ * Creates a copy of the Payee
+ */
+struct LDKPayee Payee_clone(const struct LDKPayee *NONNULL_PTR orig);
+
+/**
+ * Checks if two Payees contain equal inner contents.
+ */
+uint64_t Payee_hash(const struct LDKPayee *NONNULL_PTR o);
+
+/**
+ * Checks if two Payees contain equal inner contents.
+ * This ignores pointers and is_owned flags and looks at the values in fields.
+ * Two objects with NULL inner values will be considered "equal" here.
+ */
+bool Payee_eq(const struct LDKPayee *NONNULL_PTR a, const struct LDKPayee *NONNULL_PTR b);
+
+/**
+ * Serialize the Payee object into a byte array which can be read by Payee_read
+ */
+struct LDKCVec_u8Z Payee_write(const struct LDKPayee *NONNULL_PTR obj);
+
+/**
+ * Read a Payee from a byte array, created by Payee_write
+ */
+struct LDKCResult_PayeeDecodeErrorZ Payee_read(struct LDKu8slice ser);
+
+/**
+ * Creates a payee with the node id of the given `pubkey`.
+ */
+MUST_USE_RES struct LDKPayee Payee_from_node_id(struct LDKPublicKey pubkey);
+
+/**
+ * Creates a payee with the node id of the given `pubkey` to use for keysend payments.
+ */
+MUST_USE_RES struct LDKPayee Payee_for_keysend(struct LDKPublicKey pubkey);
+
+/**
  * Frees any resources used by the RouteHint, if is_owned is set and inner is non-NULL.
  */
 void RouteHint_free(struct LDKRouteHint this_obj);
+
+struct LDKCVec_RouteHintHopZ RouteHint_get_a(const struct LDKRouteHint *NONNULL_PTR this_ptr);
+
+void RouteHint_set_a(struct LDKRouteHint *NONNULL_PTR this_ptr, struct LDKCVec_RouteHintHopZ val);
+
+/**
+ * Constructs a new RouteHint given each field
+ */
+MUST_USE_RES struct LDKRouteHint RouteHint_new(struct LDKCVec_RouteHintHopZ a_arg);
 
 /**
  * Creates a copy of the RouteHint
@@ -20959,6 +21778,16 @@ uint64_t RouteHint_hash(const struct LDKRouteHint *NONNULL_PTR o);
  * Two objects with NULL inner values will be considered "equal" here.
  */
 bool RouteHint_eq(const struct LDKRouteHint *NONNULL_PTR a, const struct LDKRouteHint *NONNULL_PTR b);
+
+/**
+ * Serialize the RouteHint object into a byte array which can be read by RouteHint_read
+ */
+struct LDKCVec_u8Z RouteHint_write(const struct LDKRouteHint *NONNULL_PTR obj);
+
+/**
+ * Read a RouteHint from a byte array, created by RouteHint_write
+ */
+struct LDKCResult_RouteHintDecodeErrorZ RouteHint_read(struct LDKu8slice ser);
 
 /**
  * Frees any resources used by the RouteHintHop, if is_owned is set and inner is non-NULL.
@@ -21048,39 +21877,48 @@ uint64_t RouteHintHop_hash(const struct LDKRouteHintHop *NONNULL_PTR o);
 bool RouteHintHop_eq(const struct LDKRouteHintHop *NONNULL_PTR a, const struct LDKRouteHintHop *NONNULL_PTR b);
 
 /**
- * Gets a keysend route from us (payer) to the given target node (payee). This is needed because
- * keysend payments do not have an invoice from which to pull the payee's supported features, which
- * makes it tricky to otherwise supply the `payee_features` parameter of `get_route`.
- *
- * Note that first_hops (or a relevant inner pointer) may be NULL or all-0s to represent None
+ * Serialize the RouteHintHop object into a byte array which can be read by RouteHintHop_read
  */
-struct LDKCResult_RouteLightningErrorZ get_keysend_route(struct LDKPublicKey our_node_pubkey, const struct LDKNetworkGraph *NONNULL_PTR network, struct LDKPublicKey payee, struct LDKCVec_ChannelDetailsZ *first_hops, struct LDKCVec_RouteHintZ last_hops, uint64_t final_value_msat, uint32_t final_cltv, struct LDKLogger logger, const struct LDKScore *NONNULL_PTR scorer);
+struct LDKCVec_u8Z RouteHintHop_write(const struct LDKRouteHintHop *NONNULL_PTR obj);
 
 /**
- * Gets a route from us (payer) to the given target node (payee).
+ * Read a RouteHintHop from a byte array, created by RouteHintHop_write
+ */
+struct LDKCResult_RouteHintHopDecodeErrorZ RouteHintHop_read(struct LDKu8slice ser);
+
+/**
+ * Finds a route from us (payer) to the given target node (payee).
  *
- * If the payee provided features in their invoice, they should be provided via payee_features.
+ * If the payee provided features in their invoice, they should be provided via `params.payee`.
  * Without this, MPP will only be used if the payee's features are available in the network graph.
  *
- * Private routing paths between a public node and the target may be included in `last_hops`.
- * Currently, only the last hop in each path is considered.
+ * Private routing paths between a public node and the target may be included in `params.payee`.
  *
- * If some channels aren't announced, it may be useful to fill in a first_hops with the
- * results from a local ChannelManager::list_usable_channels() call. If it is filled in, our
- * view of our local channels (from net_graph_msg_handler) will be ignored, and only those
- * in first_hops will be used.
+ * If some channels aren't announced, it may be useful to fill in `first_hops` with the results
+ * from [`ChannelManager::list_usable_channels`]. If it is filled in, the view of our local
+ * channels from [`NetworkGraph`] will be ignored, and only those in `first_hops` will be used.
  *
- * Panics if first_hops contains channels without short_channel_ids
- * (ChannelManager::list_usable_channels will never include such channels).
+ * The fees on channels from us to the next hop are ignored as they are assumed to all be equal.
+ * However, the enabled/disabled bit on such channels as well as the `htlc_minimum_msat` /
+ * `htlc_maximum_msat` *are* checked as they may change based on the receiving node.
  *
- * The fees on channels from us to next-hops are ignored (as they are assumed to all be
- * equal), however the enabled/disabled bit on such channels as well as the
- * htlc_minimum_msat/htlc_maximum_msat *are* checked as they may change based on the receiving node.
+ * # Note
  *
- * Note that payee_features (or a relevant inner pointer) may be NULL or all-0s to represent None
+ * May be used to re-compute a [`Route`] when handling a [`Event::PaymentPathFailed`]. Any
+ * adjustments to the [`NetworkGraph`] and channel scores should be made prior to calling this
+ * function.
+ *
+ * # Panics
+ *
+ * Panics if first_hops contains channels without short_channel_ids;
+ * [`ChannelManager::list_usable_channels`] will never include such channels.
+ *
+ * [`ChannelManager::list_usable_channels`]: crate::ln::channelmanager::ChannelManager::list_usable_channels
+ * [`Event::PaymentPathFailed`]: crate::util::events::Event::PaymentPathFailed
+ *
  * Note that first_hops (or a relevant inner pointer) may be NULL or all-0s to represent None
  */
-struct LDKCResult_RouteLightningErrorZ get_route(struct LDKPublicKey our_node_pubkey, const struct LDKNetworkGraph *NONNULL_PTR network, struct LDKPublicKey payee, struct LDKInvoiceFeatures payee_features, struct LDKCVec_ChannelDetailsZ *first_hops, struct LDKCVec_RouteHintZ last_hops, uint64_t final_value_msat, uint32_t final_cltv, struct LDKLogger logger, const struct LDKScore *NONNULL_PTR scorer);
+struct LDKCResult_RouteLightningErrorZ find_route(struct LDKPublicKey our_node_pubkey, const struct LDKRouteParameters *NONNULL_PTR params, const struct LDKNetworkGraph *NONNULL_PTR network, struct LDKCVec_ChannelDetailsZ *first_hops, struct LDKLogger logger, const struct LDKScore *NONNULL_PTR scorer);
 
 /**
  * Frees any resources used by the Scorer, if is_owned is set and inner is non-NULL.
@@ -21088,9 +21926,85 @@ struct LDKCResult_RouteLightningErrorZ get_route(struct LDKPublicKey our_node_pu
 void Scorer_free(struct LDKScorer this_obj);
 
 /**
- * Creates a new scorer using `base_penalty_msat` as the channel penalty.
+ * Frees any resources used by the ScoringParameters, if is_owned is set and inner is non-NULL.
  */
-MUST_USE_RES struct LDKScorer Scorer_new(uint64_t base_penalty_msat);
+void ScoringParameters_free(struct LDKScoringParameters this_obj);
+
+/**
+ * A fixed penalty in msats to apply to each channel.
+ */
+uint64_t ScoringParameters_get_base_penalty_msat(const struct LDKScoringParameters *NONNULL_PTR this_ptr);
+
+/**
+ * A fixed penalty in msats to apply to each channel.
+ */
+void ScoringParameters_set_base_penalty_msat(struct LDKScoringParameters *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * A penalty in msats to apply to a channel upon failing to relay a payment.
+ *
+ * This accumulates for each failure but may be reduced over time based on
+ * [`failure_penalty_half_life`].
+ *
+ * [`failure_penalty_half_life`]: Self::failure_penalty_half_life
+ */
+uint64_t ScoringParameters_get_failure_penalty_msat(const struct LDKScoringParameters *NONNULL_PTR this_ptr);
+
+/**
+ * A penalty in msats to apply to a channel upon failing to relay a payment.
+ *
+ * This accumulates for each failure but may be reduced over time based on
+ * [`failure_penalty_half_life`].
+ *
+ * [`failure_penalty_half_life`]: Self::failure_penalty_half_life
+ */
+void ScoringParameters_set_failure_penalty_msat(struct LDKScoringParameters *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * The time required to elapse before any accumulated [`failure_penalty_msat`] penalties are
+ * cut in half.
+ *
+ * # Note
+ *
+ * When time is an [`Eternity`], as is default when enabling feature `no-std`, it will never
+ * elapse. Therefore, this penalty will never decay.
+ *
+ * [`failure_penalty_msat`]: Self::failure_penalty_msat
+ */
+uint64_t ScoringParameters_get_failure_penalty_half_life(const struct LDKScoringParameters *NONNULL_PTR this_ptr);
+
+/**
+ * The time required to elapse before any accumulated [`failure_penalty_msat`] penalties are
+ * cut in half.
+ *
+ * # Note
+ *
+ * When time is an [`Eternity`], as is default when enabling feature `no-std`, it will never
+ * elapse. Therefore, this penalty will never decay.
+ *
+ * [`failure_penalty_msat`]: Self::failure_penalty_msat
+ */
+void ScoringParameters_set_failure_penalty_half_life(struct LDKScoringParameters *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * Constructs a new ScoringParameters given each field
+ */
+MUST_USE_RES struct LDKScoringParameters ScoringParameters_new(uint64_t base_penalty_msat_arg, uint64_t failure_penalty_msat_arg, uint64_t failure_penalty_half_life_arg);
+
+/**
+ * Serialize the ScoringParameters object into a byte array which can be read by ScoringParameters_read
+ */
+struct LDKCVec_u8Z ScoringParameters_write(const struct LDKScoringParameters *NONNULL_PTR obj);
+
+/**
+ * Read a ScoringParameters from a byte array, created by ScoringParameters_write
+ */
+struct LDKCResult_ScoringParametersDecodeErrorZ ScoringParameters_read(struct LDKu8slice ser);
+
+/**
+ * Creates a new scorer using the given scoring parameters.
+ */
+MUST_USE_RES struct LDKScorer Scorer_new(struct LDKScoringParameters params);
 
 /**
  * Creates a "default" Scorer. See struct and individual field documentaiton for details on which values are used.
@@ -21098,10 +22012,25 @@ MUST_USE_RES struct LDKScorer Scorer_new(uint64_t base_penalty_msat);
 MUST_USE_RES struct LDKScorer Scorer_default(void);
 
 /**
+ * Creates a "default" ScoringParameters. See struct and individual field documentaiton for details on which values are used.
+ */
+MUST_USE_RES struct LDKScoringParameters ScoringParameters_default(void);
+
+/**
  * Constructs a new Score which calls the relevant methods on this_arg.
  * This copies the `inner` pointer in this_arg and thus the returned Score must be freed before this_arg is
  */
 struct LDKScore Scorer_as_Score(const struct LDKScorer *NONNULL_PTR this_arg);
+
+/**
+ * Serialize the Scorer object into a byte array which can be read by Scorer_read
+ */
+struct LDKCVec_u8Z Scorer_write(const struct LDKScorer *NONNULL_PTR obj);
+
+/**
+ * Read a Scorer from a byte array, created by Scorer_write
+ */
+struct LDKCResult_ScorerDecodeErrorZ Scorer_read(struct LDKu8slice ser);
 
 /**
  * Frees any resources used by the FilesystemPersister, if is_owned is set and inner is non-NULL.
@@ -21459,6 +22388,15 @@ bool Description_eq(const struct LDKDescription *NONNULL_PTR a, const struct LDK
  */
 void PayeePubKey_free(struct LDKPayeePubKey this_obj);
 
+struct LDKPublicKey PayeePubKey_get_a(const struct LDKPayeePubKey *NONNULL_PTR this_ptr);
+
+void PayeePubKey_set_a(struct LDKPayeePubKey *NONNULL_PTR this_ptr, struct LDKPublicKey val);
+
+/**
+ * Constructs a new PayeePubKey given each field
+ */
+MUST_USE_RES struct LDKPayeePubKey PayeePubKey_new(struct LDKPublicKey a_arg);
+
 /**
  * Creates a copy of the PayeePubKey
  */
@@ -21502,6 +22440,15 @@ bool ExpiryTime_eq(const struct LDKExpiryTime *NONNULL_PTR a, const struct LDKEx
  * Frees any resources used by the MinFinalCltvExpiry, if is_owned is set and inner is non-NULL.
  */
 void MinFinalCltvExpiry_free(struct LDKMinFinalCltvExpiry this_obj);
+
+uint64_t MinFinalCltvExpiry_get_a(const struct LDKMinFinalCltvExpiry *NONNULL_PTR this_ptr);
+
+void MinFinalCltvExpiry_set_a(struct LDKMinFinalCltvExpiry *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * Constructs a new MinFinalCltvExpiry given each field
+ */
+MUST_USE_RES struct LDKMinFinalCltvExpiry MinFinalCltvExpiry_new(uint64_t a_arg);
 
 /**
  * Creates a copy of the MinFinalCltvExpiry
@@ -21766,7 +22713,7 @@ MUST_USE_RES struct LDKPublicKey Invoice_payee_pub_key(const struct LDKInvoice *
 /**
  * Get the payment secret if one was included in the invoice
  */
-MUST_USE_RES struct LDKThirtyTwoBytes Invoice_payment_secret(const struct LDKInvoice *NONNULL_PTR this_arg);
+MUST_USE_RES const uint8_t (*Invoice_payment_secret(const struct LDKInvoice *NONNULL_PTR this_arg))[32];
 
 /**
  * Get the invoice features if they were included in the invoice
@@ -21784,6 +22731,11 @@ MUST_USE_RES struct LDKPublicKey Invoice_recover_payee_pub_key(const struct LDKI
  * Returns the invoice's expiry time, if present, otherwise [`DEFAULT_EXPIRY_TIME`].
  */
 MUST_USE_RES uint64_t Invoice_expiry_time(const struct LDKInvoice *NONNULL_PTR this_arg);
+
+/**
+ * Returns whether the invoice has expired.
+ */
+MUST_USE_RES bool Invoice_is_expired(const struct LDKInvoice *NONNULL_PTR this_arg);
 
 /**
  * Returns the invoice's `min_final_cltv_expiry` time, if present, otherwise
@@ -21807,9 +22759,9 @@ MUST_USE_RES struct LDKCVec_RouteHintZ Invoice_route_hints(const struct LDKInvoi
 MUST_USE_RES enum LDKCurrency Invoice_currency(const struct LDKInvoice *NONNULL_PTR this_arg);
 
 /**
- * Returns the amount if specified in the invoice as pico <currency>.
+ * Returns the amount if specified in the invoice as millisatoshis.
  */
-MUST_USE_RES struct LDKCOption_u64Z Invoice_amount_pico_btc(const struct LDKInvoice *NONNULL_PTR this_arg);
+MUST_USE_RES struct LDKCOption_u64Z Invoice_amount_milli_satoshis(const struct LDKInvoice *NONNULL_PTR this_arg);
 
 /**
  * Creates a new `Description` if `description` is at most 1023 __bytes__ long,
@@ -21992,6 +22944,118 @@ bool SignOrCreationError_eq(const struct LDKSignOrCreationError *NONNULL_PTR a, 
 struct LDKStr SignOrCreationError_to_str(const struct LDKSignOrCreationError *NONNULL_PTR o);
 
 /**
+ * Frees any resources used by the InvoicePayer, if is_owned is set and inner is non-NULL.
+ */
+void InvoicePayer_free(struct LDKInvoicePayer this_obj);
+
+/**
+ * Calls the free function if one is set
+ */
+void Payer_free(struct LDKPayer this_ptr);
+
+/**
+ * Calls the free function if one is set
+ */
+void Router_free(struct LDKRouter this_ptr);
+
+/**
+ * Frees any resources used by the RetryAttempts, if is_owned is set and inner is non-NULL.
+ */
+void RetryAttempts_free(struct LDKRetryAttempts this_obj);
+
+uintptr_t RetryAttempts_get_a(const struct LDKRetryAttempts *NONNULL_PTR this_ptr);
+
+void RetryAttempts_set_a(struct LDKRetryAttempts *NONNULL_PTR this_ptr, uintptr_t val);
+
+/**
+ * Constructs a new RetryAttempts given each field
+ */
+MUST_USE_RES struct LDKRetryAttempts RetryAttempts_new(uintptr_t a_arg);
+
+/**
+ * Creates a copy of the RetryAttempts
+ */
+struct LDKRetryAttempts RetryAttempts_clone(const struct LDKRetryAttempts *NONNULL_PTR orig);
+
+/**
+ * Checks if two RetryAttemptss contain equal inner contents.
+ * This ignores pointers and is_owned flags and looks at the values in fields.
+ * Two objects with NULL inner values will be considered "equal" here.
+ */
+bool RetryAttempts_eq(const struct LDKRetryAttempts *NONNULL_PTR a, const struct LDKRetryAttempts *NONNULL_PTR b);
+
+/**
+ * Checks if two RetryAttemptss contain equal inner contents.
+ */
+uint64_t RetryAttempts_hash(const struct LDKRetryAttempts *NONNULL_PTR o);
+
+/**
+ * Frees any resources used by the PaymentError
+ */
+void PaymentError_free(struct LDKPaymentError this_ptr);
+
+/**
+ * Creates a copy of the PaymentError
+ */
+struct LDKPaymentError PaymentError_clone(const struct LDKPaymentError *NONNULL_PTR orig);
+
+/**
+ * Utility method to constructs a new Invoice-variant PaymentError
+ */
+struct LDKPaymentError PaymentError_invoice(struct LDKStr a);
+
+/**
+ * Utility method to constructs a new Routing-variant PaymentError
+ */
+struct LDKPaymentError PaymentError_routing(struct LDKLightningError a);
+
+/**
+ * Utility method to constructs a new Sending-variant PaymentError
+ */
+struct LDKPaymentError PaymentError_sending(struct LDKPaymentSendFailure a);
+
+/**
+ * Creates an invoice payer that retries failed payment paths.
+ *
+ * Will forward any [`Event::PaymentPathFailed`] events to the decorated `event_handler` once
+ * `retry_attempts` has been exceeded for a given [`Invoice`].
+ */
+MUST_USE_RES struct LDKInvoicePayer InvoicePayer_new(struct LDKPayer payer, struct LDKRouter router, const struct LDKLockableScore *NONNULL_PTR scorer, struct LDKLogger logger, struct LDKEventHandler event_handler, struct LDKRetryAttempts retry_attempts);
+
+/**
+ * Pays the given [`Invoice`], caching it for later use in case a retry is needed.
+ *
+ * You should ensure that the `invoice.payment_hash()` is unique and the same payment_hash has
+ * never been paid before. Because [`InvoicePayer`] is stateless no effort is made to do so
+ * for you.
+ */
+MUST_USE_RES struct LDKCResult_PaymentIdPaymentErrorZ InvoicePayer_pay_invoice(const struct LDKInvoicePayer *NONNULL_PTR this_arg, const struct LDKInvoice *NONNULL_PTR invoice);
+
+/**
+ * Pays the given zero-value [`Invoice`] using the given amount, caching it for later use in
+ * case a retry is needed.
+ *
+ * You should ensure that the `invoice.payment_hash()` is unique and the same payment_hash has
+ * never been paid before. Because [`InvoicePayer`] is stateless no effort is made to do so
+ * for you.
+ */
+MUST_USE_RES struct LDKCResult_PaymentIdPaymentErrorZ InvoicePayer_pay_zero_value_invoice(const struct LDKInvoicePayer *NONNULL_PTR this_arg, const struct LDKInvoice *NONNULL_PTR invoice, uint64_t amount_msats);
+
+/**
+ * Removes the payment cached by the given payment hash.
+ *
+ * Should be called once a payment has failed or succeeded if not using [`InvoicePayer`] as an
+ * [`EventHandler`]. Otherwise, calling this method is unnecessary.
+ */
+void InvoicePayer_remove_cached_payment(const struct LDKInvoicePayer *NONNULL_PTR this_arg, const uint8_t (*payment_hash)[32]);
+
+/**
+ * Constructs a new EventHandler which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned EventHandler must be freed before this_arg is
+ */
+struct LDKEventHandler InvoicePayer_as_EventHandler(const struct LDKInvoicePayer *NONNULL_PTR this_arg);
+
+/**
  * Utility to construct an invoice. Generally, unless you want to do something like a custom
  * cltv_expiry, this is what you should be using to create an invoice. The reason being, this
  * method stores the invoice's payment secret and preimage in `ChannelManager`, so (a) the user
@@ -21999,6 +23063,28 @@ struct LDKStr SignOrCreationError_to_str(const struct LDKSignOrCreationError *NO
  * that the payment secret is valid when the invoice is paid.
  */
 struct LDKCResult_InvoiceSignOrCreationErrorZ create_invoice_from_channelmanager(const struct LDKChannelManager *NONNULL_PTR channelmanager, struct LDKKeysInterface keys_manager, enum LDKCurrency network, struct LDKCOption_u64Z amt_msat, struct LDKStr description);
+
+/**
+ * Frees any resources used by the DefaultRouter, if is_owned is set and inner is non-NULL.
+ */
+void DefaultRouter_free(struct LDKDefaultRouter this_obj);
+
+/**
+ * Creates a new router using the given [`NetworkGraph`] and  [`Logger`].
+ */
+MUST_USE_RES struct LDKDefaultRouter DefaultRouter_new(const struct LDKNetworkGraph *NONNULL_PTR network_graph, struct LDKLogger logger);
+
+/**
+ * Constructs a new Router which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned Router must be freed before this_arg is
+ */
+struct LDKRouter DefaultRouter_as_Router(const struct LDKDefaultRouter *NONNULL_PTR this_arg);
+
+/**
+ * Constructs a new Payer which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned Payer must be freed before this_arg is
+ */
+struct LDKPayer ChannelManager_as_Payer(const struct LDKChannelManager *NONNULL_PTR this_arg);
 
 /**
  * Read a SiPrefix object from a string

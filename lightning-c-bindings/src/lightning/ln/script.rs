@@ -16,7 +16,7 @@ use crate::c_types::*;
 
 
 use lightning::ln::script::ShutdownScript as nativeShutdownScriptImport;
-type nativeShutdownScript = nativeShutdownScriptImport;
+pub(crate) type nativeShutdownScript = nativeShutdownScriptImport;
 
 /// A script pubkey for shutting down a channel as defined by [BOLT #2].
 ///
@@ -48,7 +48,7 @@ impl Drop for ShutdownScript {
 pub extern "C" fn ShutdownScript_free(this_obj: ShutdownScript) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ShutdownScript_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ShutdownScript_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeShutdownScript); }
 }
 #[allow(unused)]
@@ -88,7 +88,7 @@ pub extern "C" fn ShutdownScript_clone(orig: &ShutdownScript) -> ShutdownScript 
 }
 
 use lightning::ln::script::InvalidShutdownScript as nativeInvalidShutdownScriptImport;
-type nativeInvalidShutdownScript = nativeInvalidShutdownScriptImport;
+pub(crate) type nativeInvalidShutdownScript = nativeInvalidShutdownScriptImport;
 
 /// An error occurring when converting from [`Script`] to [`ShutdownScript`].
 #[must_use]
@@ -118,7 +118,7 @@ impl Drop for InvalidShutdownScript {
 pub extern "C" fn InvalidShutdownScript_free(this_obj: InvalidShutdownScript) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn InvalidShutdownScript_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn InvalidShutdownScript_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInvalidShutdownScript); }
 }
 #[allow(unused)]

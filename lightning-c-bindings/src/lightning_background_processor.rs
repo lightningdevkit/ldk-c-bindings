@@ -18,7 +18,7 @@ use crate::c_types::*;
 
 
 use lightning_background_processor::BackgroundProcessor as nativeBackgroundProcessorImport;
-type nativeBackgroundProcessor = nativeBackgroundProcessorImport;
+pub(crate) type nativeBackgroundProcessor = nativeBackgroundProcessorImport;
 
 /// `BackgroundProcessor` takes care of tasks that (1) need to happen periodically to keep
 /// Rust-Lightning running properly, and (2) either can or should be run in the background. Its
@@ -70,7 +70,7 @@ impl Drop for BackgroundProcessor {
 pub extern "C" fn BackgroundProcessor_free(this_obj: BackgroundProcessor) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn BackgroundProcessor_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn BackgroundProcessor_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBackgroundProcessor); }
 }
 #[allow(unused)]
@@ -121,7 +121,7 @@ pub(crate) extern "C" fn ChannelManagerPersister_clone_fields(orig: &ChannelMana
 use lightning_background_processor::ChannelManagerPersister as rustChannelManagerPersister;
 impl rustChannelManagerPersister<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger> for ChannelManagerPersister {
 	fn persist_manager(&self, mut channel_manager: &lightning::ln::channelmanager::ChannelManager<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>) -> Result<(), std::io::Error> {
-		let mut ret = (self.persist_manager)(self.this_arg, &crate::lightning::ln::channelmanager::ChannelManager { inner: unsafe { ObjOps::nonnull_ptr_to_inner((channel_manager as *const _) as *mut _) }, is_owned: false });
+		let mut ret = (self.persist_manager)(self.this_arg, &crate::lightning::ln::channelmanager::ChannelManager { inner: unsafe { ObjOps::nonnull_ptr_to_inner((channel_manager as *const lightning::ln::channelmanager::ChannelManager<_, _, _, _, _, _, >) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).to_rust() })};
 		local_ret
 	}

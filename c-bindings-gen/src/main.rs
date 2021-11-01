@@ -670,7 +670,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> ", struct_name, $new_name, struct_name).unwrap();
 						types.write_c_type(w, &ref_type, Some(&gen_types), true);
 						write!(w, " {{\n\tlet mut inner_val = &mut this_ptr.get_native_mut_ref().{};\n\t", $real_name).unwrap();
-						let local_var = types.write_to_c_conversion_new_var(w, &format_ident!("inner_val"), &ref_type, Some(&gen_types), true);
+						let local_var = types.write_to_c_conversion_from_ownable_ref_new_var(w, &format_ident!("inner_val"), &ref_type, Some(&gen_types));
 						if local_var { write!(w, "\n\t").unwrap(); }
 						types.write_to_c_conversion_inline_prefix(w, &ref_type, Some(&gen_types), true);
 						write!(w, "inner_val").unwrap();

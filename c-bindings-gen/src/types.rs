@@ -1339,7 +1339,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Slice" => {
-				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
+				if let Some(syn::Type::Reference(_)) = single_contained {
+					Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "(*item)".to_string())], "); }", ContainerPrefixLocation::PerConv))
+				} else {
+					Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
+				}
 			},
 			"Option" => {
 				let contained_struct = if let Some(syn::Type::Path(p)) = single_contained {
@@ -2065,7 +2069,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		VP: Fn(&mut W, &syn::Type, Option<&GenericTypes>, bool, bool, bool),
 		VS: Fn(&mut W, &syn::Type, Option<&GenericTypes>, bool, bool, bool)>
 			(&self, w: &mut W, ident: &syn::Ident, var: &str, t: &syn::Type, generics: Option<&GenericTypes>,
-			 mut is_ref: bool, mut ptr_for_ref: bool, to_c: bool,
+			 mut is_ref: bool, mut ptr_for_ref: bool, to_c: bool, from_ownable_ref: bool,
 			 path_lookup: &LP, container_lookup: &LC, var_prefix: &VP, var_suffix: &VS) -> bool {
 
 		macro_rules! convert_container {
@@ -2112,7 +2116,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						// If the inner element contains an inner pointer, we will just use that,
 						// avoiding the need to map elements to references. Otherwise we'll need to
 						// do an extra mapping step.
-						needs_ref_map = !only_contained_has_inner;
+						needs_ref_map = !only_contained_has_inner && $container_type == "Option";
 					} else {
 						only_contained_type = Some(arg);
 						only_contained_type_nonref = Some(arg);
@@ -2138,7 +2142,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						write!(w, "{} {{ ", pfx).unwrap();
 						let new_var_name = format!("{}_{}", ident, idx);
 						let new_var = self.write_conversion_new_var_intern(w, &format_ident!("{}", new_var_name),
-								&var_access, conv_ty, generics, contains_slice || (is_ref && ty_has_inner), ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix);
+								&var_access, conv_ty, generics, contains_slice || (is_ref && ty_has_inner), ptr_for_ref,
+								to_c, from_ownable_ref, path_lookup, container_lookup, var_prefix, var_suffix);
 						if new_var { write!(w, " ").unwrap(); }
 
 						if prefix_location == ContainerPrefixLocation::PerConv {
@@ -2177,9 +2182,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		match generics.resolve_type(t) {
 			syn::Type::Reference(r) => {
 				if let syn::Type::Slice(_) = &*r.elem {
-					self.write_conversion_new_var_intern(w, ident, var, &*r.elem, generics, is_ref, ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix)
+					self.write_conversion_new_var_intern(w, ident, var, &*r.elem, generics, is_ref, ptr_for_ref, to_c, from_ownable_ref, path_lookup, container_lookup, var_prefix, var_suffix)
 				} else {
-					self.write_conversion_new_var_intern(w, ident, var, &*r.elem, generics, true, ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix)
+					self.write_conversion_new_var_intern(w, ident, var, &*r.elem, generics, true, ptr_for_ref, to_c, from_ownable_ref, path_lookup, container_lookup, var_prefix, var_suffix)
 				}
 			},
 			syn::Type::Path(p) => {
@@ -2188,7 +2193,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				}
 				let resolved_path = self.resolve_path(&p.path, generics);
 				if let Some(aliased_type) = self.crate_types.type_aliases.get(&resolved_path) {
-					return self.write_conversion_new_var_intern(w, ident, var, aliased_type, None, is_ref, ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix);
+					return self.write_conversion_new_var_intern(w, ident, var, aliased_type, None, is_ref, ptr_for_ref, to_c, from_ownable_ref, path_lookup, container_lookup, var_prefix, var_suffix);
 				}
 				if self.is_known_container(&resolved_path, is_ref) || self.is_path_transparent_container(&p.path, generics, is_ref) {
 					if let syn::PathArguments::AngleBracketed(args) = &p.path.segments.iter().next().unwrap().arguments {
@@ -2225,7 +2230,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						true
 					} else { false }
 				} else if let syn::Type::Reference(ty) = &*s.elem {
-					let tyref = [&*ty.elem];
+					let tyref = if from_ownable_ref || !to_c { [&*ty.elem] } else { [&*s.elem] };
 					is_ref = true;
 					convert_container!("Slice", 1, || tyref.iter().map(|t| generics.resolve_type(*t)));
 					unimplemented!("convert_container should return true as container_lookup should succeed for slices");
@@ -2266,7 +2271,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							let v_name = format!("orig_{}_{}", ident, idx);
 							let tuple_elem_ident = format_ident!("{}", &v_name);
 							if self.write_conversion_new_var_intern(w, &tuple_elem_ident, &v_name, elem, generics,
-									false, ptr_for_ref, to_c,
+									false, ptr_for_ref, to_c, from_ownable_ref,
 									path_lookup, container_lookup, var_prefix, var_suffix) {
 								write!(w, " ").unwrap();
 								// Opaque types with inner pointers shouldn't ever create new stack
@@ -2316,8 +2321,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 
-	pub fn write_to_c_conversion_new_var_inner<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, var_access: &str, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool) -> bool {
-		self.write_conversion_new_var_intern(w, ident, var_access, t, generics, false, ptr_for_ref, true,
+	pub fn write_to_c_conversion_new_var_inner<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, var_access: &str, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool, from_ownable_ref: bool) -> bool {
+		self.write_conversion_new_var_intern(w, ident, var_access, t, generics, false, ptr_for_ref, true, from_ownable_ref,
 			&|a, b| self.to_c_conversion_new_var_from_path(a, b),
 			&|a, b, c, d, e| self.to_c_conversion_container_new_var(generics, a, b, c, d, e),
 			// We force ptr_for_ref here since we can't generate a ref on one line and use it later
@@ -2325,10 +2330,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			&|a, b, c, d, e, f| self.write_to_c_conversion_inline_suffix_inner(a, b, c, d, e, f))
 	}
 	pub fn write_to_c_conversion_new_var<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool) -> bool {
-		self.write_to_c_conversion_new_var_inner(w, ident, &format!("{}", ident), t, generics, ptr_for_ref)
+		self.write_to_c_conversion_new_var_inner(w, ident, &format!("{}", ident), t, generics, ptr_for_ref, false)
+	}
+	/// Prints new-var conversion for an "ownable_ref" type, ie prints conversion for
+	/// `create_ownable_reference(t)`, not `t` itself.
+	pub fn write_to_c_conversion_from_ownable_ref_new_var<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, t: &syn::Type, generics: Option<&GenericTypes>) -> bool {
+		self.write_to_c_conversion_new_var_inner(w, ident, &format!("{}", ident), t, generics, true, true)
 	}
 	pub fn write_from_c_conversion_new_var<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, t: &syn::Type, generics: Option<&GenericTypes>) -> bool {
-		self.write_conversion_new_var_intern(w, ident, &format!("{}", ident), t, generics, false, false, false,
+		self.write_conversion_new_var_intern(w, ident, &format!("{}", ident), t, generics, false, false, false, false,
 			&|a, b| self.from_c_conversion_new_var_from_path(a, b),
 			&|a, b, c, d, e| self.from_c_conversion_container_new_var(generics, a, b, c, d, e),
 			// We force ptr_for_ref here since we can't generate a ref on one line and use it later

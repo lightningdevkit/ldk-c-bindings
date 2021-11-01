@@ -450,6 +450,13 @@ impl Into<Str> for &'static str {
 		Str { chars: self.as_ptr(), len: self.len(), chars_is_owned: false }
 	}
 }
+impl Into<Str> for &mut &'static str {
+	fn into(self) -> Str {
+		let us: &'static str = *self;
+		us.into()
+	}
+}
+
 impl Str {
 	pub(crate) fn into_str(&self) -> &'static str {
 		if self.len == 0 { return ""; }

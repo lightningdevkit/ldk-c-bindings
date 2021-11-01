@@ -381,9 +381,9 @@ impl<'a, 'b, 'c: 'a + 'b> ResolveType<'c> for Option<&GenericTypes<'a, 'b>> {
 pub enum DeclType<'a> {
 	MirroredEnum,
 	Trait(&'a syn::ItemTrait),
-	StructImported,
+	StructImported { generic_param_count: usize },
 	StructIgnored,
-	EnumIgnored,
+	EnumIgnored { generic_param_count: usize },
 }
 
 pub struct ImportResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
@@ -495,7 +495,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				syn::Item::Struct(s) => {
 					if let syn::Visibility::Public(_) = s.vis {
 						match export_status(&s.attrs) {
-							ExportStatus::Export => { declared.insert(s.ident.clone(), DeclType::StructImported); },
+							ExportStatus::Export => { declared.insert(s.ident.clone(), DeclType::StructImported { generic_param_count: s.generics.params.len() }); },
 							ExportStatus::NoExport => { declared.insert(s.ident.clone(), DeclType::StructIgnored); },
 							ExportStatus::TestOnly => continue,
 							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
@@ -510,14 +510,14 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 							else { process_alias = false; }
 						}
 						if process_alias {
-							declared.insert(t.ident.clone(), DeclType::StructImported);
+							declared.insert(t.ident.clone(), DeclType::StructImported { generic_param_count: t.generics.params.len() });
 						}
 					}
 				},
 				syn::Item::Enum(e) => {
 					if let syn::Visibility::Public(_) = e.vis {
 						match export_status(&e.attrs) {
-							ExportStatus::Export if is_enum_opaque(e) => { declared.insert(e.ident.clone(), DeclType::EnumIgnored); },
+							ExportStatus::Export if is_enum_opaque(e) => { declared.insert(e.ident.clone(), DeclType::EnumIgnored { generic_param_count: e.generics.params.len() }); },
 							ExportStatus::Export => { declared.insert(e.ident.clone(), DeclType::MirroredEnum); },
 							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 							_ => continue,
@@ -728,7 +728,7 @@ fn initial_clonable_types() -> HashSet<String> {
 pub struct CrateTypes<'a> {
 	/// This may contain structs or enums, but only when either is mapped as
 	/// struct X { inner: *mut originalX, .. }
-	pub opaques: HashMap<String, &'a syn::Ident>,
+	pub opaques: HashMap<String, (&'a syn::Ident, &'a syn::Generics)>,
 	/// Enums which are mapped as C enums with conversion functions
 	pub mirrored_enums: HashMap<String, &'a syn::ItemEnum>,
 	/// Traits which are mapped as a pointer + jump table
@@ -1853,8 +1853,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					}
 				} else if let Some(c_type) = path_lookup(&resolved_path, is_ref, ptr_for_ref) {
 					write!(w, "{}", c_type).unwrap();
-				} else if self.crate_types.opaques.get(&resolved_path).is_some() {
-					decl_lookup(w, &DeclType::StructImported, &resolved_path, is_ref, is_mut);
+				} else if let Some((_, generics)) = self.crate_types.opaques.get(&resolved_path) {
+					decl_lookup(w, &DeclType::StructImported { generic_param_count: generics.params.len() }, &resolved_path, is_ref, is_mut);
 				} else if self.crate_types.mirrored_enums.get(&resolved_path).is_some() {
 					decl_lookup(w, &DeclType::MirroredEnum, &resolved_path, is_ref, is_mut);
 				} else if let Some(t) = self.crate_types.traits.get(&resolved_path) {
@@ -1941,15 +1941,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						DeclType::MirroredEnum if is_ref && ptr_for_ref => write!(w, "crate::{}::from_native(", decl_path).unwrap(),
 						DeclType::MirroredEnum if is_ref => write!(w, "&crate::{}::from_native(", decl_path).unwrap(),
 						DeclType::MirroredEnum => write!(w, "crate::{}::native_into(", decl_path).unwrap(),
-						DeclType::EnumIgnored|DeclType::StructImported if is_ref && ptr_for_ref && from_ptr =>
+						DeclType::EnumIgnored {..}|DeclType::StructImported {..} if is_ref && ptr_for_ref && from_ptr =>
 							write!(w, "crate::{} {{ inner: unsafe {{ (", decl_path).unwrap(),
-						DeclType::EnumIgnored|DeclType::StructImported if is_ref => {
+						DeclType::EnumIgnored {..}|DeclType::StructImported {..} if is_ref => {
 							if !ptr_for_ref { write!(w, "&").unwrap(); }
 							write!(w, "crate::{} {{ inner: unsafe {{ ObjOps::nonnull_ptr_to_inner((", decl_path).unwrap()
 						},
-						DeclType::EnumIgnored|DeclType::StructImported if !is_ref && from_ptr =>
+						DeclType::EnumIgnored {..}|DeclType::StructImported {..} if !is_ref && from_ptr =>
 							write!(w, "crate::{} {{ inner: ", decl_path).unwrap(),
-						DeclType::EnumIgnored|DeclType::StructImported if !is_ref =>
+						DeclType::EnumIgnored {..}|DeclType::StructImported {..} if !is_ref =>
 							write!(w, "crate::{} {{ inner: ObjOps::heap_alloc(", decl_path).unwrap(),
 						DeclType::Trait(_) if is_ref => write!(w, "").unwrap(),
 						DeclType::Trait(_) if !is_ref => write!(w, "Into::into(").unwrap(),
@@ -1963,15 +1963,20 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	fn write_to_c_conversion_inline_suffix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool, from_ptr: bool) {
 		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "*/", false, |_, _| ".into()".to_owned(),
 				|a, b, c| self.to_c_conversion_inline_suffix_from_path(a, b, c),
-				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
+				|w, decl_type, full_path, is_ref, _is_mut| match decl_type {
 					DeclType::MirroredEnum => write!(w, ")").unwrap(),
-					DeclType::EnumIgnored|DeclType::StructImported if is_ref && ptr_for_ref && from_ptr =>
-						write!(w, " as *const _) as *mut _ }}, is_owned: false }}").unwrap(),
-					DeclType::EnumIgnored|DeclType::StructImported if is_ref =>
-						write!(w, " as *const _) as *mut _) }}, is_owned: false }}").unwrap(),
-					DeclType::EnumIgnored|DeclType::StructImported if !is_ref && from_ptr =>
+					DeclType::EnumIgnored { generic_param_count }|DeclType::StructImported { generic_param_count } if is_ref => {
+						write!(w, " as *const {}<", full_path).unwrap();
+						for _ in 0..*generic_param_count { write!(w, "_, ").unwrap(); }
+						if ptr_for_ref && from_ptr {
+							write!(w, ">) as *mut _ }}, is_owned: false }}").unwrap();
+						} else {
+							write!(w, ">) as *mut _) }}, is_owned: false }}").unwrap();
+						}
+					},
+					DeclType::EnumIgnored {..}|DeclType::StructImported {..} if !is_ref && from_ptr =>
 						write!(w, ", is_owned: true }}").unwrap(),
-					DeclType::EnumIgnored|DeclType::StructImported if !is_ref => write!(w, "), is_owned: true }}").unwrap(),
+					DeclType::EnumIgnored {..}|DeclType::StructImported {..} if !is_ref => write!(w, "), is_owned: true }}").unwrap(),
 					DeclType::Trait(_) if is_ref => {},
 					DeclType::Trait(_) => {
 						// This is used when we're converting a concrete Rust type into a C trait
@@ -1991,8 +1996,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		self.write_conversion_inline_intern(w, t, generics, is_ref, false, false, "() /*", true, |_, _| "&local_".to_owned(),
 				|a, b, _c| self.from_c_conversion_prefix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
-					DeclType::StructImported if is_ref => write!(w, "").unwrap(),
-					DeclType::StructImported if !is_ref => write!(w, "*unsafe {{ Box::from_raw(").unwrap(),
+					DeclType::StructImported {..} if is_ref => write!(w, "").unwrap(),
+					DeclType::StructImported {..} if !is_ref => write!(w, "*unsafe {{ Box::from_raw(").unwrap(),
 					DeclType::MirroredEnum if is_ref => write!(w, "&").unwrap(),
 					DeclType::MirroredEnum => {},
 					DeclType::Trait(_) => {},
@@ -2012,10 +2017,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				},
 				|a, b, _c| self.from_c_conversion_suffix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, is_mut| match decl_type {
-					DeclType::StructImported if is_ref && ptr_for_ref => write!(w, "XXX unimplemented").unwrap(),
-					DeclType::StructImported if is_mut && is_ref => write!(w, ".get_native_mut_ref()").unwrap(),
-					DeclType::StructImported if is_ref => write!(w, ".get_native_ref()").unwrap(),
-					DeclType::StructImported if !is_ref => write!(w, ".take_inner()) }}").unwrap(),
+					DeclType::StructImported {..} if is_ref && ptr_for_ref => write!(w, "XXX unimplemented").unwrap(),
+					DeclType::StructImported {..} if is_mut && is_ref => write!(w, ".get_native_mut_ref()").unwrap(),
+					DeclType::StructImported {..} if is_ref => write!(w, ".get_native_ref()").unwrap(),
+					DeclType::StructImported {..} if !is_ref => write!(w, ".take_inner()) }}").unwrap(),
 					DeclType::MirroredEnum if is_ref => write!(w, ".to_native()").unwrap(),
 					DeclType::MirroredEnum => write!(w, ".into_native()").unwrap(),
 					DeclType::Trait(_) => {},
@@ -2035,7 +2040,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					} else { None }
 				},
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
-					DeclType::StructImported if !is_ref => write!(w, "").unwrap(),
+					DeclType::StructImported {..} if !is_ref => write!(w, "").unwrap(),
 					_ => unimplemented!(),
 				});
 	}
@@ -2049,7 +2054,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				},
 				|a, b, _c| self.from_c_conversion_suffix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
-					DeclType::StructImported if !is_ref => write!(w, ".get_native_ref()").unwrap(),
+					DeclType::StructImported {..} if !is_ref => write!(w, ".get_native_ref()").unwrap(),
 					_ => unimplemented!(),
 				});
 	}
@@ -2682,7 +2687,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					if let syn::Type::Path(p) = &*r.elem {
 						// Slices with "real types" inside are mapped as the equivalent non-ref Vec
 						let resolved = self.resolve_path(&p.path, generics);
-						let mangled_container = if let Some(ident) = self.crate_types.opaques.get(&resolved) {
+						let mangled_container = if let Some((ident, _)) = self.crate_types.opaques.get(&resolved) {
 							format!("CVec_{}Z", ident)
 						} else if let Some(en) = self.crate_types.mirrored_enums.get(&resolved) {
 							format!("CVec_{}Z", en.ident)
@@ -2696,7 +2701,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							if let syn::Type::Path(p) = &*r2.elem {
 								// Slices with slices with opaque types (with is_owned flags) are mapped as non-ref Vecs
 								let resolved = self.resolve_path(&p.path, generics);
-								let mangled_container = if let Some(ident) = self.crate_types.opaques.get(&resolved) {
+								let mangled_container = if let Some((ident, _)) = self.crate_types.opaques.get(&resolved) {
 									format!("CVec_CVec_{}ZZ", ident)
 								} else { return false; };
 								write!(w, "{}::{}", Self::generated_container_path(), mangled_container).unwrap();

@@ -1259,7 +1259,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									write!(w, "#[no_mangle]\npub extern \"C\" fn {}_{}(", ident, m.sig.ident).unwrap();
 									let ret_type = match &declared_type {
 										DeclType::MirroredEnum => format!("{}", ident),
-										DeclType::StructImported => format!("{}", ident),
+										DeclType::StructImported {..} => format!("{}", ident),
 										_ => unimplemented!(),
 									};
 									write_method_params(w, &m.sig, &ret_type, types, Some(&meth_gen_types), false, true);
@@ -1280,7 +1280,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									} else {
 										match &declared_type {
 											DeclType::MirroredEnum => write!(w, "this_arg.to_native().{}(", m.sig.ident).unwrap(),
-											DeclType::StructImported => {
+											DeclType::StructImported {..} => {
 												if takes_owned_self {
 													write!(w, "(*unsafe {{ Box::from_raw(this_arg.take_inner()) }}).{}(", m.sig.ident).unwrap();
 												} else if takes_mut_self {
@@ -1846,7 +1846,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let struct_path = format!("{}::{}", module, s.ident);
-						crate_types.opaques.insert(struct_path, &s.ident);
+						crate_types.opaques.insert(struct_path, (&s.ident, &s.generics));
 					}
 				},
 				syn::Item::Trait(t) => {
@@ -1891,7 +1891,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 										hash_map::Entry::Vacant(e) => { e.insert(vec![(path_obj, args_obj)]); },
 									}
 
-									crate_types.opaques.insert(type_path, t_ident);
+									crate_types.opaques.insert(type_path, (t_ident, &t.generics));
 								},
 								_ => {
 									crate_types.type_aliases.insert(type_path, import_resolver.resolve_imported_refs((*t.ty).clone()));
@@ -1908,7 +1908,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let enum_path = format!("{}::{}", module, e.ident);
-						crate_types.opaques.insert(enum_path, &e.ident);
+						crate_types.opaques.insert(enum_path, (&e.ident, &e.generics));
 					}
 				},
 				syn::Item::Enum(e) => {

@@ -1945,8 +1945,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						DeclType::MirroredEnum if is_ref && ptr_for_ref => write!(w, "crate::{}::from_native(", decl_path).unwrap(),
 						DeclType::MirroredEnum if is_ref => write!(w, "&crate::{}::from_native(", decl_path).unwrap(),
 						DeclType::MirroredEnum => write!(w, "crate::{}::native_into(", decl_path).unwrap(),
-						DeclType::EnumIgnored {..}|DeclType::StructImported {..} if is_ref && ptr_for_ref && from_ptr =>
-							write!(w, "crate::{} {{ inner: unsafe {{ (", decl_path).unwrap(),
+						DeclType::EnumIgnored {..}|DeclType::StructImported {..} if is_ref && from_ptr => {
+							if !ptr_for_ref { write!(w, "&").unwrap(); }
+							write!(w, "crate::{} {{ inner: unsafe {{ (", decl_path).unwrap()
+						},
 						DeclType::EnumIgnored {..}|DeclType::StructImported {..} if is_ref => {
 							if !ptr_for_ref { write!(w, "&").unwrap(); }
 							write!(w, "crate::{} {{ inner: unsafe {{ ObjOps::nonnull_ptr_to_inner((", decl_path).unwrap()
@@ -1972,7 +1974,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					DeclType::EnumIgnored { generic_param_count }|DeclType::StructImported { generic_param_count } if is_ref => {
 						write!(w, " as *const {}<", full_path).unwrap();
 						for _ in 0..*generic_param_count { write!(w, "_, ").unwrap(); }
-						if ptr_for_ref && from_ptr {
+						if from_ptr {
 							write!(w, ">) as *mut _ }}, is_owned: false }}").unwrap();
 						} else {
 							write!(w, ">) as *mut _) }}, is_owned: false }}").unwrap();

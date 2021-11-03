@@ -559,7 +559,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	// Finally, implement the original Rust trait for the newly created mapped trait.
 	writeln!(w, "\nuse {}::{} as rust{};", types.module_path, t.ident, trait_name).unwrap();
 	if implementable {
-		write!(w, "impl rust{}", t.ident).unwrap();
+		write!(w, "impl").unwrap();
+		maybe_write_lifetime_generics(w, &t.generics, types);
+		write!(w, " rust{}", t.ident).unwrap();
 		maybe_write_generics(w, &t.generics, types, false);
 		writeln!(w, " for {} {{", trait_name).unwrap();
 		impl_trait_for_c!(t, "", types);
@@ -590,7 +592,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	// If we directly read the original type by its original name, cbindgen hits
 	// https://github.com/eqrion/cbindgen/issues/286 Thus, instead, we import it as a temporary
 	// name and then reference it by that name, which works around the issue.
-	write!(w, "\nuse {}::{} as native{}Import;\ntype native{} = native{}Import", types.module_path, ident, ident, ident, ident).unwrap();
+	write!(w, "\nuse {}::{} as native{}Import;\npub(crate) type native{} = native{}Import", types.module_path, ident, ident, ident, ident).unwrap();
 	maybe_write_generics(w, &generics, &types, true);
 	writeln!(w, ";\n").unwrap();
 	writeln!(extra_headers, "struct native{}Opaque;\ntypedef struct native{}Opaque LDKnative{};", ident, ident, ident).unwrap();
@@ -612,7 +614,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	writeln!(w, "#[no_mangle]\npub extern \"C\" fn {}_free(this_obj: {}) {{ }}", struct_name, struct_name).unwrap();
 	writeln!(w, "#[allow(unused)]").unwrap();
 	writeln!(w, "/// Used only if an object of this type is returned as a trait impl by a method").unwrap();
-	writeln!(w, "extern \"C\" fn {}_free_void(this_ptr: *mut c_void) {{", struct_name).unwrap();
+	writeln!(w, "pub(crate) extern \"C\" fn {}_free_void(this_ptr: *mut c_void) {{", struct_name).unwrap();
 	writeln!(w, "\tunsafe {{ let _ = Box::from_raw(this_ptr as *mut native{}); }}\n}}", struct_name).unwrap();
 	writeln!(w, "#[allow(unused)]").unwrap();
 	writeln!(w, "impl {} {{", struct_name).unwrap();
@@ -642,17 +644,17 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 	let struct_name = &format!("{}", s.ident);
 	writeln_opaque(w, &s.ident, struct_name, &s.generics, &s.attrs, types, extra_headers, cpp_headers);
 
-	if let syn::Fields::Named(fields) = &s.fields {
-		let mut self_path_segs = syn::punctuated::Punctuated::new();
-		self_path_segs.push(s.ident.clone().into());
-		let self_path = syn::Path { leading_colon: None, segments: self_path_segs};
-		let mut gen_types = GenericTypes::new(Some(types.resolve_path(&self_path, None)));
-		assert!(gen_types.learn_generics(&s.generics, types));
+	let mut self_path_segs = syn::punctuated::Punctuated::new();
+	self_path_segs.push(s.ident.clone().into());
+	let self_path = syn::Path { leading_colon: None, segments: self_path_segs};
+	let mut gen_types = GenericTypes::new(Some(types.resolve_path(&self_path, None)));
+	assert!(gen_types.learn_generics(&s.generics, types));
 
-		let mut all_fields_settable = true;
-		for field in fields.named.iter() {
-			if let syn::Visibility::Public(_) = field.vis {
-				let export = export_status(&field.attrs);
+	let mut all_fields_settable = true;
+	macro_rules! define_field {
+		($new_name: expr, $real_name: expr, $field: expr) => {
+			if let syn::Visibility::Public(_) = $field.vis {
+				let export = export_status(&$field.attrs);
 				match export {
 					ExportStatus::Export => {},
 					ExportStatus::NoExport|ExportStatus::TestOnly => {
@@ -662,65 +664,124 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 					ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 				}
 
-				if let Some(ident) = &field.ident {
-					if let Some(ref_type) = types.create_ownable_reference(&field.ty, Some(&gen_types)) {
-						if types.understood_c_type(&ref_type, Some(&gen_types)) {
-							writeln_arg_docs(w, &field.attrs, "", types, Some(&gen_types), vec![].drain(..), Some(&ref_type));
-							write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> ", struct_name, ident, struct_name).unwrap();
-							types.write_c_type(w, &ref_type, Some(&gen_types), true);
-							write!(w, " {{\n\tlet mut inner_val = &mut this_ptr.get_native_mut_ref().{};\n\t", ident).unwrap();
-							let local_var = types.write_to_c_conversion_new_var(w, &format_ident!("inner_val"), &ref_type, Some(&gen_types), true);
-							if local_var { write!(w, "\n\t").unwrap(); }
-							types.write_to_c_conversion_inline_prefix(w, &ref_type, Some(&gen_types), true);
-							write!(w, "inner_val").unwrap();
-							types.write_to_c_conversion_inline_suffix(w, &ref_type, Some(&gen_types), true);
-							writeln!(w, "\n}}").unwrap();
-						}
-					}
-
-					if types.understood_c_type(&field.ty, Some(&gen_types)) {
-						writeln_arg_docs(w, &field.attrs, "", types, Some(&gen_types), vec![("val".to_owned(), &field.ty)].drain(..), None);
-						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_set_{}(this_ptr: &mut {}, mut val: ", struct_name, ident, struct_name).unwrap();
-						types.write_c_type(w, &field.ty, Some(&gen_types), false);
-						write!(w, ") {{\n\t").unwrap();
-						let local_var = types.write_from_c_conversion_new_var(w, &format_ident!("val"), &field.ty, Some(&gen_types));
+				if let Some(ref_type) = types.create_ownable_reference(&$field.ty, Some(&gen_types)) {
+					if types.understood_c_type(&ref_type, Some(&gen_types)) {
+						writeln_arg_docs(w, &$field.attrs, "", types, Some(&gen_types), vec![].drain(..), Some(&ref_type));
+						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> ", struct_name, $new_name, struct_name).unwrap();
+						types.write_c_type(w, &ref_type, Some(&gen_types), true);
+						write!(w, " {{\n\tlet mut inner_val = &mut this_ptr.get_native_mut_ref().{};\n\t", $real_name).unwrap();
+						let local_var = types.write_to_c_conversion_from_ownable_ref_new_var(w, &format_ident!("inner_val"), &ref_type, Some(&gen_types));
 						if local_var { write!(w, "\n\t").unwrap(); }
-						write!(w, "unsafe {{ &mut *ObjOps::untweak_ptr(this_ptr.inner) }}.{} = ", ident).unwrap();
-						types.write_from_c_conversion_prefix(w, &field.ty, Some(&gen_types));
-						write!(w, "val").unwrap();
-						types.write_from_c_conversion_suffix(w, &field.ty, Some(&gen_types));
-						writeln!(w, ";\n}}").unwrap();
-					} else { all_fields_settable = false; }
+						types.write_to_c_conversion_inline_prefix(w, &ref_type, Some(&gen_types), true);
+						write!(w, "inner_val").unwrap();
+						types.write_to_c_conversion_inline_suffix(w, &ref_type, Some(&gen_types), true);
+						writeln!(w, "\n}}").unwrap();
+					}
+				}
+
+				if types.understood_c_type(&$field.ty, Some(&gen_types)) {
+					writeln_arg_docs(w, &$field.attrs, "", types, Some(&gen_types), vec![("val".to_owned(), &$field.ty)].drain(..), None);
+					write!(w, "#[no_mangle]\npub extern \"C\" fn {}_set_{}(this_ptr: &mut {}, mut val: ", struct_name, $new_name, struct_name).unwrap();
+					types.write_c_type(w, &$field.ty, Some(&gen_types), false);
+					write!(w, ") {{\n\t").unwrap();
+					let local_var = types.write_from_c_conversion_new_var(w, &format_ident!("val"), &$field.ty, Some(&gen_types));
+					if local_var { write!(w, "\n\t").unwrap(); }
+					write!(w, "unsafe {{ &mut *ObjOps::untweak_ptr(this_ptr.inner) }}.{} = ", $real_name).unwrap();
+					types.write_from_c_conversion_prefix(w, &$field.ty, Some(&gen_types));
+					write!(w, "val").unwrap();
+					types.write_from_c_conversion_suffix(w, &$field.ty, Some(&gen_types));
+					writeln!(w, ";\n}}").unwrap();
 				} else { all_fields_settable = false; }
 			} else { all_fields_settable = false; }
 		}
+	}
 
-		if all_fields_settable {
-			// Build a constructor!
-			writeln!(w, "/// Constructs a new {} given each field", struct_name).unwrap();
-			write!(w, "#[must_use]\n#[no_mangle]\npub extern \"C\" fn {}_new(", struct_name).unwrap();
-			for (idx, field) in fields.named.iter().enumerate() {
-				if idx != 0 { write!(w, ", ").unwrap(); }
-				write!(w, "mut {}_arg: ", field.ident.as_ref().unwrap()).unwrap();
-				types.write_c_type(w, &field.ty, Some(&gen_types), false);
-			}
-			write!(w, ") -> {} {{\n\t", struct_name).unwrap();
+	match &s.fields {
+		syn::Fields::Named(fields) => {
 			for field in fields.named.iter() {
-				let field_ident = format_ident!("{}_arg", field.ident.as_ref().unwrap());
-				if types.write_from_c_conversion_new_var(w, &field_ident, &field.ty, Some(&gen_types)) {
-					write!(w, "\n\t").unwrap();
+				if let Some(ident) = &field.ident {
+					define_field!(ident, ident, field);
+				} else { all_fields_settable = false; }
+			}
+		}
+		syn::Fields::Unnamed(fields) => {
+			for (idx, field) in fields.unnamed.iter().enumerate() {
+				define_field!(('a' as u8 + idx as u8) as char, ('0' as u8 + idx as u8) as char, field);
+			}
+		}
+		_ => unimplemented!()
+	}
+
+	if all_fields_settable {
+		// Build a constructor!
+		writeln!(w, "/// Constructs a new {} given each field", struct_name).unwrap();
+		write!(w, "#[must_use]\n#[no_mangle]\npub extern \"C\" fn {}_new(", struct_name).unwrap();
+
+		match &s.fields {
+			syn::Fields::Named(fields) => {
+				for (idx, field) in fields.named.iter().enumerate() {
+					if idx != 0 { write!(w, ", ").unwrap(); }
+					write!(w, "mut {}_arg: ", field.ident.as_ref().unwrap()).unwrap();
+					types.write_c_type(w, &field.ty, Some(&gen_types), false);
 				}
 			}
-			writeln!(w, "{} {{ inner: ObjOps::heap_alloc(native{} {{", struct_name, s.ident).unwrap();
-			for field in fields.named.iter() {
-				write!(w, "\t\t{}: ", field.ident.as_ref().unwrap()).unwrap();
-				types.write_from_c_conversion_prefix(w, &field.ty, Some(&gen_types));
-				write!(w, "{}_arg", field.ident.as_ref().unwrap()).unwrap();
-				types.write_from_c_conversion_suffix(w, &field.ty, Some(&gen_types));
-				writeln!(w, ",").unwrap();
+			syn::Fields::Unnamed(fields) => {
+				for (idx, field) in fields.unnamed.iter().enumerate() {
+					if idx != 0 { write!(w, ", ").unwrap(); }
+					write!(w, "mut {}_arg: ", ('a' as u8 + idx as u8) as char).unwrap();
+					types.write_c_type(w, &field.ty, Some(&gen_types), false);
+				}
 			}
-			writeln!(w, "\t}}), is_owned: true }}\n}}").unwrap();
+			_ => unreachable!()
 		}
+		write!(w, ") -> {} {{\n\t", struct_name).unwrap();
+		match &s.fields {
+			syn::Fields::Named(fields) => {
+				for field in fields.named.iter() {
+					let field_ident = format_ident!("{}_arg", field.ident.as_ref().unwrap());
+					if types.write_from_c_conversion_new_var(w, &field_ident, &field.ty, Some(&gen_types)) {
+						write!(w, "\n\t").unwrap();
+					}
+				}
+			},
+			syn::Fields::Unnamed(fields) => {
+				for (idx, field) in fields.unnamed.iter().enumerate() {
+					let field_ident = format_ident!("{}_arg", ('a' as u8 + idx as u8) as char);
+					if types.write_from_c_conversion_new_var(w, &field_ident, &field.ty, Some(&gen_types)) {
+						write!(w, "\n\t").unwrap();
+					}
+				}
+			},
+			_ => unreachable!()
+		}
+		write!(w, "{} {{ inner: ObjOps::heap_alloc(", struct_name).unwrap();
+		match &s.fields {
+			syn::Fields::Named(fields) => {
+				writeln!(w, "native{} {{", s.ident).unwrap();
+				for field in fields.named.iter() {
+					write!(w, "\t\t{}: ", field.ident.as_ref().unwrap()).unwrap();
+					types.write_from_c_conversion_prefix(w, &field.ty, Some(&gen_types));
+					write!(w, "{}_arg", field.ident.as_ref().unwrap()).unwrap();
+					types.write_from_c_conversion_suffix(w, &field.ty, Some(&gen_types));
+					writeln!(w, ",").unwrap();
+				}
+				write!(w, "\t}}").unwrap();
+			},
+			syn::Fields::Unnamed(fields) => {
+				assert!(s.generics.lt_token.is_none());
+				writeln!(w, "{} (", types.maybe_resolve_ident(&s.ident).unwrap()).unwrap();
+				for (idx, field) in fields.unnamed.iter().enumerate() {
+					write!(w, "\t\t").unwrap();
+					types.write_from_c_conversion_prefix(w, &field.ty, Some(&gen_types));
+					write!(w, "{}_arg", ('a' as u8 + idx as u8) as char).unwrap();
+					types.write_from_c_conversion_suffix(w, &field.ty, Some(&gen_types));
+					writeln!(w, ",").unwrap();
+				}
+				write!(w, "\t)").unwrap();
+			},
+			_ => unreachable!()
+		}
+		writeln!(w, "), is_owned: true }}\n}}").unwrap();
 	}
 }
 
@@ -769,6 +830,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 		if p.qself.is_some() { unimplemented!(); }
 		if let Some(ident) = single_ident_generic_path_to_ident(&p.path) {
 			if let Some(resolved_path) = types.maybe_resolve_non_ignored_ident(&ident) {
+				if !types.understood_c_path(&p.path) {
+					eprintln!("Not implementing anything for impl {} as the type is not understood (probably C-not exported)", ident);
+					return;
+				}
+
 				let mut gen_types = GenericTypes::new(Some(resolved_path.clone()));
 				if !gen_types.learn_generics(&i.generics, types) {
 					eprintln!("Not implementing anything for impl {} due to not understood generics", ident);
@@ -827,7 +893,13 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						// properly. This way we can call this method from deep in the
 						// type-conversion logic without actually knowing the concrete native type.
 						if !resolved_path.starts_with(types.module_path) {
-							writeln!(w, "use {} as native{};", resolved_path, ident).unwrap();
+							if !first_seg_is_stdlib(resolved_path.split("::").next().unwrap()) {
+								writeln!(w, "use crate::{}::native{} as native{};", resolved_path.rsplitn(2, "::").skip(1).next().unwrap(), ident, ident).unwrap();
+								writeln!(w, "use crate::{};", resolved_path).unwrap();
+								writeln!(w, "use crate::{}_free_void;", resolved_path).unwrap();
+							} else {
+								writeln!(w, "use {} as native{};", resolved_path, ident).unwrap();
+							}
 						}
 						writeln!(w, "impl From<native{}> for crate::{} {{", ident, full_trait_path).unwrap();
 						writeln!(w, "\tfn from(obj: native{}) -> Self {{", ident).unwrap();
@@ -1187,7 +1259,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									write!(w, "#[no_mangle]\npub extern \"C\" fn {}_{}(", ident, m.sig.ident).unwrap();
 									let ret_type = match &declared_type {
 										DeclType::MirroredEnum => format!("{}", ident),
-										DeclType::StructImported => format!("{}", ident),
+										DeclType::StructImported {..} => format!("{}", ident),
 										_ => unimplemented!(),
 									};
 									write_method_params(w, &m.sig, &ret_type, types, Some(&meth_gen_types), false, true);
@@ -1208,7 +1280,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									} else {
 										match &declared_type {
 											DeclType::MirroredEnum => write!(w, "this_arg.to_native().{}(", m.sig.ident).unwrap(),
-											DeclType::StructImported => {
+											DeclType::StructImported {..} => {
 												if takes_owned_self {
 													write!(w, "(*unsafe {{ Box::from_raw(this_arg.take_inner()) }}).{}(", m.sig.ident).unwrap();
 												} else if takes_mut_self {
@@ -1774,7 +1846,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let struct_path = format!("{}::{}", module, s.ident);
-						crate_types.opaques.insert(struct_path, &s.ident);
+						crate_types.opaques.insert(struct_path, (&s.ident, &s.generics));
 					}
 				},
 				syn::Item::Trait(t) => {
@@ -1819,7 +1891,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 										hash_map::Entry::Vacant(e) => { e.insert(vec![(path_obj, args_obj)]); },
 									}
 
-									crate_types.opaques.insert(type_path, t_ident);
+									crate_types.opaques.insert(type_path, (t_ident, &t.generics));
 								},
 								_ => {
 									crate_types.type_aliases.insert(type_path, import_resolver.resolve_imported_refs((*t.ty).clone()));
@@ -1836,7 +1908,7 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let enum_path = format!("{}::{}", module, e.ident);
-						crate_types.opaques.insert(enum_path, &e.ident);
+						crate_types.opaques.insert(enum_path, (&e.ident, &e.generics));
 					}
 				},
 				syn::Item::Enum(e) => {

@@ -90,7 +90,7 @@ pub extern "C" fn derive_public_revocation_key(mut per_commitment_point: crate::
 
 
 use lightning::ln::chan_utils::TxCreationKeys as nativeTxCreationKeysImport;
-type nativeTxCreationKeys = nativeTxCreationKeysImport;
+pub(crate) type nativeTxCreationKeys = nativeTxCreationKeysImport;
 
 /// The set of public keys which are used in the creation of one commitment transaction.
 /// These are derived from the channel base keys and per-commitment data.
@@ -130,7 +130,7 @@ impl Drop for TxCreationKeys {
 pub extern "C" fn TxCreationKeys_free(this_obj: TxCreationKeys) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn TxCreationKeys_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn TxCreationKeys_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeTxCreationKeys); }
 }
 #[allow(unused)]
@@ -257,7 +257,7 @@ pub extern "C" fn TxCreationKeys_read(ser: crate::c_types::u8slice) -> crate::c_
 }
 
 use lightning::ln::chan_utils::ChannelPublicKeys as nativeChannelPublicKeysImport;
-type nativeChannelPublicKeys = nativeChannelPublicKeysImport;
+pub(crate) type nativeChannelPublicKeys = nativeChannelPublicKeysImport;
 
 /// One counterparty's public keys which do not change over the life of a channel.
 #[must_use]
@@ -287,7 +287,7 @@ impl Drop for ChannelPublicKeys {
 pub extern "C" fn ChannelPublicKeys_free(this_obj: ChannelPublicKeys) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ChannelPublicKeys_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ChannelPublicKeys_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelPublicKeys); }
 }
 #[allow(unused)]
@@ -461,7 +461,7 @@ pub extern "C" fn get_revokeable_redeemscript(mut revocation_key: crate::c_types
 
 
 use lightning::ln::chan_utils::HTLCOutputInCommitment as nativeHTLCOutputInCommitmentImport;
-type nativeHTLCOutputInCommitment = nativeHTLCOutputInCommitmentImport;
+pub(crate) type nativeHTLCOutputInCommitment = nativeHTLCOutputInCommitmentImport;
 
 /// Information about an HTLC as it appears in a commitment transaction
 #[must_use]
@@ -491,7 +491,7 @@ impl Drop for HTLCOutputInCommitment {
 pub extern "C" fn HTLCOutputInCommitment_free(this_obj: HTLCOutputInCommitment) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn HTLCOutputInCommitment_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn HTLCOutputInCommitment_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeHTLCOutputInCommitment); }
 }
 #[allow(unused)]
@@ -658,7 +658,7 @@ pub extern "C" fn build_htlc_transaction(commitment_txid: *const [u8; 32], mut f
 
 
 use lightning::ln::chan_utils::ChannelTransactionParameters as nativeChannelTransactionParametersImport;
-type nativeChannelTransactionParameters = nativeChannelTransactionParametersImport;
+pub(crate) type nativeChannelTransactionParameters = nativeChannelTransactionParametersImport;
 
 /// Per-channel data used to build transactions in conjunction with the per-commitment data (CommitmentTransaction).
 /// The fields are organized by holder/counterparty.
@@ -692,7 +692,7 @@ impl Drop for ChannelTransactionParameters {
 pub extern "C" fn ChannelTransactionParameters_free(this_obj: ChannelTransactionParameters) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelTransactionParameters); }
 }
 #[allow(unused)]
@@ -715,7 +715,7 @@ impl ChannelTransactionParameters {
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_get_holder_pubkeys(this_ptr: &ChannelTransactionParameters) -> crate::lightning::ln::chan_utils::ChannelPublicKeys {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().holder_pubkeys;
-	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::chan_utils::ChannelPublicKeys<>) as *mut _) }, is_owned: false }
 }
 /// Holder public keys
 #[no_mangle]
@@ -753,7 +753,7 @@ pub extern "C" fn ChannelTransactionParameters_set_is_outbound_from_holder(this_
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_get_counterparty_parameters(this_ptr: &ChannelTransactionParameters) -> crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().counterparty_parameters;
-	let mut local_inner_val = crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::chan_utils::CounterpartyChannelTransactionParameters<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// The late-bound counterparty channel transaction parameters.
@@ -771,7 +771,7 @@ pub extern "C" fn ChannelTransactionParameters_set_counterparty_parameters(this_
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_get_funding_outpoint(this_ptr: &ChannelTransactionParameters) -> crate::lightning::chain::transaction::OutPoint {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().funding_outpoint;
-	let mut local_inner_val = crate::lightning::chain::transaction::OutPoint { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::chain::transaction::OutPoint { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::chain::transaction::OutPoint<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// The late-bound funding outpoint
@@ -817,7 +817,7 @@ pub extern "C" fn ChannelTransactionParameters_clone(orig: &ChannelTransactionPa
 }
 
 use lightning::ln::chan_utils::CounterpartyChannelTransactionParameters as nativeCounterpartyChannelTransactionParametersImport;
-type nativeCounterpartyChannelTransactionParameters = nativeCounterpartyChannelTransactionParametersImport;
+pub(crate) type nativeCounterpartyChannelTransactionParameters = nativeCounterpartyChannelTransactionParametersImport;
 
 /// Late-bound per-channel counterparty data used to build transactions.
 #[must_use]
@@ -847,7 +847,7 @@ impl Drop for CounterpartyChannelTransactionParameters {
 pub extern "C" fn CounterpartyChannelTransactionParameters_free(this_obj: CounterpartyChannelTransactionParameters) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn CounterpartyChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn CounterpartyChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeCounterpartyChannelTransactionParameters); }
 }
 #[allow(unused)]
@@ -870,7 +870,7 @@ impl CounterpartyChannelTransactionParameters {
 #[no_mangle]
 pub extern "C" fn CounterpartyChannelTransactionParameters_get_pubkeys(this_ptr: &CounterpartyChannelTransactionParameters) -> crate::lightning::ln::chan_utils::ChannelPublicKeys {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().pubkeys;
-	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::chan_utils::ChannelPublicKeys<>) as *mut _) }, is_owned: false }
 }
 /// Counter-party public keys
 #[no_mangle]
@@ -980,7 +980,7 @@ pub extern "C" fn ChannelTransactionParameters_read(ser: crate::c_types::u8slice
 }
 
 use lightning::ln::chan_utils::DirectedChannelTransactionParameters as nativeDirectedChannelTransactionParametersImport;
-type nativeDirectedChannelTransactionParameters = nativeDirectedChannelTransactionParametersImport<'static>;
+pub(crate) type nativeDirectedChannelTransactionParameters = nativeDirectedChannelTransactionParametersImport<'static>;
 
 /// Static channel fields used to build transactions given per-commitment fields, organized by
 /// broadcaster/countersignatory.
@@ -1014,7 +1014,7 @@ impl Drop for DirectedChannelTransactionParameters {
 pub extern "C" fn DirectedChannelTransactionParameters_free(this_obj: DirectedChannelTransactionParameters) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn DirectedChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn DirectedChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDirectedChannelTransactionParameters); }
 }
 #[allow(unused)]
@@ -1038,7 +1038,7 @@ impl DirectedChannelTransactionParameters {
 #[no_mangle]
 pub extern "C" fn DirectedChannelTransactionParameters_broadcaster_pubkeys(this_arg: &DirectedChannelTransactionParameters) -> crate::lightning::ln::chan_utils::ChannelPublicKeys {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.broadcaster_pubkeys();
-	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::chan_utils::ChannelPublicKeys<>) as *mut _) }, is_owned: false }
 }
 
 /// Get the channel pubkeys for the countersignatory
@@ -1046,7 +1046,7 @@ pub extern "C" fn DirectedChannelTransactionParameters_broadcaster_pubkeys(this_
 #[no_mangle]
 pub extern "C" fn DirectedChannelTransactionParameters_countersignatory_pubkeys(this_arg: &DirectedChannelTransactionParameters) -> crate::lightning::ln::chan_utils::ChannelPublicKeys {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.countersignatory_pubkeys();
-	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::chan_utils::ChannelPublicKeys<>) as *mut _) }, is_owned: false }
 }
 
 /// Get the contest delay applicable to the transactions.
@@ -1079,7 +1079,7 @@ pub extern "C" fn DirectedChannelTransactionParameters_funding_outpoint(this_arg
 
 
 use lightning::ln::chan_utils::HolderCommitmentTransaction as nativeHolderCommitmentTransactionImport;
-type nativeHolderCommitmentTransaction = nativeHolderCommitmentTransactionImport;
+pub(crate) type nativeHolderCommitmentTransaction = nativeHolderCommitmentTransactionImport;
 
 /// Information needed to build and sign a holder's commitment transaction.
 ///
@@ -1111,7 +1111,7 @@ impl Drop for HolderCommitmentTransaction {
 pub extern "C" fn HolderCommitmentTransaction_free(this_obj: HolderCommitmentTransaction) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn HolderCommitmentTransaction_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn HolderCommitmentTransaction_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeHolderCommitmentTransaction); }
 }
 #[allow(unused)]
@@ -1194,7 +1194,7 @@ pub extern "C" fn HolderCommitmentTransaction_new(mut commitment_tx: crate::ligh
 
 
 use lightning::ln::chan_utils::BuiltCommitmentTransaction as nativeBuiltCommitmentTransactionImport;
-type nativeBuiltCommitmentTransaction = nativeBuiltCommitmentTransactionImport;
+pub(crate) type nativeBuiltCommitmentTransaction = nativeBuiltCommitmentTransactionImport;
 
 /// A pre-built Bitcoin commitment transaction and its txid.
 #[must_use]
@@ -1224,7 +1224,7 @@ impl Drop for BuiltCommitmentTransaction {
 pub extern "C" fn BuiltCommitmentTransaction_free(this_obj: BuiltCommitmentTransaction) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn BuiltCommitmentTransaction_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn BuiltCommitmentTransaction_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBuiltCommitmentTransaction); }
 }
 #[allow(unused)]
@@ -1336,7 +1336,7 @@ pub extern "C" fn BuiltCommitmentTransaction_sign(this_arg: &BuiltCommitmentTran
 
 
 use lightning::ln::chan_utils::ClosingTransaction as nativeClosingTransactionImport;
-type nativeClosingTransaction = nativeClosingTransactionImport;
+pub(crate) type nativeClosingTransaction = nativeClosingTransactionImport;
 
 /// This class tracks the per-transaction information needed to build a closing transaction and will
 /// actually build it and sign.
@@ -1370,7 +1370,7 @@ impl Drop for ClosingTransaction {
 pub extern "C" fn ClosingTransaction_free(this_obj: ClosingTransaction) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ClosingTransaction_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ClosingTransaction_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeClosingTransaction); }
 }
 #[allow(unused)]
@@ -1458,7 +1458,7 @@ pub extern "C" fn ClosingTransaction_to_counterparty_script(this_arg: &ClosingTr
 
 
 use lightning::ln::chan_utils::TrustedClosingTransaction as nativeTrustedClosingTransactionImport;
-type nativeTrustedClosingTransaction = nativeTrustedClosingTransactionImport<'static>;
+pub(crate) type nativeTrustedClosingTransaction = nativeTrustedClosingTransactionImport<'static>;
 
 /// A wrapper on ClosingTransaction indicating that the built bitcoin
 /// transaction is trusted.
@@ -1493,7 +1493,7 @@ impl Drop for TrustedClosingTransaction {
 pub extern "C" fn TrustedClosingTransaction_free(this_obj: TrustedClosingTransaction) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn TrustedClosingTransaction_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn TrustedClosingTransaction_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeTrustedClosingTransaction); }
 }
 #[allow(unused)]
@@ -1541,7 +1541,7 @@ pub extern "C" fn TrustedClosingTransaction_sign(this_arg: &TrustedClosingTransa
 
 
 use lightning::ln::chan_utils::CommitmentTransaction as nativeCommitmentTransactionImport;
-type nativeCommitmentTransaction = nativeCommitmentTransactionImport;
+pub(crate) type nativeCommitmentTransaction = nativeCommitmentTransactionImport;
 
 /// This class tracks the per-transaction information needed to build a commitment transaction and will
 /// actually build it and sign.  It is used for holder transactions that we sign only when needed
@@ -1576,7 +1576,7 @@ impl Drop for CommitmentTransaction {
 pub extern "C" fn CommitmentTransaction_free(this_obj: CommitmentTransaction) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn CommitmentTransaction_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn CommitmentTransaction_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeCommitmentTransaction); }
 }
 #[allow(unused)]
@@ -1691,7 +1691,7 @@ pub extern "C" fn CommitmentTransaction_verify(this_arg: &CommitmentTransaction,
 
 
 use lightning::ln::chan_utils::TrustedCommitmentTransaction as nativeTrustedCommitmentTransactionImport;
-type nativeTrustedCommitmentTransaction = nativeTrustedCommitmentTransactionImport<'static>;
+pub(crate) type nativeTrustedCommitmentTransaction = nativeTrustedCommitmentTransactionImport<'static>;
 
 /// A wrapper on CommitmentTransaction indicating that the derived fields (the built bitcoin
 /// transaction and the transaction creation keys) are trusted.
@@ -1726,7 +1726,7 @@ impl Drop for TrustedCommitmentTransaction {
 pub extern "C" fn TrustedCommitmentTransaction_free(this_obj: TrustedCommitmentTransaction) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn TrustedCommitmentTransaction_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn TrustedCommitmentTransaction_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeTrustedCommitmentTransaction); }
 }
 #[allow(unused)]
@@ -1758,7 +1758,7 @@ pub extern "C" fn TrustedCommitmentTransaction_txid(this_arg: &TrustedCommitment
 #[no_mangle]
 pub extern "C" fn TrustedCommitmentTransaction_built_transaction(this_arg: &TrustedCommitmentTransaction) -> crate::lightning::ln::chan_utils::BuiltCommitmentTransaction {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.built_transaction();
-	crate::lightning::ln::chan_utils::BuiltCommitmentTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::chan_utils::BuiltCommitmentTransaction { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::chan_utils::BuiltCommitmentTransaction<>) as *mut _) }, is_owned: false }
 }
 
 /// The pre-calculated transaction creation public keys.
@@ -1766,7 +1766,7 @@ pub extern "C" fn TrustedCommitmentTransaction_built_transaction(this_arg: &Trus
 #[no_mangle]
 pub extern "C" fn TrustedCommitmentTransaction_keys(this_arg: &TrustedCommitmentTransaction) -> crate::lightning::ln::chan_utils::TxCreationKeys {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.keys();
-	crate::lightning::ln::chan_utils::TxCreationKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::chan_utils::TxCreationKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::chan_utils::TxCreationKeys<>) as *mut _) }, is_owned: false }
 }
 
 /// Get a signature for each HTLC which was included in the commitment transaction (ie for

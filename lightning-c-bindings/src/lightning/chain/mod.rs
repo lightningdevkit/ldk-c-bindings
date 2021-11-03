@@ -39,7 +39,7 @@ use crate::c_types::*;
 }
 
 use lightning::chain::BestBlock as nativeBestBlockImport;
-type nativeBestBlock = nativeBestBlockImport;
+pub(crate) type nativeBestBlock = nativeBestBlockImport;
 
 /// The best known block as identified by its hash and height.
 #[must_use]
@@ -69,7 +69,7 @@ impl Drop for BestBlock {
 pub extern "C" fn BestBlock_free(this_obj: BestBlock) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn BestBlock_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn BestBlock_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBestBlock); }
 }
 #[allow(unused)]
@@ -458,9 +458,10 @@ pub enum ChannelMonitorUpdateErr {
 	/// our state failed, but is expected to succeed at some point in the future).
 	///
 	/// Such a failure will \"freeze\" a channel, preventing us from revoking old states or
-	/// submitting new commitment transactions to the counterparty. Once the update(s) which failed
-	/// have been successfully applied, ChannelManager::channel_monitor_updated can be used to
-	/// restore the channel to an operational state.
+	/// submitting new commitment transactions to the counterparty. Once the update(s) that failed
+	/// have been successfully applied, a [`MonitorEvent::UpdateCompleted`] event should be returned
+	/// via [`Watch::release_pending_monitor_events`] which will then restore the channel to an
+	/// operational state.
 	///
 	/// Note that a given ChannelManager will *never* re-generate a given ChannelMonitorUpdate. If
 	/// you return a TemporaryFailure you must ensure that it is written to disk safely before
@@ -474,13 +475,14 @@ pub enum ChannelMonitorUpdateErr {
 	/// the channel which would invalidate previous ChannelMonitors are not made when a channel has
 	/// been \"frozen\".
 	///
-	/// Note that even if updates made after TemporaryFailure succeed you must still call
-	/// channel_monitor_updated to ensure you have the latest monitor and re-enable normal channel
-	/// operation.
+	/// Note that even if updates made after TemporaryFailure succeed you must still provide a
+	/// [`MonitorEvent::UpdateCompleted`] to ensure you have the latest monitor and re-enable
+	/// normal channel operation. Note that this is normally generated through a call to
+	/// [`ChainMonitor::channel_monitor_updated`].
 	///
-	/// Note that the update being processed here will not be replayed for you when you call
-	/// ChannelManager::channel_monitor_updated, so you must store the update itself along
-	/// with the persisted ChannelMonitor on your own local disk prior to returning a
+	/// Note that the update being processed here will not be replayed for you when you return a
+	/// [`MonitorEvent::UpdateCompleted`] event via [`Watch::release_pending_monitor_events`], so
+	/// you must store the update itself on your own local disk prior to returning a
 	/// TemporaryFailure. You may, of course, employ a journaling approach, storing only the
 	/// ChannelMonitorUpdate on disk without updating the monitor itself, replaying the journal at
 	/// reload-time.
@@ -488,6 +490,8 @@ pub enum ChannelMonitorUpdateErr {
 	/// For deployments where a copy of ChannelMonitors and other local state are backed up in a
 	/// remote location (with local copies persisted immediately), it is anticipated that all
 	/// updates will return TemporaryFailure until the remote copies could be updated.
+	///
+	/// [`ChainMonitor::channel_monitor_updated`]: chainmonitor::ChainMonitor::channel_monitor_updated
 	TemporaryFailure,
 	/// Used to indicate no further channel monitor updates will be allowed (eg we've moved on to a
 	/// different watchtower and cannot update with all watchtowers that were previously informed
@@ -603,6 +607,13 @@ pub struct Watch {
 	pub update_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::lightning::chain::transaction::OutPoint, update: crate::lightning::chain::channelmonitor::ChannelMonitorUpdate) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ,
 	/// Returns any monitor events since the last call. Subsequent calls must only return new
 	/// events.
+	///
+	/// Note that after any block- or transaction-connection calls to a [`ChannelMonitor`], no
+	/// further events may be returned here until the [`ChannelMonitor`] has been fully persisted
+	/// to disk.
+	///
+	/// For details on asynchronous [`ChannelMonitor`] updating and returning
+	/// [`MonitorEvent::UpdateCompleted`] here, see [`ChannelMonitorUpdateErr::TemporaryFailure`].
 	#[must_use]
 	pub release_pending_monitor_events: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_MonitorEventZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
@@ -746,7 +757,7 @@ impl Drop for Filter {
 }
 
 use lightning::chain::WatchedOutput as nativeWatchedOutputImport;
-type nativeWatchedOutput = nativeWatchedOutputImport;
+pub(crate) type nativeWatchedOutput = nativeWatchedOutputImport;
 
 /// A transaction output watched by a [`ChannelMonitor`] for spends on-chain.
 ///
@@ -786,7 +797,7 @@ impl Drop for WatchedOutput {
 pub extern "C" fn WatchedOutput_free(this_obj: WatchedOutput) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn WatchedOutput_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn WatchedOutput_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeWatchedOutput); }
 }
 #[allow(unused)]
@@ -826,7 +837,7 @@ pub extern "C" fn WatchedOutput_set_block_hash(this_ptr: &mut WatchedOutput, mut
 #[no_mangle]
 pub extern "C" fn WatchedOutput_get_outpoint(this_ptr: &WatchedOutput) -> crate::lightning::chain::transaction::OutPoint {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().outpoint;
-	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::chain::transaction::OutPoint { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::chain::transaction::OutPoint<>) as *mut _) }, is_owned: false }
 }
 /// Outpoint identifying the transaction output.
 #[no_mangle]

@@ -97,7 +97,7 @@ impl Drop for CustomMessageHandler {
 }
 
 use lightning::ln::peer_handler::IgnoringMessageHandler as nativeIgnoringMessageHandlerImport;
-type nativeIgnoringMessageHandler = nativeIgnoringMessageHandlerImport;
+pub(crate) type nativeIgnoringMessageHandler = nativeIgnoringMessageHandlerImport;
 
 /// A dummy struct which implements `RoutingMessageHandler` without storing any routing information
 /// or doing any processing. You can provide one of these as the route_handler in a MessageHandler.
@@ -128,7 +128,7 @@ impl Drop for IgnoringMessageHandler {
 pub extern "C" fn IgnoringMessageHandler_free(this_obj: IgnoringMessageHandler) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn IgnoringMessageHandler_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn IgnoringMessageHandler_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeIgnoringMessageHandler); }
 }
 #[allow(unused)]
@@ -350,7 +350,7 @@ extern "C" fn IgnoringMessageHandler_CustomMessageHandler_get_and_clear_pending_
 
 
 use lightning::ln::peer_handler::ErroringMessageHandler as nativeErroringMessageHandlerImport;
-type nativeErroringMessageHandler = nativeErroringMessageHandlerImport;
+pub(crate) type nativeErroringMessageHandler = nativeErroringMessageHandlerImport;
 
 /// A dummy struct which implements `ChannelMessageHandler` without having any channels.
 /// You can provide one of these as the route_handler in a MessageHandler.
@@ -381,7 +381,7 @@ impl Drop for ErroringMessageHandler {
 pub extern "C" fn ErroringMessageHandler_free(this_obj: ErroringMessageHandler) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ErroringMessageHandler_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ErroringMessageHandler_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeErroringMessageHandler); }
 }
 #[allow(unused)]
@@ -544,7 +544,7 @@ extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_error(this_arg
 
 
 use lightning::ln::peer_handler::MessageHandler as nativeMessageHandlerImport;
-type nativeMessageHandler = nativeMessageHandlerImport<crate::lightning::ln::msgs::ChannelMessageHandler, crate::lightning::ln::msgs::RoutingMessageHandler>;
+pub(crate) type nativeMessageHandler = nativeMessageHandlerImport<crate::lightning::ln::msgs::ChannelMessageHandler, crate::lightning::ln::msgs::RoutingMessageHandler>;
 
 /// Provides references to trait impls which handle different types of messages.
 #[must_use]
@@ -574,7 +574,7 @@ impl Drop for MessageHandler {
 pub extern "C" fn MessageHandler_free(this_obj: MessageHandler) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn MessageHandler_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn MessageHandler_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeMessageHandler); }
 }
 #[allow(unused)]
@@ -758,7 +758,7 @@ impl Drop for SocketDescriptor {
 }
 
 use lightning::ln::peer_handler::PeerHandleError as nativePeerHandleErrorImport;
-type nativePeerHandleError = nativePeerHandleErrorImport;
+pub(crate) type nativePeerHandleError = nativePeerHandleErrorImport;
 
 /// Error for PeerManager errors. If you get one of these, you must disconnect the socket and
 /// generate no further read_event/write_buffer_space_avail/socket_disconnected calls for the
@@ -790,7 +790,7 @@ impl Drop for PeerHandleError {
 pub extern "C" fn PeerHandleError_free(this_obj: PeerHandleError) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn PeerHandleError_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn PeerHandleError_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePeerHandleError); }
 }
 #[allow(unused)]
@@ -851,7 +851,7 @@ pub extern "C" fn PeerHandleError_clone(orig: &PeerHandleError) -> PeerHandleErr
 }
 
 use lightning::ln::peer_handler::PeerManager as nativePeerManagerImport;
-type nativePeerManager = nativePeerManagerImport<crate::lightning::ln::peer_handler::SocketDescriptor, crate::lightning::ln::msgs::ChannelMessageHandler, crate::lightning::ln::msgs::RoutingMessageHandler, crate::lightning::util::logger::Logger, crate::lightning::ln::peer_handler::CustomMessageHandler>;
+pub(crate) type nativePeerManager = nativePeerManagerImport<crate::lightning::ln::peer_handler::SocketDescriptor, crate::lightning::ln::msgs::ChannelMessageHandler, crate::lightning::ln::msgs::RoutingMessageHandler, crate::lightning::util::logger::Logger, crate::lightning::ln::peer_handler::CustomMessageHandler>;
 
 /// A PeerManager manages a set of peers, described by their [`SocketDescriptor`] and marshalls
 /// socket events into messages which it passes on to its [`MessageHandler`].
@@ -899,7 +899,7 @@ impl Drop for PeerManager {
 pub extern "C" fn PeerManager_free(this_obj: PeerManager) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn PeerManager_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn PeerManager_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePeerManager); }
 }
 #[allow(unused)]
@@ -1056,6 +1056,14 @@ pub extern "C" fn PeerManager_socket_disconnected(this_arg: &PeerManager, descri
 #[no_mangle]
 pub extern "C" fn PeerManager_disconnect_by_node_id(this_arg: &PeerManager, mut node_id: crate::c_types::PublicKey, mut no_connection_possible: bool) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.disconnect_by_node_id(node_id.into_rust(), no_connection_possible)
+}
+
+/// Disconnects all currently-connected peers. This is useful on platforms where there may be
+/// an indication that TCP sockets have stalled even if we weren't around to time them out
+/// using regular ping/pongs.
+#[no_mangle]
+pub extern "C" fn PeerManager_disconnect_all_peers(this_arg: &PeerManager) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.disconnect_all_peers()
 }
 
 /// Send pings to each peer and disconnect those which did not respond to the last round of

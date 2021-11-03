@@ -419,7 +419,18 @@ LDKCVec_C2Tuple_PublicKeyTypeZZ create_custom_msg(const void* this_arg) {
 	return ret;
 }
 
-uint64_t get_chan_score(const void *this_arg, uint64_t scid) { return 42; }
+uint64_t get_chan_score(const void *this_arg, uint64_t scid, const LDKNodeId *src, const LDKNodeId *dst) { return 42; }
+
+struct CustomRouteFinderParams {
+	LDKLogger *logger;
+	LDKNetworkGraph *graph_ref;
+};
+struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, struct LDKPublicKey payer, const struct LDKRouteParameters *NONNULL_PTR route_params, struct LDKCVec_ChannelDetailsZ *first_hops, const struct LDKScore *NONNULL_PTR scorer) {
+	const struct CustomRouteFinderParams *params = (struct CustomRouteFinderParams *)this_arg;
+	assert(first_hops->datalen == 1);
+	assert(ChannelDetails_get_is_usable(&first_hops->data[0]));
+	return find_route(payer, route_params, params->graph_ref, first_hops, *params->logger, scorer);
+}
 
 int main() {
 	uint8_t channel_open_header[80];
@@ -462,7 +473,8 @@ int main() {
 		.free = NULL,
 	};
 
-	LDK::NetGraphMsgHandler net_graph1 = NetGraphMsgHandler_new(NetworkGraph_new(genesis_hash), COption_AccessZ_none(), logger1);
+	LDK::NetworkGraph net_graph1 = NetworkGraph_new(genesis_hash);
+	LDK::NetGraphMsgHandler graph_msg_handler1 = NetGraphMsgHandler_new(&net_graph1, COption_AccessZ_none(), logger1);
 	LDKSecretKey node_secret1;
 
 	LDKLogger logger2 {
@@ -481,7 +493,8 @@ int main() {
 		.free = NULL,
 	};
 
-	LDK::NetGraphMsgHandler net_graph2 = NetGraphMsgHandler_new(NetworkGraph_new(genesis_hash), COption_AccessZ_none(), logger2);
+	LDK::NetworkGraph net_graph2 = NetworkGraph_new(genesis_hash);
+	LDK::NetGraphMsgHandler graph_msg_handler2 = NetGraphMsgHandler_new(&net_graph2, COption_AccessZ_none(), logger2);
 	LDKSecretKey node_secret2;
 
 	LDK::CVec_u8Z cm1_ser = LDKCVec_u8Z {}; // ChannelManager 1 serialization at the end of the ser-des scope
@@ -500,7 +513,7 @@ int main() {
 		LDK::CVec_ChannelDetailsZ channels = ChannelManager_list_channels(&cm1);
 		assert(channels->datalen == 0);
 
-		LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), NetGraphMsgHandler_as_RoutingMessageHandler(&net_graph1));
+		LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), NetGraphMsgHandler_as_RoutingMessageHandler(&graph_msg_handler1));
 
 		LDK::IgnoringMessageHandler ignoring_handler1 = IgnoringMessageHandler_new();
 		LDK::CustomMessageHandler custom_msg_handler1 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler1);
@@ -530,7 +543,7 @@ int main() {
 		LDK::CVec_ChannelDetailsZ channels2 = ChannelManager_list_channels(&cm2);
 		assert(channels2->datalen == 0);
 
-		LDK::RoutingMessageHandler net_msgs2 = NetGraphMsgHandler_as_RoutingMessageHandler(&net_graph2);
+		LDK::RoutingMessageHandler net_msgs2 = NetGraphMsgHandler_as_RoutingMessageHandler(&graph_msg_handler2);
 		LDK::CResult_ChannelAnnouncementDecodeErrorZ chan_ann = ChannelAnnouncement_read(LDKu8slice { .data = valid_node_announcement, .datalen = sizeof(valid_node_announcement) });
 		assert(chan_ann->result_ok);
 		LDK::CResult_boolLightningErrorZ ann_res = net_msgs2->handle_channel_announcement(net_msgs2->this_arg, chan_ann->contents.result);
@@ -673,14 +686,15 @@ int main() {
 
 		{
 			LDK::CVec_ChannelDetailsZ outbound_channels = ChannelManager_list_usable_channels(&cm1);
-			LDK::NetworkGraph graph_2_ref = NetGraphMsgHandler_get_network_graph(&net_graph2);
 			LDK::Score chan_scorer = LDKScore {
 				.this_arg = NULL, .channel_penalty_msat = get_chan_score, .free = NULL
 			};
-			LDK::CResult_RouteLightningErrorZ route = get_route(ChannelManager_get_our_node_id(&cm1), &graph_2_ref, ChannelManager_get_our_node_id(&cm2), LDKInvoiceFeatures {
-					.inner = NULL, .is_owned = false
-				}, &outbound_channels, Invoice_route_hints(invoice->contents.result),
-				5000, Invoice_min_final_cltv_expiry(invoice->contents.result), logger1, &chan_scorer);
+			LDK::RouteParameters route_params = RouteParameters_new(Payee_new(
+					ChannelManager_get_our_node_id(&cm2), LDKInvoiceFeatures {
+						.inner = NULL, .is_owned = false
+					}, Invoice_route_hints(invoice->contents.result), COption_u64Z_none()),
+				5000, Invoice_min_final_cltv_expiry(invoice->contents.result));
+			LDK::CResult_RouteLightningErrorZ route = find_route(ChannelManager_get_our_node_id(&cm1), &route_params, &net_graph2, &outbound_channels, logger1, &chan_scorer);
 			assert(route->result_ok);
 			LDK::CVec_CVec_RouteHopZZ paths = Route_get_paths(route->contents.result);
 			assert(paths->datalen == 1);
@@ -688,7 +702,9 @@ int main() {
 			assert(!memcmp(RouteHop_get_pubkey(&paths->data[0].data[0]).compressed_form,
 				ChannelManager_get_our_node_id(&cm2).compressed_form, 33));
 			assert(RouteHop_get_short_channel_id(&paths->data[0].data[0]) == channel_scid);
-			LDK::CResult_PaymentIdPaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash, Invoice_payment_secret(invoice->contents.result));
+			LDKThirtyTwoBytes payment_secret;
+			memcpy(payment_secret.data, Invoice_payment_secret(invoice->contents.result), 32);
+			LDK::CResult_PaymentIdPaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash, payment_secret);
 			assert(send_res->result_ok);
 		}
 
@@ -699,11 +715,11 @@ int main() {
 		}
 
 		// Check that we received the payment!
-		LDKEventsProvider ev2 = ChannelManager_as_EventsProvider(&cm2);
+		LDK::EventsProvider ev2 = ChannelManager_as_EventsProvider(&cm2);
 		while (true) {
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
-			ev2.process_pending_events(ev2.this_arg, handler);
+			ev2.process_pending_events(handler);
 			if (queue.events.size() == 1) {
 				assert(queue.events[0]->tag == LDKEvent_PendingHTLCsForwardable);
 				break;
@@ -718,13 +734,13 @@ int main() {
 		{
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
-			ev2.process_pending_events(ev2.this_arg, handler);
+			ev2.process_pending_events(handler);
 			assert(queue.events.size() == 1);
 			assert(queue.events[0]->tag == LDKEvent_PaymentReceived);
 			assert(!memcmp(queue.events[0]->payment_received.payment_hash.data, payment_hash.data, 32));
 			assert(queue.events[0]->payment_received.purpose.tag == LDKPaymentPurpose_InvoicePayment);
 			assert(!memcmp(queue.events[0]->payment_received.purpose.invoice_payment.payment_secret.data,
-					Invoice_payment_secret(invoice->contents.result).data, 32));
+					Invoice_payment_secret(invoice->contents.result), 32));
 			assert(queue.events[0]->payment_received.amt == 5000);
 			memcpy(payment_preimage.data, queue.events[0]->payment_received.purpose.invoice_payment.payment_preimage.data, 32);
 			assert(ChannelManager_claim_funds(&cm2, payment_preimage));
@@ -784,7 +800,7 @@ int main() {
 	assert(!close_res->result_ok); // Note that we can't close while disconnected!
 
 	// Open a connection!
-	LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), NetGraphMsgHandler_as_RoutingMessageHandler(&net_graph1));
+	LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), NetGraphMsgHandler_as_RoutingMessageHandler(&graph_msg_handler1));
 	random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
 
 	LDKPublicKey chan_2_node_id = ChannelManager_get_our_node_id(&cm2);
@@ -801,7 +817,7 @@ int main() {
 	};
 	LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, &random_bytes.data, logger1, std::move(custom_msg_handler1));
 
-	LDK::MessageHandler msg_handler2 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm2), NetGraphMsgHandler_as_RoutingMessageHandler(&net_graph2));
+	LDK::MessageHandler msg_handler2 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm2), NetGraphMsgHandler_as_RoutingMessageHandler(&graph_msg_handler2));
 	CustomMsgQueue peer_2_custom_messages;
 	LDKCustomMessageHandler custom_msg_handler2 = {
 		.this_arg = &peer_2_custom_messages,
@@ -826,6 +842,81 @@ int main() {
 			break;
 		}
 	}
+
+	// Send another payment, this time via the InvoicePayer
+	struct CustomRouteFinderParams router_params = {
+		.logger = &logger1,
+		.graph_ref = &net_graph1,
+	};
+	LDKRouter sending_router = {
+		.this_arg = &router_params,
+		.find_route = custom_find_route,
+		.free = NULL,
+	};
+	LDK::Scorer scorer = Scorer_default();
+	LDK::LockableScore scorer_mtx = LockableScore_new(Scorer_as_Score(&scorer));
+	EventQueue queue1;
+	LDKEventHandler handler1 = { .this_arg = &queue1, .handle_event = handle_event, .free = NULL };
+	LDK::InvoicePayer payer = InvoicePayer_new(ChannelManager_as_Payer(&cm1), sending_router, &scorer_mtx, logger1, handler1, RetryAttempts_new(0));
+
+	LDK::CResult_InvoiceSignOrCreationErrorZ invoice_res2 = create_invoice_from_channelmanager(&cm2,
+		KeysManager_as_KeysInterface(&keys2),
+		LDKCurrency_Bitcoin, COption_u64Z_some(10000),
+		LDKStr {
+			.chars = (const uint8_t *)"Invoice 2 Description",
+			.len =             strlen("Invoice 2 Description"),
+			.chars_is_owned = false
+		});
+	assert(invoice_res2->result_ok);
+	const LDKInvoice *invoice2 = invoice_res2->contents.result;
+	LDK::CResult_PaymentIdPaymentErrorZ invoice_pay_res = InvoicePayer_pay_invoice(&payer, invoice2);
+	assert(invoice_pay_res->result_ok);
+	PeerManager_process_events(&net1);
+
+	// Check that we received the payment!
+	while (true) {
+		EventQueue queue2;
+		LDKEventHandler handler2 = { .this_arg = &queue2, .handle_event = handle_event, .free = NULL };
+		LDK::EventsProvider ev2 = ChannelManager_as_EventsProvider(&cm2);
+		ev2.process_pending_events(handler2);
+		if (queue2.events.size() == 1) {
+			assert(queue2.events[0]->tag == LDKEvent_PendingHTLCsForwardable);
+			break;
+		}
+		std::this_thread::yield();
+	}
+	ChannelManager_process_pending_htlc_forwards(&cm2);
+	PeerManager_process_events(&net2);
+
+	while (true) {
+		EventQueue queue2;
+		LDKEventHandler handler2 = { .this_arg = &queue2, .handle_event = handle_event, .free = NULL };
+		LDK::EventsProvider ev2 = ChannelManager_as_EventsProvider(&cm2);
+		ev2.process_pending_events(handler2);
+		if (queue2.events.size() == 1) {
+			assert(queue2.events[0]->tag == LDKEvent_PaymentReceived);
+			const struct LDKEvent_LDKPaymentReceived_Body *event_data = &queue2.events[0]->payment_received;
+			assert(!memcmp(event_data->payment_hash.data, Invoice_payment_hash(invoice2), 32));
+			assert(event_data->purpose.tag == LDKPaymentPurpose_InvoicePayment);
+			assert(!memcmp(event_data->purpose.invoice_payment.payment_secret.data,
+					Invoice_payment_secret(invoice2), 32));
+			assert(event_data->amt == 10000);
+			assert(ChannelManager_claim_funds(&cm2, event_data->purpose.invoice_payment.payment_preimage));
+			break;
+		}
+		std::this_thread::yield();
+	}
+
+	while (queue1.events.size() == 0) {
+		PeerManager_process_events(&net2);
+		PeerManager_process_events(&net1);
+
+		LDK::EventsProvider ev1 = ChannelManager_as_EventsProvider(&cm1);
+		LDK::EventHandler evh1 = InvoicePayer_as_EventHandler(&payer);
+		ev1.process_pending_events(std::move(evh1));
+	}
+	assert(queue1.events.size() == 1);
+	assert(queue1.events[0]->tag == LDKEvent_PaymentSent);
 
 	// Actually close the channel
 	num_txs_broadcasted = 0;

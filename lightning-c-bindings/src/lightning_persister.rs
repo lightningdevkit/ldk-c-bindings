@@ -25,7 +25,7 @@ use crate::c_types::*;
 }
 
 use lightning_persister::FilesystemPersister as nativeFilesystemPersisterImport;
-type nativeFilesystemPersister = nativeFilesystemPersisterImport;
+pub(crate) type nativeFilesystemPersister = nativeFilesystemPersisterImport;
 
 /// FilesystemPersister persists channel data on disk, where each channel's
 /// data is stored in a file named after its funding outpoint.
@@ -66,7 +66,7 @@ impl Drop for FilesystemPersister {
 pub extern "C" fn FilesystemPersister_free(this_obj: FilesystemPersister) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn FilesystemPersister_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn FilesystemPersister_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeFilesystemPersister); }
 }
 #[allow(unused)]
@@ -144,14 +144,15 @@ pub extern "C" fn FilesystemPersister_as_Persist(this_arg: &FilesystemPersister)
 }
 
 #[must_use]
-extern "C" fn FilesystemPersister_Persist_persist_new_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, monitor: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
-	let mut ret = <nativeFilesystemPersister as lightning::chain::chainmonitor::Persist<_>>::persist_new_channel(unsafe { &mut *(this_arg as *mut nativeFilesystemPersister) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, monitor.get_native_ref());
+extern "C" fn FilesystemPersister_Persist_persist_new_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, monitor: &crate::lightning::chain::channelmonitor::ChannelMonitor, mut _update_id: crate::lightning::chain::chainmonitor::MonitorUpdateId) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
+	let mut ret = <nativeFilesystemPersister as lightning::chain::chainmonitor::Persist<_>>::persist_new_channel(unsafe { &mut *(this_arg as *mut nativeFilesystemPersister) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, monitor.get_native_ref(), *unsafe { Box::from_raw(_update_id.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::ChannelMonitorUpdateErr::native_into(e) }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn FilesystemPersister_Persist_update_persisted_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, _update: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, monitor: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
-	let mut ret = <nativeFilesystemPersister as lightning::chain::chainmonitor::Persist<_>>::update_persisted_channel(unsafe { &mut *(this_arg as *mut nativeFilesystemPersister) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, _update.get_native_ref(), monitor.get_native_ref());
+extern "C" fn FilesystemPersister_Persist_update_persisted_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, _update: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, monitor: &crate::lightning::chain::channelmonitor::ChannelMonitor, mut _update_id: crate::lightning::chain::chainmonitor::MonitorUpdateId) -> crate::c_types::derived::CResult_NoneChannelMonitorUpdateErrZ {
+	let mut local__update = if _update.inner.is_null() { None } else { Some((* { _update.get_native_ref() }).clone()) };
+	let mut ret = <nativeFilesystemPersister as lightning::chain::chainmonitor::Persist<_>>::update_persisted_channel(unsafe { &mut *(this_arg as *mut nativeFilesystemPersister) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, &local__update, monitor.get_native_ref(), *unsafe { Box::from_raw(_update_id.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::ChannelMonitorUpdateErr::native_into(e) }).into() };
 	local_ret
 }

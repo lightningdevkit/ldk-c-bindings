@@ -128,7 +128,7 @@ BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
 function add_crate() {
 	pushd "$LIGHTNING_PATH/$1"
-	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check $3 -- -Zunstable-options --pretty=expanded > /tmp/$1-crate-source.txt
+	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check $3 -- -Zunpretty=expanded > /tmp/$1-crate-source.txt
 	popd
 	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 		sed -i".original" "1i\\

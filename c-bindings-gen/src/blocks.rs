@@ -733,17 +733,9 @@ pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generi
 		for (idx, generic) in generics.params.iter().enumerate() {
 			match generic {
 				syn::GenericParam::Type(type_param) => {
-					let mut printed_param = false;
-					for bound in type_param.bounds.iter() {
-						if let syn::TypeParamBound::Trait(trait_bound) = bound {
-							assert_simple_bound(&trait_bound);
-							write!(w, "{}crate::{}", if idx != 0 { ", " } else { "" }, gen_types.maybe_resolve_ident(&type_param.ident).unwrap()).unwrap();
-							if printed_param {
-								unimplemented!("Can't print generic params that have multiple non-lifetime bounds");
-							}
-							printed_param = true;
-						}
-					}
+					write!(w, "{}", if idx != 0 { ", " } else { "" }).unwrap();
+					let type_ident = &type_param.ident;
+					types.write_c_type_in_generic_param(w, &syn::parse_quote!(#type_ident), Some(&gen_types), false);
 				},
 				syn::GenericParam::Lifetime(lt) => {
 					if concrete_lifetimes {
@@ -759,4 +751,20 @@ pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generi
 	}
 }
 
-
+pub fn maybe_write_lifetime_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generics, types: &TypeResolver) {
+	let mut gen_types = GenericTypes::new(None);
+	assert!(gen_types.learn_generics(generics, types));
+	if generics.params.iter().any(|param| if let syn::GenericParam::Lifetime(_) = param { true } else { false }) {
+		write!(w, "<").unwrap();
+		for (idx, generic) in generics.params.iter().enumerate() {
+			match generic {
+				syn::GenericParam::Type(_) => {},
+				syn::GenericParam::Lifetime(lt) => {
+					write!(w, "{}'{}", if idx != 0 { ", " } else { "" }, lt.lifetime.ident).unwrap();
+				},
+				_ => unimplemented!(),
+			}
+		}
+		write!(w, ">").unwrap();
+	}
+}

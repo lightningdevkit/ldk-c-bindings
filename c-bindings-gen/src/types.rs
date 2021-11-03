@@ -46,6 +46,10 @@ pub fn get_single_remaining_path_seg<'a, I: Iterator<Item=&'a syn::PathSegment>>
 	} else { None }
 }
 
+pub fn first_seg_is_stdlib(first_seg_str: &str) -> bool {
+	first_seg_str == "std" || first_seg_str == "core" || first_seg_str == "alloc"
+}
+
 pub fn single_ident_generic_path_to_ident(p: &syn::Path) -> Option<&syn::Ident> {
 	if p.segments.len() == 1 {
 		Some(&p.segments.iter().next().unwrap().ident)
@@ -313,23 +317,6 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 		}
 	}
 
-	/// Attempt to resolve an Ident as a generic parameter and return the full path.
-	pub fn maybe_resolve_ident<'b>(&'b self, ident: &syn::Ident) -> Option<&'b String> {
-		if let Some(ty) = &self.self_ty {
-			if format!("{}", ident) == "Self" {
-				return Some(&ty);
-			}
-		}
-		if let Some(res) = self.typed_generics.get(ident) {
-			return Some(res);
-		}
-		if let Some(parent) = self.parent {
-			parent.maybe_resolve_ident(ident)
-		} else {
-			None
-		}
-	}
-
 	/// Attempt to resolve a Path as a generic parameter and return the full path. as both a string
 	/// and syn::Path.
 	pub fn maybe_resolve_path<'b>(&'b self, path: &syn::Path) -> Option<&'b String> {
@@ -384,8 +371,8 @@ impl<'a, 'b, 'c: 'a + 'b> ResolveType<'c> for Option<&GenericTypes<'a, 'b>> {
 				}
 				_ => {},
 			}
-		}
-		ty
+			us.parent.resolve_type(ty)
+		} else { ty }
 	}
 }
 
@@ -394,9 +381,9 @@ impl<'a, 'b, 'c: 'a + 'b> ResolveType<'c> for Option<&GenericTypes<'a, 'b>> {
 pub enum DeclType<'a> {
 	MirroredEnum,
 	Trait(&'a syn::ItemTrait),
-	StructImported,
+	StructImported { generic_param_count: usize },
 	StructIgnored,
-	EnumIgnored,
+	EnumIgnored { generic_param_count: usize },
 }
 
 pub struct ImportResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
@@ -423,6 +410,10 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 					for module in super_mod.split("::") {
 						path.push(syn::PathSegment { ident: syn::Ident::new(module, Span::call_site()), arguments: syn::PathArguments::None });
 					}
+				} else if partial_path == "" && format!("{}", $ident) == "crate" {
+					new_path = format!("{}{}", crate_name, $path_suffix);
+					let crate_name_ident = format_ident!("{}", crate_name);
+					path.push(parse_quote!(#crate_name_ident));
 				} else if partial_path == "" && !dependencies.contains(&$ident) {
 					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
 					let crate_name_ident = format_ident!("{}", crate_name);
@@ -504,7 +495,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				syn::Item::Struct(s) => {
 					if let syn::Visibility::Public(_) = s.vis {
 						match export_status(&s.attrs) {
-							ExportStatus::Export => { declared.insert(s.ident.clone(), DeclType::StructImported); },
+							ExportStatus::Export => { declared.insert(s.ident.clone(), DeclType::StructImported { generic_param_count: s.generics.params.len() }); },
 							ExportStatus::NoExport => { declared.insert(s.ident.clone(), DeclType::StructIgnored); },
 							ExportStatus::TestOnly => continue,
 							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
@@ -519,14 +510,14 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 							else { process_alias = false; }
 						}
 						if process_alias {
-							declared.insert(t.ident.clone(), DeclType::StructImported);
+							declared.insert(t.ident.clone(), DeclType::StructImported { generic_param_count: t.generics.params.len() });
 						}
 					}
 				},
 				syn::Item::Enum(e) => {
 					if let syn::Visibility::Public(_) = e.vis {
 						match export_status(&e.attrs) {
-							ExportStatus::Export if is_enum_opaque(e) => { declared.insert(e.ident.clone(), DeclType::EnumIgnored); },
+							ExportStatus::Export if is_enum_opaque(e) => { declared.insert(e.ident.clone(), DeclType::EnumIgnored { generic_param_count: e.generics.params.len() }); },
 							ExportStatus::Export => { declared.insert(e.ident.clone(), DeclType::MirroredEnum); },
 							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 							_ => continue,
@@ -617,7 +608,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				}
 			} else if let Some(_) = self.priv_modules.get(&first_seg.ident) {
 				Some(format!("{}::{}{}", self.module_path, first_seg.ident, remaining))
-			} else if first_seg_str == "std" || first_seg_str == "core" || self.dependencies.contains(&first_seg.ident) {
+			} else if first_seg_is_stdlib(&first_seg_str) || self.dependencies.contains(&first_seg.ident) {
 				Some(first_seg_str + &remaining)
 			} else { None }
 		}
@@ -737,7 +728,7 @@ fn initial_clonable_types() -> HashSet<String> {
 pub struct CrateTypes<'a> {
 	/// This may contain structs or enums, but only when either is mapped as
 	/// struct X { inner: *mut originalX, .. }
-	pub opaques: HashMap<String, &'a syn::Ident>,
+	pub opaques: HashMap<String, (&'a syn::Ident, &'a syn::Generics)>,
 	/// Enums which are mapped as C enums with conversion functions
 	pub mirrored_enums: HashMap<String, &'a syn::ItemEnum>,
 	/// Traits which are mapped as a pointer + jump table
@@ -919,11 +910,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::PaymentHash" if is_ref => Some("*const [u8; 32]"),
-			"lightning::ln::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::PaymentPreimage" if is_ref => Some("*const [u8; 32]"),
-			"lightning::ln::PaymentPreimage" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::PaymentSecret" => Some("crate::c_types::ThirtyTwoBytes"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if is_ref => Some("*const [u8; 32]"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some("*const std::os::raw::c_char"),
@@ -1010,7 +1000,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentHash" if is_ref => Some("&::lightning::ln::PaymentHash(unsafe { *"),
 			"lightning::ln::PaymentPreimage" if !is_ref => Some("::lightning::ln::PaymentPreimage("),
 			"lightning::ln::PaymentPreimage" if is_ref => Some("&::lightning::ln::PaymentPreimage(unsafe { *"),
-			"lightning::ln::PaymentSecret" => Some("::lightning::ln::PaymentSecret("),
+			"lightning::ln::PaymentSecret" if !is_ref => Some("::lightning::ln::PaymentSecret("),
+			"lightning::ln::channelmanager::PaymentId" if !is_ref => Some("::lightning::ln::channelmanager::PaymentId("),
+			"lightning::ln::channelmanager::PaymentId" if is_ref=> Some("&::lightning::ln::channelmanager::PaymentId( unsafe { *"),
 
 			// List of traits we map (possibly during processing of other files):
 			"crate::util::logger::Logger" => Some(""),
@@ -1077,11 +1069,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if is_ref => Some(" }[..]).unwrap()"),
 			"bitcoin::hash_types::Txid" => Some(".data[..]).unwrap()"),
 			"bitcoin::hash_types::BlockHash" if !is_ref => Some(".data[..]).unwrap()"),
-			"lightning::ln::PaymentHash" if !is_ref => Some(".data)"),
-			"lightning::ln::PaymentHash" if is_ref => Some(" })"),
-			"lightning::ln::PaymentPreimage" if !is_ref => Some(".data)"),
-			"lightning::ln::PaymentPreimage" if is_ref => Some(" })"),
-			"lightning::ln::PaymentSecret" => Some(".data)"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if !is_ref => Some(".data)"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if is_ref => Some(" })"),
 
 			// List of traits we map (possibly during processing of other files):
 			"crate::util::logger::Logger" => Some(""),
@@ -1169,11 +1160,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"lightning::ln::PaymentHash" if is_ref => Some("&"),
-			"lightning::ln::PaymentHash" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"lightning::ln::PaymentPreimage" if is_ref => Some("&"),
-			"lightning::ln::PaymentPreimage" => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"lightning::ln::PaymentSecret" => Some("crate::c_types::ThirtyTwoBytes { data: "),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if is_ref => Some("&"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some("local_"),
@@ -1242,11 +1232,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some(".into_inner() }"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
-			"lightning::ln::PaymentHash" if is_ref => Some(".0"),
-			"lightning::ln::PaymentHash" => Some(".0 }"),
-			"lightning::ln::PaymentPreimage" if is_ref => Some(".0"),
-			"lightning::ln::PaymentPreimage" => Some(".0 }"),
-			"lightning::ln::PaymentSecret" => Some(".0 }"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if is_ref => Some(".0"),
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+				if !is_ref => Some(".0 }"),
 
 			// Override the default since Records contain an fmt with a lifetime:
 			"lightning::util::logger::Record" => Some(".as_ptr()"),
@@ -1350,7 +1339,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Slice" => {
-				Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
+				if let Some(syn::Type::Reference(_)) = single_contained {
+					Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "(*item)".to_string())], "); }", ContainerPrefixLocation::PerConv))
+				} else {
+					Some(("Vec::new(); for item in ", vec![(format!(".iter() {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
+				}
 			},
 			"Option" => {
 				let contained_struct = if let Some(syn::Type::Path(p)) = single_contained {
@@ -1386,6 +1379,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					}
 				}
 				if let Some(t) = single_contained {
+					if let syn::Type::Reference(syn::TypeReference { elem, .. }) = t {
+						if let syn::Type::Slice(_) = &**elem {
+							return Some(("if ", vec![
+									(".is_none() { SmartPtr::null() } else { SmartPtr::from_obj(".to_string(),
+									 format!("({}.unwrap())", var_access))
+								], ") }", ContainerPrefixLocation::PerConv));
+						}
+					}
 					let mut v = Vec::new();
 					self.write_empty_rust_val(generics, &mut v, t);
 					let s = String::from_utf8(v).unwrap();
@@ -1856,8 +1857,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					}
 				} else if let Some(c_type) = path_lookup(&resolved_path, is_ref, ptr_for_ref) {
 					write!(w, "{}", c_type).unwrap();
-				} else if self.crate_types.opaques.get(&resolved_path).is_some() {
-					decl_lookup(w, &DeclType::StructImported, &resolved_path, is_ref, is_mut);
+				} else if let Some((_, generics)) = self.crate_types.opaques.get(&resolved_path) {
+					decl_lookup(w, &DeclType::StructImported { generic_param_count: generics.params.len() }, &resolved_path, is_ref, is_mut);
 				} else if self.crate_types.mirrored_enums.get(&resolved_path).is_some() {
 					decl_lookup(w, &DeclType::MirroredEnum, &resolved_path, is_ref, is_mut);
 				} else if let Some(t) = self.crate_types.traits.get(&resolved_path) {
@@ -1944,15 +1945,17 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						DeclType::MirroredEnum if is_ref && ptr_for_ref => write!(w, "crate::{}::from_native(", decl_path).unwrap(),
 						DeclType::MirroredEnum if is_ref => write!(w, "&crate::{}::from_native(", decl_path).unwrap(),
 						DeclType::MirroredEnum => write!(w, "crate::{}::native_into(", decl_path).unwrap(),
-						DeclType::EnumIgnored|DeclType::StructImported if is_ref && ptr_for_ref && from_ptr =>
-							write!(w, "crate::{} {{ inner: unsafe {{ (", decl_path).unwrap(),
-						DeclType::EnumIgnored|DeclType::StructImported if is_ref => {
+						DeclType::EnumIgnored {..}|DeclType::StructImported {..} if is_ref && from_ptr => {
+							if !ptr_for_ref { write!(w, "&").unwrap(); }
+							write!(w, "crate::{} {{ inner: unsafe {{ (", decl_path).unwrap()
+						},
+						DeclType::EnumIgnored {..}|DeclType::StructImported {..} if is_ref => {
 							if !ptr_for_ref { write!(w, "&").unwrap(); }
 							write!(w, "crate::{} {{ inner: unsafe {{ ObjOps::nonnull_ptr_to_inner((", decl_path).unwrap()
 						},
-						DeclType::EnumIgnored|DeclType::StructImported if !is_ref && from_ptr =>
+						DeclType::EnumIgnored {..}|DeclType::StructImported {..} if !is_ref && from_ptr =>
 							write!(w, "crate::{} {{ inner: ", decl_path).unwrap(),
-						DeclType::EnumIgnored|DeclType::StructImported if !is_ref =>
+						DeclType::EnumIgnored {..}|DeclType::StructImported {..} if !is_ref =>
 							write!(w, "crate::{} {{ inner: ObjOps::heap_alloc(", decl_path).unwrap(),
 						DeclType::Trait(_) if is_ref => write!(w, "").unwrap(),
 						DeclType::Trait(_) if !is_ref => write!(w, "Into::into(").unwrap(),
@@ -1966,15 +1969,20 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	fn write_to_c_conversion_inline_suffix_inner<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, ptr_for_ref: bool, from_ptr: bool) {
 		self.write_conversion_inline_intern(w, t, generics, is_ref, false, ptr_for_ref, "*/", false, |_, _| ".into()".to_owned(),
 				|a, b, c| self.to_c_conversion_inline_suffix_from_path(a, b, c),
-				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
+				|w, decl_type, full_path, is_ref, _is_mut| match decl_type {
 					DeclType::MirroredEnum => write!(w, ")").unwrap(),
-					DeclType::EnumIgnored|DeclType::StructImported if is_ref && ptr_for_ref && from_ptr =>
-						write!(w, " as *const _) as *mut _ }}, is_owned: false }}").unwrap(),
-					DeclType::EnumIgnored|DeclType::StructImported if is_ref =>
-						write!(w, " as *const _) as *mut _) }}, is_owned: false }}").unwrap(),
-					DeclType::EnumIgnored|DeclType::StructImported if !is_ref && from_ptr =>
+					DeclType::EnumIgnored { generic_param_count }|DeclType::StructImported { generic_param_count } if is_ref => {
+						write!(w, " as *const {}<", full_path).unwrap();
+						for _ in 0..*generic_param_count { write!(w, "_, ").unwrap(); }
+						if from_ptr {
+							write!(w, ">) as *mut _ }}, is_owned: false }}").unwrap();
+						} else {
+							write!(w, ">) as *mut _) }}, is_owned: false }}").unwrap();
+						}
+					},
+					DeclType::EnumIgnored {..}|DeclType::StructImported {..} if !is_ref && from_ptr =>
 						write!(w, ", is_owned: true }}").unwrap(),
-					DeclType::EnumIgnored|DeclType::StructImported if !is_ref => write!(w, "), is_owned: true }}").unwrap(),
+					DeclType::EnumIgnored {..}|DeclType::StructImported {..} if !is_ref => write!(w, "), is_owned: true }}").unwrap(),
 					DeclType::Trait(_) if is_ref => {},
 					DeclType::Trait(_) => {
 						// This is used when we're converting a concrete Rust type into a C trait
@@ -1994,8 +2002,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		self.write_conversion_inline_intern(w, t, generics, is_ref, false, false, "() /*", true, |_, _| "&local_".to_owned(),
 				|a, b, _c| self.from_c_conversion_prefix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
-					DeclType::StructImported if is_ref => write!(w, "").unwrap(),
-					DeclType::StructImported if !is_ref => write!(w, "*unsafe {{ Box::from_raw(").unwrap(),
+					DeclType::StructImported {..} if is_ref => write!(w, "").unwrap(),
+					DeclType::StructImported {..} if !is_ref => write!(w, "*unsafe {{ Box::from_raw(").unwrap(),
 					DeclType::MirroredEnum if is_ref => write!(w, "&").unwrap(),
 					DeclType::MirroredEnum => {},
 					DeclType::Trait(_) => {},
@@ -2015,10 +2023,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				},
 				|a, b, _c| self.from_c_conversion_suffix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, is_mut| match decl_type {
-					DeclType::StructImported if is_ref && ptr_for_ref => write!(w, "XXX unimplemented").unwrap(),
-					DeclType::StructImported if is_mut && is_ref => write!(w, ".get_native_mut_ref()").unwrap(),
-					DeclType::StructImported if is_ref => write!(w, ".get_native_ref()").unwrap(),
-					DeclType::StructImported if !is_ref => write!(w, ".take_inner()) }}").unwrap(),
+					DeclType::StructImported {..} if is_ref && ptr_for_ref => write!(w, "XXX unimplemented").unwrap(),
+					DeclType::StructImported {..} if is_mut && is_ref => write!(w, ".get_native_mut_ref()").unwrap(),
+					DeclType::StructImported {..} if is_ref => write!(w, ".get_native_ref()").unwrap(),
+					DeclType::StructImported {..} if !is_ref => write!(w, ".take_inner()) }}").unwrap(),
 					DeclType::MirroredEnum if is_ref => write!(w, ".to_native()").unwrap(),
 					DeclType::MirroredEnum => write!(w, ".into_native()").unwrap(),
 					DeclType::Trait(_) => {},
@@ -2038,7 +2046,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					} else { None }
 				},
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
-					DeclType::StructImported if !is_ref => write!(w, "").unwrap(),
+					DeclType::StructImported {..} if !is_ref => write!(w, "").unwrap(),
 					_ => unimplemented!(),
 				});
 	}
@@ -2052,7 +2060,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				},
 				|a, b, _c| self.from_c_conversion_suffix_from_path(a, b),
 				|w, decl_type, _full_path, is_ref, _is_mut| match decl_type {
-					DeclType::StructImported if !is_ref => write!(w, ".get_native_ref()").unwrap(),
+					DeclType::StructImported {..} if !is_ref => write!(w, ".get_native_ref()").unwrap(),
 					_ => unimplemented!(),
 				});
 	}
@@ -2063,7 +2071,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		VP: Fn(&mut W, &syn::Type, Option<&GenericTypes>, bool, bool, bool),
 		VS: Fn(&mut W, &syn::Type, Option<&GenericTypes>, bool, bool, bool)>
 			(&self, w: &mut W, ident: &syn::Ident, var: &str, t: &syn::Type, generics: Option<&GenericTypes>,
-			 mut is_ref: bool, mut ptr_for_ref: bool, to_c: bool,
+			 mut is_ref: bool, mut ptr_for_ref: bool, to_c: bool, from_ownable_ref: bool,
 			 path_lookup: &LP, container_lookup: &LC, var_prefix: &VP, var_suffix: &VS) -> bool {
 
 		macro_rules! convert_container {
@@ -2110,7 +2118,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						// If the inner element contains an inner pointer, we will just use that,
 						// avoiding the need to map elements to references. Otherwise we'll need to
 						// do an extra mapping step.
-						needs_ref_map = !only_contained_has_inner;
+						needs_ref_map = !only_contained_has_inner && $container_type == "Option";
 					} else {
 						only_contained_type = Some(arg);
 						only_contained_type_nonref = Some(arg);
@@ -2119,7 +2127,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 				if let Some((prefix, conversions, suffix, prefix_location)) = container_lookup(&$container_type, is_ref && ty_has_inner, only_contained_type, ident, var) {
 					assert_eq!(conversions.len(), $args_len);
-					write!(w, "let mut local_{}{} = ", ident, if !to_c && needs_ref_map {"_base"} else { "" }).unwrap();
+					write!(w, "let mut local_{}{} = ", ident,
+						if (!to_c && needs_ref_map) || (to_c && $container_type == "Option" && contains_slice) {"_base"} else { "" }).unwrap();
 					if prefix_location == ContainerPrefixLocation::OutsideConv {
 						var_prefix(w, $args_iter().next().unwrap(), generics, is_ref, ptr_for_ref, true);
 					}
@@ -2135,7 +2144,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						write!(w, "{} {{ ", pfx).unwrap();
 						let new_var_name = format!("{}_{}", ident, idx);
 						let new_var = self.write_conversion_new_var_intern(w, &format_ident!("{}", new_var_name),
-								&var_access, conv_ty, generics, contains_slice || (is_ref && ty_has_inner), ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix);
+								&var_access, conv_ty, generics, contains_slice || (is_ref && ty_has_inner), ptr_for_ref,
+								to_c, from_ownable_ref, path_lookup, container_lookup, var_prefix, var_suffix);
 						if new_var { write!(w, " ").unwrap(); }
 
 						if prefix_location == ContainerPrefixLocation::PerConv {
@@ -2144,7 +2154,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							write!(w, "ObjOps::heap_alloc(").unwrap();
 						}
 
-						write!(w, "{}{}", if contains_slice { "local_" } else { "" }, if new_var { new_var_name } else { var_access }).unwrap();
+						write!(w, "{}{}", if contains_slice && !to_c { "local_" } else { "" }, if new_var { new_var_name } else { var_access }).unwrap();
 						if prefix_location == ContainerPrefixLocation::PerConv {
 							var_suffix(w, conv_ty, generics, is_ref && ty_has_inner, ptr_for_ref, false);
 						} else if !is_ref && !needs_ref_map && to_c && only_contained_has_inner {
@@ -2163,6 +2173,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							write!(w, ".map(|a| &a[..])").unwrap();
 						}
 						write!(w, ";").unwrap();
+					} else if to_c && $container_type == "Option" && contains_slice {
+						write!(w, " let mut local_{} = *local_{}_base;", ident, ident).unwrap();
 					}
 					return true;
 				}
@@ -2172,9 +2184,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		match generics.resolve_type(t) {
 			syn::Type::Reference(r) => {
 				if let syn::Type::Slice(_) = &*r.elem {
-					self.write_conversion_new_var_intern(w, ident, var, &*r.elem, generics, is_ref, ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix)
+					self.write_conversion_new_var_intern(w, ident, var, &*r.elem, generics, is_ref, ptr_for_ref, to_c, from_ownable_ref, path_lookup, container_lookup, var_prefix, var_suffix)
 				} else {
-					self.write_conversion_new_var_intern(w, ident, var, &*r.elem, generics, true, ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix)
+					self.write_conversion_new_var_intern(w, ident, var, &*r.elem, generics, true, ptr_for_ref, to_c, from_ownable_ref, path_lookup, container_lookup, var_prefix, var_suffix)
 				}
 			},
 			syn::Type::Path(p) => {
@@ -2183,7 +2195,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				}
 				let resolved_path = self.resolve_path(&p.path, generics);
 				if let Some(aliased_type) = self.crate_types.type_aliases.get(&resolved_path) {
-					return self.write_conversion_new_var_intern(w, ident, var, aliased_type, None, is_ref, ptr_for_ref, to_c, path_lookup, container_lookup, var_prefix, var_suffix);
+					return self.write_conversion_new_var_intern(w, ident, var, aliased_type, None, is_ref, ptr_for_ref, to_c, from_ownable_ref, path_lookup, container_lookup, var_prefix, var_suffix);
 				}
 				if self.is_known_container(&resolved_path, is_ref) || self.is_path_transparent_container(&p.path, generics, is_ref) {
 					if let syn::PathArguments::AngleBracketed(args) = &p.path.segments.iter().next().unwrap().arguments {
@@ -2220,7 +2232,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						true
 					} else { false }
 				} else if let syn::Type::Reference(ty) = &*s.elem {
-					let tyref = [&*ty.elem];
+					let tyref = if from_ownable_ref || !to_c { [&*ty.elem] } else { [&*s.elem] };
 					is_ref = true;
 					convert_container!("Slice", 1, || tyref.iter().map(|t| generics.resolve_type(*t)));
 					unimplemented!("convert_container should return true as container_lookup should succeed for slices");
@@ -2261,7 +2273,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							let v_name = format!("orig_{}_{}", ident, idx);
 							let tuple_elem_ident = format_ident!("{}", &v_name);
 							if self.write_conversion_new_var_intern(w, &tuple_elem_ident, &v_name, elem, generics,
-									false, ptr_for_ref, to_c,
+									false, ptr_for_ref, to_c, from_ownable_ref,
 									path_lookup, container_lookup, var_prefix, var_suffix) {
 								write!(w, " ").unwrap();
 								// Opaque types with inner pointers shouldn't ever create new stack
@@ -2311,8 +2323,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 
-	pub fn write_to_c_conversion_new_var_inner<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, var_access: &str, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool) -> bool {
-		self.write_conversion_new_var_intern(w, ident, var_access, t, generics, false, ptr_for_ref, true,
+	pub fn write_to_c_conversion_new_var_inner<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, var_access: &str, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool, from_ownable_ref: bool) -> bool {
+		self.write_conversion_new_var_intern(w, ident, var_access, t, generics, false, ptr_for_ref, true, from_ownable_ref,
 			&|a, b| self.to_c_conversion_new_var_from_path(a, b),
 			&|a, b, c, d, e| self.to_c_conversion_container_new_var(generics, a, b, c, d, e),
 			// We force ptr_for_ref here since we can't generate a ref on one line and use it later
@@ -2320,10 +2332,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			&|a, b, c, d, e, f| self.write_to_c_conversion_inline_suffix_inner(a, b, c, d, e, f))
 	}
 	pub fn write_to_c_conversion_new_var<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool) -> bool {
-		self.write_to_c_conversion_new_var_inner(w, ident, &format!("{}", ident), t, generics, ptr_for_ref)
+		self.write_to_c_conversion_new_var_inner(w, ident, &format!("{}", ident), t, generics, ptr_for_ref, false)
+	}
+	/// Prints new-var conversion for an "ownable_ref" type, ie prints conversion for
+	/// `create_ownable_reference(t)`, not `t` itself.
+	pub fn write_to_c_conversion_from_ownable_ref_new_var<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, t: &syn::Type, generics: Option<&GenericTypes>) -> bool {
+		self.write_to_c_conversion_new_var_inner(w, ident, &format!("{}", ident), t, generics, true, true)
 	}
 	pub fn write_from_c_conversion_new_var<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, t: &syn::Type, generics: Option<&GenericTypes>) -> bool {
-		self.write_conversion_new_var_intern(w, ident, &format!("{}", ident), t, generics, false, false, false,
+		self.write_conversion_new_var_intern(w, ident, &format!("{}", ident), t, generics, false, false, false, false,
 			&|a, b| self.from_c_conversion_new_var_from_path(a, b),
 			&|a, b, c, d, e| self.from_c_conversion_container_new_var(generics, a, b, c, d, e),
 			// We force ptr_for_ref here since we can't generate a ref on one line and use it later
@@ -2343,7 +2360,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			if let syn::Type::Reference(r_arg) = t {
 				assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
 
-				if !self.write_c_type_intern(w, &*r_arg.elem, generics, false, false, false) { return false; }
+				if !self.write_c_type_intern(w, &*r_arg.elem, generics, false, false, false, false) { return false; }
 
 				// While write_c_type_intern, above is correct, we don't want to blindly convert a
 				// reference to something stupid, so check that the container is either opaque or a
@@ -2361,10 +2378,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				} else {
 					assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
 				}
-				if !self.write_c_type_intern(w, t, generics, false, false, false) { return false; }
+				if !self.write_c_type_intern(w, t, generics, false, false, false, false) { return false; }
 			} else {
 				assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
-				if !self.write_c_type_intern(w, t, generics, false, false, false) { return false; }
+				if !self.write_c_type_intern(w, t, generics, false, false, false, false) { return false; }
 			}
 		}
 		true
@@ -2463,13 +2480,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						if self.is_transparent_container(ident, is_ref, args.iter().map(|a| *a), generics) {
 							if !in_type {
 								if self.c_type_has_inner_from_path(&subtype) {
-									if !self.write_c_path_intern(w, &$p_arg.path, generics, is_ref, is_mut, ptr_for_ref) { return false; }
+									if !self.write_c_path_intern(w, &$p_arg.path, generics, is_ref, is_mut, ptr_for_ref, false) { return false; }
 								} else {
 									if let Some(arr_ty) = self.is_real_type_array(&subtype) {
-										if !self.write_c_type_intern(w, &arr_ty, generics, false, true, false) { return false; }
+										if !self.write_c_type_intern(w, &arr_ty, generics, false, true, false, false) { return false; }
 									} else {
 										// Option<T> needs to be converted to a *mut T, ie mut ptr-for-ref
-										if !self.write_c_path_intern(w, &$p_arg.path, generics, true, true, true) { return false; }
+										if !self.write_c_path_intern(w, &$p_arg.path, generics, true, true, true, false) { return false; }
 									}
 								}
 							} else {
@@ -2586,7 +2603,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	// *** C Type Equivalent Printing ***
 	// **********************************
 
-	fn write_c_path_intern<W: std::io::Write>(&self, w: &mut W, path: &syn::Path, generics: Option<&GenericTypes>, is_ref: bool, is_mut: bool, ptr_for_ref: bool) -> bool {
+	fn write_c_path_intern<W: std::io::Write>(&self, w: &mut W, path: &syn::Path, generics: Option<&GenericTypes>, is_ref: bool, is_mut: bool, ptr_for_ref: bool, with_ref_lifetime: bool) -> bool {
 		let full_path = match self.maybe_resolve_path(&path, generics) {
 			Some(path) => path, None => return false };
 		if let Some(c_type) = self.c_type_from_path(&full_path, is_ref, ptr_for_ref) {
@@ -2596,6 +2613,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			if is_ref && ptr_for_ref {
 				write!(w, "*{} crate::{}", if is_mut { "mut" } else { "const" }, full_path).unwrap();
 			} else if is_ref {
+				if with_ref_lifetime { unimplemented!(); }
 				write!(w, "&{}crate::{}", if is_mut { "mut " } else { "" }, full_path).unwrap();
 			} else {
 				write!(w, "crate::{}", full_path).unwrap();
@@ -2608,6 +2626,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// the actual object itself (for opaque types we'll set the pointer to the actual
 				// type and note that its a reference).
 				write!(w, "crate::{}", full_path).unwrap();
+			} else if is_ref && with_ref_lifetime {
+				assert!(!is_mut);
+				// If we're concretizing something with a lifetime parameter, we have to pick a
+				// lifetime, of which the only real available choice is `static`, obviously.
+				write!(w, "&'static ").unwrap();
+				self.write_rust_path(w, generics, path);
 			} else if is_ref {
 				write!(w, "&{}crate::{}", if is_mut { "mut " } else { "" }, full_path).unwrap();
 			} else {
@@ -2618,7 +2642,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			false
 		}
 	}
-	fn write_c_type_intern<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, is_mut: bool, ptr_for_ref: bool) -> bool {
+	fn write_c_type_intern<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, is_ref: bool, is_mut: bool, ptr_for_ref: bool, with_ref_lifetime: bool) -> bool {
 		match generics.resolve_type(t) {
 			syn::Type::Path(p) => {
 				if p.qself.is_some() {
@@ -2629,24 +2653,24 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						return self.write_c_mangled_container_path(w, Self::path_to_generic_args(&p.path), generics, &full_path, is_ref, is_mut, ptr_for_ref);
 					}
 					if let Some(aliased_type) = self.crate_types.type_aliases.get(&full_path).cloned() {
-						return self.write_c_type_intern(w, &aliased_type, None, is_ref, is_mut, ptr_for_ref);
+						return self.write_c_type_intern(w, &aliased_type, None, is_ref, is_mut, ptr_for_ref, with_ref_lifetime);
 					}
 				}
-				self.write_c_path_intern(w, &p.path, generics, is_ref, is_mut, ptr_for_ref)
+				self.write_c_path_intern(w, &p.path, generics, is_ref, is_mut, ptr_for_ref, with_ref_lifetime)
 			},
 			syn::Type::Reference(r) => {
-				self.write_c_type_intern(w, &*r.elem, generics, true, r.mutability.is_some(), ptr_for_ref)
+				self.write_c_type_intern(w, &*r.elem, generics, true, r.mutability.is_some(), ptr_for_ref, with_ref_lifetime)
 			},
 			syn::Type::Array(a) => {
 				if is_ref && is_mut {
 					write!(w, "*mut [").unwrap();
-					if !self.write_c_type_intern(w, &a.elem, generics, false, false, ptr_for_ref) { return false; }
+					if !self.write_c_type_intern(w, &a.elem, generics, false, false, ptr_for_ref, with_ref_lifetime) { return false; }
 				} else if is_ref {
 					write!(w, "*const [").unwrap();
-					if !self.write_c_type_intern(w, &a.elem, generics, false, false, ptr_for_ref) { return false; }
+					if !self.write_c_type_intern(w, &a.elem, generics, false, false, ptr_for_ref, with_ref_lifetime) { return false; }
 				} else {
 					let mut typecheck = Vec::new();
-					if !self.write_c_type_intern(&mut typecheck, &a.elem, generics, false, false, ptr_for_ref) { return false; }
+					if !self.write_c_type_intern(&mut typecheck, &a.elem, generics, false, false, ptr_for_ref, with_ref_lifetime) { return false; }
 					if typecheck[..] != ['u' as u8, '8' as u8] { return false; }
 				}
 				if let syn::Expr::Lit(l) = &a.len {
@@ -2675,7 +2699,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					if let syn::Type::Path(p) = &*r.elem {
 						// Slices with "real types" inside are mapped as the equivalent non-ref Vec
 						let resolved = self.resolve_path(&p.path, generics);
-						let mangled_container = if let Some(ident) = self.crate_types.opaques.get(&resolved) {
+						let mangled_container = if let Some((ident, _)) = self.crate_types.opaques.get(&resolved) {
 							format!("CVec_{}Z", ident)
 						} else if let Some(en) = self.crate_types.mirrored_enums.get(&resolved) {
 							format!("CVec_{}Z", en.ident)
@@ -2689,7 +2713,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							if let syn::Type::Path(p) = &*r2.elem {
 								// Slices with slices with opaque types (with is_owned flags) are mapped as non-ref Vecs
 								let resolved = self.resolve_path(&p.path, generics);
-								let mangled_container = if let Some(ident) = self.crate_types.opaques.get(&resolved) {
+								let mangled_container = if let Some((ident, _)) = self.crate_types.opaques.get(&resolved) {
 									format!("CVec_CVec_{}ZZ", ident)
 								} else { return false; };
 								write!(w, "{}::{}", Self::generated_container_path(), mangled_container).unwrap();
@@ -2704,7 +2728,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					args.push(syn::GenericArgument::Type((*s.elem).clone()));
 					let mut segments = syn::punctuated::Punctuated::new();
 					segments.push(parse_quote!(Vec<#args>));
-					self.write_c_type_intern(w, &syn::Type::Path(syn::TypePath { qself: None, path: syn::Path { leading_colon: None, segments } }), generics, false, is_mut, ptr_for_ref)
+					self.write_c_type_intern(w, &syn::Type::Path(syn::TypePath { qself: None, path: syn::Path { leading_colon: None, segments } }), generics, false, is_mut, ptr_for_ref, with_ref_lifetime)
 				} else { false }
 			},
 			syn::Type::Tuple(t) => {
@@ -2719,13 +2743,16 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 	pub fn write_c_type<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool) {
-		assert!(self.write_c_type_intern(w, t, generics, false, false, ptr_for_ref));
+		assert!(self.write_c_type_intern(w, t, generics, false, false, ptr_for_ref, false));
+	}
+	pub fn write_c_type_in_generic_param<W: std::io::Write>(&self, w: &mut W, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool) {
+		assert!(self.write_c_type_intern(w, t, generics, false, false, ptr_for_ref, true));
 	}
 	pub fn understood_c_path(&self, p: &syn::Path) -> bool {
 		if p.leading_colon.is_some() { return false; }
-		self.write_c_path_intern(&mut std::io::sink(), p, None, false, false, false)
+		self.write_c_path_intern(&mut std::io::sink(), p, None, false, false, false, false)
 	}
 	pub fn understood_c_type(&self, t: &syn::Type, generics: Option<&GenericTypes>) -> bool {
-		self.write_c_type_intern(&mut std::io::sink(), t, generics, false, false, false)
+		self.write_c_type_intern(&mut std::io::sink(), t, generics, false, false, false, false)
 	}
 }

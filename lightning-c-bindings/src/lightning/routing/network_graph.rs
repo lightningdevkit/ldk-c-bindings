@@ -16,7 +16,7 @@ use crate::c_types::*;
 
 
 use lightning::routing::network_graph::NodeId as nativeNodeIdImport;
-type nativeNodeId = nativeNodeIdImport;
+pub(crate) type nativeNodeId = nativeNodeIdImport;
 
 /// Represents the compressed public key of a node
 #[must_use]
@@ -46,7 +46,7 @@ impl Drop for NodeId {
 pub extern "C" fn NodeId_free(this_obj: NodeId) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn NodeId_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn NodeId_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeId); }
 }
 #[allow(unused)]
@@ -129,7 +129,7 @@ pub extern "C" fn NodeId_read(ser: crate::c_types::u8slice) -> crate::c_types::d
 }
 
 use lightning::routing::network_graph::NetworkGraph as nativeNetworkGraphImport;
-type nativeNetworkGraph = nativeNetworkGraphImport;
+pub(crate) type nativeNetworkGraph = nativeNetworkGraphImport;
 
 /// Represents the network as nodes and channels between them
 #[must_use]
@@ -159,7 +159,7 @@ impl Drop for NetworkGraph {
 pub extern "C" fn NetworkGraph_free(this_obj: NetworkGraph) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn NetworkGraph_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn NetworkGraph_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNetworkGraph); }
 }
 #[allow(unused)]
@@ -199,7 +199,7 @@ pub extern "C" fn NetworkGraph_clone(orig: &NetworkGraph) -> NetworkGraph {
 }
 
 use lightning::routing::network_graph::ReadOnlyNetworkGraph as nativeReadOnlyNetworkGraphImport;
-type nativeReadOnlyNetworkGraph = nativeReadOnlyNetworkGraphImport<'static>;
+pub(crate) type nativeReadOnlyNetworkGraph = nativeReadOnlyNetworkGraphImport<'static>;
 
 /// A read-only view of [`NetworkGraph`].
 #[must_use]
@@ -229,7 +229,7 @@ impl Drop for ReadOnlyNetworkGraph {
 pub extern "C" fn ReadOnlyNetworkGraph_free(this_obj: ReadOnlyNetworkGraph) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ReadOnlyNetworkGraph_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ReadOnlyNetworkGraph_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeReadOnlyNetworkGraph); }
 }
 #[allow(unused)]
@@ -445,7 +445,7 @@ extern "C" fn NetGraphMsgHandler_EventHandler_handle_event(this_arg: *const c_vo
 
 
 use lightning::routing::network_graph::NetGraphMsgHandler as nativeNetGraphMsgHandlerImport;
-type nativeNetGraphMsgHandler = nativeNetGraphMsgHandlerImport<crate::lightning::chain::Access, crate::lightning::util::logger::Logger>;
+pub(crate) type nativeNetGraphMsgHandler = nativeNetGraphMsgHandlerImport<&'static lightning::routing::network_graph::NetworkGraph, crate::lightning::chain::Access, crate::lightning::util::logger::Logger>;
 
 /// Receives and validates network updates from peers,
 /// stores authentic and relevant data as a network graph.
@@ -482,7 +482,7 @@ impl Drop for NetGraphMsgHandler {
 pub extern "C" fn NetGraphMsgHandler_free(this_obj: NetGraphMsgHandler) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn NetGraphMsgHandler_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn NetGraphMsgHandler_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNetGraphMsgHandler); }
 }
 #[allow(unused)]
@@ -501,17 +501,6 @@ impl NetGraphMsgHandler {
 		ret
 	}
 }
-/// Representation of the payment channel network
-#[no_mangle]
-pub extern "C" fn NetGraphMsgHandler_get_network_graph(this_ptr: &NetGraphMsgHandler) -> crate::lightning::routing::network_graph::NetworkGraph {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().network_graph;
-	crate::lightning::routing::network_graph::NetworkGraph { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
-}
-/// Representation of the payment channel network
-#[no_mangle]
-pub extern "C" fn NetGraphMsgHandler_set_network_graph(this_ptr: &mut NetGraphMsgHandler, mut val: crate::lightning::routing::network_graph::NetworkGraph) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.network_graph = *unsafe { Box::from_raw(val.take_inner()) };
-}
 /// Creates a new tracker of the actual state of the network of channels and nodes,
 /// assuming an existing Network Graph.
 /// Chain monitor is used to make sure announced channels exist on-chain,
@@ -519,9 +508,9 @@ pub extern "C" fn NetGraphMsgHandler_set_network_graph(this_ptr: &mut NetGraphMs
 /// channel owners' keys.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetGraphMsgHandler_new(mut network_graph: crate::lightning::routing::network_graph::NetworkGraph, mut chain_access: crate::c_types::derived::COption_AccessZ, mut logger: crate::lightning::util::logger::Logger) -> NetGraphMsgHandler {
+pub extern "C" fn NetGraphMsgHandler_new(network_graph: &crate::lightning::routing::network_graph::NetworkGraph, mut chain_access: crate::c_types::derived::COption_AccessZ, mut logger: crate::lightning::util::logger::Logger) -> NetGraphMsgHandler {
 	let mut local_chain_access = { /* chain_access*/ let chain_access_opt = chain_access; { } if chain_access_opt.is_none() { None } else { Some({ chain_access_opt.take() }) } };
-	let mut ret = lightning::routing::network_graph::NetGraphMsgHandler::new(*unsafe { Box::from_raw(network_graph.take_inner()) }, local_chain_access, logger);
+	let mut ret = lightning::routing::network_graph::NetGraphMsgHandler::new(network_graph.get_native_ref(), local_chain_access, logger);
 	NetGraphMsgHandler { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
@@ -658,7 +647,7 @@ extern "C" fn NetGraphMsgHandler_MessageSendEventsProvider_get_and_clear_pending
 
 
 use lightning::routing::network_graph::DirectionalChannelInfo as nativeDirectionalChannelInfoImport;
-type nativeDirectionalChannelInfo = nativeDirectionalChannelInfoImport;
+pub(crate) type nativeDirectionalChannelInfo = nativeDirectionalChannelInfoImport;
 
 /// Details about one direction of a channel. Received
 /// within a channel update.
@@ -689,7 +678,7 @@ impl Drop for DirectionalChannelInfo {
 pub extern "C" fn DirectionalChannelInfo_free(this_obj: DirectionalChannelInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn DirectionalChannelInfo_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn DirectionalChannelInfo_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDirectionalChannelInfo); }
 }
 #[allow(unused)]
@@ -771,7 +760,7 @@ pub extern "C" fn DirectionalChannelInfo_set_htlc_maximum_msat(this_ptr: &mut Di
 #[no_mangle]
 pub extern "C" fn DirectionalChannelInfo_get_fees(this_ptr: &DirectionalChannelInfo) -> crate::lightning::routing::network_graph::RoutingFees {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().fees;
-	crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::network_graph::RoutingFees<>) as *mut _) }, is_owned: false }
 }
 /// Fees charged when the channel is used for routing
 #[no_mangle]
@@ -787,7 +776,7 @@ pub extern "C" fn DirectionalChannelInfo_set_fees(this_ptr: &mut DirectionalChan
 #[no_mangle]
 pub extern "C" fn DirectionalChannelInfo_get_last_update_message(this_ptr: &DirectionalChannelInfo) -> crate::lightning::ln::msgs::ChannelUpdate {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().last_update_message;
-	let mut local_inner_val = crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::ChannelUpdate<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Most recent update for the channel received from the network
@@ -854,7 +843,7 @@ pub extern "C" fn DirectionalChannelInfo_read(ser: crate::c_types::u8slice) -> c
 }
 
 use lightning::routing::network_graph::ChannelInfo as nativeChannelInfoImport;
-type nativeChannelInfo = nativeChannelInfoImport;
+pub(crate) type nativeChannelInfo = nativeChannelInfoImport;
 
 /// Details about a channel (both directions).
 /// Received within a channel announcement.
@@ -885,7 +874,7 @@ impl Drop for ChannelInfo {
 pub extern "C" fn ChannelInfo_free(this_obj: ChannelInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn ChannelInfo_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn ChannelInfo_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelInfo); }
 }
 #[allow(unused)]
@@ -908,7 +897,7 @@ impl ChannelInfo {
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_features(this_ptr: &ChannelInfo) -> crate::lightning::ln::features::ChannelFeatures {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().features;
-	crate::lightning::ln::features::ChannelFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::ChannelFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::features::ChannelFeatures<>) as *mut _) }, is_owned: false }
 }
 /// Protocol features of a channel communicated during its announcement
 #[no_mangle]
@@ -919,7 +908,7 @@ pub extern "C" fn ChannelInfo_set_features(this_ptr: &mut ChannelInfo, mut val: 
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_node_one(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::NodeId {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_one;
-	crate::lightning::routing::network_graph::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::routing::network_graph::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::network_graph::NodeId<>) as *mut _) }, is_owned: false }
 }
 /// Source node of the first direction of a channel
 #[no_mangle]
@@ -932,7 +921,7 @@ pub extern "C" fn ChannelInfo_set_node_one(this_ptr: &mut ChannelInfo, mut val: 
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_one_to_two(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::DirectionalChannelInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().one_to_two;
-	let mut local_inner_val = crate::lightning::routing::network_graph::DirectionalChannelInfo { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::network_graph::DirectionalChannelInfo { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::DirectionalChannelInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Details about the first direction of a channel
@@ -947,7 +936,7 @@ pub extern "C" fn ChannelInfo_set_one_to_two(this_ptr: &mut ChannelInfo, mut val
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_node_two(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::NodeId {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_two;
-	crate::lightning::routing::network_graph::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::routing::network_graph::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::network_graph::NodeId<>) as *mut _) }, is_owned: false }
 }
 /// Source node of the second direction of a channel
 #[no_mangle]
@@ -960,7 +949,7 @@ pub extern "C" fn ChannelInfo_set_node_two(this_ptr: &mut ChannelInfo, mut val: 
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_two_to_one(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::DirectionalChannelInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().two_to_one;
-	let mut local_inner_val = crate::lightning::routing::network_graph::DirectionalChannelInfo { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::network_graph::DirectionalChannelInfo { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::DirectionalChannelInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Details about the second direction of a channel
@@ -993,7 +982,7 @@ pub extern "C" fn ChannelInfo_set_capacity_sats(this_ptr: &mut ChannelInfo, mut 
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_announcement_message(this_ptr: &ChannelInfo) -> crate::lightning::ln::msgs::ChannelAnnouncement {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().announcement_message;
-	let mut local_inner_val = crate::lightning::ln::msgs::ChannelAnnouncement { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::msgs::ChannelAnnouncement { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::ChannelAnnouncement<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// An initial announcement of the channel
@@ -1062,7 +1051,7 @@ pub extern "C" fn ChannelInfo_read(ser: crate::c_types::u8slice) -> crate::c_typ
 }
 
 use lightning::routing::network_graph::RoutingFees as nativeRoutingFeesImport;
-type nativeRoutingFees = nativeRoutingFeesImport;
+pub(crate) type nativeRoutingFees = nativeRoutingFeesImport;
 
 /// Fees for routing via a given channel or a node
 #[must_use]
@@ -1092,7 +1081,7 @@ impl Drop for RoutingFees {
 pub extern "C" fn RoutingFees_free(this_obj: RoutingFees) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn RoutingFees_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn RoutingFees_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRoutingFees); }
 }
 #[allow(unused)]
@@ -1200,7 +1189,7 @@ pub extern "C" fn RoutingFees_read(ser: crate::c_types::u8slice) -> crate::c_typ
 }
 
 use lightning::routing::network_graph::NodeAnnouncementInfo as nativeNodeAnnouncementInfoImport;
-type nativeNodeAnnouncementInfo = nativeNodeAnnouncementInfoImport;
+pub(crate) type nativeNodeAnnouncementInfo = nativeNodeAnnouncementInfoImport;
 
 /// Information received in the latest node_announcement from this node.
 #[must_use]
@@ -1230,7 +1219,7 @@ impl Drop for NodeAnnouncementInfo {
 pub extern "C" fn NodeAnnouncementInfo_free(this_obj: NodeAnnouncementInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn NodeAnnouncementInfo_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn NodeAnnouncementInfo_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeAnnouncementInfo); }
 }
 #[allow(unused)]
@@ -1253,7 +1242,7 @@ impl NodeAnnouncementInfo {
 #[no_mangle]
 pub extern "C" fn NodeAnnouncementInfo_get_features(this_ptr: &NodeAnnouncementInfo) -> crate::lightning::ln::features::NodeFeatures {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().features;
-	crate::lightning::ln::features::NodeFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const _) as *mut _) }, is_owned: false }
+	crate::lightning::ln::features::NodeFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::features::NodeFeatures<>) as *mut _) }, is_owned: false }
 }
 /// Protocol features the node announced support for
 #[no_mangle]
@@ -1314,7 +1303,7 @@ pub extern "C" fn NodeAnnouncementInfo_set_addresses(this_ptr: &mut NodeAnnounce
 #[no_mangle]
 pub extern "C" fn NodeAnnouncementInfo_get_announcement_message(this_ptr: &NodeAnnouncementInfo) -> crate::lightning::ln::msgs::NodeAnnouncement {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().announcement_message;
-	let mut local_inner_val = crate::lightning::ln::msgs::NodeAnnouncement { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::msgs::NodeAnnouncement { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::NodeAnnouncement<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// An initial announcement of the node
@@ -1380,7 +1369,7 @@ pub extern "C" fn NodeAnnouncementInfo_read(ser: crate::c_types::u8slice) -> cra
 }
 
 use lightning::routing::network_graph::NodeInfo as nativeNodeInfoImport;
-type nativeNodeInfo = nativeNodeInfoImport;
+pub(crate) type nativeNodeInfo = nativeNodeInfoImport;
 
 /// Details about a node in the network, known from the network announcement.
 #[must_use]
@@ -1410,7 +1399,7 @@ impl Drop for NodeInfo {
 pub extern "C" fn NodeInfo_free(this_obj: NodeInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-extern "C" fn NodeInfo_free_void(this_ptr: *mut c_void) {
+pub(crate) extern "C" fn NodeInfo_free_void(this_ptr: *mut c_void) {
 	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeInfo); }
 }
 #[allow(unused)]
@@ -1443,7 +1432,7 @@ pub extern "C" fn NodeInfo_set_channels(this_ptr: &mut NodeInfo, mut val: crate:
 #[no_mangle]
 pub extern "C" fn NodeInfo_get_lowest_inbound_channel_fees(this_ptr: &NodeInfo) -> crate::lightning::routing::network_graph::RoutingFees {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().lowest_inbound_channel_fees;
-	let mut local_inner_val = crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::RoutingFees<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Lowest fees enabling routing via any of the enabled, known channels to a node.
@@ -1464,7 +1453,7 @@ pub extern "C" fn NodeInfo_set_lowest_inbound_channel_fees(this_ptr: &mut NodeIn
 #[no_mangle]
 pub extern "C" fn NodeInfo_get_announcement_info(this_ptr: &NodeInfo) -> crate::lightning::routing::network_graph::NodeAnnouncementInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().announcement_info;
-	let mut local_inner_val = crate::lightning::routing::network_graph::NodeAnnouncementInfo { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const _) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::network_graph::NodeAnnouncementInfo { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::NodeAnnouncementInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// More information about a node from node_announcement.

@@ -450,6 +450,13 @@ impl Into<Str> for &'static str {
 		Str { chars: self.as_ptr(), len: self.len(), chars_is_owned: false }
 	}
 }
+impl Into<Str> for &mut &'static str {
+	fn into(self) -> Str {
+		let us: &'static str = *self;
+		us.into()
+	}
+}
+
 impl Str {
 	pub(crate) fn into_str(&self) -> &'static str {
 		if self.len == 0 { return ""; }
@@ -605,5 +612,30 @@ pub(crate) mod ObjOps {
 			#[cfg(not(test_mod_pointers))]
 			ptr
 		}
+	}
+}
+
+pub(crate) struct SmartPtr<T> {
+	ptr: *mut T,
+}
+impl<T> SmartPtr<T> {
+	pub(crate) fn from_obj(o: T) -> Self {
+		Self { ptr: Box::into_raw(Box::new(o)) }
+	}
+	pub(crate) fn null() -> Self {
+		Self { ptr: std::ptr::null_mut() }
+	}
+}
+impl<T> Drop for SmartPtr<T> {
+	fn drop(&mut self) {
+		if self.ptr != std::ptr::null_mut() {
+			unsafe { Box::from_raw(self.ptr); }
+		}
+	}
+}
+impl<T> std::ops::Deref for SmartPtr<T> {
+	type Target = *mut T;
+	fn deref(&self) -> &*mut T {
+		&self.ptr
 	}
 }

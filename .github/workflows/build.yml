@@ -29,7 +29,10 @@ jobs:
       - name: Install cbindgen
         run: cargo install --force cbindgen
       - name: Checkout Rust-Lightning git
-        run: git clone https://github.com/rust-bitcoin/rust-lightning
+        run: |
+          git clone https://github.com/rust-bitcoin/rust-lightning
+          cd rust-lightning
+          git checkout 0.0.103-bindings
       - name: Rebuild bindings without std, and check the sample app builds + links
         run: ./genbindings.sh ./rust-lightning false
       - name: Rebuild bindings, and check the sample app builds + links
@@ -77,7 +80,10 @@ jobs:
       - name: Install cbindgen
         run: cargo install --force cbindgen
       - name: Checkout Rust-Lightning git
-        run: git clone https://github.com/rust-bitcoin/rust-lightning
+        run: |
+          git clone https://github.com/rust-bitcoin/rust-lightning
+          cd rust-lightning
+          git checkout 0.0.103-bindings
       - name: Rebuild bindings using Apple clang, and check the sample app builds + links
         run: ./genbindings.sh ./rust-lightning true
       - name: Rebuild bindings using upstream clang, and check the sample app builds + links

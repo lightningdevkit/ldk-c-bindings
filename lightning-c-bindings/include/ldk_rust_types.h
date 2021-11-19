@@ -241,6 +241,8 @@ struct nativeCommitmentUpdateOpaque;
 typedef struct nativeCommitmentUpdateOpaque LDKnativeCommitmentUpdate;
 struct nativeDefaultRouterOpaque;
 typedef struct nativeDefaultRouterOpaque LDKnativeDefaultRouter;
+struct nativeRecordOpaque;
+typedef struct nativeRecordOpaque LDKnativeRecord;
 struct nativeMonitorUpdateIdOpaque;
 typedef struct nativeMonitorUpdateIdOpaque LDKnativeMonitorUpdateId;
 struct nativeLockedChannelMonitorOpaque;

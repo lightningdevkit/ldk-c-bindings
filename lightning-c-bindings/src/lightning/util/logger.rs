@@ -126,6 +126,132 @@ pub extern "C" fn Level_max() -> crate::lightning::util::logger::Level {
 	crate::lightning::util::logger::Level::native_into(ret)
 }
 
+
+use lightning::util::logger::Record as nativeRecordImport;
+pub(crate) type nativeRecord = nativeRecordImport<'static>;
+
+/// A Record, unit of logging output with Metadata to enable filtering
+/// Module_path, file, line to inform on log's source
+#[must_use]
+#[repr(C)]
+pub struct Record {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeRecord,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for Record {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeRecord>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the Record, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn Record_free(this_obj: Record) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Record_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRecord); }
+}
+#[allow(unused)]
+impl Record {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeRecord {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeRecord {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeRecord {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = std::ptr::null_mut();
+		ret
+	}
+}
+/// The verbosity level of the message.
+#[no_mangle]
+pub extern "C" fn Record_get_level(this_ptr: &Record) -> crate::lightning::util::logger::Level {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().level;
+	crate::lightning::util::logger::Level::from_native(inner_val)
+}
+/// The verbosity level of the message.
+#[no_mangle]
+pub extern "C" fn Record_set_level(this_ptr: &mut Record, mut val: crate::lightning::util::logger::Level) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.level = val.into_native();
+}
+/// The message body.
+#[no_mangle]
+pub extern "C" fn Record_get_args(this_ptr: &Record) -> crate::c_types::Str {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().args;
+	inner_val.as_str().into()
+}
+/// The message body.
+#[no_mangle]
+pub extern "C" fn Record_set_args(this_ptr: &mut Record, mut val: crate::c_types::Str) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.args = val.into_string();
+}
+/// The module path of the message.
+#[no_mangle]
+pub extern "C" fn Record_get_module_path(this_ptr: &Record) -> crate::c_types::Str {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().module_path;
+	inner_val.into()
+}
+/// The module path of the message.
+#[no_mangle]
+pub extern "C" fn Record_set_module_path(this_ptr: &mut Record, mut val: crate::c_types::Str) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.module_path = val.into_str();
+}
+/// The source file containing the message.
+#[no_mangle]
+pub extern "C" fn Record_get_file(this_ptr: &Record) -> crate::c_types::Str {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().file;
+	inner_val.into()
+}
+/// The source file containing the message.
+#[no_mangle]
+pub extern "C" fn Record_set_file(this_ptr: &mut Record, mut val: crate::c_types::Str) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.file = val.into_str();
+}
+/// The line containing the message.
+#[no_mangle]
+pub extern "C" fn Record_get_line(this_ptr: &Record) -> u32 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().line;
+	*inner_val
+}
+/// The line containing the message.
+#[no_mangle]
+pub extern "C" fn Record_set_line(this_ptr: &mut Record, mut val: u32) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.line = val;
+}
+impl Clone for Record {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeRecord>::is_null(self.inner) { std::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Record_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRecord)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the Record
+pub extern "C" fn Record_clone(orig: &Record) -> Record {
+	orig.clone()
+}
 /// A trait encapsulating the operations required of a logger
 #[repr(C)]
 pub struct Logger {
@@ -133,7 +259,7 @@ pub struct Logger {
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Logs the `Record`
-	pub log: extern "C" fn (this_arg: *const c_void, record: *const std::os::raw::c_char),
+	pub log: extern "C" fn (this_arg: *const c_void, record: &crate::lightning::util::logger::Record),
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -152,8 +278,7 @@ pub(crate) extern "C" fn Logger_clone_fields(orig: &Logger) -> Logger {
 use lightning::util::logger::Logger as rustLogger;
 impl rustLogger for Logger {
 	fn log(&self, mut record: &lightning::util::logger::Record) {
-		let mut local_record = std::ffi::CString::new(format!("{}", record.args)).unwrap();
-		(self.log)(self.this_arg, local_record.as_ptr())
+		(self.log)(self.this_arg, &crate::lightning::util::logger::Record { inner: unsafe { ObjOps::nonnull_ptr_to_inner((record as *const lightning::util::logger::Record<'_, >) as *mut _) }, is_owned: false })
 	}
 }
 

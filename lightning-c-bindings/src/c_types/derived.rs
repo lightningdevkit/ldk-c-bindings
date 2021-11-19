@@ -39,6 +39,11 @@ pub extern "C" fn CResult_SecretKeyErrorZ_err(e: crate::c_types::Secp256k1Error)
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_SecretKeyErrorZ_is_ok(o: &CResult_SecretKeyErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_SecretKeyErrorZ.
 pub extern "C" fn CResult_SecretKeyErrorZ_free(_res: CResult_SecretKeyErrorZ) { }
@@ -112,6 +117,11 @@ pub extern "C" fn CResult_PublicKeyErrorZ_err(e: crate::c_types::Secp256k1Error)
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_PublicKeyErrorZ_is_ok(o: &CResult_PublicKeyErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_PublicKeyErrorZ.
@@ -204,6 +214,11 @@ pub extern "C" fn CResult_TxCreationKeysDecodeErrorZ_err(e: crate::lightning::ln
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_TxCreationKeysDecodeErrorZ_is_ok(o: &CResult_TxCreationKeysDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_TxCreationKeysDecodeErrorZ.
 pub extern "C" fn CResult_TxCreationKeysDecodeErrorZ_free(_res: CResult_TxCreationKeysDecodeErrorZ) { }
@@ -295,6 +310,11 @@ pub extern "C" fn CResult_ChannelPublicKeysDecodeErrorZ_err(e: crate::lightning:
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ChannelPublicKeysDecodeErrorZ_is_ok(o: &CResult_ChannelPublicKeysDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ChannelPublicKeysDecodeErrorZ.
 pub extern "C" fn CResult_ChannelPublicKeysDecodeErrorZ_free(_res: CResult_ChannelPublicKeysDecodeErrorZ) { }
@@ -385,6 +405,11 @@ pub extern "C" fn CResult_TxCreationKeysErrorZ_err(e: crate::c_types::Secp256k1E
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_TxCreationKeysErrorZ_is_ok(o: &CResult_TxCreationKeysErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_TxCreationKeysErrorZ.
@@ -514,6 +539,11 @@ pub extern "C" fn CResult_HTLCOutputInCommitmentDecodeErrorZ_err(e: crate::light
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_HTLCOutputInCommitmentDecodeErrorZ_is_ok(o: &CResult_HTLCOutputInCommitmentDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_HTLCOutputInCommitmentDecodeErrorZ.
 pub extern "C" fn CResult_HTLCOutputInCommitmentDecodeErrorZ_free(_res: CResult_HTLCOutputInCommitmentDecodeErrorZ) { }
@@ -605,6 +635,11 @@ pub extern "C" fn CResult_CounterpartyChannelTransactionParametersDecodeErrorZ_e
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_CounterpartyChannelTransactionParametersDecodeErrorZ_is_ok(o: &CResult_CounterpartyChannelTransactionParametersDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_CounterpartyChannelTransactionParametersDecodeErrorZ.
 pub extern "C" fn CResult_CounterpartyChannelTransactionParametersDecodeErrorZ_free(_res: CResult_CounterpartyChannelTransactionParametersDecodeErrorZ) { }
@@ -695,6 +730,11 @@ pub extern "C" fn CResult_ChannelTransactionParametersDecodeErrorZ_err(e: crate:
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ChannelTransactionParametersDecodeErrorZ_is_ok(o: &CResult_ChannelTransactionParametersDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_ChannelTransactionParametersDecodeErrorZ.
@@ -833,6 +873,11 @@ pub extern "C" fn CResult_HolderCommitmentTransactionDecodeErrorZ_err(e: crate::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_HolderCommitmentTransactionDecodeErrorZ_is_ok(o: &CResult_HolderCommitmentTransactionDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_HolderCommitmentTransactionDecodeErrorZ.
 pub extern "C" fn CResult_HolderCommitmentTransactionDecodeErrorZ_free(_res: CResult_HolderCommitmentTransactionDecodeErrorZ) { }
@@ -924,6 +969,11 @@ pub extern "C" fn CResult_BuiltCommitmentTransactionDecodeErrorZ_err(e: crate::l
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_BuiltCommitmentTransactionDecodeErrorZ_is_ok(o: &CResult_BuiltCommitmentTransactionDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_BuiltCommitmentTransactionDecodeErrorZ.
 pub extern "C" fn CResult_BuiltCommitmentTransactionDecodeErrorZ_free(_res: CResult_BuiltCommitmentTransactionDecodeErrorZ) { }
@@ -1014,6 +1064,11 @@ pub extern "C" fn CResult_TrustedClosingTransactionNoneZ_err() -> CResult_Truste
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_TrustedClosingTransactionNoneZ_is_ok(o: &CResult_TrustedClosingTransactionNoneZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_TrustedClosingTransactionNoneZ.
 pub extern "C" fn CResult_TrustedClosingTransactionNoneZ_free(_res: CResult_TrustedClosingTransactionNoneZ) { }
@@ -1084,6 +1139,11 @@ pub extern "C" fn CResult_CommitmentTransactionDecodeErrorZ_err(e: crate::lightn
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_CommitmentTransactionDecodeErrorZ_is_ok(o: &CResult_CommitmentTransactionDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_CommitmentTransactionDecodeErrorZ.
@@ -1175,6 +1235,11 @@ pub extern "C" fn CResult_TrustedCommitmentTransactionNoneZ_err() -> CResult_Tru
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_TrustedCommitmentTransactionNoneZ_is_ok(o: &CResult_TrustedCommitmentTransactionNoneZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_TrustedCommitmentTransactionNoneZ.
 pub extern "C" fn CResult_TrustedCommitmentTransactionNoneZ_free(_res: CResult_TrustedCommitmentTransactionNoneZ) { }
@@ -1244,6 +1309,11 @@ pub extern "C" fn CResult_CVec_SignatureZNoneZ_err() -> CResult_CVec_SignatureZN
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_CVec_SignatureZNoneZ_is_ok(o: &CResult_CVec_SignatureZNoneZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_CVec_SignatureZNoneZ.
@@ -1332,6 +1402,11 @@ pub extern "C" fn CResult_ShutdownScriptDecodeErrorZ_err(e: crate::lightning::ln
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ShutdownScriptDecodeErrorZ_is_ok(o: &CResult_ShutdownScriptDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_ShutdownScriptDecodeErrorZ.
@@ -1424,6 +1499,11 @@ pub extern "C" fn CResult_ShutdownScriptInvalidShutdownScriptZ_err(e: crate::lig
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ShutdownScriptInvalidShutdownScriptZ_is_ok(o: &CResult_ShutdownScriptInvalidShutdownScriptZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ShutdownScriptInvalidShutdownScriptZ.
 pub extern "C" fn CResult_ShutdownScriptInvalidShutdownScriptZ_free(_res: CResult_ShutdownScriptInvalidShutdownScriptZ) { }
@@ -1496,6 +1576,11 @@ pub extern "C" fn CResult_NoneErrorZ_err(e: crate::c_types::IOError) -> CResult_
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NoneErrorZ_is_ok(o: &CResult_NoneErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_NoneErrorZ.
@@ -1584,6 +1669,11 @@ pub extern "C" fn CResult_RouteHopDecodeErrorZ_err(e: crate::lightning::ln::msgs
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_RouteHopDecodeErrorZ_is_ok(o: &CResult_RouteHopDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_RouteHopDecodeErrorZ.
@@ -1768,6 +1858,11 @@ pub extern "C" fn CResult_RouteDecodeErrorZ_err(e: crate::lightning::ln::msgs::D
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_RouteDecodeErrorZ_is_ok(o: &CResult_RouteDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_RouteDecodeErrorZ.
 pub extern "C" fn CResult_RouteDecodeErrorZ_free(_res: CResult_RouteDecodeErrorZ) { }
@@ -1858,6 +1953,11 @@ pub extern "C" fn CResult_RouteParametersDecodeErrorZ_err(e: crate::lightning::l
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_RouteParametersDecodeErrorZ_is_ok(o: &CResult_RouteParametersDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_RouteParametersDecodeErrorZ.
@@ -2033,6 +2133,11 @@ pub extern "C" fn CResult_PayeeDecodeErrorZ_err(e: crate::lightning::ln::msgs::D
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_PayeeDecodeErrorZ_is_ok(o: &CResult_PayeeDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_PayeeDecodeErrorZ.
 pub extern "C" fn CResult_PayeeDecodeErrorZ_free(_res: CResult_PayeeDecodeErrorZ) { }
@@ -2170,6 +2275,11 @@ pub extern "C" fn CResult_RouteHintDecodeErrorZ_err(e: crate::lightning::ln::msg
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_RouteHintDecodeErrorZ_is_ok(o: &CResult_RouteHintDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_RouteHintDecodeErrorZ.
 pub extern "C" fn CResult_RouteHintDecodeErrorZ_free(_res: CResult_RouteHintDecodeErrorZ) { }
@@ -2260,6 +2370,11 @@ pub extern "C" fn CResult_RouteHintHopDecodeErrorZ_err(e: crate::lightning::ln::
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_RouteHintHopDecodeErrorZ_is_ok(o: &CResult_RouteHintHopDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_RouteHintHopDecodeErrorZ.
@@ -2398,6 +2513,11 @@ pub extern "C" fn CResult_RouteLightningErrorZ_err(e: crate::lightning::ln::msgs
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_RouteLightningErrorZ_is_ok(o: &CResult_RouteLightningErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_RouteLightningErrorZ.
 pub extern "C" fn CResult_RouteLightningErrorZ_free(_res: CResult_RouteLightningErrorZ) { }
@@ -2488,6 +2608,11 @@ pub extern "C" fn CResult_TxOutAccessErrorZ_err(e: crate::lightning::chain::Acce
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_TxOutAccessErrorZ_is_ok(o: &CResult_TxOutAccessErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_TxOutAccessErrorZ.
@@ -2713,6 +2838,11 @@ pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_err(e: crate::lightning::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_is_ok(o: &CResult_NoneChannelMonitorUpdateErrZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_NoneChannelMonitorUpdateErrZ.
 pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_free(_res: CResult_NoneChannelMonitorUpdateErrZ) { }
@@ -2845,6 +2975,139 @@ pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_free(_res: COption_C2Tuple_
 pub extern "C" fn COption_C2Tuple_usizeTransactionZZ_clone(orig: &COption_C2Tuple_usizeTransactionZZ) -> COption_C2Tuple_usizeTransactionZZ { Clone::clone(&orig) }
 #[repr(C)]
 #[derive(Clone)]
+/// An enum which can either contain a crate::lightning::util::events::ClosureReason or not
+pub enum COption_ClosureReasonZ {
+	/// When we're in this state, this COption_ClosureReasonZ contains a crate::lightning::util::events::ClosureReason
+	Some(crate::lightning::util::events::ClosureReason),
+	/// When we're in this state, this COption_ClosureReasonZ contains nothing
+	None
+}
+impl COption_ClosureReasonZ {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> crate::lightning::util::events::ClosureReason {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+/// Constructs a new COption_ClosureReasonZ containing a crate::lightning::util::events::ClosureReason
+pub extern "C" fn COption_ClosureReasonZ_some(o: crate::lightning::util::events::ClosureReason) -> COption_ClosureReasonZ {
+	COption_ClosureReasonZ::Some(o)
+}
+#[no_mangle]
+/// Constructs a new COption_ClosureReasonZ containing nothing
+pub extern "C" fn COption_ClosureReasonZ_none() -> COption_ClosureReasonZ {
+	COption_ClosureReasonZ::None
+}
+#[no_mangle]
+/// Frees any resources associated with the crate::lightning::util::events::ClosureReason, if we are in the Some state
+pub extern "C" fn COption_ClosureReasonZ_free(_res: COption_ClosureReasonZ) { }
+#[no_mangle]
+/// Creates a new COption_ClosureReasonZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn COption_ClosureReasonZ_clone(orig: &COption_ClosureReasonZ) -> COption_ClosureReasonZ { Clone::clone(&orig) }
+#[repr(C)]
+/// The contents of CResult_COption_ClosureReasonZDecodeErrorZ
+pub union CResult_COption_ClosureReasonZDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::c_types::derived::COption_ClosureReasonZ,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_COption_ClosureReasonZDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::COption_ClosureReasonZ on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_COption_ClosureReasonZDecodeErrorZ {
+	/// The contents of this CResult_COption_ClosureReasonZDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_COption_ClosureReasonZDecodeErrorZPtr,
+	/// Whether this CResult_COption_ClosureReasonZDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_COption_ClosureReasonZDecodeErrorZ in the success state.
+pub extern "C" fn CResult_COption_ClosureReasonZDecodeErrorZ_ok(o: crate::c_types::derived::COption_ClosureReasonZ) -> CResult_COption_ClosureReasonZDecodeErrorZ {
+	CResult_COption_ClosureReasonZDecodeErrorZ {
+		contents: CResult_COption_ClosureReasonZDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_COption_ClosureReasonZDecodeErrorZ in the error state.
+pub extern "C" fn CResult_COption_ClosureReasonZDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_COption_ClosureReasonZDecodeErrorZ {
+	CResult_COption_ClosureReasonZDecodeErrorZ {
+		contents: CResult_COption_ClosureReasonZDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_COption_ClosureReasonZDecodeErrorZ_is_ok(o: &CResult_COption_ClosureReasonZDecodeErrorZ) -> bool {
+	o.result_ok
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_COption_ClosureReasonZDecodeErrorZ.
+pub extern "C" fn CResult_COption_ClosureReasonZDecodeErrorZ_free(_res: CResult_COption_ClosureReasonZDecodeErrorZ) { }
+impl Drop for CResult_COption_ClosureReasonZDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::c_types::derived::COption_ClosureReasonZ, crate::lightning::ln::msgs::DecodeError>> for CResult_COption_ClosureReasonZDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::COption_ClosureReasonZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_COption_ClosureReasonZDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_COption_ClosureReasonZDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_COption_ClosureReasonZDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_COption_ClosureReasonZDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::c_types::derived::COption_ClosureReasonZ>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_COption_ClosureReasonZDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_COption_ClosureReasonZDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_COption_ClosureReasonZDecodeErrorZ_clone(orig: &CResult_COption_ClosureReasonZDecodeErrorZ) -> CResult_COption_ClosureReasonZDecodeErrorZ { Clone::clone(&orig) }
+#[repr(C)]
+#[derive(Clone)]
 /// An enum which can either contain a crate::lightning::routing::network_graph::NetworkUpdate or not
 pub enum COption_NetworkUpdateZ {
 	/// When we're in this state, this COption_NetworkUpdateZ contains a crate::lightning::routing::network_graph::NetworkUpdate
@@ -2926,6 +3189,139 @@ impl Clone for CVec_SpendableOutputDescriptorZ {
 		Self::from(res)
 	}
 }
+#[repr(C)]
+#[derive(Clone)]
+/// An enum which can either contain a crate::lightning::util::events::Event or not
+pub enum COption_EventZ {
+	/// When we're in this state, this COption_EventZ contains a crate::lightning::util::events::Event
+	Some(crate::lightning::util::events::Event),
+	/// When we're in this state, this COption_EventZ contains nothing
+	None
+}
+impl COption_EventZ {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> crate::lightning::util::events::Event {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+/// Constructs a new COption_EventZ containing a crate::lightning::util::events::Event
+pub extern "C" fn COption_EventZ_some(o: crate::lightning::util::events::Event) -> COption_EventZ {
+	COption_EventZ::Some(o)
+}
+#[no_mangle]
+/// Constructs a new COption_EventZ containing nothing
+pub extern "C" fn COption_EventZ_none() -> COption_EventZ {
+	COption_EventZ::None
+}
+#[no_mangle]
+/// Frees any resources associated with the crate::lightning::util::events::Event, if we are in the Some state
+pub extern "C" fn COption_EventZ_free(_res: COption_EventZ) { }
+#[no_mangle]
+/// Creates a new COption_EventZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn COption_EventZ_clone(orig: &COption_EventZ) -> COption_EventZ { Clone::clone(&orig) }
+#[repr(C)]
+/// The contents of CResult_COption_EventZDecodeErrorZ
+pub union CResult_COption_EventZDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::c_types::derived::COption_EventZ,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_COption_EventZDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::COption_EventZ on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_COption_EventZDecodeErrorZ {
+	/// The contents of this CResult_COption_EventZDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_COption_EventZDecodeErrorZPtr,
+	/// Whether this CResult_COption_EventZDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_COption_EventZDecodeErrorZ in the success state.
+pub extern "C" fn CResult_COption_EventZDecodeErrorZ_ok(o: crate::c_types::derived::COption_EventZ) -> CResult_COption_EventZDecodeErrorZ {
+	CResult_COption_EventZDecodeErrorZ {
+		contents: CResult_COption_EventZDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_COption_EventZDecodeErrorZ in the error state.
+pub extern "C" fn CResult_COption_EventZDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_COption_EventZDecodeErrorZ {
+	CResult_COption_EventZDecodeErrorZ {
+		contents: CResult_COption_EventZDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_COption_EventZDecodeErrorZ_is_ok(o: &CResult_COption_EventZDecodeErrorZ) -> bool {
+	o.result_ok
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_COption_EventZDecodeErrorZ.
+pub extern "C" fn CResult_COption_EventZDecodeErrorZ_free(_res: CResult_COption_EventZDecodeErrorZ) { }
+impl Drop for CResult_COption_EventZDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::c_types::derived::COption_EventZ, crate::lightning::ln::msgs::DecodeError>> for CResult_COption_EventZDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::COption_EventZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_COption_EventZDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_COption_EventZDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_COption_EventZDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_COption_EventZDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::c_types::derived::COption_EventZ>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_COption_EventZDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_COption_EventZDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_COption_EventZDecodeErrorZ_clone(orig: &CResult_COption_EventZDecodeErrorZ) -> CResult_COption_EventZDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of crate::lightning::util::events::MessageSendEvents of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -3013,6 +3409,11 @@ pub extern "C" fn CResult_InitFeaturesDecodeErrorZ_err(e: crate::lightning::ln::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_InitFeaturesDecodeErrorZ_is_ok(o: &CResult_InitFeaturesDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_InitFeaturesDecodeErrorZ.
 pub extern "C" fn CResult_InitFeaturesDecodeErrorZ_free(_res: CResult_InitFeaturesDecodeErrorZ) { }
@@ -3086,6 +3487,11 @@ pub extern "C" fn CResult_NodeFeaturesDecodeErrorZ_err(e: crate::lightning::ln::
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NodeFeaturesDecodeErrorZ_is_ok(o: &CResult_NodeFeaturesDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_NodeFeaturesDecodeErrorZ.
@@ -3161,6 +3567,11 @@ pub extern "C" fn CResult_ChannelFeaturesDecodeErrorZ_err(e: crate::lightning::l
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ChannelFeaturesDecodeErrorZ_is_ok(o: &CResult_ChannelFeaturesDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ChannelFeaturesDecodeErrorZ.
 pub extern "C" fn CResult_ChannelFeaturesDecodeErrorZ_free(_res: CResult_ChannelFeaturesDecodeErrorZ) { }
@@ -3234,6 +3645,11 @@ pub extern "C" fn CResult_InvoiceFeaturesDecodeErrorZ_err(e: crate::lightning::l
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_InvoiceFeaturesDecodeErrorZ_is_ok(o: &CResult_InvoiceFeaturesDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_InvoiceFeaturesDecodeErrorZ.
@@ -3309,6 +3725,11 @@ pub extern "C" fn CResult_ScoringParametersDecodeErrorZ_err(e: crate::lightning:
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ScoringParametersDecodeErrorZ_is_ok(o: &CResult_ScoringParametersDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ScoringParametersDecodeErrorZ.
 pub extern "C" fn CResult_ScoringParametersDecodeErrorZ_free(_res: CResult_ScoringParametersDecodeErrorZ) { }
@@ -3383,6 +3804,11 @@ pub extern "C" fn CResult_ScorerDecodeErrorZ_err(e: crate::lightning::ln::msgs::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ScorerDecodeErrorZ_is_ok(o: &CResult_ScorerDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ScorerDecodeErrorZ.
 pub extern "C" fn CResult_ScorerDecodeErrorZ_free(_res: CResult_ScorerDecodeErrorZ) { }
@@ -3456,6 +3882,11 @@ pub extern "C" fn CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_err(e: crat
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_DelayedPaymentOutputDescriptorDecodeErrorZ_is_ok(o: &CResult_DelayedPaymentOutputDescriptorDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_DelayedPaymentOutputDescriptorDecodeErrorZ.
@@ -3548,6 +3979,11 @@ pub extern "C" fn CResult_StaticPaymentOutputDescriptorDecodeErrorZ_err(e: crate
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_StaticPaymentOutputDescriptorDecodeErrorZ_is_ok(o: &CResult_StaticPaymentOutputDescriptorDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_StaticPaymentOutputDescriptorDecodeErrorZ.
 pub extern "C" fn CResult_StaticPaymentOutputDescriptorDecodeErrorZ_free(_res: CResult_StaticPaymentOutputDescriptorDecodeErrorZ) { }
@@ -3639,6 +4075,11 @@ pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_err(e: crate::li
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_is_ok(o: &CResult_SpendableOutputDescriptorDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_SpendableOutputDescriptorDecodeErrorZ.
 pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_free(_res: CResult_SpendableOutputDescriptorDecodeErrorZ) { }
@@ -3727,6 +4168,11 @@ pub extern "C" fn CResult_NoneNoneZ_err() -> CResult_NoneNoneZ {
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NoneNoneZ_is_ok(o: &CResult_NoneNoneZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_NoneNoneZ.
@@ -3854,6 +4300,11 @@ pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_err() -> CResul
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_is_ok(o: &CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ.
 pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_free(_res: CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ) { }
@@ -3940,6 +4391,11 @@ pub extern "C" fn CResult_SignatureNoneZ_err() -> CResult_SignatureNoneZ {
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_SignatureNoneZ_is_ok(o: &CResult_SignatureNoneZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_SignatureNoneZ.
@@ -4028,6 +4484,11 @@ pub extern "C" fn CResult_SignDecodeErrorZ_err(e: crate::lightning::ln::msgs::De
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_SignDecodeErrorZ_is_ok(o: &CResult_SignDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_SignDecodeErrorZ.
@@ -4165,6 +4626,11 @@ pub extern "C" fn CResult_RecoverableSignatureNoneZ_err() -> CResult_Recoverable
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_RecoverableSignatureNoneZ_is_ok(o: &CResult_RecoverableSignatureNoneZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_RecoverableSignatureNoneZ.
 pub extern "C" fn CResult_RecoverableSignatureNoneZ_free(_res: CResult_RecoverableSignatureNoneZ) { }
@@ -4298,6 +4764,11 @@ pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_err() -> CResult_CVec_CVec_u8ZZNon
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_is_ok(o: &CResult_CVec_CVec_u8ZZNoneZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_CVec_CVec_u8ZZNoneZ.
 pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_free(_res: CResult_CVec_CVec_u8ZZNoneZ) { }
@@ -4385,6 +4856,11 @@ pub extern "C" fn CResult_InMemorySignerDecodeErrorZ_err(e: crate::lightning::ln
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_InMemorySignerDecodeErrorZ_is_ok(o: &CResult_InMemorySignerDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_InMemorySignerDecodeErrorZ.
@@ -4521,6 +4997,11 @@ pub extern "C" fn CResult_TransactionNoneZ_err() -> CResult_TransactionNoneZ {
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_TransactionNoneZ_is_ok(o: &CResult_TransactionNoneZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_TransactionNoneZ.
@@ -4678,6 +5159,11 @@ pub extern "C" fn CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ_err(e: cr
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ_is_ok(o: &CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ.
 pub extern "C" fn CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ_free(_res: CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ) { }
@@ -4787,6 +5273,11 @@ pub extern "C" fn CResult_NoneAPIErrorZ_err(e: crate::lightning::util::errors::A
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NoneAPIErrorZ_is_ok(o: &CResult_NoneAPIErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_NoneAPIErrorZ.
@@ -4968,6 +5459,11 @@ pub extern "C" fn CResult__u832APIErrorZ_err(e: crate::lightning::util::errors::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult__u832APIErrorZ_is_ok(o: &CResult__u832APIErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult__u832APIErrorZ.
 pub extern "C" fn CResult__u832APIErrorZ_free(_res: CResult__u832APIErrorZ) { }
@@ -5059,6 +5555,11 @@ pub extern "C" fn CResult_PaymentIdPaymentSendFailureZ_err(e: crate::lightning::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_PaymentIdPaymentSendFailureZ_is_ok(o: &CResult_PaymentIdPaymentSendFailureZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_PaymentIdPaymentSendFailureZ.
 pub extern "C" fn CResult_PaymentIdPaymentSendFailureZ_free(_res: CResult_PaymentIdPaymentSendFailureZ) { }
@@ -5148,6 +5649,11 @@ pub extern "C" fn CResult_NonePaymentSendFailureZ_err(e: crate::lightning::ln::c
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NonePaymentSendFailureZ_is_ok(o: &CResult_NonePaymentSendFailureZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_NonePaymentSendFailureZ.
@@ -5278,6 +5784,11 @@ pub extern "C" fn CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ_err(e
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ_is_ok(o: &CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ.
@@ -5458,6 +5969,11 @@ pub extern "C" fn CResult_PaymentSecretAPIErrorZ_err(e: crate::lightning::util::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_PaymentSecretAPIErrorZ_is_ok(o: &CResult_PaymentSecretAPIErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_PaymentSecretAPIErrorZ.
 pub extern "C" fn CResult_PaymentSecretAPIErrorZ_free(_res: CResult_PaymentSecretAPIErrorZ) { }
@@ -5617,6 +6133,11 @@ pub extern "C" fn CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ_err(e: cr
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ_is_ok(o: &CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ.
 pub extern "C" fn CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ_free(_res: CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ) { }
@@ -5690,6 +6211,11 @@ pub extern "C" fn CResult_ChannelConfigDecodeErrorZ_err(e: crate::lightning::ln:
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ChannelConfigDecodeErrorZ_is_ok(o: &CResult_ChannelConfigDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_ChannelConfigDecodeErrorZ.
@@ -5781,6 +6307,11 @@ pub extern "C" fn CResult_OutPointDecodeErrorZ_err(e: crate::lightning::ln::msgs
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_OutPointDecodeErrorZ_is_ok(o: &CResult_OutPointDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_OutPointDecodeErrorZ.
@@ -5905,6 +6436,11 @@ pub extern "C" fn CResult_COption_TypeZDecodeErrorZ_err(e: crate::lightning::ln:
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_COption_TypeZDecodeErrorZ_is_ok(o: &CResult_COption_TypeZDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_COption_TypeZDecodeErrorZ.
 pub extern "C" fn CResult_COption_TypeZDecodeErrorZ_free(_res: CResult_COption_TypeZDecodeErrorZ) { }
@@ -5978,6 +6514,11 @@ pub extern "C" fn CResult_PaymentIdPaymentErrorZ_err(e: crate::lightning_invoice
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_PaymentIdPaymentErrorZ_is_ok(o: &CResult_PaymentIdPaymentErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_PaymentIdPaymentErrorZ.
@@ -6069,6 +6610,11 @@ pub extern "C" fn CResult_SiPrefixNoneZ_err() -> CResult_SiPrefixNoneZ {
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_SiPrefixNoneZ_is_ok(o: &CResult_SiPrefixNoneZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_SiPrefixNoneZ.
 pub extern "C" fn CResult_SiPrefixNoneZ_free(_res: CResult_SiPrefixNoneZ) { }
@@ -6156,6 +6702,11 @@ pub extern "C" fn CResult_InvoiceNoneZ_err() -> CResult_InvoiceNoneZ {
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_InvoiceNoneZ_is_ok(o: &CResult_InvoiceNoneZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_InvoiceNoneZ.
 pub extern "C" fn CResult_InvoiceNoneZ_free(_res: CResult_InvoiceNoneZ) { }
@@ -6242,6 +6793,11 @@ pub extern "C" fn CResult_SignedRawInvoiceNoneZ_err() -> CResult_SignedRawInvoic
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_SignedRawInvoiceNoneZ_is_ok(o: &CResult_SignedRawInvoiceNoneZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_SignedRawInvoiceNoneZ.
@@ -6376,6 +6932,11 @@ pub extern "C" fn CResult_PayeePubKeyErrorZ_err(e: crate::c_types::Secp256k1Erro
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_PayeePubKeyErrorZ_is_ok(o: &CResult_PayeePubKeyErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_PayeePubKeyErrorZ.
@@ -6514,6 +7075,11 @@ pub extern "C" fn CResult_PositiveTimestampCreationErrorZ_err(e: crate::lightnin
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_PositiveTimestampCreationErrorZ_is_ok(o: &CResult_PositiveTimestampCreationErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_PositiveTimestampCreationErrorZ.
 pub extern "C" fn CResult_PositiveTimestampCreationErrorZ_free(_res: CResult_PositiveTimestampCreationErrorZ) { }
@@ -6604,6 +7170,11 @@ pub extern "C" fn CResult_NoneSemanticErrorZ_err(e: crate::lightning_invoice::Se
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NoneSemanticErrorZ_is_ok(o: &CResult_NoneSemanticErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_NoneSemanticErrorZ.
 pub extern "C" fn CResult_NoneSemanticErrorZ_free(_res: CResult_NoneSemanticErrorZ) { }
@@ -6691,6 +7262,11 @@ pub extern "C" fn CResult_InvoiceSemanticErrorZ_err(e: crate::lightning_invoice:
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_InvoiceSemanticErrorZ_is_ok(o: &CResult_InvoiceSemanticErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_InvoiceSemanticErrorZ.
@@ -6783,6 +7359,11 @@ pub extern "C" fn CResult_DescriptionCreationErrorZ_err(e: crate::lightning_invo
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_DescriptionCreationErrorZ_is_ok(o: &CResult_DescriptionCreationErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_DescriptionCreationErrorZ.
 pub extern "C" fn CResult_DescriptionCreationErrorZ_free(_res: CResult_DescriptionCreationErrorZ) { }
@@ -6873,6 +7454,11 @@ pub extern "C" fn CResult_ExpiryTimeCreationErrorZ_err(e: crate::lightning_invoi
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ExpiryTimeCreationErrorZ_is_ok(o: &CResult_ExpiryTimeCreationErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_ExpiryTimeCreationErrorZ.
@@ -6965,6 +7551,11 @@ pub extern "C" fn CResult_PrivateRouteCreationErrorZ_err(e: crate::lightning_inv
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_PrivateRouteCreationErrorZ_is_ok(o: &CResult_PrivateRouteCreationErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_PrivateRouteCreationErrorZ.
 pub extern "C" fn CResult_PrivateRouteCreationErrorZ_free(_res: CResult_PrivateRouteCreationErrorZ) { }
@@ -7056,6 +7647,11 @@ pub extern "C" fn CResult_StringErrorZ_err(e: crate::c_types::Secp256k1Error) ->
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_StringErrorZ_is_ok(o: &CResult_StringErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_StringErrorZ.
 pub extern "C" fn CResult_StringErrorZ_free(_res: CResult_StringErrorZ) { }
@@ -7130,6 +7726,11 @@ pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_err(e: crate::lightni
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_is_ok(o: &CResult_ChannelMonitorUpdateDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ChannelMonitorUpdateDecodeErrorZ.
 pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_free(_res: CResult_ChannelMonitorUpdateDecodeErrorZ) { }
@@ -7181,6 +7782,139 @@ impl Clone for CResult_ChannelMonitorUpdateDecodeErrorZ {
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ChannelMonitorUpdateDecodeErrorZ_clone(orig: &CResult_ChannelMonitorUpdateDecodeErrorZ) -> CResult_ChannelMonitorUpdateDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
+#[derive(Clone)]
+/// An enum which can either contain a crate::lightning::chain::channelmonitor::MonitorEvent or not
+pub enum COption_MonitorEventZ {
+	/// When we're in this state, this COption_MonitorEventZ contains a crate::lightning::chain::channelmonitor::MonitorEvent
+	Some(crate::lightning::chain::channelmonitor::MonitorEvent),
+	/// When we're in this state, this COption_MonitorEventZ contains nothing
+	None
+}
+impl COption_MonitorEventZ {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::Some(_) = self { true } else { false }
+	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> crate::lightning::chain::channelmonitor::MonitorEvent {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+/// Constructs a new COption_MonitorEventZ containing a crate::lightning::chain::channelmonitor::MonitorEvent
+pub extern "C" fn COption_MonitorEventZ_some(o: crate::lightning::chain::channelmonitor::MonitorEvent) -> COption_MonitorEventZ {
+	COption_MonitorEventZ::Some(o)
+}
+#[no_mangle]
+/// Constructs a new COption_MonitorEventZ containing nothing
+pub extern "C" fn COption_MonitorEventZ_none() -> COption_MonitorEventZ {
+	COption_MonitorEventZ::None
+}
+#[no_mangle]
+/// Frees any resources associated with the crate::lightning::chain::channelmonitor::MonitorEvent, if we are in the Some state
+pub extern "C" fn COption_MonitorEventZ_free(_res: COption_MonitorEventZ) { }
+#[no_mangle]
+/// Creates a new COption_MonitorEventZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn COption_MonitorEventZ_clone(orig: &COption_MonitorEventZ) -> COption_MonitorEventZ { Clone::clone(&orig) }
+#[repr(C)]
+/// The contents of CResult_COption_MonitorEventZDecodeErrorZ
+pub union CResult_COption_MonitorEventZDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::c_types::derived::COption_MonitorEventZ,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_COption_MonitorEventZDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::COption_MonitorEventZ on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_COption_MonitorEventZDecodeErrorZ {
+	/// The contents of this CResult_COption_MonitorEventZDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_COption_MonitorEventZDecodeErrorZPtr,
+	/// Whether this CResult_COption_MonitorEventZDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_COption_MonitorEventZDecodeErrorZ in the success state.
+pub extern "C" fn CResult_COption_MonitorEventZDecodeErrorZ_ok(o: crate::c_types::derived::COption_MonitorEventZ) -> CResult_COption_MonitorEventZDecodeErrorZ {
+	CResult_COption_MonitorEventZDecodeErrorZ {
+		contents: CResult_COption_MonitorEventZDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_COption_MonitorEventZDecodeErrorZ in the error state.
+pub extern "C" fn CResult_COption_MonitorEventZDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_COption_MonitorEventZDecodeErrorZ {
+	CResult_COption_MonitorEventZDecodeErrorZ {
+		contents: CResult_COption_MonitorEventZDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_COption_MonitorEventZDecodeErrorZ_is_ok(o: &CResult_COption_MonitorEventZDecodeErrorZ) -> bool {
+	o.result_ok
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_COption_MonitorEventZDecodeErrorZ.
+pub extern "C" fn CResult_COption_MonitorEventZDecodeErrorZ_free(_res: CResult_COption_MonitorEventZDecodeErrorZ) { }
+impl Drop for CResult_COption_MonitorEventZDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::c_types::derived::COption_MonitorEventZ, crate::lightning::ln::msgs::DecodeError>> for CResult_COption_MonitorEventZDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::COption_MonitorEventZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_COption_MonitorEventZDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_COption_MonitorEventZDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_COption_MonitorEventZDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_COption_MonitorEventZDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::c_types::derived::COption_MonitorEventZ>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_COption_MonitorEventZDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_COption_MonitorEventZDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_COption_MonitorEventZDecodeErrorZ_clone(orig: &CResult_COption_MonitorEventZDecodeErrorZ) -> CResult_COption_MonitorEventZDecodeErrorZ { Clone::clone(&orig) }
+#[repr(C)]
 /// The contents of CResult_HTLCUpdateDecodeErrorZ
 pub union CResult_HTLCUpdateDecodeErrorZPtr {
 	/// A pointer to the contents in the success state.
@@ -7220,6 +7954,11 @@ pub extern "C" fn CResult_HTLCUpdateDecodeErrorZ_err(e: crate::lightning::ln::ms
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_HTLCUpdateDecodeErrorZ_is_ok(o: &CResult_HTLCUpdateDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_HTLCUpdateDecodeErrorZ.
@@ -7310,6 +8049,11 @@ pub extern "C" fn CResult_NoneMonitorUpdateErrorZ_err(e: crate::lightning::chain
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NoneMonitorUpdateErrorZ_is_ok(o: &CResult_NoneMonitorUpdateErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_NoneMonitorUpdateErrorZ.
@@ -7931,6 +8675,11 @@ pub extern "C" fn CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ_err(e: cr
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ_is_ok(o: &CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ.
 pub extern "C" fn CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ_free(_res: CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ) { }
@@ -8003,6 +8752,11 @@ pub extern "C" fn CResult_NoneLightningErrorZ_err(e: crate::lightning::ln::msgs:
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NoneLightningErrorZ_is_ok(o: &CResult_NoneLightningErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_NoneLightningErrorZ.
@@ -8159,6 +8913,11 @@ pub extern "C" fn CResult_boolLightningErrorZ_err(e: crate::lightning::ln::msgs:
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_boolLightningErrorZ_is_ok(o: &CResult_boolLightningErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_boolLightningErrorZ.
@@ -8435,6 +9194,11 @@ pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_err(e: crate::lightning::ln::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_is_ok(o: &CResult_CVec_u8ZPeerHandleErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_CVec_u8ZPeerHandleErrorZ.
 pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_free(_res: CResult_CVec_u8ZPeerHandleErrorZ) { }
@@ -8525,6 +9289,11 @@ pub extern "C" fn CResult_NonePeerHandleErrorZ_err(e: crate::lightning::ln::peer
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NonePeerHandleErrorZ_is_ok(o: &CResult_NonePeerHandleErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_NonePeerHandleErrorZ.
 pub extern "C" fn CResult_NonePeerHandleErrorZ_free(_res: CResult_NonePeerHandleErrorZ) { }
@@ -8612,6 +9381,11 @@ pub extern "C" fn CResult_boolPeerHandleErrorZ_err(e: crate::lightning::ln::peer
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_boolPeerHandleErrorZ_is_ok(o: &CResult_boolPeerHandleErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_boolPeerHandleErrorZ.
@@ -8704,6 +9478,11 @@ pub extern "C" fn CResult_NodeIdDecodeErrorZ_err(e: crate::lightning::ln::msgs::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NodeIdDecodeErrorZ_is_ok(o: &CResult_NodeIdDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_NodeIdDecodeErrorZ.
 pub extern "C" fn CResult_NodeIdDecodeErrorZ_free(_res: CResult_NodeIdDecodeErrorZ) { }
@@ -8754,6 +9533,102 @@ impl Clone for CResult_NodeIdDecodeErrorZ {
 /// Creates a new CResult_NodeIdDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NodeIdDecodeErrorZ_clone(orig: &CResult_NodeIdDecodeErrorZ) -> CResult_NodeIdDecodeErrorZ { Clone::clone(&orig) }
+#[repr(C)]
+/// The contents of CResult_COption_NetworkUpdateZDecodeErrorZ
+pub union CResult_COption_NetworkUpdateZDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::c_types::derived::COption_NetworkUpdateZ,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_COption_NetworkUpdateZDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::COption_NetworkUpdateZ on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_COption_NetworkUpdateZDecodeErrorZ {
+	/// The contents of this CResult_COption_NetworkUpdateZDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_COption_NetworkUpdateZDecodeErrorZPtr,
+	/// Whether this CResult_COption_NetworkUpdateZDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_COption_NetworkUpdateZDecodeErrorZ in the success state.
+pub extern "C" fn CResult_COption_NetworkUpdateZDecodeErrorZ_ok(o: crate::c_types::derived::COption_NetworkUpdateZ) -> CResult_COption_NetworkUpdateZDecodeErrorZ {
+	CResult_COption_NetworkUpdateZDecodeErrorZ {
+		contents: CResult_COption_NetworkUpdateZDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_COption_NetworkUpdateZDecodeErrorZ in the error state.
+pub extern "C" fn CResult_COption_NetworkUpdateZDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_COption_NetworkUpdateZDecodeErrorZ {
+	CResult_COption_NetworkUpdateZDecodeErrorZ {
+		contents: CResult_COption_NetworkUpdateZDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_COption_NetworkUpdateZDecodeErrorZ_is_ok(o: &CResult_COption_NetworkUpdateZDecodeErrorZ) -> bool {
+	o.result_ok
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_COption_NetworkUpdateZDecodeErrorZ.
+pub extern "C" fn CResult_COption_NetworkUpdateZDecodeErrorZ_free(_res: CResult_COption_NetworkUpdateZDecodeErrorZ) { }
+impl Drop for CResult_COption_NetworkUpdateZDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::c_types::derived::COption_NetworkUpdateZ, crate::lightning::ln::msgs::DecodeError>> for CResult_COption_NetworkUpdateZDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::COption_NetworkUpdateZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = std::ptr::null_mut() };
+			CResult_COption_NetworkUpdateZDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = std::ptr::null_mut(); }
+			CResult_COption_NetworkUpdateZDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_COption_NetworkUpdateZDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_COption_NetworkUpdateZDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::c_types::derived::COption_NetworkUpdateZ>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_COption_NetworkUpdateZDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_COption_NetworkUpdateZDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_COption_NetworkUpdateZDecodeErrorZ_clone(orig: &CResult_COption_NetworkUpdateZDecodeErrorZ) -> CResult_COption_NetworkUpdateZDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// An enum which can either contain a crate::lightning::chain::Access or not
 pub enum COption_AccessZ {
@@ -8826,6 +9701,11 @@ pub extern "C" fn CResult_DirectionalChannelInfoDecodeErrorZ_err(e: crate::light
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_DirectionalChannelInfoDecodeErrorZ_is_ok(o: &CResult_DirectionalChannelInfoDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_DirectionalChannelInfoDecodeErrorZ.
@@ -8918,6 +9798,11 @@ pub extern "C" fn CResult_ChannelInfoDecodeErrorZ_err(e: crate::lightning::ln::m
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ChannelInfoDecodeErrorZ_is_ok(o: &CResult_ChannelInfoDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ChannelInfoDecodeErrorZ.
 pub extern "C" fn CResult_ChannelInfoDecodeErrorZ_free(_res: CResult_ChannelInfoDecodeErrorZ) { }
@@ -9009,6 +9894,11 @@ pub extern "C" fn CResult_RoutingFeesDecodeErrorZ_err(e: crate::lightning::ln::m
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_RoutingFeesDecodeErrorZ_is_ok(o: &CResult_RoutingFeesDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_RoutingFeesDecodeErrorZ.
 pub extern "C" fn CResult_RoutingFeesDecodeErrorZ_free(_res: CResult_RoutingFeesDecodeErrorZ) { }
@@ -9099,6 +9989,11 @@ pub extern "C" fn CResult_NodeAnnouncementInfoDecodeErrorZ_err(e: crate::lightni
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NodeAnnouncementInfoDecodeErrorZ_is_ok(o: &CResult_NodeAnnouncementInfoDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_NodeAnnouncementInfoDecodeErrorZ.
@@ -9237,6 +10132,11 @@ pub extern "C" fn CResult_NodeInfoDecodeErrorZ_err(e: crate::lightning::ln::msgs
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NodeInfoDecodeErrorZ_is_ok(o: &CResult_NodeInfoDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_NodeInfoDecodeErrorZ.
 pub extern "C" fn CResult_NodeInfoDecodeErrorZ_free(_res: CResult_NodeInfoDecodeErrorZ) { }
@@ -9327,6 +10227,11 @@ pub extern "C" fn CResult_NetworkGraphDecodeErrorZ_err(e: crate::lightning::ln::
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NetworkGraphDecodeErrorZ_is_ok(o: &CResult_NetworkGraphDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_NetworkGraphDecodeErrorZ.
@@ -9455,6 +10360,11 @@ pub extern "C" fn CResult_NetAddressDecodeErrorZ_err(e: crate::lightning::ln::ms
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NetAddressDecodeErrorZ_is_ok(o: &CResult_NetAddressDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_NetAddressDecodeErrorZ.
@@ -9731,6 +10641,11 @@ pub extern "C" fn CResult_AcceptChannelDecodeErrorZ_err(e: crate::lightning::ln:
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_AcceptChannelDecodeErrorZ_is_ok(o: &CResult_AcceptChannelDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_AcceptChannelDecodeErrorZ.
 pub extern "C" fn CResult_AcceptChannelDecodeErrorZ_free(_res: CResult_AcceptChannelDecodeErrorZ) { }
@@ -9821,6 +10736,11 @@ pub extern "C" fn CResult_AnnouncementSignaturesDecodeErrorZ_err(e: crate::light
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_AnnouncementSignaturesDecodeErrorZ_is_ok(o: &CResult_AnnouncementSignaturesDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_AnnouncementSignaturesDecodeErrorZ.
@@ -9913,6 +10833,11 @@ pub extern "C" fn CResult_ChannelReestablishDecodeErrorZ_err(e: crate::lightning
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ChannelReestablishDecodeErrorZ_is_ok(o: &CResult_ChannelReestablishDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ChannelReestablishDecodeErrorZ.
 pub extern "C" fn CResult_ChannelReestablishDecodeErrorZ_free(_res: CResult_ChannelReestablishDecodeErrorZ) { }
@@ -10003,6 +10928,11 @@ pub extern "C" fn CResult_ClosingSignedDecodeErrorZ_err(e: crate::lightning::ln:
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ClosingSignedDecodeErrorZ_is_ok(o: &CResult_ClosingSignedDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_ClosingSignedDecodeErrorZ.
@@ -10095,6 +11025,11 @@ pub extern "C" fn CResult_ClosingSignedFeeRangeDecodeErrorZ_err(e: crate::lightn
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ClosingSignedFeeRangeDecodeErrorZ_is_ok(o: &CResult_ClosingSignedFeeRangeDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ClosingSignedFeeRangeDecodeErrorZ.
 pub extern "C" fn CResult_ClosingSignedFeeRangeDecodeErrorZ_free(_res: CResult_ClosingSignedFeeRangeDecodeErrorZ) { }
@@ -10185,6 +11120,11 @@ pub extern "C" fn CResult_CommitmentSignedDecodeErrorZ_err(e: crate::lightning::
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_CommitmentSignedDecodeErrorZ_is_ok(o: &CResult_CommitmentSignedDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_CommitmentSignedDecodeErrorZ.
@@ -10277,6 +11217,11 @@ pub extern "C" fn CResult_FundingCreatedDecodeErrorZ_err(e: crate::lightning::ln
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_FundingCreatedDecodeErrorZ_is_ok(o: &CResult_FundingCreatedDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_FundingCreatedDecodeErrorZ.
 pub extern "C" fn CResult_FundingCreatedDecodeErrorZ_free(_res: CResult_FundingCreatedDecodeErrorZ) { }
@@ -10367,6 +11312,11 @@ pub extern "C" fn CResult_FundingSignedDecodeErrorZ_err(e: crate::lightning::ln:
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_FundingSignedDecodeErrorZ_is_ok(o: &CResult_FundingSignedDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_FundingSignedDecodeErrorZ.
@@ -10459,6 +11409,11 @@ pub extern "C" fn CResult_FundingLockedDecodeErrorZ_err(e: crate::lightning::ln:
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_FundingLockedDecodeErrorZ_is_ok(o: &CResult_FundingLockedDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_FundingLockedDecodeErrorZ.
 pub extern "C" fn CResult_FundingLockedDecodeErrorZ_free(_res: CResult_FundingLockedDecodeErrorZ) { }
@@ -10549,6 +11504,11 @@ pub extern "C" fn CResult_InitDecodeErrorZ_err(e: crate::lightning::ln::msgs::De
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_InitDecodeErrorZ_is_ok(o: &CResult_InitDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_InitDecodeErrorZ.
@@ -10641,6 +11601,11 @@ pub extern "C" fn CResult_OpenChannelDecodeErrorZ_err(e: crate::lightning::ln::m
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_OpenChannelDecodeErrorZ_is_ok(o: &CResult_OpenChannelDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_OpenChannelDecodeErrorZ.
 pub extern "C" fn CResult_OpenChannelDecodeErrorZ_free(_res: CResult_OpenChannelDecodeErrorZ) { }
@@ -10731,6 +11696,11 @@ pub extern "C" fn CResult_RevokeAndACKDecodeErrorZ_err(e: crate::lightning::ln::
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_RevokeAndACKDecodeErrorZ_is_ok(o: &CResult_RevokeAndACKDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_RevokeAndACKDecodeErrorZ.
@@ -10823,6 +11793,11 @@ pub extern "C" fn CResult_ShutdownDecodeErrorZ_err(e: crate::lightning::ln::msgs
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ShutdownDecodeErrorZ_is_ok(o: &CResult_ShutdownDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ShutdownDecodeErrorZ.
 pub extern "C" fn CResult_ShutdownDecodeErrorZ_free(_res: CResult_ShutdownDecodeErrorZ) { }
@@ -10913,6 +11888,11 @@ pub extern "C" fn CResult_UpdateFailHTLCDecodeErrorZ_err(e: crate::lightning::ln
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_UpdateFailHTLCDecodeErrorZ_is_ok(o: &CResult_UpdateFailHTLCDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_UpdateFailHTLCDecodeErrorZ.
@@ -11005,6 +11985,11 @@ pub extern "C" fn CResult_UpdateFailMalformedHTLCDecodeErrorZ_err(e: crate::ligh
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_UpdateFailMalformedHTLCDecodeErrorZ_is_ok(o: &CResult_UpdateFailMalformedHTLCDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_UpdateFailMalformedHTLCDecodeErrorZ.
 pub extern "C" fn CResult_UpdateFailMalformedHTLCDecodeErrorZ_free(_res: CResult_UpdateFailMalformedHTLCDecodeErrorZ) { }
@@ -11095,6 +12080,11 @@ pub extern "C" fn CResult_UpdateFeeDecodeErrorZ_err(e: crate::lightning::ln::msg
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_UpdateFeeDecodeErrorZ_is_ok(o: &CResult_UpdateFeeDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_UpdateFeeDecodeErrorZ.
@@ -11187,6 +12177,11 @@ pub extern "C" fn CResult_UpdateFulfillHTLCDecodeErrorZ_err(e: crate::lightning:
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_UpdateFulfillHTLCDecodeErrorZ_is_ok(o: &CResult_UpdateFulfillHTLCDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_UpdateFulfillHTLCDecodeErrorZ.
 pub extern "C" fn CResult_UpdateFulfillHTLCDecodeErrorZ_free(_res: CResult_UpdateFulfillHTLCDecodeErrorZ) { }
@@ -11277,6 +12272,11 @@ pub extern "C" fn CResult_UpdateAddHTLCDecodeErrorZ_err(e: crate::lightning::ln:
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_UpdateAddHTLCDecodeErrorZ_is_ok(o: &CResult_UpdateAddHTLCDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_UpdateAddHTLCDecodeErrorZ.
@@ -11369,6 +12369,11 @@ pub extern "C" fn CResult_PingDecodeErrorZ_err(e: crate::lightning::ln::msgs::De
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_PingDecodeErrorZ_is_ok(o: &CResult_PingDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_PingDecodeErrorZ.
 pub extern "C" fn CResult_PingDecodeErrorZ_free(_res: CResult_PingDecodeErrorZ) { }
@@ -11459,6 +12464,11 @@ pub extern "C" fn CResult_PongDecodeErrorZ_err(e: crate::lightning::ln::msgs::De
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_PongDecodeErrorZ_is_ok(o: &CResult_PongDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_PongDecodeErrorZ.
@@ -11551,6 +12561,11 @@ pub extern "C" fn CResult_UnsignedChannelAnnouncementDecodeErrorZ_err(e: crate::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_UnsignedChannelAnnouncementDecodeErrorZ_is_ok(o: &CResult_UnsignedChannelAnnouncementDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_UnsignedChannelAnnouncementDecodeErrorZ.
 pub extern "C" fn CResult_UnsignedChannelAnnouncementDecodeErrorZ_free(_res: CResult_UnsignedChannelAnnouncementDecodeErrorZ) { }
@@ -11641,6 +12656,11 @@ pub extern "C" fn CResult_ChannelAnnouncementDecodeErrorZ_err(e: crate::lightnin
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ChannelAnnouncementDecodeErrorZ_is_ok(o: &CResult_ChannelAnnouncementDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_ChannelAnnouncementDecodeErrorZ.
@@ -11733,6 +12753,11 @@ pub extern "C" fn CResult_UnsignedChannelUpdateDecodeErrorZ_err(e: crate::lightn
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_UnsignedChannelUpdateDecodeErrorZ_is_ok(o: &CResult_UnsignedChannelUpdateDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_UnsignedChannelUpdateDecodeErrorZ.
 pub extern "C" fn CResult_UnsignedChannelUpdateDecodeErrorZ_free(_res: CResult_UnsignedChannelUpdateDecodeErrorZ) { }
@@ -11823,6 +12848,11 @@ pub extern "C" fn CResult_ChannelUpdateDecodeErrorZ_err(e: crate::lightning::ln:
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ChannelUpdateDecodeErrorZ_is_ok(o: &CResult_ChannelUpdateDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_ChannelUpdateDecodeErrorZ.
@@ -11915,6 +12945,11 @@ pub extern "C" fn CResult_ErrorMessageDecodeErrorZ_err(e: crate::lightning::ln::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ErrorMessageDecodeErrorZ_is_ok(o: &CResult_ErrorMessageDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ErrorMessageDecodeErrorZ.
 pub extern "C" fn CResult_ErrorMessageDecodeErrorZ_free(_res: CResult_ErrorMessageDecodeErrorZ) { }
@@ -12005,6 +13040,11 @@ pub extern "C" fn CResult_UnsignedNodeAnnouncementDecodeErrorZ_err(e: crate::lig
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_UnsignedNodeAnnouncementDecodeErrorZ_is_ok(o: &CResult_UnsignedNodeAnnouncementDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_UnsignedNodeAnnouncementDecodeErrorZ.
@@ -12097,6 +13137,11 @@ pub extern "C" fn CResult_NodeAnnouncementDecodeErrorZ_err(e: crate::lightning::
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NodeAnnouncementDecodeErrorZ_is_ok(o: &CResult_NodeAnnouncementDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_NodeAnnouncementDecodeErrorZ.
 pub extern "C" fn CResult_NodeAnnouncementDecodeErrorZ_free(_res: CResult_NodeAnnouncementDecodeErrorZ) { }
@@ -12187,6 +13232,11 @@ pub extern "C" fn CResult_QueryShortChannelIdsDecodeErrorZ_err(e: crate::lightni
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_QueryShortChannelIdsDecodeErrorZ_is_ok(o: &CResult_QueryShortChannelIdsDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_QueryShortChannelIdsDecodeErrorZ.
@@ -12279,6 +13329,11 @@ pub extern "C" fn CResult_ReplyShortChannelIdsEndDecodeErrorZ_err(e: crate::ligh
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ReplyShortChannelIdsEndDecodeErrorZ_is_ok(o: &CResult_ReplyShortChannelIdsEndDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ReplyShortChannelIdsEndDecodeErrorZ.
 pub extern "C" fn CResult_ReplyShortChannelIdsEndDecodeErrorZ_free(_res: CResult_ReplyShortChannelIdsEndDecodeErrorZ) { }
@@ -12369,6 +13424,11 @@ pub extern "C" fn CResult_QueryChannelRangeDecodeErrorZ_err(e: crate::lightning:
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_QueryChannelRangeDecodeErrorZ_is_ok(o: &CResult_QueryChannelRangeDecodeErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_QueryChannelRangeDecodeErrorZ.
@@ -12461,6 +13521,11 @@ pub extern "C" fn CResult_ReplyChannelRangeDecodeErrorZ_err(e: crate::lightning:
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ReplyChannelRangeDecodeErrorZ_is_ok(o: &CResult_ReplyChannelRangeDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_ReplyChannelRangeDecodeErrorZ.
 pub extern "C" fn CResult_ReplyChannelRangeDecodeErrorZ_free(_res: CResult_ReplyChannelRangeDecodeErrorZ) { }
@@ -12552,6 +13617,11 @@ pub extern "C" fn CResult_GossipTimestampFilterDecodeErrorZ_err(e: crate::lightn
 		result_ok: false,
 	}
 }
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_GossipTimestampFilterDecodeErrorZ_is_ok(o: &CResult_GossipTimestampFilterDecodeErrorZ) -> bool {
+	o.result_ok
+}
 #[no_mangle]
 /// Frees any resources used by the CResult_GossipTimestampFilterDecodeErrorZ.
 pub extern "C" fn CResult_GossipTimestampFilterDecodeErrorZ_free(_res: CResult_GossipTimestampFilterDecodeErrorZ) { }
@@ -12642,6 +13712,11 @@ pub extern "C" fn CResult_InvoiceSignOrCreationErrorZ_err(e: crate::lightning_in
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_InvoiceSignOrCreationErrorZ_is_ok(o: &CResult_InvoiceSignOrCreationErrorZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_InvoiceSignOrCreationErrorZ.
@@ -12764,6 +13839,11 @@ pub extern "C" fn CResult_LockedChannelMonitorNoneZ_err() -> CResult_LockedChann
 		},
 		result_ok: false,
 	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_LockedChannelMonitorNoneZ_is_ok(o: &CResult_LockedChannelMonitorNoneZ) -> bool {
+	o.result_ok
 }
 #[no_mangle]
 /// Frees any resources used by the CResult_LockedChannelMonitorNoneZ.

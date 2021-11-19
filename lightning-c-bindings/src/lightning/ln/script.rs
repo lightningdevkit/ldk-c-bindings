@@ -172,7 +172,7 @@ pub(crate) extern "C" fn ShutdownScript_write_void(obj: *const c_void) -> crate:
 #[no_mangle]
 /// Read a ShutdownScript from a byte array, created by ShutdownScript_write
 pub extern "C" fn ShutdownScript_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ShutdownScriptDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::ln::script::ShutdownScript, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }

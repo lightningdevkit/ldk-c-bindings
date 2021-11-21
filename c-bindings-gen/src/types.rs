@@ -879,6 +879,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some("u64"),
 			"std::time::SystemTime" => Some("u64"),
 			"std::io::Error" => Some("crate::c_types::IOError"),
+			"core::fmt::Arguments" if is_ref => Some("crate::c_types::Str"),
 
 			"core::convert::Infallible" => Some("crate::c_types::NotConstructable"),
 
@@ -919,9 +920,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref => Some("*const [u8; 32]"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-
-			// Override the default since Records contain an fmt with a lifetime:
-			"lightning::util::logger::Record" => Some("*const std::os::raw::c_char"),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice"),
 
@@ -1010,8 +1008,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::channelmanager::PaymentId" if is_ref=> Some("&::lightning::ln::channelmanager::PaymentId( unsafe { *"),
 
 			// List of traits we map (possibly during processing of other files):
-			"crate::util::logger::Logger" => Some(""),
-
 			"lightning::io::Read" => Some("&mut "),
 
 			_ => None,
@@ -1080,8 +1076,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref => Some(" })"),
 
 			// List of traits we map (possibly during processing of other files):
-			"crate::util::logger::Logger" => Some(""),
-
 			"lightning::io::Read" => Some(".to_reader()"),
 
 			_ => None,
@@ -1100,9 +1094,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::block::Block" if is_ref => Some(("::bitcoin::consensus::encode::serialize(", ")")),
 			"bitcoin::hash_types::Txid" => None,
 
-			// Override the default since Records contain an fmt with a lifetime:
-			// TODO: We should include the other record fields
-			"lightning::util::logger::Record" => Some(("std::ffi::CString::new(format!(\"{}\", ", ".args)).unwrap()")),
 			_ => None,
 		}.map(|s| s.to_owned())
 	}
@@ -1132,6 +1123,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some(""),
 			"std::time::SystemTime" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
+			"core::fmt::Arguments" => Some("format!(\"{}\", "),
 
 			"core::convert::Infallible" => Some("panic!(\"Cannot construct an Infallible: "),
 
@@ -1170,9 +1162,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
-			// Override the default since Records contain an fmt with a lifetime:
-			"lightning::util::logger::Record" => Some("local_"),
-
 			"lightning::io::Read" => Some("crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec("),
 
 			_ => None,
@@ -1205,6 +1194,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some(".as_secs()"),
 			"std::time::SystemTime" => Some(".duration_since(::std::time::SystemTime::UNIX_EPOCH).expect(\"Times must be post-1970\").as_secs()"),
 			"std::io::Error" if !is_ref => Some(")"),
+			"core::fmt::Arguments" => Some(").into()"),
 
 			"core::convert::Infallible" => Some("\")"),
 
@@ -1241,9 +1231,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref => Some(".0"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
 				if !is_ref => Some(".0 }"),
-
-			// Override the default since Records contain an fmt with a lifetime:
-			"lightning::util::logger::Record" => Some(".as_ptr()"),
 
 			"lightning::io::Read" => Some("))"),
 

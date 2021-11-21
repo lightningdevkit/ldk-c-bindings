@@ -386,9 +386,9 @@ impl<'a, 'b, 'c: 'a + 'b> ResolveType<'c> for Option<&GenericTypes<'a, 'b>> {
 pub enum DeclType<'a> {
 	MirroredEnum,
 	Trait(&'a syn::ItemTrait),
-	StructImported { generic_param_count: usize },
+	StructImported { generics: &'a syn::Generics  },
 	StructIgnored,
-	EnumIgnored { generic_param_count: usize },
+	EnumIgnored { generics: &'a syn::Generics },
 }
 
 pub struct ImportResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
@@ -500,7 +500,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				syn::Item::Struct(s) => {
 					if let syn::Visibility::Public(_) = s.vis {
 						match export_status(&s.attrs) {
-							ExportStatus::Export => { declared.insert(s.ident.clone(), DeclType::StructImported { generic_param_count: s.generics.params.len() }); },
+							ExportStatus::Export => { declared.insert(s.ident.clone(), DeclType::StructImported { generics: &s.generics }); },
 							ExportStatus::NoExport => { declared.insert(s.ident.clone(), DeclType::StructIgnored); },
 							ExportStatus::TestOnly => continue,
 							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
@@ -515,14 +515,14 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 							else { process_alias = false; }
 						}
 						if process_alias {
-							declared.insert(t.ident.clone(), DeclType::StructImported { generic_param_count: t.generics.params.len() });
+							declared.insert(t.ident.clone(), DeclType::StructImported { generics: &t.generics });
 						}
 					}
 				},
 				syn::Item::Enum(e) => {
 					if let syn::Visibility::Public(_) = e.vis {
 						match export_status(&e.attrs) {
-							ExportStatus::Export if is_enum_opaque(e) => { declared.insert(e.ident.clone(), DeclType::EnumIgnored { generic_param_count: e.generics.params.len() }); },
+							ExportStatus::Export if is_enum_opaque(e) => { declared.insert(e.ident.clone(), DeclType::EnumIgnored { generics: &e.generics }); },
 							ExportStatus::Export => { declared.insert(e.ident.clone(), DeclType::MirroredEnum); },
 							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 							_ => continue,
@@ -1863,7 +1863,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				} else if let Some(c_type) = path_lookup(&resolved_path, is_ref, ptr_for_ref) {
 					write!(w, "{}", c_type).unwrap();
 				} else if let Some((_, generics)) = self.crate_types.opaques.get(&resolved_path) {
-					decl_lookup(w, &DeclType::StructImported { generic_param_count: generics.params.len() }, &resolved_path, is_ref, is_mut);
+					decl_lookup(w, &DeclType::StructImported { generics: &generics }, &resolved_path, is_ref, is_mut);
 				} else if self.crate_types.mirrored_enums.get(&resolved_path).is_some() {
 					decl_lookup(w, &DeclType::MirroredEnum, &resolved_path, is_ref, is_mut);
 				} else if let Some(t) = self.crate_types.traits.get(&resolved_path) {
@@ -1976,9 +1976,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				|a, b, c| self.to_c_conversion_inline_suffix_from_path(a, b, c),
 				|w, decl_type, full_path, is_ref, _is_mut| match decl_type {
 					DeclType::MirroredEnum => write!(w, ")").unwrap(),
-					DeclType::EnumIgnored { generic_param_count }|DeclType::StructImported { generic_param_count } if is_ref => {
+					DeclType::EnumIgnored { generics }|DeclType::StructImported { generics } if is_ref => {
 						write!(w, " as *const {}<", full_path).unwrap();
-						for _ in 0..*generic_param_count { write!(w, "_, ").unwrap(); }
+						for param in generics.params.iter() {
+							if let syn::GenericParam::Lifetime(_) = param {
+								write!(w, "'_, ").unwrap();
+							} else {
+								write!(w, "_, ").unwrap();
+							}
+						}
 						if from_ptr {
 							write!(w, ">) as *mut _ }}, is_owned: false }}").unwrap();
 						} else {

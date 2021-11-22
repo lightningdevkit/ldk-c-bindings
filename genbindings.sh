@@ -31,10 +31,9 @@ PATH="$PATH:~/.cargo/bin"
 # Set up CFLAGS and RUSTFLAGS vars appropriately for building libsecp256k1 and demo apps...
 BASE_CFLAGS="" # CFLAGS for libsecp256k1
 LOCAL_CFLAGS="" # CFLAGS for demo apps
-BASE_RUSTFLAGS="" # RUSTFLAGS
 
 # Remap paths so that our builds are deterministic
-BASE_RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo="
+BASE_RUSTFLAGS="--cfg=c_bindings --remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo="
 
 # If the C compiler supports it, also set -ffile-prefix-map
 echo "int main() {}" > genbindings_path_map_test_file.c
@@ -128,7 +127,7 @@ BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
 function add_crate() {
 	pushd "$LIGHTNING_PATH/$1"
-	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check $3 -- -Zunpretty=expanded > /tmp/$1-crate-source.txt
+	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check $3 -- --cfg=c_bindings -Zunpretty=expanded > /tmp/$1-crate-source.txt
 	popd
 	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 		sed -i".original" "1i\\

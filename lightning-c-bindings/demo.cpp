@@ -98,8 +98,10 @@ const LDKThirtyTwoBytes genesis_hash = { // We don't care particularly if this i
 	.data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1 }
 };
 
-void print_log(const void *this_arg, const char *record) {
-	printf("%p - %s\n", this_arg, record);
+void print_log(const void *this_arg, const LDKRecord *record) {
+	LDK::Str mod = Record_get_module_path(record);
+	LDK::Str str = Record_get_args(record);
+	printf("%p - %.*s:%d - %.*s\n", this_arg, (int)mod->len, mod->chars, Record_get_line(record), (int)str->len, str->chars);
 }
 
 uint32_t get_fee(const void *this_arg, LDKConfirmationTarget target) {

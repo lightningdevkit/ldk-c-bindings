@@ -256,7 +256,7 @@ pub(crate) extern "C" fn ScoringParameters_write_void(obj: *const c_void) -> cra
 #[no_mangle]
 /// Read a ScoringParameters from a byte array, created by ScoringParameters_write
 pub extern "C" fn ScoringParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ScoringParametersDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::routing::scorer::ScoringParameters, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scorer::ScoringParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
@@ -325,7 +325,7 @@ pub(crate) extern "C" fn Scorer_write_void(obj: *const c_void) -> crate::c_types
 #[no_mangle]
 /// Read a Scorer from a byte array, created by Scorer_write
 pub extern "C" fn Scorer_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ScorerDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::routing::scorer::Scorer, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scorer::Scorer { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }

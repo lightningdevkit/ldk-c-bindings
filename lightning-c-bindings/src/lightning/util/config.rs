@@ -799,7 +799,7 @@ pub(crate) extern "C" fn ChannelConfig_write_void(obj: *const c_void) -> crate::
 #[no_mangle]
 /// Read a ChannelConfig from a byte array, created by ChannelConfig_write
 pub extern "C" fn ChannelConfig_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelConfigDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::util::config::ChannelConfig, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::util::config::ChannelConfig { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }

@@ -31,10 +31,9 @@ PATH="$PATH:~/.cargo/bin"
 # Set up CFLAGS and RUSTFLAGS vars appropriately for building libsecp256k1 and demo apps...
 BASE_CFLAGS="" # CFLAGS for libsecp256k1
 LOCAL_CFLAGS="" # CFLAGS for demo apps
-BASE_RUSTFLAGS="" # RUSTFLAGS
 
 # Remap paths so that our builds are deterministic
-BASE_RUSTFLAGS="--remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo="
+BASE_RUSTFLAGS="--cfg=c_bindings --remap-path-prefix $LIGHTNING_PATH=rust-lightning --remap-path-prefix $(pwd)=ldk-c-bindings --remap-path-prefix $HOME/.cargo="
 
 # If the C compiler supports it, also set -ffile-prefix-map
 echo "int main() {}" > genbindings_path_map_test_file.c
@@ -128,7 +127,7 @@ BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
 function add_crate() {
 	pushd "$LIGHTNING_PATH/$1"
-	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check $3 -- -Zunpretty=expanded > /tmp/$1-crate-source.txt
+	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check $3 -- --cfg=c_bindings -Zunpretty=expanded > /tmp/$1-crate-source.txt
 	popd
 	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 		sed -i".original" "1i\\
@@ -352,7 +351,7 @@ if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 		echo "Apple clang isn't compatible with upstream clang, install upstream clang"
 		CLANG_LLVM_V="0"
 	else
-		CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }')
+		CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($3, 0, 2); }')
 		if [ -x "$(which ld64.lld)" ]; then
 			LLD_LLVM_V="$(ld64.lld --version | awk '{ print substr($2, 0, 2); }')"
 		fi
@@ -439,13 +438,13 @@ echo "C++ Bin size and runtime with only RL (LTO) optimized:"
 ls -lha a.out
 time ./a.out > /dev/null
 
-if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" ]; then
+if [ "$CLANGPP" != "" ]; then
 	# If we can use cross-language LTO, use it for building C dependencies (i.e. libsecp256k1) as well
 	export CC="$CLANG"
 	# The cc-rs crate tries to force -fdata-sections and -ffunction-sections on, which
 	# breaks -fembed-bitcode, so we turn off cc-rs' default flags and specify exactly
 	# what we want here.
-	export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -fPIC -fembed-bitcode -march=sandybridge"
+	export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -fPIC -fembed-bitcode -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 	export CRATE_CC_NO_DEFAULTS=true
 fi
 
@@ -479,25 +478,35 @@ for IDX in ${!EXTRA_TARGETS[@]}; do
 	RUSTFLAGS="$BASE_RUSTFLAGS -C linker=${EXTRA_CCS[$IDX]}" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target "${EXTRA_TARGETS[$IDX]}" -- -C lto
 done
 
-if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
-	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target aarch64-apple-darwin -- -C lto
-fi
-
-if [ "$HOST_PLATFORM" != "host: x86_64-apple-darwin" -a "$CLANGPP" != "" -a "$LLD" != "" ]; then
+if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 	# Finally, test cross-language LTO. Note that this will fail if rustc and clang++
 	# build against different versions of LLVM (eg when rustc is installed via rustup
 	# or Ubuntu packages). This should work fine on Distros which do more involved
 	# packaging than simply shipping the rustup binaries (eg Debian should Just Work
 	# here).
-	export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -O3 -fPIC -fembed-bitcode -march=sandybridge"
+	LINK_ARG_FLAGS="-C link-arg=-fuse-ld=$LLD"
+	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+		export LDK_CLANG_PATH=$(which $CLANG)
+		export CLANG="$(pwd)/../deterministic-build-wrappers/clang-lto-link-osx"
+		for ARG in "CFLAGS_aarch64_apple_darwin"; do
+			MANUAL_LINK_CFLAGS="$MANUAL_LINK_CFLAGS -C link-arg=$ARG"
+		done
+		export CFLAGS_aarch64_apple_darwin="$CFLAGS_aarch64_apple_darwin -O3 -fPIC -fembed-bitcode"
+		LINK_ARG_FLAGS="$LINK_ARG_FLAGS -C link-arg="-isysroot$(xcrun --show-sdk-path)" -C link-arg=-mmacosx-version-min=10.9"
+		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target aarch64-apple-darwin -- -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-mcpu=apple-a14
+	fi
+	export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -O3 -fPIC -fembed-bitcode -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 	# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 	cargo clean --release
-	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C linker-plugin-lto -C lto -C linker=$CLANG -C link-arg=-fuse-ld=$LLD
+	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge
 	$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=lld -O2 demo.cpp target/release/libldk.a -ldl
 	strip ./a.out
 	echo "C++ Bin size and runtime with cross-language LTO:"
 	ls -lha a.out
 	time ./a.out > /dev/null
 else
-	echo "WARNING: Building with cross-language LTO is not avilable on OSX or without clang-$RUSTC_LLVM_V"
+	if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
+		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target aarch64-apple-darwin -- -C lto
+	fi
+	echo "WARNING: Building with cross-language LTO is not avilable without clang-$RUSTC_LLVM_V"
 fi

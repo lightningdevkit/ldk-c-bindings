@@ -149,7 +149,7 @@ pub(crate) extern "C" fn ChannelMonitorUpdate_write_void(obj: *const c_void) -> 
 #[no_mangle]
 /// Read a ChannelMonitorUpdate from a byte array, created by ChannelMonitorUpdate_write
 pub extern "C" fn ChannelMonitorUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelMonitorUpdateDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::chain::channelmonitor::ChannelMonitorUpdate, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
@@ -426,6 +426,13 @@ pub extern "C" fn MonitorEvent_update_failed(a: crate::lightning::chain::transac
 pub extern "C" fn MonitorEvent_write(obj: &MonitorEvent) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
 }
+#[no_mangle]
+/// Read a MonitorEvent from a byte array, created by MonitorEvent_write
+pub extern "C" fn MonitorEvent_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_MonitorEventZDecodeErrorZ {
+	let res: Result<Option<lightning::chain::channelmonitor::MonitorEvent>, lightning::ln::msgs::DecodeError> = crate::c_types::maybe_deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_MonitorEventZ::None } else { crate::c_types::derived::COption_MonitorEventZ::Some( { crate::lightning::chain::channelmonitor::MonitorEvent::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
 
 use lightning::chain::channelmonitor::HTLCUpdate as nativeHTLCUpdateImport;
 pub(crate) type nativeHTLCUpdate = nativeHTLCUpdateImport;
@@ -510,7 +517,7 @@ pub(crate) extern "C" fn HTLCUpdate_write_void(obj: *const c_void) -> crate::c_t
 #[no_mangle]
 /// Read a HTLCUpdate from a byte array, created by HTLCUpdate_write
 pub extern "C" fn HTLCUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_HTLCUpdateDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::chain::channelmonitor::HTLCUpdate, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::HTLCUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }

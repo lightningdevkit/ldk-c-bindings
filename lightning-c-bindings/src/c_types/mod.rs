@@ -14,7 +14,7 @@ use bitcoin::secp256k1::recovery::RecoverableSignature as SecpRecoverableSignatu
 use bitcoin::bech32;
 
 use std::convert::TryInto; // Bindings need at least rustc 1.34
-
+use core::ffi::c_void;
 use std::io::{Cursor, Read}; // TODO: We should use core2 here when we support no_std
 
 #[repr(C)]
@@ -430,6 +430,9 @@ pub(crate) fn serialize_obj<I: lightning::util::ser::Writeable>(i: &I) -> derive
 pub(crate) fn deserialize_obj<I: lightning::util::ser::Readable>(s: u8slice) -> Result<I, lightning::ln::msgs::DecodeError> {
 	I::read(&mut s.to_slice())
 }
+pub(crate) fn maybe_deserialize_obj<I: lightning::util::ser::MaybeReadable>(s: u8slice) -> Result<Option<I>, lightning::ln::msgs::DecodeError> {
+	I::read(&mut s.to_slice())
+}
 pub(crate) fn deserialize_obj_arg<A, I: lightning::util::ser::ReadableArgs<A>>(s: u8slice, args: A) -> Result<I, lightning::ln::msgs::DecodeError> {
 	I::read(&mut s.to_slice(), args)
 }
@@ -612,6 +615,18 @@ pub(crate) mod ObjOps {
 			#[cfg(not(test_mod_pointers))]
 			ptr
 		}
+	}
+}
+
+#[cfg(test_mod_pointers)]
+#[no_mangle]
+/// This function exists for memory safety testing purposes. It should never be used in production
+/// code
+pub extern "C" fn __unmangle_inner_ptr(ptr: *const c_void) -> *const c_void {
+	if ptr as usize == 1 {
+		core::ptr::null()
+	} else {
+		unsafe { ptr.cast::<u8>().sub(4096).cast::<c_void>() }
 	}
 }
 

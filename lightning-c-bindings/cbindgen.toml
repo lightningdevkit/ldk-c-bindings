@@ -29,3 +29,6 @@ must_use = "MUST_USE_ENUM"
 
 [ptr]
 non_null_attribute = "NONNULL_PTR"
+
+[defines]
+"test_mod_pointers" = "LDK_DEBUG_BUILD"

@@ -124,6 +124,12 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	writeln!(w, "\t}}").unwrap();
 	writeln!(w, "}}").unwrap();
 
+	writeln!(w, "/// Checks if the given object is currently in the success state").unwrap();
+	writeln!(w, "#[no_mangle]").unwrap();
+	writeln!(w, "pub extern \"C\" fn {}_is_ok(o: &{}) -> bool {{", mangled_container, mangled_container).unwrap();
+	writeln!(w, "\to.result_ok").unwrap();
+	writeln!(w, "}}").unwrap();
+
 	writeln!(w, "#[no_mangle]").unwrap();
 	writeln!(w, "/// Frees any resources used by the {}.", mangled_container).unwrap();
 	writeln!(w, "pub extern \"C\" fn {}_free(_res: {}) {{ }}", mangled_container, mangled_container).unwrap();

@@ -294,23 +294,28 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 				&syn::TraitItem::Type(ref t) => {
 					if t.default.is_some() || t.generics.lt_token.is_some() { unimplemented!(); }
 					let mut bounds_iter = t.bounds.iter();
-					match bounds_iter.next().unwrap() {
-						syn::TypeParamBound::Trait(tr) => {
-							assert_simple_bound(&tr);
-							if let Some(path) = types.maybe_resolve_path(&tr.path, None) {
-								if types.skip_path(&path) { continue; }
-								// In general we handle Deref<Target=X> as if it were just X (and
-								// implement Deref<Target=Self> for relevant types). We don't
-								// bother to implement it for associated types, however, so we just
-								// ignore such bounds.
-								if path != "std::ops::Deref" && path != "core::ops::Deref" {
-									self.typed_generics.insert(&t.ident, path);
+					loop {
+						match bounds_iter.next().unwrap() {
+							syn::TypeParamBound::Trait(tr) => {
+								assert_simple_bound(&tr);
+								if let Some(path) = types.maybe_resolve_path(&tr.path, None) {
+									if types.skip_path(&path) { continue; }
+									// In general we handle Deref<Target=X> as if it were just X (and
+									// implement Deref<Target=Self> for relevant types). We don't
+									// bother to implement it for associated types, however, so we just
+									// ignore such bounds.
+									if path != "std::ops::Deref" && path != "core::ops::Deref" {
+										self.typed_generics.insert(&t.ident, path);
+									}
+								} else { unimplemented!(); }
+								for bound in bounds_iter {
+									if let syn::TypeParamBound::Trait(_) = bound { unimplemented!(); }
 								}
-							} else { unimplemented!(); }
-						},
-						_ => unimplemented!(),
+								break;
+							},
+							syn::TypeParamBound::Lifetime(_) => {},
+						}
 					}
-					if bounds_iter.next().is_some() { unimplemented!(); }
 				},
 				_ => {},
 			}
@@ -381,9 +386,9 @@ impl<'a, 'b, 'c: 'a + 'b> ResolveType<'c> for Option<&GenericTypes<'a, 'b>> {
 pub enum DeclType<'a> {
 	MirroredEnum,
 	Trait(&'a syn::ItemTrait),
-	StructImported { generic_param_count: usize },
+	StructImported { generics: &'a syn::Generics  },
 	StructIgnored,
-	EnumIgnored { generic_param_count: usize },
+	EnumIgnored { generics: &'a syn::Generics },
 }
 
 pub struct ImportResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
@@ -408,6 +413,11 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 					new_path = format!("{}{}", super_mod, $path_suffix);
 					assert_eq!(path.len(), 0);
 					for module in super_mod.split("::") {
+						path.push(syn::PathSegment { ident: syn::Ident::new(module, Span::call_site()), arguments: syn::PathArguments::None });
+					}
+				} else if partial_path == "" && format!("{}", $ident) == "self" {
+					new_path = format!("{}{}", module_path, $path_suffix);
+					for module in module_path.split("::") {
 						path.push(syn::PathSegment { ident: syn::Ident::new(module, Span::call_site()), arguments: syn::PathArguments::None });
 					}
 				} else if partial_path == "" && format!("{}", $ident) == "crate" {
@@ -495,7 +505,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				syn::Item::Struct(s) => {
 					if let syn::Visibility::Public(_) = s.vis {
 						match export_status(&s.attrs) {
-							ExportStatus::Export => { declared.insert(s.ident.clone(), DeclType::StructImported { generic_param_count: s.generics.params.len() }); },
+							ExportStatus::Export => { declared.insert(s.ident.clone(), DeclType::StructImported { generics: &s.generics }); },
 							ExportStatus::NoExport => { declared.insert(s.ident.clone(), DeclType::StructIgnored); },
 							ExportStatus::TestOnly => continue,
 							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
@@ -510,14 +520,14 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 							else { process_alias = false; }
 						}
 						if process_alias {
-							declared.insert(t.ident.clone(), DeclType::StructImported { generic_param_count: t.generics.params.len() });
+							declared.insert(t.ident.clone(), DeclType::StructImported { generics: &t.generics });
 						}
 					}
 				},
 				syn::Item::Enum(e) => {
 					if let syn::Visibility::Public(_) = e.vis {
 						match export_status(&e.attrs) {
-							ExportStatus::Export if is_enum_opaque(e) => { declared.insert(e.ident.clone(), DeclType::EnumIgnored { generic_param_count: e.generics.params.len() }); },
+							ExportStatus::Export if is_enum_opaque(e) => { declared.insert(e.ident.clone(), DeclType::EnumIgnored { generics: &e.generics }); },
 							ExportStatus::Export => { declared.insert(e.ident.clone(), DeclType::MirroredEnum); },
 							ExportStatus::NotImplementable => panic!("(C-not implementable) should only appear on traits!"),
 							_ => continue,
@@ -874,6 +884,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some("u64"),
 			"std::time::SystemTime" => Some("u64"),
 			"std::io::Error" => Some("crate::c_types::IOError"),
+			"core::fmt::Arguments" if is_ref => Some("crate::c_types::Str"),
 
 			"core::convert::Infallible" => Some("crate::c_types::NotConstructable"),
 
@@ -914,9 +925,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref => Some("*const [u8; 32]"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-
-			// Override the default since Records contain an fmt with a lifetime:
-			"lightning::util::logger::Record" => Some("*const std::os::raw::c_char"),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice"),
 
@@ -1005,8 +1013,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::channelmanager::PaymentId" if is_ref=> Some("&::lightning::ln::channelmanager::PaymentId( unsafe { *"),
 
 			// List of traits we map (possibly during processing of other files):
-			"crate::util::logger::Logger" => Some(""),
-
 			"lightning::io::Read" => Some("&mut "),
 
 			_ => None,
@@ -1075,8 +1081,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref => Some(" })"),
 
 			// List of traits we map (possibly during processing of other files):
-			"crate::util::logger::Logger" => Some(""),
-
 			"lightning::io::Read" => Some(".to_reader()"),
 
 			_ => None,
@@ -1095,9 +1099,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::block::Block" if is_ref => Some(("::bitcoin::consensus::encode::serialize(", ")")),
 			"bitcoin::hash_types::Txid" => None,
 
-			// Override the default since Records contain an fmt with a lifetime:
-			// TODO: We should include the other record fields
-			"lightning::util::logger::Record" => Some(("std::ffi::CString::new(format!(\"{}\", ", ".args)).unwrap()")),
 			_ => None,
 		}.map(|s| s.to_owned())
 	}
@@ -1127,6 +1128,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some(""),
 			"std::time::SystemTime" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
+			"core::fmt::Arguments" => Some("format!(\"{}\", "),
 
 			"core::convert::Infallible" => Some("panic!(\"Cannot construct an Infallible: "),
 
@@ -1165,9 +1167,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
-			// Override the default since Records contain an fmt with a lifetime:
-			"lightning::util::logger::Record" => Some("local_"),
-
 			"lightning::io::Read" => Some("crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec("),
 
 			_ => None,
@@ -1200,6 +1199,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some(".as_secs()"),
 			"std::time::SystemTime" => Some(".duration_since(::std::time::SystemTime::UNIX_EPOCH).expect(\"Times must be post-1970\").as_secs()"),
 			"std::io::Error" if !is_ref => Some(")"),
+			"core::fmt::Arguments" => Some(").into()"),
 
 			"core::convert::Infallible" => Some("\")"),
 
@@ -1236,9 +1236,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref => Some(".0"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
 				if !is_ref => Some(".0 }"),
-
-			// Override the default since Records contain an fmt with a lifetime:
-			"lightning::util::logger::Record" => Some(".as_ptr()"),
 
 			"lightning::io::Read" => Some("))"),
 
@@ -1858,7 +1855,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				} else if let Some(c_type) = path_lookup(&resolved_path, is_ref, ptr_for_ref) {
 					write!(w, "{}", c_type).unwrap();
 				} else if let Some((_, generics)) = self.crate_types.opaques.get(&resolved_path) {
-					decl_lookup(w, &DeclType::StructImported { generic_param_count: generics.params.len() }, &resolved_path, is_ref, is_mut);
+					decl_lookup(w, &DeclType::StructImported { generics: &generics }, &resolved_path, is_ref, is_mut);
 				} else if self.crate_types.mirrored_enums.get(&resolved_path).is_some() {
 					decl_lookup(w, &DeclType::MirroredEnum, &resolved_path, is_ref, is_mut);
 				} else if let Some(t) = self.crate_types.traits.get(&resolved_path) {
@@ -1971,9 +1968,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				|a, b, c| self.to_c_conversion_inline_suffix_from_path(a, b, c),
 				|w, decl_type, full_path, is_ref, _is_mut| match decl_type {
 					DeclType::MirroredEnum => write!(w, ")").unwrap(),
-					DeclType::EnumIgnored { generic_param_count }|DeclType::StructImported { generic_param_count } if is_ref => {
+					DeclType::EnumIgnored { generics }|DeclType::StructImported { generics } if is_ref => {
 						write!(w, " as *const {}<", full_path).unwrap();
-						for _ in 0..*generic_param_count { write!(w, "_, ").unwrap(); }
+						for param in generics.params.iter() {
+							if let syn::GenericParam::Lifetime(_) = param {
+								write!(w, "'_, ").unwrap();
+							} else {
+								write!(w, "_, ").unwrap();
+							}
+						}
 						if from_ptr {
 							write!(w, ">) as *mut _ }}, is_owned: false }}").unwrap();
 						} else {

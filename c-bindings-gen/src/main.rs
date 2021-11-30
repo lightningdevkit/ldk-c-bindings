@@ -84,9 +84,9 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 					writeln!(w, "}}").unwrap();
 				}
 			},
-			"lightning::util::ser::Readable"|"lightning::util::ser::ReadableArgs" => {
+			"lightning::util::ser::Readable"|"lightning::util::ser::ReadableArgs"|"lightning::util::ser::MaybeReadable" => {
 				// Create the Result<Object, DecodeError> syn::Type
-				let res_ty: syn::Type = parse_quote!(Result<#for_ty, ::ln::msgs::DecodeError>);
+				let mut res_ty: syn::Type = parse_quote!(Result<#for_ty, ::ln::msgs::DecodeError>);
 
 				writeln!(w, "#[no_mangle]").unwrap();
 				writeln!(w, "/// Read a {} from a byte array, created by {}_write", for_obj, for_obj).unwrap();
@@ -111,6 +111,8 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 							types.write_from_c_conversion_suffix(&mut arg_conv, &args_ty, Some(generics));
 						} else { unreachable!(); }
 					} else { unreachable!(); }
+				} else if t == "lightning::util::ser::MaybeReadable" {
+					res_ty = parse_quote!(Result<Option<#for_ty>, ::ln::msgs::DecodeError>);
 				}
 				write!(w, ") -> ").unwrap();
 				types.write_c_type(w, &res_ty, Some(generics), false);
@@ -118,12 +120,19 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 
 				if t == "lightning::util::ser::ReadableArgs" {
 					w.write(&arg_conv).unwrap();
-					write!(w, ";\n\tlet res: ").unwrap();
-					// At least in one case we need type annotations here, so provide them.
-					types.write_rust_type(w, Some(generics), &res_ty);
+					write!(w, ";\n").unwrap();
+				}
+
+				write!(w, "\tlet res: ").unwrap();
+				// At least in one case we need type annotations here, so provide them.
+				types.write_rust_type(w, Some(generics), &res_ty);
+
+				if t == "lightning::util::ser::ReadableArgs" {
 					writeln!(w, " = crate::c_types::deserialize_obj_arg(ser, arg_conv);").unwrap();
+				} else if t == "lightning::util::ser::MaybeReadable" {
+					writeln!(w, " = crate::c_types::maybe_deserialize_obj(ser);").unwrap();
 				} else {
-					writeln!(w, "\tlet res = crate::c_types::deserialize_obj(ser);").unwrap();
+					writeln!(w, " = crate::c_types::deserialize_obj(ser);").unwrap();
 				}
 				write!(w, "\t").unwrap();
 				if types.write_to_c_conversion_new_var(w, &format_ident!("res"), &res_ty, Some(generics), false) {
@@ -482,13 +491,18 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 					&syn::TraitItem::Type(ref t) => {
 						if t.default.is_some() || t.generics.lt_token.is_some() { unimplemented!(); }
 						let mut bounds_iter = t.bounds.iter();
-						match bounds_iter.next().unwrap() {
-							syn::TypeParamBound::Trait(tr) => {
-								writeln!(w, "\ttype {} = crate::{};", t.ident, $type_resolver.resolve_path(&tr.path, Some(&gen_types))).unwrap();
-							},
-							_ => unimplemented!(),
+						loop {
+							match bounds_iter.next().unwrap() {
+								syn::TypeParamBound::Trait(tr) => {
+									writeln!(w, "\ttype {} = crate::{};", t.ident, $type_resolver.resolve_path(&tr.path, Some(&gen_types))).unwrap();
+									for bound in bounds_iter {
+										if let syn::TypeParamBound::Trait(_) = bound { unimplemented!(); }
+									}
+									break;
+								},
+								syn::TypeParamBound::Lifetime(_) => {},
+							}
 						}
-						if bounds_iter.next().is_some() { unimplemented!(); }
 					},
 					_ => unimplemented!(),
 				}

@@ -207,7 +207,7 @@ pub(crate) extern "C" fn RouteHop_write_void(obj: *const c_void) -> crate::c_typ
 #[no_mangle]
 /// Read a RouteHop from a byte array, created by RouteHop_write
 pub extern "C" fn RouteHop_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteHopDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::routing::router::RouteHop, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
@@ -391,7 +391,7 @@ pub(crate) extern "C" fn Route_write_void(obj: *const c_void) -> crate::c_types:
 #[no_mangle]
 /// Read a Route from a byte array, created by Route_write
 pub extern "C" fn Route_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::routing::router::Route, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
@@ -525,7 +525,7 @@ pub(crate) extern "C" fn RouteParameters_write_void(obj: *const c_void) -> crate
 #[no_mangle]
 /// Read a RouteParameters from a byte array, created by RouteParameters_write
 pub extern "C" fn RouteParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteParametersDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::routing::router::RouteParameters, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
@@ -708,7 +708,7 @@ pub(crate) extern "C" fn Payee_write_void(obj: *const c_void) -> crate::c_types:
 #[no_mangle]
 /// Read a Payee from a byte array, created by Payee_write
 pub extern "C" fn Payee_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_PayeeDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::routing::router::Payee, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Payee { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
@@ -849,7 +849,7 @@ pub(crate) extern "C" fn RouteHint_write_void(obj: *const c_void) -> crate::c_ty
 #[no_mangle]
 /// Read a RouteHint from a byte array, created by RouteHint_write
 pub extern "C" fn RouteHint_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteHintDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::routing::router::RouteHint, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteHint { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
@@ -1039,7 +1039,7 @@ pub(crate) extern "C" fn RouteHintHop_write_void(obj: *const c_void) -> crate::c
 #[no_mangle]
 /// Read a RouteHintHop from a byte array, created by RouteHintHop_write
 pub extern "C" fn RouteHintHop_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteHintHopDecodeErrorZ {
-	let res = crate::c_types::deserialize_obj(ser);
+	let res: Result<lightning::routing::router::RouteHintHop, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteHintHop { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }

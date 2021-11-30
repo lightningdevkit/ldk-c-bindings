@@ -1,0 +1,15 @@
+#!/bin/sh
+# We want to use rustc's -C linker-plugin-lto, but it passes several arguments
+# that are not understood by OSX clang/ld64.lld. Specifically, it passes
+# -plugin-opt* arguments to set optimization levels, which are not supported.
+# Thus, we intercept the call here, strip the unsupported arguments, and pass
+# -flto and -O3.
+args=("$@")
+for ((i=0; i<"${#args[@]}"; ++i)); do
+    case ${args[i]} in
+        -Wl,-plugin-opt*)
+			args[i]=""
+			;;
+    esac
+done
+$LDK_CLANG_PATH -flto -O3 -Wl,-O3 "${args[@]}"

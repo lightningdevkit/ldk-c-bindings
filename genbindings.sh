@@ -356,10 +356,20 @@ if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 			LLD_LLVM_V="$(ld64.lld --version | awk '{ print substr($2, 0, 2); }')"
 		fi
 	fi
+	LLD_PFX=ld64.
 else
 	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }')
 	if [ -x "$(which ld.lld)" ]; then
-		LLD_LLVM_V="$(ld.lld --version | awk '{ print substr($2, 0, 2); }')"
+		LLD_LLVM_V="$(ld.lld --version | awk '{ print $2; }')"
+		if [ "$LLD_LLVM_V" = "LLD" ]; then # eg if the output is "Debian LLD ..."
+			LLD_LLVM_V="$(ld.lld --version | awk '{ print substr($3, 0, 2); }')"
+		else
+			LLD_LLVM_V="$(ld.lld-$RUSTC_LLVM_V --version | awk '{ print substr($2, 0, 2); }')"
+		fi
+	fi
+	LLD_PFX=ld.
+	if [ $RUSTC_LLVM_V -lt "13" ]; then
+		LLD_PFX=
 	fi
 fi
 
@@ -368,7 +378,7 @@ if [ "$CLANG_LLVM_V" = "$RUSTC_LLVM_V" ]; then
 	CLANG=clang
 	CLANGPP=clang++
 	if [ "$LLD_LLVM_V" = "$CLANG_LLVM_V" ]; then
-		LLD=lld
+		LLD=${LLD_PFX}lld
 	fi
 elif [ -x "$(which clang-$RUSTC_LLVM_V)" ]; then
 	CLANG="$(which clang-$RUSTC_LLVM_V)"
@@ -379,8 +389,13 @@ elif [ -x "$(which clang-$RUSTC_LLVM_V)" ]; then
 		unset CLANGPP
 	fi
 	if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
-		LLD="$(which lld-$RUSTC_LLVM_V || echo lld)"
-		LLD_LLVM_V="$(ld.$LLD --version | awk '{ print substr($2, 0, 2); }')"
+		LLD="$(which ${LLD_PFX}lld-$RUSTC_LLVM_V || echo ${LLD_PFX}lld)"
+		LLD_LLVM_V="$($LLD --version | awk '{ print $2; }')"
+		if [ "$LLD_LLVM_V" = "LLD" ]; then # eg if the output is "Debian LLD ..."
+			LLD_LLVM_V="$(${LLD_PFX}lld-$RUSTC_LLVM_V --version | awk '{ print substr($3, 0, 2); }')"
+		else
+			LLD_LLVM_V="$(${LLD_PFX}lld-$RUSTC_LLVM_V --version | awk '{ print substr($2, 0, 2); }')"
+		fi
 		if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
 			echo "Could not find a workable version of lld, not using cross-language LTO"
 			unset LLD
@@ -499,7 +514,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 	# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 	cargo clean --release
 	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge
-	$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=lld -O2 demo.cpp target/release/libldk.a -ldl
+	$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -O2 demo.cpp target/release/libldk.a -ldl
 	strip ./a.out
 	echo "C++ Bin size and runtime with cross-language LTO:"
 	ls -lha a.out

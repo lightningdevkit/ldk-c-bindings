@@ -47,15 +47,6 @@ pub enum PaymentPurpose {
 		/// [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
 		/// [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
 		payment_secret: crate::c_types::ThirtyTwoBytes,
-		/// This is the `user_payment_id` which was provided to
-		/// [`ChannelManager::create_inbound_payment_for_hash`] or
-		/// [`ChannelManager::create_inbound_payment`]. It has no meaning inside of LDK and is
-		/// simply copied here. It may be used to correlate PaymentReceived events with invoice
-		/// metadata stored elsewhere.
-		///
-		/// [`ChannelManager::create_inbound_payment`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment
-		/// [`ChannelManager::create_inbound_payment_for_hash`]: crate::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
-		user_payment_id: u64,
 	},
 	/// Because this is a spontaneous payment, the payer generated their own preimage rather than us
 	/// (the payee) providing a preimage.
@@ -66,15 +57,13 @@ impl PaymentPurpose {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativePaymentPurpose {
 		match self {
-			PaymentPurpose::InvoicePayment {ref payment_preimage, ref payment_secret, ref user_payment_id, } => {
+			PaymentPurpose::InvoicePayment {ref payment_preimage, ref payment_secret, } => {
 				let mut payment_preimage_nonref = (*payment_preimage).clone();
 				let mut local_payment_preimage_nonref = if payment_preimage_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(payment_preimage_nonref.data) }) };
 				let mut payment_secret_nonref = (*payment_secret).clone();
-				let mut user_payment_id_nonref = (*user_payment_id).clone();
 				nativePaymentPurpose::InvoicePayment {
 					payment_preimage: local_payment_preimage_nonref,
 					payment_secret: ::lightning::ln::PaymentSecret(payment_secret_nonref.data),
-					user_payment_id: user_payment_id_nonref,
 				}
 			},
 			PaymentPurpose::SpontaneousPayment (ref a, ) => {
@@ -88,12 +77,11 @@ impl PaymentPurpose {
 	#[allow(unused)]
 	pub(crate) fn into_native(self) -> nativePaymentPurpose {
 		match self {
-			PaymentPurpose::InvoicePayment {mut payment_preimage, mut payment_secret, mut user_payment_id, } => {
+			PaymentPurpose::InvoicePayment {mut payment_preimage, mut payment_secret, } => {
 				let mut local_payment_preimage = if payment_preimage.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(payment_preimage.data) }) };
 				nativePaymentPurpose::InvoicePayment {
 					payment_preimage: local_payment_preimage,
 					payment_secret: ::lightning::ln::PaymentSecret(payment_secret.data),
-					user_payment_id: user_payment_id,
 				}
 			},
 			PaymentPurpose::SpontaneousPayment (mut a, ) => {
@@ -106,15 +94,13 @@ impl PaymentPurpose {
 	#[allow(unused)]
 	pub(crate) fn from_native(native: &nativePaymentPurpose) -> Self {
 		match native {
-			nativePaymentPurpose::InvoicePayment {ref payment_preimage, ref payment_secret, ref user_payment_id, } => {
+			nativePaymentPurpose::InvoicePayment {ref payment_preimage, ref payment_secret, } => {
 				let mut payment_preimage_nonref = (*payment_preimage).clone();
 				let mut local_payment_preimage_nonref = if payment_preimage_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_preimage_nonref.unwrap()).0 } } };
 				let mut payment_secret_nonref = (*payment_secret).clone();
-				let mut user_payment_id_nonref = (*user_payment_id).clone();
 				PaymentPurpose::InvoicePayment {
 					payment_preimage: local_payment_preimage_nonref,
 					payment_secret: crate::c_types::ThirtyTwoBytes { data: payment_secret_nonref.0 },
-					user_payment_id: user_payment_id_nonref,
 				}
 			},
 			nativePaymentPurpose::SpontaneousPayment (ref a, ) => {
@@ -128,12 +114,11 @@ impl PaymentPurpose {
 	#[allow(unused)]
 	pub(crate) fn native_into(native: nativePaymentPurpose) -> Self {
 		match native {
-			nativePaymentPurpose::InvoicePayment {mut payment_preimage, mut payment_secret, mut user_payment_id, } => {
+			nativePaymentPurpose::InvoicePayment {mut payment_preimage, mut payment_secret, } => {
 				let mut local_payment_preimage = if payment_preimage.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_preimage.unwrap()).0 } } };
 				PaymentPurpose::InvoicePayment {
 					payment_preimage: local_payment_preimage,
 					payment_secret: crate::c_types::ThirtyTwoBytes { data: payment_secret.0 },
-					user_payment_id: user_payment_id,
 				}
 			},
 			nativePaymentPurpose::SpontaneousPayment (mut a, ) => {
@@ -154,11 +139,10 @@ pub extern "C" fn PaymentPurpose_clone(orig: &PaymentPurpose) -> PaymentPurpose 
 }
 #[no_mangle]
 /// Utility method to constructs a new InvoicePayment-variant PaymentPurpose
-pub extern "C" fn PaymentPurpose_invoice_payment(payment_preimage: crate::c_types::ThirtyTwoBytes, payment_secret: crate::c_types::ThirtyTwoBytes, user_payment_id: u64) -> PaymentPurpose {
+pub extern "C" fn PaymentPurpose_invoice_payment(payment_preimage: crate::c_types::ThirtyTwoBytes, payment_secret: crate::c_types::ThirtyTwoBytes) -> PaymentPurpose {
 	PaymentPurpose::InvoicePayment {
 		payment_preimage,
 		payment_secret,
-		user_payment_id,
 	}
 }
 #[no_mangle]
@@ -194,6 +178,8 @@ pub enum ClosureReason {
 	/// commitment transaction came from our counterparty, but it may also have come from
 	/// a copy of our own `ChannelMonitor`.
 	CommitmentTxConfirmed,
+	/// The funding transaction failed to confirm in a timely manner on an inbound channel.
+	FundingTimedOut,
 	/// Closure generated from processing an event, likely a HTLC forward/relay/reception.
 	ProcessingError {
 		/// A developer-readable error message which we generated.
@@ -223,6 +209,7 @@ impl ClosureReason {
 			ClosureReason::HolderForceClosed => nativeClosureReason::HolderForceClosed,
 			ClosureReason::CooperativeClosure => nativeClosureReason::CooperativeClosure,
 			ClosureReason::CommitmentTxConfirmed => nativeClosureReason::CommitmentTxConfirmed,
+			ClosureReason::FundingTimedOut => nativeClosureReason::FundingTimedOut,
 			ClosureReason::ProcessingError {ref err, } => {
 				let mut err_nonref = (*err).clone();
 				nativeClosureReason::ProcessingError {
@@ -244,6 +231,7 @@ impl ClosureReason {
 			ClosureReason::HolderForceClosed => nativeClosureReason::HolderForceClosed,
 			ClosureReason::CooperativeClosure => nativeClosureReason::CooperativeClosure,
 			ClosureReason::CommitmentTxConfirmed => nativeClosureReason::CommitmentTxConfirmed,
+			ClosureReason::FundingTimedOut => nativeClosureReason::FundingTimedOut,
 			ClosureReason::ProcessingError {mut err, } => {
 				nativeClosureReason::ProcessingError {
 					err: err.into_string(),
@@ -265,6 +253,7 @@ impl ClosureReason {
 			nativeClosureReason::HolderForceClosed => ClosureReason::HolderForceClosed,
 			nativeClosureReason::CooperativeClosure => ClosureReason::CooperativeClosure,
 			nativeClosureReason::CommitmentTxConfirmed => ClosureReason::CommitmentTxConfirmed,
+			nativeClosureReason::FundingTimedOut => ClosureReason::FundingTimedOut,
 			nativeClosureReason::ProcessingError {ref err, } => {
 				let mut err_nonref = (*err).clone();
 				ClosureReason::ProcessingError {
@@ -286,6 +275,7 @@ impl ClosureReason {
 			nativeClosureReason::HolderForceClosed => ClosureReason::HolderForceClosed,
 			nativeClosureReason::CooperativeClosure => ClosureReason::CooperativeClosure,
 			nativeClosureReason::CommitmentTxConfirmed => ClosureReason::CommitmentTxConfirmed,
+			nativeClosureReason::FundingTimedOut => ClosureReason::FundingTimedOut,
 			nativeClosureReason::ProcessingError {mut err, } => {
 				ClosureReason::ProcessingError {
 					err: err.into(),
@@ -324,6 +314,10 @@ pub extern "C" fn ClosureReason_cooperative_closure() -> ClosureReason {
 pub extern "C" fn ClosureReason_commitment_tx_confirmed() -> ClosureReason {
 	ClosureReason::CommitmentTxConfirmed}
 #[no_mangle]
+/// Utility method to constructs a new FundingTimedOut-variant ClosureReason
+pub extern "C" fn ClosureReason_funding_timed_out() -> ClosureReason {
+	ClosureReason::FundingTimedOut}
+#[no_mangle]
 /// Utility method to constructs a new ProcessingError-variant ClosureReason
 pub extern "C" fn ClosureReason_processing_error(err: crate::c_types::Str) -> ClosureReason {
 	ClosureReason::ProcessingError {
@@ -360,10 +354,13 @@ pub extern "C" fn ClosureReason_read(ser: crate::c_types::u8slice) -> crate::c_t
 #[repr(C)]
 pub enum Event {
 	/// Used to indicate that the client should generate a funding transaction with the given
-	/// parameters and then call ChannelManager::funding_transaction_generated.
-	/// Generated in ChannelManager message handling.
+	/// parameters and then call [`ChannelManager::funding_transaction_generated`].
+	/// Generated in [`ChannelManager`] message handling.
 	/// Note that *all inputs* in the funding transaction must spend SegWit outputs or your
 	/// counterparty can steal your funds!
+	///
+	/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
+	/// [`ChannelManager::funding_transaction_generated`]: crate::ln::channelmanager::ChannelManager::funding_transaction_generated
 	FundingGenerationReady {
 		/// The random channel_id we picked which you'll need to pass into
 		/// ChannelManager::funding_transaction_generated.
@@ -387,10 +384,15 @@ pub enum Event {
 	/// [`ChannelManager::fail_htlc_backwards`] within the HTLC's timeout, the HTLC will be
 	/// automatically failed.
 	///
+	/// # Note
+	/// LDK will not stop an inbound payment from being paid multiple times, so multiple
+	/// `PaymentReceived` events may be generated for the same payment.
+	///
 	/// [`ChannelManager::claim_funds`]: crate::ln::channelmanager::ChannelManager::claim_funds
 	/// [`ChannelManager::fail_htlc_backwards`]: crate::ln::channelmanager::ChannelManager::fail_htlc_backwards
 	PaymentReceived {
-		/// The hash for which the preimage should be handed to the ChannelManager.
+		/// The hash for which the preimage should be handed to the ChannelManager. Note that LDK will
+		/// not stop you from registering duplicate payment hashes for inbound payments.
 		payment_hash: crate::c_types::ThirtyTwoBytes,
 		/// The value, in thousandths of a satoshi, that this payment is for.
 		amt: u64,
@@ -416,7 +418,7 @@ pub enum Event {
 		/// Note that this serves as a payment receipt, if you wish to have such a thing, you must
 		/// store it somehow!
 		payment_preimage: crate::c_types::ThirtyTwoBytes,
-		/// The hash which was given to [`ChannelManager::send_payment`].
+		/// The hash that was given to [`ChannelManager::send_payment`].
 		///
 		/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
 		payment_hash: crate::c_types::ThirtyTwoBytes,
@@ -431,18 +433,26 @@ pub enum Event {
 		/// [`Route::get_total_fees`]: crate::routing::router::Route::get_total_fees
 		fee_paid_msat: crate::c_types::derived::COption_u64Z,
 	},
-	/// Indicates an outbound payment we made failed. Probably some intermediary node dropped
+	/// Indicates an outbound HTLC we sent failed. Probably some intermediary node dropped
 	/// something. You may wish to retry with a different route.
+	///
+	/// Note that this does *not* indicate that all paths for an MPP payment have failed, see
+	/// [`Event::PaymentFailed`] and [`all_paths_failed`].
+	///
+	/// [`all_paths_failed`]: Self::all_paths_failed
 	PaymentPathFailed {
 		/// The id returned by [`ChannelManager::send_payment`] and used with
-		/// [`ChannelManager::retry_payment`].
+		/// [`ChannelManager::retry_payment`] and [`ChannelManager::abandon_payment`].
 		///
 		/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
 		/// [`ChannelManager::retry_payment`]: crate::ln::channelmanager::ChannelManager::retry_payment
+		/// [`ChannelManager::abandon_payment`]: crate::ln::channelmanager::ChannelManager::abandon_payment
 		///
 		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
 		payment_id: crate::c_types::ThirtyTwoBytes,
-		/// The hash which was given to ChannelManager::send_payment.
+		/// The hash that was given to [`ChannelManager::send_payment`].
+		///
+		/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
 		payment_hash: crate::c_types::ThirtyTwoBytes,
 		/// Indicates the payment was rejected for some reason by the recipient. This implies that
 		/// the payment has failed, not just the route in question. If this is not set, you may
@@ -460,6 +470,20 @@ pub enum Event {
 		/// For both single-path and multi-path payments, this is set if all paths of the payment have
 		/// failed. This will be set to false if (1) this is an MPP payment and (2) other parts of the
 		/// larger MPP payment were still in flight when this event was generated.
+		///
+		/// Note that if you are retrying individual MPP parts, using this value to determine if a
+		/// payment has fully failed is race-y. Because multiple failures can happen prior to events
+		/// being processed, you may retry in response to a first failure, with a second failure
+		/// (with `all_paths_failed` set) still pending. Then, when the second failure is processed
+		/// you will see `all_paths_failed` set even though the retry of the first failure still
+		/// has an associated in-flight HTLC. See (1) for an example of such a failure.
+		///
+		/// If you wish to retry individual MPP parts and learn when a payment has failed, you must
+		/// call [`ChannelManager::abandon_payment`] and wait for a [`Event::PaymentFailed`] event.
+		///
+		/// (1) <https://github.com/lightningdevkit/rust-lightning/issues/1164>
+		///
+		/// [`ChannelManager::abandon_payment`]: crate::ln::channelmanager::ChannelManager::abandon_payment
 		all_paths_failed: bool,
 		/// The payment path that failed.
 		path: crate::c_types::derived::CVec_RouteHopZ,
@@ -478,8 +502,31 @@ pub enum Event {
 		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
 		retry: crate::lightning::routing::router::RouteParameters,
 	},
-	/// Used to indicate that ChannelManager::process_pending_htlc_forwards should be called at a
-	/// time in the future.
+	/// Indicates an outbound payment failed. Individual [`Event::PaymentPathFailed`] events
+	/// provide failure information for each MPP part in the payment.
+	///
+	/// This event is provided once there are no further pending HTLCs for the payment and the
+	/// payment is no longer retryable, either due to a several-block timeout or because
+	/// [`ChannelManager::abandon_payment`] was previously called for the corresponding payment.
+	///
+	/// [`ChannelManager::abandon_payment`]: crate::ln::channelmanager::ChannelManager::abandon_payment
+	PaymentFailed {
+		/// The id returned by [`ChannelManager::send_payment`] and used with
+		/// [`ChannelManager::retry_payment`] and [`ChannelManager::abandon_payment`].
+		///
+		/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+		/// [`ChannelManager::retry_payment`]: crate::ln::channelmanager::ChannelManager::retry_payment
+		/// [`ChannelManager::abandon_payment`]: crate::ln::channelmanager::ChannelManager::abandon_payment
+		payment_id: crate::c_types::ThirtyTwoBytes,
+		/// The hash that was given to [`ChannelManager::send_payment`].
+		///
+		/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+		payment_hash: crate::c_types::ThirtyTwoBytes,
+	},
+	/// Used to indicate that [`ChannelManager::process_pending_htlc_forwards`] should be called at
+	/// a time in the future.
+	///
+	/// [`ChannelManager::process_pending_htlc_forwards`]: crate::ln::channelmanager::ChannelManager::process_pending_htlc_forwards
 	PendingHTLCsForwardable {
 		/// The minimum amount of time that should be waited prior to calling
 		/// process_pending_htlc_forwards. To increase the effort required to correlate payments,
@@ -538,6 +585,28 @@ pub enum Event {
 		channel_id: crate::c_types::ThirtyTwoBytes,
 		/// The full transaction received from the user
 		transaction: crate::c_types::Transaction,
+	},
+	/// Indicates that a path for an outbound payment was successful.
+	///
+	/// Always generated after [`Event::PaymentSent`] and thus useful for scoring channels. See
+	/// [`Event::PaymentSent`] for obtaining the payment preimage.
+	PaymentPathSuccessful {
+		/// The id returned by [`ChannelManager::send_payment`] and used with
+		/// [`ChannelManager::retry_payment`].
+		///
+		/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+		/// [`ChannelManager::retry_payment`]: crate::ln::channelmanager::ChannelManager::retry_payment
+		payment_id: crate::c_types::ThirtyTwoBytes,
+		/// The hash that was given to [`ChannelManager::send_payment`].
+		///
+		/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+		///
+		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+		payment_hash: crate::c_types::ThirtyTwoBytes,
+		/// The payment path that was successful.
+		///
+		/// May contain a closed channel if the HTLC sent along the path was fulfilled on chain.
+		path: crate::c_types::derived::CVec_RouteHopZ,
 	},
 }
 use lightning::util::events::Event as nativeEvent;
@@ -606,6 +675,14 @@ impl Event {
 					retry: local_retry_nonref,
 				}
 			},
+			Event::PaymentFailed {ref payment_id, ref payment_hash, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_hash_nonref = (*payment_hash).clone();
+				nativeEvent::PaymentFailed {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
+				}
+			},
 			Event::PendingHTLCsForwardable {ref time_forwardable, } => {
 				let mut time_forwardable_nonref = (*time_forwardable).clone();
 				nativeEvent::PendingHTLCsForwardable {
@@ -644,6 +721,18 @@ impl Event {
 				nativeEvent::DiscardFunding {
 					channel_id: channel_id_nonref.data,
 					transaction: transaction_nonref.into_bitcoin(),
+				}
+			},
+			Event::PaymentPathSuccessful {ref payment_id, ref payment_hash, ref path, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut local_payment_hash_nonref = if payment_hash_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentHash(payment_hash_nonref.data) }) };
+				let mut path_nonref = (*path).clone();
+				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.into_rust().drain(..) { local_path_nonref.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+				nativeEvent::PaymentPathSuccessful {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
+					payment_hash: local_payment_hash_nonref,
+					path: local_path_nonref,
 				}
 			},
 		}
@@ -693,6 +782,12 @@ impl Event {
 					retry: local_retry,
 				}
 			},
+			Event::PaymentFailed {mut payment_id, mut payment_hash, } => {
+				nativeEvent::PaymentFailed {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id.data),
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
+				}
+			},
 			Event::PendingHTLCsForwardable {mut time_forwardable, } => {
 				nativeEvent::PendingHTLCsForwardable {
 					time_forwardable: std::time::Duration::from_secs(time_forwardable),
@@ -722,6 +817,15 @@ impl Event {
 				nativeEvent::DiscardFunding {
 					channel_id: channel_id.data,
 					transaction: transaction.into_bitcoin(),
+				}
+			},
+			Event::PaymentPathSuccessful {mut payment_id, mut payment_hash, mut path, } => {
+				let mut local_payment_hash = if payment_hash.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentHash(payment_hash.data) }) };
+				let mut local_path = Vec::new(); for mut item in path.into_rust().drain(..) { local_path.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+				nativeEvent::PaymentPathSuccessful {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id.data),
+					payment_hash: local_payment_hash,
+					path: local_path,
 				}
 			},
 		}
@@ -790,6 +894,14 @@ impl Event {
 					retry: local_retry_nonref,
 				}
 			},
+			nativeEvent::PaymentFailed {ref payment_id, ref payment_hash, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_hash_nonref = (*payment_hash).clone();
+				Event::PaymentFailed {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
+				}
+			},
 			nativeEvent::PendingHTLCsForwardable {ref time_forwardable, } => {
 				let mut time_forwardable_nonref = (*time_forwardable).clone();
 				Event::PendingHTLCsForwardable {
@@ -828,6 +940,18 @@ impl Event {
 				Event::DiscardFunding {
 					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id_nonref },
 					transaction: crate::c_types::Transaction::from_bitcoin(&transaction_nonref),
+				}
+			},
+			nativeEvent::PaymentPathSuccessful {ref payment_id, ref payment_hash, ref path, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut local_payment_hash_nonref = if payment_hash_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_hash_nonref.unwrap()).0 } } };
+				let mut path_nonref = (*path).clone();
+				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.drain(..) { local_path_nonref.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+				Event::PaymentPathSuccessful {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
+					payment_hash: local_payment_hash_nonref,
+					path: local_path_nonref.into(),
 				}
 			},
 		}
@@ -877,6 +1001,12 @@ impl Event {
 					retry: local_retry,
 				}
 			},
+			nativeEvent::PaymentFailed {mut payment_id, mut payment_hash, } => {
+				Event::PaymentFailed {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id.0 },
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
+				}
+			},
 			nativeEvent::PendingHTLCsForwardable {mut time_forwardable, } => {
 				Event::PendingHTLCsForwardable {
 					time_forwardable: time_forwardable.as_secs(),
@@ -906,6 +1036,15 @@ impl Event {
 				Event::DiscardFunding {
 					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id },
 					transaction: crate::c_types::Transaction::from_bitcoin(&transaction),
+				}
+			},
+			nativeEvent::PaymentPathSuccessful {mut payment_id, mut payment_hash, mut path, } => {
+				let mut local_payment_hash = if payment_hash.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_hash.unwrap()).0 } } };
+				let mut local_path = Vec::new(); for mut item in path.drain(..) { local_path.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+				Event::PaymentPathSuccessful {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id.0 },
+					payment_hash: local_payment_hash,
+					path: local_path.into(),
 				}
 			},
 		}
@@ -963,6 +1102,14 @@ pub extern "C" fn Event_payment_path_failed(payment_id: crate::c_types::ThirtyTw
 	}
 }
 #[no_mangle]
+/// Utility method to constructs a new PaymentFailed-variant Event
+pub extern "C" fn Event_payment_failed(payment_id: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::ThirtyTwoBytes) -> Event {
+	Event::PaymentFailed {
+		payment_id,
+		payment_hash,
+	}
+}
+#[no_mangle]
 /// Utility method to constructs a new PendingHTLCsForwardable-variant Event
 pub extern "C" fn Event_pending_htlcs_forwardable(time_forwardable: u64) -> Event {
 	Event::PendingHTLCsForwardable {
@@ -999,6 +1146,15 @@ pub extern "C" fn Event_discard_funding(channel_id: crate::c_types::ThirtyTwoByt
 	Event::DiscardFunding {
 		channel_id,
 		transaction,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new PaymentPathSuccessful-variant Event
+pub extern "C" fn Event_payment_path_successful(payment_id: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::ThirtyTwoBytes, path: crate::c_types::derived::CVec_RouteHopZ) -> Event {
+	Event::PaymentPathSuccessful {
+		payment_id,
+		payment_hash,
+		path,
 	}
 }
 #[no_mangle]

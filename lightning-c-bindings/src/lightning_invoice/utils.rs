@@ -108,9 +108,9 @@ pub extern "C" fn DefaultRouter_as_Router(this_arg: &DefaultRouter) -> crate::li
 }
 
 #[must_use]
-extern "C" fn DefaultRouter_Router_find_route(this_arg: *const c_void, mut payer: crate::c_types::PublicKey, params: &crate::lightning::routing::router::RouteParameters, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, scorer: &crate::lightning::routing::Score) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+extern "C" fn DefaultRouter_Router_find_route(this_arg: *const c_void, mut payer: crate::c_types::PublicKey, params: &crate::lightning::routing::router::RouteParameters, _payment_hash: *const [u8; 32], first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, scorer: &crate::lightning::routing::scoring::Score) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
 	let mut local_first_hops_base = if first_hops == std::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { item.get_native_ref() }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
-	let mut ret = <nativeDefaultRouter as lightning_invoice::payment::Router<_>>::find_route(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &payer.into_rust(), params.get_native_ref(), local_first_hops, scorer);
+	let mut ret = <nativeDefaultRouter as lightning_invoice::payment::Router<_>>::find_route(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &payer.into_rust(), params.get_native_ref(), &::lightning::ln::PaymentHash(unsafe { *_payment_hash }), local_first_hops, scorer);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
@@ -138,7 +138,9 @@ pub extern "C" fn ChannelManager_as_Payer(this_arg: &ChannelManager) -> crate::l
 		node_id: ChannelManager_Payer_node_id,
 		first_hops: ChannelManager_Payer_first_hops,
 		send_payment: ChannelManager_Payer_send_payment,
+		send_spontaneous_payment: ChannelManager_Payer_send_spontaneous_payment,
 		retry_payment: ChannelManager_Payer_retry_payment,
+		abandon_payment: ChannelManager_Payer_abandon_payment,
 	}
 }
 
@@ -161,9 +163,18 @@ extern "C" fn ChannelManager_Payer_send_payment(this_arg: *const c_void, route: 
 	local_ret
 }
 #[must_use]
+extern "C" fn ChannelManager_Payer_send_spontaneous_payment(this_arg: *const c_void, route: &crate::lightning::routing::router::Route, mut payment_preimage: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_PaymentIdPaymentSendFailureZ {
+	let mut ret = <nativeChannelManager as lightning_invoice::payment::Payer<>>::send_spontaneous_payment(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, route.get_native_ref(), ::lightning::ln::PaymentPreimage(payment_preimage.data));
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::channelmanager::PaymentSendFailure::native_into(e) }).into() };
+	local_ret
+}
+#[must_use]
 extern "C" fn ChannelManager_Payer_retry_payment(this_arg: *const c_void, route: &crate::lightning::routing::router::Route, mut payment_id: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_NonePaymentSendFailureZ {
 	let mut ret = <nativeChannelManager as lightning_invoice::payment::Payer<>>::retry_payment(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, route.get_native_ref(), ::lightning::ln::channelmanager::PaymentId(payment_id.data));
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::channelmanager::PaymentSendFailure::native_into(e) }).into() };
 	local_ret
+}
+extern "C" fn ChannelManager_Payer_abandon_payment(this_arg: *const c_void, mut payment_id: crate::c_types::ThirtyTwoBytes) {
+	<nativeChannelManager as lightning_invoice::payment::Payer<>>::abandon_payment(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, ::lightning::ln::channelmanager::PaymentId(payment_id.data))
 }
 

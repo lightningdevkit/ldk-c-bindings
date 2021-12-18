@@ -1003,24 +1003,6 @@ pub extern "C" fn ChannelInfo_set_announcement_message(this_ptr: &mut ChannelInf
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.announcement_message = local_val;
 }
-/// Constructs a new ChannelInfo given each field
-#[must_use]
-#[no_mangle]
-pub extern "C" fn ChannelInfo_new(mut features_arg: crate::lightning::ln::features::ChannelFeatures, mut node_one_arg: crate::lightning::routing::network_graph::NodeId, mut one_to_two_arg: crate::lightning::routing::network_graph::DirectionalChannelInfo, mut node_two_arg: crate::lightning::routing::network_graph::NodeId, mut two_to_one_arg: crate::lightning::routing::network_graph::DirectionalChannelInfo, mut capacity_sats_arg: crate::c_types::derived::COption_u64Z, mut announcement_message_arg: crate::lightning::ln::msgs::ChannelAnnouncement) -> ChannelInfo {
-	let mut local_one_to_two_arg = if one_to_two_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(one_to_two_arg.take_inner()) } }) };
-	let mut local_two_to_one_arg = if two_to_one_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(two_to_one_arg.take_inner()) } }) };
-	let mut local_capacity_sats_arg = if capacity_sats_arg.is_some() { Some( { capacity_sats_arg.take() }) } else { None };
-	let mut local_announcement_message_arg = if announcement_message_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(announcement_message_arg.take_inner()) } }) };
-	ChannelInfo { inner: ObjOps::heap_alloc(nativeChannelInfo {
-		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
-		node_one: *unsafe { Box::from_raw(node_one_arg.take_inner()) },
-		one_to_two: local_one_to_two_arg,
-		node_two: *unsafe { Box::from_raw(node_two_arg.take_inner()) },
-		two_to_one: local_two_to_one_arg,
-		capacity_sats: local_capacity_sats_arg,
-		announcement_message: local_announcement_message_arg,
-	}), is_owned: true }
-}
 impl Clone for ChannelInfo {
 	fn clone(&self) -> Self {
 		Self {
@@ -1626,12 +1608,30 @@ pub extern "C" fn NetworkGraph_fail_node(this_arg: &NetworkGraph, mut _node_id: 
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.fail_node(&_node_id.into_rust(), is_permanent)
 }
 
+/// Removes information about channels that we haven't heard any updates about in some time.
+/// This can be used regularly to prune the network graph of channels that likely no longer
+/// exist.
+///
+/// While there is no formal requirement that nodes regularly re-broadcast their channel
+/// updates every two weeks, the non-normative section of BOLT 7 currently suggests that
+/// pruning occur for updates which are at least two weeks old, which we implement here.
+///
+/// This function takes the current unix time as an argument. For users with the `std` feature
+/// enabled, [`NetworkGraph::remove_stale_channels`] may be preferable.
+#[no_mangle]
+pub extern "C" fn NetworkGraph_remove_stale_channels_with_time(this_arg: &NetworkGraph, mut current_time_unix: u64) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.remove_stale_channels_with_time(current_time_unix)
+}
+
 /// For an already known (from announcement) channel, update info about one of the directions
 /// of the channel.
 ///
 /// You probably don't want to call this directly, instead relying on a NetGraphMsgHandler's
 /// RoutingMessageHandler implementation to call it indirectly. This may be useful to accept
 /// routing messages from a source using a protocol other than the lightning P2P protocol.
+///
+/// If built with `no-std`, any updates with a timestamp more than two weeks in the past or
+/// materially in the future will be rejected.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NetworkGraph_update_channel(this_arg: &NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
@@ -1643,6 +1643,9 @@ pub extern "C" fn NetworkGraph_update_channel(this_arg: &NetworkGraph, msg: &cra
 /// For an already known (from announcement) channel, update info about one of the directions
 /// of the channel without verifying the associated signatures. Because we aren't given the
 /// associated signatures here we cannot relay the channel update to any of our peers.
+///
+/// If built with `no-std`, any updates with a timestamp more than two weeks in the past or
+/// materially in the future will be rejected.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NetworkGraph_update_channel_unsigned(this_arg: &NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelUpdate) -> crate::c_types::derived::CResult_NoneLightningErrorZ {

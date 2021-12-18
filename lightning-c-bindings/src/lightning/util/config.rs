@@ -931,15 +931,29 @@ pub extern "C" fn UserConfig_get_accept_forwards_to_priv_channels(this_ptr: &Use
 pub extern "C" fn UserConfig_set_accept_forwards_to_priv_channels(this_ptr: &mut UserConfig, mut val: bool) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.accept_forwards_to_priv_channels = val;
 }
+/// If this is set to false, we do not accept inbound requests to open a new channel.
+/// Default value: true.
+#[no_mangle]
+pub extern "C" fn UserConfig_get_accept_inbound_channels(this_ptr: &UserConfig) -> bool {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().accept_inbound_channels;
+	*inner_val
+}
+/// If this is set to false, we do not accept inbound requests to open a new channel.
+/// Default value: true.
+#[no_mangle]
+pub extern "C" fn UserConfig_set_accept_inbound_channels(this_ptr: &mut UserConfig, mut val: bool) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.accept_inbound_channels = val;
+}
 /// Constructs a new UserConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn UserConfig_new(mut own_channel_config_arg: crate::lightning::util::config::ChannelHandshakeConfig, mut peer_channel_config_limits_arg: crate::lightning::util::config::ChannelHandshakeLimits, mut channel_options_arg: crate::lightning::util::config::ChannelConfig, mut accept_forwards_to_priv_channels_arg: bool) -> UserConfig {
+pub extern "C" fn UserConfig_new(mut own_channel_config_arg: crate::lightning::util::config::ChannelHandshakeConfig, mut peer_channel_config_limits_arg: crate::lightning::util::config::ChannelHandshakeLimits, mut channel_options_arg: crate::lightning::util::config::ChannelConfig, mut accept_forwards_to_priv_channels_arg: bool, mut accept_inbound_channels_arg: bool) -> UserConfig {
 	UserConfig { inner: ObjOps::heap_alloc(nativeUserConfig {
 		own_channel_config: *unsafe { Box::from_raw(own_channel_config_arg.take_inner()) },
 		peer_channel_config_limits: *unsafe { Box::from_raw(peer_channel_config_limits_arg.take_inner()) },
 		channel_options: *unsafe { Box::from_raw(channel_options_arg.take_inner()) },
 		accept_forwards_to_priv_channels: accept_forwards_to_priv_channels_arg,
+		accept_inbound_channels: accept_inbound_channels_arg,
 	}), is_owned: true }
 }
 impl Clone for UserConfig {

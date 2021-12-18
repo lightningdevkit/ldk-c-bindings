@@ -999,6 +999,11 @@ pub struct KeysInterface {
 	/// blindly signing the hash.
 	#[must_use]
 	pub sign_invoice: extern "C" fn (this_arg: *const c_void, invoice_preimage: crate::c_types::derived::CVec_u8Z) -> crate::c_types::derived::CResult_RecoverableSignatureNoneZ,
+	/// Get secret key material as bytes for use in encrypting and decrypting inbound payment data.
+	///
+	/// This method must return the same value each time it is called.
+	#[must_use]
+	pub get_inbound_payment_key_material: extern "C" fn (this_arg: *const c_void) -> crate::c_types::ThirtyTwoBytes,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -1016,6 +1021,7 @@ pub(crate) extern "C" fn KeysInterface_clone_fields(orig: &KeysInterface) -> Key
 		get_secure_random_bytes: Clone::clone(&orig.get_secure_random_bytes),
 		read_chan_signer: Clone::clone(&orig.read_chan_signer),
 		sign_invoice: Clone::clone(&orig.sign_invoice),
+		get_inbound_payment_key_material: Clone::clone(&orig.get_inbound_payment_key_material),
 		free: Clone::clone(&orig.free),
 	}
 }
@@ -1054,6 +1060,10 @@ impl rustKeysInterface for KeysInterface {
 		let mut ret = (self.sign_invoice)(self.this_arg, local_invoice_preimage.into());
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
+	}
+	fn get_inbound_payment_key_material(&self) -> lightning::chain::keysinterface::KeyMaterial {
+		let mut ret = (self.get_inbound_payment_key_material)(self.this_arg);
+		::lightning::chain::keysinterface::KeyMaterial(ret.data)
 	}
 }
 
@@ -1280,6 +1290,15 @@ pub extern "C" fn InMemorySigner_funding_outpoint(this_arg: &InMemorySigner) -> 
 pub extern "C" fn InMemorySigner_get_channel_parameters(this_arg: &InMemorySigner) -> crate::lightning::ln::chan_utils::ChannelTransactionParameters {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_channel_parameters();
 	crate::lightning::ln::chan_utils::ChannelTransactionParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::chan_utils::ChannelTransactionParameters<>) as *mut _) }, is_owned: false }
+}
+
+/// Whether anchors should be used.
+/// Will panic if ready_channel wasn't called.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InMemorySigner_opt_anchors(this_arg: &InMemorySigner) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.opt_anchors();
+	ret
 }
 
 /// Sign the single input of spend_tx at index `input_idx` which spends the output
@@ -1635,6 +1654,7 @@ pub extern "C" fn KeysManager_as_KeysInterface(this_arg: &KeysManager) -> crate:
 		get_secure_random_bytes: KeysManager_KeysInterface_get_secure_random_bytes,
 		read_chan_signer: KeysManager_KeysInterface_read_chan_signer,
 		sign_invoice: KeysManager_KeysInterface_sign_invoice,
+		get_inbound_payment_key_material: KeysManager_KeysInterface_get_inbound_payment_key_material,
 	}
 }
 
@@ -1642,6 +1662,11 @@ pub extern "C" fn KeysManager_as_KeysInterface(this_arg: &KeysManager) -> crate:
 extern "C" fn KeysManager_KeysInterface_get_node_secret(this_arg: *const c_void) -> crate::c_types::SecretKey {
 	let mut ret = <nativeKeysManager as lightning::chain::keysinterface::KeysInterface<>>::get_node_secret(unsafe { &mut *(this_arg as *mut nativeKeysManager) }, );
 	crate::c_types::SecretKey::from_rust(ret)
+}
+#[must_use]
+extern "C" fn KeysManager_KeysInterface_get_inbound_payment_key_material(this_arg: *const c_void) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = <nativeKeysManager as lightning::chain::keysinterface::KeysInterface<>>::get_inbound_payment_key_material(unsafe { &mut *(this_arg as *mut nativeKeysManager) }, );
+	crate::c_types::ThirtyTwoBytes { data: ret.0 }
 }
 #[must_use]
 extern "C" fn KeysManager_KeysInterface_get_destination_script(this_arg: *const c_void) -> crate::c_types::derived::CVec_u8Z {

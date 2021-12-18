@@ -29,6 +29,8 @@ pub(crate) type nativeBackgroundProcessor = nativeBackgroundProcessorImport;
 ///   [`ChannelManager`] persistence should be done in the background.
 /// * Calling [`ChannelManager::timer_tick_occurred`] and [`PeerManager::timer_tick_occurred`]
 ///   at the appropriate intervals.
+/// * Calling [`NetworkGraph::remove_stale_channels`] (if a [`NetGraphMsgHandler`] is provided to
+///   [`BackgroundProcessor::start`]).
 ///
 /// It will also call [`PeerManager::process_events`] periodically though this shouldn't be relied
 /// upon as doing so may result in high latency.
@@ -170,7 +172,7 @@ impl Drop for ChannelManagerPersister {
 /// functionality implemented by other handlers.
 /// * [`NetGraphMsgHandler`] if given will update the [`NetworkGraph`] based on payment failures.
 ///
-/// [top-level documentation]: Self
+/// [top-level documentation]: BackgroundProcessor
 /// [`join`]: Self::join
 /// [`stop`]: Self::stop
 /// [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager

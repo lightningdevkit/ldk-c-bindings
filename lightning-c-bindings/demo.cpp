@@ -167,7 +167,7 @@ LDKCResult_NoneChannelMonitorUpdateErrZ update_channel_monitor(const void *this_
 			LDKBroadcasterInterface broadcaster = {
 				.broadcast_transaction = broadcast_tx,
 			};
-			LDK::CResult_NoneMonitorUpdateErrorZ res = ChannelMonitor_update_monitor(&mon.second, &update, &broadcaster, &fee_est, arg->logger);
+			LDK::CResult_NoneNoneZ res = ChannelMonitor_update_monitor(&mon.second, &update, &broadcaster, &fee_est, arg->logger);
 			assert(res->result_ok);
 		}
 	}
@@ -421,13 +421,17 @@ LDKCVec_C2Tuple_PublicKeyTypeZZ create_custom_msg(const void* this_arg) {
 	return ret;
 }
 
-uint64_t get_chan_score(const void *this_arg, uint64_t scid, const LDKNodeId *src, const LDKNodeId *dst) { return 42; }
+uint64_t get_chan_score(const void *this_arg, uint64_t scid, uint64_t htlc_amt,
+LDKCOption_u64Z chan_capacity, const LDKNodeId *src, const LDKNodeId *dst) {
+	LDK::COption_u64Z _capacity(std::move(chan_capacity));
+	return 42;
+}
 
 struct CustomRouteFinderParams {
 	LDKLogger *logger;
 	LDKNetworkGraph *graph_ref;
 };
-struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, struct LDKPublicKey payer, const struct LDKRouteParameters *NONNULL_PTR route_params, struct LDKCVec_ChannelDetailsZ *first_hops, const struct LDKScore *NONNULL_PTR scorer) {
+struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, struct LDKPublicKey payer, const struct LDKRouteParameters *NONNULL_PTR route_params, const uint8_t (*payment_hash)[32], struct LDKCVec_ChannelDetailsZ *first_hops, const struct LDKScore *NONNULL_PTR scorer) {
 	const struct CustomRouteFinderParams *params = (struct CustomRouteFinderParams *)this_arg;
 	assert(first_hops->datalen == 1);
 	assert(ChannelDetails_get_is_usable(&first_hops->data[0]));
@@ -755,10 +759,13 @@ int main() {
 		{
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
-			ev1.process_pending_events(ev1.this_arg, handler);
-			assert(queue.events.size() == 1);
+			while (queue.events.size() < 2)
+				ev1.process_pending_events(ev1.this_arg, handler);
+			assert(queue.events.size() == 2);
 			assert(queue.events[0]->tag == LDKEvent_PaymentSent);
 			assert(!memcmp(queue.events[0]->payment_sent.payment_preimage.data, payment_preimage.data, 32));
+			assert(queue.events[1]->tag == LDKEvent_PaymentPathSuccessful);
+			assert(!memcmp(queue.events[1]->payment_path_successful.payment_hash.data, payment_hash.data, 32));
 		}
 
 		conn.stop();
@@ -856,7 +863,7 @@ int main() {
 		.free = NULL,
 	};
 	LDK::Scorer scorer = Scorer_default();
-	LDK::LockableScore scorer_mtx = LockableScore_new(Scorer_as_Score(&scorer));
+	LDK::MultiThreadedLockableScore scorer_mtx = MultiThreadedLockableScore_new(Scorer_as_Score(&scorer));
 	EventQueue queue1;
 	LDKEventHandler handler1 = { .this_arg = &queue1, .handle_event = handle_event, .free = NULL };
 	LDK::InvoicePayer payer = InvoicePayer_new(ChannelManager_as_Payer(&cm1), sending_router, &scorer_mtx, logger1, handler1, RetryAttempts_new(0));
@@ -909,7 +916,7 @@ int main() {
 		std::this_thread::yield();
 	}
 
-	while (queue1.events.size() == 0) {
+	while (queue1.events.size() < 2) {
 		PeerManager_process_events(&net2);
 		PeerManager_process_events(&net1);
 
@@ -917,8 +924,9 @@ int main() {
 		LDK::EventHandler evh1 = InvoicePayer_as_EventHandler(&payer);
 		ev1.process_pending_events(std::move(evh1));
 	}
-	assert(queue1.events.size() == 1);
+	assert(queue1.events.size() == 2);
 	assert(queue1.events[0]->tag == LDKEvent_PaymentSent);
+	assert(queue1.events[1]->tag == LDKEvent_PaymentPathSuccessful);
 
 	// Actually close the channel
 	num_txs_broadcasted = 0;

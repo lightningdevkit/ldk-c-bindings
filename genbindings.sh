@@ -158,11 +158,11 @@ function drop_crate() {
 
 echo > /tmp/crate-source.txt
 if [ "$2" = "true" ]; then
-	add_crate lightning lightning --features=allow_wallclock_use ', features = ["allow_wallclock_use"]'
+	add_crate lightning lightning --features=std ', features = ["std"]'
 	add_crate "lightning-persister" "lightning_persister"
 	add_crate "lightning-background-processor" "lightning_background_processor"
 else
-	add_crate lightning lightning
+	add_crate lightning lightning --features=no-std ', features = ["no-std"]'
 	drop_crate "lightning-persister"
 	drop_crate "lightning-background-processor"
 fi

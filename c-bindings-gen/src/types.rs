@@ -1386,6 +1386,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					}
 				}
 				if let Some(t) = single_contained {
+					if let syn::Type::Tuple(syn::TypeTuple { elems, .. }) = t {
+						assert!(elems.is_empty());
+						let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
+						return Some(("if ", vec![
+							(format!(".is_none() {{ {}::None }} else {{ {}::Some /*",
+								inner_name, inner_name), format!(""))
+							], " */}", ContainerPrefixLocation::PerConv));
+					}
 					if let syn::Type::Reference(syn::TypeReference { elem, .. }) = t {
 						if let syn::Type::Slice(_) = &**elem {
 							return Some(("if ", vec![
@@ -2393,7 +2401,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				}
 				if !self.write_c_type_intern(w, t, generics, false, false, false, false) { return false; }
 			} else {
-				assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
+				// We don't currently support outer reference types for non-primitive inners,
+				// except for the empty tuple.
+				if let syn::Type::Tuple(t_arg) = t {
+					assert!(t_arg.elems.len() == 0 || !is_ref);
+				} else {
+					assert!(!is_ref);
+				}
 				if !self.write_c_type_intern(w, t, generics, false, false, false, false) { return false; }
 			}
 		}

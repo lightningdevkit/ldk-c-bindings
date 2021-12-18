@@ -874,7 +874,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"[u8; 20]" if !is_ref => Some("crate::c_types::TwentyBytes"),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::SixteenBytes"),
-			"[u8; 10]" if !is_ref => Some("crate::c_types::TenBytes"),
+			"[u8; 12]" if !is_ref => Some("crate::c_types::TwelveBytes"),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes"),
 			"[u8; 3]" if !is_ref => Some("crate::c_types::ThreeBytes"), // Used for RGB values
 
@@ -949,7 +949,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 32]" if !is_ref => Some(""),
 			"[u8; 20]" if !is_ref => Some(""),
 			"[u8; 16]" if !is_ref => Some(""),
-			"[u8; 10]" if !is_ref => Some(""),
+			"[u8; 12]" if !is_ref => Some(""),
 			"[u8; 4]" if !is_ref => Some(""),
 			"[u8; 3]" if !is_ref => Some(""),
 
@@ -1031,7 +1031,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 32]" if !is_ref => Some(".data"),
 			"[u8; 20]" if !is_ref => Some(".data"),
 			"[u8; 16]" if !is_ref => Some(".data"),
-			"[u8; 10]" if !is_ref => Some(".data"),
+			"[u8; 12]" if !is_ref => Some(".data"),
 			"[u8; 4]" if !is_ref => Some(".data"),
 			"[u8; 3]" if !is_ref => Some(".data"),
 
@@ -1115,7 +1115,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 32]" if is_ref => Some(""),
 			"[u8; 20]" if !is_ref => Some("crate::c_types::TwentyBytes { data: "),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::SixteenBytes { data: "),
-			"[u8; 10]" if !is_ref => Some("crate::c_types::TenBytes { data: "),
+			"[u8; 12]" if !is_ref => Some("crate::c_types::TwelveBytes { data: "),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes { data: "),
 			"[u8; 3]" if is_ref => Some(""),
 
@@ -1185,7 +1185,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 32]" if is_ref => Some(""),
 			"[u8; 20]" if !is_ref => Some(" }"),
 			"[u8; 16]" if !is_ref => Some(" }"),
-			"[u8; 10]" if !is_ref => Some(" }"),
+			"[u8; 12]" if !is_ref => Some(" }"),
 			"[u8; 4]" if !is_ref => Some(" }"),
 			"[u8; 3]" if is_ref => Some(""),
 

@@ -279,29 +279,35 @@ gcc $LOCAL_CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl -lm
 ./a.out
 
 # And run the C++ demo app
-g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread demo.cpp -Ltarget/debug/ -lldk -ldl
-LD_LIBRARY_PATH=target/debug/ ./a.out > /dev/null
+if [ "$2" = "true" ]; then
+	g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread demo.cpp -Ltarget/debug/ -lldk -ldl
+	LD_LIBRARY_PATH=target/debug/ ./a.out > /dev/null
+fi
 
 # Finally, run the C++ demo app with our native networking library
 # in valgrind to test memory model correctness and lack of leaks.
 gcc $LOCAL_CFLAGS -fPIC -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
-g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl -lm
-if [ -x "`which valgrind`" ]; then
-	valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
-	echo
-else
-	echo "WARNING: Please install valgrind for more testing"
-	./a.out
+if [ "$2" = "true" ]; then
+	g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl -lm
+	if [ -x "`which valgrind`" ]; then
+		valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
+		echo
+	else
+		echo "WARNING: Please install valgrind for more testing"
+		./a.out
+	fi
 fi
 
 
 # Test a statically-linked C++ version, tracking the resulting binary size and runtime
 # across debug, LTO, and cross-language LTO builds (using the same compiler each time).
-clang++ $LOCAL_CFLAGS -std=c++11 demo.cpp target/debug/libldk.a -ldl
-strip ./a.out
-echo " C++ Bin size and runtime w/o optimization:"
-ls -lha a.out
-time ./a.out > /dev/null
+if [ "$2" = "true" ]; then
+	clang++ $LOCAL_CFLAGS -std=c++11 demo.cpp target/debug/libldk.a -ldl
+	strip ./a.out
+	echo " C++ Bin size and runtime w/o optimization:"
+	ls -lha a.out
+	time ./a.out > /dev/null
+fi
 
 # Then, check with memory sanitizer, if we're on Linux and have rustc nightly
 if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" ]; then
@@ -321,14 +327,16 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" ]; then
 			clang-$LLVM_V $LOCAL_CFLAGS -fsanitize=memory -fsanitize-memory-track-origins -g demo.c target/debug/libldk.a -ldl
 			./a.out
 
-			# ...then the C++ demo app
-			clang++-$LLVM_V $LOCAL_CFLAGS -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g demo.cpp target/debug/libldk.a -ldl
-			./a.out >/dev/null
+			if [ "$2" = "true" ]; then
+				# ...then the C++ demo app
+				clang++-$LLVM_V $LOCAL_CFLAGS -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g demo.cpp target/debug/libldk.a -ldl
+				./a.out >/dev/null
 
-			# ...then the C++ demo app with the ldk_net network implementation
-			clang-$LLVM_V $LOCAL_CFLAGS -std=c99 -fsanitize=memory -fsanitize-memory-track-origins -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
-			clang++-$LLVM_V $LOCAL_CFLAGS -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
-			./a.out >/dev/null
+				# ...then the C++ demo app with the ldk_net network implementation
+				clang-$LLVM_V $LOCAL_CFLAGS -std=c99 -fsanitize=memory -fsanitize-memory-track-origins -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+				clang++-$LLVM_V $LOCAL_CFLAGS -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
+				./a.out >/dev/null
+			fi
 
 			# restore exit-on-failure
 			set -e
@@ -427,14 +435,16 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "
 		$CLANG $LOCAL_CFLAGS -fsanitize=address -g demo.c target/debug/libldk.a -ldl
 		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out
 
-		# ...then the C++ demo app
-		$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g demo.cpp target/debug/libldk.a -ldl
-		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
+		if [ "$2" = "true" ]; then
+			# ...then the C++ demo app
+			$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g demo.cpp target/debug/libldk.a -ldl
+			ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
 
-		# ...then the C++ demo app with the ldk_net network implementation
-		$CLANG $LOCAL_CFLAGS -fPIC -fsanitize=address -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
-		$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
-		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
+			# ...then the C++ demo app with the ldk_net network implementation
+			$CLANG $LOCAL_CFLAGS -fPIC -fsanitize=address -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+			$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
+			ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
+		fi
 	else
 		echo "WARNING: Please install clang-$RUSTC_LLVM_V and clang++-$RUSTC_LLVM_V to build with address sanitizer"
 	fi
@@ -446,7 +456,9 @@ fi
 # Clear stale release build artifacts from previous runs
 cargo clean --release
 CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C lto
-clang++ $LOCAL_CFLAGS -std=c++11 -O2 demo.cpp target/release/libldk.a -ldl
+if [ "$2" = "true" ]; then
+	clang++ $LOCAL_CFLAGS -std=c++11 -O2 demo.cpp target/release/libldk.a -ldl
+fi
 
 strip ./a.out
 echo "C++ Bin size and runtime with only RL (LTO) optimized:"
@@ -514,11 +526,14 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 	# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 	cargo clean --release
 	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge
-	$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -O2 demo.cpp target/release/libldk.a -ldl
-	strip ./a.out
-	echo "C++ Bin size and runtime with cross-language LTO:"
-	ls -lha a.out
-	time ./a.out > /dev/null
+
+	if [ "$2" = "true" ]; then
+		$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -O2 demo.cpp target/release/libldk.a -ldl
+		strip ./a.out
+		echo "C++ Bin size and runtime with cross-language LTO:"
+		ls -lha a.out
+		time ./a.out > /dev/null
+	fi
 else
 	if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
 		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target aarch64-apple-darwin -- -C lto

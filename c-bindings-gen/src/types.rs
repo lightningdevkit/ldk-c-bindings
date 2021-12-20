@@ -874,7 +874,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"[u8; 20]" if !is_ref => Some("crate::c_types::TwentyBytes"),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::SixteenBytes"),
-			"[u8; 10]" if !is_ref => Some("crate::c_types::TenBytes"),
+			"[u8; 12]" if !is_ref => Some("crate::c_types::TwelveBytes"),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes"),
 			"[u8; 3]" if !is_ref => Some("crate::c_types::ThreeBytes"), // Used for RGB values
 
@@ -921,9 +921,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
-			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
 				if is_ref => Some("*const [u8; 32]"),
-			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice"),
@@ -949,7 +951,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 32]" if !is_ref => Some(""),
 			"[u8; 20]" if !is_ref => Some(""),
 			"[u8; 16]" if !is_ref => Some(""),
-			"[u8; 10]" if !is_ref => Some(""),
+			"[u8; 12]" if !is_ref => Some(""),
 			"[u8; 4]" if !is_ref => Some(""),
 			"[u8; 3]" if !is_ref => Some(""),
 
@@ -1011,6 +1013,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentSecret" if !is_ref => Some("::lightning::ln::PaymentSecret("),
 			"lightning::ln::channelmanager::PaymentId" if !is_ref => Some("::lightning::ln::channelmanager::PaymentId("),
 			"lightning::ln::channelmanager::PaymentId" if is_ref=> Some("&::lightning::ln::channelmanager::PaymentId( unsafe { *"),
+			"lightning::chain::keysinterface::KeyMaterial" if !is_ref => Some("::lightning::chain::keysinterface::KeyMaterial("),
+			"lightning::chain::keysinterface::KeyMaterial" if is_ref=> Some("&::lightning::chain::keysinterface::KeyMaterial( unsafe { *"),
 
 			// List of traits we map (possibly during processing of other files):
 			"lightning::io::Read" => Some("&mut "),
@@ -1031,7 +1035,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 32]" if !is_ref => Some(".data"),
 			"[u8; 20]" if !is_ref => Some(".data"),
 			"[u8; 16]" if !is_ref => Some(".data"),
-			"[u8; 10]" if !is_ref => Some(".data"),
+			"[u8; 12]" if !is_ref => Some(".data"),
 			"[u8; 4]" if !is_ref => Some(".data"),
 			"[u8; 3]" if !is_ref => Some(".data"),
 
@@ -1075,9 +1079,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if is_ref => Some(" }[..]).unwrap()"),
 			"bitcoin::hash_types::Txid" => Some(".data[..]).unwrap()"),
 			"bitcoin::hash_types::BlockHash" if !is_ref => Some(".data[..]).unwrap()"),
-			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
 				if !is_ref => Some(".data)"),
-			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
 				if is_ref => Some(" })"),
 
 			// List of traits we map (possibly during processing of other files):
@@ -1115,7 +1121,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 32]" if is_ref => Some(""),
 			"[u8; 20]" if !is_ref => Some("crate::c_types::TwentyBytes { data: "),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::SixteenBytes { data: "),
-			"[u8; 10]" if !is_ref => Some("crate::c_types::TenBytes { data: "),
+			"[u8; 12]" if !is_ref => Some("crate::c_types::TwelveBytes { data: "),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes { data: "),
 			"[u8; 3]" if is_ref => Some(""),
 
@@ -1162,9 +1168,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
-			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
 				if is_ref => Some("&"),
-			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec("),
@@ -1185,7 +1193,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 32]" if is_ref => Some(""),
 			"[u8; 20]" if !is_ref => Some(" }"),
 			"[u8; 16]" if !is_ref => Some(" }"),
-			"[u8; 10]" if !is_ref => Some(" }"),
+			"[u8; 12]" if !is_ref => Some(" }"),
 			"[u8; 4]" if !is_ref => Some(" }"),
 			"[u8; 3]" if is_ref => Some(""),
 
@@ -1232,9 +1240,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some(".into_inner() }"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
-			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
 				if is_ref => Some(".0"),
-			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"|"lightning::ln::channelmanager::PaymentId"
+			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
 				if !is_ref => Some(".0 }"),
 
 			"lightning::io::Read" => Some("))"),
@@ -1376,6 +1386,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					}
 				}
 				if let Some(t) = single_contained {
+					if let syn::Type::Tuple(syn::TypeTuple { elems, .. }) = t {
+						assert!(elems.is_empty());
+						let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
+						return Some(("if ", vec![
+							(format!(".is_none() {{ {}::None }} else {{ {}::Some /*",
+								inner_name, inner_name), format!(""))
+							], " */}", ContainerPrefixLocation::PerConv));
+					}
 					if let syn::Type::Reference(syn::TypeReference { elem, .. }) = t {
 						if let syn::Type::Slice(_) = &**elem {
 							return Some(("if ", vec![
@@ -2383,7 +2401,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				}
 				if !self.write_c_type_intern(w, t, generics, false, false, false, false) { return false; }
 			} else {
-				assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
+				// We don't currently support outer reference types for non-primitive inners,
+				// except for the empty tuple.
+				if let syn::Type::Tuple(t_arg) = t {
+					assert!(t_arg.elems.len() == 0 || !is_ref);
+				} else {
+					assert!(!is_ref);
+				}
 				if !self.write_c_type_intern(w, t, generics, false, false, false, false) { return false; }
 			}
 		}

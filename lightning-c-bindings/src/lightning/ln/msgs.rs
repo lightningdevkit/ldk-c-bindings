@@ -738,6 +738,27 @@ pub extern "C" fn OpenChannel_get_channel_flags(this_ptr: &OpenChannel) -> u8 {
 pub extern "C" fn OpenChannel_set_channel_flags(this_ptr: &mut OpenChannel, mut val: u8) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_flags = val;
 }
+/// The channel type that this channel will represent. If none is set, we derive the channel
+/// type from the intersection of our feature bits with our counterparty's feature bits from
+/// the Init message.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn OpenChannel_get_channel_type(this_ptr: &OpenChannel) -> crate::lightning::ln::features::ChannelTypeFeatures {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_type;
+	let mut local_inner_val = crate::lightning::ln::features::ChannelTypeFeatures { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::features::ChannelTypeFeatures<>) as *mut _ }, is_owned: false };
+	local_inner_val
+}
+/// The channel type that this channel will represent. If none is set, we derive the channel
+/// type from the intersection of our feature bits with our counterparty's feature bits from
+/// the Init message.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn OpenChannel_set_channel_type(this_ptr: &mut OpenChannel, mut val: crate::lightning::ln::features::ChannelTypeFeatures) {
+	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_type = local_val;
+}
 impl Clone for OpenChannel {
 	fn clone(&self) -> Self {
 		Self {
@@ -2762,12 +2783,10 @@ pub enum NetAddress {
 		port: u16,
 	},
 	/// An old-style Tor onion address/port on which the peer is listening.
-	OnionV2 {
-		/// The bytes (usually encoded in base32 with \".onion\" appended)
-		addr: crate::c_types::TenBytes,
-		/// The port on which the node is listening
-		port: u16,
-	},
+	///
+	/// This field is deprecated and the Tor network generally no longer supports V2 Onion
+	/// addresses. Thus, the details are not parsed here.
+	OnionV2(crate::c_types::TwelveBytes),
 	/// A new-style Tor onion address/port on which the peer is listening.
 	/// To create the human-readable \"hostname\", concatenate ed25519_pubkey, checksum, and version,
 	/// wrap as base32 and append \".onion\".
@@ -2803,13 +2822,11 @@ impl NetAddress {
 					port: port_nonref,
 				}
 			},
-			NetAddress::OnionV2 {ref addr, ref port, } => {
-				let mut addr_nonref = (*addr).clone();
-				let mut port_nonref = (*port).clone();
-				nativeNetAddress::OnionV2 {
-					addr: addr_nonref.data,
-					port: port_nonref,
-				}
+			NetAddress::OnionV2 (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeNetAddress::OnionV2 (
+					a_nonref.data,
+				)
 			},
 			NetAddress::OnionV3 {ref ed25519_pubkey, ref checksum, ref version, ref port, } => {
 				let mut ed25519_pubkey_nonref = (*ed25519_pubkey).clone();
@@ -2840,11 +2857,10 @@ impl NetAddress {
 					port: port,
 				}
 			},
-			NetAddress::OnionV2 {mut addr, mut port, } => {
-				nativeNetAddress::OnionV2 {
-					addr: addr.data,
-					port: port,
-				}
+			NetAddress::OnionV2 (mut a, ) => {
+				nativeNetAddress::OnionV2 (
+					a.data,
+				)
 			},
 			NetAddress::OnionV3 {mut ed25519_pubkey, mut checksum, mut version, mut port, } => {
 				nativeNetAddress::OnionV3 {
@@ -2875,13 +2891,11 @@ impl NetAddress {
 					port: port_nonref,
 				}
 			},
-			nativeNetAddress::OnionV2 {ref addr, ref port, } => {
-				let mut addr_nonref = (*addr).clone();
-				let mut port_nonref = (*port).clone();
-				NetAddress::OnionV2 {
-					addr: crate::c_types::TenBytes { data: addr_nonref },
-					port: port_nonref,
-				}
+			nativeNetAddress::OnionV2 (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				NetAddress::OnionV2 (
+					crate::c_types::TwelveBytes { data: a_nonref },
+				)
 			},
 			nativeNetAddress::OnionV3 {ref ed25519_pubkey, ref checksum, ref version, ref port, } => {
 				let mut ed25519_pubkey_nonref = (*ed25519_pubkey).clone();
@@ -2912,11 +2926,10 @@ impl NetAddress {
 					port: port,
 				}
 			},
-			nativeNetAddress::OnionV2 {mut addr, mut port, } => {
-				NetAddress::OnionV2 {
-					addr: crate::c_types::TenBytes { data: addr },
-					port: port,
-				}
+			nativeNetAddress::OnionV2 (mut a, ) => {
+				NetAddress::OnionV2 (
+					crate::c_types::TwelveBytes { data: a },
+				)
 			},
 			nativeNetAddress::OnionV3 {mut ed25519_pubkey, mut checksum, mut version, mut port, } => {
 				NetAddress::OnionV3 {
@@ -2955,11 +2968,8 @@ pub extern "C" fn NetAddress_ipv6(addr: crate::c_types::SixteenBytes, port: u16)
 }
 #[no_mangle]
 /// Utility method to constructs a new OnionV2-variant NetAddress
-pub extern "C" fn NetAddress_onion_v2(addr: crate::c_types::TenBytes, port: u16) -> NetAddress {
-	NetAddress::OnionV2 {
-		addr,
-		port,
-	}
+pub extern "C" fn NetAddress_onion_v2(a: crate::c_types::TwelveBytes) -> NetAddress {
+	NetAddress::OnionV2(a, )
 }
 #[no_mangle]
 /// Utility method to constructs a new OnionV3-variant NetAddress
@@ -4373,6 +4383,10 @@ pub enum ErrorAction {
 	/// The peer did something harmless that we weren't able to meaningfully process.
 	/// If the error is logged, log it at the given level.
 	IgnoreAndLog(crate::lightning::util::logger::Level),
+	/// The peer provided us with a gossip message which we'd already seen. In most cases this
+	/// should be ignored, but it may result in the message being forwarded if it is a duplicate of
+	/// our own channel announcements.
+	IgnoreDuplicateGossip,
 	/// The peer did something incorrect. Tell them.
 	SendErrorMessage {
 		/// The message to send.
@@ -4398,6 +4412,7 @@ impl ErrorAction {
 					a_nonref.into_native(),
 				)
 			},
+			ErrorAction::IgnoreDuplicateGossip => nativeErrorAction::IgnoreDuplicateGossip,
 			ErrorAction::SendErrorMessage {ref msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				nativeErrorAction::SendErrorMessage {
@@ -4421,6 +4436,7 @@ impl ErrorAction {
 					a.into_native(),
 				)
 			},
+			ErrorAction::IgnoreDuplicateGossip => nativeErrorAction::IgnoreDuplicateGossip,
 			ErrorAction::SendErrorMessage {mut msg, } => {
 				nativeErrorAction::SendErrorMessage {
 					msg: *unsafe { Box::from_raw(msg.take_inner()) },
@@ -4445,6 +4461,7 @@ impl ErrorAction {
 					crate::lightning::util::logger::Level::native_into(a_nonref),
 				)
 			},
+			nativeErrorAction::IgnoreDuplicateGossip => ErrorAction::IgnoreDuplicateGossip,
 			nativeErrorAction::SendErrorMessage {ref msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				ErrorAction::SendErrorMessage {
@@ -4468,6 +4485,7 @@ impl ErrorAction {
 					crate::lightning::util::logger::Level::native_into(a),
 				)
 			},
+			nativeErrorAction::IgnoreDuplicateGossip => ErrorAction::IgnoreDuplicateGossip,
 			nativeErrorAction::SendErrorMessage {mut msg, } => {
 				ErrorAction::SendErrorMessage {
 					msg: crate::lightning::ln::msgs::ErrorMessage { inner: ObjOps::heap_alloc(msg), is_owned: true },
@@ -4500,6 +4518,10 @@ pub extern "C" fn ErrorAction_ignore_error() -> ErrorAction {
 pub extern "C" fn ErrorAction_ignore_and_log(a: crate::lightning::util::logger::Level) -> ErrorAction {
 	ErrorAction::IgnoreAndLog(a, )
 }
+#[no_mangle]
+/// Utility method to constructs a new IgnoreDuplicateGossip-variant ErrorAction
+pub extern "C" fn ErrorAction_ignore_duplicate_gossip() -> ErrorAction {
+	ErrorAction::IgnoreDuplicateGossip}
 #[no_mangle]
 /// Utility method to constructs a new SendErrorMessage-variant ErrorAction
 pub extern "C" fn ErrorAction_send_error_message(msg: crate::lightning::ln::msgs::ErrorMessage) -> ErrorAction {

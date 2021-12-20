@@ -15,6 +15,20 @@ use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
 
+/// Gets the weight for an HTLC-Success transaction.
+#[no_mangle]
+pub extern "C" fn htlc_success_tx_weight(mut opt_anchors: bool) -> u64 {
+	let mut ret = lightning::ln::chan_utils::htlc_success_tx_weight(opt_anchors);
+	ret
+}
+
+/// Gets the weight for an HTLC-Timeout transaction.
+#[no_mangle]
+pub extern "C" fn htlc_timeout_tx_weight(mut opt_anchors: bool) -> u64 {
+	let mut ret = lightning::ln::chan_utils::htlc_timeout_tx_weight(opt_anchors);
+	ret
+}
+
 /// Build the commitment secret from the seed and the commitment number
 #[no_mangle]
 pub extern "C" fn build_commitment_secret(commitment_seed: *const [u8; 32], mut idx: u64) -> crate::c_types::ThirtyTwoBytes {
@@ -630,8 +644,8 @@ pub extern "C" fn HTLCOutputInCommitment_read(ser: crate::c_types::u8slice) -> c
 /// Gets the witness redeemscript for an HTLC output in a commitment transaction. Note that htlc
 /// does not need to have its previous_output_index filled.
 #[no_mangle]
-pub extern "C" fn get_htlc_redeemscript(htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, keys: &crate::lightning::ln::chan_utils::TxCreationKeys) -> crate::c_types::derived::CVec_u8Z {
-	let mut ret = lightning::ln::chan_utils::get_htlc_redeemscript(htlc.get_native_ref(), keys.get_native_ref());
+pub extern "C" fn get_htlc_redeemscript(htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, mut opt_anchors: bool, keys: &crate::lightning::ln::chan_utils::TxCreationKeys) -> crate::c_types::derived::CVec_u8Z {
+	let mut ret = lightning::ln::chan_utils::get_htlc_redeemscript(htlc.get_native_ref(), opt_anchors, keys.get_native_ref());
 	ret.into_bytes().into()
 }
 
@@ -651,9 +665,21 @@ pub extern "C" fn make_funding_redeemscript(mut broadcaster: crate::c_types::Pub
 /// Panics if htlc.transaction_output_index.is_none() (as such HTLCs do not appear in the
 /// commitment transaction).
 #[no_mangle]
-pub extern "C" fn build_htlc_transaction(commitment_txid: *const [u8; 32], mut feerate_per_kw: u32, mut contest_delay: u16, htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, mut broadcaster_delayed_payment_key: crate::c_types::PublicKey, mut revocation_key: crate::c_types::PublicKey) -> crate::c_types::Transaction {
-	let mut ret = lightning::ln::chan_utils::build_htlc_transaction(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*commitment_txid }[..]).unwrap(), feerate_per_kw, contest_delay, htlc.get_native_ref(), &broadcaster_delayed_payment_key.into_rust(), &revocation_key.into_rust());
+pub extern "C" fn build_htlc_transaction(commitment_txid: *const [u8; 32], mut feerate_per_kw: u32, mut contest_delay: u16, htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, mut opt_anchors: bool, mut broadcaster_delayed_payment_key: crate::c_types::PublicKey, mut revocation_key: crate::c_types::PublicKey) -> crate::c_types::Transaction {
+	let mut ret = lightning::ln::chan_utils::build_htlc_transaction(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*commitment_txid }[..]).unwrap(), feerate_per_kw, contest_delay, htlc.get_native_ref(), opt_anchors, &broadcaster_delayed_payment_key.into_rust(), &revocation_key.into_rust());
 	crate::c_types::Transaction::from_bitcoin(&ret)
+}
+
+/// Gets the witnessScript for an anchor output from the funding public key.
+/// The witness in the spending input must be:
+/// <BIP 143 funding_signature>
+/// After 16 blocks of confirmation, an alternative satisfying witness could be:
+/// <>
+/// (empty vector required to satisfy compliance with MINIMALIF-standard rule)
+#[no_mangle]
+pub extern "C" fn get_anchor_redeemscript(mut funding_pubkey: crate::c_types::PublicKey) -> crate::c_types::derived::CVec_u8Z {
+	let mut ret = lightning::ln::chan_utils::get_anchor_redeemscript(&funding_pubkey.into_rust());
+	ret.into_bytes().into()
 }
 
 
@@ -782,18 +808,33 @@ pub extern "C" fn ChannelTransactionParameters_set_funding_outpoint(this_ptr: &m
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.funding_outpoint = local_val;
 }
+/// Are anchors used for this channel.  Boolean is serialization backwards-compatible
+#[no_mangle]
+pub extern "C" fn ChannelTransactionParameters_get_opt_anchors(this_ptr: &ChannelTransactionParameters) -> crate::c_types::derived::COption_NoneZ {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().opt_anchors;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NoneZ::None } else { crate::c_types::derived::COption_NoneZ::Some /* { () /**/ } */};
+	local_inner_val
+}
+/// Are anchors used for this channel.  Boolean is serialization backwards-compatible
+#[no_mangle]
+pub extern "C" fn ChannelTransactionParameters_set_opt_anchors(this_ptr: &mut ChannelTransactionParameters, mut val: crate::c_types::derived::COption_NoneZ) {
+	let mut local_val = if val.is_some() { Some( { () /*val.take()*/ }) } else { None };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.opt_anchors = local_val;
+}
 /// Constructs a new ChannelTransactionParameters given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelTransactionParameters_new(mut holder_pubkeys_arg: crate::lightning::ln::chan_utils::ChannelPublicKeys, mut holder_selected_contest_delay_arg: u16, mut is_outbound_from_holder_arg: bool, mut counterparty_parameters_arg: crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters, mut funding_outpoint_arg: crate::lightning::chain::transaction::OutPoint) -> ChannelTransactionParameters {
+pub extern "C" fn ChannelTransactionParameters_new(mut holder_pubkeys_arg: crate::lightning::ln::chan_utils::ChannelPublicKeys, mut holder_selected_contest_delay_arg: u16, mut is_outbound_from_holder_arg: bool, mut counterparty_parameters_arg: crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters, mut funding_outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut opt_anchors_arg: crate::c_types::derived::COption_NoneZ) -> ChannelTransactionParameters {
 	let mut local_counterparty_parameters_arg = if counterparty_parameters_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(counterparty_parameters_arg.take_inner()) } }) };
 	let mut local_funding_outpoint_arg = if funding_outpoint_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(funding_outpoint_arg.take_inner()) } }) };
+	let mut local_opt_anchors_arg = if opt_anchors_arg.is_some() { Some( { () /*opt_anchors_arg.take()*/ }) } else { None };
 	ChannelTransactionParameters { inner: ObjOps::heap_alloc(nativeChannelTransactionParameters {
 		holder_pubkeys: *unsafe { Box::from_raw(holder_pubkeys_arg.take_inner()) },
 		holder_selected_contest_delay: holder_selected_contest_delay_arg,
 		is_outbound_from_holder: is_outbound_from_holder_arg,
 		counterparty_parameters: local_counterparty_parameters_arg,
 		funding_outpoint: local_funding_outpoint_arg,
+		opt_anchors: local_opt_anchors_arg,
 	}), is_owned: true }
 }
 impl Clone for ChannelTransactionParameters {
@@ -1075,6 +1116,14 @@ pub extern "C" fn DirectedChannelTransactionParameters_is_outbound(this_arg: &Di
 pub extern "C" fn DirectedChannelTransactionParameters_funding_outpoint(this_arg: &DirectedChannelTransactionParameters) -> crate::lightning::chain::transaction::OutPoint {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.funding_outpoint();
 	crate::c_types::bitcoin_to_C_outpoint(ret)
+}
+
+/// Whether to use anchors for this channel
+#[must_use]
+#[no_mangle]
+pub extern "C" fn DirectedChannelTransactionParameters_opt_anchors(this_arg: &DirectedChannelTransactionParameters) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.opt_anchors();
+	ret
 }
 
 
@@ -1388,6 +1437,35 @@ impl ClosingTransaction {
 		self.inner = std::ptr::null_mut();
 		ret
 	}
+}
+impl Clone for ClosingTransaction {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeClosingTransaction>::is_null(self.inner) { std::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ClosingTransaction_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeClosingTransaction)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the ClosingTransaction
+pub extern "C" fn ClosingTransaction_clone(orig: &ClosingTransaction) -> ClosingTransaction {
+	orig.clone()
+}
+/// Checks if two ClosingTransactions contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn ClosingTransaction_hash(o: &ClosingTransaction) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	std::hash::Hasher::finish(&hasher)
 }
 /// Construct an object of the class
 #[must_use]
@@ -1767,6 +1845,14 @@ pub extern "C" fn TrustedCommitmentTransaction_built_transaction(this_arg: &Trus
 pub extern "C" fn TrustedCommitmentTransaction_keys(this_arg: &TrustedCommitmentTransaction) -> crate::lightning::ln::chan_utils::TxCreationKeys {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.keys();
 	crate::lightning::ln::chan_utils::TxCreationKeys { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::chan_utils::TxCreationKeys<>) as *mut _) }, is_owned: false }
+}
+
+/// Should anchors be used.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn TrustedCommitmentTransaction_opt_anchors(this_arg: &TrustedCommitmentTransaction) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.opt_anchors();
+	ret
 }
 
 /// Get a signature for each HTLC which was included in the commitment transaction (ie for

@@ -24,6 +24,8 @@ use crate::c_types::*;
 #[derive(Clone)]
 #[repr(C)]
 pub enum Level {
+	/// Designates extremely verbose information, including gossip-induced messages
+	Gossip,
 	/// Designates very low priority, often extremely verbose, information
 	Trace,
 	/// Designates lower priority information
@@ -40,6 +42,7 @@ impl Level {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeLevel {
 		match self {
+			Level::Gossip => nativeLevel::Gossip,
 			Level::Trace => nativeLevel::Trace,
 			Level::Debug => nativeLevel::Debug,
 			Level::Info => nativeLevel::Info,
@@ -50,6 +53,7 @@ impl Level {
 	#[allow(unused)]
 	pub(crate) fn into_native(self) -> nativeLevel {
 		match self {
+			Level::Gossip => nativeLevel::Gossip,
 			Level::Trace => nativeLevel::Trace,
 			Level::Debug => nativeLevel::Debug,
 			Level::Info => nativeLevel::Info,
@@ -60,6 +64,7 @@ impl Level {
 	#[allow(unused)]
 	pub(crate) fn from_native(native: &nativeLevel) -> Self {
 		match native {
+			nativeLevel::Gossip => Level::Gossip,
 			nativeLevel::Trace => Level::Trace,
 			nativeLevel::Debug => Level::Debug,
 			nativeLevel::Info => Level::Info,
@@ -70,6 +75,7 @@ impl Level {
 	#[allow(unused)]
 	pub(crate) fn native_into(native: nativeLevel) -> Self {
 		match native {
+			nativeLevel::Gossip => Level::Gossip,
 			nativeLevel::Trace => Level::Trace,
 			nativeLevel::Debug => Level::Debug,
 			nativeLevel::Info => Level::Info,
@@ -83,6 +89,10 @@ impl Level {
 pub extern "C" fn Level_clone(orig: &Level) -> Level {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new Gossip-variant Level
+pub extern "C" fn Level_gossip() -> Level {
+	Level::Gossip}
 #[no_mangle]
 /// Utility method to constructs a new Trace-variant Level
 pub extern "C" fn Level_trace() -> Level {

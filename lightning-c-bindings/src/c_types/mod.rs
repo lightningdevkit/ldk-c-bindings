@@ -404,8 +404,8 @@ pub struct ThreeBytes { /** The three bytes */ pub data: [u8; 3], }
 pub struct FourBytes { /** The four bytes */ pub data: [u8; 4], }
 #[derive(Clone)]
 #[repr(C)]
-/// A 10-byte byte array.
-pub struct TenBytes { /** The ten bytes */ pub data: [u8; 10], }
+/// A 12-byte byte array.
+pub struct TwelveBytes { /** The twelve bytes */ pub data: [u8; 12], }
 #[derive(Clone)]
 #[repr(C)]
 /// A 16-byte byte array.

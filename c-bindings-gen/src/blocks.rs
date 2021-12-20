@@ -346,27 +346,38 @@ pub fn write_option_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	writeln!(w, "/// An enum which can either contain a {} or not", inner_type).unwrap();
 	writeln!(w, "pub enum {} {{", mangled_container).unwrap();
 	writeln!(w, "\t/// When we're in this state, this {} contains a {}", mangled_container, inner_type).unwrap();
-	writeln!(w, "\tSome({}),", inner_type).unwrap();
+	if inner_type != "" {
+		writeln!(w, "\tSome({}),", inner_type).unwrap();
+	} else {
+		writeln!(w, "\tSome,").unwrap();
+	}
 	writeln!(w, "\t/// When we're in this state, this {} contains nothing", mangled_container).unwrap();
 	writeln!(w, "\tNone").unwrap();
 	writeln!(w, "}}").unwrap();
 
 	writeln!(w, "impl {} {{", mangled_container).unwrap();
 	writeln!(w, "\t#[allow(unused)] pub(crate) fn is_some(&self) -> bool {{").unwrap();
-	writeln!(w, "\t\tif let Self::Some(_) = self {{ true }} else {{ false }}").unwrap();
+	writeln!(w, "\t\tif let Self::None = self {{ false }} else {{ true }}").unwrap();
 	writeln!(w, "\t}}").unwrap();
 	writeln!(w, "\t#[allow(unused)] pub(crate) fn is_none(&self) -> bool {{").unwrap();
 	writeln!(w, "\t\t!self.is_some()").unwrap();
 	writeln!(w, "\t}}").unwrap();
-	writeln!(w, "\t#[allow(unused)] pub(crate) fn take(mut self) -> {} {{", inner_type).unwrap();
-	writeln!(w, "\t\tif let Self::Some(v) = self {{ v }} else {{ unreachable!() }}").unwrap();
-	writeln!(w, "\t}}").unwrap();
+	if inner_type != "" {
+		writeln!(w, "\t#[allow(unused)] pub(crate) fn take(mut self) -> {} {{", inner_type).unwrap();
+		writeln!(w, "\t\tif let Self::Some(v) = self {{ v }} else {{ unreachable!() }}").unwrap();
+		writeln!(w, "\t}}").unwrap();
+	}
 	writeln!(w, "}}").unwrap();
 
 	writeln!(w, "#[no_mangle]").unwrap();
 	writeln!(w, "/// Constructs a new {} containing a {}", mangled_container, inner_type).unwrap();
-	writeln!(w, "pub extern \"C\" fn {}_some(o: {}) -> {} {{", mangled_container, inner_type, mangled_container).unwrap();
-	writeln!(w, "\t{}::Some(o)", mangled_container).unwrap();
+	if inner_type != "" {
+		writeln!(w, "pub extern \"C\" fn {}_some(o: {}) -> {} {{", mangled_container, inner_type, mangled_container).unwrap();
+		writeln!(w, "\t{}::Some(o)", mangled_container).unwrap();
+	} else {
+		writeln!(w, "pub extern \"C\" fn {}_some() -> {} {{", mangled_container, mangled_container).unwrap();
+		writeln!(w, "\t{}::Some", mangled_container).unwrap();
+	}
 	writeln!(w, "}}").unwrap();
 
 	writeln!(w, "#[no_mangle]").unwrap();

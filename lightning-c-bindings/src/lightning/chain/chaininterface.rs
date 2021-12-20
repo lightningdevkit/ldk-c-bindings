@@ -149,12 +149,12 @@ pub struct FeeEstimator {
 	pub this_arg: *mut c_void,
 	/// Gets estimated satoshis of fee required per 1000 Weight-Units.
 	///
-	/// Must be no smaller than 253 (ie 1 satoshi-per-byte rounded up to ensure later round-downs
-	/// don't put us below 1 satoshi-per-byte).
+	/// Must return a value no smaller than 253 (ie 1 satoshi-per-byte rounded up to ensure later
+	/// round-downs don't put us below 1 satoshi-per-byte).
 	///
-	/// This translates to:
-	///  * satoshis-per-byte * 250
-	///  * ceil(satoshis-per-kbyte / 4)
+	/// This method can be implemented with the following unit conversions:
+	///  * max(satoshis-per-byte * 250, 253)
+	///  * max(satoshis-per-kbyte / 4, 253)
 	#[must_use]
 	pub get_est_sat_per_1000_weight: extern "C" fn (this_arg: *const c_void, confirmation_target: crate::lightning::chain::chaininterface::ConfirmationTarget) -> u32,
 	/// Frees any resources associated with this object given its this_arg pointer.

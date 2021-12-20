@@ -2035,6 +2035,8 @@ pub enum CreationError {
 	TimestampOutOfBounds,
 	/// The supplied expiry time could cause an overflow if added to a `PositiveTimestamp`
 	ExpiryTimeOutOfBounds,
+	/// The supplied millisatoshi amount was greater than the total bitcoin supply.
+	InvalidAmount,
 }
 use lightning_invoice::CreationError as nativeCreationError;
 impl CreationError {
@@ -2045,6 +2047,7 @@ impl CreationError {
 			CreationError::RouteTooLong => nativeCreationError::RouteTooLong,
 			CreationError::TimestampOutOfBounds => nativeCreationError::TimestampOutOfBounds,
 			CreationError::ExpiryTimeOutOfBounds => nativeCreationError::ExpiryTimeOutOfBounds,
+			CreationError::InvalidAmount => nativeCreationError::InvalidAmount,
 		}
 	}
 	#[allow(unused)]
@@ -2054,6 +2057,7 @@ impl CreationError {
 			CreationError::RouteTooLong => nativeCreationError::RouteTooLong,
 			CreationError::TimestampOutOfBounds => nativeCreationError::TimestampOutOfBounds,
 			CreationError::ExpiryTimeOutOfBounds => nativeCreationError::ExpiryTimeOutOfBounds,
+			CreationError::InvalidAmount => nativeCreationError::InvalidAmount,
 		}
 	}
 	#[allow(unused)]
@@ -2063,6 +2067,7 @@ impl CreationError {
 			nativeCreationError::RouteTooLong => CreationError::RouteTooLong,
 			nativeCreationError::TimestampOutOfBounds => CreationError::TimestampOutOfBounds,
 			nativeCreationError::ExpiryTimeOutOfBounds => CreationError::ExpiryTimeOutOfBounds,
+			nativeCreationError::InvalidAmount => CreationError::InvalidAmount,
 		}
 	}
 	#[allow(unused)]
@@ -2072,6 +2077,7 @@ impl CreationError {
 			nativeCreationError::RouteTooLong => CreationError::RouteTooLong,
 			nativeCreationError::TimestampOutOfBounds => CreationError::TimestampOutOfBounds,
 			nativeCreationError::ExpiryTimeOutOfBounds => CreationError::ExpiryTimeOutOfBounds,
+			nativeCreationError::InvalidAmount => CreationError::InvalidAmount,
 		}
 	}
 }
@@ -2096,6 +2102,10 @@ pub extern "C" fn CreationError_timestamp_out_of_bounds() -> CreationError {
 /// Utility method to constructs a new ExpiryTimeOutOfBounds-variant CreationError
 pub extern "C" fn CreationError_expiry_time_out_of_bounds() -> CreationError {
 	CreationError::ExpiryTimeOutOfBounds}
+#[no_mangle]
+/// Utility method to constructs a new InvalidAmount-variant CreationError
+pub extern "C" fn CreationError_invalid_amount() -> CreationError {
+	CreationError::InvalidAmount}
 /// Checks if two CreationErrors contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]

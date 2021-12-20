@@ -153,97 +153,6 @@ pub extern "C" fn ChannelMonitorUpdate_read(ser: crate::c_types::u8slice) -> cra
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
-
-use lightning::chain::channelmonitor::MonitorUpdateError as nativeMonitorUpdateErrorImport;
-pub(crate) type nativeMonitorUpdateError = nativeMonitorUpdateErrorImport;
-
-/// General Err type for ChannelMonitor actions. Generally, this implies that the data provided is
-/// inconsistent with the ChannelMonitor being called. eg for ChannelMonitor::update_monitor this
-/// means you tried to update a monitor for a different channel or the ChannelMonitorUpdate was
-/// corrupted.
-/// Contains a developer-readable error message.
-#[must_use]
-#[repr(C)]
-pub struct MonitorUpdateError {
-	/// A pointer to the opaque Rust object.
-
-	/// Nearly everywhere, inner must be non-null, however in places where
-	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeMonitorUpdateError,
-	/// Indicates that this is the only struct which contains the same pointer.
-
-	/// Rust functions which take ownership of an object provided via an argument require
-	/// this to be true and invalidate the object pointed to by inner.
-	pub is_owned: bool,
-}
-
-impl Drop for MonitorUpdateError {
-	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeMonitorUpdateError>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
-		}
-	}
-}
-/// Frees any resources used by the MonitorUpdateError, if is_owned is set and inner is non-NULL.
-#[no_mangle]
-pub extern "C" fn MonitorUpdateError_free(this_obj: MonitorUpdateError) { }
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn MonitorUpdateError_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeMonitorUpdateError); }
-}
-#[allow(unused)]
-impl MonitorUpdateError {
-	pub(crate) fn get_native_ref(&self) -> &'static nativeMonitorUpdateError {
-		unsafe { &*ObjOps::untweak_ptr(self.inner) }
-	}
-	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeMonitorUpdateError {
-		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
-	}
-	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-	pub(crate) fn take_inner(mut self) -> *mut nativeMonitorUpdateError {
-		assert!(self.is_owned);
-		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
-		ret
-	}
-}
-#[no_mangle]
-pub extern "C" fn MonitorUpdateError_get_a(this_ptr: &MonitorUpdateError) -> crate::c_types::Str {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().0;
-	inner_val.into()
-}
-#[no_mangle]
-pub extern "C" fn MonitorUpdateError_set_a(this_ptr: &mut MonitorUpdateError, mut val: crate::c_types::Str) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.0 = val.into_str();
-}
-/// Constructs a new MonitorUpdateError given each field
-#[must_use]
-#[no_mangle]
-pub extern "C" fn MonitorUpdateError_new(mut a_arg: crate::c_types::Str) -> MonitorUpdateError {
-	MonitorUpdateError { inner: ObjOps::heap_alloc(lightning::chain::channelmonitor::MonitorUpdateError (
-		a_arg.into_str(),
-	)), is_owned: true }
-}
-impl Clone for MonitorUpdateError {
-	fn clone(&self) -> Self {
-		Self {
-			inner: if <*mut nativeMonitorUpdateError>::is_null(self.inner) { std::ptr::null_mut() } else {
-				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
-			is_owned: true,
-		}
-	}
-}
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn MonitorUpdateError_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeMonitorUpdateError)).clone() })) as *mut c_void
-}
-#[no_mangle]
-/// Creates a copy of the MonitorUpdateError
-pub extern "C" fn MonitorUpdateError_clone(orig: &MonitorUpdateError) -> MonitorUpdateError {
-	orig.clone()
-}
 /// An event to be processed by the ChannelManager.
 #[must_use]
 #[derive(Clone)]
@@ -839,9 +748,9 @@ pub(crate) extern "C" fn ChannelMonitor_write_void(obj: *const c_void) -> crate:
 /// panics if the given update is not the next update by update_id.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_update_monitor(this_arg: &ChannelMonitor, updates: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, broadcaster: &crate::lightning::chain::chaininterface::BroadcasterInterface, fee_estimator: &crate::lightning::chain::chaininterface::FeeEstimator, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_NoneMonitorUpdateErrorZ {
+pub extern "C" fn ChannelMonitor_update_monitor(this_arg: &ChannelMonitor, updates: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, broadcaster: &crate::lightning::chain::chaininterface::BroadcasterInterface, fee_estimator: &crate::lightning::chain::chaininterface::FeeEstimator, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_NoneNoneZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_monitor(updates.get_native_ref(), broadcaster, fee_estimator, logger);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::chain::channelmonitor::MonitorUpdateError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 

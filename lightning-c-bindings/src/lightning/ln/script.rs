@@ -160,6 +160,25 @@ pub extern "C" fn InvalidShutdownScript_new(mut script_arg: crate::c_types::deri
 		script: ::bitcoin::blockdata::script::Script::from(script_arg.into_rust()),
 	}), is_owned: true }
 }
+impl Clone for InvalidShutdownScript {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeInvalidShutdownScript>::is_null(self.inner) { std::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn InvalidShutdownScript_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInvalidShutdownScript)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the InvalidShutdownScript
+pub extern "C" fn InvalidShutdownScript_clone(orig: &InvalidShutdownScript) -> InvalidShutdownScript {
+	orig.clone()
+}
 #[no_mangle]
 /// Serialize the ShutdownScript object into a byte array which can be read by ShutdownScript_read
 pub extern "C" fn ShutdownScript_write(obj: &ShutdownScript) -> crate::c_types::derived::CVec_u8Z {

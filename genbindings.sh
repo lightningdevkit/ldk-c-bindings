@@ -364,7 +364,6 @@ if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 			LLD_LLVM_V="$(ld64.lld --version | awk '{ print substr($2, 0, 2); }')"
 		fi
 	fi
-	LLD_PFX=ld64.
 else
 	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }')
 	if [ -x "$(which ld.lld)" ]; then
@@ -372,12 +371,8 @@ else
 		if [ "$LLD_LLVM_V" = "LLD" ]; then # eg if the output is "Debian LLD ..."
 			LLD_LLVM_V="$(ld.lld --version | awk '{ print substr($3, 0, 2); }')"
 		else
-			LLD_LLVM_V="$(ld.lld-$RUSTC_LLVM_V --version | awk '{ print substr($2, 0, 2); }')"
+			LLD_LLVM_V="$(ld.lld --version | awk '{ print substr($2, 0, 2); }')"
 		fi
-	fi
-	LLD_PFX=ld.
-	if [ $RUSTC_LLVM_V -lt "13" ]; then
-		LLD_PFX=
 	fi
 fi
 
@@ -386,7 +381,7 @@ if [ "$CLANG_LLVM_V" = "$RUSTC_LLVM_V" ]; then
 	CLANG=clang
 	CLANGPP=clang++
 	if [ "$LLD_LLVM_V" = "$CLANG_LLVM_V" ]; then
-		LLD=${LLD_PFX}lld
+		LLD=lld
 	fi
 elif [ -x "$(which clang-$RUSTC_LLVM_V)" ]; then
 	CLANG="$(which clang-$RUSTC_LLVM_V)"
@@ -397,12 +392,13 @@ elif [ -x "$(which clang-$RUSTC_LLVM_V)" ]; then
 		unset CLANGPP
 	fi
 	if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
-		LLD="$(which ${LLD_PFX}lld-$RUSTC_LLVM_V || echo ${LLD_PFX}lld)"
-		LLD_LLVM_V="$($LLD --version | awk '{ print $2; }')"
+		LLD="lld"
+		[ -x "$(which lld-$RUSTC_LLVM_V)" ] && LLD="lld-$RUSTC_LLVM_V"
+		LLD_LLVM_V="$(ld.lld-$RUSTC_LLVM_V --version | awk '{ print $2; }')"
 		if [ "$LLD_LLVM_V" = "LLD" ]; then # eg if the output is "Debian LLD ..."
-			LLD_LLVM_V="$(${LLD_PFX}lld-$RUSTC_LLVM_V --version | awk '{ print substr($3, 0, 2); }')"
+			LLD_LLVM_V="$(ld.lld-$RUSTC_LLVM_V --version | awk '{ print substr($3, 0, 2); }')"
 		else
-			LLD_LLVM_V="$(${LLD_PFX}lld-$RUSTC_LLVM_V --version | awk '{ print substr($2, 0, 2); }')"
+			LLD_LLVM_V="$(ld.lld-$RUSTC_LLVM_V --version | awk '{ print substr($2, 0, 2); }')"
 		fi
 		if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
 			echo "Could not find a workable version of lld, not using cross-language LTO"

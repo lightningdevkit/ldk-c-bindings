@@ -82,35 +82,38 @@ mv lightning-c-bindings/src/bitcoin ./
 git checkout lightning-c-bindings/src
 git checkout lightning-c-bindings/include
 BINDINGS_GIT="$(git describe --tag --dirty --abbrev=16)"
-echo -e "#ifndef _LDK_HEADER_VER" > lightning-c-bindings/include/ldk_ver.h
-echo -e "static inline int _ldk_strncmp(const char *s1, const char *s2, uint64_t n) {" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\tif (n && *s1 != *s2) return 1;" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\twhile (n && *s1 != 0 && *s2 != 0) {" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\t\ts1++; s2++; n--;" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\t\tif (n && *s1 != *s2) return 1;" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\t}" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\treturn 0;" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "}" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "#define _LDK_HEADER_VER \"$LIGHTNING_GIT\"" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "#define _LDK_C_BINDINGS_HEADER_VER \"$BINDINGS_GIT\"" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "static inline const char* check_get_ldk_version() {" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\tLDKStr bin_ver = _ldk_get_compiled_version();" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\tif (_ldk_strncmp(_LDK_HEADER_VER, (const char*)bin_ver.chars, bin_ver.len) != 0) {" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\t// Version mismatch, we don't know what we're running!" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\t\treturn 0;" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\t}" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\treturn _LDK_HEADER_VER;" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "}" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "static inline const char* check_get_ldk_bindings_version() {" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\tLDKStr bin_ver = _ldk_c_bindings_get_compiled_version();" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\tif (_ldk_strncmp(_LDK_C_BINDINGS_HEADER_VER, (const char*)bin_ver.chars, bin_ver.len) != 0) {" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\t// Version mismatch, we don't know what we're running!" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\t\treturn 0;" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\t}" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "\treturn _LDK_C_BINDINGS_HEADER_VER;" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "}" >> lightning-c-bindings/include/ldk_ver.h
-echo -e "#endif /* _LDK_HEADER_VER */" >> lightning-c-bindings/include/ldk_ver.h
+echo "$(cat <<EOF
+#ifndef _LDK_HEADER_VER
+static inline int _ldk_strncmp(const char *s1, const char *s2, uint64_t n) {
+	if (n && *s1 != *s2) return 1;
+	while (n && *s1 != 0 && *s2 != 0) {
+		s1++; s2++; n--;
+		if (n && *s1 != *s2) return 1;
+	}
+	return 0;
+}
+
+#define _LDK_HEADER_VER "${LIGHTNING_GIT}"
+#define _LDK_C_BINDINGS_HEADER_VER "${BINDINGS_GIT}"
+static inline const char* check_get_ldk_version() {
+	LDKStr bin_ver = _ldk_get_compiled_version();
+	if (_ldk_strncmp(_LDK_HEADER_VER, (const char*)bin_ver.chars, bin_ver.len) != 0) {
+	// Version mismatch, we don't know what we're running!
+		return 0;
+	}
+	return _LDK_HEADER_VER;
+}
+static inline const char* check_get_ldk_bindings_version() {
+	LDKStr bin_ver = _ldk_c_bindings_get_compiled_version();
+	if (_ldk_strncmp(_LDK_C_BINDINGS_HEADER_VER, (const char*)bin_ver.chars, bin_ver.len) != 0) {
+	// Version mismatch, we don't know what we're running!
+		return 0;
+	}
+	return _LDK_C_BINDINGS_HEADER_VER;
+}
+#endif /* _LDK_HEADER_VER */
+EOF
+)" >> lightning-c-bindings/include/ldk_ver.h
 
 rm -rf lightning-c-bindings/src
 
@@ -170,14 +173,17 @@ add_crate "lightning-invoice" "lightning_invoice"
 
 cat /tmp/crate-source.txt | RUST_BACKTRACE=1 "$BIN" "$OUT/" "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
 
-echo -e '#[no_mangle]' >> lightning-c-bindings/src/version.rs
-echo -e 'pub extern "C" fn _ldk_get_compiled_version() -> crate::c_types::Str {' >> lightning-c-bindings/src/version.rs
-echo -e '\t"'"$LIGHTNING_GIT"'".into()' >> lightning-c-bindings/src/version.rs
-echo -e '}' >> lightning-c-bindings/src/version.rs
-echo -e '#[no_mangle]' >> lightning-c-bindings/src/version.rs
-echo -e 'pub extern "C" fn _ldk_c_bindings_get_compiled_version() -> crate::c_types::Str {' >> lightning-c-bindings/src/version.rs
-echo -e '\t"'"$BINDINGS_GIT"'".into()' >> lightning-c-bindings/src/version.rs
-echo -e '}' >> lightning-c-bindings/src/version.rs
+echo "$(cat <<EOF
+#[no_mangle]
+pub extern "C" fn _ldk_get_compiled_version() -> crate::c_types::Str {
+	"${LIGHTNING_GIT}".into()
+}
+#[no_mangle]
+pub extern "C" fn _ldk_c_bindings_get_compiled_version() -> crate::c_types::Str {
+	"${BINDINGS_GIT}".into()
+}
+EOF
+)" >> lightning-c-bindings/src/version.rs
 
 # Now cd to lightning-c-bindings, build the generated bindings, and call cbindgen to build a C header file
 cd lightning-c-bindings

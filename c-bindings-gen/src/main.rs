@@ -175,7 +175,7 @@ fn do_write_impl_trait<W: std::io::Write>(w: &mut W, trait_path: &str, _trait_na
 	match trait_path {
 		"lightning::util::ser::Writeable" => {
 			writeln!(w, "impl {} for {} {{", trait_path, for_obj).unwrap();
-			writeln!(w, "\tfn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), ::std::io::Error> {{").unwrap();
+			writeln!(w, "\tfn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), crate::c_types::io::Error> {{").unwrap();
 			writeln!(w, "\t\tlet vec = (self.write)(self.this_arg);").unwrap();
 			writeln!(w, "\t\tw.write_all(vec.as_slice())").unwrap();
 			writeln!(w, "\t}}\n}}").unwrap();

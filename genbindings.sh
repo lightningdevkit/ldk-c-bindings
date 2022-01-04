@@ -127,7 +127,7 @@ BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
 function add_crate() {
 	pushd "$LIGHTNING_PATH/$1"
-	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check $3 -- --cfg=c_bindings -Zunpretty=expanded > /tmp/$1-crate-source.txt
+	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check --no-default-features $3 -- --cfg=c_bindings -Zunpretty=expanded > /tmp/$1-crate-source.txt
 	popd
 	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 		sed -i".original" "1i\\
@@ -141,9 +141,9 @@ pub mod $2 {
 	rm /tmp/$1-crate-source.txt
 	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 		# OSX sed is for some reason not compatible with GNU sed
-		sed -E -i '' 's|#?'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'" '"$4"' }|' lightning-c-bindings/Cargo.toml
+		sed -E -i '' 's|#*'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'", default-features = false }|' lightning-c-bindings/Cargo.toml
 	else
-		sed -E -i 's|#?'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'" '"$4"' }|' lightning-c-bindings/Cargo.toml
+		sed -E -i 's|#*'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'", default-features = false }|' lightning-c-bindings/Cargo.toml
 	fi
 }
 
@@ -158,15 +158,18 @@ function drop_crate() {
 
 echo > /tmp/crate-source.txt
 if [ "$2" = "true" ]; then
-	add_crate lightning lightning --features=std ', features = ["std"]'
+	add_crate lightning lightning --features=std
 	add_crate "lightning-persister" "lightning_persister"
 	add_crate "lightning-background-processor" "lightning_background_processor"
+	add_crate "lightning-invoice" "lightning_invoice"
+	CARGO_BUILD_ARGS="--features=std"
 else
-	add_crate lightning lightning --features=no-std ', features = ["no-std"]'
+	add_crate lightning lightning --features=no-std
 	drop_crate "lightning-persister"
 	drop_crate "lightning-background-processor"
+	drop_crate "lightning-invoice"
+	CARGO_BUILD_ARGS="--features=no-std"
 fi
-add_crate "lightning-invoice" "lightning_invoice"
 
 cat /tmp/crate-source.txt | RUST_BACKTRACE=1 "$BIN" "$OUT/" "$OUT_TEMPL" "$OUT_F" "$OUT_CPP"
 
@@ -182,9 +185,9 @@ echo -e '}' >> lightning-c-bindings/src/version.rs
 # Now cd to lightning-c-bindings, build the generated bindings, and call cbindgen to build a C header file
 cd lightning-c-bindings
 
-RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" cargo build
+RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" cargo build $CARGO_BUILD_ARGS
 if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
-	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" cargo build --target aarch64-apple-darwin
+	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" cargo build $CARGO_BUILD_ARGS --target aarch64-apple-darwin
 fi
 cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1
 
@@ -315,7 +318,7 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" ]; then
 		LLVM_V=$(rustc +nightly --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 2); }')
 		if [ -x "$(which clang-$LLVM_V)" ]; then
 			cargo +nightly clean
-			cargo +nightly rustc -Zbuild-std=std,panic_abort --target x86_64-unknown-linux-gnu -v -- -Zsanitizer=memory -Zsanitizer-memory-track-origins -Cforce-frame-pointers=yes
+			cargo +nightly rustc $CARGO_BUILD_ARGS -Zbuild-std=std,panic_abort --target x86_64-unknown-linux-gnu -v -- -Zsanitizer=memory -Zsanitizer-memory-track-origins -Cforce-frame-pointers=yes
 			mv target/x86_64-unknown-linux-gnu/debug/libldk.* target/debug/
 
 			# Sadly, std doesn't seem to compile into something that is memsan-safe as of Aug 2020,
@@ -422,9 +425,9 @@ if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "
 			sed -i.bk 's/,"cdylib"]/]/g' Cargo.toml
 		fi
 		if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
-			RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" RUSTC_BOOTSTRAP=1 cargo rustc --target aarch64-apple-darwin -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
+			RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" RUSTC_BOOTSTRAP=1 cargo rustc $CARGO_BUILD_ARGS --target aarch64-apple-darwin -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
 		fi
-		RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" RUSTC_BOOTSTRAP=1 cargo rustc -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
+		RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" RUSTC_BOOTSTRAP=1 cargo rustc $CARGO_BUILD_ARGS -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
 		mv Cargo.toml.bk Cargo.toml
 
 		# First the C demo app...
@@ -451,7 +454,7 @@ fi
 # Now build with LTO on on both C++ and rust, but without cross-language LTO:
 # Clear stale release build artifacts from previous runs
 cargo clean --release
-CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C lto
+CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release -- -C lto
 if [ "$2" = "true" ]; then
 	clang++ $LOCAL_CFLAGS -std=c++11 -O2 demo.cpp target/release/libldk.a -ldl
 fi
@@ -477,9 +480,9 @@ if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]
 	if clang -nostdlib -o /dev/null --target=wasm32-wasi -Wl,--no-entry genbindings_wasm_test_file.c > /dev/null 2>&1; then
 		# And if it does, build a WASM binary without capturing errors
 		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -target wasm32"
-		cargo rustc -v --target=wasm32-wasi
+		RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" cargo rustc $CARGO_BUILD_ARGS -v --target=wasm32-wasi
 		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -target wasm32 -Os"
-		CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target=wasm32-wasi -- -C embed-bitcode=yes -C opt-level=s -C linker-plugin-lto -C lto
+		CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release --target=wasm32-wasi -- -C embed-bitcode=yes -C opt-level=s -C linker-plugin-lto -C lto
 	else
 		echo "Cannot build WASM lib as clang does not seem to support the wasm32-wasi target"
 	fi
@@ -498,7 +501,7 @@ for IDX in ${!EXTRA_TARGETS[@]}; do
 	EXTRA_ENV_TARGET=$(echo "${EXTRA_TARGETS[$IDX]}" | sed 's/-/_/g')
 	export CFLAGS_$EXTRA_ENV_TARGET="$BASE_CFLAGS"
 	export CC_$EXTRA_ENV_TARGET=${EXTRA_CCS[$IDX]}
-	RUSTFLAGS="$BASE_RUSTFLAGS -C linker=${EXTRA_CCS[$IDX]}" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target "${EXTRA_TARGETS[$IDX]}" -- -C lto
+	RUSTFLAGS="$BASE_RUSTFLAGS -C linker=${EXTRA_CCS[$IDX]}" CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release --target "${EXTRA_TARGETS[$IDX]}" -- -C lto
 done
 
 if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
@@ -516,12 +519,12 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 		done
 		export CFLAGS_aarch64_apple_darwin="$CFLAGS_aarch64_apple_darwin -O3 -fPIC -fembed-bitcode"
 		LINK_ARG_FLAGS="$LINK_ARG_FLAGS -C link-arg="-isysroot$(xcrun --show-sdk-path)" -C link-arg=-mmacosx-version-min=10.9"
-		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target aarch64-apple-darwin -- -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-mcpu=apple-a14
+		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin -- -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-mcpu=apple-a14
 	fi
 	export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -O3 -fPIC -fembed-bitcode -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 	# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 	cargo clean --release
-	CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release -- -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge
+	CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release -- -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge
 
 	if [ "$2" = "true" ]; then
 		$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -O2 demo.cpp target/release/libldk.a -ldl
@@ -532,7 +535,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 	fi
 else
 	if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
-		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc -v --release --target aarch64-apple-darwin -- -C lto
+		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin -- -C lto
 	fi
 	echo "WARNING: Building with cross-language LTO is not avilable without clang-$RUSTC_LLVM_V"
 fi

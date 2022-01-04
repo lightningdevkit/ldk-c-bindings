@@ -14,14 +14,20 @@ crate-type = ["staticlib"
 # Note that the following line is matched exactly by genbindings to turn off dylib creation
 ,"cdylib"]
 
+[features]
+no-std = ["bitcoin/no-std", "lightning/no-std", "core2"]
+std = ["bitcoin/std", "lightning/std"]
+
 [dependencies]
-bitcoin = "0.27"
+bitcoin = { version = "0.27", default-features = false }
 secp256k1 = { version = "0.20.3", features = ["global-context-less-secure"] }
 # Note that the following line is matched by genbindings to update the path
-lightning = { git = "https://github.com/lightningdevkit/rust-lightning", rev = "80ea2e51cdd3decf084574dee365065d782f7e8c", features = ["std"] }
-lightning-persister = { git = "https://github.com/lightningdevkit/rust-lightning", rev = "80ea2e51cdd3decf084574dee365065d782f7e8c" }
-lightning-invoice = { git = "https://github.com/lightningdevkit/rust-lightning", rev = "80ea2e51cdd3decf084574dee365065d782f7e8c" }
-lightning-background-processor = { git = "https://github.com/lightningdevkit/rust-lightning", rev = "80ea2e51cdd3decf084574dee365065d782f7e8c" }
+lightning = { git = "https://github.com/lightningdevkit/rust-lightning", rev = "80ea2e51cdd3decf084574dee365065d782f7e8c", default-features = false }
+lightning-persister = { git = "https://github.com/lightningdevkit/rust-lightning", rev = "80ea2e51cdd3decf084574dee365065d782f7e8c", default-features = false }
+lightning-invoice = { git = "https://github.com/lightningdevkit/rust-lightning", rev = "80ea2e51cdd3decf084574dee365065d782f7e8c", default-features = false }
+lightning-background-processor = { git = "https://github.com/lightningdevkit/rust-lightning", rev = "80ea2e51cdd3decf084574dee365065d782f7e8c", default-features = false }
+
+core2 = { version = "0.3.0", optional = true, default-features = false }
 
 # Always force panic=abort, further options are set in the genbindings.sh build script
 [profile.dev]

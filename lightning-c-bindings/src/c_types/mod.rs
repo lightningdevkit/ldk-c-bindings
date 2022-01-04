@@ -13,9 +13,13 @@ use bitcoin::secp256k1::recovery::RecoveryId;
 use bitcoin::secp256k1::recovery::RecoverableSignature as SecpRecoverableSignature;
 use bitcoin::bech32;
 
-use std::convert::TryInto; // Bindings need at least rustc 1.34
+use core::convert::TryInto; // Bindings need at least rustc 1.34
 use core::ffi::c_void;
-use std::io::{Cursor, Read}; // TODO: We should use core2 here when we support no_std
+
+#[cfg(feature = "std")]
+pub(crate) use std::io::{self, Cursor, Read};
+#[cfg(feature = "no-std")]
+pub(crate) use core2::io::{self, Cursor, Read};
 
 #[repr(C)]
 /// A dummy struct of which an instance must never exist.
@@ -417,7 +421,7 @@ pub struct TwentyBytes { /** The twenty bytes */ pub data: [u8; 20], }
 
 pub(crate) struct VecWriter(pub Vec<u8>);
 impl lightning::util::ser::Writer for VecWriter {
-	fn write_all(&mut self, buf: &[u8]) -> Result<(), ::std::io::Error> {
+	fn write_all(&mut self, buf: &[u8]) -> Result<(), io::Error> {
 		self.0.extend_from_slice(buf);
 		Ok(())
 	}

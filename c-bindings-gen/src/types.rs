@@ -1269,7 +1269,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	/// TODO: We should never need to use this!
 	fn real_rust_type_mapping<'equiv>(&self, thing: &'equiv str) -> &'equiv str {
 		match thing {
-			"lightning::io::Read" => "std::io::Read",
+			"lightning::io::Read" => "crate::c_types::io::Read",
 			_ => thing,
 		}
 	}

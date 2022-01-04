@@ -61,7 +61,7 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 		writeln!(w, "\tpub result: *mut {},", ok_type).unwrap();
 	} else {
 		writeln!(w, "\t/// Note that this value is always NULL, as there are no contents in the OK variant").unwrap();
-		writeln!(w, "\tpub result: *mut std::ffi::c_void,").unwrap();
+		writeln!(w, "\tpub result: *mut core::ffi::c_void,").unwrap();
 	}
 	if err_type != "()" {
 		writeln!(w, "\t/// A pointer to the contents in the error state.").unwrap();
@@ -69,7 +69,7 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 		writeln!(w, "\tpub err: *mut {},", err_type).unwrap();
 	} else {
 		writeln!(w, "\t/// Note that this value is always NULL, as there are no contents in the Err variant").unwrap();
-		writeln!(w, "\tpub err: *mut std::ffi::c_void,").unwrap();
+		writeln!(w, "\tpub err: *mut core::ffi::c_void,").unwrap();
 	}
 	writeln!(w, "}}").unwrap();
 	writeln!(w, "#[repr(C)]").unwrap();
@@ -97,7 +97,7 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	if ok_type != "()" {
 		writeln!(w, "\t\t\tresult: Box::into_raw(Box::new(o)),").unwrap();
 	} else {
-		writeln!(w, "\t\t\tresult: std::ptr::null_mut(),").unwrap();
+		writeln!(w, "\t\t\tresult: core::ptr::null_mut(),").unwrap();
 	}
 	writeln!(w, "\t\t}},").unwrap();
 	writeln!(w, "\t\tresult_ok: true,").unwrap();
@@ -117,7 +117,7 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	if err_type != "()" {
 		writeln!(w, "\t\t\terr: Box::into_raw(Box::new(e)),").unwrap();
 	} else {
-		writeln!(w, "\t\t\terr: std::ptr::null_mut(),").unwrap();
+		writeln!(w, "\t\t\terr: core::ptr::null_mut(),").unwrap();
 	}
 	writeln!(w, "\t\t}},").unwrap();
 	writeln!(w, "\t\tresult_ok: false,").unwrap();
@@ -156,22 +156,22 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 	writeln!(w, "\t\tlet contents = if o.result_ok {{").unwrap();
 	if ok_type != "()" {
 		writeln!(w, "\t\t\tlet result = unsafe {{ o.contents.result }};").unwrap();
-		writeln!(w, "\t\t\tunsafe {{ o.contents.result = std::ptr::null_mut() }};").unwrap();
+		writeln!(w, "\t\t\tunsafe {{ o.contents.result = core::ptr::null_mut() }};").unwrap();
 		writeln!(w, "\t\t\t{}Ptr {{ result }}", mangled_container).unwrap();
 	} else {
 		writeln!(w, "\t\t\tlet _ = unsafe {{ Box::from_raw(o.contents.result) }};").unwrap();
-		writeln!(w, "\t\t\to.contents.result = std::ptr::null_mut();").unwrap();
-		writeln!(w, "\t\t\t{}Ptr {{ result: std::ptr::null_mut() }}", mangled_container).unwrap();
+		writeln!(w, "\t\t\to.contents.result = core::ptr::null_mut();").unwrap();
+		writeln!(w, "\t\t\t{}Ptr {{ result: core::ptr::null_mut() }}", mangled_container).unwrap();
 	}
 	writeln!(w, "\t\t}} else {{").unwrap();
 	if err_type != "()" {
 		writeln!(w, "\t\t\tlet err = unsafe {{ o.contents.err }};").unwrap();
-		writeln!(w, "\t\t\tunsafe {{ o.contents.err = std::ptr::null_mut(); }}").unwrap();
+		writeln!(w, "\t\t\tunsafe {{ o.contents.err = core::ptr::null_mut(); }}").unwrap();
 		writeln!(w, "\t\t\t{}Ptr {{ err }}", mangled_container).unwrap();
 	} else {
 		writeln!(w, "\t\t\tlet _ = unsafe {{ Box::from_raw(o.contents.err) }};").unwrap();
-		writeln!(w, "\t\t\to.contents.err = std::ptr::null_mut();").unwrap();
-		writeln!(w, "\t\t\t{}Ptr {{ err: std::ptr::null_mut() }}", mangled_container).unwrap();
+		writeln!(w, "\t\t\to.contents.err = core::ptr::null_mut();").unwrap();
+		writeln!(w, "\t\t\t{}Ptr {{ err: core::ptr::null_mut() }}", mangled_container).unwrap();
 	}
 	writeln!(w, "\t\t}};").unwrap();
 	writeln!(w, "\t\tSelf {{").unwrap();
@@ -189,7 +189,7 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 		if ok_type != "()" {
 			writeln!(w, "\t\t\t\tresult: Box::into_raw(Box::new(<{}>::clone(unsafe {{ &*self.contents.result }})))", ok_type).unwrap();
 		} else {
-			writeln!(w, "\t\t\t\tresult: std::ptr::null_mut()").unwrap();
+			writeln!(w, "\t\t\t\tresult: core::ptr::null_mut()").unwrap();
 		}
 		writeln!(w, "\t\t\t}} }}").unwrap();
 		writeln!(w, "\t\t}} else {{").unwrap();
@@ -197,7 +197,7 @@ pub fn write_result_block<W: std::io::Write>(w: &mut W, mangled_container: &str,
 		if err_type != "()" {
 			writeln!(w, "\t\t\t\terr: Box::into_raw(Box::new(<{}>::clone(unsafe {{ &*self.contents.err }})))", err_type).unwrap();
 		} else {
-			writeln!(w, "\t\t\t\terr: std::ptr::null_mut()").unwrap();
+			writeln!(w, "\t\t\t\terr: core::ptr::null_mut()").unwrap();
 		}
 		writeln!(w, "\t\t\t}} }}").unwrap();
 		writeln!(w, "\t\t}}").unwrap();
@@ -226,13 +226,13 @@ pub fn write_vec_block<W: std::io::Write>(w: &mut W, mangled_container: &str, in
 	writeln!(w, "impl {} {{", mangled_container).unwrap();
 	writeln!(w, "\t#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<{}> {{", inner_type).unwrap();
 	writeln!(w, "\t\tif self.datalen == 0 {{ return Vec::new(); }}").unwrap();
-	writeln!(w, "\t\tlet ret = unsafe {{ Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }}.into();").unwrap();
-	writeln!(w, "\t\tself.data = std::ptr::null_mut();").unwrap();
+	writeln!(w, "\t\tlet ret = unsafe {{ Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }}.into();").unwrap();
+	writeln!(w, "\t\tself.data = core::ptr::null_mut();").unwrap();
 	writeln!(w, "\t\tself.datalen = 0;").unwrap();
 	writeln!(w, "\t\tret").unwrap();
 	writeln!(w, "\t}}").unwrap();
 	writeln!(w, "\t#[allow(unused)] pub(crate) fn as_slice(&self) -> &[{}] {{", inner_type).unwrap();
-	writeln!(w, "\t\tunsafe {{ std::slice::from_raw_parts_mut(self.data, self.datalen) }}").unwrap();
+	writeln!(w, "\t\tunsafe {{ core::slice::from_raw_parts_mut(self.data, self.datalen) }}").unwrap();
 	writeln!(w, "\t}}").unwrap();
 	writeln!(w, "}}").unwrap();
 
@@ -250,7 +250,7 @@ pub fn write_vec_block<W: std::io::Write>(w: &mut W, mangled_container: &str, in
 	writeln!(w, "impl Drop for {} {{", mangled_container).unwrap();
 	writeln!(w, "\tfn drop(&mut self) {{").unwrap();
 	writeln!(w, "\t\tif self.datalen == 0 {{ return; }}").unwrap();
-	writeln!(w, "\t\tunsafe {{ Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }};").unwrap();
+	writeln!(w, "\t\tunsafe {{ Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }};").unwrap();
 	writeln!(w, "\t}}").unwrap();
 	writeln!(w, "}}").unwrap();
 	if clonable {
@@ -258,7 +258,7 @@ pub fn write_vec_block<W: std::io::Write>(w: &mut W, mangled_container: &str, in
 		writeln!(w, "\tfn clone(&self) -> Self {{").unwrap();
 		writeln!(w, "\t\tlet mut res = Vec::new();").unwrap();
 		writeln!(w, "\t\tif self.datalen == 0 {{ return Self::from(res); }}").unwrap();
-		writeln!(w, "\t\tres.extend_from_slice(unsafe {{ std::slice::from_raw_parts_mut(self.data, self.datalen) }});").unwrap();
+		writeln!(w, "\t\tres.extend_from_slice(unsafe {{ core::slice::from_raw_parts_mut(self.data, self.datalen) }});").unwrap();
 		writeln!(w, "\t\tSelf::from(res)").unwrap();
 		writeln!(w, "\t}}").unwrap();
 		writeln!(w, "}}").unwrap();

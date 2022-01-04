@@ -530,13 +530,13 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	// Implement supertraits for the C-mapped struct.
 	walk_supertraits!(t, Some(&types), (
 		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
-			writeln!(w, "impl std::cmp::Eq for {} {{}}", trait_name).unwrap();
-			writeln!(w, "impl std::cmp::PartialEq for {} {{", trait_name).unwrap();
+			writeln!(w, "impl core::cmp::Eq for {} {{}}", trait_name).unwrap();
+			writeln!(w, "impl core::cmp::PartialEq for {} {{", trait_name).unwrap();
 			writeln!(w, "\tfn eq(&self, o: &Self) -> bool {{ (self.eq)(self.this_arg, o) }}\n}}").unwrap();
 		},
 		("std::hash::Hash", _)|("core::hash::Hash", _) => {
-			writeln!(w, "impl std::hash::Hash for {} {{", trait_name).unwrap();
-			writeln!(w, "\tfn hash<H: std::hash::Hasher>(&self, hasher: &mut H) {{ hasher.write_u64((self.hash)(self.this_arg)) }}\n}}").unwrap();
+			writeln!(w, "impl core::hash::Hash for {} {{", trait_name).unwrap();
+			writeln!(w, "\tfn hash<H: core::hash::Hasher>(&self, hasher: &mut H) {{ hasher.write_u64((self.hash)(self.this_arg)) }}\n}}").unwrap();
 		},
 		("Send", _) => {}, ("Sync", _) => {},
 		("Clone", _) => {
@@ -582,7 +582,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		writeln!(w, "}}\n").unwrap();
 		writeln!(w, "// We're essentially a pointer already, or at least a set of pointers, so allow us to be used").unwrap();
 		writeln!(w, "// directly as a Deref trait in higher-level structs:").unwrap();
-		writeln!(w, "impl std::ops::Deref for {} {{\n\ttype Target = Self;", trait_name).unwrap();
+		writeln!(w, "impl core::ops::Deref for {} {{\n\ttype Target = Self;", trait_name).unwrap();
 		writeln!(w, "\tfn deref(&self) -> &Self {{\n\t\tself\n\t}}\n}}").unwrap();
 	}
 
@@ -642,7 +642,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	writeln!(w, "\tpub(crate) fn take_inner(mut self) -> *mut native{} {{", struct_name).unwrap();
 	writeln!(w, "\t\tassert!(self.is_owned);").unwrap();
 	writeln!(w, "\t\tlet ret = ObjOps::untweak_ptr(self.inner);").unwrap();
-	writeln!(w, "\t\tself.inner = std::ptr::null_mut();").unwrap();
+	writeln!(w, "\t\tself.inner = core::ptr::null_mut();").unwrap();
 	writeln!(w, "\t\tret").unwrap();
 	writeln!(w, "\t}}\n}}").unwrap();
 
@@ -923,7 +923,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							writeln!(w, "\t\tlet mut rust_obj = {} {{ inner: ObjOps::heap_alloc(obj), is_owned: true }};", ident).unwrap();
 							writeln!(w, "\t\tlet mut ret = {}_as_{}(&rust_obj);", ident, trait_obj.ident).unwrap();
 							writeln!(w, "\t\t// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn").unwrap();
-							writeln!(w, "\t\trust_obj.inner = std::ptr::null_mut();").unwrap();
+							writeln!(w, "\t\trust_obj.inner = core::ptr::null_mut();").unwrap();
 							writeln!(w, "\t\tret.free = Some({}_free_void);", ident).unwrap();
 							writeln!(w, "\t\tret").unwrap();
 						}
@@ -1186,21 +1186,21 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						let ref_type: syn::Type = syn::parse_quote!(&#path);
 						assert!(!types.write_to_c_conversion_new_var(w, &format_ident!("a"), &*i.self_ty, Some(&gen_types), false), "We don't support new var conversions when comparing equality");
 
-						writeln!(w, "\t// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core").unwrap();
+						writeln!(w, "\t// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core").unwrap();
 						writeln!(w, "\t#[allow(deprecated)]").unwrap();
 						writeln!(w, "\tlet mut hasher = core::hash::SipHasher::new();").unwrap();
-						write!(w, "\tstd::hash::Hash::hash(").unwrap();
+						write!(w, "\tcore::hash::Hash::hash(").unwrap();
 						types.write_from_c_conversion_prefix(w, &ref_type, Some(&gen_types));
 						write!(w, "o").unwrap();
 						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
 						writeln!(w, ", &mut hasher);").unwrap();
-						writeln!(w, "\tstd::hash::Hasher::finish(&hasher)\n}}").unwrap();
+						writeln!(w, "\tcore::hash::Hasher::finish(&hasher)\n}}").unwrap();
 					} else if (path_matches_nongeneric(&trait_path.1, &["core", "clone", "Clone"]) || path_matches_nongeneric(&trait_path.1, &["Clone"])) &&
 							types.c_type_has_inner_from_path(&resolved_path) {
 						writeln!(w, "impl Clone for {} {{", ident).unwrap();
 						writeln!(w, "\tfn clone(&self) -> Self {{").unwrap();
 						writeln!(w, "\t\tSelf {{").unwrap();
-						writeln!(w, "\t\t\tinner: if <*mut native{}>::is_null(self.inner) {{ std::ptr::null_mut() }} else {{", ident).unwrap();
+						writeln!(w, "\t\t\tinner: if <*mut native{}>::is_null(self.inner) {{ core::ptr::null_mut() }} else {{", ident).unwrap();
 						writeln!(w, "\t\t\t\tObjOps::heap_alloc(unsafe {{ &*ObjOps::untweak_ptr(self.inner) }}.clone()) }},").unwrap();
 						writeln!(w, "\t\t\tis_owned: true,").unwrap();
 						writeln!(w, "\t\t}}\n\t}}\n}}").unwrap();

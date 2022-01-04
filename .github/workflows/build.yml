@@ -25,7 +25,7 @@ jobs:
         run: |
           # Note that the version tags aren't checked into git
           touch src/version.rs
-          RUSTFLAGS="--cfg=c_bindings" cargo check
+          RUSTFLAGS="--cfg=c_bindings" cargo check --features std
       - name: Install cbindgen
         run: cargo install --force cbindgen
       - name: Checkout Rust-Lightning git

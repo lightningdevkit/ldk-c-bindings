@@ -20,6 +20,8 @@ use core::ffi::c_void;
 pub(crate) use std::io::{self, Cursor, Read};
 #[cfg(feature = "no-std")]
 pub(crate) use core2::io::{self, Cursor, Read};
+#[cfg(feature = "no-std")]
+use alloc::{boxed::Box, vec::Vec, string::String};
 
 #[repr(C)]
 /// A dummy struct of which an instance must never exist.
@@ -192,6 +194,7 @@ pub enum IOError {
 	Other,
 	UnexpectedEof,
 }
+#[cfg(feature = "std")]
 impl IOError {
 	pub(crate) fn from_rust(err: std::io::Error) -> Self {
 		match err.kind() {
@@ -576,6 +579,9 @@ impl<T> TakePointer<*mut T> for *mut T {
 
 
 pub(crate) mod ObjOps {
+	#[cfg(feature = "no-std")]
+	use alloc::boxed::Box;
+
 	#[inline]
 	#[must_use = "returns new dangling pointer"]
 	pub(crate) fn heap_alloc<T>(obj: T) -> *mut T {

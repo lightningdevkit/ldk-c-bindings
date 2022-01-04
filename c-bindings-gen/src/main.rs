@@ -33,7 +33,15 @@ mod blocks;
 use types::*;
 use blocks::*;
 
-const DEFAULT_IMPORTS: &'static str = "\nuse std::str::FromStr;\nuse std::ffi::c_void;\nuse core::convert::Infallible;\nuse bitcoin::hashes::Hash;\nuse crate::c_types::*;\n";
+const DEFAULT_IMPORTS: &'static str = "
+use alloc::str::FromStr;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature=\"no-std\")]
+use alloc::{vec::Vec, boxed::Box};
+";
 
 // *************************************
 // *** Manually-expanded conversions ***
@@ -1726,6 +1734,12 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 			writeln!(out, "#![allow(unused_braces)]").unwrap();
 			// TODO: We need to map deny(missing_docs) in the source crate(s)
 			//writeln!(out, "#![deny(missing_docs)]").unwrap();
+
+			writeln!(out, "#![cfg_attr(not(feature = \"std\"), no_std)]").unwrap();
+			writeln!(out, "#[cfg(not(any(feature = \"std\", feature = \"no-std\")))]").unwrap();
+			writeln!(out, "compile_error!(\"at least one of the `std` or `no-std` features must be enabled\");").unwrap();
+			writeln!(out, "extern crate alloc;").unwrap();
+
 			writeln!(out, "pub mod version;").unwrap();
 			writeln!(out, "pub mod c_types;").unwrap();
 			writeln!(out, "pub mod bitcoin;").unwrap();
@@ -1972,6 +1986,7 @@ fn main() {
 
 	let mut derived_templates = std::fs::OpenOptions::new().write(true).create(true).truncate(true)
 		.open(&args[2]).expect("Unable to open new header file");
+	writeln!(&mut derived_templates, "{}", DEFAULT_IMPORTS).unwrap();
 	let mut header_file = std::fs::OpenOptions::new().write(true).create(true).truncate(true)
 		.open(&args[3]).expect("Unable to open new header file");
 	let mut cpp_header_file = std::fs::OpenOptions::new().write(true).create(true).truncate(true)

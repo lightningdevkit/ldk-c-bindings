@@ -10,11 +10,13 @@
 //! running properly, and (2) either can or should be run in the background. See docs for
 //! [`BackgroundProcessor`] for more details on the nitty-gritty.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning_background_processor::BackgroundProcessor as nativeBackgroundProcessorImport;
@@ -87,7 +89,7 @@ impl BackgroundProcessor {
 	pub(crate) fn take_inner(mut self) -> *mut nativeBackgroundProcessor {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -131,7 +133,7 @@ impl rustChannelManagerPersister<crate::lightning::chain::keysinterface::Sign, c
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for ChannelManagerPersister {
+impl core::ops::Deref for ChannelManagerPersister {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self

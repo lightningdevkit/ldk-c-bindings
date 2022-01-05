@@ -50,11 +50,13 @@
 //!
 //! [`find_route`]: crate::routing::router::find_route
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 /// An interface used to score payment channels for path finding.
 ///
@@ -102,7 +104,7 @@ pub(crate) extern "C" fn Score_clone_fields(orig: &Score) -> Score {
 	}
 }
 impl lightning::util::ser::Writeable for Score {
-	fn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), ::std::io::Error> {
+	fn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), crate::c_types::io::Error> {
 		let vec = (self.write)(self.this_arg);
 		w.write_all(vec.as_slice())
 	}
@@ -127,7 +129,7 @@ impl rustScore for Score {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Score {
+impl core::ops::Deref for Score {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -185,7 +187,7 @@ impl<'a> rustLockableScore<'a> for LockableScore {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for LockableScore {
+impl core::ops::Deref for LockableScore {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -248,7 +250,7 @@ impl MultiThreadedLockableScore {
 	pub(crate) fn take_inner(mut self) -> *mut nativeMultiThreadedLockableScore {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -314,7 +316,7 @@ impl Scorer {
 	pub(crate) fn take_inner(mut self) -> *mut nativeScorer {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -365,7 +367,7 @@ impl ScoringParameters {
 	pub(crate) fn take_inner(mut self) -> *mut nativeScoringParameters {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -482,7 +484,7 @@ pub extern "C" fn ScoringParameters_get_failure_penalty_half_life(this_ptr: &Sco
 /// [`failure_penalty_msat`]: Self::failure_penalty_msat
 #[no_mangle]
 pub extern "C" fn ScoringParameters_set_failure_penalty_half_life(this_ptr: &mut ScoringParameters, mut val: u64) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.failure_penalty_half_life = std::time::Duration::from_secs(val);
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.failure_penalty_half_life = core::time::Duration::from_secs(val);
 }
 /// Constructs a new ScoringParameters given each field
 #[must_use]
@@ -493,7 +495,7 @@ pub extern "C" fn ScoringParameters_new(mut base_penalty_msat_arg: u64, mut fail
 		failure_penalty_msat: failure_penalty_msat_arg,
 		overuse_penalty_start_1024th: overuse_penalty_start_1024th_arg,
 		overuse_penalty_msat_per_1024th: overuse_penalty_msat_per_1024th_arg,
-		failure_penalty_half_life: std::time::Duration::from_secs(failure_penalty_half_life_arg),
+		failure_penalty_half_life: core::time::Duration::from_secs(failure_penalty_half_life_arg),
 	}), is_owned: true }
 }
 #[no_mangle]
@@ -537,7 +539,7 @@ impl From<nativeScorer> for crate::lightning::routing::scoring::Score {
 		let mut rust_obj = Scorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = Scorer_as_Score(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(Scorer_free_void);
 		ret
 	}
@@ -589,10 +591,12 @@ pub extern "C" fn Scorer_read(ser: crate::c_types::u8slice) -> crate::c_types::d
 }
 mod time {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 }

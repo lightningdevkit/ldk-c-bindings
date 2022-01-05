@@ -8,11 +8,13 @@
 
 //! Abstractions for scripts used in the Lightning Network.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning::ln::script::ShutdownScript as nativeShutdownScriptImport;
@@ -63,14 +65,14 @@ impl ShutdownScript {
 	pub(crate) fn take_inner(mut self) -> *mut nativeShutdownScript {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for ShutdownScript {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeShutdownScript>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeShutdownScript>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -133,7 +135,7 @@ impl InvalidShutdownScript {
 	pub(crate) fn take_inner(mut self) -> *mut nativeInvalidShutdownScript {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -163,7 +165,7 @@ pub extern "C" fn InvalidShutdownScript_new(mut script_arg: crate::c_types::deri
 impl Clone for InvalidShutdownScript {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeInvalidShutdownScript>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeInvalidShutdownScript>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}

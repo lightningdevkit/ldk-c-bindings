@@ -16,6 +16,10 @@
 #![allow(unused_parens)]
 #![allow(unused_unsafe)]
 #![allow(unused_braces)]
+#![cfg_attr(not(feature = "std"), no_std)]
+#[cfg(not(any(feature = "std", feature = "no-std")))]
+compile_error!("at least one of the `std` or `no-std` features must be enabled");
+extern crate alloc;
 pub mod version;
 pub mod c_types;
 pub mod bitcoin;

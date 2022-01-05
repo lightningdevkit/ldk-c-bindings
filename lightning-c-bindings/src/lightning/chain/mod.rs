@@ -8,11 +8,13 @@
 
 //! Structs and traits which allow other parts of rust-lightning to interact with the blockchain.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 pub mod chaininterface;
 pub mod chainmonitor;
@@ -21,20 +23,24 @@ pub mod transaction;
 pub mod keysinterface;
 mod onchaintx {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 }
 mod package {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 }
 
@@ -84,14 +90,14 @@ impl BestBlock {
 	pub(crate) fn take_inner(mut self) -> *mut nativeBestBlock {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for BestBlock {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeBestBlock>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeBestBlock>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -234,7 +240,7 @@ impl rustAccess for Access {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Access {
+impl core::ops::Deref for Access {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -296,7 +302,7 @@ impl rustListen for Listen {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Listen {
+impl core::ops::Deref for Listen {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -433,7 +439,7 @@ impl rustConfirm for Confirm {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Confirm {
+impl core::ops::Deref for Confirm {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -654,7 +660,7 @@ impl rustWatch<crate::lightning::chain::keysinterface::Sign> for Watch {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Watch {
+impl core::ops::Deref for Watch {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -739,7 +745,7 @@ impl rustFilter for Filter {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Filter {
+impl core::ops::Deref for Filter {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -812,7 +818,7 @@ impl WatchedOutput {
 	pub(crate) fn take_inner(mut self) -> *mut nativeWatchedOutput {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -869,7 +875,7 @@ pub extern "C" fn WatchedOutput_new(mut block_hash_arg: crate::c_types::ThirtyTw
 impl Clone for WatchedOutput {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeWatchedOutput>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeWatchedOutput>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -889,9 +895,9 @@ pub extern "C" fn WatchedOutput_clone(orig: &WatchedOutput) -> WatchedOutput {
 #[no_mangle]
 pub extern "C" fn WatchedOutput_hash(o: &WatchedOutput) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }

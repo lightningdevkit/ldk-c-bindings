@@ -8,11 +8,13 @@
 
 //! Types describing on-chain transactions.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning::chain::transaction::OutPoint as nativeOutPointImport;
@@ -64,7 +66,7 @@ impl OutPoint {
 	pub(crate) fn take_inner(mut self) -> *mut nativeOutPoint {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -102,7 +104,7 @@ pub extern "C" fn OutPoint_new(mut txid_arg: crate::c_types::ThirtyTwoBytes, mut
 impl Clone for OutPoint {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeOutPoint>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeOutPoint>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -131,11 +133,11 @@ pub extern "C" fn OutPoint_eq(a: &OutPoint, b: &OutPoint) -> bool {
 #[no_mangle]
 pub extern "C" fn OutPoint_hash(o: &OutPoint) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Convert an `OutPoint` to a lightning channel id.
 #[must_use]

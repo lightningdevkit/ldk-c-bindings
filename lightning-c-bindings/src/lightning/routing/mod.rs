@@ -8,11 +8,13 @@
 
 //! Structs and impls for receiving messages about the network and storing the topology live here.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 pub mod network_graph;
 pub mod router;

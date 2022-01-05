@@ -9,11 +9,13 @@
 //! Various user-configurable channel limits and settings which ChannelManager
 //! applies for you.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning::util::config::ChannelHandshakeConfig as nativeChannelHandshakeConfigImport;
@@ -64,7 +66,7 @@ impl ChannelHandshakeConfig {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelHandshakeConfig {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -162,7 +164,7 @@ pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our
 impl Clone for ChannelHandshakeConfig {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelHandshakeConfig>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelHandshakeConfig>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -241,7 +243,7 @@ impl ChannelHandshakeLimits {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelHandshakeLimits {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -419,7 +421,7 @@ pub extern "C" fn ChannelHandshakeLimits_new(mut min_funding_satoshis_arg: u64, 
 impl Clone for ChannelHandshakeLimits {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelHandshakeLimits>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelHandshakeLimits>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -489,7 +491,7 @@ impl ChannelConfig {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelConfig {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -765,7 +767,7 @@ pub extern "C" fn ChannelConfig_new(mut forwarding_fee_proportional_millionths_a
 impl Clone for ChannelConfig {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelConfig>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelConfig>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -853,7 +855,7 @@ impl UserConfig {
 	pub(crate) fn take_inner(mut self) -> *mut nativeUserConfig {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -959,7 +961,7 @@ pub extern "C" fn UserConfig_new(mut own_channel_config_arg: crate::lightning::u
 impl Clone for UserConfig {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeUserConfig>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeUserConfig>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}

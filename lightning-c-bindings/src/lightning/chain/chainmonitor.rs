@@ -22,11 +22,13 @@
 //! events. The remote server would make use of [`ChainMonitor`] for block processing and for
 //! servicing [`ChannelMonitor`] updates from the client.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning::chain::chainmonitor::MonitorUpdateId as nativeMonitorUpdateIdImport;
@@ -75,14 +77,14 @@ impl MonitorUpdateId {
 	pub(crate) fn take_inner(mut self) -> *mut nativeMonitorUpdateId {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for MonitorUpdateId {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeMonitorUpdateId>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeMonitorUpdateId>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -102,11 +104,11 @@ pub extern "C" fn MonitorUpdateId_clone(orig: &MonitorUpdateId) -> MonitorUpdate
 #[no_mangle]
 pub extern "C" fn MonitorUpdateId_hash(o: &MonitorUpdateId) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two MonitorUpdateIds contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -219,7 +221,7 @@ impl rustPersist<crate::lightning::chain::keysinterface::Sign> for Persist {
 		local_ret
 	}
 	fn update_persisted_channel(&self, mut channel_id: lightning::chain::transaction::OutPoint, mut update: &Option<lightning::chain::channelmonitor::ChannelMonitorUpdate>, mut data: &lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>, mut update_id: lightning::chain::chainmonitor::MonitorUpdateId) -> Result<(), lightning::chain::ChannelMonitorUpdateErr> {
-		let mut local_update = &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: unsafe { (if update.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (update.as_ref().unwrap()) }) } as *const lightning::chain::channelmonitor::ChannelMonitorUpdate<>) as *mut _ }, is_owned: false };
+		let mut local_update = &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: unsafe { (if update.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (update.as_ref().unwrap()) }) } as *const lightning::chain::channelmonitor::ChannelMonitorUpdate<>) as *mut _ }, is_owned: false };
 		let mut ret = (self.update_persisted_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(channel_id), is_owned: true }, local_update, &crate::lightning::chain::channelmonitor::ChannelMonitor { inner: unsafe { ObjOps::nonnull_ptr_to_inner((data as *const lightning::chain::channelmonitor::ChannelMonitor<_, >) as *mut _) }, is_owned: false }, crate::lightning::chain::chainmonitor::MonitorUpdateId { inner: ObjOps::heap_alloc(update_id), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
@@ -228,7 +230,7 @@ impl rustPersist<crate::lightning::chain::keysinterface::Sign> for Persist {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Persist {
+impl core::ops::Deref for Persist {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -294,7 +296,7 @@ impl LockedChannelMonitor {
 	pub(crate) fn take_inner(mut self) -> *mut nativeLockedChannelMonitor {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -353,7 +355,7 @@ impl ChainMonitor {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChainMonitor {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -441,7 +443,7 @@ impl From<nativeChainMonitor> for crate::lightning::chain::Listen {
 		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_Listen(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(ChainMonitor_free_void);
 		ret
 	}
@@ -470,7 +472,7 @@ impl From<nativeChainMonitor> for crate::lightning::chain::Confirm {
 		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_Confirm(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(ChainMonitor_free_void);
 		ret
 	}
@@ -511,7 +513,7 @@ impl From<nativeChainMonitor> for crate::lightning::chain::Watch {
 		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_Watch(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(ChainMonitor_free_void);
 		ret
 	}
@@ -553,7 +555,7 @@ impl From<nativeChainMonitor> for crate::lightning::util::events::EventsProvider
 		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_EventsProvider(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(ChainMonitor_free_void);
 		ret
 	}

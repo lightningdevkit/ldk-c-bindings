@@ -13,11 +13,13 @@
 //! The second one, client-side by implementing check against Record Level field.
 //! Each module may have its own Logger or share one.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 /// An enum representing the available verbosity levels of the logger.
 #[must_use]
@@ -122,11 +124,11 @@ pub extern "C" fn Level_eq(a: &Level, b: &Level) -> bool {
 /// Checks if two Levels contain equal inner contents.
 #[no_mangle]
 pub extern "C" fn Level_hash(o: &Level) -> u64 {
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(&o.to_native(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(&o.to_native(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Returns the most verbose logging level.
 #[must_use]
@@ -184,7 +186,7 @@ impl Record {
 	pub(crate) fn take_inner(mut self) -> *mut nativeRecord {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -246,7 +248,7 @@ pub extern "C" fn Record_set_line(this_ptr: &mut Record, mut val: u32) {
 impl Clone for Record {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRecord>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRecord>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -294,7 +296,7 @@ impl rustLogger for Logger {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Logger {
+impl core::ops::Deref for Logger {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self

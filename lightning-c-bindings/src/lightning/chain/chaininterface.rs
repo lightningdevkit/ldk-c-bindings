@@ -12,11 +12,13 @@
 //! Includes traits for monitoring and receiving notifications of new blocks and block
 //! disconnections, transaction broadcasting, and feerate information requests.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 /// An interface to send a transaction to the Bitcoin network.
 #[repr(C)]
@@ -50,7 +52,7 @@ impl rustBroadcasterInterface for BroadcasterInterface {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for BroadcasterInterface {
+impl core::ops::Deref for BroadcasterInterface {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -182,7 +184,7 @@ impl rustFeeEstimator for FeeEstimator {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for FeeEstimator {
+impl core::ops::Deref for FeeEstimator {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self

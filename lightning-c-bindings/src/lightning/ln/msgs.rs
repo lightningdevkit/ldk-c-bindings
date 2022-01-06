@@ -23,11 +23,13 @@
 //! raw socket events into your non-internet-facing system and then send routing events back to
 //! track the network on the less-secure system.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning::ln::msgs::DecodeError as nativeDecodeErrorImport;
@@ -76,14 +78,14 @@ impl DecodeError {
 	pub(crate) fn take_inner(mut self) -> *mut nativeDecodeError {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for DecodeError {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeDecodeError>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeDecodeError>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -146,7 +148,7 @@ impl Init {
 	pub(crate) fn take_inner(mut self) -> *mut nativeInit {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -172,7 +174,7 @@ pub extern "C" fn Init_new(mut features_arg: crate::lightning::ln::features::Ini
 impl Clone for Init {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeInit>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeInit>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -235,7 +237,7 @@ impl ErrorMessage {
 	pub(crate) fn take_inner(mut self) -> *mut nativeErrorMessage {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -279,7 +281,7 @@ pub extern "C" fn ErrorMessage_new(mut channel_id_arg: crate::c_types::ThirtyTwo
 impl Clone for ErrorMessage {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeErrorMessage>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeErrorMessage>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -342,7 +344,7 @@ impl Ping {
 	pub(crate) fn take_inner(mut self) -> *mut nativePing {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -382,7 +384,7 @@ pub extern "C" fn Ping_new(mut ponglen_arg: u16, mut byteslen_arg: u16) -> Ping 
 impl Clone for Ping {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativePing>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativePing>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -445,7 +447,7 @@ impl Pong {
 	pub(crate) fn take_inner(mut self) -> *mut nativePong {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -473,7 +475,7 @@ pub extern "C" fn Pong_new(mut byteslen_arg: u16) -> Pong {
 impl Clone for Pong {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativePong>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativePong>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -536,7 +538,7 @@ impl OpenChannel {
 	pub(crate) fn take_inner(mut self) -> *mut nativeOpenChannel {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -746,7 +748,7 @@ pub extern "C" fn OpenChannel_set_channel_flags(this_ptr: &mut OpenChannel, mut 
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_channel_type(this_ptr: &OpenChannel) -> crate::lightning::ln::features::ChannelTypeFeatures {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_type;
-	let mut local_inner_val = crate::lightning::ln::features::ChannelTypeFeatures { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::features::ChannelTypeFeatures<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::features::ChannelTypeFeatures { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::features::ChannelTypeFeatures<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// The channel type that this channel will represent. If none is set, we derive the channel
@@ -762,7 +764,7 @@ pub extern "C" fn OpenChannel_set_channel_type(this_ptr: &mut OpenChannel, mut v
 impl Clone for OpenChannel {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeOpenChannel>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeOpenChannel>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -825,7 +827,7 @@ impl AcceptChannel {
 	pub(crate) fn take_inner(mut self) -> *mut nativeAcceptChannel {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -986,7 +988,7 @@ pub extern "C" fn AcceptChannel_set_first_per_commitment_point(this_ptr: &mut Ac
 impl Clone for AcceptChannel {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeAcceptChannel>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeAcceptChannel>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1049,7 +1051,7 @@ impl FundingCreated {
 	pub(crate) fn take_inner(mut self) -> *mut nativeFundingCreated {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1111,7 +1113,7 @@ pub extern "C" fn FundingCreated_new(mut temporary_channel_id_arg: crate::c_type
 impl Clone for FundingCreated {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeFundingCreated>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeFundingCreated>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1174,7 +1176,7 @@ impl FundingSigned {
 	pub(crate) fn take_inner(mut self) -> *mut nativeFundingSigned {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1212,7 +1214,7 @@ pub extern "C" fn FundingSigned_new(mut channel_id_arg: crate::c_types::ThirtyTw
 impl Clone for FundingSigned {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeFundingSigned>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeFundingSigned>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1275,7 +1277,7 @@ impl FundingLocked {
 	pub(crate) fn take_inner(mut self) -> *mut nativeFundingLocked {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1313,7 +1315,7 @@ pub extern "C" fn FundingLocked_new(mut channel_id_arg: crate::c_types::ThirtyTw
 impl Clone for FundingLocked {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeFundingLocked>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeFundingLocked>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1376,7 +1378,7 @@ impl Shutdown {
 	pub(crate) fn take_inner(mut self) -> *mut nativeShutdown {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1416,7 +1418,7 @@ pub extern "C" fn Shutdown_new(mut channel_id_arg: crate::c_types::ThirtyTwoByte
 impl Clone for Shutdown {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeShutdown>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeShutdown>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1481,7 +1483,7 @@ impl ClosingSignedFeeRange {
 	pub(crate) fn take_inner(mut self) -> *mut nativeClosingSignedFeeRange {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1523,7 +1525,7 @@ pub extern "C" fn ClosingSignedFeeRange_new(mut min_fee_satoshis_arg: u64, mut m
 impl Clone for ClosingSignedFeeRange {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeClosingSignedFeeRange>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeClosingSignedFeeRange>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1586,7 +1588,7 @@ impl ClosingSigned {
 	pub(crate) fn take_inner(mut self) -> *mut nativeClosingSigned {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1630,7 +1632,7 @@ pub extern "C" fn ClosingSigned_set_signature(this_ptr: &mut ClosingSigned, mut 
 #[no_mangle]
 pub extern "C" fn ClosingSigned_get_fee_range(this_ptr: &ClosingSigned) -> crate::lightning::ln::msgs::ClosingSignedFeeRange {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().fee_range;
-	let mut local_inner_val = crate::lightning::ln::msgs::ClosingSignedFeeRange { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::ClosingSignedFeeRange<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::msgs::ClosingSignedFeeRange { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::ClosingSignedFeeRange<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// The minimum and maximum fees which the sender is willing to accept, provided only by new
@@ -1657,7 +1659,7 @@ pub extern "C" fn ClosingSigned_new(mut channel_id_arg: crate::c_types::ThirtyTw
 impl Clone for ClosingSigned {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeClosingSigned>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeClosingSigned>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1720,7 +1722,7 @@ impl UpdateAddHTLC {
 	pub(crate) fn take_inner(mut self) -> *mut nativeUpdateAddHTLC {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1782,7 +1784,7 @@ pub extern "C" fn UpdateAddHTLC_set_cltv_expiry(this_ptr: &mut UpdateAddHTLC, mu
 impl Clone for UpdateAddHTLC {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeUpdateAddHTLC>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeUpdateAddHTLC>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1845,7 +1847,7 @@ impl UpdateFulfillHTLC {
 	pub(crate) fn take_inner(mut self) -> *mut nativeUpdateFulfillHTLC {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1895,7 +1897,7 @@ pub extern "C" fn UpdateFulfillHTLC_new(mut channel_id_arg: crate::c_types::Thir
 impl Clone for UpdateFulfillHTLC {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeUpdateFulfillHTLC>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeUpdateFulfillHTLC>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1958,7 +1960,7 @@ impl UpdateFailHTLC {
 	pub(crate) fn take_inner(mut self) -> *mut nativeUpdateFailHTLC {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1987,7 +1989,7 @@ pub extern "C" fn UpdateFailHTLC_set_htlc_id(this_ptr: &mut UpdateFailHTLC, mut 
 impl Clone for UpdateFailHTLC {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeUpdateFailHTLC>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeUpdateFailHTLC>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -2050,7 +2052,7 @@ impl UpdateFailMalformedHTLC {
 	pub(crate) fn take_inner(mut self) -> *mut nativeUpdateFailMalformedHTLC {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -2090,7 +2092,7 @@ pub extern "C" fn UpdateFailMalformedHTLC_set_failure_code(this_ptr: &mut Update
 impl Clone for UpdateFailMalformedHTLC {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeUpdateFailMalformedHTLC>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeUpdateFailMalformedHTLC>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -2153,7 +2155,7 @@ impl CommitmentSigned {
 	pub(crate) fn take_inner(mut self) -> *mut nativeCommitmentSigned {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -2199,7 +2201,7 @@ pub extern "C" fn CommitmentSigned_new(mut channel_id_arg: crate::c_types::Thirt
 impl Clone for CommitmentSigned {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeCommitmentSigned>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeCommitmentSigned>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -2262,7 +2264,7 @@ impl RevokeAndACK {
 	pub(crate) fn take_inner(mut self) -> *mut nativeRevokeAndACK {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -2312,7 +2314,7 @@ pub extern "C" fn RevokeAndACK_new(mut channel_id_arg: crate::c_types::ThirtyTwo
 impl Clone for RevokeAndACK {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRevokeAndACK>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRevokeAndACK>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -2375,7 +2377,7 @@ impl UpdateFee {
 	pub(crate) fn take_inner(mut self) -> *mut nativeUpdateFee {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -2413,7 +2415,7 @@ pub extern "C" fn UpdateFee_new(mut channel_id_arg: crate::c_types::ThirtyTwoByt
 impl Clone for UpdateFee {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeUpdateFee>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeUpdateFee>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -2479,7 +2481,7 @@ impl DataLossProtect {
 	pub(crate) fn take_inner(mut self) -> *mut nativeDataLossProtect {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -2519,7 +2521,7 @@ pub extern "C" fn DataLossProtect_new(mut your_last_per_commitment_secret_arg: c
 impl Clone for DataLossProtect {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeDataLossProtect>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeDataLossProtect>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -2582,7 +2584,7 @@ impl ChannelReestablish {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelReestablish {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -2622,7 +2624,7 @@ pub extern "C" fn ChannelReestablish_set_next_remote_commitment_number(this_ptr:
 impl Clone for ChannelReestablish {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelReestablish>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelReestablish>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -2685,7 +2687,7 @@ impl AnnouncementSignatures {
 	pub(crate) fn take_inner(mut self) -> *mut nativeAnnouncementSignatures {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -2747,7 +2749,7 @@ pub extern "C" fn AnnouncementSignatures_new(mut channel_id_arg: crate::c_types:
 impl Clone for AnnouncementSignatures {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeAnnouncementSignatures>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeAnnouncementSignatures>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -3040,7 +3042,7 @@ impl UnsignedNodeAnnouncement {
 	pub(crate) fn take_inner(mut self) -> *mut nativeUnsignedNodeAnnouncement {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -3112,7 +3114,7 @@ pub extern "C" fn UnsignedNodeAnnouncement_set_addresses(this_ptr: &mut Unsigned
 impl Clone for UnsignedNodeAnnouncement {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeUnsignedNodeAnnouncement>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeUnsignedNodeAnnouncement>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -3175,7 +3177,7 @@ impl NodeAnnouncement {
 	pub(crate) fn take_inner(mut self) -> *mut nativeNodeAnnouncement {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -3213,7 +3215,7 @@ pub extern "C" fn NodeAnnouncement_new(mut signature_arg: crate::c_types::Signat
 impl Clone for NodeAnnouncement {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeNodeAnnouncement>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeNodeAnnouncement>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -3276,7 +3278,7 @@ impl UnsignedChannelAnnouncement {
 	pub(crate) fn take_inner(mut self) -> *mut nativeUnsignedChannelAnnouncement {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -3360,7 +3362,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_set_bitcoin_key_2(this_ptr: &mut U
 impl Clone for UnsignedChannelAnnouncement {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeUnsignedChannelAnnouncement>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeUnsignedChannelAnnouncement>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -3423,7 +3425,7 @@ impl ChannelAnnouncement {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelAnnouncement {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -3497,7 +3499,7 @@ pub extern "C" fn ChannelAnnouncement_new(mut node_signature_1_arg: crate::c_typ
 impl Clone for ChannelAnnouncement {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelAnnouncement>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelAnnouncement>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -3560,7 +3562,7 @@ impl UnsignedChannelUpdate {
 	pub(crate) fn take_inner(mut self) -> *mut nativeUnsignedChannelUpdate {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -3669,7 +3671,7 @@ pub extern "C" fn UnsignedChannelUpdate_set_fee_proportional_millionths(this_ptr
 impl Clone for UnsignedChannelUpdate {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeUnsignedChannelUpdate>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeUnsignedChannelUpdate>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -3732,7 +3734,7 @@ impl ChannelUpdate {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelUpdate {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -3770,7 +3772,7 @@ pub extern "C" fn ChannelUpdate_new(mut signature_arg: crate::c_types::Signature
 impl Clone for ChannelUpdate {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelUpdate>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelUpdate>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -3836,7 +3838,7 @@ impl QueryChannelRange {
 	pub(crate) fn take_inner(mut self) -> *mut nativeQueryChannelRange {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -3886,7 +3888,7 @@ pub extern "C" fn QueryChannelRange_new(mut chain_hash_arg: crate::c_types::Thir
 impl Clone for QueryChannelRange {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeQueryChannelRange>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeQueryChannelRange>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -3955,7 +3957,7 @@ impl ReplyChannelRange {
 	pub(crate) fn take_inner(mut self) -> *mut nativeReplyChannelRange {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -4025,7 +4027,7 @@ pub extern "C" fn ReplyChannelRange_new(mut chain_hash_arg: crate::c_types::Thir
 impl Clone for ReplyChannelRange {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeReplyChannelRange>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeReplyChannelRange>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -4095,7 +4097,7 @@ impl QueryShortChannelIds {
 	pub(crate) fn take_inner(mut self) -> *mut nativeQueryShortChannelIds {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -4129,7 +4131,7 @@ pub extern "C" fn QueryShortChannelIds_new(mut chain_hash_arg: crate::c_types::T
 impl Clone for QueryShortChannelIds {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeQueryShortChannelIds>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeQueryShortChannelIds>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -4195,7 +4197,7 @@ impl ReplyShortChannelIdsEnd {
 	pub(crate) fn take_inner(mut self) -> *mut nativeReplyShortChannelIdsEnd {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -4235,7 +4237,7 @@ pub extern "C" fn ReplyShortChannelIdsEnd_new(mut chain_hash_arg: crate::c_types
 impl Clone for ReplyShortChannelIdsEnd {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeReplyShortChannelIdsEnd>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeReplyShortChannelIdsEnd>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -4300,7 +4302,7 @@ impl GossipTimestampFilter {
 	pub(crate) fn take_inner(mut self) -> *mut nativeGossipTimestampFilter {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -4350,7 +4352,7 @@ pub extern "C" fn GossipTimestampFilter_new(mut chain_hash_arg: crate::c_types::
 impl Clone for GossipTimestampFilter {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeGossipTimestampFilter>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeGossipTimestampFilter>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -4449,7 +4451,7 @@ impl ErrorAction {
 		match native {
 			nativeErrorAction::DisconnectPeer {ref msg, } => {
 				let mut msg_nonref = (*msg).clone();
-				let mut local_msg_nonref = crate::lightning::ln::msgs::ErrorMessage { inner: if msg_nonref.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((msg_nonref.unwrap())) } }, is_owned: true };
+				let mut local_msg_nonref = crate::lightning::ln::msgs::ErrorMessage { inner: if msg_nonref.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((msg_nonref.unwrap())) } }, is_owned: true };
 				ErrorAction::DisconnectPeer {
 					msg: local_msg_nonref,
 				}
@@ -4474,7 +4476,7 @@ impl ErrorAction {
 	pub(crate) fn native_into(native: nativeErrorAction) -> Self {
 		match native {
 			nativeErrorAction::DisconnectPeer {mut msg, } => {
-				let mut local_msg = crate::lightning::ln::msgs::ErrorMessage { inner: if msg.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((msg.unwrap())) } }, is_owned: true };
+				let mut local_msg = crate::lightning::ln::msgs::ErrorMessage { inner: if msg.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((msg.unwrap())) } }, is_owned: true };
 				ErrorAction::DisconnectPeer {
 					msg: local_msg,
 				}
@@ -4576,7 +4578,7 @@ impl LightningError {
 	pub(crate) fn take_inner(mut self) -> *mut nativeLightningError {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -4614,7 +4616,7 @@ pub extern "C" fn LightningError_new(mut err_arg: crate::c_types::Str, mut actio
 impl Clone for LightningError {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeLightningError>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeLightningError>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -4678,7 +4680,7 @@ impl CommitmentUpdate {
 	pub(crate) fn take_inner(mut self) -> *mut nativeCommitmentUpdate {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -4740,7 +4742,7 @@ pub extern "C" fn CommitmentUpdate_set_update_fail_malformed_htlcs(this_ptr: &mu
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_update_fee(this_ptr: &CommitmentUpdate) -> crate::lightning::ln::msgs::UpdateFee {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_fee;
-	let mut local_inner_val = crate::lightning::ln::msgs::UpdateFee { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::UpdateFee<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::msgs::UpdateFee { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::UpdateFee<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// An update_fee message which should be sent
@@ -4783,7 +4785,7 @@ pub extern "C" fn CommitmentUpdate_new(mut update_add_htlcs_arg: crate::c_types:
 impl Clone for CommitmentUpdate {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeCommitmentUpdate>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeCommitmentUpdate>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -4961,7 +4963,7 @@ impl rustChannelMessageHandler for ChannelMessageHandler {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for ChannelMessageHandler {
+impl core::ops::Deref for ChannelMessageHandler {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -5126,7 +5128,7 @@ impl rustRoutingMessageHandler for RoutingMessageHandler {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for RoutingMessageHandler {
+impl core::ops::Deref for RoutingMessageHandler {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -5144,11 +5146,13 @@ impl Drop for RoutingMessageHandler {
 }
 mod fuzzy_internal_msgs {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 }
 #[no_mangle]

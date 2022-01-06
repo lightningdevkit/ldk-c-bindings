@@ -9,11 +9,13 @@
 //! A very simple serialization framework which is used to serialize/deserialize messages as well
 //! as ChannelsManagers and ChannelMonitors.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 /// serialization buffer size
 

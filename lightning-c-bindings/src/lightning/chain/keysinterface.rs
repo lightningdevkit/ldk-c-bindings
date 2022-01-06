@@ -10,11 +10,13 @@
 //! spendable on-chain outputs which the user owns and is responsible for using just as any other
 //! on-chain output which is theirs.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning::chain::keysinterface::DelayedPaymentOutputDescriptor as nativeDelayedPaymentOutputDescriptorImport;
@@ -64,7 +66,7 @@ impl DelayedPaymentOutputDescriptor {
 	pub(crate) fn take_inner(mut self) -> *mut nativeDelayedPaymentOutputDescriptor {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -164,7 +166,7 @@ pub extern "C" fn DelayedPaymentOutputDescriptor_new(mut outpoint_arg: crate::li
 impl Clone for DelayedPaymentOutputDescriptor {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeDelayedPaymentOutputDescriptor>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeDelayedPaymentOutputDescriptor>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -244,7 +246,7 @@ impl StaticPaymentOutputDescriptor {
 	pub(crate) fn take_inner(mut self) -> *mut nativeStaticPaymentOutputDescriptor {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -304,7 +306,7 @@ pub extern "C" fn StaticPaymentOutputDescriptor_new(mut outpoint_arg: crate::lig
 impl Clone for StaticPaymentOutputDescriptor {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeStaticPaymentOutputDescriptor>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeStaticPaymentOutputDescriptor>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -790,7 +792,7 @@ impl rustBaseSign for BaseSign {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for BaseSign {
+impl core::ops::Deref for BaseSign {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -909,7 +911,7 @@ impl lightning::chain::keysinterface::BaseSign for Sign {
 	}
 }
 impl lightning::util::ser::Writeable for Sign {
-	fn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), ::std::io::Error> {
+	fn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), crate::c_types::io::Error> {
 		let vec = (self.write)(self.this_arg);
 		w.write_all(vec.as_slice())
 	}
@@ -933,7 +935,7 @@ impl rustSign for Sign {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Sign {
+impl core::ops::Deref for Sign {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -1069,7 +1071,7 @@ impl rustKeysInterface for KeysInterface {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for KeysInterface {
+impl core::ops::Deref for KeysInterface {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -1135,7 +1137,7 @@ impl InMemorySigner {
 	pub(crate) fn take_inner(mut self) -> *mut nativeInMemorySigner {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1208,7 +1210,7 @@ pub extern "C" fn InMemorySigner_set_commitment_seed(this_ptr: &mut InMemorySign
 impl Clone for InMemorySigner {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeInMemorySigner>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeInMemorySigner>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1333,7 +1335,7 @@ impl From<nativeInMemorySigner> for crate::lightning::chain::keysinterface::Base
 		let mut rust_obj = InMemorySigner { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = InMemorySigner_as_BaseSign(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(InMemorySigner_free_void);
 		ret
 	}
@@ -1349,7 +1351,7 @@ pub extern "C" fn InMemorySigner_as_BaseSign(this_arg: &InMemorySigner) -> crate
 		release_commitment_secret: InMemorySigner_BaseSign_release_commitment_secret,
 		validate_holder_commitment: InMemorySigner_BaseSign_validate_holder_commitment,
 
-		pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: std::ptr::null_mut(), is_owned: true },
+		pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: core::ptr::null_mut(), is_owned: true },
 		set_pubkeys: Some(InMemorySigner_BaseSign_set_pubkeys),
 		channel_keys_id: InMemorySigner_BaseSign_channel_keys_id,
 		sign_counterparty_commitment: InMemorySigner_BaseSign_sign_counterparty_commitment,
@@ -1454,7 +1456,7 @@ impl From<nativeInMemorySigner> for crate::lightning::chain::keysinterface::Sign
 		let mut rust_obj = InMemorySigner { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = InMemorySigner_as_Sign(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(InMemorySigner_free_void);
 		ret
 	}
@@ -1473,7 +1475,7 @@ pub extern "C" fn InMemorySigner_as_Sign(this_arg: &InMemorySigner) -> crate::li
 			release_commitment_secret: InMemorySigner_BaseSign_release_commitment_secret,
 			validate_holder_commitment: InMemorySigner_BaseSign_validate_holder_commitment,
 
-			pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: std::ptr::null_mut(), is_owned: true },
+			pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: core::ptr::null_mut(), is_owned: true },
 			set_pubkeys: Some(InMemorySigner_BaseSign_set_pubkeys),
 			channel_keys_id: InMemorySigner_BaseSign_channel_keys_id,
 			sign_counterparty_commitment: InMemorySigner_BaseSign_sign_counterparty_commitment,
@@ -1567,7 +1569,7 @@ impl KeysManager {
 	pub(crate) fn take_inner(mut self) -> *mut nativeKeysManager {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1635,7 +1637,7 @@ impl From<nativeKeysManager> for crate::lightning::chain::keysinterface::KeysInt
 		let mut rust_obj = KeysManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = KeysManager_as_KeysInterface(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(KeysManager_free_void);
 		ret
 	}

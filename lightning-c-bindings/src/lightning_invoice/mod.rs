@@ -15,30 +15,36 @@
 //!   * For constructing invoices use the `InvoiceBuilder`
 //!   * For serializing invoices use the `Display`/`ToString` traits
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 pub mod payment;
 pub mod utils;
 pub mod constants;
 mod de {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 mod hrp_sm {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 }
 #[no_mangle]
@@ -80,11 +86,13 @@ pub extern "C" fn SignedRawInvoice_from_str(s: crate::c_types::Str) -> crate::c_
 }
 mod ser {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 #[no_mangle]
 /// Get the string representation of a Invoice object
@@ -109,11 +117,13 @@ pub extern "C" fn SiPrefix_to_str(o: &crate::lightning_invoice::SiPrefix) -> Str
 }
 mod tb {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 }
 /// Default expiry time as defined by [BOLT 11].
@@ -202,7 +212,7 @@ impl Invoice {
 	pub(crate) fn take_inner(mut self) -> *mut nativeInvoice {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -218,7 +228,7 @@ pub extern "C" fn Invoice_eq(a: &Invoice, b: &Invoice) -> bool {
 impl Clone for Invoice {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeInvoice>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeInvoice>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -285,7 +295,7 @@ impl SignedRawInvoice {
 	pub(crate) fn take_inner(mut self) -> *mut nativeSignedRawInvoice {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -301,7 +311,7 @@ pub extern "C" fn SignedRawInvoice_eq(a: &SignedRawInvoice, b: &SignedRawInvoice
 impl Clone for SignedRawInvoice {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeSignedRawInvoice>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeSignedRawInvoice>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -368,7 +378,7 @@ impl RawInvoice {
 	pub(crate) fn take_inner(mut self) -> *mut nativeRawInvoice {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -395,7 +405,7 @@ pub extern "C" fn RawInvoice_eq(a: &RawInvoice, b: &RawInvoice) -> bool {
 impl Clone for RawInvoice {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRawInvoice>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRawInvoice>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -458,7 +468,7 @@ impl RawDataPart {
 	pub(crate) fn take_inner(mut self) -> *mut nativeRawDataPart {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -485,7 +495,7 @@ pub extern "C" fn RawDataPart_eq(a: &RawDataPart, b: &RawDataPart) -> bool {
 impl Clone for RawDataPart {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRawDataPart>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRawDataPart>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -553,7 +563,7 @@ impl PositiveTimestamp {
 	pub(crate) fn take_inner(mut self) -> *mut nativePositiveTimestamp {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -569,7 +579,7 @@ pub extern "C" fn PositiveTimestamp_eq(a: &PositiveTimestamp, b: &PositiveTimest
 impl Clone for PositiveTimestamp {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativePositiveTimestamp>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativePositiveTimestamp>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -761,11 +771,11 @@ pub extern "C" fn Currency_signet() -> Currency {
 /// Checks if two Currencys contain equal inner contents.
 #[no_mangle]
 pub extern "C" fn Currency_hash(o: &Currency) -> u64 {
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(&o.to_native(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(&o.to_native(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two Currencys contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -820,14 +830,14 @@ impl Sha256 {
 	pub(crate) fn take_inner(mut self) -> *mut nativeSha256 {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for Sha256 {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeSha256>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeSha256>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -847,11 +857,11 @@ pub extern "C" fn Sha256_clone(orig: &Sha256) -> Sha256 {
 #[no_mangle]
 pub extern "C" fn Sha256_hash(o: &Sha256) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two Sha256s contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -912,14 +922,14 @@ impl Description {
 	pub(crate) fn take_inner(mut self) -> *mut nativeDescription {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for Description {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeDescription>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeDescription>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -939,11 +949,11 @@ pub extern "C" fn Description_clone(orig: &Description) -> Description {
 #[no_mangle]
 pub extern "C" fn Description_hash(o: &Description) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two Descriptions contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -1001,7 +1011,7 @@ impl PayeePubKey {
 	pub(crate) fn take_inner(mut self) -> *mut nativePayeePubKey {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1025,7 +1035,7 @@ pub extern "C" fn PayeePubKey_new(mut a_arg: crate::c_types::PublicKey) -> Payee
 impl Clone for PayeePubKey {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativePayeePubKey>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativePayeePubKey>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1045,11 +1055,11 @@ pub extern "C" fn PayeePubKey_clone(orig: &PayeePubKey) -> PayeePubKey {
 #[no_mangle]
 pub extern "C" fn PayeePubKey_hash(o: &PayeePubKey) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two PayeePubKeys contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -1113,14 +1123,14 @@ impl ExpiryTime {
 	pub(crate) fn take_inner(mut self) -> *mut nativeExpiryTime {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for ExpiryTime {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeExpiryTime>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeExpiryTime>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1140,11 +1150,11 @@ pub extern "C" fn ExpiryTime_clone(orig: &ExpiryTime) -> ExpiryTime {
 #[no_mangle]
 pub extern "C" fn ExpiryTime_hash(o: &ExpiryTime) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two ExpiryTimes contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -1202,7 +1212,7 @@ impl MinFinalCltvExpiry {
 	pub(crate) fn take_inner(mut self) -> *mut nativeMinFinalCltvExpiry {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1226,7 +1236,7 @@ pub extern "C" fn MinFinalCltvExpiry_new(mut a_arg: u64) -> MinFinalCltvExpiry {
 impl Clone for MinFinalCltvExpiry {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeMinFinalCltvExpiry>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeMinFinalCltvExpiry>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1246,11 +1256,11 @@ pub extern "C" fn MinFinalCltvExpiry_clone(orig: &MinFinalCltvExpiry) -> MinFina
 #[no_mangle]
 pub extern "C" fn MinFinalCltvExpiry_hash(o: &MinFinalCltvExpiry) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two MinFinalCltvExpirys contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -1401,11 +1411,11 @@ pub extern "C" fn Fallback_script_hash(a: crate::c_types::TwentyBytes) -> Fallba
 /// Checks if two Fallbacks contain equal inner contents.
 #[no_mangle]
 pub extern "C" fn Fallback_hash(o: &Fallback) -> u64 {
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(&o.to_native(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(&o.to_native(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two Fallbacks contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -1460,14 +1470,14 @@ impl InvoiceSignature {
 	pub(crate) fn take_inner(mut self) -> *mut nativeInvoiceSignature {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for InvoiceSignature {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeInvoiceSignature>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeInvoiceSignature>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1543,14 +1553,14 @@ impl PrivateRoute {
 	pub(crate) fn take_inner(mut self) -> *mut nativePrivateRoute {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for PrivateRoute {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativePrivateRoute>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativePrivateRoute>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1570,11 +1580,11 @@ pub extern "C" fn PrivateRoute_clone(orig: &PrivateRoute) -> PrivateRoute {
 #[no_mangle]
 pub extern "C" fn PrivateRoute_hash(o: &PrivateRoute) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two PrivateRoutes contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -1653,7 +1663,7 @@ pub extern "C" fn RawInvoice_hash(this_arg: &RawInvoice) -> crate::c_types::Thir
 #[no_mangle]
 pub extern "C" fn RawInvoice_payment_hash(this_arg: &RawInvoice) -> crate::lightning_invoice::Sha256 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_hash();
-	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::Sha256<>) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::Sha256<>) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1663,7 +1673,7 @@ pub extern "C" fn RawInvoice_payment_hash(this_arg: &RawInvoice) -> crate::light
 #[no_mangle]
 pub extern "C" fn RawInvoice_description(this_arg: &RawInvoice) -> crate::lightning_invoice::Description {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.description();
-	let mut local_ret = crate::lightning_invoice::Description { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::Description<>) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::Description { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::Description<>) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1673,7 +1683,7 @@ pub extern "C" fn RawInvoice_description(this_arg: &RawInvoice) -> crate::lightn
 #[no_mangle]
 pub extern "C" fn RawInvoice_payee_pub_key(this_arg: &RawInvoice) -> crate::lightning_invoice::PayeePubKey {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payee_pub_key();
-	let mut local_ret = crate::lightning_invoice::PayeePubKey { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::PayeePubKey<>) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::PayeePubKey { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::PayeePubKey<>) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1683,7 +1693,7 @@ pub extern "C" fn RawInvoice_payee_pub_key(this_arg: &RawInvoice) -> crate::ligh
 #[no_mangle]
 pub extern "C" fn RawInvoice_description_hash(this_arg: &RawInvoice) -> crate::lightning_invoice::Sha256 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.description_hash();
-	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::Sha256<>) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::Sha256<>) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1693,7 +1703,7 @@ pub extern "C" fn RawInvoice_description_hash(this_arg: &RawInvoice) -> crate::l
 #[no_mangle]
 pub extern "C" fn RawInvoice_expiry_time(this_arg: &RawInvoice) -> crate::lightning_invoice::ExpiryTime {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.expiry_time();
-	let mut local_ret = crate::lightning_invoice::ExpiryTime { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::ExpiryTime<>) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::ExpiryTime { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::ExpiryTime<>) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1703,7 +1713,7 @@ pub extern "C" fn RawInvoice_expiry_time(this_arg: &RawInvoice) -> crate::lightn
 #[no_mangle]
 pub extern "C" fn RawInvoice_min_final_cltv_expiry(this_arg: &RawInvoice) -> crate::lightning_invoice::MinFinalCltvExpiry {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.min_final_cltv_expiry();
-	let mut local_ret = crate::lightning_invoice::MinFinalCltvExpiry { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::MinFinalCltvExpiry<>) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning_invoice::MinFinalCltvExpiry { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::MinFinalCltvExpiry<>) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1723,7 +1733,7 @@ pub extern "C" fn RawInvoice_payment_secret(this_arg: &RawInvoice) -> crate::c_t
 #[no_mangle]
 pub extern "C" fn RawInvoice_features(this_arg: &RawInvoice) -> crate::lightning::ln::features::InvoiceFeatures {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.features();
-	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::ln::features::InvoiceFeatures<>) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::ln::features::InvoiceFeatures<>) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1875,7 +1885,7 @@ pub extern "C" fn Invoice_payment_secret(this_arg: &Invoice) -> *const [u8; 32] 
 #[no_mangle]
 pub extern "C" fn Invoice_features(this_arg: &Invoice) -> crate::lightning::ln::features::InvoiceFeatures {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.features();
-	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::ln::features::InvoiceFeatures<>) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::ln::features::InvoiceFeatures<>) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -1984,7 +1994,7 @@ pub extern "C" fn ExpiryTime_from_seconds(mut seconds: u64) -> crate::c_types::d
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ExpiryTime_from_duration(mut duration: u64) -> crate::c_types::derived::CResult_ExpiryTimeCreationErrorZ {
-	let mut ret = lightning_invoice::ExpiryTime::from_duration(std::time::Duration::from_secs(duration));
+	let mut ret = lightning_invoice::ExpiryTime::from_duration(core::time::Duration::from_secs(duration));
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::ExpiryTime { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
 	local_ret
 }

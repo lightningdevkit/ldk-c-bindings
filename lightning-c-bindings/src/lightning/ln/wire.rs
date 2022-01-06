@@ -11,11 +11,13 @@
 //! 
 //! [BOLT #1]: https://github.com/lightningnetwork/lightning-rfc/blob/master/01-messaging.md
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 /// Trait to be implemented by custom message (unrelated to the channel/gossip LN layers)
 /// decoders.
@@ -48,7 +50,7 @@ pub(crate) extern "C" fn CustomMessageReader_clone_fields(orig: &CustomMessageRe
 use lightning::ln::wire::CustomMessageReader as rustCustomMessageReader;
 impl rustCustomMessageReader for CustomMessageReader {
 	type CustomMessage = crate::lightning::ln::wire::Type;
-	fn read<R:std::io::Read>(&self, mut message_type: u16, mut buffer: &mut R) -> Result<Option<crate::lightning::ln::wire::Type>, lightning::ln::msgs::DecodeError> {
+	fn read<R:crate::c_types::io::Read>(&self, mut message_type: u16, mut buffer: &mut R) -> Result<Option<crate::lightning::ln::wire::Type>, lightning::ln::msgs::DecodeError> {
 		let mut ret = (self.read)(self.this_arg, message_type, crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec(buffer)));
 		let mut local_ret = match ret.result_ok { true => Ok( { let mut local_ret_0 = { /* (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ let ret_0_opt = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }); { } if ret_0_opt.is_none() { None } else { Some({ ret_0_opt.take() }) } }; local_ret_0 }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
@@ -57,7 +59,7 @@ impl rustCustomMessageReader for CustomMessageReader {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for CustomMessageReader {
+impl core::ops::Deref for CustomMessageReader {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -75,11 +77,13 @@ impl Drop for CustomMessageReader {
 }
 mod encode {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 }
 /// Defines a type identifier for sending messages over the wire.
@@ -119,7 +123,7 @@ impl core::fmt::Debug for Type {
 	}
 }
 impl lightning::util::ser::Writeable for Type {
-	fn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), ::std::io::Error> {
+	fn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), crate::c_types::io::Error> {
 		let vec = (self.write)(self.this_arg);
 		w.write_all(vec.as_slice())
 	}
@@ -135,7 +139,7 @@ impl rustType for Type {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Type {
+impl core::ops::Deref for Type {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self

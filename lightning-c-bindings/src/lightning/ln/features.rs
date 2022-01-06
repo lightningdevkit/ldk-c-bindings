@@ -21,19 +21,23 @@
 //! [BOLT #9]: https://github.com/lightningnetwork/lightning-rfc/blob/master/09-features.md
 //! [messages]: crate::ln::msgs
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 mod sealed {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 }
 /// Checks if two InitFeaturess contain equal inner contents.
@@ -84,7 +88,7 @@ pub extern "C" fn ChannelTypeFeatures_eq(a: &ChannelTypeFeatures, b: &ChannelTyp
 impl Clone for InitFeatures {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeInitFeatures>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeInitFeatures>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -103,7 +107,7 @@ pub extern "C" fn InitFeatures_clone(orig: &InitFeatures) -> InitFeatures {
 impl Clone for NodeFeatures {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeNodeFeatures>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeNodeFeatures>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -122,7 +126,7 @@ pub extern "C" fn NodeFeatures_clone(orig: &NodeFeatures) -> NodeFeatures {
 impl Clone for ChannelFeatures {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelFeatures>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelFeatures>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -141,7 +145,7 @@ pub extern "C" fn ChannelFeatures_clone(orig: &ChannelFeatures) -> ChannelFeatur
 impl Clone for InvoiceFeatures {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeInvoiceFeatures>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeInvoiceFeatures>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -160,7 +164,7 @@ pub extern "C" fn InvoiceFeatures_clone(orig: &InvoiceFeatures) -> InvoiceFeatur
 impl Clone for ChannelTypeFeatures {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelTypeFeatures>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelTypeFeatures>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -223,7 +227,7 @@ impl InitFeatures {
 	pub(crate) fn take_inner(mut self) -> *mut nativeInitFeatures {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -274,7 +278,7 @@ impl NodeFeatures {
 	pub(crate) fn take_inner(mut self) -> *mut nativeNodeFeatures {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -325,7 +329,7 @@ impl ChannelFeatures {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelFeatures {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -376,7 +380,7 @@ impl InvoiceFeatures {
 	pub(crate) fn take_inner(mut self) -> *mut nativeInvoiceFeatures {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -436,7 +440,7 @@ impl ChannelTypeFeatures {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelTypeFeatures {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }

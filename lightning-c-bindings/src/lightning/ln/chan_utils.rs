@@ -9,11 +9,13 @@
 //! Various utilities for building scripts and deriving keys related to channels. These are
 //! largely of interest for those implementing chain::keysinterface::Sign message signing by hand.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 /// Gets the weight for an HTLC-Success transaction.
 #[no_mangle]
@@ -159,7 +161,7 @@ impl TxCreationKeys {
 	pub(crate) fn take_inner(mut self) -> *mut nativeTxCreationKeys {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -237,7 +239,7 @@ pub extern "C" fn TxCreationKeys_new(mut per_commitment_point_arg: crate::c_type
 impl Clone for TxCreationKeys {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeTxCreationKeys>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeTxCreationKeys>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -316,7 +318,7 @@ impl ChannelPublicKeys {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelPublicKeys {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -408,7 +410,7 @@ pub extern "C" fn ChannelPublicKeys_new(mut funding_pubkey_arg: crate::c_types::
 impl Clone for ChannelPublicKeys {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelPublicKeys>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelPublicKeys>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -520,7 +522,7 @@ impl HTLCOutputInCommitment {
 	pub(crate) fn take_inner(mut self) -> *mut nativeHTLCOutputInCommitment {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -609,7 +611,7 @@ pub extern "C" fn HTLCOutputInCommitment_new(mut offered_arg: bool, mut amount_m
 impl Clone for HTLCOutputInCommitment {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeHTLCOutputInCommitment>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeHTLCOutputInCommitment>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -733,7 +735,7 @@ impl ChannelTransactionParameters {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelTransactionParameters {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -779,7 +781,7 @@ pub extern "C" fn ChannelTransactionParameters_set_is_outbound_from_holder(this_
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_get_counterparty_parameters(this_ptr: &ChannelTransactionParameters) -> crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().counterparty_parameters;
-	let mut local_inner_val = crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::chan_utils::CounterpartyChannelTransactionParameters<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::chan_utils::CounterpartyChannelTransactionParameters<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// The late-bound counterparty channel transaction parameters.
@@ -797,7 +799,7 @@ pub extern "C" fn ChannelTransactionParameters_set_counterparty_parameters(this_
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_get_funding_outpoint(this_ptr: &ChannelTransactionParameters) -> crate::lightning::chain::transaction::OutPoint {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().funding_outpoint;
-	let mut local_inner_val = crate::lightning::chain::transaction::OutPoint { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::chain::transaction::OutPoint<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::chain::transaction::OutPoint { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::chain::transaction::OutPoint<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// The late-bound funding outpoint
@@ -840,7 +842,7 @@ pub extern "C" fn ChannelTransactionParameters_new(mut holder_pubkeys_arg: crate
 impl Clone for ChannelTransactionParameters {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelTransactionParameters>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelTransactionParameters>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -903,7 +905,7 @@ impl CounterpartyChannelTransactionParameters {
 	pub(crate) fn take_inner(mut self) -> *mut nativeCounterpartyChannelTransactionParameters {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -941,7 +943,7 @@ pub extern "C" fn CounterpartyChannelTransactionParameters_new(mut pubkeys_arg: 
 impl Clone for CounterpartyChannelTransactionParameters {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeCounterpartyChannelTransactionParameters>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeCounterpartyChannelTransactionParameters>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1070,7 +1072,7 @@ impl DirectedChannelTransactionParameters {
 	pub(crate) fn take_inner(mut self) -> *mut nativeDirectedChannelTransactionParameters {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1175,7 +1177,7 @@ impl HolderCommitmentTransaction {
 	pub(crate) fn take_inner(mut self) -> *mut nativeHolderCommitmentTransaction {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1199,7 +1201,7 @@ pub extern "C" fn HolderCommitmentTransaction_set_counterparty_htlc_sigs(this_pt
 impl Clone for HolderCommitmentTransaction {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeHolderCommitmentTransaction>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeHolderCommitmentTransaction>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1288,7 +1290,7 @@ impl BuiltCommitmentTransaction {
 	pub(crate) fn take_inner(mut self) -> *mut nativeBuiltCommitmentTransaction {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1332,7 +1334,7 @@ pub extern "C" fn BuiltCommitmentTransaction_new(mut transaction_arg: crate::c_t
 impl Clone for BuiltCommitmentTransaction {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeBuiltCommitmentTransaction>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeBuiltCommitmentTransaction>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1434,14 +1436,14 @@ impl ClosingTransaction {
 	pub(crate) fn take_inner(mut self) -> *mut nativeClosingTransaction {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for ClosingTransaction {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeClosingTransaction>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeClosingTransaction>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1461,11 +1463,11 @@ pub extern "C" fn ClosingTransaction_clone(orig: &ClosingTransaction) -> Closing
 #[no_mangle]
 pub extern "C" fn ClosingTransaction_hash(o: &ClosingTransaction) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Construct an object of the class
 #[must_use]
@@ -1586,7 +1588,7 @@ impl TrustedClosingTransaction {
 	pub(crate) fn take_inner(mut self) -> *mut nativeTrustedClosingTransaction {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1669,14 +1671,14 @@ impl CommitmentTransaction {
 	pub(crate) fn take_inner(mut self) -> *mut nativeCommitmentTransaction {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for CommitmentTransaction {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeCommitmentTransaction>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeCommitmentTransaction>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1819,7 +1821,7 @@ impl TrustedCommitmentTransaction {
 	pub(crate) fn take_inner(mut self) -> *mut nativeTrustedCommitmentTransaction {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }

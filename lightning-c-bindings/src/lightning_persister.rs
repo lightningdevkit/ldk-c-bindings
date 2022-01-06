@@ -8,19 +8,23 @@
 
 //! Utilities that handle persisting Rust-Lightning data to disk via standard filesystem APIs.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 mod util {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 }
 
@@ -81,7 +85,7 @@ impl FilesystemPersister {
 	pub(crate) fn take_inner(mut self) -> *mut nativeFilesystemPersister {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -126,7 +130,7 @@ impl From<nativeFilesystemPersister> for crate::lightning::chain::chainmonitor::
 		let mut rust_obj = FilesystemPersister { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = FilesystemPersister_as_Persist(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(FilesystemPersister_free_void);
 		ret
 	}

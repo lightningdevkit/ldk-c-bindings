@@ -13,9 +13,15 @@ use bitcoin::secp256k1::recovery::RecoveryId;
 use bitcoin::secp256k1::recovery::RecoverableSignature as SecpRecoverableSignature;
 use bitcoin::bech32;
 
-use std::convert::TryInto; // Bindings need at least rustc 1.34
+use core::convert::TryInto; // Bindings need at least rustc 1.34
 use core::ffi::c_void;
-use std::io::{Cursor, Read}; // TODO: We should use core2 here when we support no_std
+
+#[cfg(feature = "std")]
+pub(crate) use std::io::{self, Cursor, Read};
+#[cfg(feature = "no-std")]
+pub(crate) use core2::io::{self, Cursor, Read};
+#[cfg(feature = "no-std")]
+use alloc::{boxed::Box, vec::Vec, string::String};
 
 #[repr(C)]
 /// A dummy struct of which an instance must never exist.
@@ -188,6 +194,7 @@ pub enum IOError {
 	Other,
 	UnexpectedEof,
 }
+#[cfg(feature = "std")]
 impl IOError {
 	pub(crate) fn from_rust(err: std::io::Error) -> Self {
 		match err.kind() {
@@ -272,7 +279,7 @@ impl Transaction {
 	}
 	pub(crate) fn into_bitcoin(&self) -> BitcoinTransaction {
 		if self.datalen == 0 { panic!("0-length buffer can never represent a valid Transaction"); }
-		::bitcoin::consensus::encode::deserialize(unsafe { std::slice::from_raw_parts(self.data, self.datalen) }).unwrap()
+		::bitcoin::consensus::encode::deserialize(unsafe { core::slice::from_raw_parts(self.data, self.datalen) }).unwrap()
 	}
 	pub(crate) fn from_bitcoin(btc: &BitcoinTransaction) -> Self {
 		let vec = ::bitcoin::consensus::encode::serialize(btc);
@@ -288,7 +295,7 @@ impl Drop for Transaction {
 }
 impl Clone for Transaction {
 	fn clone(&self) -> Self {
-		let sl = unsafe { std::slice::from_raw_parts(self.data, self.datalen) };
+		let sl = unsafe { core::slice::from_raw_parts(self.data, self.datalen) };
 		let mut v = Vec::new();
 		v.extend_from_slice(&sl);
 		Self::from_vec(v)
@@ -365,7 +372,7 @@ impl u8slice {
 	}
 	pub(crate) fn to_slice(&self) -> &[u8] {
 		if self.datalen == 0 { return &[]; }
-		unsafe { std::slice::from_raw_parts(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts(self.data, self.datalen) }
 	}
 	pub(crate) fn to_reader<'a>(&'a self) -> Cursor<&'a [u8]> {
 		let sl = self.to_slice();
@@ -417,7 +424,7 @@ pub struct TwentyBytes { /** The twenty bytes */ pub data: [u8; 20], }
 
 pub(crate) struct VecWriter(pub Vec<u8>);
 impl lightning::util::ser::Writer for VecWriter {
-	fn write_all(&mut self, buf: &[u8]) -> Result<(), ::std::io::Error> {
+	fn write_all(&mut self, buf: &[u8]) -> Result<(), io::Error> {
 		self.0.extend_from_slice(buf);
 		Ok(())
 	}
@@ -463,20 +470,20 @@ impl Into<Str> for &mut &'static str {
 impl Str {
 	pub(crate) fn into_str(&self) -> &'static str {
 		if self.len == 0 { return ""; }
-		std::str::from_utf8(unsafe { std::slice::from_raw_parts(self.chars, self.len) }).unwrap()
+		core::str::from_utf8(unsafe { core::slice::from_raw_parts(self.chars, self.len) }).unwrap()
 	}
 	pub(crate) fn into_string(mut self) -> String {
 		let bytes = if self.len == 0 {
 			Vec::new()
 		} else if self.chars_is_owned {
 			let ret = unsafe {
-				Box::from_raw(std::slice::from_raw_parts_mut(unsafe { self.chars as *mut u8 }, self.len))
+				Box::from_raw(core::slice::from_raw_parts_mut(unsafe { self.chars as *mut u8 }, self.len))
 			}.into();
 			self.chars_is_owned = false;
 			ret
 		} else {
 			let mut ret = Vec::with_capacity(self.len);
-			ret.extend_from_slice(unsafe { std::slice::from_raw_parts(self.chars, self.len) });
+			ret.extend_from_slice(unsafe { core::slice::from_raw_parts(self.chars, self.len) });
 			ret
 		};
 		String::from_utf8(bytes).unwrap()
@@ -558,20 +565,23 @@ pub(crate) trait TakePointer<T> {
 impl<T> TakePointer<*const T> for *const T {
 	fn take_ptr(&mut self) -> *const T {
 		let ret = *self;
-		*self = std::ptr::null();
+		*self = core::ptr::null();
 		ret
 	}
 }
 impl<T> TakePointer<*mut T> for *mut T {
 	fn take_ptr(&mut self) -> *mut T {
 		let ret = *self;
-		*self = std::ptr::null_mut();
+		*self = core::ptr::null_mut();
 		ret
 	}
 }
 
 
 pub(crate) mod ObjOps {
+	#[cfg(feature = "no-std")]
+	use alloc::boxed::Box;
+
 	#[inline]
 	#[must_use = "returns new dangling pointer"]
 	pub(crate) fn heap_alloc<T>(obj: T) -> *mut T {
@@ -638,17 +648,17 @@ impl<T> SmartPtr<T> {
 		Self { ptr: Box::into_raw(Box::new(o)) }
 	}
 	pub(crate) fn null() -> Self {
-		Self { ptr: std::ptr::null_mut() }
+		Self { ptr: core::ptr::null_mut() }
 	}
 }
 impl<T> Drop for SmartPtr<T> {
 	fn drop(&mut self) {
-		if self.ptr != std::ptr::null_mut() {
+		if self.ptr != core::ptr::null_mut() {
 			unsafe { Box::from_raw(self.ptr); }
 		}
 	}
 }
-impl<T> std::ops::Deref for SmartPtr<T> {
+impl<T> core::ops::Deref for SmartPtr<T> {
 	type Target = *mut T;
 	fn deref(&self) -> &*mut T {
 		&self.ptr

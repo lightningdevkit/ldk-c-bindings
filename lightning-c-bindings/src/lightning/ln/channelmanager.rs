@@ -17,19 +17,23 @@
 //! imply it needs to fail HTLCs/payments/channels it manages).
 //!
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 mod inbound_payment {
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 }
 
@@ -114,7 +118,7 @@ impl ChannelManager {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelManager {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -169,7 +173,7 @@ impl ChainParameters {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChainParameters {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -211,7 +215,7 @@ pub extern "C" fn ChainParameters_new(mut network_arg: crate::bitcoin::network::
 impl Clone for ChainParameters {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChainParameters>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChainParameters>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -298,7 +302,7 @@ impl CounterpartyForwardingInfo {
 	pub(crate) fn take_inner(mut self) -> *mut nativeCounterpartyForwardingInfo {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -352,7 +356,7 @@ pub extern "C" fn CounterpartyForwardingInfo_new(mut fee_base_msat_arg: u32, mut
 impl Clone for CounterpartyForwardingInfo {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeCounterpartyForwardingInfo>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeCounterpartyForwardingInfo>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -416,7 +420,7 @@ impl ChannelCounterparty {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelCounterparty {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -476,7 +480,7 @@ pub extern "C" fn ChannelCounterparty_set_unspendable_punishment_reserve(this_pt
 #[no_mangle]
 pub extern "C" fn ChannelCounterparty_get_forwarding_info(this_ptr: &ChannelCounterparty) -> crate::lightning::ln::channelmanager::CounterpartyForwardingInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().forwarding_info;
-	let mut local_inner_val = crate::lightning::ln::channelmanager::CounterpartyForwardingInfo { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::channelmanager::CounterpartyForwardingInfo<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::channelmanager::CounterpartyForwardingInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::channelmanager::CounterpartyForwardingInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Information on the fees and requirements that the counterparty requires when forwarding
@@ -503,7 +507,7 @@ pub extern "C" fn ChannelCounterparty_new(mut node_id_arg: crate::c_types::Publi
 impl Clone for ChannelCounterparty {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelCounterparty>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelCounterparty>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -566,7 +570,7 @@ impl ChannelDetails {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelDetails {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -608,7 +612,7 @@ pub extern "C" fn ChannelDetails_set_counterparty(this_ptr: &mut ChannelDetails,
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_funding_txo(this_ptr: &ChannelDetails) -> crate::lightning::chain::transaction::OutPoint {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().funding_txo;
-	let mut local_inner_val = crate::lightning::chain::transaction::OutPoint { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::chain::transaction::OutPoint<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::chain::transaction::OutPoint { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::chain::transaction::OutPoint<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// The Channel's funding transaction output, if we've negotiated the funding transaction with
@@ -925,7 +929,7 @@ pub extern "C" fn ChannelDetails_new(mut channel_id_arg: crate::c_types::ThirtyT
 impl Clone for ChannelDetails {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelDetails>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelDetails>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1086,7 +1090,7 @@ impl PaymentSendFailure {
 				let mut results_nonref = (*results).clone();
 				let mut local_results_nonref = Vec::new(); for mut item in results_nonref.drain(..) { local_results_nonref.push( { let mut local_results_nonref_0 = match item { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() }; local_results_nonref_0 }); };
 				let mut failed_paths_retry_nonref = (*failed_paths_retry).clone();
-				let mut local_failed_paths_retry_nonref = crate::lightning::routing::router::RouteParameters { inner: if failed_paths_retry_nonref.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((failed_paths_retry_nonref.unwrap())) } }, is_owned: true };
+				let mut local_failed_paths_retry_nonref = crate::lightning::routing::router::RouteParameters { inner: if failed_paths_retry_nonref.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((failed_paths_retry_nonref.unwrap())) } }, is_owned: true };
 				let mut payment_id_nonref = (*payment_id).clone();
 				PaymentSendFailure::PartialFailure {
 					results: local_results_nonref.into(),
@@ -1118,7 +1122,7 @@ impl PaymentSendFailure {
 			},
 			nativePaymentSendFailure::PartialFailure {mut results, mut failed_paths_retry, mut payment_id, } => {
 				let mut local_results = Vec::new(); for mut item in results.drain(..) { local_results.push( { let mut local_results_0 = match item { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() }; local_results_0 }); };
-				let mut local_failed_paths_retry = crate::lightning::routing::router::RouteParameters { inner: if failed_paths_retry.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((failed_paths_retry.unwrap())) } }, is_owned: true };
+				let mut local_failed_paths_retry = crate::lightning::routing::router::RouteParameters { inner: if failed_paths_retry.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((failed_paths_retry.unwrap())) } }, is_owned: true };
 				PaymentSendFailure::PartialFailure {
 					results: local_results.into(),
 					failed_paths_retry: local_failed_paths_retry,
@@ -1687,7 +1691,7 @@ impl From<nativeChannelManager> for crate::lightning::util::events::MessageSendE
 		let mut rust_obj = ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChannelManager_as_MessageSendEventsProvider(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(ChannelManager_free_void);
 		ret
 	}
@@ -1715,7 +1719,7 @@ impl From<nativeChannelManager> for crate::lightning::util::events::EventsProvid
 		let mut rust_obj = ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChannelManager_as_EventsProvider(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(ChannelManager_free_void);
 		ret
 	}
@@ -1740,7 +1744,7 @@ impl From<nativeChannelManager> for crate::lightning::chain::Listen {
 		let mut rust_obj = ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChannelManager_as_Listen(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(ChannelManager_free_void);
 		ret
 	}
@@ -1769,7 +1773,7 @@ impl From<nativeChannelManager> for crate::lightning::chain::Confirm {
 		let mut rust_obj = ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChannelManager_as_Confirm(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(ChannelManager_free_void);
 		ret
 	}
@@ -1814,7 +1818,7 @@ extern "C" fn ChannelManager_Confirm_transaction_unconfirmed(this_arg: *const c_
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_await_persistable_update_timeout(this_arg: &ChannelManager, mut max_wait: u64) -> bool {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.await_persistable_update_timeout(std::time::Duration::from_secs(max_wait));
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.await_persistable_update_timeout(core::time::Duration::from_secs(max_wait));
 	ret
 }
 
@@ -1840,7 +1844,7 @@ impl From<nativeChannelManager> for crate::lightning::ln::msgs::ChannelMessageHa
 		let mut rust_obj = ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChannelManager_as_ChannelMessageHandler(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(ChannelManager_free_void);
 		ret
 	}
@@ -2028,7 +2032,7 @@ impl ChannelManagerReadArgs {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelManagerReadArgs {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }

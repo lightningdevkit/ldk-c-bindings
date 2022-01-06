@@ -13,11 +13,13 @@
 //! future, as well as generate and broadcast funding transactions handle payment preimages and a
 //! few other things.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 /// Some information provided on receipt of payment depends on whether the payment received is a
 /// spontaneous payment or a \"conventional\" lightning payment that's paying an invoice.
@@ -686,7 +688,7 @@ impl Event {
 			Event::PendingHTLCsForwardable {ref time_forwardable, } => {
 				let mut time_forwardable_nonref = (*time_forwardable).clone();
 				nativeEvent::PendingHTLCsForwardable {
-					time_forwardable: std::time::Duration::from_secs(time_forwardable_nonref),
+					time_forwardable: core::time::Duration::from_secs(time_forwardable_nonref),
 				}
 			},
 			Event::SpendableOutputs {ref outputs, } => {
@@ -790,7 +792,7 @@ impl Event {
 			},
 			Event::PendingHTLCsForwardable {mut time_forwardable, } => {
 				nativeEvent::PendingHTLCsForwardable {
-					time_forwardable: std::time::Duration::from_secs(time_forwardable),
+					time_forwardable: core::time::Duration::from_secs(time_forwardable),
 				}
 			},
 			Event::SpendableOutputs {mut outputs, } => {
@@ -882,7 +884,7 @@ impl Event {
 				let mut short_channel_id_nonref = (*short_channel_id).clone();
 				let mut local_short_channel_id_nonref = if short_channel_id_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { short_channel_id_nonref.unwrap() }) };
 				let mut retry_nonref = (*retry).clone();
-				let mut local_retry_nonref = crate::lightning::routing::router::RouteParameters { inner: if retry_nonref.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((retry_nonref.unwrap())) } }, is_owned: true };
+				let mut local_retry_nonref = crate::lightning::routing::router::RouteParameters { inner: if retry_nonref.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((retry_nonref.unwrap())) } }, is_owned: true };
 				Event::PaymentPathFailed {
 					payment_id: local_payment_id_nonref,
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
@@ -989,7 +991,7 @@ impl Event {
 				let mut local_network_update = if network_update.is_none() { crate::c_types::derived::COption_NetworkUpdateZ::None } else { crate::c_types::derived::COption_NetworkUpdateZ::Some( { crate::lightning::routing::network_graph::NetworkUpdate::native_into(network_update.unwrap()) }) };
 				let mut local_path = Vec::new(); for mut item in path.drain(..) { local_path.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
 				let mut local_short_channel_id = if short_channel_id.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { short_channel_id.unwrap() }) };
-				let mut local_retry = crate::lightning::routing::router::RouteParameters { inner: if retry.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((retry.unwrap())) } }, is_owned: true };
+				let mut local_retry = crate::lightning::routing::router::RouteParameters { inner: if retry.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((retry.unwrap())) } }, is_owned: true };
 				Event::PaymentPathFailed {
 					payment_id: local_payment_id,
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
@@ -2057,7 +2059,7 @@ impl rustMessageSendEventsProvider for MessageSendEventsProvider {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for MessageSendEventsProvider {
+impl core::ops::Deref for MessageSendEventsProvider {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -2168,7 +2170,7 @@ impl rustEventHandler for EventHandler {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for EventHandler {
+impl core::ops::Deref for EventHandler {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self

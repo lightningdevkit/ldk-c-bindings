@@ -124,11 +124,13 @@
 //! as updates to the network graph or changes to channel scores should be applied prior to
 //! retries, typically by way of composing [`EventHandler`]s accordingly.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning_invoice::payment::InvoicePayer as nativeInvoicePayerImport;
@@ -181,7 +183,7 @@ impl InvoicePayer {
 	pub(crate) fn take_inner(mut self) -> *mut nativeInvoicePayer {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -264,7 +266,7 @@ impl rustPayer for Payer {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Payer {
+impl core::ops::Deref for Payer {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -318,7 +320,7 @@ impl rustRouter<crate::lightning::routing::scoring::Score> for Router {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for Router {
+impl core::ops::Deref for Router {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -385,7 +387,7 @@ impl RetryAttempts {
 	pub(crate) fn take_inner(mut self) -> *mut nativeRetryAttempts {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -409,7 +411,7 @@ pub extern "C" fn RetryAttempts_new(mut a_arg: usize) -> RetryAttempts {
 impl Clone for RetryAttempts {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRetryAttempts>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRetryAttempts>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -438,11 +440,11 @@ pub extern "C" fn RetryAttempts_eq(a: &RetryAttempts, b: &RetryAttempts) -> bool
 #[no_mangle]
 pub extern "C" fn RetryAttempts_hash(o: &RetryAttempts) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// An error that may occur when making a payment.
 #[must_use]
@@ -633,7 +635,7 @@ impl From<nativeInvoicePayer> for crate::lightning::util::events::EventHandler {
 		let mut rust_obj = InvoicePayer { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = InvoicePayer_as_EventHandler(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(InvoicePayer_free_void);
 		ret
 	}

@@ -8,11 +8,13 @@
 
 //! Error types live here.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 /// Indicates an error on the client's part (usually some variant of attempting to use too-low or
 /// too-high values)

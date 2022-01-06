@@ -966,7 +966,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"core::convert::Infallible" => Some("panic!(\"You must never construct a NotConstructable! : "),
 
-			"std::time::Duration"|"core::time::Duration" => Some("std::time::Duration::from_secs("),
+			"std::time::Duration"|"core::time::Duration" => Some("core::time::Duration::from_secs("),
 			"std::time::SystemTime" => Some("(::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs("),
 
 			"bech32::u5" => Some(""),
@@ -1269,7 +1269,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	/// TODO: We should never need to use this!
 	fn real_rust_type_mapping<'equiv>(&self, thing: &'equiv str) -> &'equiv str {
 		match thing {
-			"lightning::io::Read" => "std::io::Read",
+			"lightning::io::Read" => "crate::c_types::io::Read",
 			_ => thing,
 		}
 	}
@@ -1365,12 +1365,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						let is_inner_ref = if let Some(syn::Type::Reference(_)) = single_contained { true } else { false };
 						if is_ref {
 							return Some(("if ", vec![
-								(".is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner(".to_owned(),
+								(".is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner(".to_owned(),
 									format!("({}{}.unwrap())", var_access, if is_inner_ref { "" } else { ".as_ref()" }))
 								], ") }", ContainerPrefixLocation::OutsideConv));
 						} else {
 							return Some(("if ", vec![
-								(".is_none() { std::ptr::null_mut() } else { ".to_owned(), format!("({}.unwrap())", var_access))
+								(".is_none() { core::ptr::null_mut() } else { ".to_owned(), format!("({}.unwrap())", var_access))
 								], " }", ContainerPrefixLocation::OutsideConv));
 						}
 					} else if self.is_primitive(&inner_path) || self.c_type_from_path(&inner_path, false, false).is_none() {
@@ -1704,7 +1704,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			syn::Type::Path(p) => {
 				let resolved = self.resolve_path(&p.path, generics);
 				if self.crate_types.opaques.get(&resolved).is_some() {
-					write!(w, "crate::{} {{ inner: std::ptr::null_mut(), is_owned: true }}", resolved).unwrap();
+					write!(w, "crate::{} {{ inner: core::ptr::null_mut(), is_owned: true }}", resolved).unwrap();
 				} else {
 					// Assume its a manually-mapped C type, where we can just define an null() fn
 					write!(w, "{}::null()", self.c_type_from_path(&resolved, false, false).unwrap()).unwrap();
@@ -1780,7 +1780,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			syn::Type::Slice(_) => {
 				// Option<[]> always implies that we want to treat len() == 0 differently from
 				// None, so we always map an Option<[]> into a pointer.
-				write!(w, " == std::ptr::null_mut()").unwrap();
+				write!(w, " == core::ptr::null_mut()").unwrap();
 				EmptyValExpectedTy::ReferenceAsPointer
 			},
 			_ => unimplemented!(),

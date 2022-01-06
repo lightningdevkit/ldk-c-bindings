@@ -14,11 +14,13 @@
 //! call into the provided message handlers (probably a ChannelManager and NetGraphmsgHandler) with messages
 //! they should handle, and encoding/sending response messages.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 /// Handler for BOLT1-compliant messages.
 #[repr(C)]
@@ -56,7 +58,7 @@ pub(crate) extern "C" fn CustomMessageHandler_clone_fields(orig: &CustomMessageH
 }
 impl lightning::ln::wire::CustomMessageReader for CustomMessageHandler {
 	type CustomMessage = crate::lightning::ln::wire::Type;
-	fn read<R:std::io::Read>(&self, mut message_type: u16, mut buffer: &mut R) -> Result<Option<crate::lightning::ln::wire::Type>, lightning::ln::msgs::DecodeError> {
+	fn read<R:crate::c_types::io::Read>(&self, mut message_type: u16, mut buffer: &mut R) -> Result<Option<crate::lightning::ln::wire::Type>, lightning::ln::msgs::DecodeError> {
 		let mut ret = (self.CustomMessageReader.read)(self.CustomMessageReader.this_arg, message_type, crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec(buffer)));
 		let mut local_ret = match ret.result_ok { true => Ok( { let mut local_ret_0 = { /* (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ let ret_0_opt = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }); { } if ret_0_opt.is_none() { None } else { Some({ ret_0_opt.take() }) } }; local_ret_0 }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
@@ -79,7 +81,7 @@ impl rustCustomMessageHandler for CustomMessageHandler {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for CustomMessageHandler {
+impl core::ops::Deref for CustomMessageHandler {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -143,7 +145,7 @@ impl IgnoringMessageHandler {
 	pub(crate) fn take_inner(mut self) -> *mut nativeIgnoringMessageHandler {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -159,7 +161,7 @@ impl From<nativeIgnoringMessageHandler> for crate::lightning::util::events::Mess
 		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = IgnoringMessageHandler_as_MessageSendEventsProvider(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(IgnoringMessageHandler_free_void);
 		ret
 	}
@@ -187,7 +189,7 @@ impl From<nativeIgnoringMessageHandler> for crate::lightning::ln::msgs::RoutingM
 		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = IgnoringMessageHandler_as_RoutingMessageHandler(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(IgnoringMessageHandler_free_void);
 		ret
 	}
@@ -238,7 +240,7 @@ extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_channel_update
 #[must_use]
 extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_get_next_channel_announcements(this_arg: *const c_void, mut _starting_point: u64, mut _batch_amount: u8) -> crate::c_types::derived::CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
 	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::get_next_channel_announcements(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, _starting_point, _batch_amount);
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item; let mut local_orig_ret_0_1 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_1.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_1.unwrap())) } }, is_owned: true }; let mut local_orig_ret_0_2 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_2.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_2.unwrap())) } }, is_owned: true }; let mut local_ret_0 = (crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, local_orig_ret_0_1, local_orig_ret_0_2).into(); local_ret_0 }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item; let mut local_orig_ret_0_1 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_1.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_1.unwrap())) } }, is_owned: true }; let mut local_orig_ret_0_2 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_2.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_2.unwrap())) } }, is_owned: true }; let mut local_ret_0 = (crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, local_orig_ret_0_1, local_orig_ret_0_2).into(); local_ret_0 }); };
 	local_ret.into()
 }
 #[must_use]
@@ -287,7 +289,7 @@ impl From<nativeIgnoringMessageHandler> for crate::lightning::ln::wire::CustomMe
 		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = IgnoringMessageHandler_as_CustomMessageReader(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(IgnoringMessageHandler_free_void);
 		ret
 	}
@@ -315,7 +317,7 @@ impl From<nativeIgnoringMessageHandler> for crate::lightning::ln::peer_handler::
 		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = IgnoringMessageHandler_as_CustomMessageHandler(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(IgnoringMessageHandler_free_void);
 		ret
 	}
@@ -396,7 +398,7 @@ impl ErroringMessageHandler {
 	pub(crate) fn take_inner(mut self) -> *mut nativeErroringMessageHandler {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -413,7 +415,7 @@ impl From<nativeErroringMessageHandler> for crate::lightning::util::events::Mess
 		let mut rust_obj = ErroringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ErroringMessageHandler_as_MessageSendEventsProvider(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(ErroringMessageHandler_free_void);
 		ret
 	}
@@ -441,7 +443,7 @@ impl From<nativeErroringMessageHandler> for crate::lightning::ln::msgs::ChannelM
 		let mut rust_obj = ErroringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ErroringMessageHandler_as_ChannelMessageHandler(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(ErroringMessageHandler_free_void);
 		ret
 	}
@@ -589,7 +591,7 @@ impl MessageHandler {
 	pub(crate) fn take_inner(mut self) -> *mut nativeMessageHandler {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -706,12 +708,12 @@ pub(crate) extern "C" fn SocketDescriptor_clone_fields(orig: &SocketDescriptor) 
 		free: Clone::clone(&orig.free),
 	}
 }
-impl std::cmp::Eq for SocketDescriptor {}
-impl std::cmp::PartialEq for SocketDescriptor {
+impl core::cmp::Eq for SocketDescriptor {}
+impl core::cmp::PartialEq for SocketDescriptor {
 	fn eq(&self, o: &Self) -> bool { (self.eq)(self.this_arg, o) }
 }
-impl std::hash::Hash for SocketDescriptor {
-	fn hash<H: std::hash::Hasher>(&self, hasher: &mut H) { hasher.write_u64((self.hash)(self.this_arg)) }
+impl core::hash::Hash for SocketDescriptor {
+	fn hash<H: core::hash::Hasher>(&self, hasher: &mut H) { hasher.write_u64((self.hash)(self.this_arg)) }
 }
 #[no_mangle]
 /// Creates a copy of a SocketDescriptor
@@ -740,7 +742,7 @@ impl rustSocketDescriptor for SocketDescriptor {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl std::ops::Deref for SocketDescriptor {
+impl core::ops::Deref for SocketDescriptor {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -805,7 +807,7 @@ impl PeerHandleError {
 	pub(crate) fn take_inner(mut self) -> *mut nativePeerHandleError {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -833,7 +835,7 @@ pub extern "C" fn PeerHandleError_new(mut no_connection_possible_arg: bool) -> P
 impl Clone for PeerHandleError {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativePeerHandleError>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativePeerHandleError>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -914,7 +916,7 @@ impl PeerManager {
 	pub(crate) fn take_inner(mut self) -> *mut nativePeerManager {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }

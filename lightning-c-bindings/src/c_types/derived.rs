@@ -1,3 +1,12 @@
+
+use alloc::str::FromStr;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
 #[repr(C)]
 /// The contents of CResult_SecretKeyErrorZ
 pub union CResult_SecretKeyErrorZPtr {
@@ -64,11 +73,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::SecretKey, crate::c_types
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::SecretKey, crate::c_types::Secp256k1Error>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_SecretKeyErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_SecretKeyErrorZPtr { err }
 		};
 		Self {
@@ -143,11 +152,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::PublicKey, crate::c_types
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::PublicKey, crate::c_types::Secp256k1Error>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PublicKeyErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_PublicKeyErrorZPtr { err }
 		};
 		Self {
@@ -239,11 +248,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::TxCreat
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::TxCreationKeys, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_TxCreationKeysDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_TxCreationKeysDecodeErrorZPtr { err }
 		};
 		Self {
@@ -335,11 +344,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::Channel
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::ChannelPublicKeys, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ChannelPublicKeysDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ChannelPublicKeysDecodeErrorZPtr { err }
 		};
 		Self {
@@ -431,11 +440,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::TxCreat
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::TxCreationKeys, crate::c_types::Secp256k1Error>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_TxCreationKeysErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_TxCreationKeysErrorZPtr { err }
 		};
 		Self {
@@ -564,11 +573,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::HTLCOut
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::HTLCOutputInCommitment, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_HTLCOutputInCommitmentDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_HTLCOutputInCommitmentDecodeErrorZPtr { err }
 		};
 		Self {
@@ -689,11 +698,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::Counter
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_CounterpartyChannelTransactionParametersDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_CounterpartyChannelTransactionParametersDecodeErrorZPtr { err }
 		};
 		Self {
@@ -785,11 +794,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::Channel
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::ChannelTransactionParameters, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ChannelTransactionParametersDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ChannelTransactionParametersDecodeErrorZPtr { err }
 		};
 		Self {
@@ -828,13 +837,13 @@ pub struct CVec_SignatureZ {
 impl CVec_SignatureZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::Signature> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::Signature] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::Signature>> for CVec_SignatureZ {
@@ -850,14 +859,14 @@ pub extern "C" fn CVec_SignatureZ_free(_res: CVec_SignatureZ) { }
 impl Drop for CVec_SignatureZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_SignatureZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -927,11 +936,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::HolderC
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::HolderCommitmentTransaction, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_HolderCommitmentTransactionDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_HolderCommitmentTransactionDecodeErrorZPtr { err }
 		};
 		Self {
@@ -1023,11 +1032,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::BuiltCo
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::BuiltCommitmentTransaction, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_BuiltCommitmentTransactionDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_BuiltCommitmentTransactionDecodeErrorZPtr { err }
 		};
 		Self {
@@ -1060,7 +1069,7 @@ pub union CResult_TrustedClosingTransactionNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::lightning::ln::chan_utils::TrustedClosingTransaction,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_TrustedClosingTransactionNoneZ represents the result of a fallible operation,
@@ -1088,7 +1097,7 @@ pub extern "C" fn CResult_TrustedClosingTransactionNoneZ_ok(o: crate::lightning:
 pub extern "C" fn CResult_TrustedClosingTransactionNoneZ_err() -> CResult_TrustedClosingTransactionNoneZ {
 	CResult_TrustedClosingTransactionNoneZ {
 		contents: CResult_TrustedClosingTransactionNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -1115,12 +1124,12 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::Trusted
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::TrustedClosingTransaction, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_TrustedClosingTransactionNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_TrustedClosingTransactionNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_TrustedClosingTransactionNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -1194,11 +1203,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::Commitm
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::CommitmentTransaction, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_CommitmentTransactionDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_CommitmentTransactionDecodeErrorZPtr { err }
 		};
 		Self {
@@ -1231,7 +1240,7 @@ pub union CResult_TrustedCommitmentTransactionNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::lightning::ln::chan_utils::TrustedCommitmentTransaction,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_TrustedCommitmentTransactionNoneZ represents the result of a fallible operation,
@@ -1259,7 +1268,7 @@ pub extern "C" fn CResult_TrustedCommitmentTransactionNoneZ_ok(o: crate::lightni
 pub extern "C" fn CResult_TrustedCommitmentTransactionNoneZ_err() -> CResult_TrustedCommitmentTransactionNoneZ {
 	CResult_TrustedCommitmentTransactionNoneZ {
 		contents: CResult_TrustedCommitmentTransactionNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -1286,12 +1295,12 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::Trusted
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::chan_utils::TrustedCommitmentTransaction, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_TrustedCommitmentTransactionNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_TrustedCommitmentTransactionNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_TrustedCommitmentTransactionNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -1306,7 +1315,7 @@ pub union CResult_CVec_SignatureZNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::derived::CVec_SignatureZ,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_CVec_SignatureZNoneZ represents the result of a fallible operation,
@@ -1334,7 +1343,7 @@ pub extern "C" fn CResult_CVec_SignatureZNoneZ_ok(o: crate::c_types::derived::CV
 pub extern "C" fn CResult_CVec_SignatureZNoneZ_err() -> CResult_CVec_SignatureZNoneZ {
 	CResult_CVec_SignatureZNoneZ {
 		contents: CResult_CVec_SignatureZNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -1361,12 +1370,12 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::CVec_SignatureZ,
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::CVec_SignatureZ, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_CVec_SignatureZNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_CVec_SignatureZNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_CVec_SignatureZNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -1382,7 +1391,7 @@ impl Clone for CResult_CVec_SignatureZNoneZ {
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_CVec_SignatureZNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -1457,11 +1466,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::script::ShutdownScr
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::script::ShutdownScript, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ShutdownScriptDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ShutdownScriptDecodeErrorZPtr { err }
 		};
 		Self {
@@ -1553,11 +1562,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::script::ShutdownScr
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::script::ShutdownScript, crate::lightning::ln::script::InvalidShutdownScript>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ShutdownScriptInvalidShutdownScriptZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ShutdownScriptInvalidShutdownScriptZPtr { err }
 		};
 		Self {
@@ -1587,7 +1596,7 @@ pub extern "C" fn CResult_ShutdownScriptInvalidShutdownScriptZ_clone(orig: &CRes
 /// The contents of CResult_NoneErrorZ
 pub union CResult_NoneErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
-	pub result: *mut std::ffi::c_void,
+	pub result: *mut core::ffi::c_void,
 	/// A pointer to the contents in the error state.
 	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::c_types::IOError,
@@ -1608,7 +1617,7 @@ pub struct CResult_NoneErrorZ {
 pub extern "C" fn CResult_NoneErrorZ_ok() -> CResult_NoneErrorZ {
 	CResult_NoneErrorZ {
 		contents: CResult_NoneErrorZPtr {
-			result: std::ptr::null_mut(),
+			result: core::ptr::null_mut(),
 		},
 		result_ok: true,
 	}
@@ -1645,11 +1654,11 @@ impl From<crate::c_types::CResultTempl<(), crate::c_types::IOError>> for CResult
 	fn from(mut o: crate::c_types::CResultTempl<(), crate::c_types::IOError>) -> Self {
 		let contents = if o.result_ok {
 			let _ = unsafe { Box::from_raw(o.contents.result) };
-			o.contents.result = std::ptr::null_mut();
-			CResult_NoneErrorZPtr { result: std::ptr::null_mut() }
+			o.contents.result = core::ptr::null_mut();
+			CResult_NoneErrorZPtr { result: core::ptr::null_mut() }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NoneErrorZPtr { err }
 		};
 		Self {
@@ -1662,7 +1671,7 @@ impl Clone for CResult_NoneErrorZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
 			Self { result_ok: true, contents: CResult_NoneErrorZPtr {
-				result: std::ptr::null_mut()
+				result: core::ptr::null_mut()
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_NoneErrorZPtr {
@@ -1741,11 +1750,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::router::RouteH
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::router::RouteHop, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_RouteHopDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_RouteHopDecodeErrorZPtr { err }
 		};
 		Self {
@@ -1784,13 +1793,13 @@ pub struct CVec_RouteHopZ {
 impl CVec_RouteHopZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::routing::router::RouteHop> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::routing::router::RouteHop] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::routing::router::RouteHop>> for CVec_RouteHopZ {
@@ -1806,14 +1815,14 @@ pub extern "C" fn CVec_RouteHopZ_free(_res: CVec_RouteHopZ) { }
 impl Drop for CVec_RouteHopZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_RouteHopZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -1830,13 +1839,13 @@ pub struct CVec_CVec_RouteHopZZ {
 impl CVec_CVec_RouteHopZZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::CVec_RouteHopZ> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::CVec_RouteHopZ] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::derived::CVec_RouteHopZ>> for CVec_CVec_RouteHopZZ {
@@ -1852,14 +1861,14 @@ pub extern "C" fn CVec_CVec_RouteHopZZ_free(_res: CVec_CVec_RouteHopZZ) { }
 impl Drop for CVec_CVec_RouteHopZZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_CVec_RouteHopZZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -1929,11 +1938,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::router::Route,
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::router::Route, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_RouteDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_RouteDecodeErrorZPtr { err }
 		};
 		Self {
@@ -2025,11 +2034,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::router::RouteP
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::router::RouteParameters, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_RouteParametersDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_RouteParametersDecodeErrorZPtr { err }
 		};
 		Self {
@@ -2068,13 +2077,13 @@ pub struct CVec_RouteHintZ {
 impl CVec_RouteHintZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::routing::router::RouteHint> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::routing::router::RouteHint] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::routing::router::RouteHint>> for CVec_RouteHintZ {
@@ -2090,14 +2099,14 @@ pub extern "C" fn CVec_RouteHintZ_free(_res: CVec_RouteHintZ) { }
 impl Drop for CVec_RouteHintZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_RouteHintZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -2204,11 +2213,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::router::Payee,
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::router::Payee, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PayeeDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_PayeeDecodeErrorZPtr { err }
 		};
 		Self {
@@ -2247,13 +2256,13 @@ pub struct CVec_RouteHintHopZ {
 impl CVec_RouteHintHopZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::routing::router::RouteHintHop> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::routing::router::RouteHintHop] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::routing::router::RouteHintHop>> for CVec_RouteHintHopZ {
@@ -2269,14 +2278,14 @@ pub extern "C" fn CVec_RouteHintHopZ_free(_res: CVec_RouteHintHopZ) { }
 impl Drop for CVec_RouteHintHopZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_RouteHintHopZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -2346,11 +2355,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::router::RouteH
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::router::RouteHint, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_RouteHintDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_RouteHintDecodeErrorZPtr { err }
 		};
 		Self {
@@ -2442,11 +2451,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::router::RouteH
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::router::RouteHintHop, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_RouteHintHopDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_RouteHintHopDecodeErrorZPtr { err }
 		};
 		Self {
@@ -2485,13 +2494,13 @@ pub struct CVec_ChannelDetailsZ {
 impl CVec_ChannelDetailsZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::ln::channelmanager::ChannelDetails> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::ln::channelmanager::ChannelDetails] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::ln::channelmanager::ChannelDetails>> for CVec_ChannelDetailsZ {
@@ -2507,14 +2516,14 @@ pub extern "C" fn CVec_ChannelDetailsZ_free(_res: CVec_ChannelDetailsZ) { }
 impl Drop for CVec_ChannelDetailsZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_ChannelDetailsZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -2584,11 +2593,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::router::Route,
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::router::Route, crate::lightning::ln::msgs::LightningError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_RouteLightningErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_RouteLightningErrorZPtr { err }
 		};
 		Self {
@@ -2680,11 +2689,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::TxOut, crate::lightning::
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::TxOut, crate::lightning::chain::AccessError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_TxOutAccessErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_TxOutAccessErrorZPtr { err }
 		};
 		Self {
@@ -2765,13 +2774,13 @@ pub struct CVec_C2Tuple_usizeTransactionZZ {
 impl CVec_C2Tuple_usizeTransactionZZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_usizeTransactionZ> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_usizeTransactionZ] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::derived::C2Tuple_usizeTransactionZ>> for CVec_C2Tuple_usizeTransactionZZ {
@@ -2787,14 +2796,14 @@ pub extern "C" fn CVec_C2Tuple_usizeTransactionZZ_free(_res: CVec_C2Tuple_usizeT
 impl Drop for CVec_C2Tuple_usizeTransactionZZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_C2Tuple_usizeTransactionZZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -2811,13 +2820,13 @@ pub struct CVec_TxidZ {
 impl CVec_TxidZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::ThirtyTwoBytes> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::ThirtyTwoBytes] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::ThirtyTwoBytes>> for CVec_TxidZ {
@@ -2833,14 +2842,14 @@ pub extern "C" fn CVec_TxidZ_free(_res: CVec_TxidZ) { }
 impl Drop for CVec_TxidZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_TxidZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -2848,7 +2857,7 @@ impl Clone for CVec_TxidZ {
 /// The contents of CResult_NoneChannelMonitorUpdateErrZ
 pub union CResult_NoneChannelMonitorUpdateErrZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
-	pub result: *mut std::ffi::c_void,
+	pub result: *mut core::ffi::c_void,
 	/// A pointer to the contents in the error state.
 	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::lightning::chain::ChannelMonitorUpdateErr,
@@ -2869,7 +2878,7 @@ pub struct CResult_NoneChannelMonitorUpdateErrZ {
 pub extern "C" fn CResult_NoneChannelMonitorUpdateErrZ_ok() -> CResult_NoneChannelMonitorUpdateErrZ {
 	CResult_NoneChannelMonitorUpdateErrZ {
 		contents: CResult_NoneChannelMonitorUpdateErrZPtr {
-			result: std::ptr::null_mut(),
+			result: core::ptr::null_mut(),
 		},
 		result_ok: true,
 	}
@@ -2906,11 +2915,11 @@ impl From<crate::c_types::CResultTempl<(), crate::lightning::chain::ChannelMonit
 	fn from(mut o: crate::c_types::CResultTempl<(), crate::lightning::chain::ChannelMonitorUpdateErr>) -> Self {
 		let contents = if o.result_ok {
 			let _ = unsafe { Box::from_raw(o.contents.result) };
-			o.contents.result = std::ptr::null_mut();
-			CResult_NoneChannelMonitorUpdateErrZPtr { result: std::ptr::null_mut() }
+			o.contents.result = core::ptr::null_mut();
+			CResult_NoneChannelMonitorUpdateErrZPtr { result: core::ptr::null_mut() }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NoneChannelMonitorUpdateErrZPtr { err }
 		};
 		Self {
@@ -2923,7 +2932,7 @@ impl Clone for CResult_NoneChannelMonitorUpdateErrZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
 			Self { result_ok: true, contents: CResult_NoneChannelMonitorUpdateErrZPtr {
-				result: std::ptr::null_mut()
+				result: core::ptr::null_mut()
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_NoneChannelMonitorUpdateErrZPtr {
@@ -2949,13 +2958,13 @@ pub struct CVec_MonitorEventZ {
 impl CVec_MonitorEventZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::chain::channelmonitor::MonitorEvent> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::chain::channelmonitor::MonitorEvent] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::chain::channelmonitor::MonitorEvent>> for CVec_MonitorEventZ {
@@ -2971,14 +2980,14 @@ pub extern "C" fn CVec_MonitorEventZ_free(_res: CVec_MonitorEventZ) { }
 impl Drop for CVec_MonitorEventZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_MonitorEventZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -3122,11 +3131,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::COption_ClosureR
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::COption_ClosureReasonZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_COption_ClosureReasonZDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_COption_ClosureReasonZDecodeErrorZPtr { err }
 		};
 		Self {
@@ -3202,13 +3211,13 @@ pub struct CVec_SpendableOutputDescriptorZ {
 impl CVec_SpendableOutputDescriptorZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::chain::keysinterface::SpendableOutputDescriptor> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::chain::keysinterface::SpendableOutputDescriptor] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::chain::keysinterface::SpendableOutputDescriptor>> for CVec_SpendableOutputDescriptorZ {
@@ -3224,14 +3233,14 @@ pub extern "C" fn CVec_SpendableOutputDescriptorZ_free(_res: CVec_SpendableOutpu
 impl Drop for CVec_SpendableOutputDescriptorZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_SpendableOutputDescriptorZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -3338,11 +3347,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::COption_EventZ, 
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::COption_EventZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_COption_EventZDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_COption_EventZDecodeErrorZPtr { err }
 		};
 		Self {
@@ -3381,13 +3390,13 @@ pub struct CVec_MessageSendEventZ {
 impl CVec_MessageSendEventZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::util::events::MessageSendEvent> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::util::events::MessageSendEvent] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::util::events::MessageSendEvent>> for CVec_MessageSendEventZ {
@@ -3403,14 +3412,14 @@ pub extern "C" fn CVec_MessageSendEventZ_free(_res: CVec_MessageSendEventZ) { }
 impl Drop for CVec_MessageSendEventZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_MessageSendEventZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -3480,11 +3489,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::scoring::Scori
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::scoring::ScoringParameters, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ScoringParametersDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ScoringParametersDecodeErrorZPtr { err }
 		};
 		Self {
@@ -3559,11 +3568,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::scoring::Score
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::scoring::Scorer, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ScorerDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ScorerDecodeErrorZPtr { err }
 		};
 		Self {
@@ -3638,11 +3647,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::features::InitFeatu
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::features::InitFeatures, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_InitFeaturesDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_InitFeaturesDecodeErrorZPtr { err }
 		};
 		Self {
@@ -3717,11 +3726,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::features::ChannelFe
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::features::ChannelFeatures, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ChannelFeaturesDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ChannelFeaturesDecodeErrorZPtr { err }
 		};
 		Self {
@@ -3796,11 +3805,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::features::NodeFeatu
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::features::NodeFeatures, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_NodeFeaturesDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NodeFeaturesDecodeErrorZPtr { err }
 		};
 		Self {
@@ -3875,11 +3884,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::features::InvoiceFe
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::features::InvoiceFeatures, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_InvoiceFeaturesDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_InvoiceFeaturesDecodeErrorZPtr { err }
 		};
 		Self {
@@ -3954,11 +3963,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::features::ChannelTy
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::features::ChannelTypeFeatures, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ChannelTypeFeaturesDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ChannelTypeFeaturesDecodeErrorZPtr { err }
 		};
 		Self {
@@ -4033,11 +4042,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::D
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::DelayedPaymentOutputDescriptor, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_DelayedPaymentOutputDescriptorDecodeErrorZPtr { err }
 		};
 		Self {
@@ -4129,11 +4138,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::S
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::StaticPaymentOutputDescriptor, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_StaticPaymentOutputDescriptorDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_StaticPaymentOutputDescriptorDecodeErrorZPtr { err }
 		};
 		Self {
@@ -4225,11 +4234,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::S
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::SpendableOutputDescriptor, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_SpendableOutputDescriptorDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_SpendableOutputDescriptorDecodeErrorZPtr { err }
 		};
 		Self {
@@ -4259,9 +4268,9 @@ pub extern "C" fn CResult_SpendableOutputDescriptorDecodeErrorZ_clone(orig: &CRe
 /// The contents of CResult_NoneNoneZ
 pub union CResult_NoneNoneZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
-	pub result: *mut std::ffi::c_void,
+	pub result: *mut core::ffi::c_void,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_NoneNoneZ represents the result of a fallible operation,
@@ -4279,7 +4288,7 @@ pub struct CResult_NoneNoneZ {
 pub extern "C" fn CResult_NoneNoneZ_ok() -> CResult_NoneNoneZ {
 	CResult_NoneNoneZ {
 		contents: CResult_NoneNoneZPtr {
-			result: std::ptr::null_mut(),
+			result: core::ptr::null_mut(),
 		},
 		result_ok: true,
 	}
@@ -4289,7 +4298,7 @@ pub extern "C" fn CResult_NoneNoneZ_ok() -> CResult_NoneNoneZ {
 pub extern "C" fn CResult_NoneNoneZ_err() -> CResult_NoneNoneZ {
 	CResult_NoneNoneZ {
 		contents: CResult_NoneNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -4313,12 +4322,12 @@ impl From<crate::c_types::CResultTempl<(), ()>> for CResult_NoneNoneZ {
 	fn from(mut o: crate::c_types::CResultTempl<(), ()>) -> Self {
 		let contents = if o.result_ok {
 			let _ = unsafe { Box::from_raw(o.contents.result) };
-			o.contents.result = std::ptr::null_mut();
-			CResult_NoneNoneZPtr { result: std::ptr::null_mut() }
+			o.contents.result = core::ptr::null_mut();
+			CResult_NoneNoneZPtr { result: core::ptr::null_mut() }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_NoneNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_NoneNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -4330,11 +4339,11 @@ impl Clone for CResult_NoneNoneZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
 			Self { result_ok: true, contents: CResult_NoneNoneZPtr {
-				result: std::ptr::null_mut()
+				result: core::ptr::null_mut()
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_NoneNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -4392,7 +4401,7 @@ pub union CResult_C2Tuple_SignatureCVec_SignatureZZNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::derived::C2Tuple_SignatureCVec_SignatureZZ,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ represents the result of a fallible operation,
@@ -4420,7 +4429,7 @@ pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_ok(o: crate::c_
 pub extern "C" fn CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ_err() -> CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
 	CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
 		contents: CResult_C2Tuple_SignatureCVec_SignatureZZNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -4447,12 +4456,12 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_Signatur
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_SignatureCVec_SignatureZZ, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_C2Tuple_SignatureCVec_SignatureZZNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_C2Tuple_SignatureCVec_SignatureZZNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_C2Tuple_SignatureCVec_SignatureZZNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -4468,7 +4477,7 @@ impl Clone for CResult_C2Tuple_SignatureCVec_SignatureZZNoneZ {
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_C2Tuple_SignatureCVec_SignatureZZNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -4484,7 +4493,7 @@ pub union CResult_SignatureNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::Signature,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_SignatureNoneZ represents the result of a fallible operation,
@@ -4512,7 +4521,7 @@ pub extern "C" fn CResult_SignatureNoneZ_ok(o: crate::c_types::Signature) -> CRe
 pub extern "C" fn CResult_SignatureNoneZ_err() -> CResult_SignatureNoneZ {
 	CResult_SignatureNoneZ {
 		contents: CResult_SignatureNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -4539,12 +4548,12 @@ impl From<crate::c_types::CResultTempl<crate::c_types::Signature, ()>> for CResu
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::Signature, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_SignatureNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_SignatureNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_SignatureNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -4560,7 +4569,7 @@ impl Clone for CResult_SignatureNoneZ {
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_SignatureNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -4635,11 +4644,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::S
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::Sign, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_SignDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_SignDecodeErrorZPtr { err }
 		};
 		Self {
@@ -4678,13 +4687,13 @@ pub struct CVec_u8Z {
 impl CVec_u8Z {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<u8> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[u8] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<u8>> for CVec_u8Z {
@@ -4700,14 +4709,14 @@ pub extern "C" fn CVec_u8Z_free(_res: CVec_u8Z) { }
 impl Drop for CVec_u8Z {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_u8Z {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -4718,7 +4727,7 @@ pub union CResult_RecoverableSignatureNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::RecoverableSignature,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_RecoverableSignatureNoneZ represents the result of a fallible operation,
@@ -4746,7 +4755,7 @@ pub extern "C" fn CResult_RecoverableSignatureNoneZ_ok(o: crate::c_types::Recove
 pub extern "C" fn CResult_RecoverableSignatureNoneZ_err() -> CResult_RecoverableSignatureNoneZ {
 	CResult_RecoverableSignatureNoneZ {
 		contents: CResult_RecoverableSignatureNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -4773,12 +4782,12 @@ impl From<crate::c_types::CResultTempl<crate::c_types::RecoverableSignature, ()>
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::RecoverableSignature, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_RecoverableSignatureNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_RecoverableSignatureNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_RecoverableSignatureNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -4794,7 +4803,7 @@ impl Clone for CResult_RecoverableSignatureNoneZ {
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_RecoverableSignatureNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -4816,13 +4825,13 @@ pub struct CVec_CVec_u8ZZ {
 impl CVec_CVec_u8ZZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::CVec_u8Z> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::CVec_u8Z] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::derived::CVec_u8Z>> for CVec_CVec_u8ZZ {
@@ -4838,14 +4847,14 @@ pub extern "C" fn CVec_CVec_u8ZZ_free(_res: CVec_CVec_u8ZZ) { }
 impl Drop for CVec_CVec_u8ZZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_CVec_u8ZZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -4856,7 +4865,7 @@ pub union CResult_CVec_CVec_u8ZZNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::derived::CVec_CVec_u8ZZ,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_CVec_CVec_u8ZZNoneZ represents the result of a fallible operation,
@@ -4884,7 +4893,7 @@ pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_ok(o: crate::c_types::derived::CVe
 pub extern "C" fn CResult_CVec_CVec_u8ZZNoneZ_err() -> CResult_CVec_CVec_u8ZZNoneZ {
 	CResult_CVec_CVec_u8ZZNoneZ {
 		contents: CResult_CVec_CVec_u8ZZNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -4911,12 +4920,12 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::CVec_CVec_u8ZZ, 
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::CVec_CVec_u8ZZ, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_CVec_CVec_u8ZZNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_CVec_CVec_u8ZZNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_CVec_CVec_u8ZZNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -4932,7 +4941,7 @@ impl Clone for CResult_CVec_CVec_u8ZZNoneZ {
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_CVec_CVec_u8ZZNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -5007,11 +5016,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::I
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::chain::keysinterface::InMemorySigner, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_InMemorySignerDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_InMemorySignerDecodeErrorZPtr { err }
 		};
 		Self {
@@ -5050,13 +5059,13 @@ pub struct CVec_TxOutZ {
 impl CVec_TxOutZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::TxOut> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::TxOut] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::TxOut>> for CVec_TxOutZ {
@@ -5072,14 +5081,14 @@ pub extern "C" fn CVec_TxOutZ_free(_res: CVec_TxOutZ) { }
 impl Drop for CVec_TxOutZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_TxOutZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -5090,7 +5099,7 @@ pub union CResult_TransactionNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::Transaction,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_TransactionNoneZ represents the result of a fallible operation,
@@ -5118,7 +5127,7 @@ pub extern "C" fn CResult_TransactionNoneZ_ok(o: crate::c_types::Transaction) ->
 pub extern "C" fn CResult_TransactionNoneZ_err() -> CResult_TransactionNoneZ {
 	CResult_TransactionNoneZ {
 		contents: CResult_TransactionNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -5145,12 +5154,12 @@ impl From<crate::c_types::CResultTempl<crate::c_types::Transaction, ()>> for CRe
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::Transaction, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_TransactionNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_TransactionNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_TransactionNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -5166,7 +5175,7 @@ impl Clone for CResult_TransactionNoneZ {
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_TransactionNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -5218,13 +5227,13 @@ pub struct CVec_C2Tuple_BlockHashChannelMonitorZZ {
 impl CVec_C2Tuple_BlockHashChannelMonitorZZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ>> for CVec_C2Tuple_BlockHashChannelMonitorZZ {
@@ -5240,7 +5249,7 @@ pub extern "C" fn CVec_C2Tuple_BlockHashChannelMonitorZZ_free(_res: CVec_C2Tuple
 impl Drop for CVec_C2Tuple_BlockHashChannelMonitorZZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 #[repr(C)]
@@ -5309,11 +5318,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::CVec_C2Tuple_Blo
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::CVec_C2Tuple_BlockHashChannelMonitorZZ, crate::c_types::IOError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZPtr { err }
 		};
 		Self {
@@ -5363,7 +5372,7 @@ pub extern "C" fn COption_u16Z_clone(orig: &COption_u16Z) -> COption_u16Z { Clon
 /// The contents of CResult_NoneAPIErrorZ
 pub union CResult_NoneAPIErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
-	pub result: *mut std::ffi::c_void,
+	pub result: *mut core::ffi::c_void,
 	/// A pointer to the contents in the error state.
 	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::lightning::util::errors::APIError,
@@ -5384,7 +5393,7 @@ pub struct CResult_NoneAPIErrorZ {
 pub extern "C" fn CResult_NoneAPIErrorZ_ok() -> CResult_NoneAPIErrorZ {
 	CResult_NoneAPIErrorZ {
 		contents: CResult_NoneAPIErrorZPtr {
-			result: std::ptr::null_mut(),
+			result: core::ptr::null_mut(),
 		},
 		result_ok: true,
 	}
@@ -5421,11 +5430,11 @@ impl From<crate::c_types::CResultTempl<(), crate::lightning::util::errors::APIEr
 	fn from(mut o: crate::c_types::CResultTempl<(), crate::lightning::util::errors::APIError>) -> Self {
 		let contents = if o.result_ok {
 			let _ = unsafe { Box::from_raw(o.contents.result) };
-			o.contents.result = std::ptr::null_mut();
-			CResult_NoneAPIErrorZPtr { result: std::ptr::null_mut() }
+			o.contents.result = core::ptr::null_mut();
+			CResult_NoneAPIErrorZPtr { result: core::ptr::null_mut() }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NoneAPIErrorZPtr { err }
 		};
 		Self {
@@ -5438,7 +5447,7 @@ impl Clone for CResult_NoneAPIErrorZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
 			Self { result_ok: true, contents: CResult_NoneAPIErrorZPtr {
-				result: std::ptr::null_mut()
+				result: core::ptr::null_mut()
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_NoneAPIErrorZPtr {
@@ -5464,13 +5473,13 @@ pub struct CVec_CResult_NoneAPIErrorZZ {
 impl CVec_CResult_NoneAPIErrorZZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::CResult_NoneAPIErrorZ> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::CResult_NoneAPIErrorZ] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::derived::CResult_NoneAPIErrorZ>> for CVec_CResult_NoneAPIErrorZZ {
@@ -5486,14 +5495,14 @@ pub extern "C" fn CVec_CResult_NoneAPIErrorZZ_free(_res: CVec_CResult_NoneAPIErr
 impl Drop for CVec_CResult_NoneAPIErrorZZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_CResult_NoneAPIErrorZZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -5510,13 +5519,13 @@ pub struct CVec_APIErrorZ {
 impl CVec_APIErrorZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::util::errors::APIError> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::util::errors::APIError] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::util::errors::APIError>> for CVec_APIErrorZ {
@@ -5532,14 +5541,14 @@ pub extern "C" fn CVec_APIErrorZ_free(_res: CVec_APIErrorZ) { }
 impl Drop for CVec_APIErrorZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_APIErrorZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -5609,11 +5618,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, crate::li
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, crate::lightning::util::errors::APIError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult__u832APIErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult__u832APIErrorZPtr { err }
 		};
 		Self {
@@ -5705,11 +5714,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, crate::li
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, crate::lightning::ln::channelmanager::PaymentSendFailure>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PaymentIdPaymentSendFailureZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_PaymentIdPaymentSendFailureZPtr { err }
 		};
 		Self {
@@ -5739,7 +5748,7 @@ pub extern "C" fn CResult_PaymentIdPaymentSendFailureZ_clone(orig: &CResult_Paym
 /// The contents of CResult_NonePaymentSendFailureZ
 pub union CResult_NonePaymentSendFailureZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
-	pub result: *mut std::ffi::c_void,
+	pub result: *mut core::ffi::c_void,
 	/// A pointer to the contents in the error state.
 	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::lightning::ln::channelmanager::PaymentSendFailure,
@@ -5760,7 +5769,7 @@ pub struct CResult_NonePaymentSendFailureZ {
 pub extern "C" fn CResult_NonePaymentSendFailureZ_ok() -> CResult_NonePaymentSendFailureZ {
 	CResult_NonePaymentSendFailureZ {
 		contents: CResult_NonePaymentSendFailureZPtr {
-			result: std::ptr::null_mut(),
+			result: core::ptr::null_mut(),
 		},
 		result_ok: true,
 	}
@@ -5797,11 +5806,11 @@ impl From<crate::c_types::CResultTempl<(), crate::lightning::ln::channelmanager:
 	fn from(mut o: crate::c_types::CResultTempl<(), crate::lightning::ln::channelmanager::PaymentSendFailure>) -> Self {
 		let contents = if o.result_ok {
 			let _ = unsafe { Box::from_raw(o.contents.result) };
-			o.contents.result = std::ptr::null_mut();
-			CResult_NonePaymentSendFailureZPtr { result: std::ptr::null_mut() }
+			o.contents.result = core::ptr::null_mut();
+			CResult_NonePaymentSendFailureZPtr { result: core::ptr::null_mut() }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NonePaymentSendFailureZPtr { err }
 		};
 		Self {
@@ -5814,7 +5823,7 @@ impl Clone for CResult_NonePaymentSendFailureZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
 			Self { result_ok: true, contents: CResult_NonePaymentSendFailureZPtr {
-				result: std::ptr::null_mut()
+				result: core::ptr::null_mut()
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_NonePaymentSendFailureZPtr {
@@ -5935,11 +5944,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_PaymentH
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_PaymentHashPaymentIdZ, crate::lightning::ln::channelmanager::PaymentSendFailure>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZPtr { err }
 		};
 		Self {
@@ -5978,13 +5987,13 @@ pub struct CVec_NetAddressZ {
 impl CVec_NetAddressZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::ln::msgs::NetAddress> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::ln::msgs::NetAddress] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::ln::msgs::NetAddress>> for CVec_NetAddressZ {
@@ -6000,14 +6009,14 @@ pub extern "C" fn CVec_NetAddressZ_free(_res: CVec_NetAddressZ) { }
 impl Drop for CVec_NetAddressZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_NetAddressZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -6060,7 +6069,7 @@ pub union CResult_C2Tuple_PaymentHashPaymentSecretZNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::derived::C2Tuple_PaymentHashPaymentSecretZ,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_C2Tuple_PaymentHashPaymentSecretZNoneZ represents the result of a fallible operation,
@@ -6088,7 +6097,7 @@ pub extern "C" fn CResult_C2Tuple_PaymentHashPaymentSecretZNoneZ_ok(o: crate::c_
 pub extern "C" fn CResult_C2Tuple_PaymentHashPaymentSecretZNoneZ_err() -> CResult_C2Tuple_PaymentHashPaymentSecretZNoneZ {
 	CResult_C2Tuple_PaymentHashPaymentSecretZNoneZ {
 		contents: CResult_C2Tuple_PaymentHashPaymentSecretZNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -6115,12 +6124,12 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_PaymentH
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_PaymentHashPaymentSecretZ, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_C2Tuple_PaymentHashPaymentSecretZNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_C2Tuple_PaymentHashPaymentSecretZNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_C2Tuple_PaymentHashPaymentSecretZNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -6136,7 +6145,7 @@ impl Clone for CResult_C2Tuple_PaymentHashPaymentSecretZNoneZ {
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_C2Tuple_PaymentHashPaymentSecretZNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -6211,11 +6220,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_PaymentH
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_PaymentHashPaymentSecretZ, crate::lightning::util::errors::APIError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_C2Tuple_PaymentHashPaymentSecretZAPIErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_C2Tuple_PaymentHashPaymentSecretZAPIErrorZPtr { err }
 		};
 		Self {
@@ -6248,7 +6257,7 @@ pub union CResult_PaymentSecretNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::c_types::ThirtyTwoBytes,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_PaymentSecretNoneZ represents the result of a fallible operation,
@@ -6276,7 +6285,7 @@ pub extern "C" fn CResult_PaymentSecretNoneZ_ok(o: crate::c_types::ThirtyTwoByte
 pub extern "C" fn CResult_PaymentSecretNoneZ_err() -> CResult_PaymentSecretNoneZ {
 	CResult_PaymentSecretNoneZ {
 		contents: CResult_PaymentSecretNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -6303,12 +6312,12 @@ impl From<crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, ()>> for 
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PaymentSecretNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_PaymentSecretNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_PaymentSecretNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -6324,7 +6333,7 @@ impl Clone for CResult_PaymentSecretNoneZ {
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_PaymentSecretNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -6399,11 +6408,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, crate::li
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, crate::lightning::util::errors::APIError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PaymentSecretAPIErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_PaymentSecretAPIErrorZPtr { err }
 		};
 		Self {
@@ -6495,11 +6504,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, crate::li
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, crate::lightning::util::errors::APIError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PaymentPreimageAPIErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_PaymentPreimageAPIErrorZPtr { err }
 		};
 		Self {
@@ -6538,13 +6547,13 @@ pub struct CVec_ChannelMonitorZ {
 impl CVec_ChannelMonitorZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::chain::channelmonitor::ChannelMonitor> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::chain::channelmonitor::ChannelMonitor] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::chain::channelmonitor::ChannelMonitor>> for CVec_ChannelMonitorZ {
@@ -6560,7 +6569,7 @@ pub extern "C" fn CVec_ChannelMonitorZ_free(_res: CVec_ChannelMonitorZ) { }
 impl Drop for CVec_ChannelMonitorZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 #[repr(C)]
@@ -6659,11 +6668,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_BlockHas
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_BlockHashChannelManagerZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZPtr { err }
 		};
 		Self {
@@ -6738,11 +6747,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::util::config::ChannelCo
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::util::config::ChannelConfig, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ChannelConfigDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ChannelConfigDecodeErrorZPtr { err }
 		};
 		Self {
@@ -6834,11 +6843,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::chain::transaction::Out
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::chain::transaction::OutPoint, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_OutPointDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_OutPointDecodeErrorZPtr { err }
 		};
 		Self {
@@ -6962,11 +6971,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::COption_TypeZ, c
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::COption_TypeZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_COption_TypeZDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_COption_TypeZDecodeErrorZPtr { err }
 		};
 		Self {
@@ -7041,11 +7050,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, crate::li
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::ThirtyTwoBytes, crate::lightning_invoice::payment::PaymentError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PaymentIdPaymentErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_PaymentIdPaymentErrorZPtr { err }
 		};
 		Self {
@@ -7078,7 +7087,7 @@ pub union CResult_SiPrefixNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::lightning_invoice::SiPrefix,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_SiPrefixNoneZ represents the result of a fallible operation,
@@ -7106,7 +7115,7 @@ pub extern "C" fn CResult_SiPrefixNoneZ_ok(o: crate::lightning_invoice::SiPrefix
 pub extern "C" fn CResult_SiPrefixNoneZ_err() -> CResult_SiPrefixNoneZ {
 	CResult_SiPrefixNoneZ {
 		contents: CResult_SiPrefixNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -7133,12 +7142,12 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::SiPrefix, ()>> 
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::SiPrefix, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_SiPrefixNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_SiPrefixNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_SiPrefixNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -7154,7 +7163,7 @@ impl Clone for CResult_SiPrefixNoneZ {
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_SiPrefixNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -7170,7 +7179,7 @@ pub union CResult_InvoiceNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::lightning_invoice::Invoice,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_InvoiceNoneZ represents the result of a fallible operation,
@@ -7198,7 +7207,7 @@ pub extern "C" fn CResult_InvoiceNoneZ_ok(o: crate::lightning_invoice::Invoice) 
 pub extern "C" fn CResult_InvoiceNoneZ_err() -> CResult_InvoiceNoneZ {
 	CResult_InvoiceNoneZ {
 		contents: CResult_InvoiceNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -7225,12 +7234,12 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::Invoice, ()>> f
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::Invoice, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_InvoiceNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_InvoiceNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_InvoiceNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -7246,7 +7255,7 @@ impl Clone for CResult_InvoiceNoneZ {
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_InvoiceNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -7262,7 +7271,7 @@ pub union CResult_SignedRawInvoiceNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::lightning_invoice::SignedRawInvoice,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_SignedRawInvoiceNoneZ represents the result of a fallible operation,
@@ -7290,7 +7299,7 @@ pub extern "C" fn CResult_SignedRawInvoiceNoneZ_ok(o: crate::lightning_invoice::
 pub extern "C" fn CResult_SignedRawInvoiceNoneZ_err() -> CResult_SignedRawInvoiceNoneZ {
 	CResult_SignedRawInvoiceNoneZ {
 		contents: CResult_SignedRawInvoiceNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -7317,12 +7326,12 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::SignedRawInvoic
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::SignedRawInvoice, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_SignedRawInvoiceNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_SignedRawInvoiceNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_SignedRawInvoiceNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -7338,7 +7347,7 @@ impl Clone for CResult_SignedRawInvoiceNoneZ {
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_SignedRawInvoiceNoneZPtr {
-				err: std::ptr::null_mut()
+				err: core::ptr::null_mut()
 			} }
 		}
 	}
@@ -7459,11 +7468,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::PayeePubKey, cr
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::PayeePubKey, crate::c_types::Secp256k1Error>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PayeePubKeyErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_PayeePubKeyErrorZPtr { err }
 		};
 		Self {
@@ -7502,13 +7511,13 @@ pub struct CVec_PrivateRouteZ {
 impl CVec_PrivateRouteZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning_invoice::PrivateRoute> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning_invoice::PrivateRoute] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning_invoice::PrivateRoute>> for CVec_PrivateRouteZ {
@@ -7524,14 +7533,14 @@ pub extern "C" fn CVec_PrivateRouteZ_free(_res: CVec_PrivateRouteZ) { }
 impl Drop for CVec_PrivateRouteZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_PrivateRouteZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -7601,11 +7610,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::PositiveTimesta
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::PositiveTimestamp, crate::lightning_invoice::CreationError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PositiveTimestampCreationErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_PositiveTimestampCreationErrorZPtr { err }
 		};
 		Self {
@@ -7635,7 +7644,7 @@ pub extern "C" fn CResult_PositiveTimestampCreationErrorZ_clone(orig: &CResult_P
 /// The contents of CResult_NoneSemanticErrorZ
 pub union CResult_NoneSemanticErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
-	pub result: *mut std::ffi::c_void,
+	pub result: *mut core::ffi::c_void,
 	/// A pointer to the contents in the error state.
 	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::lightning_invoice::SemanticError,
@@ -7656,7 +7665,7 @@ pub struct CResult_NoneSemanticErrorZ {
 pub extern "C" fn CResult_NoneSemanticErrorZ_ok() -> CResult_NoneSemanticErrorZ {
 	CResult_NoneSemanticErrorZ {
 		contents: CResult_NoneSemanticErrorZPtr {
-			result: std::ptr::null_mut(),
+			result: core::ptr::null_mut(),
 		},
 		result_ok: true,
 	}
@@ -7693,11 +7702,11 @@ impl From<crate::c_types::CResultTempl<(), crate::lightning_invoice::SemanticErr
 	fn from(mut o: crate::c_types::CResultTempl<(), crate::lightning_invoice::SemanticError>) -> Self {
 		let contents = if o.result_ok {
 			let _ = unsafe { Box::from_raw(o.contents.result) };
-			o.contents.result = std::ptr::null_mut();
-			CResult_NoneSemanticErrorZPtr { result: std::ptr::null_mut() }
+			o.contents.result = core::ptr::null_mut();
+			CResult_NoneSemanticErrorZPtr { result: core::ptr::null_mut() }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NoneSemanticErrorZPtr { err }
 		};
 		Self {
@@ -7710,7 +7719,7 @@ impl Clone for CResult_NoneSemanticErrorZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
 			Self { result_ok: true, contents: CResult_NoneSemanticErrorZPtr {
-				result: std::ptr::null_mut()
+				result: core::ptr::null_mut()
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_NoneSemanticErrorZPtr {
@@ -7789,11 +7798,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::Invoice, crate:
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::Invoice, crate::lightning_invoice::SemanticError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_InvoiceSemanticErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_InvoiceSemanticErrorZPtr { err }
 		};
 		Self {
@@ -7885,11 +7894,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::Description, cr
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::Description, crate::lightning_invoice::CreationError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_DescriptionCreationErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_DescriptionCreationErrorZPtr { err }
 		};
 		Self {
@@ -7981,11 +7990,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::ExpiryTime, cra
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::ExpiryTime, crate::lightning_invoice::CreationError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ExpiryTimeCreationErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ExpiryTimeCreationErrorZPtr { err }
 		};
 		Self {
@@ -8077,11 +8086,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::PrivateRoute, c
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::PrivateRoute, crate::lightning_invoice::CreationError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PrivateRouteCreationErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_PrivateRouteCreationErrorZPtr { err }
 		};
 		Self {
@@ -8173,11 +8182,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::Str, crate::c_types::Secp
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::Str, crate::c_types::Secp256k1Error>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_StringErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_StringErrorZPtr { err }
 		};
 		Self {
@@ -8252,11 +8261,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::chain::channelmonitor::
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ChannelMonitorUpdateDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ChannelMonitorUpdateDecodeErrorZPtr { err }
 		};
 		Self {
@@ -8385,11 +8394,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::COption_MonitorE
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::COption_MonitorEventZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_COption_MonitorEventZDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_COption_MonitorEventZDecodeErrorZPtr { err }
 		};
 		Self {
@@ -8481,11 +8490,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::chain::channelmonitor::
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::chain::channelmonitor::HTLCUpdate, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_HTLCUpdateDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_HTLCUpdateDecodeErrorZPtr { err }
 		};
 		Self {
@@ -8608,13 +8617,13 @@ pub struct CVec_C2Tuple_u32ScriptZZ {
 impl CVec_C2Tuple_u32ScriptZZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_u32ScriptZ> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_u32ScriptZ] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::derived::C2Tuple_u32ScriptZ>> for CVec_C2Tuple_u32ScriptZZ {
@@ -8630,14 +8639,14 @@ pub extern "C" fn CVec_C2Tuple_u32ScriptZZ_free(_res: CVec_C2Tuple_u32ScriptZZ) 
 impl Drop for CVec_C2Tuple_u32ScriptZZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_C2Tuple_u32ScriptZZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -8696,13 +8705,13 @@ pub struct CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
 impl CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZ>> for CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
@@ -8718,14 +8727,14 @@ pub extern "C" fn CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ_free(_res: CVec_C2
 impl Drop for CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -8742,13 +8751,13 @@ pub struct CVec_EventZ {
 impl CVec_EventZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::util::events::Event> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::util::events::Event] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::util::events::Event>> for CVec_EventZ {
@@ -8764,14 +8773,14 @@ pub extern "C" fn CVec_EventZ_free(_res: CVec_EventZ) { }
 impl Drop for CVec_EventZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_EventZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -8788,13 +8797,13 @@ pub struct CVec_TransactionZ {
 impl CVec_TransactionZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::Transaction> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::Transaction] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::Transaction>> for CVec_TransactionZ {
@@ -8810,14 +8819,14 @@ pub extern "C" fn CVec_TransactionZ_free(_res: CVec_TransactionZ) { }
 impl Drop for CVec_TransactionZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_TransactionZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -8876,13 +8885,13 @@ pub struct CVec_C2Tuple_u32TxOutZZ {
 impl CVec_C2Tuple_u32TxOutZZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_u32TxOutZ> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_u32TxOutZ] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::derived::C2Tuple_u32TxOutZ>> for CVec_C2Tuple_u32TxOutZZ {
@@ -8898,14 +8907,14 @@ pub extern "C" fn CVec_C2Tuple_u32TxOutZZ_free(_res: CVec_C2Tuple_u32TxOutZZ) { 
 impl Drop for CVec_C2Tuple_u32TxOutZZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_C2Tuple_u32TxOutZZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -8964,13 +8973,13 @@ pub struct CVec_TransactionOutputsZ {
 impl CVec_TransactionOutputsZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::derived::C2Tuple_TxidCVec_C2Tuple_u32TxOutZZZ>> for CVec_TransactionOutputsZ {
@@ -8986,14 +8995,14 @@ pub extern "C" fn CVec_TransactionOutputsZ_free(_res: CVec_TransactionOutputsZ) 
 impl Drop for CVec_TransactionOutputsZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_TransactionOutputsZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -9010,13 +9019,13 @@ pub struct CVec_BalanceZ {
 impl CVec_BalanceZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::chain::channelmonitor::Balance> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::chain::channelmonitor::Balance] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::chain::channelmonitor::Balance>> for CVec_BalanceZ {
@@ -9032,14 +9041,14 @@ pub extern "C" fn CVec_BalanceZ_free(_res: CVec_BalanceZ) { }
 impl Drop for CVec_BalanceZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_BalanceZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -9109,11 +9118,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_BlockHas
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_BlockHashChannelMonitorZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZPtr { err }
 		};
 		Self {
@@ -9126,7 +9135,7 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::C2Tuple_BlockHas
 /// The contents of CResult_NoneLightningErrorZ
 pub union CResult_NoneLightningErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
-	pub result: *mut std::ffi::c_void,
+	pub result: *mut core::ffi::c_void,
 	/// A pointer to the contents in the error state.
 	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::lightning::ln::msgs::LightningError,
@@ -9147,7 +9156,7 @@ pub struct CResult_NoneLightningErrorZ {
 pub extern "C" fn CResult_NoneLightningErrorZ_ok() -> CResult_NoneLightningErrorZ {
 	CResult_NoneLightningErrorZ {
 		contents: CResult_NoneLightningErrorZPtr {
-			result: std::ptr::null_mut(),
+			result: core::ptr::null_mut(),
 		},
 		result_ok: true,
 	}
@@ -9184,11 +9193,11 @@ impl From<crate::c_types::CResultTempl<(), crate::lightning::ln::msgs::Lightning
 	fn from(mut o: crate::c_types::CResultTempl<(), crate::lightning::ln::msgs::LightningError>) -> Self {
 		let contents = if o.result_ok {
 			let _ = unsafe { Box::from_raw(o.contents.result) };
-			o.contents.result = std::ptr::null_mut();
-			CResult_NoneLightningErrorZPtr { result: std::ptr::null_mut() }
+			o.contents.result = core::ptr::null_mut();
+			CResult_NoneLightningErrorZPtr { result: core::ptr::null_mut() }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NoneLightningErrorZPtr { err }
 		};
 		Self {
@@ -9201,7 +9210,7 @@ impl Clone for CResult_NoneLightningErrorZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
 			Self { result_ok: true, contents: CResult_NoneLightningErrorZPtr {
-				result: std::ptr::null_mut()
+				result: core::ptr::null_mut()
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_NoneLightningErrorZPtr {
@@ -9257,13 +9266,13 @@ pub struct CVec_C2Tuple_PublicKeyTypeZZ {
 impl CVec_C2Tuple_PublicKeyTypeZZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_PublicKeyTypeZ> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_PublicKeyTypeZ] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::derived::C2Tuple_PublicKeyTypeZ>> for CVec_C2Tuple_PublicKeyTypeZZ {
@@ -9279,7 +9288,7 @@ pub extern "C" fn CVec_C2Tuple_PublicKeyTypeZZ_free(_res: CVec_C2Tuple_PublicKey
 impl Drop for CVec_C2Tuple_PublicKeyTypeZZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 #[repr(C)]
@@ -9348,11 +9357,11 @@ impl From<crate::c_types::CResultTempl<bool, crate::lightning::ln::msgs::Lightni
 	fn from(mut o: crate::c_types::CResultTempl<bool, crate::lightning::ln::msgs::LightningError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_boolLightningErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_boolLightningErrorZPtr { err }
 		};
 		Self {
@@ -9437,13 +9446,13 @@ pub struct CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
 impl CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::derived::C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZ>> for CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
@@ -9459,14 +9468,14 @@ pub extern "C" fn CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ_f
 impl Drop for CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -9483,13 +9492,13 @@ pub struct CVec_NodeAnnouncementZ {
 impl CVec_NodeAnnouncementZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::ln::msgs::NodeAnnouncement> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::ln::msgs::NodeAnnouncement] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::ln::msgs::NodeAnnouncement>> for CVec_NodeAnnouncementZ {
@@ -9505,14 +9514,14 @@ pub extern "C" fn CVec_NodeAnnouncementZ_free(_res: CVec_NodeAnnouncementZ) { }
 impl Drop for CVec_NodeAnnouncementZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_NodeAnnouncementZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -9529,13 +9538,13 @@ pub struct CVec_PublicKeyZ {
 impl CVec_PublicKeyZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::PublicKey> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::PublicKey] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::c_types::PublicKey>> for CVec_PublicKeyZ {
@@ -9551,14 +9560,14 @@ pub extern "C" fn CVec_PublicKeyZ_free(_res: CVec_PublicKeyZ) { }
 impl Drop for CVec_PublicKeyZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_PublicKeyZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -9628,11 +9637,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::CVec_u8Z, crate:
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::CVec_u8Z, crate::lightning::ln::peer_handler::PeerHandleError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_CVec_u8ZPeerHandleErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_CVec_u8ZPeerHandleErrorZPtr { err }
 		};
 		Self {
@@ -9662,7 +9671,7 @@ pub extern "C" fn CResult_CVec_u8ZPeerHandleErrorZ_clone(orig: &CResult_CVec_u8Z
 /// The contents of CResult_NonePeerHandleErrorZ
 pub union CResult_NonePeerHandleErrorZPtr {
 	/// Note that this value is always NULL, as there are no contents in the OK variant
-	pub result: *mut std::ffi::c_void,
+	pub result: *mut core::ffi::c_void,
 	/// A pointer to the contents in the error state.
 	/// Reading from this pointer when `result_ok` is set is undefined.
 	pub err: *mut crate::lightning::ln::peer_handler::PeerHandleError,
@@ -9683,7 +9692,7 @@ pub struct CResult_NonePeerHandleErrorZ {
 pub extern "C" fn CResult_NonePeerHandleErrorZ_ok() -> CResult_NonePeerHandleErrorZ {
 	CResult_NonePeerHandleErrorZ {
 		contents: CResult_NonePeerHandleErrorZPtr {
-			result: std::ptr::null_mut(),
+			result: core::ptr::null_mut(),
 		},
 		result_ok: true,
 	}
@@ -9720,11 +9729,11 @@ impl From<crate::c_types::CResultTempl<(), crate::lightning::ln::peer_handler::P
 	fn from(mut o: crate::c_types::CResultTempl<(), crate::lightning::ln::peer_handler::PeerHandleError>) -> Self {
 		let contents = if o.result_ok {
 			let _ = unsafe { Box::from_raw(o.contents.result) };
-			o.contents.result = std::ptr::null_mut();
-			CResult_NonePeerHandleErrorZPtr { result: std::ptr::null_mut() }
+			o.contents.result = core::ptr::null_mut();
+			CResult_NonePeerHandleErrorZPtr { result: core::ptr::null_mut() }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NonePeerHandleErrorZPtr { err }
 		};
 		Self {
@@ -9737,7 +9746,7 @@ impl Clone for CResult_NonePeerHandleErrorZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
 			Self { result_ok: true, contents: CResult_NonePeerHandleErrorZPtr {
-				result: std::ptr::null_mut()
+				result: core::ptr::null_mut()
 			} }
 		} else {
 			Self { result_ok: false, contents: CResult_NonePeerHandleErrorZPtr {
@@ -9816,11 +9825,11 @@ impl From<crate::c_types::CResultTempl<bool, crate::lightning::ln::peer_handler:
 	fn from(mut o: crate::c_types::CResultTempl<bool, crate::lightning::ln::peer_handler::PeerHandleError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_boolPeerHandleErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_boolPeerHandleErrorZPtr { err }
 		};
 		Self {
@@ -9912,11 +9921,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::network_graph:
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::network_graph::NodeId, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_NodeIdDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NodeIdDecodeErrorZPtr { err }
 		};
 		Self {
@@ -10008,11 +10017,11 @@ impl From<crate::c_types::CResultTempl<crate::c_types::derived::COption_NetworkU
 	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::COption_NetworkUpdateZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_COption_NetworkUpdateZDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_COption_NetworkUpdateZDecodeErrorZPtr { err }
 		};
 		Self {
@@ -10136,11 +10145,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::network_graph:
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::network_graph::DirectionalChannelInfo, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_DirectionalChannelInfoDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_DirectionalChannelInfoDecodeErrorZPtr { err }
 		};
 		Self {
@@ -10232,11 +10241,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::network_graph:
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::network_graph::ChannelInfo, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ChannelInfoDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ChannelInfoDecodeErrorZPtr { err }
 		};
 		Self {
@@ -10328,11 +10337,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::network_graph:
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::network_graph::RoutingFees, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_RoutingFeesDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_RoutingFeesDecodeErrorZPtr { err }
 		};
 		Self {
@@ -10424,11 +10433,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::network_graph:
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::network_graph::NodeAnnouncementInfo, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_NodeAnnouncementInfoDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NodeAnnouncementInfoDecodeErrorZPtr { err }
 		};
 		Self {
@@ -10467,13 +10476,13 @@ pub struct CVec_u64Z {
 impl CVec_u64Z {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<u64> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[u64] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<u64>> for CVec_u64Z {
@@ -10489,14 +10498,14 @@ pub extern "C" fn CVec_u64Z_free(_res: CVec_u64Z) { }
 impl Drop for CVec_u64Z {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_u64Z {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -10566,11 +10575,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::network_graph:
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::network_graph::NodeInfo, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_NodeInfoDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NodeInfoDecodeErrorZPtr { err }
 		};
 		Self {
@@ -10662,11 +10671,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::routing::network_graph:
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::network_graph::NetworkGraph, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_NetworkGraphDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NetworkGraphDecodeErrorZPtr { err }
 		};
 		Self {
@@ -10795,11 +10804,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::NetAddress, c
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::NetAddress, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_NetAddressDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NetAddressDecodeErrorZPtr { err }
 		};
 		Self {
@@ -10838,13 +10847,13 @@ pub struct CVec_UpdateAddHTLCZ {
 impl CVec_UpdateAddHTLCZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::ln::msgs::UpdateAddHTLC> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::ln::msgs::UpdateAddHTLC] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::ln::msgs::UpdateAddHTLC>> for CVec_UpdateAddHTLCZ {
@@ -10860,14 +10869,14 @@ pub extern "C" fn CVec_UpdateAddHTLCZ_free(_res: CVec_UpdateAddHTLCZ) { }
 impl Drop for CVec_UpdateAddHTLCZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_UpdateAddHTLCZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -10884,13 +10893,13 @@ pub struct CVec_UpdateFulfillHTLCZ {
 impl CVec_UpdateFulfillHTLCZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::ln::msgs::UpdateFulfillHTLC> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::ln::msgs::UpdateFulfillHTLC] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::ln::msgs::UpdateFulfillHTLC>> for CVec_UpdateFulfillHTLCZ {
@@ -10906,14 +10915,14 @@ pub extern "C" fn CVec_UpdateFulfillHTLCZ_free(_res: CVec_UpdateFulfillHTLCZ) { 
 impl Drop for CVec_UpdateFulfillHTLCZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_UpdateFulfillHTLCZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -10930,13 +10939,13 @@ pub struct CVec_UpdateFailHTLCZ {
 impl CVec_UpdateFailHTLCZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::ln::msgs::UpdateFailHTLC> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::ln::msgs::UpdateFailHTLC] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::ln::msgs::UpdateFailHTLC>> for CVec_UpdateFailHTLCZ {
@@ -10952,14 +10961,14 @@ pub extern "C" fn CVec_UpdateFailHTLCZ_free(_res: CVec_UpdateFailHTLCZ) { }
 impl Drop for CVec_UpdateFailHTLCZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_UpdateFailHTLCZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -10976,13 +10985,13 @@ pub struct CVec_UpdateFailMalformedHTLCZ {
 impl CVec_UpdateFailMalformedHTLCZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::ln::msgs::UpdateFailMalformedHTLC> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::ln::msgs::UpdateFailMalformedHTLC] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::ln::msgs::UpdateFailMalformedHTLC>> for CVec_UpdateFailMalformedHTLCZ {
@@ -10998,14 +11007,14 @@ pub extern "C" fn CVec_UpdateFailMalformedHTLCZ_free(_res: CVec_UpdateFailMalfor
 impl Drop for CVec_UpdateFailMalformedHTLCZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_UpdateFailMalformedHTLCZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }
@@ -11075,11 +11084,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::AcceptChannel
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::AcceptChannel, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_AcceptChannelDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_AcceptChannelDecodeErrorZPtr { err }
 		};
 		Self {
@@ -11171,11 +11180,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::AnnouncementS
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::AnnouncementSignatures, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_AnnouncementSignaturesDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_AnnouncementSignaturesDecodeErrorZPtr { err }
 		};
 		Self {
@@ -11267,11 +11276,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::ChannelReesta
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::ChannelReestablish, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ChannelReestablishDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ChannelReestablishDecodeErrorZPtr { err }
 		};
 		Self {
@@ -11363,11 +11372,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::ClosingSigned
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::ClosingSigned, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ClosingSignedDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ClosingSignedDecodeErrorZPtr { err }
 		};
 		Self {
@@ -11459,11 +11468,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::ClosingSigned
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::ClosingSignedFeeRange, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ClosingSignedFeeRangeDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ClosingSignedFeeRangeDecodeErrorZPtr { err }
 		};
 		Self {
@@ -11555,11 +11564,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::CommitmentSig
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::CommitmentSigned, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_CommitmentSignedDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_CommitmentSignedDecodeErrorZPtr { err }
 		};
 		Self {
@@ -11651,11 +11660,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::FundingCreate
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::FundingCreated, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_FundingCreatedDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_FundingCreatedDecodeErrorZPtr { err }
 		};
 		Self {
@@ -11747,11 +11756,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::FundingSigned
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::FundingSigned, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_FundingSignedDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_FundingSignedDecodeErrorZPtr { err }
 		};
 		Self {
@@ -11843,11 +11852,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::FundingLocked
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::FundingLocked, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_FundingLockedDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_FundingLockedDecodeErrorZPtr { err }
 		};
 		Self {
@@ -11939,11 +11948,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::Init, crate::
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::Init, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_InitDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_InitDecodeErrorZPtr { err }
 		};
 		Self {
@@ -12035,11 +12044,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::OpenChannel, 
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::OpenChannel, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_OpenChannelDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_OpenChannelDecodeErrorZPtr { err }
 		};
 		Self {
@@ -12131,11 +12140,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::RevokeAndACK,
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::RevokeAndACK, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_RevokeAndACKDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_RevokeAndACKDecodeErrorZPtr { err }
 		};
 		Self {
@@ -12227,11 +12236,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::Shutdown, cra
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::Shutdown, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ShutdownDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ShutdownDecodeErrorZPtr { err }
 		};
 		Self {
@@ -12323,11 +12332,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::UpdateFailHTL
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::UpdateFailHTLC, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_UpdateFailHTLCDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_UpdateFailHTLCDecodeErrorZPtr { err }
 		};
 		Self {
@@ -12419,11 +12428,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::UpdateFailMal
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::UpdateFailMalformedHTLC, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_UpdateFailMalformedHTLCDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_UpdateFailMalformedHTLCDecodeErrorZPtr { err }
 		};
 		Self {
@@ -12515,11 +12524,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::UpdateFee, cr
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::UpdateFee, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_UpdateFeeDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_UpdateFeeDecodeErrorZPtr { err }
 		};
 		Self {
@@ -12611,11 +12620,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::UpdateFulfill
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::UpdateFulfillHTLC, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_UpdateFulfillHTLCDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_UpdateFulfillHTLCDecodeErrorZPtr { err }
 		};
 		Self {
@@ -12707,11 +12716,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::UpdateAddHTLC
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::UpdateAddHTLC, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_UpdateAddHTLCDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_UpdateAddHTLCDecodeErrorZPtr { err }
 		};
 		Self {
@@ -12803,11 +12812,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::Ping, crate::
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::Ping, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PingDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_PingDecodeErrorZPtr { err }
 		};
 		Self {
@@ -12899,11 +12908,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::Pong, crate::
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::Pong, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_PongDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_PongDecodeErrorZPtr { err }
 		};
 		Self {
@@ -12995,11 +13004,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::UnsignedChann
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::UnsignedChannelAnnouncement, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_UnsignedChannelAnnouncementDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_UnsignedChannelAnnouncementDecodeErrorZPtr { err }
 		};
 		Self {
@@ -13091,11 +13100,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::ChannelAnnoun
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::ChannelAnnouncement, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ChannelAnnouncementDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ChannelAnnouncementDecodeErrorZPtr { err }
 		};
 		Self {
@@ -13187,11 +13196,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::UnsignedChann
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::UnsignedChannelUpdate, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_UnsignedChannelUpdateDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_UnsignedChannelUpdateDecodeErrorZPtr { err }
 		};
 		Self {
@@ -13283,11 +13292,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::ChannelUpdate
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::ChannelUpdate, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ChannelUpdateDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ChannelUpdateDecodeErrorZPtr { err }
 		};
 		Self {
@@ -13379,11 +13388,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::ErrorMessage,
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::ErrorMessage, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ErrorMessageDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ErrorMessageDecodeErrorZPtr { err }
 		};
 		Self {
@@ -13475,11 +13484,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::UnsignedNodeA
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::UnsignedNodeAnnouncement, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_UnsignedNodeAnnouncementDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_UnsignedNodeAnnouncementDecodeErrorZPtr { err }
 		};
 		Self {
@@ -13571,11 +13580,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::NodeAnnouncem
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::NodeAnnouncement, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_NodeAnnouncementDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_NodeAnnouncementDecodeErrorZPtr { err }
 		};
 		Self {
@@ -13667,11 +13676,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::QueryShortCha
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::QueryShortChannelIds, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_QueryShortChannelIdsDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_QueryShortChannelIdsDecodeErrorZPtr { err }
 		};
 		Self {
@@ -13763,11 +13772,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::ReplyShortCha
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::ReplyShortChannelIdsEnd, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ReplyShortChannelIdsEndDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ReplyShortChannelIdsEndDecodeErrorZPtr { err }
 		};
 		Self {
@@ -13859,11 +13868,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::QueryChannelR
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::QueryChannelRange, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_QueryChannelRangeDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_QueryChannelRangeDecodeErrorZPtr { err }
 		};
 		Self {
@@ -13955,11 +13964,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::ReplyChannelR
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::ReplyChannelRange, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_ReplyChannelRangeDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_ReplyChannelRangeDecodeErrorZPtr { err }
 		};
 		Self {
@@ -14051,11 +14060,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning::ln::msgs::GossipTimesta
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::ln::msgs::GossipTimestampFilter, crate::lightning::ln::msgs::DecodeError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_GossipTimestampFilterDecodeErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_GossipTimestampFilterDecodeErrorZPtr { err }
 		};
 		Self {
@@ -14147,11 +14156,11 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::Invoice, crate:
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::Invoice, crate::lightning_invoice::SignOrCreationError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_InvoiceSignOrCreationErrorZPtr { result }
 		} else {
 			let err = unsafe { o.contents.err };
-			unsafe { o.contents.err = std::ptr::null_mut(); }
+			unsafe { o.contents.err = core::ptr::null_mut(); }
 			CResult_InvoiceSignOrCreationErrorZPtr { err }
 		};
 		Self {
@@ -14216,7 +14225,7 @@ pub union CResult_LockedChannelMonitorNoneZPtr {
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::lightning::chain::chainmonitor::LockedChannelMonitor,
 	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut std::ffi::c_void,
+	pub err: *mut core::ffi::c_void,
 }
 #[repr(C)]
 /// A CResult_LockedChannelMonitorNoneZ represents the result of a fallible operation,
@@ -14244,7 +14253,7 @@ pub extern "C" fn CResult_LockedChannelMonitorNoneZ_ok(o: crate::lightning::chai
 pub extern "C" fn CResult_LockedChannelMonitorNoneZ_err() -> CResult_LockedChannelMonitorNoneZ {
 	CResult_LockedChannelMonitorNoneZ {
 		contents: CResult_LockedChannelMonitorNoneZPtr {
-			err: std::ptr::null_mut(),
+			err: core::ptr::null_mut(),
 		},
 		result_ok: false,
 	}
@@ -14271,12 +14280,12 @@ impl From<crate::c_types::CResultTempl<crate::lightning::chain::chainmonitor::Lo
 	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::chain::chainmonitor::LockedChannelMonitor, ()>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
-			unsafe { o.contents.result = std::ptr::null_mut() };
+			unsafe { o.contents.result = core::ptr::null_mut() };
 			CResult_LockedChannelMonitorNoneZPtr { result }
 		} else {
 			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = std::ptr::null_mut();
-			CResult_LockedChannelMonitorNoneZPtr { err: std::ptr::null_mut() }
+			o.contents.err = core::ptr::null_mut();
+			CResult_LockedChannelMonitorNoneZPtr { err: core::ptr::null_mut() }
 		};
 		Self {
 			contents,
@@ -14297,13 +14306,13 @@ pub struct CVec_OutPointZ {
 impl CVec_OutPointZ {
 	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::chain::transaction::OutPoint> {
 		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = std::ptr::null_mut();
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
 	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::chain::transaction::OutPoint] {
-		unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) }
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
 impl From<Vec<crate::lightning::chain::transaction::OutPoint>> for CVec_OutPointZ {
@@ -14319,14 +14328,14 @@ pub extern "C" fn CVec_OutPointZ_free(_res: CVec_OutPointZ) { }
 impl Drop for CVec_OutPointZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(std::slice::from_raw_parts_mut(self.data, self.datalen)) };
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
 impl Clone for CVec_OutPointZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { std::slice::from_raw_parts_mut(self.data, self.datalen) });
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
 		Self::from(res)
 	}
 }

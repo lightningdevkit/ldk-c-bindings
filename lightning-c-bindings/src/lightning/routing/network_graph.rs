@@ -8,11 +8,13 @@
 
 //! The top-level network map tracking logic lives here.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning::routing::network_graph::NodeId as nativeNodeIdImport;
@@ -61,14 +63,14 @@ impl NodeId {
 	pub(crate) fn take_inner(mut self) -> *mut nativeNodeId {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for NodeId {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeNodeId>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeNodeId>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -105,11 +107,11 @@ pub extern "C" fn NodeId_as_slice(this_arg: &NodeId) -> crate::c_types::u8slice 
 #[no_mangle]
 pub extern "C" fn NodeId_hash(o: &NodeId) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 #[no_mangle]
 /// Serialize the NodeId object into a byte array which can be read by NodeId_read
@@ -174,14 +176,14 @@ impl NetworkGraph {
 	pub(crate) fn take_inner(mut self) -> *mut nativeNetworkGraph {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for NetworkGraph {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeNetworkGraph>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeNetworkGraph>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -244,7 +246,7 @@ impl ReadOnlyNetworkGraph {
 	pub(crate) fn take_inner(mut self) -> *mut nativeReadOnlyNetworkGraph {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -430,7 +432,7 @@ impl From<nativeNetGraphMsgHandler> for crate::lightning::util::events::EventHan
 		let mut rust_obj = NetGraphMsgHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = NetGraphMsgHandler_as_EventHandler(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(NetGraphMsgHandler_free_void);
 		ret
 	}
@@ -504,7 +506,7 @@ impl NetGraphMsgHandler {
 	pub(crate) fn take_inner(mut self) -> *mut nativeNetGraphMsgHandler {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -535,7 +537,7 @@ impl From<nativeNetGraphMsgHandler> for crate::lightning::ln::msgs::RoutingMessa
 		let mut rust_obj = NetGraphMsgHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = NetGraphMsgHandler_as_RoutingMessageHandler(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(NetGraphMsgHandler_free_void);
 		ret
 	}
@@ -586,7 +588,7 @@ extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_handle_channel_update(thi
 #[must_use]
 extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_get_next_channel_announcements(this_arg: *const c_void, mut starting_point: u64, mut batch_amount: u8) -> crate::c_types::derived::CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
 	let mut ret = <nativeNetGraphMsgHandler as lightning::ln::msgs::RoutingMessageHandler<>>::get_next_channel_announcements(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, starting_point, batch_amount);
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item; let mut local_orig_ret_0_1 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_1.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_1.unwrap())) } }, is_owned: true }; let mut local_orig_ret_0_2 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_2.is_none() { std::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_2.unwrap())) } }, is_owned: true }; let mut local_ret_0 = (crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, local_orig_ret_0_1, local_orig_ret_0_2).into(); local_ret_0 }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item; let mut local_orig_ret_0_1 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_1.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_1.unwrap())) } }, is_owned: true }; let mut local_orig_ret_0_2 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_2.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_2.unwrap())) } }, is_owned: true }; let mut local_ret_0 = (crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, local_orig_ret_0_1, local_orig_ret_0_2).into(); local_ret_0 }); };
 	local_ret.into()
 }
 #[must_use]
@@ -629,7 +631,7 @@ impl From<nativeNetGraphMsgHandler> for crate::lightning::util::events::MessageS
 		let mut rust_obj = NetGraphMsgHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = NetGraphMsgHandler_as_MessageSendEventsProvider(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = std::ptr::null_mut();
+		rust_obj.inner = core::ptr::null_mut();
 		ret.free = Some(NetGraphMsgHandler_free_void);
 		ret
 	}
@@ -700,7 +702,7 @@ impl DirectionalChannelInfo {
 	pub(crate) fn take_inner(mut self) -> *mut nativeDirectionalChannelInfo {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -783,7 +785,7 @@ pub extern "C" fn DirectionalChannelInfo_set_fees(this_ptr: &mut DirectionalChan
 #[no_mangle]
 pub extern "C" fn DirectionalChannelInfo_get_last_update_message(this_ptr: &DirectionalChannelInfo) -> crate::lightning::ln::msgs::ChannelUpdate {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().last_update_message;
-	let mut local_inner_val = crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::ChannelUpdate<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::ChannelUpdate<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Most recent update for the channel received from the network
@@ -816,7 +818,7 @@ pub extern "C" fn DirectionalChannelInfo_new(mut last_update_arg: u32, mut enabl
 impl Clone for DirectionalChannelInfo {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeDirectionalChannelInfo>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeDirectionalChannelInfo>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -896,7 +898,7 @@ impl ChannelInfo {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelInfo {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -928,7 +930,7 @@ pub extern "C" fn ChannelInfo_set_node_one(this_ptr: &mut ChannelInfo, mut val: 
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_one_to_two(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::DirectionalChannelInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().one_to_two;
-	let mut local_inner_val = crate::lightning::routing::network_graph::DirectionalChannelInfo { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::DirectionalChannelInfo<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::network_graph::DirectionalChannelInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::DirectionalChannelInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Details about the first direction of a channel
@@ -956,7 +958,7 @@ pub extern "C" fn ChannelInfo_set_node_two(this_ptr: &mut ChannelInfo, mut val: 
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_two_to_one(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::DirectionalChannelInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().two_to_one;
-	let mut local_inner_val = crate::lightning::routing::network_graph::DirectionalChannelInfo { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::DirectionalChannelInfo<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::network_graph::DirectionalChannelInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::DirectionalChannelInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Details about the second direction of a channel
@@ -989,7 +991,7 @@ pub extern "C" fn ChannelInfo_set_capacity_sats(this_ptr: &mut ChannelInfo, mut 
 #[no_mangle]
 pub extern "C" fn ChannelInfo_get_announcement_message(this_ptr: &ChannelInfo) -> crate::lightning::ln::msgs::ChannelAnnouncement {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().announcement_message;
-	let mut local_inner_val = crate::lightning::ln::msgs::ChannelAnnouncement { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::ChannelAnnouncement<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::msgs::ChannelAnnouncement { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::ChannelAnnouncement<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// An initial announcement of the channel
@@ -1006,7 +1008,7 @@ pub extern "C" fn ChannelInfo_set_announcement_message(this_ptr: &mut ChannelInf
 impl Clone for ChannelInfo {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelInfo>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelInfo>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1085,7 +1087,7 @@ impl RoutingFees {
 	pub(crate) fn take_inner(mut self) -> *mut nativeRoutingFees {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1134,7 +1136,7 @@ pub extern "C" fn RoutingFees_eq(a: &RoutingFees, b: &RoutingFees) -> bool {
 impl Clone for RoutingFees {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRoutingFees>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRoutingFees>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1154,11 +1156,11 @@ pub extern "C" fn RoutingFees_clone(orig: &RoutingFees) -> RoutingFees {
 #[no_mangle]
 pub extern "C" fn RoutingFees_hash(o: &RoutingFees) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 #[no_mangle]
 /// Serialize the RoutingFees object into a byte array which can be read by RoutingFees_read
@@ -1223,7 +1225,7 @@ impl NodeAnnouncementInfo {
 	pub(crate) fn take_inner(mut self) -> *mut nativeNodeAnnouncementInfo {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1292,7 +1294,7 @@ pub extern "C" fn NodeAnnouncementInfo_set_addresses(this_ptr: &mut NodeAnnounce
 #[no_mangle]
 pub extern "C" fn NodeAnnouncementInfo_get_announcement_message(this_ptr: &NodeAnnouncementInfo) -> crate::lightning::ln::msgs::NodeAnnouncement {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().announcement_message;
-	let mut local_inner_val = crate::lightning::ln::msgs::NodeAnnouncement { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::NodeAnnouncement<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::msgs::NodeAnnouncement { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::NodeAnnouncement<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// An initial announcement of the node
@@ -1324,7 +1326,7 @@ pub extern "C" fn NodeAnnouncementInfo_new(mut features_arg: crate::lightning::l
 impl Clone for NodeAnnouncementInfo {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeNodeAnnouncementInfo>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeNodeAnnouncementInfo>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1403,7 +1405,7 @@ impl NodeInfo {
 	pub(crate) fn take_inner(mut self) -> *mut nativeNodeInfo {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -1421,7 +1423,7 @@ pub extern "C" fn NodeInfo_set_channels(this_ptr: &mut NodeInfo, mut val: crate:
 #[no_mangle]
 pub extern "C" fn NodeInfo_get_lowest_inbound_channel_fees(this_ptr: &NodeInfo) -> crate::lightning::routing::network_graph::RoutingFees {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().lowest_inbound_channel_fees;
-	let mut local_inner_val = crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::RoutingFees<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::RoutingFees<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Lowest fees enabling routing via any of the enabled, known channels to a node.
@@ -1442,7 +1444,7 @@ pub extern "C" fn NodeInfo_set_lowest_inbound_channel_fees(this_ptr: &mut NodeIn
 #[no_mangle]
 pub extern "C" fn NodeInfo_get_announcement_info(this_ptr: &NodeInfo) -> crate::lightning::routing::network_graph::NodeAnnouncementInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().announcement_info;
-	let mut local_inner_val = crate::lightning::routing::network_graph::NodeAnnouncementInfo { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::NodeAnnouncementInfo<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::network_graph::NodeAnnouncementInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::NodeAnnouncementInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// More information about a node from node_announcement.
@@ -1471,7 +1473,7 @@ pub extern "C" fn NodeInfo_new(mut channels_arg: crate::c_types::derived::CVec_u
 impl Clone for NodeInfo {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeNodeInfo>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeNodeInfo>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}

@@ -19,11 +19,13 @@
 //! security-domain-separated system design, you should consider having multiple paths for
 //! ChannelMonitors to get out of the HSM and onto monitoring devices.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning::chain::channelmonitor::ChannelMonitorUpdate as nativeChannelMonitorUpdateImport;
@@ -73,7 +75,7 @@ impl ChannelMonitorUpdate {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelMonitorUpdate {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -111,7 +113,7 @@ pub extern "C" fn ChannelMonitorUpdate_set_update_id(this_ptr: &mut ChannelMonit
 impl Clone for ChannelMonitorUpdate {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeChannelMonitorUpdate>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelMonitorUpdate>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -391,14 +393,14 @@ impl HTLCUpdate {
 	pub(crate) fn take_inner(mut self) -> *mut nativeHTLCUpdate {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
 impl Clone for HTLCUpdate {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeHTLCUpdate>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeHTLCUpdate>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -729,7 +731,7 @@ impl ChannelMonitor {
 	pub(crate) fn take_inner(mut self) -> *mut nativeChannelMonitor {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }

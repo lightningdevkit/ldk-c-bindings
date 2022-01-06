@@ -11,11 +11,13 @@
 //! You probably want to create a NetGraphMsgHandler and use that as your RoutingMessageHandler and then
 //! interrogate it to get routes for your own payments.
 
-use std::str::FromStr;
-use std::ffi::c_void;
+use alloc::str::FromStr;
+use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
 use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning::routing::router::RouteHop as nativeRouteHopImport;
@@ -64,7 +66,7 @@ impl RouteHop {
 	pub(crate) fn take_inner(mut self) -> *mut nativeRouteHop {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -160,7 +162,7 @@ pub extern "C" fn RouteHop_new(mut pubkey_arg: crate::c_types::PublicKey, mut no
 impl Clone for RouteHop {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRouteHop>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRouteHop>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -180,11 +182,11 @@ pub extern "C" fn RouteHop_clone(orig: &RouteHop) -> RouteHop {
 #[no_mangle]
 pub extern "C" fn RouteHop_hash(o: &RouteHop) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two RouteHops contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -259,7 +261,7 @@ impl Route {
 	pub(crate) fn take_inner(mut self) -> *mut nativeRoute {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -296,7 +298,7 @@ pub extern "C" fn Route_set_paths(this_ptr: &mut Route, mut val: crate::c_types:
 #[no_mangle]
 pub extern "C" fn Route_get_payee(this_ptr: &Route) -> crate::lightning::routing::router::Payee {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().payee;
-	let mut local_inner_val = crate::lightning::routing::router::Payee { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::router::Payee<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::router::Payee { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::router::Payee<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// The `payee` parameter passed to [`find_route`].
@@ -325,7 +327,7 @@ pub extern "C" fn Route_new(mut paths_arg: crate::c_types::derived::CVec_CVec_Ro
 impl Clone for Route {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRoute>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRoute>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -345,11 +347,11 @@ pub extern "C" fn Route_clone(orig: &Route) -> Route {
 #[no_mangle]
 pub extern "C" fn Route_hash(o: &Route) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two Routes contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -447,7 +449,7 @@ impl RouteParameters {
 	pub(crate) fn take_inner(mut self) -> *mut nativeRouteParameters {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -497,7 +499,7 @@ pub extern "C" fn RouteParameters_new(mut payee_arg: crate::lightning::routing::
 impl Clone for RouteParameters {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRouteParameters>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRouteParameters>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -576,7 +578,7 @@ impl Payee {
 	pub(crate) fn take_inner(mut self) -> *mut nativePayee {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -602,7 +604,7 @@ pub extern "C" fn Payee_set_pubkey(this_ptr: &mut Payee, mut val: crate::c_types
 #[no_mangle]
 pub extern "C" fn Payee_get_features(this_ptr: &Payee) -> crate::lightning::ln::features::InvoiceFeatures {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().features;
-	let mut local_inner_val = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if inner_val.is_none() { std::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::features::InvoiceFeatures<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::features::InvoiceFeatures<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Features supported by the payee.
@@ -661,7 +663,7 @@ pub extern "C" fn Payee_new(mut pubkey_arg: crate::c_types::PublicKey, mut featu
 impl Clone for Payee {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativePayee>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativePayee>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -681,11 +683,11 @@ pub extern "C" fn Payee_clone(orig: &Payee) -> Payee {
 #[no_mangle]
 pub extern "C" fn Payee_hash(o: &Payee) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two Payees contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -775,7 +777,7 @@ impl RouteHint {
 	pub(crate) fn take_inner(mut self) -> *mut nativeRouteHint {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -802,7 +804,7 @@ pub extern "C" fn RouteHint_new(mut a_arg: crate::c_types::derived::CVec_RouteHi
 impl Clone for RouteHint {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRouteHint>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRouteHint>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -822,11 +824,11 @@ pub extern "C" fn RouteHint_clone(orig: &RouteHint) -> RouteHint {
 #[no_mangle]
 pub extern "C" fn RouteHint_hash(o: &RouteHint) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two RouteHints contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -900,7 +902,7 @@ impl RouteHintHop {
 	pub(crate) fn take_inner(mut self) -> *mut nativeRouteHintHop {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = std::ptr::null_mut();
+		self.inner = core::ptr::null_mut();
 		ret
 	}
 }
@@ -992,7 +994,7 @@ pub extern "C" fn RouteHintHop_new(mut src_node_id_arg: crate::c_types::PublicKe
 impl Clone for RouteHintHop {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeRouteHintHop>::is_null(self.inner) { std::ptr::null_mut() } else {
+			inner: if <*mut nativeRouteHintHop>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1012,11 +1014,11 @@ pub extern "C" fn RouteHintHop_clone(orig: &RouteHintHop) -> RouteHintHop {
 #[no_mangle]
 pub extern "C" fn RouteHintHop_hash(o: &RouteHintHop) -> u64 {
 	if o.inner.is_null() { return 0; }
-	// Note that we'd love to use std::collections::hash_map::DefaultHasher but it's not in core
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	std::hash::Hash::hash(o.get_native_ref(), &mut hasher);
-	std::hash::Hasher::finish(&hasher)
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two RouteHintHops contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -1075,7 +1077,7 @@ pub extern "C" fn RouteHintHop_read(ser: crate::c_types::u8slice) -> crate::c_ty
 /// Note that first_hops (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
 pub extern "C" fn find_route(mut our_node_pubkey: crate::c_types::PublicKey, params: &crate::lightning::routing::router::RouteParameters, network: &crate::lightning::routing::network_graph::NetworkGraph, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut logger: crate::lightning::util::logger::Logger, scorer: &crate::lightning::routing::scoring::Score) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
-	let mut local_first_hops_base = if first_hops == std::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { item.get_native_ref() }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
+	let mut local_first_hops_base = if first_hops == core::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { item.get_native_ref() }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
 	let mut ret = lightning::routing::router::find_route(&our_node_pubkey.into_rust(), params.get_native_ref(), network.get_native_ref(), local_first_hops, logger, scorer);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret

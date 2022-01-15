@@ -485,10 +485,10 @@ if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]
 	echo "int main() {}" > genbindings_wasm_test_file.c
 	if clang -nostdlib -o /dev/null --target=wasm32-wasi -Wl,--no-entry genbindings_wasm_test_file.c > /dev/null 2>&1; then
 		# And if it does, build a WASM binary without capturing errors
-		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -target wasm32"
+		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -target wasm32 -O1"
 		RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" cargo rustc $CARGO_BUILD_ARGS -v --target=wasm32-wasi
-		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -target wasm32 -Os"
-		CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release --target=wasm32-wasi -- -C embed-bitcode=yes -C opt-level=s -C linker-plugin-lto -C lto
+		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -fembed-bitcode -target wasm32 -Oz"
+		CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release --target=wasm32-wasi -- -C embed-bitcode=yes -C opt-level=z -C linker-plugin-lto -C lto
 	else
 		echo "Cannot build WASM lib as clang does not seem to support the wasm32-wasi target"
 	fi

@@ -113,7 +113,7 @@ static inline const char* check_get_ldk_bindings_version() {
 }
 #endif /* _LDK_HEADER_VER */
 EOF
-)" >> lightning-c-bindings/include/ldk_ver.h
+)" > lightning-c-bindings/include/ldk_ver.h
 
 rm -rf lightning-c-bindings/src
 

@@ -113,7 +113,7 @@ static inline const char* check_get_ldk_bindings_version() {
 }
 #endif /* _LDK_HEADER_VER */
 EOF
-)" >> lightning-c-bindings/include/ldk_ver.h
+)" > lightning-c-bindings/include/ldk_ver.h
 
 rm -rf lightning-c-bindings/src
 
@@ -460,7 +460,7 @@ fi
 # Now build with LTO on on both C++ and rust, but without cross-language LTO:
 # Clear stale release build artifacts from previous runs
 cargo clean --release
-CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release -- -C lto
+CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C lto" cargo build $CARGO_BUILD_ARGS -v --release
 if [ "$2" = "true" ]; then
 	clang++ $LOCAL_CFLAGS -std=c++11 -O2 demo.cpp target/release/libldk.a -ldl
 fi
@@ -485,10 +485,10 @@ if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]
 	echo "int main() {}" > genbindings_wasm_test_file.c
 	if clang -nostdlib -o /dev/null --target=wasm32-wasi -Wl,--no-entry genbindings_wasm_test_file.c > /dev/null 2>&1; then
 		# And if it does, build a WASM binary without capturing errors
-		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -target wasm32"
-		RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" cargo rustc $CARGO_BUILD_ARGS -v --target=wasm32-wasi
-		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -target wasm32 -Os"
-		CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release --target=wasm32-wasi -- -C embed-bitcode=yes -C opt-level=s -C linker-plugin-lto -C lto
+		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -target wasm32 -O1"
+		RUSTFLAGS="$BASE_RUSTFLAGS -C opt-level=1 --cfg=test_mod_pointers" cargo build $CARGO_BUILD_ARGS -v --target=wasm32-wasi
+		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -fembed-bitcode -target wasm32 -Oz"
+		RUSTFLAGS="$BASE_RUSTFLAGS -C embed-bitcode=yes -C opt-level=z -C linker-plugin-lto -C lto" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target=wasm32-wasi
 	else
 		echo "Cannot build WASM lib as clang does not seem to support the wasm32-wasi target"
 	fi
@@ -507,7 +507,7 @@ for IDX in ${!EXTRA_TARGETS[@]}; do
 	EXTRA_ENV_TARGET=$(echo "${EXTRA_TARGETS[$IDX]}" | sed 's/-/_/g')
 	export CFLAGS_$EXTRA_ENV_TARGET="$BASE_CFLAGS"
 	export CC_$EXTRA_ENV_TARGET=${EXTRA_CCS[$IDX]}
-	RUSTFLAGS="$BASE_RUSTFLAGS -C linker=${EXTRA_CCS[$IDX]}" CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release --target "${EXTRA_TARGETS[$IDX]}" -- -C lto
+	RUSTFLAGS="$BASE_RUSTFLAGS -C embed-bitcode=yes -C lto -C linker=${EXTRA_CCS[$IDX]}" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target "${EXTRA_TARGETS[$IDX]}"
 done
 
 if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
@@ -525,12 +525,12 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 		done
 		export CFLAGS_aarch64_apple_darwin="$CFLAGS_aarch64_apple_darwin -O3 -fPIC -fembed-bitcode"
 		LINK_ARG_FLAGS="$LINK_ARG_FLAGS -C link-arg="-isysroot$(xcrun --show-sdk-path)" -C link-arg=-mmacosx-version-min=10.9"
-		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin -- -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-mcpu=apple-a14
+		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14 -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-mcpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin
 	fi
 	export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -O3 -fPIC -fembed-bitcode -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 	# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 	cargo clean --release
-	CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release -- -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge
+	CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge" cargo build $CARGO_BUILD_ARGS -v --release
 
 	if [ "$2" = "true" ]; then
 		$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -O2 demo.cpp target/release/libldk.a -ldl
@@ -541,7 +541,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 	fi
 else
 	if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
-		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo rustc $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin -- -C lto
+		RUSTFLAGS="$BASE_RUSTFLAGS -C embed-bitcode=yes -C lto -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin
 	fi
 	echo "WARNING: Building with cross-language LTO is not avilable without clang-$RUSTC_LLVM_V"
 fi

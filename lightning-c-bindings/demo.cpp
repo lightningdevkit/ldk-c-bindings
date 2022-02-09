@@ -421,9 +421,7 @@ LDKCVec_C2Tuple_PublicKeyTypeZZ create_custom_msg(const void* this_arg) {
 	return ret;
 }
 
-uint64_t get_chan_score(const void *this_arg, uint64_t scid, uint64_t htlc_amt,
-LDKCOption_u64Z chan_capacity, const LDKNodeId *src, const LDKNodeId *dst) {
-	LDK::COption_u64Z _capacity(std::move(chan_capacity));
+uint64_t get_chan_score(const void *this_arg, uint64_t scid, uint64_t htlc_amt, uint64_t chan_capacity, const LDKNodeId *src, const LDKNodeId *dst) {
 	return 42;
 }
 
@@ -512,7 +510,9 @@ int main() {
 		memset(&node_seed, 0, 32);
 		LDK::KeysManager keys1 = KeysManager_new(&node_seed, 0, 0);
 		LDK::KeysInterface keys_source1 = KeysManager_as_KeysInterface(&keys1);
-		node_secret1 = keys_source1->get_node_secret(keys_source1->this_arg);
+		LDK::CResult_SecretKeyNoneZ node_secret1_res = keys_source1->get_node_secret(keys_source1->this_arg, LDKRecipient_Node);
+		assert(node_secret1_res->result_ok);
+		node_secret1 = *node_secret1_res->contents.result;
 
 		LDK::ChannelManager cm1 = ChannelManager_new(fee_est, mon1, broadcast, logger1, KeysManager_as_KeysInterface(&keys1), UserConfig_default(), ChainParameters_new(network, BestBlock_new(chain_tip, 0)));
 
@@ -537,7 +537,9 @@ int main() {
 		memset(&node_seed, 1, 32);
 		LDK::KeysManager keys2 = KeysManager_new(&node_seed, 0, 0);
 		LDK::KeysInterface keys_source2 = KeysManager_as_KeysInterface(&keys2);
-		node_secret2 = keys_source2->get_node_secret(keys_source2->this_arg);
+		LDK::CResult_SecretKeyNoneZ node_secret2_res = keys_source2->get_node_secret(keys_source2->this_arg, LDKRecipient_Node);
+		assert(node_secret2_res->result_ok);
+		node_secret2 = *node_secret2_res->contents.result;
 
 		LDK::ChannelHandshakeConfig handshake_config2 = ChannelHandshakeConfig_default();
 		ChannelHandshakeConfig_set_minimum_depth(&handshake_config2, 2);
@@ -695,10 +697,10 @@ int main() {
 			LDK::Score chan_scorer = LDKScore {
 				.this_arg = NULL, .channel_penalty_msat = get_chan_score, .free = NULL
 			};
-			LDK::RouteParameters route_params = RouteParameters_new(Payee_new(
+			LDK::RouteParameters route_params = RouteParameters_new(PaymentParameters_new(
 					ChannelManager_get_our_node_id(&cm2), LDKInvoiceFeatures {
 						.inner = NULL, .is_owned = false
-					}, Invoice_route_hints(invoice->contents.result), COption_u64Z_none()),
+					}, Invoice_route_hints(invoice->contents.result), COption_u64Z_none(), 0xffffffff),
 				5000, Invoice_min_final_cltv_expiry(invoice->contents.result));
 			LDK::CResult_RouteLightningErrorZ route = find_route(ChannelManager_get_our_node_id(&cm1), &route_params, &net_graph2, &outbound_channels, logger1, &chan_scorer);
 			assert(route->result_ok);
@@ -950,5 +952,5 @@ int main() {
 	memset(&sk, 42, 32);
 	LDKThirtyTwoBytes kdiv_params;
 	memset(&kdiv_params, 43, 32);
-	LDK::InMemorySigner signer = InMemorySigner_new(sk, sk, sk, sk, sk, random_bytes, 42, kdiv_params);
+	LDK::InMemorySigner signer = InMemorySigner_new(sk, sk, sk, sk, sk, sk, random_bytes, 42, kdiv_params);
 }

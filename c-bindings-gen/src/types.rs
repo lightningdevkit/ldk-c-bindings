@@ -110,8 +110,7 @@ pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
 									}
 									if all_test { return ExportStatus::TestOnly; }
 								}
-							} else if i == "test" || i == "feature" {
-								// If its cfg(feature(...)) we assume its test-only
+							} else if i == "test" {
 								return ExportStatus::TestOnly;
 							}
 						}

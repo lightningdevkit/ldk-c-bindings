@@ -888,7 +888,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"core::convert::Infallible" => Some("crate::c_types::NotConstructable"),
 
-			"bech32::u5" => Some("crate::c_types::u5"),
+			"bitcoin::bech32::u5"|"bech32::u5" => Some("crate::c_types::u5"),
 			"core::num::NonZeroU8" => Some("u8"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
@@ -969,7 +969,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some("core::time::Duration::from_secs("),
 			"std::time::SystemTime" => Some("(::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs("),
 
-			"bech32::u5" => Some(""),
+			"bitcoin::bech32::u5"|"bech32::u5" => Some(""),
 			"core::num::NonZeroU8" => Some("core::num::NonZeroU8::new("),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
@@ -1051,7 +1051,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some(")"),
 			"std::time::SystemTime" => Some("))"),
 
-			"bech32::u5" => Some(".into()"),
+			"bitcoin::bech32::u5"|"bech32::u5" => Some(".into()"),
 			"core::num::NonZeroU8" => Some(").expect(\"Value must be non-zero\")"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
@@ -1138,7 +1138,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"core::convert::Infallible" => Some("panic!(\"Cannot construct an Infallible: "),
 
-			"bech32::u5" => Some(""),
+			"bitcoin::bech32::u5"|"bech32::u5" => Some(""),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey::from_rust(&"),
@@ -1211,7 +1211,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"core::convert::Infallible" => Some("\")"),
 
-			"bech32::u5" => Some(".into()"),
+			"bitcoin::bech32::u5"|"bech32::u5" => Some(".into()"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(")"),

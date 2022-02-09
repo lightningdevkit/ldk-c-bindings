@@ -15,8 +15,8 @@ crate-type = ["staticlib"
 ,"cdylib"]
 
 [features]
-no-std = ["bitcoin/no-std", "lightning/no-std", "core2"]
-std = ["bitcoin/std", "lightning/std"]
+no-std = ["bitcoin/no-std", "lightning/no-std", "lightning-invoice/no-std", "core2"]
+std = ["bitcoin/std", "lightning/std", "lightning-invoice/std"]
 
 [dependencies]
 bitcoin = { version = "0.27", default-features = false }

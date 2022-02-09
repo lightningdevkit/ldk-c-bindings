@@ -1898,8 +1898,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// This may result in some outputs not compiling.
 				if let syn::Type::Path(p) = &*s.elem {
 					let resolved = self.resolve_path(&p.path, generics);
-					assert!(self.is_primitive(&resolved));
-					write!(w, "{}", path_lookup("[u8]", is_ref, ptr_for_ref).unwrap()).unwrap();
+					if self.is_primitive(&resolved) {
+						write!(w, "{}", path_lookup("[u8]", is_ref, ptr_for_ref).unwrap()).unwrap();
+					} else {
+						write!(w, "{}", sliceconv(true, None)).unwrap();
+					}
 				} else if let syn::Type::Reference(r) = &*s.elem {
 					if let syn::Type::Path(p) = &*r.elem {
 						write!(w, "{}", sliceconv(self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)), None)).unwrap();
@@ -2246,12 +2249,24 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			syn::Type::Slice(s) => {
 				if let syn::Type::Path(p) = &*s.elem {
 					let resolved = self.resolve_path(&p.path, generics);
-					assert!(self.is_primitive(&resolved));
-					let slice_path = format!("[{}]", resolved);
-					if let Some((prefix, suffix)) = path_lookup(&slice_path, true) {
-						write!(w, "let mut local_{} = {}{}{};", ident, prefix, var, suffix).unwrap();
-						true
-					} else { false }
+					if self.is_primitive(&resolved) {
+						let slice_path = format!("[{}]", resolved);
+						if let Some((prefix, suffix)) = path_lookup(&slice_path, true) {
+							write!(w, "let mut local_{} = {}{}{};", ident, prefix, var, suffix).unwrap();
+							true
+						} else { false }
+					} else {
+						let tyref = [&*s.elem];
+						if to_c {
+							// If we're converting from a slice to a Vec, assume we can clone the
+							// elements and clone them into a new Vec first. Next we'll walk the
+							// new Vec here and convert them to C types.
+							write!(w, "let mut local_{}_clone = Vec::new(); local_{}_clone.extend_from_slice({}); let mut {} = local_{}_clone; ", ident, ident, ident, ident, ident).unwrap();
+						}
+						is_ref = false;
+						convert_container!("Vec", 1, || tyref.iter().map(|t| generics.resolve_type(*t)));
+						unimplemented!("convert_container should return true as container_lookup should succeed for slices");
+					}
 				} else if let syn::Type::Reference(ty) = &*s.elem {
 					let tyref = if from_ownable_ref || !to_c { [&*ty.elem] } else { [&*s.elem] };
 					is_ref = true;
@@ -2721,7 +2736,17 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					if self.is_primitive(&resolved) {
 						write!(w, "{}::{}slice", Self::container_templ_path(), resolved).unwrap();
 						true
-					} else { false }
+					} else {
+						let mut inner_c_ty = Vec::new();
+						assert!(self.write_c_path_intern(&mut inner_c_ty, &p.path, generics, true, false, ptr_for_ref, with_ref_lifetime));
+						if self.is_clonable(&String::from_utf8(inner_c_ty).unwrap()) {
+							if let Some(id) = p.path.get_ident() {
+								let mangled_container = format!("CVec_{}Z", id);
+								write!(w, "{}::{}", Self::generated_container_path(), mangled_container).unwrap();
+								self.check_create_container(mangled_container, "Vec", vec![&*s.elem], generics, false)
+							} else { false }
+						} else { false }
+					}
 				} else if let syn::Type::Reference(r) = &*s.elem {
 					if let syn::Type::Path(p) = &*r.elem {
 						// Slices with "real types" inside are mapped as the equivalent non-ref Vec

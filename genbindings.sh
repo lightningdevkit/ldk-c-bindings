@@ -43,7 +43,14 @@ export BASE_CFLAGS="-ffile-prefix-map=$HOME/.cargo="
 BASE_CFLAGS="$BASE_CFLAGS -frandom-seed=42"
 LOCAL_CFLAGS="-Wall -Wno-nullability-completeness -pthread -Iinclude/"
 
+HOST_OSX=false
 if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+	HOST_OSX=true
+elif [ "$HOST_PLATFORM" = "host: aarch64-apple-darwin" ]; then
+	HOST_OSX=true
+fi
+
+if [ "$HOST_OSX" = "true" ]; then
 	export MACOSX_DEPLOYMENT_TARGET=10.9
 	LOCAL_CFLAGS="$LOCAL_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
 	BASE_CFLAGS="$BASE_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
@@ -132,7 +139,7 @@ function add_crate() {
 	pushd "$LIGHTNING_PATH/$1"
 	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check --no-default-features $3 -- --cfg=c_bindings -Zunpretty=expanded > /tmp/$1-crate-source.txt
 	popd
-	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+	if [ "$HOST_OSX" = "true" ]; then
 		sed -i".original" "1i\\
 pub mod $2 {
 " /tmp/$1-crate-source.txt
@@ -142,7 +149,7 @@ pub mod $2 {
 	echo "}" >> /tmp/$1-crate-source.txt
 	cat /tmp/$1-crate-source.txt >> /tmp/crate-source.txt
 	rm /tmp/$1-crate-source.txt
-	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+	if [ "$HOST_OSX" = "true" ]; then
 		# OSX sed is for some reason not compatible with GNU sed
 		sed -E -i '' 's|#*'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'", default-features = false }|' lightning-c-bindings/Cargo.toml
 	else
@@ -151,7 +158,7 @@ pub mod $2 {
 }
 
 function drop_crate() {
-	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+	if [ "$HOST_OSX" = "true" ]; then
 		# OSX sed is for some reason not compatible with GNU sed
 		sed -E -i '' 's|'$1' = \{ (.*)|#'$1' = \{ \1|' lightning-c-bindings/Cargo.toml
 	else
@@ -200,7 +207,7 @@ cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1
 # cbindgen is relatively braindead when exporting typedefs -
 # it happily exports all our typedefs for private types, even with the
 # generics we specified in C mode! So we drop all those types manually here.
-if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+if [ "$HOST_OSX" = "true" ]; then
 	# OSX sed is for some reason not compatible with GNU sed
 	sed -i '' 's/typedef LDKnative.*Import.*LDKnative.*;//g' include/lightning.h
 
@@ -361,7 +368,7 @@ fi
 
 RUSTC_LLVM_V=$(rustc --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 2); }')
 
-if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+if [ "$HOST_OSX" = "true" ]; then
 	# Apple is special, as always, and their versions of clang aren't
 	# compatible with upstream LLVM.
 	if [ "$(clang --version | grep 'Apple clang')" != "" ]; then
@@ -424,7 +431,7 @@ fi
 # Finally, if we're on OSX or on Linux, build the final debug binary with address sanitizer (and leave it there)
 if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
 	if [ "$CLANGPP" != "" ]; then
-		if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+		if [ "$HOST_OSX" = "true" ]; then
 			# OSX sed is for some reason not compatible with GNU sed
 			sed -i .bk 's/,"cdylib"]/]/g' Cargo.toml
 		else
@@ -517,7 +524,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 	# packaging than simply shipping the rustup binaries (eg Debian should Just Work
 	# here).
 	LINK_ARG_FLAGS="-C link-arg=-fuse-ld=$LLD"
-	if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+	if [ "$HOST_OSX" = "true" ]; then
 		export LDK_CLANG_PATH=$(which $CLANG)
 		export CLANG="$(pwd)/../deterministic-build-wrappers/clang-lto-link-osx"
 		for ARG in "CFLAGS_aarch64_apple_darwin"; do

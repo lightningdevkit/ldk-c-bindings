@@ -1248,7 +1248,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						let self_ty = &i.self_ty;
 						let ref_type: syn::Type = syn::parse_quote!(&#self_ty);
 						let new_var = types.write_from_c_conversion_new_var(w, &format_ident!("o"), &ref_type, Some(&gen_types));
-						write!(w, "\tformat!(\"{{}}\", ").unwrap();
+						write!(w, "\talloc::format!(\"{{}}\", ").unwrap();
 						types.write_from_c_conversion_prefix(w, &ref_type, Some(&gen_types));
 						write!(w, "{}o", if new_var { "local_" } else { "" }).unwrap();
 						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));

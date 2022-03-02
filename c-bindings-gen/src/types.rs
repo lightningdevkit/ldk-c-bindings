@@ -1133,7 +1133,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some(""),
 			"std::time::SystemTime" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
-			"core::fmt::Arguments" => Some("format!(\"{}\", "),
+			"core::fmt::Arguments" => Some("alloc::format!(\"{}\", "),
 
 			"core::convert::Infallible" => Some("panic!(\"Cannot construct an Infallible: "),
 

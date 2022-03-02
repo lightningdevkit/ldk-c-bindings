@@ -946,16 +946,52 @@ pub extern "C" fn UserConfig_get_accept_inbound_channels(this_ptr: &UserConfig) 
 pub extern "C" fn UserConfig_set_accept_inbound_channels(this_ptr: &mut UserConfig, mut val: bool) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.accept_inbound_channels = val;
 }
+/// If this is set to true, the user needs to manually accept inbound requests to open a new
+/// channel.
+///
+/// When set to true, [`Event::OpenChannelRequest`] will be triggered once a request to open a
+/// new inbound channel is received through a [`msgs::OpenChannel`] message. In that case, a
+/// [`msgs::AcceptChannel`] message will not be sent back to the counterparty node unless the
+/// user explicitly chooses to accept the request.
+///
+/// Default value: false.
+///
+/// [`Event::OpenChannelRequest`]: crate::util::events::Event::OpenChannelRequest
+/// [`msgs::OpenChannel`]: crate::ln::msgs::OpenChannel
+/// [`msgs::AcceptChannel`]: crate::ln::msgs::AcceptChannel
+#[no_mangle]
+pub extern "C" fn UserConfig_get_manually_accept_inbound_channels(this_ptr: &UserConfig) -> bool {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().manually_accept_inbound_channels;
+	*inner_val
+}
+/// If this is set to true, the user needs to manually accept inbound requests to open a new
+/// channel.
+///
+/// When set to true, [`Event::OpenChannelRequest`] will be triggered once a request to open a
+/// new inbound channel is received through a [`msgs::OpenChannel`] message. In that case, a
+/// [`msgs::AcceptChannel`] message will not be sent back to the counterparty node unless the
+/// user explicitly chooses to accept the request.
+///
+/// Default value: false.
+///
+/// [`Event::OpenChannelRequest`]: crate::util::events::Event::OpenChannelRequest
+/// [`msgs::OpenChannel`]: crate::ln::msgs::OpenChannel
+/// [`msgs::AcceptChannel`]: crate::ln::msgs::AcceptChannel
+#[no_mangle]
+pub extern "C" fn UserConfig_set_manually_accept_inbound_channels(this_ptr: &mut UserConfig, mut val: bool) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.manually_accept_inbound_channels = val;
+}
 /// Constructs a new UserConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn UserConfig_new(mut own_channel_config_arg: crate::lightning::util::config::ChannelHandshakeConfig, mut peer_channel_config_limits_arg: crate::lightning::util::config::ChannelHandshakeLimits, mut channel_options_arg: crate::lightning::util::config::ChannelConfig, mut accept_forwards_to_priv_channels_arg: bool, mut accept_inbound_channels_arg: bool) -> UserConfig {
+pub extern "C" fn UserConfig_new(mut own_channel_config_arg: crate::lightning::util::config::ChannelHandshakeConfig, mut peer_channel_config_limits_arg: crate::lightning::util::config::ChannelHandshakeLimits, mut channel_options_arg: crate::lightning::util::config::ChannelConfig, mut accept_forwards_to_priv_channels_arg: bool, mut accept_inbound_channels_arg: bool, mut manually_accept_inbound_channels_arg: bool) -> UserConfig {
 	UserConfig { inner: ObjOps::heap_alloc(nativeUserConfig {
 		own_channel_config: *unsafe { Box::from_raw(own_channel_config_arg.take_inner()) },
 		peer_channel_config_limits: *unsafe { Box::from_raw(peer_channel_config_limits_arg.take_inner()) },
 		channel_options: *unsafe { Box::from_raw(channel_options_arg.take_inner()) },
 		accept_forwards_to_priv_channels: accept_forwards_to_priv_channels_arg,
 		accept_inbound_channels: accept_inbound_channels_arg,
+		manually_accept_inbound_channels: manually_accept_inbound_channels_arg,
 	}), is_owned: true }
 }
 impl Clone for UserConfig {

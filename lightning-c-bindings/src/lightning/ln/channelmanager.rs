@@ -1164,6 +1164,107 @@ pub extern "C" fn PaymentSendFailure_partial_failure(results: crate::c_types::de
 		payment_id,
 	}
 }
+
+use lightning::ln::channelmanager::PhantomRouteHints as nativePhantomRouteHintsImport;
+pub(crate) type nativePhantomRouteHints = nativePhantomRouteHintsImport;
+
+/// Route hints used in constructing invoices for [phantom node payents].
+///
+/// [phantom node payments]: crate::chain::keysinterface::PhantomKeysManager
+#[must_use]
+#[repr(C)]
+pub struct PhantomRouteHints {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativePhantomRouteHints,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for PhantomRouteHints {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativePhantomRouteHints>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the PhantomRouteHints, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn PhantomRouteHints_free(this_obj: PhantomRouteHints) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn PhantomRouteHints_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePhantomRouteHints); }
+}
+#[allow(unused)]
+impl PhantomRouteHints {
+	pub(crate) fn get_native_ref(&self) -> &'static nativePhantomRouteHints {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativePhantomRouteHints {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativePhantomRouteHints {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// The list of channels to be included in the invoice route hints.
+#[no_mangle]
+pub extern "C" fn PhantomRouteHints_get_channels(this_ptr: &PhantomRouteHints) -> crate::c_types::derived::CVec_ChannelDetailsZ {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channels;
+	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::channelmanager::ChannelDetails { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning::ln::channelmanager::ChannelDetails<>) as *mut _) }, is_owned: false } }); };
+	local_inner_val.into()
+}
+/// The list of channels to be included in the invoice route hints.
+#[no_mangle]
+pub extern "C" fn PhantomRouteHints_set_channels(this_ptr: &mut PhantomRouteHints, mut val: crate::c_types::derived::CVec_ChannelDetailsZ) {
+	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channels = local_val;
+}
+/// A fake scid used for representing the phantom node's fake channel in generating the invoice
+/// route hints.
+#[no_mangle]
+pub extern "C" fn PhantomRouteHints_get_phantom_scid(this_ptr: &PhantomRouteHints) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().phantom_scid;
+	*inner_val
+}
+/// A fake scid used for representing the phantom node's fake channel in generating the invoice
+/// route hints.
+#[no_mangle]
+pub extern "C" fn PhantomRouteHints_set_phantom_scid(this_ptr: &mut PhantomRouteHints, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.phantom_scid = val;
+}
+/// The pubkey of the real backing node that would ultimately receive the payment.
+#[no_mangle]
+pub extern "C" fn PhantomRouteHints_get_real_node_pubkey(this_ptr: &PhantomRouteHints) -> crate::c_types::PublicKey {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().real_node_pubkey;
+	crate::c_types::PublicKey::from_rust(&inner_val)
+}
+/// The pubkey of the real backing node that would ultimately receive the payment.
+#[no_mangle]
+pub extern "C" fn PhantomRouteHints_set_real_node_pubkey(this_ptr: &mut PhantomRouteHints, mut val: crate::c_types::PublicKey) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.real_node_pubkey = val.into_rust();
+}
+/// Constructs a new PhantomRouteHints given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn PhantomRouteHints_new(mut channels_arg: crate::c_types::derived::CVec_ChannelDetailsZ, mut phantom_scid_arg: u64, mut real_node_pubkey_arg: crate::c_types::PublicKey) -> PhantomRouteHints {
+	let mut local_channels_arg = Vec::new(); for mut item in channels_arg.into_rust().drain(..) { local_channels_arg.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+	PhantomRouteHints { inner: ObjOps::heap_alloc(nativePhantomRouteHints {
+		channels: local_channels_arg,
+		phantom_scid: phantom_scid_arg,
+		real_node_pubkey: real_node_pubkey_arg.into_rust(),
+	}), is_owned: true }
+}
 /// Constructs a new ChannelManager to hold several channels and route between them.
 ///
 /// This is the main \"logic hub\" for all channel-related actions, and implements
@@ -1553,6 +1654,20 @@ pub extern "C" fn ChannelManager_get_our_node_id(this_arg: &ChannelManager) -> c
 	crate::c_types::PublicKey::from_rust(&ret)
 }
 
+/// Called to accept a request to open a channel after [`Event::OpenChannelRequest`] has been
+/// triggered.
+///
+/// The `temporary_channel_id` parameter indicates which inbound channel should be accepted.
+///
+/// [`Event::OpenChannelRequest`]: crate::util::events::Event::OpenChannelRequest
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_accept_inbound_channel(this_arg: &ChannelManager, temporary_channel_id: *const [u8; 32]) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.accept_inbound_channel(unsafe { &*temporary_channel_id});
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
+	local_ret
+}
+
 /// Gets a payment secret and payment hash for use in an invoice given to a third party wishing
 /// to pay us.
 ///
@@ -1684,6 +1799,27 @@ pub extern "C" fn ChannelManager_get_payment_preimage(this_arg: &ChannelManager,
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_payment_preimage(::lightning::ln::PaymentHash(payment_hash.data), ::lightning::ln::PaymentSecret(payment_secret.data));
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
+}
+
+/// Gets a fake short channel id for use in receiving [phantom node payments]. These fake scids
+/// are used when constructing the phantom invoice's route hints.
+///
+/// [phantom node payments]: crate::chain::keysinterface::PhantomKeysManager
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_get_phantom_scid(this_arg: &ChannelManager) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_phantom_scid();
+	ret
+}
+
+/// Gets route hints for use in receiving [phantom node payments].
+///
+/// [phantom node payments]: crate::chain::keysinterface::PhantomKeysManager
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_get_phantom_route_hints(this_arg: &ChannelManager) -> crate::lightning::ln::channelmanager::PhantomRouteHints {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_phantom_route_hints();
+	crate::lightning::ln::channelmanager::PhantomRouteHints { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 impl From<nativeChannelManager> for crate::lightning::util::events::MessageSendEventsProvider {
@@ -1945,6 +2081,70 @@ extern "C" fn ChannelManager_ChannelMessageHandler_handle_error(this_arg: *const
 	<nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::handle_error(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &counterparty_node_id.into_rust(), msg.get_native_ref())
 }
 
+#[no_mangle]
+/// Serialize the CounterpartyForwardingInfo object into a byte array which can be read by CounterpartyForwardingInfo_read
+pub extern "C" fn CounterpartyForwardingInfo_write(obj: &CounterpartyForwardingInfo) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn CounterpartyForwardingInfo_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeCounterpartyForwardingInfo) })
+}
+#[no_mangle]
+/// Read a CounterpartyForwardingInfo from a byte array, created by CounterpartyForwardingInfo_write
+pub extern "C" fn CounterpartyForwardingInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CounterpartyForwardingInfoDecodeErrorZ {
+	let res: Result<lightning::ln::channelmanager::CounterpartyForwardingInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::CounterpartyForwardingInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the ChannelCounterparty object into a byte array which can be read by ChannelCounterparty_read
+pub extern "C" fn ChannelCounterparty_write(obj: &ChannelCounterparty) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn ChannelCounterparty_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelCounterparty) })
+}
+#[no_mangle]
+/// Read a ChannelCounterparty from a byte array, created by ChannelCounterparty_write
+pub extern "C" fn ChannelCounterparty_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelCounterpartyDecodeErrorZ {
+	let res: Result<lightning::ln::channelmanager::ChannelCounterparty, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::ChannelCounterparty { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the ChannelDetails object into a byte array which can be read by ChannelDetails_read
+pub extern "C" fn ChannelDetails_write(obj: &ChannelDetails) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn ChannelDetails_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelDetails) })
+}
+#[no_mangle]
+/// Read a ChannelDetails from a byte array, created by ChannelDetails_write
+pub extern "C" fn ChannelDetails_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelDetailsDecodeErrorZ {
+	let res: Result<lightning::ln::channelmanager::ChannelDetails, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::ChannelDetails { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the PhantomRouteHints object into a byte array which can be read by PhantomRouteHints_read
+pub extern "C" fn PhantomRouteHints_write(obj: &PhantomRouteHints) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn PhantomRouteHints_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativePhantomRouteHints) })
+}
+#[no_mangle]
+/// Read a PhantomRouteHints from a byte array, created by PhantomRouteHints_write
+pub extern "C" fn PhantomRouteHints_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_PhantomRouteHintsDecodeErrorZ {
+	let res: Result<lightning::ln::channelmanager::PhantomRouteHints, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::PhantomRouteHints { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
 #[no_mangle]
 /// Serialize the ChannelManager object into a byte array which can be read by ChannelManager_read
 pub extern "C" fn ChannelManager_write(obj: &ChannelManager) -> crate::c_types::derived::CVec_u8Z {

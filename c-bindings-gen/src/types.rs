@@ -110,8 +110,7 @@ pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
 									}
 									if all_test { return ExportStatus::TestOnly; }
 								}
-							} else if i == "test" || i == "feature" {
-								// If its cfg(feature(...)) we assume its test-only
+							} else if i == "test" {
 								return ExportStatus::TestOnly;
 							}
 						}
@@ -828,7 +827,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	// *************************************************
 
 	/// Returns true we if can just skip passing this to C entirely
-	fn skip_path(&self, full_path: &str) -> bool {
+	pub fn skip_path(&self, full_path: &str) -> bool {
 		full_path == "bitcoin::secp256k1::Secp256k1" ||
 		full_path == "bitcoin::secp256k1::Signing" ||
 		full_path == "bitcoin::secp256k1::Verification"
@@ -888,7 +887,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"core::convert::Infallible" => Some("crate::c_types::NotConstructable"),
 
-			"bech32::u5" => Some("crate::c_types::u5"),
+			"bitcoin::bech32::u5"|"bech32::u5" => Some("crate::c_types::u5"),
 			"core::num::NonZeroU8" => Some("u8"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
@@ -969,7 +968,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some("core::time::Duration::from_secs("),
 			"std::time::SystemTime" => Some("(::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs("),
 
-			"bech32::u5" => Some(""),
+			"bitcoin::bech32::u5"|"bech32::u5" => Some(""),
 			"core::num::NonZeroU8" => Some("core::num::NonZeroU8::new("),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
@@ -1051,7 +1050,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some(")"),
 			"std::time::SystemTime" => Some("))"),
 
-			"bech32::u5" => Some(".into()"),
+			"bitcoin::bech32::u5"|"bech32::u5" => Some(".into()"),
 			"core::num::NonZeroU8" => Some(").expect(\"Value must be non-zero\")"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
@@ -1134,11 +1133,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some(""),
 			"std::time::SystemTime" => Some(""),
 			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
-			"core::fmt::Arguments" => Some("format!(\"{}\", "),
+			"core::fmt::Arguments" => Some("alloc::format!(\"{}\", "),
 
 			"core::convert::Infallible" => Some("panic!(\"Cannot construct an Infallible: "),
 
-			"bech32::u5" => Some(""),
+			"bitcoin::bech32::u5"|"bech32::u5" => Some(""),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some("crate::c_types::PublicKey::from_rust(&"),
@@ -1211,7 +1210,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"core::convert::Infallible" => Some("\")"),
 
-			"bech32::u5" => Some(".into()"),
+			"bitcoin::bech32::u5"|"bech32::u5" => Some(".into()"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
 				=> Some(")"),
@@ -1297,6 +1296,22 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			assert!(args.next().is_none());
 			match inner {
 				syn::Type::Reference(_) => true,
+				syn::Type::Array(a) => {
+					if let syn::Expr::Lit(l) = &a.len {
+						if let syn::Lit::Int(i) = &l.lit {
+							if i.base10_digits().parse::<usize>().unwrap() >= 32 {
+								let mut buf = Vec::new();
+								self.write_rust_type(&mut buf, generics, &a.elem);
+								let ty = String::from_utf8(buf).unwrap();
+								ty == "u8"
+							} else {
+								// Blindly assume that if we're trying to create an empty value for an
+								// array < 32 entries that all-0s may be a valid state.
+								unimplemented!();
+							}
+						} else { unimplemented!(); }
+					} else { unimplemented!(); }
+				},
 				syn::Type::Path(p) => {
 					if let Some(resolved) = self.maybe_resolve_path(&p.path, generics) {
 						if self.c_type_has_inner_from_path(&resolved) { return true; }
@@ -1898,8 +1913,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// This may result in some outputs not compiling.
 				if let syn::Type::Path(p) = &*s.elem {
 					let resolved = self.resolve_path(&p.path, generics);
-					assert!(self.is_primitive(&resolved));
-					write!(w, "{}", path_lookup("[u8]", is_ref, ptr_for_ref).unwrap()).unwrap();
+					if self.is_primitive(&resolved) {
+						write!(w, "{}", path_lookup("[u8]", is_ref, ptr_for_ref).unwrap()).unwrap();
+					} else {
+						write!(w, "{}", sliceconv(true, None)).unwrap();
+					}
 				} else if let syn::Type::Reference(r) = &*s.elem {
 					if let syn::Type::Path(p) = &*r.elem {
 						write!(w, "{}", sliceconv(self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics)), None)).unwrap();
@@ -2246,12 +2264,24 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			syn::Type::Slice(s) => {
 				if let syn::Type::Path(p) = &*s.elem {
 					let resolved = self.resolve_path(&p.path, generics);
-					assert!(self.is_primitive(&resolved));
-					let slice_path = format!("[{}]", resolved);
-					if let Some((prefix, suffix)) = path_lookup(&slice_path, true) {
-						write!(w, "let mut local_{} = {}{}{};", ident, prefix, var, suffix).unwrap();
-						true
-					} else { false }
+					if self.is_primitive(&resolved) {
+						let slice_path = format!("[{}]", resolved);
+						if let Some((prefix, suffix)) = path_lookup(&slice_path, true) {
+							write!(w, "let mut local_{} = {}{}{};", ident, prefix, var, suffix).unwrap();
+							true
+						} else { false }
+					} else {
+						let tyref = [&*s.elem];
+						if to_c {
+							// If we're converting from a slice to a Vec, assume we can clone the
+							// elements and clone them into a new Vec first. Next we'll walk the
+							// new Vec here and convert them to C types.
+							write!(w, "let mut local_{}_clone = Vec::new(); local_{}_clone.extend_from_slice({}); let mut {} = local_{}_clone; ", ident, ident, ident, ident, ident).unwrap();
+						}
+						is_ref = false;
+						convert_container!("Vec", 1, || tyref.iter().map(|t| generics.resolve_type(*t)));
+						unimplemented!("convert_container should return true as container_lookup should succeed for slices");
+					}
 				} else if let syn::Type::Reference(ty) = &*s.elem {
 					let tyref = if from_ownable_ref || !to_c { [&*ty.elem] } else { [&*s.elem] };
 					is_ref = true;
@@ -2596,8 +2626,15 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						if !self.is_primitive(&resolved) { return false; }
 						if let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Int(len), .. }) = &a.len {
 							if self.c_type_from_path(&format!("[{}; {}]", resolved, len.base10_digits()), is_ref, ptr_for_ref).is_none() { return false; }
-							write!(w, "_{}{}", resolved, len.base10_digits()).unwrap();
-							write!(mangled_type, "_{}{}", resolved, len.base10_digits()).unwrap();
+							if in_type || args.len() != 1 {
+								write!(w, "_{}{}", resolved, len.base10_digits()).unwrap();
+								write!(mangled_type, "_{}{}", resolved, len.base10_digits()).unwrap();
+							} else {
+								let arrty = format!("[{}; {}]", resolved, len.base10_digits());
+								let realty = self.c_type_from_path(&arrty, is_ref, ptr_for_ref).unwrap_or(&arrty);
+								write!(w, "{}", realty).unwrap();
+								write!(mangled_type, "{}", realty).unwrap();
+							}
 						} else { return false; }
 					} else { return false; }
 				},
@@ -2721,7 +2758,17 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					if self.is_primitive(&resolved) {
 						write!(w, "{}::{}slice", Self::container_templ_path(), resolved).unwrap();
 						true
-					} else { false }
+					} else {
+						let mut inner_c_ty = Vec::new();
+						assert!(self.write_c_path_intern(&mut inner_c_ty, &p.path, generics, true, false, ptr_for_ref, with_ref_lifetime));
+						if self.is_clonable(&String::from_utf8(inner_c_ty).unwrap()) {
+							if let Some(id) = p.path.get_ident() {
+								let mangled_container = format!("CVec_{}Z", id);
+								write!(w, "{}::{}", Self::generated_container_path(), mangled_container).unwrap();
+								self.check_create_container(mangled_container, "Vec", vec![&*s.elem], generics, false)
+							} else { false }
+						} else { false }
+					}
 				} else if let syn::Type::Reference(r) = &*s.elem {
 					if let syn::Type::Path(p) = &*r.elem {
 						// Slices with "real types" inside are mapped as the equivalent non-ref Vec

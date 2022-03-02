@@ -16,6 +16,39 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
+/// Utility to create an invoice that can be paid to one of multiple nodes, or a \"phantom invoice.\"
+/// See [`PhantomKeysManager`] for more information on phantom node payments.
+///
+/// `phantom_route_hints` parameter:
+/// * Contains channel info for all nodes participating in the phantom invoice
+/// * Entries are retrieved from a call to [`ChannelManager::get_phantom_route_hints`] on each
+///   participating node
+/// * It is fine to cache `phantom_route_hints` and reuse it across invoices, as long as the data is
+///   updated when a channel becomes disabled or closes
+/// * Note that if too many channels are included in [`PhantomRouteHints::channels`], the invoice
+///   may be too long for QR code scanning. To fix this, `PhantomRouteHints::channels` may be pared
+///   down
+///
+/// `payment_hash` and `payment_secret` come from [`ChannelManager::create_inbound_payment`] or
+/// [`ChannelManager::create_inbound_payment_for_hash`]. These values can be retrieved from any
+/// participating node.
+///
+/// Note that the provided `keys_manager`'s `KeysInterface` implementation must support phantom
+/// invoices in its `sign_invoice` implementation ([`PhantomKeysManager`] satisfies this
+/// requirement).
+///
+/// [`PhantomKeysManager`]: lightning::chain::keysinterface::PhantomKeysManager
+/// [`ChannelManager::get_phantom_route_hints`]: lightning::ln::channelmanager::ChannelManager::get_phantom_route_hints
+/// [`PhantomRouteHints::channels`]: lightning::ln::channelmanager::PhantomRouteHints::channels
+#[no_mangle]
+pub extern "C" fn create_phantom_invoice(mut amt_msat: crate::c_types::derived::COption_u64Z, mut description: crate::c_types::Str, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut payment_secret: crate::c_types::ThirtyTwoBytes, mut phantom_route_hints: crate::c_types::derived::CVec_PhantomRouteHintsZ, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface, mut network: crate::lightning_invoice::Currency) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
+	let mut local_amt_msat = if amt_msat.is_some() { Some( { amt_msat.take() }) } else { None };
+	let mut local_phantom_route_hints = Vec::new(); for mut item in phantom_route_hints.into_rust().drain(..) { local_phantom_route_hints.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+	let mut ret = lightning_invoice::utils::create_phantom_invoice::<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::keysinterface::KeysInterface>(local_amt_msat, description.into_string(), ::lightning::ln::PaymentHash(payment_hash.data), ::lightning::ln::PaymentSecret(payment_secret.data), local_phantom_route_hints, keys_manager, network.into_native());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
+	local_ret
+}
+
 /// Utility to construct an invoice. Generally, unless you want to do something like a custom
 /// cltv_expiry, this is what you should be using to create an invoice. The reason being, this
 /// method stores the invoice's payment secret and preimage in `ChannelManager`, so (a) the user
@@ -24,7 +57,18 @@ use alloc::{vec::Vec, boxed::Box};
 #[no_mangle]
 pub extern "C" fn create_invoice_from_channelmanager(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description: crate::c_types::Str) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
 	let mut local_amt_msat = if amt_msat.is_some() { Some( { amt_msat.take() }) } else { None };
-	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager(channelmanager.get_native_ref(), keys_manager, network.into_native(), local_amt_msat, description.into_string());
+	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager::<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), keys_manager, network.into_native(), local_amt_msat, description.into_string());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
+	local_ret
+}
+
+/// See [`create_invoice_from_channelmanager`]
+/// This version can be used in a `no_std` environment, where [`std::time::SystemTime`] is not
+/// available and the current time is supplied by the caller.
+#[no_mangle]
+pub extern "C" fn create_invoice_from_channelmanager_and_duration_since_epoch(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description: crate::c_types::Str, mut duration_since_epoch: u64) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
+	let mut local_amt_msat = if amt_msat.is_some() { Some( { amt_msat.take() }) } else { None };
+	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager_and_duration_since_epoch::<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), keys_manager, network.into_native(), local_amt_msat, description.into_string(), core::time::Duration::from_secs(duration_since_epoch));
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
 	local_ret
 }

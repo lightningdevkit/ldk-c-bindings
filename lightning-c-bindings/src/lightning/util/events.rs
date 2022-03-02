@@ -441,7 +441,7 @@ pub enum Event {
 	/// Note that this does *not* indicate that all paths for an MPP payment have failed, see
 	/// [`Event::PaymentFailed`] and [`all_paths_failed`].
 	///
-	/// [`all_paths_failed`]: Self::all_paths_failed
+	/// [`all_paths_failed`]: Self::PaymentPathFailed::all_paths_failed
 	PaymentPathFailed {
 		/// The id returned by [`ChannelManager::send_payment`] and used with
 		/// [`ChannelManager::retry_payment`] and [`ChannelManager::abandon_payment`].
@@ -610,6 +610,34 @@ pub enum Event {
 		/// May contain a closed channel if the HTLC sent along the path was fulfilled on chain.
 		path: crate::c_types::derived::CVec_RouteHopZ,
 	},
+	/// Indicates a request to open a new channel by a peer.
+	///
+	/// To accept the request, call [`ChannelManager::accept_inbound_channel`]. To reject the
+	/// request, call [`ChannelManager::force_close_channel`].
+	///
+	/// The event is only triggered when a new open channel request is received and the
+	/// [`UserConfig::manually_accept_inbound_channels`] config flag is set to true.
+	///
+	/// [`ChannelManager::accept_inbound_channel`]: crate::ln::channelmanager::ChannelManager::accept_inbound_channel
+	/// [`ChannelManager::force_close_channel`]: crate::ln::channelmanager::ChannelManager::force_close_channel
+	/// [`UserConfig::manually_accept_inbound_channels`]: crate::util::config::UserConfig::manually_accept_inbound_channels
+	OpenChannelRequest {
+		/// The temporary channel ID of the channel requested to be opened.
+		///
+		/// When responding to the request, the `temporary_channel_id` should be passed
+		/// back to the ChannelManager with [`ChannelManager::accept_inbound_channel`] to accept,
+		/// or to [`ChannelManager::force_close_channel`] to reject.
+		///
+		/// [`ChannelManager::accept_inbound_channel`]: crate::ln::channelmanager::ChannelManager::accept_inbound_channel
+		/// [`ChannelManager::force_close_channel`]: crate::ln::channelmanager::ChannelManager::force_close_channel
+		temporary_channel_id: crate::c_types::ThirtyTwoBytes,
+		/// The node_id of the counterparty requesting to open the channel.
+		counterparty_node_id: crate::c_types::PublicKey,
+		/// The channel value of the requested channel.
+		funding_satoshis: u64,
+		/// Our starting balance in the channel if the request is accepted, in milli-satoshi.
+		push_msat: u64,
+	},
 }
 use lightning::util::events::Event as nativeEvent;
 impl Event {
@@ -737,6 +765,18 @@ impl Event {
 					path: local_path_nonref,
 				}
 			},
+			Event::OpenChannelRequest {ref temporary_channel_id, ref counterparty_node_id, ref funding_satoshis, ref push_msat, } => {
+				let mut temporary_channel_id_nonref = (*temporary_channel_id).clone();
+				let mut counterparty_node_id_nonref = (*counterparty_node_id).clone();
+				let mut funding_satoshis_nonref = (*funding_satoshis).clone();
+				let mut push_msat_nonref = (*push_msat).clone();
+				nativeEvent::OpenChannelRequest {
+					temporary_channel_id: temporary_channel_id_nonref.data,
+					counterparty_node_id: counterparty_node_id_nonref.into_rust(),
+					funding_satoshis: funding_satoshis_nonref,
+					push_msat: push_msat_nonref,
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -828,6 +868,14 @@ impl Event {
 					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id.data),
 					payment_hash: local_payment_hash,
 					path: local_path,
+				}
+			},
+			Event::OpenChannelRequest {mut temporary_channel_id, mut counterparty_node_id, mut funding_satoshis, mut push_msat, } => {
+				nativeEvent::OpenChannelRequest {
+					temporary_channel_id: temporary_channel_id.data,
+					counterparty_node_id: counterparty_node_id.into_rust(),
+					funding_satoshis: funding_satoshis,
+					push_msat: push_msat,
 				}
 			},
 		}
@@ -956,6 +1004,18 @@ impl Event {
 					path: local_path_nonref.into(),
 				}
 			},
+			nativeEvent::OpenChannelRequest {ref temporary_channel_id, ref counterparty_node_id, ref funding_satoshis, ref push_msat, } => {
+				let mut temporary_channel_id_nonref = (*temporary_channel_id).clone();
+				let mut counterparty_node_id_nonref = (*counterparty_node_id).clone();
+				let mut funding_satoshis_nonref = (*funding_satoshis).clone();
+				let mut push_msat_nonref = (*push_msat).clone();
+				Event::OpenChannelRequest {
+					temporary_channel_id: crate::c_types::ThirtyTwoBytes { data: temporary_channel_id_nonref },
+					counterparty_node_id: crate::c_types::PublicKey::from_rust(&counterparty_node_id_nonref),
+					funding_satoshis: funding_satoshis_nonref,
+					push_msat: push_msat_nonref,
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -1047,6 +1107,14 @@ impl Event {
 					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id.0 },
 					payment_hash: local_payment_hash,
 					path: local_path.into(),
+				}
+			},
+			nativeEvent::OpenChannelRequest {mut temporary_channel_id, mut counterparty_node_id, mut funding_satoshis, mut push_msat, } => {
+				Event::OpenChannelRequest {
+					temporary_channel_id: crate::c_types::ThirtyTwoBytes { data: temporary_channel_id },
+					counterparty_node_id: crate::c_types::PublicKey::from_rust(&counterparty_node_id),
+					funding_satoshis: funding_satoshis,
+					push_msat: push_msat,
 				}
 			},
 		}
@@ -1157,6 +1225,16 @@ pub extern "C" fn Event_payment_path_successful(payment_id: crate::c_types::Thir
 		payment_id,
 		payment_hash,
 		path,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new OpenChannelRequest-variant Event
+pub extern "C" fn Event_open_channel_request(temporary_channel_id: crate::c_types::ThirtyTwoBytes, counterparty_node_id: crate::c_types::PublicKey, funding_satoshis: u64, push_msat: u64) -> Event {
+	Event::OpenChannelRequest {
+		temporary_channel_id,
+		counterparty_node_id,
+		funding_satoshis,
+		push_msat,
 	}
 }
 #[no_mangle]

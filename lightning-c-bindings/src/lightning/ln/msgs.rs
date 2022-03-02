@@ -241,30 +241,36 @@ impl ErrorMessage {
 		ret
 	}
 }
-/// The channel ID involved in the error
+/// The channel ID involved in the error.
+///
+/// All-0s indicates a general error unrelated to a specific channel, after which all channels
+/// with the sending peer should be closed.
 #[no_mangle]
 pub extern "C" fn ErrorMessage_get_channel_id(this_ptr: &ErrorMessage) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
 	inner_val
 }
-/// The channel ID involved in the error
+/// The channel ID involved in the error.
+///
+/// All-0s indicates a general error unrelated to a specific channel, after which all channels
+/// with the sending peer should be closed.
 #[no_mangle]
 pub extern "C" fn ErrorMessage_set_channel_id(this_ptr: &mut ErrorMessage, mut val: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
 }
 /// A possibly human-readable error description.
-/// The string should be sanitized before it is used (e.g. emitted to logs
-/// or printed to stdout).  Otherwise, a well crafted error message may trigger a security
-/// vulnerability in the terminal emulator or the logging subsystem.
+/// The string should be sanitized before it is used (e.g. emitted to logs or printed to
+/// stdout). Otherwise, a well crafted error message may trigger a security vulnerability in
+/// the terminal emulator or the logging subsystem.
 #[no_mangle]
 pub extern "C" fn ErrorMessage_get_data(this_ptr: &ErrorMessage) -> crate::c_types::Str {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().data;
 	inner_val.as_str().into()
 }
 /// A possibly human-readable error description.
-/// The string should be sanitized before it is used (e.g. emitted to logs
-/// or printed to stdout).  Otherwise, a well crafted error message may trigger a security
-/// vulnerability in the terminal emulator or the logging subsystem.
+/// The string should be sanitized before it is used (e.g. emitted to logs or printed to
+/// stdout). Otherwise, a well crafted error message may trigger a security vulnerability in
+/// the terminal emulator or the logging subsystem.
 #[no_mangle]
 pub extern "C" fn ErrorMessage_set_data(this_ptr: &mut ErrorMessage, mut val: crate::c_types::Str) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.data = val.into_string();
@@ -295,6 +301,117 @@ pub(crate) extern "C" fn ErrorMessage_clone_void(this_ptr: *const c_void) -> *mu
 #[no_mangle]
 /// Creates a copy of the ErrorMessage
 pub extern "C" fn ErrorMessage_clone(orig: &ErrorMessage) -> ErrorMessage {
+	orig.clone()
+}
+
+use lightning::ln::msgs::WarningMessage as nativeWarningMessageImport;
+pub(crate) type nativeWarningMessage = nativeWarningMessageImport;
+
+/// A warning message to be sent or received from a peer
+#[must_use]
+#[repr(C)]
+pub struct WarningMessage {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeWarningMessage,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for WarningMessage {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeWarningMessage>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the WarningMessage, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn WarningMessage_free(this_obj: WarningMessage) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn WarningMessage_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeWarningMessage); }
+}
+#[allow(unused)]
+impl WarningMessage {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeWarningMessage {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeWarningMessage {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeWarningMessage {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// The channel ID involved in the warning.
+///
+/// All-0s indicates a warning unrelated to a specific channel.
+#[no_mangle]
+pub extern "C" fn WarningMessage_get_channel_id(this_ptr: &WarningMessage) -> *const [u8; 32] {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
+	inner_val
+}
+/// The channel ID involved in the warning.
+///
+/// All-0s indicates a warning unrelated to a specific channel.
+#[no_mangle]
+pub extern "C" fn WarningMessage_set_channel_id(this_ptr: &mut WarningMessage, mut val: crate::c_types::ThirtyTwoBytes) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+}
+/// A possibly human-readable warning description.
+/// The string should be sanitized before it is used (e.g. emitted to logs or printed to
+/// stdout). Otherwise, a well crafted error message may trigger a security vulnerability in
+/// the terminal emulator or the logging subsystem.
+#[no_mangle]
+pub extern "C" fn WarningMessage_get_data(this_ptr: &WarningMessage) -> crate::c_types::Str {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().data;
+	inner_val.as_str().into()
+}
+/// A possibly human-readable warning description.
+/// The string should be sanitized before it is used (e.g. emitted to logs or printed to
+/// stdout). Otherwise, a well crafted error message may trigger a security vulnerability in
+/// the terminal emulator or the logging subsystem.
+#[no_mangle]
+pub extern "C" fn WarningMessage_set_data(this_ptr: &mut WarningMessage, mut val: crate::c_types::Str) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.data = val.into_string();
+}
+/// Constructs a new WarningMessage given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn WarningMessage_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut data_arg: crate::c_types::Str) -> WarningMessage {
+	WarningMessage { inner: ObjOps::heap_alloc(nativeWarningMessage {
+		channel_id: channel_id_arg.data,
+		data: data_arg.into_string(),
+	}), is_owned: true }
+}
+impl Clone for WarningMessage {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeWarningMessage>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn WarningMessage_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeWarningMessage)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the WarningMessage
+pub extern "C" fn WarningMessage_clone(orig: &WarningMessage) -> WarningMessage {
 	orig.clone()
 }
 
@@ -984,6 +1101,31 @@ pub extern "C" fn AcceptChannel_get_first_per_commitment_point(this_ptr: &Accept
 #[no_mangle]
 pub extern "C" fn AcceptChannel_set_first_per_commitment_point(this_ptr: &mut AcceptChannel, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.first_per_commitment_point = val.into_rust();
+}
+/// The channel type that this channel will represent. If none is set, we derive the channel
+/// type from the intersection of our feature bits with our counterparty's feature bits from
+/// the Init message.
+///
+/// This is required to match the equivalent field in [`OpenChannel::channel_type`].
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn AcceptChannel_get_channel_type(this_ptr: &AcceptChannel) -> crate::lightning::ln::features::ChannelTypeFeatures {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_type;
+	let mut local_inner_val = crate::lightning::ln::features::ChannelTypeFeatures { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::features::ChannelTypeFeatures<>) as *mut _ }, is_owned: false };
+	local_inner_val
+}
+/// The channel type that this channel will represent. If none is set, we derive the channel
+/// type from the intersection of our feature bits with our counterparty's feature bits from
+/// the Init message.
+///
+/// This is required to match the equivalent field in [`OpenChannel::channel_type`].
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn AcceptChannel_set_channel_type(this_ptr: &mut AcceptChannel, mut val: crate::lightning::ln::features::ChannelTypeFeatures) {
+	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_type = local_val;
 }
 impl Clone for AcceptChannel {
 	fn clone(&self) -> Self {
@@ -4394,6 +4536,15 @@ pub enum ErrorAction {
 		/// The message to send.
 		msg: crate::lightning::ln::msgs::ErrorMessage,
 	},
+	/// The peer did something incorrect. Tell them without closing any channels.
+	SendWarningMessage {
+		/// The message to send.
+		msg: crate::lightning::ln::msgs::WarningMessage,
+		/// The peer may have done something harmless that we weren't able to meaningfully process,
+		/// though we should still tell them about it.
+		/// If this event is logged, log it at the given level.
+		log_level: crate::lightning::util::logger::Level,
+	},
 }
 use lightning::ln::msgs::ErrorAction as nativeErrorAction;
 impl ErrorAction {
@@ -4421,6 +4572,14 @@ impl ErrorAction {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
+			ErrorAction::SendWarningMessage {ref msg, ref log_level, } => {
+				let mut msg_nonref = (*msg).clone();
+				let mut log_level_nonref = (*log_level).clone();
+				nativeErrorAction::SendWarningMessage {
+					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
+					log_level: log_level_nonref.into_native(),
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -4442,6 +4601,12 @@ impl ErrorAction {
 			ErrorAction::SendErrorMessage {mut msg, } => {
 				nativeErrorAction::SendErrorMessage {
 					msg: *unsafe { Box::from_raw(msg.take_inner()) },
+				}
+			},
+			ErrorAction::SendWarningMessage {mut msg, mut log_level, } => {
+				nativeErrorAction::SendWarningMessage {
+					msg: *unsafe { Box::from_raw(msg.take_inner()) },
+					log_level: log_level.into_native(),
 				}
 			},
 		}
@@ -4470,6 +4635,14 @@ impl ErrorAction {
 					msg: crate::lightning::ln::msgs::ErrorMessage { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
+			nativeErrorAction::SendWarningMessage {ref msg, ref log_level, } => {
+				let mut msg_nonref = (*msg).clone();
+				let mut log_level_nonref = (*log_level).clone();
+				ErrorAction::SendWarningMessage {
+					msg: crate::lightning::ln::msgs::WarningMessage { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
+					log_level: crate::lightning::util::logger::Level::native_into(log_level_nonref),
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -4491,6 +4664,12 @@ impl ErrorAction {
 			nativeErrorAction::SendErrorMessage {mut msg, } => {
 				ErrorAction::SendErrorMessage {
 					msg: crate::lightning::ln::msgs::ErrorMessage { inner: ObjOps::heap_alloc(msg), is_owned: true },
+				}
+			},
+			nativeErrorAction::SendWarningMessage {mut msg, mut log_level, } => {
+				ErrorAction::SendWarningMessage {
+					msg: crate::lightning::ln::msgs::WarningMessage { inner: ObjOps::heap_alloc(msg), is_owned: true },
+					log_level: crate::lightning::util::logger::Level::native_into(log_level),
 				}
 			},
 		}
@@ -4529,6 +4708,14 @@ pub extern "C" fn ErrorAction_ignore_duplicate_gossip() -> ErrorAction {
 pub extern "C" fn ErrorAction_send_error_message(msg: crate::lightning::ln::msgs::ErrorMessage) -> ErrorAction {
 	ErrorAction::SendErrorMessage {
 		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendWarningMessage-variant ErrorAction
+pub extern "C" fn ErrorAction_send_warning_message(msg: crate::lightning::ln::msgs::WarningMessage, log_level: crate::lightning::util::logger::Level) -> ErrorAction {
+	ErrorAction::SendWarningMessage {
+		msg,
+		log_level,
 	}
 }
 
@@ -5553,6 +5740,22 @@ pub(crate) extern "C" fn ErrorMessage_write_void(obj: *const c_void) -> crate::c
 pub extern "C" fn ErrorMessage_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ErrorMessageDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::ErrorMessage, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ErrorMessage { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the WarningMessage object into a byte array which can be read by WarningMessage_read
+pub extern "C" fn WarningMessage_write(obj: &WarningMessage) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn WarningMessage_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeWarningMessage) })
+}
+#[no_mangle]
+/// Read a WarningMessage from a byte array, created by WarningMessage_write
+pub extern "C" fn WarningMessage_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_WarningMessageDecodeErrorZ {
+	let res: Result<lightning::ln::msgs::WarningMessage, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::WarningMessage { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]

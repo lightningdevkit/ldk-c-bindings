@@ -655,19 +655,18 @@ extern "C" fn NetGraphMsgHandler_MessageSendEventsProvider_get_and_clear_pending
 }
 
 
-use lightning::routing::network_graph::DirectionalChannelInfo as nativeDirectionalChannelInfoImport;
-pub(crate) type nativeDirectionalChannelInfo = nativeDirectionalChannelInfoImport;
+use lightning::routing::network_graph::ChannelUpdateInfo as nativeChannelUpdateInfoImport;
+pub(crate) type nativeChannelUpdateInfo = nativeChannelUpdateInfoImport;
 
-/// Details about one direction of a channel. Received
-/// within a channel update.
+/// Details about one direction of a channel as received within a [`ChannelUpdate`].
 #[must_use]
 #[repr(C)]
-pub struct DirectionalChannelInfo {
+pub struct ChannelUpdateInfo {
 	/// A pointer to the opaque Rust object.
 
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeDirectionalChannelInfo,
+	pub inner: *mut nativeChannelUpdateInfo,
 	/// Indicates that this is the only struct which contains the same pointer.
 
 	/// Rust functions which take ownership of an object provided via an argument require
@@ -675,31 +674,31 @@ pub struct DirectionalChannelInfo {
 	pub is_owned: bool,
 }
 
-impl Drop for DirectionalChannelInfo {
+impl Drop for ChannelUpdateInfo {
 	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeDirectionalChannelInfo>::is_null(self.inner) {
+		if self.is_owned && !<*mut nativeChannelUpdateInfo>::is_null(self.inner) {
 			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
-/// Frees any resources used by the DirectionalChannelInfo, if is_owned is set and inner is non-NULL.
+/// Frees any resources used by the ChannelUpdateInfo, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_free(this_obj: DirectionalChannelInfo) { }
+pub extern "C" fn ChannelUpdateInfo_free(this_obj: ChannelUpdateInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn DirectionalChannelInfo_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDirectionalChannelInfo); }
+pub(crate) extern "C" fn ChannelUpdateInfo_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelUpdateInfo); }
 }
 #[allow(unused)]
-impl DirectionalChannelInfo {
-	pub(crate) fn get_native_ref(&self) -> &'static nativeDirectionalChannelInfo {
+impl ChannelUpdateInfo {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeChannelUpdateInfo {
 		unsafe { &*ObjOps::untweak_ptr(self.inner) }
 	}
-	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeDirectionalChannelInfo {
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeChannelUpdateInfo {
 		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
 	}
 	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-	pub(crate) fn take_inner(mut self) -> *mut nativeDirectionalChannelInfo {
+	pub(crate) fn take_inner(mut self) -> *mut nativeChannelUpdateInfo {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = core::ptr::null_mut();
@@ -709,71 +708,71 @@ impl DirectionalChannelInfo {
 /// When the last update to the channel direction was issued.
 /// Value is opaque, as set in the announcement.
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_get_last_update(this_ptr: &DirectionalChannelInfo) -> u32 {
+pub extern "C" fn ChannelUpdateInfo_get_last_update(this_ptr: &ChannelUpdateInfo) -> u32 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().last_update;
 	*inner_val
 }
 /// When the last update to the channel direction was issued.
 /// Value is opaque, as set in the announcement.
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_set_last_update(this_ptr: &mut DirectionalChannelInfo, mut val: u32) {
+pub extern "C" fn ChannelUpdateInfo_set_last_update(this_ptr: &mut ChannelUpdateInfo, mut val: u32) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.last_update = val;
 }
 /// Whether the channel can be currently used for payments (in this one direction).
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_get_enabled(this_ptr: &DirectionalChannelInfo) -> bool {
+pub extern "C" fn ChannelUpdateInfo_get_enabled(this_ptr: &ChannelUpdateInfo) -> bool {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().enabled;
 	*inner_val
 }
 /// Whether the channel can be currently used for payments (in this one direction).
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_set_enabled(this_ptr: &mut DirectionalChannelInfo, mut val: bool) {
+pub extern "C" fn ChannelUpdateInfo_set_enabled(this_ptr: &mut ChannelUpdateInfo, mut val: bool) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.enabled = val;
 }
 /// The difference in CLTV values that you must have when routing through this channel.
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_get_cltv_expiry_delta(this_ptr: &DirectionalChannelInfo) -> u16 {
+pub extern "C" fn ChannelUpdateInfo_get_cltv_expiry_delta(this_ptr: &ChannelUpdateInfo) -> u16 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().cltv_expiry_delta;
 	*inner_val
 }
 /// The difference in CLTV values that you must have when routing through this channel.
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_set_cltv_expiry_delta(this_ptr: &mut DirectionalChannelInfo, mut val: u16) {
+pub extern "C" fn ChannelUpdateInfo_set_cltv_expiry_delta(this_ptr: &mut ChannelUpdateInfo, mut val: u16) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.cltv_expiry_delta = val;
 }
 /// The minimum value, which must be relayed to the next hop via the channel
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_get_htlc_minimum_msat(this_ptr: &DirectionalChannelInfo) -> u64 {
+pub extern "C" fn ChannelUpdateInfo_get_htlc_minimum_msat(this_ptr: &ChannelUpdateInfo) -> u64 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().htlc_minimum_msat;
 	*inner_val
 }
 /// The minimum value, which must be relayed to the next hop via the channel
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_set_htlc_minimum_msat(this_ptr: &mut DirectionalChannelInfo, mut val: u64) {
+pub extern "C" fn ChannelUpdateInfo_set_htlc_minimum_msat(this_ptr: &mut ChannelUpdateInfo, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc_minimum_msat = val;
 }
 /// The maximum value which may be relayed to the next hop via the channel.
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_get_htlc_maximum_msat(this_ptr: &DirectionalChannelInfo) -> crate::c_types::derived::COption_u64Z {
+pub extern "C" fn ChannelUpdateInfo_get_htlc_maximum_msat(this_ptr: &ChannelUpdateInfo) -> crate::c_types::derived::COption_u64Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().htlc_maximum_msat;
 	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { inner_val.unwrap() }) };
 	local_inner_val
 }
 /// The maximum value which may be relayed to the next hop via the channel.
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_set_htlc_maximum_msat(this_ptr: &mut DirectionalChannelInfo, mut val: crate::c_types::derived::COption_u64Z) {
+pub extern "C" fn ChannelUpdateInfo_set_htlc_maximum_msat(this_ptr: &mut ChannelUpdateInfo, mut val: crate::c_types::derived::COption_u64Z) {
 	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc_maximum_msat = local_val;
 }
 /// Fees charged when the channel is used for routing
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_get_fees(this_ptr: &DirectionalChannelInfo) -> crate::lightning::routing::network_graph::RoutingFees {
+pub extern "C" fn ChannelUpdateInfo_get_fees(this_ptr: &ChannelUpdateInfo) -> crate::lightning::routing::network_graph::RoutingFees {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().fees;
 	crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::network_graph::RoutingFees<>) as *mut _) }, is_owned: false }
 }
 /// Fees charged when the channel is used for routing
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_set_fees(this_ptr: &mut DirectionalChannelInfo, mut val: crate::lightning::routing::network_graph::RoutingFees) {
+pub extern "C" fn ChannelUpdateInfo_set_fees(this_ptr: &mut ChannelUpdateInfo, mut val: crate::lightning::routing::network_graph::RoutingFees) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.fees = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Most recent update for the channel received from the network
@@ -783,7 +782,7 @@ pub extern "C" fn DirectionalChannelInfo_set_fees(this_ptr: &mut DirectionalChan
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_get_last_update_message(this_ptr: &DirectionalChannelInfo) -> crate::lightning::ln::msgs::ChannelUpdate {
+pub extern "C" fn ChannelUpdateInfo_get_last_update_message(this_ptr: &ChannelUpdateInfo) -> crate::lightning::ln::msgs::ChannelUpdate {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().last_update_message;
 	let mut local_inner_val = crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::ChannelUpdate<>) as *mut _ }, is_owned: false };
 	local_inner_val
@@ -795,17 +794,17 @@ pub extern "C" fn DirectionalChannelInfo_get_last_update_message(this_ptr: &Dire
 ///
 /// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_set_last_update_message(this_ptr: &mut DirectionalChannelInfo, mut val: crate::lightning::ln::msgs::ChannelUpdate) {
+pub extern "C" fn ChannelUpdateInfo_set_last_update_message(this_ptr: &mut ChannelUpdateInfo, mut val: crate::lightning::ln::msgs::ChannelUpdate) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.last_update_message = local_val;
 }
-/// Constructs a new DirectionalChannelInfo given each field
+/// Constructs a new ChannelUpdateInfo given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn DirectionalChannelInfo_new(mut last_update_arg: u32, mut enabled_arg: bool, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: u64, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z, mut fees_arg: crate::lightning::routing::network_graph::RoutingFees, mut last_update_message_arg: crate::lightning::ln::msgs::ChannelUpdate) -> DirectionalChannelInfo {
+pub extern "C" fn ChannelUpdateInfo_new(mut last_update_arg: u32, mut enabled_arg: bool, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: u64, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z, mut fees_arg: crate::lightning::routing::network_graph::RoutingFees, mut last_update_message_arg: crate::lightning::ln::msgs::ChannelUpdate) -> ChannelUpdateInfo {
 	let mut local_htlc_maximum_msat_arg = if htlc_maximum_msat_arg.is_some() { Some( { htlc_maximum_msat_arg.take() }) } else { None };
 	let mut local_last_update_message_arg = if last_update_message_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(last_update_message_arg.take_inner()) } }) };
-	DirectionalChannelInfo { inner: ObjOps::heap_alloc(nativeDirectionalChannelInfo {
+	ChannelUpdateInfo { inner: ObjOps::heap_alloc(nativeChannelUpdateInfo {
 		last_update: last_update_arg,
 		enabled: enabled_arg,
 		cltv_expiry_delta: cltv_expiry_delta_arg,
@@ -815,10 +814,10 @@ pub extern "C" fn DirectionalChannelInfo_new(mut last_update_arg: u32, mut enabl
 		last_update_message: local_last_update_message_arg,
 	}), is_owned: true }
 }
-impl Clone for DirectionalChannelInfo {
+impl Clone for ChannelUpdateInfo {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeDirectionalChannelInfo>::is_null(self.inner) { core::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelUpdateInfo>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -826,28 +825,28 @@ impl Clone for DirectionalChannelInfo {
 }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn DirectionalChannelInfo_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeDirectionalChannelInfo)).clone() })) as *mut c_void
+pub(crate) extern "C" fn ChannelUpdateInfo_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelUpdateInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
-/// Creates a copy of the DirectionalChannelInfo
-pub extern "C" fn DirectionalChannelInfo_clone(orig: &DirectionalChannelInfo) -> DirectionalChannelInfo {
+/// Creates a copy of the ChannelUpdateInfo
+pub extern "C" fn ChannelUpdateInfo_clone(orig: &ChannelUpdateInfo) -> ChannelUpdateInfo {
 	orig.clone()
 }
 #[no_mangle]
-/// Serialize the DirectionalChannelInfo object into a byte array which can be read by DirectionalChannelInfo_read
-pub extern "C" fn DirectionalChannelInfo_write(obj: &DirectionalChannelInfo) -> crate::c_types::derived::CVec_u8Z {
+/// Serialize the ChannelUpdateInfo object into a byte array which can be read by ChannelUpdateInfo_read
+pub extern "C" fn ChannelUpdateInfo_write(obj: &ChannelUpdateInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
-pub(crate) extern "C" fn DirectionalChannelInfo_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeDirectionalChannelInfo) })
+pub(crate) extern "C" fn ChannelUpdateInfo_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelUpdateInfo) })
 }
 #[no_mangle]
-/// Read a DirectionalChannelInfo from a byte array, created by DirectionalChannelInfo_write
-pub extern "C" fn DirectionalChannelInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_DirectionalChannelInfoDecodeErrorZ {
-	let res: Result<lightning::routing::network_graph::DirectionalChannelInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::DirectionalChannelInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+/// Read a ChannelUpdateInfo from a byte array, created by ChannelUpdateInfo_write
+pub extern "C" fn ChannelUpdateInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelUpdateInfoDecodeErrorZ {
+	let res: Result<lightning::routing::network_graph::ChannelUpdateInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::ChannelUpdateInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 
@@ -928,16 +927,16 @@ pub extern "C" fn ChannelInfo_set_node_one(this_ptr: &mut ChannelInfo, mut val: 
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn ChannelInfo_get_one_to_two(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::DirectionalChannelInfo {
+pub extern "C" fn ChannelInfo_get_one_to_two(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::ChannelUpdateInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().one_to_two;
-	let mut local_inner_val = crate::lightning::routing::network_graph::DirectionalChannelInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::DirectionalChannelInfo<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::network_graph::ChannelUpdateInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::ChannelUpdateInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Details about the first direction of a channel
 ///
 /// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn ChannelInfo_set_one_to_two(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::DirectionalChannelInfo) {
+pub extern "C" fn ChannelInfo_set_one_to_two(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::ChannelUpdateInfo) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.one_to_two = local_val;
 }
@@ -956,16 +955,16 @@ pub extern "C" fn ChannelInfo_set_node_two(this_ptr: &mut ChannelInfo, mut val: 
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn ChannelInfo_get_two_to_one(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::DirectionalChannelInfo {
+pub extern "C" fn ChannelInfo_get_two_to_one(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::ChannelUpdateInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().two_to_one;
-	let mut local_inner_val = crate::lightning::routing::network_graph::DirectionalChannelInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::DirectionalChannelInfo<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::network_graph::ChannelUpdateInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::ChannelUpdateInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Details about the second direction of a channel
 ///
 /// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn ChannelInfo_set_two_to_one(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::DirectionalChannelInfo) {
+pub extern "C" fn ChannelInfo_set_two_to_one(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::ChannelUpdateInfo) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.two_to_one = local_val;
 }
@@ -1040,6 +1039,287 @@ pub extern "C" fn ChannelInfo_read(ser: crate::c_types::u8slice) -> crate::c_typ
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::ChannelInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
+
+use lightning::routing::network_graph::DirectedChannelInfo as nativeDirectedChannelInfoImport;
+pub(crate) type nativeDirectedChannelInfo = nativeDirectedChannelInfoImport<'static>;
+
+/// A wrapper around [`ChannelInfo`] representing information about the channel as directed from a
+/// source node to a target node.
+#[must_use]
+#[repr(C)]
+pub struct DirectedChannelInfo {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeDirectedChannelInfo,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for DirectedChannelInfo {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeDirectedChannelInfo>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the DirectedChannelInfo, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn DirectedChannelInfo_free(this_obj: DirectedChannelInfo) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn DirectedChannelInfo_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDirectedChannelInfo); }
+}
+#[allow(unused)]
+impl DirectedChannelInfo {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeDirectedChannelInfo {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeDirectedChannelInfo {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeDirectedChannelInfo {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+impl Clone for DirectedChannelInfo {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeDirectedChannelInfo>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn DirectedChannelInfo_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeDirectedChannelInfo)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the DirectedChannelInfo
+pub extern "C" fn DirectedChannelInfo_clone(orig: &DirectedChannelInfo) -> DirectedChannelInfo {
+	orig.clone()
+}
+/// Returns information for the channel.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn DirectedChannelInfo_channel(this_arg: &DirectedChannelInfo) -> crate::lightning::routing::network_graph::ChannelInfo {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel();
+	crate::lightning::routing::network_graph::ChannelInfo { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::routing::network_graph::ChannelInfo<>) as *mut _) }, is_owned: false }
+}
+
+/// Returns information for the direction.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn DirectedChannelInfo_direction(this_arg: &DirectedChannelInfo) -> crate::lightning::routing::network_graph::ChannelUpdateInfo {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.direction();
+	let mut local_ret = crate::lightning::routing::network_graph::ChannelUpdateInfo { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::routing::network_graph::ChannelUpdateInfo<>) as *mut _ }, is_owned: false };
+	local_ret
+}
+
+/// Returns the [`EffectiveCapacity`] of the channel in the direction.
+///
+/// This is either the total capacity from the funding transaction, if known, or the
+/// `htlc_maximum_msat` for the direction as advertised by the gossip network, if known,
+/// whichever is smaller.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn DirectedChannelInfo_effective_capacity(this_arg: &DirectedChannelInfo) -> crate::lightning::routing::network_graph::EffectiveCapacity {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.effective_capacity();
+	crate::lightning::routing::network_graph::EffectiveCapacity::native_into(ret)
+}
+
+/// The effective capacity of a channel for routing purposes.
+///
+/// While this may be smaller than the actual channel capacity, amounts greater than
+/// [`Self::as_msat`] should not be routed through the channel.
+#[must_use]
+#[derive(Clone)]
+#[repr(C)]
+pub enum EffectiveCapacity {
+	/// The available liquidity in the channel known from being a channel counterparty, and thus a
+	/// direct hop.
+	ExactLiquidity {
+		/// Either the inbound or outbound liquidity depending on the direction, denominated in
+		/// millisatoshi.
+		liquidity_msat: u64,
+	},
+	/// The maximum HTLC amount in one direction as advertised on the gossip network.
+	MaximumHTLC {
+		/// The maximum HTLC amount denominated in millisatoshi.
+		amount_msat: u64,
+	},
+	/// The total capacity of the channel as determined by the funding transaction.
+	Total {
+		/// The funding amount denominated in millisatoshi.
+		capacity_msat: u64,
+	},
+	/// A capacity sufficient to route any payment, typically used for private channels provided by
+	/// an invoice.
+	Infinite,
+	/// A capacity that is unknown possibly because either the chain state is unavailable to know
+	/// the total capacity or the `htlc_maximum_msat` was not advertised on the gossip network.
+	Unknown,
+}
+use lightning::routing::network_graph::EffectiveCapacity as nativeEffectiveCapacity;
+impl EffectiveCapacity {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeEffectiveCapacity {
+		match self {
+			EffectiveCapacity::ExactLiquidity {ref liquidity_msat, } => {
+				let mut liquidity_msat_nonref = (*liquidity_msat).clone();
+				nativeEffectiveCapacity::ExactLiquidity {
+					liquidity_msat: liquidity_msat_nonref,
+				}
+			},
+			EffectiveCapacity::MaximumHTLC {ref amount_msat, } => {
+				let mut amount_msat_nonref = (*amount_msat).clone();
+				nativeEffectiveCapacity::MaximumHTLC {
+					amount_msat: amount_msat_nonref,
+				}
+			},
+			EffectiveCapacity::Total {ref capacity_msat, } => {
+				let mut capacity_msat_nonref = (*capacity_msat).clone();
+				nativeEffectiveCapacity::Total {
+					capacity_msat: capacity_msat_nonref,
+				}
+			},
+			EffectiveCapacity::Infinite => nativeEffectiveCapacity::Infinite,
+			EffectiveCapacity::Unknown => nativeEffectiveCapacity::Unknown,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeEffectiveCapacity {
+		match self {
+			EffectiveCapacity::ExactLiquidity {mut liquidity_msat, } => {
+				nativeEffectiveCapacity::ExactLiquidity {
+					liquidity_msat: liquidity_msat,
+				}
+			},
+			EffectiveCapacity::MaximumHTLC {mut amount_msat, } => {
+				nativeEffectiveCapacity::MaximumHTLC {
+					amount_msat: amount_msat,
+				}
+			},
+			EffectiveCapacity::Total {mut capacity_msat, } => {
+				nativeEffectiveCapacity::Total {
+					capacity_msat: capacity_msat,
+				}
+			},
+			EffectiveCapacity::Infinite => nativeEffectiveCapacity::Infinite,
+			EffectiveCapacity::Unknown => nativeEffectiveCapacity::Unknown,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeEffectiveCapacity) -> Self {
+		match native {
+			nativeEffectiveCapacity::ExactLiquidity {ref liquidity_msat, } => {
+				let mut liquidity_msat_nonref = (*liquidity_msat).clone();
+				EffectiveCapacity::ExactLiquidity {
+					liquidity_msat: liquidity_msat_nonref,
+				}
+			},
+			nativeEffectiveCapacity::MaximumHTLC {ref amount_msat, } => {
+				let mut amount_msat_nonref = (*amount_msat).clone();
+				EffectiveCapacity::MaximumHTLC {
+					amount_msat: amount_msat_nonref,
+				}
+			},
+			nativeEffectiveCapacity::Total {ref capacity_msat, } => {
+				let mut capacity_msat_nonref = (*capacity_msat).clone();
+				EffectiveCapacity::Total {
+					capacity_msat: capacity_msat_nonref,
+				}
+			},
+			nativeEffectiveCapacity::Infinite => EffectiveCapacity::Infinite,
+			nativeEffectiveCapacity::Unknown => EffectiveCapacity::Unknown,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeEffectiveCapacity) -> Self {
+		match native {
+			nativeEffectiveCapacity::ExactLiquidity {mut liquidity_msat, } => {
+				EffectiveCapacity::ExactLiquidity {
+					liquidity_msat: liquidity_msat,
+				}
+			},
+			nativeEffectiveCapacity::MaximumHTLC {mut amount_msat, } => {
+				EffectiveCapacity::MaximumHTLC {
+					amount_msat: amount_msat,
+				}
+			},
+			nativeEffectiveCapacity::Total {mut capacity_msat, } => {
+				EffectiveCapacity::Total {
+					capacity_msat: capacity_msat,
+				}
+			},
+			nativeEffectiveCapacity::Infinite => EffectiveCapacity::Infinite,
+			nativeEffectiveCapacity::Unknown => EffectiveCapacity::Unknown,
+		}
+	}
+}
+/// Frees any resources used by the EffectiveCapacity
+#[no_mangle]
+pub extern "C" fn EffectiveCapacity_free(this_ptr: EffectiveCapacity) { }
+/// Creates a copy of the EffectiveCapacity
+#[no_mangle]
+pub extern "C" fn EffectiveCapacity_clone(orig: &EffectiveCapacity) -> EffectiveCapacity {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new ExactLiquidity-variant EffectiveCapacity
+pub extern "C" fn EffectiveCapacity_exact_liquidity(liquidity_msat: u64) -> EffectiveCapacity {
+	EffectiveCapacity::ExactLiquidity {
+		liquidity_msat,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new MaximumHTLC-variant EffectiveCapacity
+pub extern "C" fn EffectiveCapacity_maximum_htlc(amount_msat: u64) -> EffectiveCapacity {
+	EffectiveCapacity::MaximumHTLC {
+		amount_msat,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new Total-variant EffectiveCapacity
+pub extern "C" fn EffectiveCapacity_total(capacity_msat: u64) -> EffectiveCapacity {
+	EffectiveCapacity::Total {
+		capacity_msat,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new Infinite-variant EffectiveCapacity
+pub extern "C" fn EffectiveCapacity_infinite() -> EffectiveCapacity {
+	EffectiveCapacity::Infinite}
+#[no_mangle]
+/// Utility method to constructs a new Unknown-variant EffectiveCapacity
+pub extern "C" fn EffectiveCapacity_unknown() -> EffectiveCapacity {
+	EffectiveCapacity::Unknown}
+/// The presumed channel capacity denominated in millisatoshi for [`EffectiveCapacity::Unknown`] to
+/// use when making routing decisions.
+
+#[no_mangle]
+pub static UNKNOWN_CHANNEL_CAPACITY_MSAT: u64 = lightning::routing::network_graph::UNKNOWN_CHANNEL_CAPACITY_MSAT;
+/// Returns the effective capacity denominated in millisatoshi.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn EffectiveCapacity_as_msat(this_arg: &EffectiveCapacity) -> u64 {
+	let mut ret = this_arg.to_native().as_msat();
+	ret
+}
+
 
 use lightning::routing::network_graph::RoutingFees as nativeRoutingFeesImport;
 pub(crate) type nativeRoutingFees = nativeRoutingFeesImport;
@@ -1608,6 +1888,24 @@ pub extern "C" fn NetworkGraph_close_channel_from_update(this_arg: &NetworkGraph
 #[no_mangle]
 pub extern "C" fn NetworkGraph_fail_node(this_arg: &NetworkGraph, mut _node_id: crate::c_types::PublicKey, mut is_permanent: bool) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.fail_node(&_node_id.into_rust(), is_permanent)
+}
+
+/// Removes information about channels that we haven't heard any updates about in some time.
+/// This can be used regularly to prune the network graph of channels that likely no longer
+/// exist.
+///
+/// While there is no formal requirement that nodes regularly re-broadcast their channel
+/// updates every two weeks, the non-normative section of BOLT 7 currently suggests that
+/// pruning occur for updates which are at least two weeks old, which we implement here.
+///
+/// Note that for users of the `lightning-background-processor` crate this method may be
+/// automatically called regularly for you.
+///
+/// This method is only available with the `std` feature. See
+/// [`NetworkGraph::remove_stale_channels_with_time`] for `no-std` use.
+#[no_mangle]
+pub extern "C" fn NetworkGraph_remove_stale_channels(this_arg: &NetworkGraph) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.remove_stale_channels()
 }
 
 /// Removes information about channels that we haven't heard any updates about in some time.

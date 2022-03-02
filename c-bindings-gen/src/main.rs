@@ -1248,7 +1248,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						let self_ty = &i.self_ty;
 						let ref_type: syn::Type = syn::parse_quote!(&#self_ty);
 						let new_var = types.write_from_c_conversion_new_var(w, &format_ident!("o"), &ref_type, Some(&gen_types));
-						write!(w, "\tformat!(\"{{}}\", ").unwrap();
+						write!(w, "\talloc::format!(\"{{}}\", ").unwrap();
 						types.write_from_c_conversion_prefix(w, &ref_type, Some(&gen_types));
 						write!(w, "{}o", if new_var { "local_" } else { "" }).unwrap();
 						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
@@ -1647,10 +1647,20 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 	writeln_fn_docs(w, &f.attrs, "", types, Some(&gen_types), f.sig.inputs.iter(), &f.sig.output);
 
 	write!(w, "#[no_mangle]\npub extern \"C\" fn {}(", f.sig.ident).unwrap();
+
+
 	write_method_params(w, &f.sig, "", types, Some(&gen_types), false, true);
 	write!(w, " {{\n\t").unwrap();
 	write_method_var_decl_body(w, &f.sig, "", types, Some(&gen_types), false);
-	write!(w, "{}::{}(", types.module_path, f.sig.ident).unwrap();
+	write!(w, "{}::{}", types.module_path, f.sig.ident).unwrap();
+
+	let mut function_generic_args = Vec::new();
+	maybe_write_generics(&mut function_generic_args, &f.sig.generics, types, true);
+	if !function_generic_args.is_empty() {
+		write!(w, "::{}", String::from_utf8(function_generic_args).unwrap()).unwrap();
+	}
+	write!(w, "(").unwrap();
+
 	write_method_call_params(w, &f.sig, "", types, Some(&gen_types), "", false);
 	writeln!(w, "\n}}\n").unwrap();
 }

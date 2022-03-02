@@ -97,22 +97,22 @@ use alloc::{vec::Vec, boxed::Box};
 #[no_mangle]
 /// Get the string representation of a Invoice object
 pub extern "C" fn Invoice_to_str(o: &crate::lightning_invoice::Invoice) -> Str {
-	format!("{}", o.get_native_ref()).into()
+	alloc::format!("{}", o.get_native_ref()).into()
 }
 #[no_mangle]
 /// Get the string representation of a SignedRawInvoice object
 pub extern "C" fn SignedRawInvoice_to_str(o: &crate::lightning_invoice::SignedRawInvoice) -> Str {
-	format!("{}", o.get_native_ref()).into()
+	alloc::format!("{}", o.get_native_ref()).into()
 }
 #[no_mangle]
 /// Get the string representation of a Currency object
 pub extern "C" fn Currency_to_str(o: &crate::lightning_invoice::Currency) -> Str {
-	format!("{}", &o.to_native()).into()
+	alloc::format!("{}", &o.to_native()).into()
 }
 #[no_mangle]
 /// Get the string representation of a SiPrefix object
 pub extern "C" fn SiPrefix_to_str(o: &crate::lightning_invoice::SiPrefix) -> Str {
-	format!("{}", &o.to_native()).into()
+	alloc::format!("{}", &o.to_native()).into()
 }
 }
 mod tb {
@@ -126,9 +126,37 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 }
+mod prelude {
+
+use alloc::str::FromStr;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
+mod sync {
+
+use alloc::str::FromStr;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
+/// The maximum timestamp as [`Duration::as_secs`] since the Unix epoch allowed by [`BOLT 11`].
+///
+/// [BOLT 11]: https://github.com/lightning/bolts/blob/master/11-payment-encoding.md
+
+#[no_mangle]
+pub static MAX_TIMESTAMP: u64 = lightning_invoice::MAX_TIMESTAMP;
 /// Default expiry time as defined by [BOLT 11].
 ///
-/// [BOLT 11]: https://github.com/lightningnetwork/lightning-rfc/blob/master/11-payment-encoding.md
+/// [BOLT 11]: https://github.com/lightning/bolts/blob/master/11-payment-encoding.md
 
 #[no_mangle]
 pub static DEFAULT_EXPIRY_TIME: u64 = lightning_invoice::DEFAULT_EXPIRY_TIME;
@@ -137,29 +165,11 @@ pub static DEFAULT_EXPIRY_TIME: u64 = lightning_invoice::DEFAULT_EXPIRY_TIME;
 /// Note that this is *not* the same value as rust-lightning's minimum CLTV expiry, which is
 /// provided in [`MIN_FINAL_CLTV_EXPIRY`].
 ///
-/// [BOLT 11]: https://github.com/lightningnetwork/lightning-rfc/blob/master/11-payment-encoding.md
+/// [BOLT 11]: https://github.com/lightning/bolts/blob/master/11-payment-encoding.md
 /// [`MIN_FINAL_CLTV_EXPIRY`]: lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY
 
 #[no_mangle]
 pub static DEFAULT_MIN_FINAL_CLTV_EXPIRY: u64 = lightning_invoice::DEFAULT_MIN_FINAL_CLTV_EXPIRY;
-/// **Call this function on startup to ensure that all assumptions about the platform are valid.**
-///
-/// Unfortunately we have to make assumptions about the upper bounds of the `SystemTime` type on
-/// your platform which we can't fully verify at compile time and which isn't part of it's contract.
-/// To our best knowledge our assumptions hold for all platforms officially supported by rust, but
-/// since this check is fast we recommend to do it anyway.
-///
-/// If this function fails this is considered a bug. Please open an issue describing your
-/// platform and stating your current system time.
-///
-/// # Panics
-/// If the check fails this function panics. By calling this function on startup you ensure that
-/// this wont happen at an arbitrary later point in time.
-#[no_mangle]
-pub extern "C" fn check_platform() {
-	lightning_invoice::check_platform()
-}
-
 
 use lightning_invoice::Invoice as nativeInvoiceImport;
 pub(crate) type nativeInvoice = nativeInvoiceImport;
@@ -515,12 +525,12 @@ pub extern "C" fn RawDataPart_clone(orig: &RawDataPart) -> RawDataPart {
 use lightning_invoice::PositiveTimestamp as nativePositiveTimestampImport;
 pub(crate) type nativePositiveTimestamp = nativePositiveTimestampImport;
 
-/// A timestamp that refers to a date after 1 January 1970 which means its representation as UNIX
-/// timestamp is positive.
+/// A timestamp that refers to a date after 1 January 1970.
 ///
 /// # Invariants
-/// The UNIX timestamp representing the stored time has to be positive and small enough so that
-/// a `EpiryTime` can be added to it without an overflow.
+///
+/// The Unix timestamp representing the stored time has to be positive and no greater than
+/// [`MAX_TIMESTAMP`].
 #[must_use]
 #[repr(C)]
 pub struct PositiveTimestamp {
@@ -1076,11 +1086,6 @@ pub(crate) type nativeExpiryTime = nativeExpiryTimeImport;
 
 /// Positive duration that defines when (relatively to the timestamp) in the future the invoice
 /// expires
-///
-/// # Invariants
-/// The number of seconds this expiry time represents has to be in the range
-/// `0...(SYSTEM_TIME_MAX_UNIX_TIMESTAMP - MAX_EXPIRY_TIME)` to avoid overflows when adding it to a
-/// timestamp
 #[must_use]
 #[repr(C)]
 pub struct ExpiryTime {
@@ -1760,9 +1765,9 @@ pub extern "C" fn RawInvoice_currency(this_arg: &RawInvoice) -> crate::lightning
 	crate::lightning_invoice::Currency::native_into(ret)
 }
 
-/// Create a new `PositiveTimestamp` from a unix timestamp in the Range
-/// `0...SYSTEM_TIME_MAX_UNIX_TIMESTAMP - MAX_EXPIRY_TIME`, otherwise return a
-/// `CreationError::TimestampOutOfBounds`.
+/// Creates a `PositiveTimestamp` from a Unix timestamp in the range `0..=MAX_TIMESTAMP`.
+///
+/// Otherwise, returns a [`CreationError::TimestampOutOfBounds`].
 #[must_use]
 #[no_mangle]
 pub extern "C" fn PositiveTimestamp_from_unix_timestamp(mut unix_seconds: u64) -> crate::c_types::derived::CResult_PositiveTimestampCreationErrorZ {
@@ -1771,9 +1776,10 @@ pub extern "C" fn PositiveTimestamp_from_unix_timestamp(mut unix_seconds: u64) -
 	local_ret
 }
 
-/// Create a new `PositiveTimestamp` from a `SystemTime` with a corresponding unix timestamp in
-/// the Range `0...SYSTEM_TIME_MAX_UNIX_TIMESTAMP - MAX_EXPIRY_TIME`, otherwise return a
-/// `CreationError::TimestampOutOfBounds`.
+/// Creates a `PositiveTimestamp` from a [`SystemTime`] with a corresponding Unix timestamp in
+/// the range `0..=MAX_TIMESTAMP`.
+///
+/// Otherwise, returns a [`CreationError::TimestampOutOfBounds`].
 #[must_use]
 #[no_mangle]
 pub extern "C" fn PositiveTimestamp_from_system_time(mut time: u64) -> crate::c_types::derived::CResult_PositiveTimestampCreationErrorZ {
@@ -1782,7 +1788,19 @@ pub extern "C" fn PositiveTimestamp_from_system_time(mut time: u64) -> crate::c_
 	local_ret
 }
 
-/// Returns the UNIX timestamp representing the stored time
+/// Creates a `PositiveTimestamp` from a [`Duration`] since the Unix epoch in the range
+/// `0..=MAX_TIMESTAMP`.
+///
+/// Otherwise, returns a [`CreationError::TimestampOutOfBounds`].
+#[must_use]
+#[no_mangle]
+pub extern "C" fn PositiveTimestamp_from_duration_since_epoch(mut duration: u64) -> crate::c_types::derived::CResult_PositiveTimestampCreationErrorZ {
+	let mut ret = lightning_invoice::PositiveTimestamp::from_duration_since_epoch(core::time::Duration::from_secs(duration));
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PositiveTimestamp { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
+	local_ret
+}
+
+/// Returns the Unix timestamp representing the stored time
 #[must_use]
 #[no_mangle]
 pub extern "C" fn PositiveTimestamp_as_unix_timestamp(this_arg: &PositiveTimestamp) -> u64 {
@@ -1790,7 +1808,15 @@ pub extern "C" fn PositiveTimestamp_as_unix_timestamp(this_arg: &PositiveTimesta
 	ret
 }
 
-/// Returns a reference to the internal `SystemTime` time representation
+/// Returns the duration of the stored time since the Unix epoch
+#[must_use]
+#[no_mangle]
+pub extern "C" fn PositiveTimestamp_as_duration_since_epoch(this_arg: &PositiveTimestamp) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_duration_since_epoch();
+	ret.as_secs()
+}
+
+/// Returns the [`SystemTime`] representing the stored time
 #[must_use]
 #[no_mangle]
 pub extern "C" fn PositiveTimestamp_as_time(this_arg: &PositiveTimestamp) -> u64 {
@@ -1843,12 +1869,20 @@ pub extern "C" fn Invoice_from_signed(mut signed_invoice: crate::lightning_invoi
 	local_ret
 }
 
-/// Returns the `Invoice`'s timestamp (should equal it's creation time)
+/// Returns the `Invoice`'s timestamp (should equal its creation time)
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Invoice_timestamp(this_arg: &Invoice) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.timestamp();
 	ret.duration_since(::std::time::SystemTime::UNIX_EPOCH).expect("Times must be post-1970").as_secs()
+}
+
+/// Returns the `Invoice`'s timestamp as a duration since the Unix epoch
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Invoice_duration_since_epoch(this_arg: &Invoice) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.duration_since_epoch();
+	ret.as_secs()
 }
 
 /// Returns the hash to which we will receive the preimage on completion of the payment
@@ -1910,6 +1944,15 @@ pub extern "C" fn Invoice_expiry_time(this_arg: &Invoice) -> u64 {
 #[no_mangle]
 pub extern "C" fn Invoice_is_expired(this_arg: &Invoice) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_expired();
+	ret
+}
+
+/// Returns whether the expiry time would pass at the given point in time.
+/// `at_time` is the timestamp as a duration since the Unix epoch.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Invoice_would_expire(this_arg: &Invoice, mut at_time: u64) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.would_expire(core::time::Duration::from_secs(at_time));
 	ret
 }
 
@@ -1977,26 +2020,20 @@ pub extern "C" fn Description_into_inner(mut this_arg: Description) -> crate::c_
 	ret.into()
 }
 
-/// Construct an `ExpiryTime` from seconds. If there exists a `PositiveTimestamp` which would
-/// overflow on adding the `EpiryTime` to it then this function will return a
-/// `CreationError::ExpiryTimeOutOfBounds`.
+/// Construct an `ExpiryTime` from seconds.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ExpiryTime_from_seconds(mut seconds: u64) -> crate::c_types::derived::CResult_ExpiryTimeCreationErrorZ {
+pub extern "C" fn ExpiryTime_from_seconds(mut seconds: u64) -> crate::lightning_invoice::ExpiryTime {
 	let mut ret = lightning_invoice::ExpiryTime::from_seconds(seconds);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::ExpiryTime { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
-	local_ret
+	crate::lightning_invoice::ExpiryTime { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Construct an `ExpiryTime` from a `Duration`. If there exists a `PositiveTimestamp` which
-/// would overflow on adding the `EpiryTime` to it then this function will return a
-/// `CreationError::ExpiryTimeOutOfBounds`.
+/// Construct an `ExpiryTime` from a `Duration`.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ExpiryTime_from_duration(mut duration: u64) -> crate::c_types::derived::CResult_ExpiryTimeCreationErrorZ {
+pub extern "C" fn ExpiryTime_from_duration(mut duration: u64) -> crate::lightning_invoice::ExpiryTime {
 	let mut ret = lightning_invoice::ExpiryTime::from_duration(core::time::Duration::from_secs(duration));
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::ExpiryTime { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::CreationError::native_into(e) }).into() };
-	local_ret
+	crate::lightning_invoice::ExpiryTime { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns the expiry time in seconds
@@ -2041,12 +2078,15 @@ pub enum CreationError {
 	DescriptionTooLong,
 	/// The specified route has too many hops and can't be encoded
 	RouteTooLong,
-	/// The unix timestamp of the supplied date is <0 or can't be represented as `SystemTime`
+	/// The Unix timestamp of the supplied date is less than zero or greater than 35-bits
 	TimestampOutOfBounds,
-	/// The supplied expiry time could cause an overflow if added to a `PositiveTimestamp`
-	ExpiryTimeOutOfBounds,
 	/// The supplied millisatoshi amount was greater than the total bitcoin supply.
 	InvalidAmount,
+	/// Route hints were required for this invoice and were missing. Applies to
+	/// [phantom invoices].
+	///
+	/// [phantom invoices]: crate::utils::create_phantom_invoice
+	MissingRouteHints,
 }
 use lightning_invoice::CreationError as nativeCreationError;
 impl CreationError {
@@ -2056,8 +2096,8 @@ impl CreationError {
 			CreationError::DescriptionTooLong => nativeCreationError::DescriptionTooLong,
 			CreationError::RouteTooLong => nativeCreationError::RouteTooLong,
 			CreationError::TimestampOutOfBounds => nativeCreationError::TimestampOutOfBounds,
-			CreationError::ExpiryTimeOutOfBounds => nativeCreationError::ExpiryTimeOutOfBounds,
 			CreationError::InvalidAmount => nativeCreationError::InvalidAmount,
+			CreationError::MissingRouteHints => nativeCreationError::MissingRouteHints,
 		}
 	}
 	#[allow(unused)]
@@ -2066,8 +2106,8 @@ impl CreationError {
 			CreationError::DescriptionTooLong => nativeCreationError::DescriptionTooLong,
 			CreationError::RouteTooLong => nativeCreationError::RouteTooLong,
 			CreationError::TimestampOutOfBounds => nativeCreationError::TimestampOutOfBounds,
-			CreationError::ExpiryTimeOutOfBounds => nativeCreationError::ExpiryTimeOutOfBounds,
 			CreationError::InvalidAmount => nativeCreationError::InvalidAmount,
+			CreationError::MissingRouteHints => nativeCreationError::MissingRouteHints,
 		}
 	}
 	#[allow(unused)]
@@ -2076,8 +2116,8 @@ impl CreationError {
 			nativeCreationError::DescriptionTooLong => CreationError::DescriptionTooLong,
 			nativeCreationError::RouteTooLong => CreationError::RouteTooLong,
 			nativeCreationError::TimestampOutOfBounds => CreationError::TimestampOutOfBounds,
-			nativeCreationError::ExpiryTimeOutOfBounds => CreationError::ExpiryTimeOutOfBounds,
 			nativeCreationError::InvalidAmount => CreationError::InvalidAmount,
+			nativeCreationError::MissingRouteHints => CreationError::MissingRouteHints,
 		}
 	}
 	#[allow(unused)]
@@ -2086,8 +2126,8 @@ impl CreationError {
 			nativeCreationError::DescriptionTooLong => CreationError::DescriptionTooLong,
 			nativeCreationError::RouteTooLong => CreationError::RouteTooLong,
 			nativeCreationError::TimestampOutOfBounds => CreationError::TimestampOutOfBounds,
-			nativeCreationError::ExpiryTimeOutOfBounds => CreationError::ExpiryTimeOutOfBounds,
 			nativeCreationError::InvalidAmount => CreationError::InvalidAmount,
+			nativeCreationError::MissingRouteHints => CreationError::MissingRouteHints,
 		}
 	}
 }
@@ -2109,13 +2149,13 @@ pub extern "C" fn CreationError_route_too_long() -> CreationError {
 pub extern "C" fn CreationError_timestamp_out_of_bounds() -> CreationError {
 	CreationError::TimestampOutOfBounds}
 #[no_mangle]
-/// Utility method to constructs a new ExpiryTimeOutOfBounds-variant CreationError
-pub extern "C" fn CreationError_expiry_time_out_of_bounds() -> CreationError {
-	CreationError::ExpiryTimeOutOfBounds}
-#[no_mangle]
 /// Utility method to constructs a new InvalidAmount-variant CreationError
 pub extern "C" fn CreationError_invalid_amount() -> CreationError {
 	CreationError::InvalidAmount}
+#[no_mangle]
+/// Utility method to constructs a new MissingRouteHints-variant CreationError
+pub extern "C" fn CreationError_missing_route_hints() -> CreationError {
+	CreationError::MissingRouteHints}
 /// Checks if two CreationErrors contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -2125,7 +2165,7 @@ pub extern "C" fn CreationError_eq(a: &CreationError, b: &CreationError) -> bool
 #[no_mangle]
 /// Get the string representation of a CreationError object
 pub extern "C" fn CreationError_to_str(o: &crate::lightning_invoice::CreationError) -> Str {
-	format!("{}", &o.to_native()).into()
+	alloc::format!("{}", &o.to_native()).into()
 }
 /// Errors that may occur when converting a `RawInvoice` to an `Invoice`. They relate to the
 /// requirements sections in BOLT #11
@@ -2272,7 +2312,7 @@ pub extern "C" fn SemanticError_eq(a: &SemanticError, b: &SemanticError) -> bool
 #[no_mangle]
 /// Get the string representation of a SemanticError object
 pub extern "C" fn SemanticError_to_str(o: &crate::lightning_invoice::SemanticError) -> Str {
-	format!("{}", &o.to_native()).into()
+	alloc::format!("{}", &o.to_native()).into()
 }
 /// When signing using a fallible method either an user-supplied `SignError` or a `CreationError`
 /// may occur.
@@ -2371,5 +2411,5 @@ pub extern "C" fn SignOrCreationError_eq(a: &SignOrCreationError, b: &SignOrCrea
 #[no_mangle]
 /// Get the string representation of a SignOrCreationError object
 pub extern "C" fn SignOrCreationError_to_str(o: &crate::lightning_invoice::SignOrCreationError) -> Str {
-	format!("{}", &o.to_native()).into()
+	alloc::format!("{}", &o.to_native()).into()
 }

@@ -45,6 +45,135 @@ pub extern "C" fn build_closing_transaction(mut to_holder_value_sat: u64, mut to
 	crate::c_types::Transaction::from_bitcoin(&ret)
 }
 
+
+use lightning::ln::chan_utils::CounterpartyCommitmentSecrets as nativeCounterpartyCommitmentSecretsImport;
+pub(crate) type nativeCounterpartyCommitmentSecrets = nativeCounterpartyCommitmentSecretsImport;
+
+/// Implements the per-commitment secret storage scheme from
+/// [BOLT 3](https://github.com/lightningnetwork/lightning-rfc/blob/dcbf8583976df087c79c3ce0b535311212e6812d/03-transactions.md#efficient-per-commitment-secret-storage).
+///
+/// Allows us to keep track of all of the revocation secrets of our counterparty in just 50*32 bytes
+/// or so.
+#[must_use]
+#[repr(C)]
+pub struct CounterpartyCommitmentSecrets {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeCounterpartyCommitmentSecrets,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for CounterpartyCommitmentSecrets {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeCounterpartyCommitmentSecrets>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the CounterpartyCommitmentSecrets, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn CounterpartyCommitmentSecrets_free(this_obj: CounterpartyCommitmentSecrets) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn CounterpartyCommitmentSecrets_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeCounterpartyCommitmentSecrets); }
+}
+#[allow(unused)]
+impl CounterpartyCommitmentSecrets {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeCounterpartyCommitmentSecrets {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeCounterpartyCommitmentSecrets {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeCounterpartyCommitmentSecrets {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+impl Clone for CounterpartyCommitmentSecrets {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeCounterpartyCommitmentSecrets>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn CounterpartyCommitmentSecrets_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCounterpartyCommitmentSecrets)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the CounterpartyCommitmentSecrets
+pub extern "C" fn CounterpartyCommitmentSecrets_clone(orig: &CounterpartyCommitmentSecrets) -> CounterpartyCommitmentSecrets {
+	orig.clone()
+}
+/// Creates a new empty `CounterpartyCommitmentSecrets` structure.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn CounterpartyCommitmentSecrets_new() -> CounterpartyCommitmentSecrets {
+	let mut ret = lightning::ln::chan_utils::CounterpartyCommitmentSecrets::new();
+	CounterpartyCommitmentSecrets { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns the minimum index of all stored secrets. Note that indexes start
+/// at 1 << 48 and get decremented by one for each new secret.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn CounterpartyCommitmentSecrets_get_min_seen_secret(this_arg: &CounterpartyCommitmentSecrets) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_min_seen_secret();
+	ret
+}
+
+/// Inserts the `secret` at `idx`. Returns `Ok(())` if the secret
+/// was generated in accordance with BOLT 3 and is consistent with previous secrets.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn CounterpartyCommitmentSecrets_provide_secret(this_arg: &mut CounterpartyCommitmentSecrets, mut idx: u64, mut secret: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut nativeCounterpartyCommitmentSecrets)) }.provide_secret(idx, secret.data);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Returns the secret at `idx`.
+/// Returns `None` if `idx` is < [`CounterpartyCommitmentSecrets::get_min_seen_secret`].
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn CounterpartyCommitmentSecrets_get_secret(this_arg: &CounterpartyCommitmentSecrets, mut idx: u64) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_secret(idx);
+	let mut local_ret = if ret.is_none() { crate::c_types::ThirtyTwoBytes { data: [0; 32] } } else {  { crate::c_types::ThirtyTwoBytes { data: (ret.unwrap()) } } };
+	local_ret
+}
+
+#[no_mangle]
+/// Serialize the CounterpartyCommitmentSecrets object into a byte array which can be read by CounterpartyCommitmentSecrets_read
+pub extern "C" fn CounterpartyCommitmentSecrets_write(obj: &CounterpartyCommitmentSecrets) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn CounterpartyCommitmentSecrets_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeCounterpartyCommitmentSecrets) })
+}
+#[no_mangle]
+/// Read a CounterpartyCommitmentSecrets from a byte array, created by CounterpartyCommitmentSecrets_write
+pub extern "C" fn CounterpartyCommitmentSecrets_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CounterpartyCommitmentSecretsDecodeErrorZ {
+	let res: Result<lightning::ln::chan_utils::CounterpartyCommitmentSecrets, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::CounterpartyCommitmentSecrets { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
 /// Derives a per-commitment-transaction private key (eg an htlc key or delayed_payment key)
 /// from the base secret and the per_commitment_point.
 ///
@@ -1861,6 +1990,8 @@ pub extern "C" fn TrustedCommitmentTransaction_opt_anchors(this_arg: &TrustedCom
 /// which HTLCOutputInCommitment::transaction_output_index.is_some()).
 ///
 /// The returned Vec has one entry for each HTLC, and in the same order.
+///
+/// This function is only valid in the holder commitment context, it always uses SigHashType::All.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn TrustedCommitmentTransaction_get_htlc_sigs(this_arg: &TrustedCommitmentTransaction, htlc_base_key: *const [u8; 32], channel_parameters: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters) -> crate::c_types::derived::CResult_CVec_SignatureZNoneZ {

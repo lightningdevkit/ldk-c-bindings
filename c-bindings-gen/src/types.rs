@@ -827,7 +827,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	// *************************************************
 
 	/// Returns true we if can just skip passing this to C entirely
-	fn skip_path(&self, full_path: &str) -> bool {
+	pub fn skip_path(&self, full_path: &str) -> bool {
 		full_path == "bitcoin::secp256k1::Secp256k1" ||
 		full_path == "bitcoin::secp256k1::Signing" ||
 		full_path == "bitcoin::secp256k1::Verification"

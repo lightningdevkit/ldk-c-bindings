@@ -745,27 +745,47 @@ pub fn write_method_call_params<W: std::io::Write>(w: &mut W, sig: &syn::Signatu
 pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generics, types: &TypeResolver, concrete_lifetimes: bool) {
 	let mut gen_types = GenericTypes::new(None);
 	assert!(gen_types.learn_generics(generics, types));
-	if !generics.params.is_empty() {
-		write!(w, "<").unwrap();
-		for (idx, generic) in generics.params.iter().enumerate() {
-			match generic {
-				syn::GenericParam::Type(type_param) => {
-					write!(w, "{}", if idx != 0 { ", " } else { "" }).unwrap();
-					let type_ident = &type_param.ident;
-					types.write_c_type_in_generic_param(w, &syn::parse_quote!(#type_ident), Some(&gen_types), false);
-				},
-				syn::GenericParam::Lifetime(lt) => {
-					if concrete_lifetimes {
-						write!(w, "'static").unwrap();
-					} else {
-						write!(w, "{}'{}", if idx != 0 { ", " } else { "" }, lt.lifetime.ident).unwrap();
+	if generics.params.is_empty() { return; }
+	for generic in generics.params.iter() {
+		match generic {
+			syn::GenericParam::Type(type_param) => {
+				for bound in type_param.bounds.iter() {
+					match bound {
+						syn::TypeParamBound::Trait(t) => {
+							if let Some(trait_bound) = types.maybe_resolve_path(&t.path, None) {
+								if types.skip_path(&trait_bound) {
+									// Just hope rust deduces generic params if some bounds are skipable.
+									return;
+								}
+							}
+						}
+						_ => {},
 					}
-				},
-				_ => unimplemented!(),
+				}
 			}
+			_ => {},
 		}
-		write!(w, ">").unwrap();
 	}
+
+	write!(w, "<").unwrap();
+	for (idx, generic) in generics.params.iter().enumerate() {
+		match generic {
+			syn::GenericParam::Type(type_param) => {
+				write!(w, "{}", if idx != 0 { ", " } else { "" }).unwrap();
+				let type_ident = &type_param.ident;
+				types.write_c_type_in_generic_param(w, &syn::parse_quote!(#type_ident), Some(&gen_types), false);
+			},
+			syn::GenericParam::Lifetime(lt) => {
+				if concrete_lifetimes {
+					write!(w, "'static").unwrap();
+				} else {
+					write!(w, "{}'{}", if idx != 0 { ", " } else { "" }, lt.lifetime.ident).unwrap();
+				}
+			},
+			_ => unimplemented!(),
+		}
+	}
+	write!(w, ">").unwrap();
 }
 
 pub fn maybe_write_lifetime_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generics, types: &TypeResolver) {

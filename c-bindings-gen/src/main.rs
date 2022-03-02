@@ -1647,10 +1647,20 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 	writeln_fn_docs(w, &f.attrs, "", types, Some(&gen_types), f.sig.inputs.iter(), &f.sig.output);
 
 	write!(w, "#[no_mangle]\npub extern \"C\" fn {}(", f.sig.ident).unwrap();
+
+
 	write_method_params(w, &f.sig, "", types, Some(&gen_types), false, true);
 	write!(w, " {{\n\t").unwrap();
 	write_method_var_decl_body(w, &f.sig, "", types, Some(&gen_types), false);
-	write!(w, "{}::{}(", types.module_path, f.sig.ident).unwrap();
+	write!(w, "{}::{}", types.module_path, f.sig.ident).unwrap();
+
+	let mut function_generic_args = Vec::new();
+	maybe_write_generics(&mut function_generic_args, &f.sig.generics, types, true);
+	if !function_generic_args.is_empty() {
+		write!(w, "::{}", String::from_utf8(function_generic_args).unwrap()).unwrap();
+	}
+	write!(w, "(").unwrap();
+
 	write_method_call_params(w, &f.sig, "", types, Some(&gen_types), "", false);
 	writeln!(w, "\n}}\n").unwrap();
 }

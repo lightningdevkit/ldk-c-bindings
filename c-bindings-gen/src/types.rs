@@ -723,6 +723,7 @@ fn initial_clonable_types() -> HashSet<String> {
 	let mut res = HashSet::new();
 	res.insert("crate::c_types::u5".to_owned());
 	res.insert("crate::c_types::ThirtyTwoBytes".to_owned());
+	res.insert("crate::c_types::SecretKey".to_owned());
 	res.insert("crate::c_types::PublicKey".to_owned());
 	res.insert("crate::c_types::Transaction".to_owned());
 	res.insert("crate::c_types::TxOut".to_owned());

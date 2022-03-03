@@ -67,6 +67,7 @@ impl PublicKey {
 }
 
 #[repr(C)]
+#[derive(Clone)]
 /// Represents a valid secp256k1 secret key serialized as a 32 byte array.
 pub struct SecretKey {
 	/// The bytes of the secret key

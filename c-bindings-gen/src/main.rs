@@ -1324,7 +1324,14 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 				}
 			} else if let Some(resolved_path) = types.maybe_resolve_ident(&ident) {
 				if let Some(aliases) = types.crate_types.reverse_alias_map.get(&resolved_path).cloned() {
+					let mut gen_types = Some(GenericTypes::new(Some(resolved_path.clone())));
+					if !gen_types.as_mut().unwrap().learn_generics(&i.generics, types) {
+						gen_types = None;
+					}
 					'alias_impls: for (alias, arguments) in aliases {
+						let mut new_ty_generics = Vec::new();
+						let mut need_generics = false;
+
 						let alias_resolved = types.resolve_path(&alias, None);
 						for (idx, gen) in i.generics.params.iter().enumerate() {
 							match gen {
@@ -1334,17 +1341,26 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 											if let syn::PathArguments::AngleBracketed(ref t) = &arguments {
 												assert!(idx < t.args.len());
 												if let syn::GenericArgument::Type(syn::Type::Path(p)) = &t.args[idx] {
-													let generic_arg = types.resolve_path(&p.path, None);
-													let generic_bound = types.resolve_path(&trait_bound.path, None);
-													if let Some(traits_impld) = types.crate_types.trait_impls.get(&generic_arg) {
-														for trait_impld in traits_impld {
-															if *trait_impld == generic_bound { continue 'bounds_check; }
+													if let Some(generic_arg) = types.maybe_resolve_path(&p.path, None) {
+
+														new_ty_generics.push((type_param.ident.clone(), syn::Type::Path(p.clone())));
+														let generic_bound = types.resolve_path(&trait_bound.path, None);
+														if let Some(traits_impld) = types.crate_types.trait_impls.get(&generic_arg) {
+															for trait_impld in traits_impld {
+																if *trait_impld == generic_bound { continue 'bounds_check; }
+															}
+															eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
+															continue 'alias_impls;
+														} else {
+															eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
+															continue 'alias_impls;
 														}
-														eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
-														continue 'alias_impls;
+													} else if gen_types.is_some() {
+														new_ty_generics.push((type_param.ident.clone(),
+															gen_types.as_ref().resolve_type(&syn::Type::Path(p.clone())).clone()));
+														need_generics = true;
 													} else {
-														eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
-														continue 'alias_impls;
+														unimplemented!();
 													}
 												} else { unimplemented!(); }
 											} else { unimplemented!(); }
@@ -1355,19 +1371,54 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 								syn::GenericParam::Const(_) => unimplemented!(),
 							}
 						}
+						let mut params = syn::punctuated::Punctuated::new();
+						let real_aliased =
+							if need_generics {
+								let alias_generics = types.crate_types.opaques.get(&alias_resolved).unwrap().1;
+
+								// If we need generics on the alias, create impl generic bounds...
+								assert_eq!(new_ty_generics.len(), i.generics.params.len());
+								let mut args = syn::punctuated::Punctuated::new();
+								for (ident, param) in new_ty_generics.drain(..) {
+									// TODO: We blindly assume that generics in the type alias and
+									// the aliased type have the same names, which we really shouldn't.
+									if alias_generics.params.iter().any(|generic|
+										if let syn::GenericParam::Type(t) = generic { t.ident == ident } else { false })
+									{
+										args.push(parse_quote!(#ident));
+									}
+									params.push(syn::GenericParam::Type(syn::TypeParam {
+										attrs: Vec::new(),
+										ident,
+										colon_token: None,
+										bounds: syn::punctuated::Punctuated::new(),
+										eq_token: Some(syn::token::Eq(Span::call_site())),
+										default: Some(param),
+									}));
+								}
+								// ... and swap the last segment of the impl self_ty to use the generic bounds.
+								let mut res = alias.clone();
+								res.segments.last_mut().unwrap().arguments = syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
+									colon2_token: None,
+									lt_token: syn::token::Lt(Span::call_site()),
+									args,
+									gt_token: syn::token::Gt(Span::call_site()),
+								});
+								res
+							} else { alias.clone() };
 						let aliased_impl = syn::ItemImpl {
 							attrs: i.attrs.clone(),
 							brace_token: syn::token::Brace(Span::call_site()),
 							defaultness: None,
 							generics: syn::Generics {
 								lt_token: None,
-								params: syn::punctuated::Punctuated::new(),
+								params,
 								gt_token: None,
 								where_clause: None,
 							},
 							impl_token: syn::Token![impl](Span::call_site()),
 							items: i.items.clone(),
-							self_ty: Box::new(syn::Type::Path(syn::TypePath { qself: None, path: alias.clone() })),
+							self_ty: Box::new(syn::Type::Path(syn::TypePath { qself: None, path: real_aliased })),
 							trait_: i.trait_.clone(),
 							unsafety: None,
 						};
@@ -1812,17 +1863,33 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 
-						let mut process_alias = true;
-						for tok in t.generics.params.iter() {
-							if let syn::GenericParam::Lifetime(_) = tok {}
-							else { process_alias = false; }
-						}
-						if process_alias {
-							match &*t.ty {
-								syn::Type::Path(_) =>
-									writeln_opaque(&mut out, &t.ident, &format!("{}", t.ident), &t.generics, &t.attrs, &type_resolver, header_file, cpp_header_file),
-								_ => {}
-							}
+						match &*t.ty {
+							syn::Type::Path(p) => {
+								let real_ty = type_resolver.resolve_path(&p.path, None);
+								let real_generic_bounds = type_resolver.crate_types.opaques.get(&real_ty).map(|t| t.1).or(
+									type_resolver.crate_types.priv_structs.get(&real_ty).map(|r| *r)).unwrap();
+								let mut resolved_generics = t.generics.clone();
+
+								if let syn::PathArguments::AngleBracketed(real_generics) = &p.path.segments.last().unwrap().arguments {
+									for (real_idx, real_param) in real_generics.args.iter().enumerate() {
+										if let syn::GenericArgument::Type(syn::Type::Path(real_param_path)) = real_param {
+											for param in resolved_generics.params.iter_mut() {
+												if let syn::GenericParam::Type(type_param) = param {
+													if Some(&type_param.ident) == real_param_path.path.get_ident() {
+														if let syn::GenericParam::Type(real_type_param) = &real_generic_bounds.params[real_idx] {
+															type_param.bounds = real_type_param.bounds.clone();
+															type_param.default = real_type_param.default.clone();
+
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+
+								writeln_opaque(&mut out, &t.ident, &format!("{}", t.ident), &resolved_generics, &t.attrs, &type_resolver, header_file, cpp_header_file)},
+							_ => {}
 						}
 					}
 				},
@@ -1878,12 +1945,15 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 			match item {
 				syn::Item::Struct(s) => {
 					if let syn::Visibility::Public(_) = s.vis {
+						let struct_path = format!("{}::{}", module, s.ident);
 						match export_status(&s.attrs) {
 							ExportStatus::Export => {},
-							ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+							ExportStatus::NoExport|ExportStatus::TestOnly => {
+								crate_types.priv_structs.insert(struct_path, &s.generics);
+								continue
+							},
 							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
-						let struct_path = format!("{}::{}", module, s.ident);
 						crate_types.opaques.insert(struct_path, (&s.ident, &s.generics));
 					}
 				},
@@ -1911,29 +1981,22 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 							ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 						}
 						let type_path = format!("{}::{}", module, t.ident);
-						let mut process_alias = true;
-						for tok in t.generics.params.iter() {
-							if let syn::GenericParam::Lifetime(_) = tok {}
-							else { process_alias = false; }
-						}
-						if process_alias {
-							match &*t.ty {
-								syn::Type::Path(p) => {
-									let t_ident = &t.ident;
+						match &*t.ty {
+							syn::Type::Path(p) => {
+								let t_ident = &t.ident;
 
-									// If its a path with no generics, assume we don't map the aliased type and map it opaque
-									let path_obj = parse_quote!(#t_ident);
-									let args_obj = p.path.segments.last().unwrap().arguments.clone();
-									match crate_types.reverse_alias_map.entry(import_resolver.maybe_resolve_path(&p.path, None).unwrap()) {
-										hash_map::Entry::Occupied(mut e) => { e.get_mut().push((path_obj, args_obj)); },
-										hash_map::Entry::Vacant(e) => { e.insert(vec![(path_obj, args_obj)]); },
-									}
-
-									crate_types.opaques.insert(type_path, (t_ident, &t.generics));
-								},
-								_ => {
-									crate_types.type_aliases.insert(type_path, import_resolver.resolve_imported_refs((*t.ty).clone()));
+								// If its a path with no generics, assume we don't map the aliased type and map it opaque
+								let path_obj = parse_quote!(#t_ident);
+								let args_obj = p.path.segments.last().unwrap().arguments.clone();
+								match crate_types.reverse_alias_map.entry(import_resolver.maybe_resolve_path(&p.path, None).unwrap()) {
+									hash_map::Entry::Occupied(mut e) => { e.get_mut().push((path_obj, args_obj)); },
+									hash_map::Entry::Vacant(e) => { e.insert(vec![(path_obj, args_obj)]); },
 								}
+
+								crate_types.opaques.insert(type_path, (t_ident, &t.generics));
+							},
+							_ => {
+								crate_types.type_aliases.insert(type_path, import_resolver.resolve_imported_refs((*t.ty).clone()));
 							}
 						}
 					}

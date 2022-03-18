@@ -352,7 +352,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 	}
 }
 
-trait ResolveType<'a> { fn resolve_type(&'a self, ty: &'a syn::Type) -> &'a syn::Type; }
+pub trait ResolveType<'a> { fn resolve_type(&'a self, ty: &'a syn::Type) -> &'a syn::Type; }
 impl<'a, 'b, 'c: 'a + 'b> ResolveType<'c> for Option<&GenericTypes<'a, 'b>> {
 	fn resolve_type(&'c self, ty: &'c syn::Type) -> &'c syn::Type {
 		if let Some(us) = self {
@@ -513,14 +513,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				},
 				syn::Item::Type(t) if export_status(&t.attrs) == ExportStatus::Export => {
 					if let syn::Visibility::Public(_) = t.vis {
-						let mut process_alias = true;
-						for tok in t.generics.params.iter() {
-							if let syn::GenericParam::Lifetime(_) = tok {}
-							else { process_alias = false; }
-						}
-						if process_alias {
-							declared.insert(t.ident.clone(), DeclType::StructImported { generics: &t.generics });
-						}
+						declared.insert(t.ident.clone(), DeclType::StructImported { generics: &t.generics });
 					}
 				},
 				syn::Item::Enum(e) => {
@@ -739,6 +732,8 @@ pub struct CrateTypes<'a> {
 	/// This may contain structs or enums, but only when either is mapped as
 	/// struct X { inner: *mut originalX, .. }
 	pub opaques: HashMap<String, (&'a syn::Ident, &'a syn::Generics)>,
+	/// structs that weren't exposed
+	pub priv_structs: HashMap<String, &'a syn::Generics>,
 	/// Enums which are mapped as C enums with conversion functions
 	pub mirrored_enums: HashMap<String, &'a syn::ItemEnum>,
 	/// Traits which are mapped as a pointer + jump table
@@ -768,7 +763,7 @@ impl<'a> CrateTypes<'a> {
 		CrateTypes {
 			opaques: HashMap::new(), mirrored_enums: HashMap::new(), traits: HashMap::new(),
 			type_aliases: HashMap::new(), reverse_alias_map: HashMap::new(),
-			templates_defined: RefCell::new(HashMap::default()),
+			templates_defined: RefCell::new(HashMap::default()), priv_structs: HashMap::new(),
 			clonable_types: RefCell::new(initial_clonable_types()), trait_impls: HashMap::new(),
 			template_file: RefCell::new(template_file), lib_ast: &libast,
 		}

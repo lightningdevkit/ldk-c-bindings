@@ -1662,7 +1662,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		write!(w, ">").unwrap();
 	}
 	pub fn write_rust_type<W: std::io::Write>(&self, w: &mut W, generics: Option<&GenericTypes>, t: &syn::Type) {
-		match t {
+		match generics.resolve_type(t) {
 			syn::Type::Path(p) => {
 				if p.qself.is_some() {
 					unimplemented!();
@@ -2332,6 +2332,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					}
 					write!(w, "let mut local_{} = (", ident).unwrap();
 					for (idx, elem) in t.elems.iter().enumerate() {
+						let real_elem = generics.resolve_type(&elem);
 						let ty_has_inner = {
 								if to_c {
 									// "To C ptr_for_ref" means "return the regular object with
@@ -2339,16 +2340,16 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 									// if we're about to set ty_has_inner.
 									ptr_for_ref = true;
 								}
-								if let syn::Type::Reference(t) = elem {
+								if let syn::Type::Reference(t) = real_elem {
 									if let syn::Type::Path(p) = &*t.elem {
 										self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics))
 									} else { false }
-								} else if let syn::Type::Path(p) = elem {
+								} else if let syn::Type::Path(p) = real_elem {
 									self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics))
 								} else { false }
 							};
 						if idx != 0 { write!(w, ", ").unwrap(); }
-						var_prefix(w, elem, generics, is_ref && ty_has_inner, ptr_for_ref, false);
+						var_prefix(w, real_elem, generics, is_ref && ty_has_inner, ptr_for_ref, false);
 						if is_ref && ty_has_inner {
 							// For ty_has_inner, the regular var_prefix mapping will take a
 							// reference, so deref once here to make sure we keep the original ref.
@@ -2360,7 +2361,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							// hope the type is Clonable and use that.
 							write!(w, ".clone()").unwrap();
 						}
-						var_suffix(w, elem, generics, is_ref && ty_has_inner, ptr_for_ref, false);
+						var_suffix(w, real_elem, generics, is_ref && ty_has_inner, ptr_for_ref, false);
 					}
 					write!(w, "){};", if to_c { ".into()" } else { "" }).unwrap();
 					true

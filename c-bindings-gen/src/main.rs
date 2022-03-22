@@ -111,9 +111,12 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 						if let syn::GenericArgument::Type(args_ty) = args.args.iter().next().unwrap() {
 							types.write_c_type(w, args_ty, Some(generics), false);
 
-							assert!(!types.write_from_c_conversion_new_var(&mut arg_conv, &format_ident!("arg"), &args_ty, Some(generics)));
+							write!(&mut arg_conv, "\t").unwrap();
+							if types.write_from_c_conversion_new_var(&mut arg_conv, &format_ident!("arg"), &args_ty, Some(generics)) {
+								write!(&mut arg_conv, "\n\t").unwrap();
+							}
 
-							write!(&mut arg_conv, "\tlet arg_conv = ").unwrap();
+							write!(&mut arg_conv, "let arg_conv = ").unwrap();
 							types.write_from_c_conversion_prefix(&mut arg_conv, &args_ty, Some(generics));
 							write!(&mut arg_conv, "arg").unwrap();
 							types.write_from_c_conversion_suffix(&mut arg_conv, &args_ty, Some(generics));

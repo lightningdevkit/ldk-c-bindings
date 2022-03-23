@@ -864,8 +864,8 @@ int main() {
 		.find_route = custom_find_route,
 		.free = NULL,
 	};
-	LDK::Scorer scorer = Scorer_default();
-	LDK::MultiThreadedLockableScore scorer_mtx = MultiThreadedLockableScore_new(Scorer_as_Score(&scorer));
+	LDK::ProbabilisticScorer scorer = ProbabilisticScorer_new(ProbabilisticScoringParameters_default(), &net_graph1);
+	LDK::MultiThreadedLockableScore scorer_mtx = MultiThreadedLockableScore_new(ProbabilisticScorer_as_Score(&scorer));
 	EventQueue queue1;
 	LDKEventHandler handler1 = { .this_arg = &queue1, .handle_event = handle_event, .free = NULL };
 	LDK::InvoicePayer payer = InvoicePayer_new(ChannelManager_as_Payer(&cm1), sending_router, &scorer_mtx, logger1, handler1, RetryAttempts_new(0));

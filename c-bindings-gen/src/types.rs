@@ -772,6 +772,7 @@ impl<'a> CrateTypes<'a> {
 		self.clonable_types.borrow_mut().insert(object);
 	}
 	pub fn is_clonable(&self, object: &str) -> bool {
+		object.starts_with("&'static ") ||
 		self.clonable_types.borrow().contains(object)
 	}
 	pub fn write_new_template(&self, mangled_container: String, has_destructor: bool, created_container: &[u8]) {

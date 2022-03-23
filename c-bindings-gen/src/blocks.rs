@@ -272,14 +272,22 @@ pub fn write_tuple_block<W: std::io::Write>(w: &mut W, mangled_container: &str, 
 	writeln!(w, "pub struct {} {{", mangled_container).unwrap();
 	for (idx, ty) in types.iter().enumerate() {
 		writeln!(w, "\t/// The element at position {}", idx).unwrap();
-		writeln!(w, "\tpub {}: {},", ('a' as u8 + idx as u8) as char, ty).unwrap();
+		if ty.starts_with("&'static ") {
+			writeln!(w, "\tpub {}: {},", ('a' as u8 + idx as u8) as char, &ty[9..]).unwrap();
+		} else {
+			writeln!(w, "\tpub {}: {},", ('a' as u8 + idx as u8) as char, ty).unwrap();
+		}
 	}
 	writeln!(w, "}}").unwrap();
 
 	let mut tuple_str = "(".to_owned();
 	for (idx, ty) in types.iter().enumerate() {
 		if idx != 0 { tuple_str += ", "; }
-		tuple_str += ty;
+		if ty.starts_with("&'static ") {
+			tuple_str += &ty[9..];
+		} else {
+			tuple_str += ty;
+		}
 	}
 	tuple_str += ")";
 
@@ -306,8 +314,14 @@ pub fn write_tuple_block<W: std::io::Write>(w: &mut W, mangled_container: &str, 
 		writeln!(w, "impl Clone for {} {{", mangled_container).unwrap();
 		writeln!(w, "\tfn clone(&self) -> Self {{").unwrap();
 		writeln!(w, "\t\tSelf {{").unwrap();
-		for idx in 0..types.len() {
-			writeln!(w, "\t\t\t{}: Clone::clone(&self.{}),", ('a' as u8 + idx as u8) as char, ('a' as u8 + idx as u8) as char).unwrap();
+		for (idx, ty) in types.iter().enumerate() {
+			if ty.starts_with("&'static ") {
+				// Assume blindly the type is opaque. If its not we'll fail to build.
+				// Really we should never have derived structs with a reference type.
+				write!(w, "\t\t\t{}: {} {{ inner: self.{}.inner, is_owned: false}},", ('a' as u8 + idx as u8) as char, &ty[9..], ('a' as u8 + idx as u8) as char).unwrap();
+			} else{
+				writeln!(w, "\t\t\t{}: Clone::clone(&self.{}),", ('a' as u8 + idx as u8) as char, ('a' as u8 + idx as u8) as char).unwrap();
+			}
 		}
 		writeln!(w, "\t\t}}").unwrap();
 		writeln!(w, "\t}}").unwrap();
@@ -327,8 +341,14 @@ pub fn write_tuple_block<W: std::io::Write>(w: &mut W, mangled_container: &str, 
 	}
 	writeln!(w, ") -> {} {{", mangled_container).unwrap();
 	write!(w, "\t{} {{ ", mangled_container).unwrap();
-	for idx in 0..types.len() {
-		write!(w, "{}, ", ('a' as u8 + idx as u8) as char).unwrap();
+	for (idx, ty) in types.iter().enumerate() {
+		if ty.starts_with("&'static ") {
+			// Assume blindly the type is opaque. If its not we'll fail to build.
+			// Really we should never have derived structs with a reference type.
+			write!(w, "{}: {} {{ inner: {}.inner, is_owned: false}}, ", ('a' as u8 + idx as u8) as char, &ty[9..], ('a' as u8 + idx as u8) as char).unwrap();
+		} else {
+			write!(w, "{}, ", ('a' as u8 + idx as u8) as char).unwrap();
+		}
 	}
 	writeln!(w, "}}\n}}\n").unwrap();
 

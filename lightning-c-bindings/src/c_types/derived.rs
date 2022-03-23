@@ -3963,10 +3963,10 @@ pub struct C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
 	/// The element at position 0
 	pub a: crate::lightning::routing::scoring::ProbabilisticScoringParameters,
 	/// The element at position 1
-	pub b: &'static crate::lightning::routing::network_graph::NetworkGraph,
+	pub b: crate::lightning::routing::network_graph::NetworkGraph,
 }
-impl From<(crate::lightning::routing::scoring::ProbabilisticScoringParameters, &'static crate::lightning::routing::network_graph::NetworkGraph)> for C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
-	fn from (tup: (crate::lightning::routing::scoring::ProbabilisticScoringParameters, &'static crate::lightning::routing::network_graph::NetworkGraph)) -> Self {
+impl From<(crate::lightning::routing::scoring::ProbabilisticScoringParameters, crate::lightning::routing::network_graph::NetworkGraph)> for C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
+	fn from (tup: (crate::lightning::routing::scoring::ProbabilisticScoringParameters, crate::lightning::routing::network_graph::NetworkGraph)) -> Self {
 		Self {
 			a: tup.0,
 			b: tup.1,
@@ -3974,14 +3974,25 @@ impl From<(crate::lightning::routing::scoring::ProbabilisticScoringParameters, &
 	}
 }
 impl C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
-	#[allow(unused)] pub(crate) fn to_rust(mut self) -> (crate::lightning::routing::scoring::ProbabilisticScoringParameters, &'static crate::lightning::routing::network_graph::NetworkGraph) {
+	#[allow(unused)] pub(crate) fn to_rust(mut self) -> (crate::lightning::routing::scoring::ProbabilisticScoringParameters, crate::lightning::routing::network_graph::NetworkGraph) {
 		(self.a, self.b)
 	}
 }
+impl Clone for C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
+	fn clone(&self) -> Self {
+		Self {
+			a: Clone::clone(&self.a),
+			b: crate::lightning::routing::network_graph::NetworkGraph { inner: self.b.inner, is_owned: false},		}
+	}
+}
+#[no_mangle]
+/// Creates a new tuple which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_clone(orig: &C2Tuple_ProbabilisticScoringParametersNetworkGraphZ) -> C2Tuple_ProbabilisticScoringParametersNetworkGraphZ { Clone::clone(&orig) }
 /// Creates a new C2Tuple_ProbabilisticScoringParametersNetworkGraphZ from the contained elements.
 #[no_mangle]
 pub extern "C" fn C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_new(a: crate::lightning::routing::scoring::ProbabilisticScoringParameters, b: &'static crate::lightning::routing::network_graph::NetworkGraph) -> C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
-	C2Tuple_ProbabilisticScoringParametersNetworkGraphZ { a, b, }
+	C2Tuple_ProbabilisticScoringParametersNetworkGraphZ { a, b: crate::lightning::routing::network_graph::NetworkGraph { inner: b.inner, is_owned: false}, }
 }
 
 #[no_mangle]

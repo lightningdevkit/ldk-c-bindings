@@ -4319,7 +4319,7 @@ typedef struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
    /**
     * The element at position 1
     */
-   const struct LDKNetworkGraph *NONNULL_PTR b;
+   struct LDKNetworkGraph b;
 } LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ;
 
 
@@ -13406,6 +13406,12 @@ void CResult_ProbabilisticScoringParametersDecodeErrorZ_free(struct LDKCResult_P
  * but with all dynamically-allocated buffers duplicated in new buffers.
  */
 struct LDKCResult_ProbabilisticScoringParametersDecodeErrorZ CResult_ProbabilisticScoringParametersDecodeErrorZ_clone(const struct LDKCResult_ProbabilisticScoringParametersDecodeErrorZ *NONNULL_PTR orig);
+
+/**
+ * Creates a new tuple which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_clone(const struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ *NONNULL_PTR orig);
 
 /**
  * Creates a new C2Tuple_ProbabilisticScoringParametersNetworkGraphZ from the contained elements.

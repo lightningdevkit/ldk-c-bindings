@@ -4291,6 +4291,114 @@ typedef struct LDKCResult_ProbabilisticScoringParametersDecodeErrorZ {
 
 
 /**
+ * Represents the network as nodes and channels between them
+ */
+typedef struct MUST_USE_STRUCT LDKNetworkGraph {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeNetworkGraph *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKNetworkGraph;
+
+/**
+ * A tuple of 2 elements. See the individual fields for the types contained.
+ */
+typedef struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
+   /**
+    * The element at position 0
+    */
+   struct LDKProbabilisticScoringParameters a;
+   /**
+    * The element at position 1
+    */
+   const struct LDKNetworkGraph *NONNULL_PTR b;
+} LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ;
+
+
+
+/**
+ * [`Score`] implementation using channel success probability distributions.
+ *
+ * Based on *Optimally Reliable & Cheap Payment Flows on the Lightning Network* by Rene Pickhardt
+ * and Stefan Richter [[1]]. Given the uncertainty of channel liquidity balances, probability
+ * distributions are defined based on knowledge learned from successful and unsuccessful attempts.
+ * Then the negative `log10` of the success probability is used to determine the cost of routing a
+ * specific HTLC amount through a channel.
+ *
+ * Knowledge about channel liquidity balances takes the form of upper and lower bounds on the
+ * possible liquidity. Certainty of the bounds is decreased over time using a decay function. See
+ * [`ProbabilisticScoringParameters`] for details.
+ *
+ * Since the scorer aims to learn the current channel liquidity balances, it works best for nodes
+ * with high payment volume or that actively probe the [`NetworkGraph`]. Nodes with low payment
+ * volume are more likely to experience failed payment paths, which would need to be retried.
+ *
+ * # Note
+ *
+ * Mixing the `no-std` feature between serialization and deserialization results in undefined
+ * behavior.
+ *
+ * [1]: https://arxiv.org/abs/2107.05322
+ */
+typedef struct MUST_USE_STRUCT LDKProbabilisticScorer {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeProbabilisticScorer *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKProbabilisticScorer;
+
+/**
+ * The contents of CResult_ProbabilisticScorerDecodeErrorZ
+ */
+typedef union LDKCResult_ProbabilisticScorerDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKProbabilisticScorer *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_ProbabilisticScorerDecodeErrorZPtr;
+
+/**
+ * A CResult_ProbabilisticScorerDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::lightning::routing::scoring::ProbabilisticScorer on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_ProbabilisticScorerDecodeErrorZ {
+   /**
+    * The contents of this CResult_ProbabilisticScorerDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_ProbabilisticScorerDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_ProbabilisticScorerDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_ProbabilisticScorerDecodeErrorZ;
+
+
+
+/**
  * Features used within an `init` message.
  */
 typedef struct MUST_USE_STRUCT LDKInitFeatures {
@@ -8719,26 +8827,6 @@ typedef struct LDKCResult_NodeInfoDecodeErrorZ {
    bool result_ok;
 } LDKCResult_NodeInfoDecodeErrorZ;
 
-
-
-/**
- * Represents the network as nodes and channels between them
- */
-typedef struct MUST_USE_STRUCT LDKNetworkGraph {
-   /**
-    * A pointer to the opaque Rust object.
-    * Nearly everywhere, inner must be non-null, however in places where
-    * the Rust equivalent takes an Option, it may be set to null to indicate None.
-    */
-   LDKnativeNetworkGraph *inner;
-   /**
-    * Indicates that this is the only struct which contains the same pointer.
-    * Rust functions which take ownership of an object provided via an argument require
-    * this to be true and invalidate the object pointed to by inner.
-    */
-   bool is_owned;
-} LDKNetworkGraph;
-
 /**
  * The contents of CResult_NetworkGraphDecodeErrorZ
  */
@@ -12326,6 +12414,12 @@ bool CResult_SecretKeyErrorZ_is_ok(const struct LDKCResult_SecretKeyErrorZ *NONN
 void CResult_SecretKeyErrorZ_free(struct LDKCResult_SecretKeyErrorZ _res);
 
 /**
+ * Creates a new CResult_SecretKeyErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_SecretKeyErrorZ CResult_SecretKeyErrorZ_clone(const struct LDKCResult_SecretKeyErrorZ *NONNULL_PTR orig);
+
+/**
  * Creates a new CResult_PublicKeyErrorZ in the success state.
  */
 struct LDKCResult_PublicKeyErrorZ CResult_PublicKeyErrorZ_ok(struct LDKPublicKey o);
@@ -13314,6 +13408,36 @@ void CResult_ProbabilisticScoringParametersDecodeErrorZ_free(struct LDKCResult_P
 struct LDKCResult_ProbabilisticScoringParametersDecodeErrorZ CResult_ProbabilisticScoringParametersDecodeErrorZ_clone(const struct LDKCResult_ProbabilisticScoringParametersDecodeErrorZ *NONNULL_PTR orig);
 
 /**
+ * Creates a new C2Tuple_ProbabilisticScoringParametersNetworkGraphZ from the contained elements.
+ */
+struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_new(struct LDKProbabilisticScoringParameters a, const struct LDKNetworkGraph *NONNULL_PTR b);
+
+/**
+ * Frees any resources used by the C2Tuple_ProbabilisticScoringParametersNetworkGraphZ.
+ */
+void C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_free(struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ _res);
+
+/**
+ * Creates a new CResult_ProbabilisticScorerDecodeErrorZ in the success state.
+ */
+struct LDKCResult_ProbabilisticScorerDecodeErrorZ CResult_ProbabilisticScorerDecodeErrorZ_ok(struct LDKProbabilisticScorer o);
+
+/**
+ * Creates a new CResult_ProbabilisticScorerDecodeErrorZ in the error state.
+ */
+struct LDKCResult_ProbabilisticScorerDecodeErrorZ CResult_ProbabilisticScorerDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Checks if the given object is currently in the success state
+ */
+bool CResult_ProbabilisticScorerDecodeErrorZ_is_ok(const struct LDKCResult_ProbabilisticScorerDecodeErrorZ *NONNULL_PTR o);
+
+/**
+ * Frees any resources used by the CResult_ProbabilisticScorerDecodeErrorZ.
+ */
+void CResult_ProbabilisticScorerDecodeErrorZ_free(struct LDKCResult_ProbabilisticScorerDecodeErrorZ _res);
+
+/**
  * Creates a new CResult_InitFeaturesDecodeErrorZ in the success state.
  */
 struct LDKCResult_InitFeaturesDecodeErrorZ CResult_InitFeaturesDecodeErrorZ_ok(struct LDKInitFeatures o);
@@ -13625,6 +13749,12 @@ bool CResult_SecretKeyNoneZ_is_ok(const struct LDKCResult_SecretKeyNoneZ *NONNUL
  * Frees any resources used by the CResult_SecretKeyNoneZ.
  */
 void CResult_SecretKeyNoneZ_free(struct LDKCResult_SecretKeyNoneZ _res);
+
+/**
+ * Creates a new CResult_SecretKeyNoneZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_SecretKeyNoneZ CResult_SecretKeyNoneZ_clone(const struct LDKCResult_SecretKeyNoneZ *NONNULL_PTR orig);
 
 /**
  * Creates a new CResult_SignDecodeErrorZ in the success state.
@@ -25238,6 +25368,11 @@ struct LDKCVec_u8Z Scorer_write(const struct LDKScorer *NONNULL_PTR obj);
 struct LDKCResult_ScorerDecodeErrorZ Scorer_read(struct LDKu8slice ser);
 
 /**
+ * Frees any resources used by the ProbabilisticScorer, if is_owned is set and inner is non-NULL.
+ */
+void ProbabilisticScorer_free(struct LDKProbabilisticScorer this_obj);
+
+/**
  * Frees any resources used by the ProbabilisticScoringParameters, if is_owned is set and inner is non-NULL.
  */
 void ProbabilisticScoringParameters_free(struct LDKProbabilisticScoringParameters this_obj);
@@ -25331,9 +25466,31 @@ struct LDKCVec_u8Z ProbabilisticScoringParameters_write(const struct LDKProbabil
 struct LDKCResult_ProbabilisticScoringParametersDecodeErrorZ ProbabilisticScoringParameters_read(struct LDKu8slice ser);
 
 /**
+ * Creates a new scorer using the given scoring parameters for sending payments from a node
+ * through a network graph.
+ */
+MUST_USE_RES struct LDKProbabilisticScorer ProbabilisticScorer_new(struct LDKProbabilisticScoringParameters params, const struct LDKNetworkGraph *NONNULL_PTR network_graph);
+
+/**
  * Creates a "default" ProbabilisticScoringParameters. See struct and individual field documentaiton for details on which values are used.
  */
 MUST_USE_RES struct LDKProbabilisticScoringParameters ProbabilisticScoringParameters_default(void);
+
+/**
+ * Constructs a new Score which calls the relevant methods on this_arg.
+ * This copies the `inner` pointer in this_arg and thus the returned Score must be freed before this_arg is
+ */
+struct LDKScore ProbabilisticScorer_as_Score(const struct LDKProbabilisticScorer *NONNULL_PTR this_arg);
+
+/**
+ * Serialize the ProbabilisticScorer object into a byte array which can be read by ProbabilisticScorer_read
+ */
+struct LDKCVec_u8Z ProbabilisticScorer_write(const struct LDKProbabilisticScorer *NONNULL_PTR obj);
+
+/**
+ * Read a ProbabilisticScorer from a byte array, created by ProbabilisticScorer_write
+ */
+struct LDKCResult_ProbabilisticScorerDecodeErrorZ ProbabilisticScorer_read(struct LDKu8slice ser, struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ arg);
 
 /**
  * Frees any resources used by the FilesystemPersister, if is_owned is set and inner is non-NULL.

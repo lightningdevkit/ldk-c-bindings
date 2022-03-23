@@ -270,6 +270,23 @@ impl From<crate::c_types::CResultTempl<crate::c_types::SecretKey, crate::c_types
 		}
 	}
 }
+impl Clone for CResult_SecretKeyErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_SecretKeyErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::c_types::SecretKey>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_SecretKeyErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::c_types::Secp256k1Error>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_SecretKeyErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_SecretKeyErrorZ_clone(orig: &CResult_SecretKeyErrorZ) -> CResult_SecretKeyErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_PublicKeyErrorZ
 pub union CResult_PublicKeyErrorZPtr {
@@ -3941,6 +3958,115 @@ impl Clone for CResult_ProbabilisticScoringParametersDecodeErrorZ {
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ProbabilisticScoringParametersDecodeErrorZ_clone(orig: &CResult_ProbabilisticScoringParametersDecodeErrorZ) -> CResult_ProbabilisticScoringParametersDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
+pub struct C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
+	/// The element at position 0
+	pub a: crate::lightning::routing::scoring::ProbabilisticScoringParameters,
+	/// The element at position 1
+	pub b: &'static crate::lightning::routing::network_graph::NetworkGraph,
+}
+impl From<(crate::lightning::routing::scoring::ProbabilisticScoringParameters, &'static crate::lightning::routing::network_graph::NetworkGraph)> for C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
+	fn from (tup: (crate::lightning::routing::scoring::ProbabilisticScoringParameters, &'static crate::lightning::routing::network_graph::NetworkGraph)) -> Self {
+		Self {
+			a: tup.0,
+			b: tup.1,
+		}
+	}
+}
+impl C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
+	#[allow(unused)] pub(crate) fn to_rust(mut self) -> (crate::lightning::routing::scoring::ProbabilisticScoringParameters, &'static crate::lightning::routing::network_graph::NetworkGraph) {
+		(self.a, self.b)
+	}
+}
+/// Creates a new C2Tuple_ProbabilisticScoringParametersNetworkGraphZ from the contained elements.
+#[no_mangle]
+pub extern "C" fn C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_new(a: crate::lightning::routing::scoring::ProbabilisticScoringParameters, b: &'static crate::lightning::routing::network_graph::NetworkGraph) -> C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
+	C2Tuple_ProbabilisticScoringParametersNetworkGraphZ { a, b, }
+}
+
+#[no_mangle]
+/// Frees any resources used by the C2Tuple_ProbabilisticScoringParametersNetworkGraphZ.
+pub extern "C" fn C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_free(_res: C2Tuple_ProbabilisticScoringParametersNetworkGraphZ) { }
+#[repr(C)]
+/// The contents of CResult_ProbabilisticScorerDecodeErrorZ
+pub union CResult_ProbabilisticScorerDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::lightning::routing::scoring::ProbabilisticScorer,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_ProbabilisticScorerDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning::routing::scoring::ProbabilisticScorer on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_ProbabilisticScorerDecodeErrorZ {
+	/// The contents of this CResult_ProbabilisticScorerDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_ProbabilisticScorerDecodeErrorZPtr,
+	/// Whether this CResult_ProbabilisticScorerDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_ProbabilisticScorerDecodeErrorZ in the success state.
+pub extern "C" fn CResult_ProbabilisticScorerDecodeErrorZ_ok(o: crate::lightning::routing::scoring::ProbabilisticScorer) -> CResult_ProbabilisticScorerDecodeErrorZ {
+	CResult_ProbabilisticScorerDecodeErrorZ {
+		contents: CResult_ProbabilisticScorerDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_ProbabilisticScorerDecodeErrorZ in the error state.
+pub extern "C" fn CResult_ProbabilisticScorerDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_ProbabilisticScorerDecodeErrorZ {
+	CResult_ProbabilisticScorerDecodeErrorZ {
+		contents: CResult_ProbabilisticScorerDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_ProbabilisticScorerDecodeErrorZ_is_ok(o: &CResult_ProbabilisticScorerDecodeErrorZ) -> bool {
+	o.result_ok
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_ProbabilisticScorerDecodeErrorZ.
+pub extern "C" fn CResult_ProbabilisticScorerDecodeErrorZ_free(_res: CResult_ProbabilisticScorerDecodeErrorZ) { }
+impl Drop for CResult_ProbabilisticScorerDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::lightning::routing::scoring::ProbabilisticScorer, crate::lightning::ln::msgs::DecodeError>> for CResult_ProbabilisticScorerDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::scoring::ProbabilisticScorer, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = core::ptr::null_mut() };
+			CResult_ProbabilisticScorerDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = core::ptr::null_mut(); }
+			CResult_ProbabilisticScorerDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+#[repr(C)]
 /// The contents of CResult_InitFeaturesDecodeErrorZ
 pub union CResult_InitFeaturesDecodeErrorZPtr {
 	/// A pointer to the contents in the success state.
@@ -5104,6 +5230,23 @@ impl From<crate::c_types::CResultTempl<crate::c_types::SecretKey, ()>> for CResu
 		}
 	}
 }
+impl Clone for CResult_SecretKeyNoneZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_SecretKeyNoneZPtr {
+				result: Box::into_raw(Box::new(<crate::c_types::SecretKey>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_SecretKeyNoneZPtr {
+				err: core::ptr::null_mut()
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_SecretKeyNoneZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_SecretKeyNoneZ_clone(orig: &CResult_SecretKeyNoneZ) -> CResult_SecretKeyNoneZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_SignDecodeErrorZ
 pub union CResult_SignDecodeErrorZPtr {

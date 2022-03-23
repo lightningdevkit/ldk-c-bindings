@@ -707,6 +707,78 @@ pub extern "C" fn Scorer_read(ser: crate::c_types::u8slice) -> crate::c_types::d
 	local_res
 }
 
+use lightning::routing::scoring::ProbabilisticScorer as nativeProbabilisticScorerImport;
+pub(crate) type nativeProbabilisticScorer = nativeProbabilisticScorerImport<&'static lightning::routing::network_graph::NetworkGraph>;
+
+/// [`Score`] implementation using channel success probability distributions.
+///
+/// Based on *Optimally Reliable & Cheap Payment Flows on the Lightning Network* by Rene Pickhardt
+/// and Stefan Richter [[1]]. Given the uncertainty of channel liquidity balances, probability
+/// distributions are defined based on knowledge learned from successful and unsuccessful attempts.
+/// Then the negative `log10` of the success probability is used to determine the cost of routing a
+/// specific HTLC amount through a channel.
+///
+/// Knowledge about channel liquidity balances takes the form of upper and lower bounds on the
+/// possible liquidity. Certainty of the bounds is decreased over time using a decay function. See
+/// [`ProbabilisticScoringParameters`] for details.
+///
+/// Since the scorer aims to learn the current channel liquidity balances, it works best for nodes
+/// with high payment volume or that actively probe the [`NetworkGraph`]. Nodes with low payment
+/// volume are more likely to experience failed payment paths, which would need to be retried.
+///
+/// # Note
+///
+/// Mixing the `no-std` feature between serialization and deserialization results in undefined
+/// behavior.
+///
+/// [1]: https://arxiv.org/abs/2107.05322
+#[must_use]
+#[repr(C)]
+pub struct ProbabilisticScorer {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeProbabilisticScorer,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for ProbabilisticScorer {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeProbabilisticScorer>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the ProbabilisticScorer, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn ProbabilisticScorer_free(this_obj: ProbabilisticScorer) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ProbabilisticScorer_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeProbabilisticScorer); }
+}
+#[allow(unused)]
+impl ProbabilisticScorer {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeProbabilisticScorer {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeProbabilisticScorer {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeProbabilisticScorer {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+
 use lightning::routing::scoring::ProbabilisticScoringParameters as nativeProbabilisticScoringParametersImport;
 pub(crate) type nativeProbabilisticScoringParameters = nativeProbabilisticScoringParametersImport;
 
@@ -871,11 +943,76 @@ pub extern "C" fn ProbabilisticScoringParameters_read(ser: crate::c_types::u8sli
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scoring::ProbabilisticScoringParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
+/// Creates a new scorer using the given scoring parameters for sending payments from a node
+/// through a network graph.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ProbabilisticScorer_new(mut params: crate::lightning::routing::scoring::ProbabilisticScoringParameters, network_graph: &crate::lightning::routing::network_graph::NetworkGraph) -> ProbabilisticScorer {
+	let mut ret = lightning::routing::scoring::ProbabilisticScorer::new(*unsafe { Box::from_raw(params.take_inner()) }, network_graph.get_native_ref());
+	ProbabilisticScorer { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
 /// Creates a "default" ProbabilisticScoringParameters. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ProbabilisticScoringParameters_default() -> ProbabilisticScoringParameters {
 	ProbabilisticScoringParameters { inner: ObjOps::heap_alloc(Default::default()), is_owned: true }
+}
+impl From<nativeProbabilisticScorer> for crate::lightning::routing::scoring::Score {
+	fn from(obj: nativeProbabilisticScorer) -> Self {
+		let mut rust_obj = ProbabilisticScorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let mut ret = ProbabilisticScorer_as_Score(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
+		rust_obj.inner = core::ptr::null_mut();
+		ret.free = Some(ProbabilisticScorer_free_void);
+		ret
+	}
+}
+/// Constructs a new Score which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned Score must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn ProbabilisticScorer_as_Score(this_arg: &ProbabilisticScorer) -> crate::lightning::routing::scoring::Score {
+	crate::lightning::routing::scoring::Score {
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
+		free: None,
+		channel_penalty_msat: ProbabilisticScorer_Score_channel_penalty_msat,
+		payment_path_failed: ProbabilisticScorer_Score_payment_path_failed,
+		payment_path_successful: ProbabilisticScorer_Score_payment_path_successful,
+		write: ProbabilisticScorer_write_void,
+	}
+}
+
+#[must_use]
+extern "C" fn ProbabilisticScorer_Score_channel_penalty_msat(this_arg: *const c_void, mut short_channel_id: u64, mut amount_msat: u64, mut capacity_msat: u64, source: &crate::lightning::routing::network_graph::NodeId, target: &crate::lightning::routing::network_graph::NodeId) -> u64 {
+	let mut ret = <nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::channel_penalty_msat(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, short_channel_id, amount_msat, capacity_msat, source.get_native_ref(), target.get_native_ref());
+	ret
+}
+extern "C" fn ProbabilisticScorer_Score_payment_path_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::payment_path_failed(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, &local_path[..], short_channel_id)
+}
+extern "C" fn ProbabilisticScorer_Score_payment_path_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, &local_path[..])
+}
+
+#[no_mangle]
+/// Serialize the ProbabilisticScorer object into a byte array which can be read by ProbabilisticScorer_read
+pub extern "C" fn ProbabilisticScorer_write(obj: &ProbabilisticScorer) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn ProbabilisticScorer_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeProbabilisticScorer) })
+}
+#[no_mangle]
+/// Read a ProbabilisticScorer from a byte array, created by ProbabilisticScorer_write
+pub extern "C" fn ProbabilisticScorer_read(ser: crate::c_types::u8slice, arg: crate::c_types::derived::C2Tuple_ProbabilisticScoringParametersNetworkGraphZ) -> crate::c_types::derived::CResult_ProbabilisticScorerDecodeErrorZ {
+	let (mut orig_arg_0, mut orig_arg_1) = arg.to_rust(); let mut local_arg = (*unsafe { Box::from_raw(orig_arg_0.take_inner()) }, orig_arg_1.get_native_ref());
+	let arg_conv = local_arg;
+	let res: Result<lightning::routing::scoring::ProbabilisticScorer<&lightning::routing::network_graph::NetworkGraph>, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scoring::ProbabilisticScorer { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
 }
 mod time {
 

@@ -1007,9 +1007,10 @@ pub(crate) extern "C" fn ProbabilisticScorer_write_void(obj: *const c_void) -> c
 }
 #[no_mangle]
 /// Read a ProbabilisticScorer from a byte array, created by ProbabilisticScorer_write
-pub extern "C" fn ProbabilisticScorer_read(ser: crate::c_types::u8slice, arg: crate::c_types::derived::C2Tuple_ProbabilisticScoringParametersNetworkGraphZ) -> crate::c_types::derived::CResult_ProbabilisticScorerDecodeErrorZ {
-	let (mut orig_arg_0, mut orig_arg_1) = arg.to_rust(); let mut local_arg = (*unsafe { Box::from_raw(orig_arg_0.take_inner()) }, orig_arg_1.get_native_ref());
-	let arg_conv = local_arg;
+pub extern "C" fn ProbabilisticScorer_read(ser: crate::c_types::u8slice, arg_a: crate::lightning::routing::scoring::ProbabilisticScoringParameters, arg_b: &crate::lightning::routing::network_graph::NetworkGraph) -> crate::c_types::derived::CResult_ProbabilisticScorerDecodeErrorZ {
+	let arg_a_conv = *unsafe { Box::from_raw(arg_a.take_inner()) };
+	let arg_b_conv = arg_b.get_native_ref();
+	let arg_conv = (arg_a_conv, arg_b_conv);
 	let res: Result<lightning::routing::scoring::ProbabilisticScorer<&lightning::routing::network_graph::NetworkGraph>, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scoring::ProbabilisticScorer { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res

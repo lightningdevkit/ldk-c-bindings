@@ -305,7 +305,7 @@ fi
 gcc $LOCAL_CFLAGS -fPIC -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
 if [ "$2" = "true" ]; then
 	g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl -lm
-	if [ -x "`which valgrind`" ]; then
+	if [ -x "`which valgrind`" -a "$(uname -m)" != "ppc64le" ]; then
 		valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
 		echo
 	else

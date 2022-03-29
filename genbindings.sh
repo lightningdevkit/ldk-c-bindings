@@ -50,13 +50,15 @@ elif [ "$HOST_PLATFORM" = "host: aarch64-apple-darwin" ]; then
 	HOST_OSX=true
 fi
 
+BASE_HOST_CFLAGS="$BASE_CFLAGS"
+
 if [ "$HOST_OSX" = "true" ]; then
 	export MACOSX_DEPLOYMENT_TARGET=10.9
 	LOCAL_CFLAGS="$LOCAL_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
-	BASE_CFLAGS="$BASE_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
+	BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
 	# Targeting aarch64 appears to be supported only starting with Big Sur, so check it before use
-	clang -o /dev/null $BASE_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14 genbindings_path_map_test_file.c &&
-	export CFLAGS_aarch64_apple_darwin="$BASE_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14" ||
+	clang -o /dev/null $BASE_HOST_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14 genbindings_path_map_test_file.c &&
+	export CFLAGS_aarch64_apple_darwin="$BASE_HOST_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14" ||
 	echo "WARNING: Can not build targeting aarch64-apple-darin. Upgrade to Big Sur or try upstream clang"
 fi
 
@@ -66,12 +68,12 @@ ENV_TARGET=$(rustc --version --verbose | grep host | awk '{ print $2 }' | sed 's
 case "$ENV_TARGET" in
 	"x86_64"*)
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge"
-		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 		;;
 	*)
 		# Assume this isn't targeted at another host and build for the host's CPU.
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=native"
-		export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -mcpu=native"
+		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -mcpu=native"
 		;;
 esac
 
@@ -483,7 +485,7 @@ if [ "$CLANGPP" != "" ]; then
 	# The cc-rs crate tries to force -fdata-sections and -ffunction-sections on, which
 	# breaks -fembed-bitcode, so we turn off cc-rs' default flags and specify exactly
 	# what we want here.
-	export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -fPIC -fembed-bitcode -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+	export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -fPIC -fembed-bitcode -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 	export CRATE_CC_NO_DEFAULTS=true
 fi
 
@@ -534,7 +536,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 		LINK_ARG_FLAGS="$LINK_ARG_FLAGS -C link-arg="-isysroot$(xcrun --show-sdk-path)" -C link-arg=-mmacosx-version-min=10.9"
 		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14 -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-mcpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin
 	fi
-	export CFLAGS_$ENV_TARGET="$BASE_CFLAGS -O3 -fPIC -fembed-bitcode -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+	export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -O3 -fPIC -fembed-bitcode -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 	# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 	cargo clean --release
 	CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge" cargo build $CARGO_BUILD_ARGS -v --release

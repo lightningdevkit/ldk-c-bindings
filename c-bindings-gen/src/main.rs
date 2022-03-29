@@ -102,24 +102,44 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 
 				let mut arg_conv = Vec::new();
 				if t == "lightning::util::ser::ReadableArgs" {
-					write!(w, ", arg: ").unwrap();
 					assert!(trait_path.leading_colon.is_none());
 					let args_seg = trait_path.segments.iter().last().unwrap();
 					assert_eq!(format!("{}", args_seg.ident), "ReadableArgs");
 					if let syn::PathArguments::AngleBracketed(args) = &args_seg.arguments {
 						assert_eq!(args.args.len(), 1);
 						if let syn::GenericArgument::Type(args_ty) = args.args.iter().next().unwrap() {
-							types.write_c_type(w, args_ty, Some(generics), false);
+							macro_rules! write_arg_conv {
+								($ty: expr, $arg_name: expr) => {
+									write!(w, ", {}: ", $arg_name).unwrap();
+									types.write_c_type(w, $ty, Some(generics), false);
 
-							write!(&mut arg_conv, "\t").unwrap();
-							if types.write_from_c_conversion_new_var(&mut arg_conv, &format_ident!("arg"), &args_ty, Some(generics)) {
-								write!(&mut arg_conv, "\n\t").unwrap();
+									write!(&mut arg_conv, "\t").unwrap();
+									if types.write_from_c_conversion_new_var(&mut arg_conv, &format_ident!("{}", $arg_name), &$ty, Some(generics)) {
+										write!(&mut arg_conv, "\n\t").unwrap();
+									}
+
+									write!(&mut arg_conv, "let {}_conv = ", $arg_name).unwrap();
+									types.write_from_c_conversion_prefix(&mut arg_conv, &$ty, Some(generics));
+									write!(&mut arg_conv, "{}", $arg_name).unwrap();
+									types.write_from_c_conversion_suffix(&mut arg_conv, &$ty, Some(generics));
+									write!(&mut arg_conv, ";\n").unwrap();
+								}
 							}
 
-							write!(&mut arg_conv, "let arg_conv = ").unwrap();
-							types.write_from_c_conversion_prefix(&mut arg_conv, &args_ty, Some(generics));
-							write!(&mut arg_conv, "arg").unwrap();
-							types.write_from_c_conversion_suffix(&mut arg_conv, &args_ty, Some(generics));
+							if let syn::Type::Tuple(tup) = args_ty {
+								// Crack open tuples and make them separate arguments instead of
+								// converting the full tuple. This makes it substantially easier to
+								// reason about things like references in the tuple fields.
+								let mut arg_conv_res = Vec::new();
+								for (idx, elem) in tup.elems.iter().enumerate() {
+									let arg_name = format!("arg_{}", ('a' as u8 + idx as u8) as char);
+									write_arg_conv!(elem, arg_name);
+									write!(&mut arg_conv_res, "{}_conv{}", arg_name, if idx != tup.elems.len() - 1 { ", " } else { "" }).unwrap();
+								}
+								writeln!(&mut arg_conv, "\tlet arg_conv = ({});", String::from_utf8(arg_conv_res).unwrap()).unwrap();
+							} else {
+								write_arg_conv!(args_ty, "arg");
+							}
 						} else { unreachable!(); }
 					} else { unreachable!(); }
 				} else if t == "lightning::util::ser::MaybeReadable" {
@@ -131,7 +151,6 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 
 				if t == "lightning::util::ser::ReadableArgs" {
 					w.write(&arg_conv).unwrap();
-					write!(w, ";\n").unwrap();
 				}
 
 				write!(w, "\tlet res: ").unwrap();

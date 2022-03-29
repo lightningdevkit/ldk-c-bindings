@@ -2714,7 +2714,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if !c_ty {
 					self.write_rust_path(w, generics, path);
 				} else {
-					write!(w, "{}", full_path).unwrap();
+					// We shouldn't be mapping references in types, so panic here
+					unimplemented!();
 				}
 			} else if is_ref {
 				write!(w, "&{}{}{}", if is_mut { "mut " } else { "" }, crate_pfx, full_path).unwrap();

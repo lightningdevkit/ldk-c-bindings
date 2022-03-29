@@ -1365,14 +1365,17 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				}
 			},
 			"Option" => {
+				let mut is_contained_ref = false;
 				let contained_struct = if let Some(syn::Type::Path(p)) = single_contained {
 					Some(self.resolve_path(&p.path, generics))
 				} else if let Some(syn::Type::Reference(r)) = single_contained {
+					is_contained_ref = true;
 					if let syn::Type::Path(p) = &*r.elem {
 						Some(self.resolve_path(&p.path, generics))
 					} else { None }
 				} else { None };
 				if let Some(inner_path) = contained_struct {
+					let only_contained_has_inner = self.c_type_has_inner_from_path(&inner_path);
 					if self.c_type_has_inner_from_path(&inner_path) {
 						let is_inner_ref = if let Some(syn::Type::Reference(_)) = single_contained { true } else { false };
 						if is_ref {
@@ -1386,12 +1389,19 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 								], " }", ContainerPrefixLocation::OutsideConv));
 						}
 					} else if self.is_primitive(&inner_path) || self.c_type_from_path(&inner_path, false, false).is_none() {
-						let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
-						return Some(("if ", vec![
-							(format!(".is_none() {{ {}::None }} else {{ {}::Some(",
-								inner_name, inner_name),
-							 format!("{}.unwrap()", var_access))
-							], ") }", ContainerPrefixLocation::PerConv));
+						if self.is_primitive(&inner_path) || (!is_contained_ref && !is_ref) || only_contained_has_inner {
+							let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
+							return Some(("if ", vec![
+								(format!(".is_none() {{ {}::None }} else {{ {}::Some(", inner_name, inner_name),
+								 format!("{}.unwrap()", var_access))
+								], ") }", ContainerPrefixLocation::PerConv));
+						} else {
+							let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
+							return Some(("if ", vec![
+								(format!(".is_none() {{ {}::None }} else {{ {}::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */", inner_name, inner_name),
+								 format!("{}.clone().unwrap()", var_access))
+								], ") }", ContainerPrefixLocation::PerConv));
+						}
 					} else {
 						// If c_type_from_path is some (ie there's a manual mapping for the inner
 						// type), lean on write_empty_rust_val, below.
@@ -2378,7 +2388,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 
 	pub fn write_to_c_conversion_new_var_inner<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, var_access: &str, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool, from_ownable_ref: bool) -> bool {
-		self.write_conversion_new_var_intern(w, ident, var_access, t, generics, false, ptr_for_ref, true, from_ownable_ref,
+		self.write_conversion_new_var_intern(w, ident, var_access, t, generics, from_ownable_ref, ptr_for_ref, true, from_ownable_ref,
 			&|a, b| self.to_c_conversion_new_var_from_path(a, b),
 			&|a, b, c, d, e| self.to_c_conversion_container_new_var(generics, a, b, c, d, e),
 			// We force ptr_for_ref here since we can't generate a ref on one line and use it later

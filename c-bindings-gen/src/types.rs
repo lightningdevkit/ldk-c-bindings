@@ -1432,6 +1432,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// Returns prefix + Vec<(prefix, var-name-to-inline-convert)> + suffix
 			// expecting one element in the vec per generic type, each of which is inline-converted
 			-> Option<(&'b str, Vec<(String, String)>, &'b str, ContainerPrefixLocation)> {
+		let mut only_contained_has_inner = false;
+		let only_contained_resolved = if let Some(syn::Type::Path(p)) = single_contained {
+			let res = self.resolve_path(&p.path, generics);
+			only_contained_has_inner = self.c_type_has_inner_from_path(&res);
+			Some(res)
+		} else { None };
 		match full_path {
 			"Result" if !is_ref => {
 				Some(("match ",
@@ -1439,18 +1445,17 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						     ("), false => Err(".to_string(), format!("(*unsafe {{ Box::from_raw(<*mut _>::take_ptr(&mut {}.contents.err)) }})", var_access))],
 						")}", ContainerPrefixLocation::PerConv))
 			},
-			"Slice" if is_ref => {
+			"Slice" if is_ref && only_contained_has_inner => {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".as_slice().iter() {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Vec"|"Slice" => {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".into_rust().drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Option" => {
-				if let Some(syn::Type::Path(p)) = single_contained {
-					let inner_path = self.resolve_path(&p.path, generics);
-					if self.is_primitive(&inner_path) {
+				if let Some(resolved) = only_contained_resolved {
+					if self.is_primitive(&resolved) {
 						return Some(("if ", vec![(".is_some() { Some(".to_string(), format!("{}.take()", var_access))], ") } else { None }", ContainerPrefixLocation::NoPrefix))
-					} else if self.c_type_has_inner_from_path(&inner_path) {
+					} else if only_contained_has_inner {
 						if is_ref {
 							return Some(("if ", vec![(".inner.is_null() { None } else { Some((*".to_string(), format!("{}", var_access))], ").clone()) }", ContainerPrefixLocation::PerConv))
 						} else {
@@ -2161,7 +2166,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					}
 				}
 
-				if let Some((prefix, conversions, suffix, prefix_location)) = container_lookup(&$container_type, is_ref && ty_has_inner, only_contained_type, ident, var) {
+				if let Some((prefix, conversions, suffix, prefix_location)) = container_lookup(&$container_type, is_ref, only_contained_type, ident, var) {
 					assert_eq!(conversions.len(), $args_len);
 					write!(w, "let mut local_{}{} = ", ident,
 						if (!to_c && needs_ref_map) || (to_c && $container_type == "Option" && contains_slice) {"_base"} else { "" }).unwrap();

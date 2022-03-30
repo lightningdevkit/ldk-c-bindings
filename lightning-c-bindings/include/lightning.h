@@ -4308,20 +4308,6 @@ typedef struct MUST_USE_STRUCT LDKNetworkGraph {
    bool is_owned;
 } LDKNetworkGraph;
 
-/**
- * A tuple of 2 elements. See the individual fields for the types contained.
- */
-typedef struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
-   /**
-    * The element at position 0
-    */
-   struct LDKProbabilisticScoringParameters a;
-   /**
-    * The element at position 1
-    */
-   struct LDKNetworkGraph b;
-} LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ;
-
 
 
 /**
@@ -13406,22 +13392,6 @@ void CResult_ProbabilisticScoringParametersDecodeErrorZ_free(struct LDKCResult_P
  * but with all dynamically-allocated buffers duplicated in new buffers.
  */
 struct LDKCResult_ProbabilisticScoringParametersDecodeErrorZ CResult_ProbabilisticScoringParametersDecodeErrorZ_clone(const struct LDKCResult_ProbabilisticScoringParametersDecodeErrorZ *NONNULL_PTR orig);
-
-/**
- * Creates a new tuple which has the same data as `orig`
- * but with all dynamically-allocated buffers duplicated in new buffers.
- */
-struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_clone(const struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ *NONNULL_PTR orig);
-
-/**
- * Creates a new C2Tuple_ProbabilisticScoringParametersNetworkGraphZ from the contained elements.
- */
-struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_new(struct LDKProbabilisticScoringParameters a, const struct LDKNetworkGraph *NONNULL_PTR b);
-
-/**
- * Frees any resources used by the C2Tuple_ProbabilisticScoringParametersNetworkGraphZ.
- */
-void C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_free(struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ _res);
 
 /**
  * Creates a new CResult_ProbabilisticScorerDecodeErrorZ in the success state.
@@ -25496,7 +25466,7 @@ struct LDKCVec_u8Z ProbabilisticScorer_write(const struct LDKProbabilisticScorer
 /**
  * Read a ProbabilisticScorer from a byte array, created by ProbabilisticScorer_write
  */
-struct LDKCResult_ProbabilisticScorerDecodeErrorZ ProbabilisticScorer_read(struct LDKu8slice ser, struct LDKC2Tuple_ProbabilisticScoringParametersNetworkGraphZ arg);
+struct LDKCResult_ProbabilisticScorerDecodeErrorZ ProbabilisticScorer_read(struct LDKu8slice ser, struct LDKProbabilisticScoringParameters arg_a, const struct LDKNetworkGraph *NONNULL_PTR arg_b);
 
 /**
  * Frees any resources used by the FilesystemPersister, if is_owned is set and inner is non-NULL.

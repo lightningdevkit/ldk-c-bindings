@@ -772,7 +772,6 @@ impl<'a> CrateTypes<'a> {
 		self.clonable_types.borrow_mut().insert(object);
 	}
 	pub fn is_clonable(&self, object: &str) -> bool {
-		object.starts_with("&'static ") ||
 		self.clonable_types.borrow().contains(object)
 	}
 	pub fn write_new_template(&self, mangled_container: String, has_destructor: bool, created_container: &[u8]) {
@@ -1365,14 +1364,17 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				}
 			},
 			"Option" => {
+				let mut is_contained_ref = false;
 				let contained_struct = if let Some(syn::Type::Path(p)) = single_contained {
 					Some(self.resolve_path(&p.path, generics))
 				} else if let Some(syn::Type::Reference(r)) = single_contained {
+					is_contained_ref = true;
 					if let syn::Type::Path(p) = &*r.elem {
 						Some(self.resolve_path(&p.path, generics))
 					} else { None }
 				} else { None };
 				if let Some(inner_path) = contained_struct {
+					let only_contained_has_inner = self.c_type_has_inner_from_path(&inner_path);
 					if self.c_type_has_inner_from_path(&inner_path) {
 						let is_inner_ref = if let Some(syn::Type::Reference(_)) = single_contained { true } else { false };
 						if is_ref {
@@ -1386,12 +1388,19 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 								], " }", ContainerPrefixLocation::OutsideConv));
 						}
 					} else if self.is_primitive(&inner_path) || self.c_type_from_path(&inner_path, false, false).is_none() {
-						let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
-						return Some(("if ", vec![
-							(format!(".is_none() {{ {}::None }} else {{ {}::Some(",
-								inner_name, inner_name),
-							 format!("{}.unwrap()", var_access))
-							], ") }", ContainerPrefixLocation::PerConv));
+						if self.is_primitive(&inner_path) || (!is_contained_ref && !is_ref) || only_contained_has_inner {
+							let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
+							return Some(("if ", vec![
+								(format!(".is_none() {{ {}::None }} else {{ {}::Some(", inner_name, inner_name),
+								 format!("{}.unwrap()", var_access))
+								], ") }", ContainerPrefixLocation::PerConv));
+						} else {
+							let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
+							return Some(("if ", vec![
+								(format!(".is_none() {{ {}::None }} else {{ {}::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */", inner_name, inner_name),
+								 format!("{}.clone().unwrap()", var_access))
+								], ") }", ContainerPrefixLocation::PerConv));
+						}
 					} else {
 						// If c_type_from_path is some (ie there's a manual mapping for the inner
 						// type), lean on write_empty_rust_val, below.
@@ -1432,6 +1441,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// Returns prefix + Vec<(prefix, var-name-to-inline-convert)> + suffix
 			// expecting one element in the vec per generic type, each of which is inline-converted
 			-> Option<(&'b str, Vec<(String, String)>, &'b str, ContainerPrefixLocation)> {
+		let mut only_contained_has_inner = false;
+		let only_contained_resolved = if let Some(syn::Type::Path(p)) = single_contained {
+			let res = self.resolve_path(&p.path, generics);
+			only_contained_has_inner = self.c_type_has_inner_from_path(&res);
+			Some(res)
+		} else { None };
 		match full_path {
 			"Result" if !is_ref => {
 				Some(("match ",
@@ -1439,18 +1454,17 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						     ("), false => Err(".to_string(), format!("(*unsafe {{ Box::from_raw(<*mut _>::take_ptr(&mut {}.contents.err)) }})", var_access))],
 						")}", ContainerPrefixLocation::PerConv))
 			},
-			"Slice" if is_ref => {
+			"Slice" if is_ref && only_contained_has_inner => {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".as_slice().iter() {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Vec"|"Slice" => {
 				Some(("Vec::new(); for mut item in ", vec![(format!(".into_rust().drain(..) {{ local_{}.push(", var_name), "item".to_string())], "); }", ContainerPrefixLocation::PerConv))
 			},
 			"Option" => {
-				if let Some(syn::Type::Path(p)) = single_contained {
-					let inner_path = self.resolve_path(&p.path, generics);
-					if self.is_primitive(&inner_path) {
+				if let Some(resolved) = only_contained_resolved {
+					if self.is_primitive(&resolved) {
 						return Some(("if ", vec![(".is_some() { Some(".to_string(), format!("{}.take()", var_access))], ") } else { None }", ContainerPrefixLocation::NoPrefix))
-					} else if self.c_type_has_inner_from_path(&inner_path) {
+					} else if only_contained_has_inner {
 						if is_ref {
 							return Some(("if ", vec![(".inner.is_null() { None } else { Some((*".to_string(), format!("{}", var_access))], ").clone()) }", ContainerPrefixLocation::PerConv))
 						} else {
@@ -2161,7 +2175,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					}
 				}
 
-				if let Some((prefix, conversions, suffix, prefix_location)) = container_lookup(&$container_type, is_ref && ty_has_inner, only_contained_type, ident, var) {
+				if let Some((prefix, conversions, suffix, prefix_location)) = container_lookup(&$container_type, is_ref, only_contained_type, ident, var) {
 					assert_eq!(conversions.len(), $args_len);
 					write!(w, "let mut local_{}{} = ", ident,
 						if (!to_c && needs_ref_map) || (to_c && $container_type == "Option" && contains_slice) {"_base"} else { "" }).unwrap();
@@ -2373,7 +2387,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	}
 
 	pub fn write_to_c_conversion_new_var_inner<W: std::io::Write>(&self, w: &mut W, ident: &syn::Ident, var_access: &str, t: &syn::Type, generics: Option<&GenericTypes>, ptr_for_ref: bool, from_ownable_ref: bool) -> bool {
-		self.write_conversion_new_var_intern(w, ident, var_access, t, generics, false, ptr_for_ref, true, from_ownable_ref,
+		self.write_conversion_new_var_intern(w, ident, var_access, t, generics, from_ownable_ref, ptr_for_ref, true, from_ownable_ref,
 			&|a, b| self.to_c_conversion_new_var_from_path(a, b),
 			&|a, b, c, d, e| self.to_c_conversion_container_new_var(generics, a, b, c, d, e),
 			// We force ptr_for_ref here since we can't generate a ref on one line and use it later
@@ -2700,7 +2714,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if !c_ty {
 					self.write_rust_path(w, generics, path);
 				} else {
-					write!(w, "{}", full_path).unwrap();
+					// We shouldn't be mapping references in types, so panic here
+					unimplemented!();
 				}
 			} else if is_ref {
 				write!(w, "&{}{}{}", if is_mut { "mut " } else { "" }, crate_pfx, full_path).unwrap();

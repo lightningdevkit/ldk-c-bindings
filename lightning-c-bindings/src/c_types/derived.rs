@@ -3958,47 +3958,6 @@ impl Clone for CResult_ProbabilisticScoringParametersDecodeErrorZ {
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_ProbabilisticScoringParametersDecodeErrorZ_clone(orig: &CResult_ProbabilisticScoringParametersDecodeErrorZ) -> CResult_ProbabilisticScoringParametersDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
-/// A tuple of 2 elements. See the individual fields for the types contained.
-pub struct C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
-	/// The element at position 0
-	pub a: crate::lightning::routing::scoring::ProbabilisticScoringParameters,
-	/// The element at position 1
-	pub b: crate::lightning::routing::network_graph::NetworkGraph,
-}
-impl From<(crate::lightning::routing::scoring::ProbabilisticScoringParameters, crate::lightning::routing::network_graph::NetworkGraph)> for C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
-	fn from (tup: (crate::lightning::routing::scoring::ProbabilisticScoringParameters, crate::lightning::routing::network_graph::NetworkGraph)) -> Self {
-		Self {
-			a: tup.0,
-			b: tup.1,
-		}
-	}
-}
-impl C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
-	#[allow(unused)] pub(crate) fn to_rust(mut self) -> (crate::lightning::routing::scoring::ProbabilisticScoringParameters, crate::lightning::routing::network_graph::NetworkGraph) {
-		(self.a, self.b)
-	}
-}
-impl Clone for C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
-	fn clone(&self) -> Self {
-		Self {
-			a: Clone::clone(&self.a),
-			b: crate::lightning::routing::network_graph::NetworkGraph { inner: self.b.inner, is_owned: false},		}
-	}
-}
-#[no_mangle]
-/// Creates a new tuple which has the same data as `orig`
-/// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_clone(orig: &C2Tuple_ProbabilisticScoringParametersNetworkGraphZ) -> C2Tuple_ProbabilisticScoringParametersNetworkGraphZ { Clone::clone(&orig) }
-/// Creates a new C2Tuple_ProbabilisticScoringParametersNetworkGraphZ from the contained elements.
-#[no_mangle]
-pub extern "C" fn C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_new(a: crate::lightning::routing::scoring::ProbabilisticScoringParameters, b: &'static crate::lightning::routing::network_graph::NetworkGraph) -> C2Tuple_ProbabilisticScoringParametersNetworkGraphZ {
-	C2Tuple_ProbabilisticScoringParametersNetworkGraphZ { a, b: crate::lightning::routing::network_graph::NetworkGraph { inner: b.inner, is_owned: false}, }
-}
-
-#[no_mangle]
-/// Frees any resources used by the C2Tuple_ProbabilisticScoringParametersNetworkGraphZ.
-pub extern "C" fn C2Tuple_ProbabilisticScoringParametersNetworkGraphZ_free(_res: C2Tuple_ProbabilisticScoringParametersNetworkGraphZ) { }
-#[repr(C)]
 /// The contents of CResult_ProbabilisticScorerDecodeErrorZ
 pub union CResult_ProbabilisticScorerDecodeErrorZPtr {
 	/// A pointer to the contents in the success state.

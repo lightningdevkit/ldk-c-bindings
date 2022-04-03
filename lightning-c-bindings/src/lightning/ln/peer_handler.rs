@@ -206,7 +206,7 @@ pub extern "C" fn IgnoringMessageHandler_as_RoutingMessageHandler(this_arg: &Ign
 		handle_channel_update: IgnoringMessageHandler_RoutingMessageHandler_handle_channel_update,
 		get_next_channel_announcements: IgnoringMessageHandler_RoutingMessageHandler_get_next_channel_announcements,
 		get_next_node_announcements: IgnoringMessageHandler_RoutingMessageHandler_get_next_node_announcements,
-		sync_routing_table: IgnoringMessageHandler_RoutingMessageHandler_sync_routing_table,
+		peer_connected: IgnoringMessageHandler_RoutingMessageHandler_peer_connected,
 		handle_reply_channel_range: IgnoringMessageHandler_RoutingMessageHandler_handle_reply_channel_range,
 		handle_reply_short_channel_ids_end: IgnoringMessageHandler_RoutingMessageHandler_handle_reply_short_channel_ids_end,
 		handle_query_channel_range: IgnoringMessageHandler_RoutingMessageHandler_handle_query_channel_range,
@@ -250,8 +250,8 @@ extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_get_next_node_announc
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::ln::msgs::NodeAnnouncement { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
 	local_ret.into()
 }
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_sync_routing_table(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _init: &crate::lightning::ln::msgs::Init) {
-	<nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::sync_routing_table(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &_their_node_id.into_rust(), _init.get_native_ref())
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_peer_connected(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _init: &crate::lightning::ln::msgs::Init) {
+	<nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &_their_node_id.into_rust(), _init.get_native_ref())
 }
 #[must_use]
 extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_reply_channel_range(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _msg: crate::lightning::ln::msgs::ReplyChannelRange) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
@@ -943,7 +943,13 @@ pub extern "C" fn PeerManager_get_peer_node_ids(this_arg: &PeerManager) -> crate
 	local_ret.into()
 }
 
-/// Indicates a new outbound connection has been established to a node with the given node_id.
+/// Indicates a new outbound connection has been established to a node with the given node_id
+/// and an optional remote network address.
+///
+/// The remote network address adds the option to report a remote IP address back to a connecting
+/// peer using the init message.
+/// The user should pass the remote network address of the host they are connected to.
+///
 /// Note that if an Err is returned here you MUST NOT call socket_disconnected for the new
 /// descriptor but must disconnect the connection immediately.
 ///
@@ -955,13 +961,19 @@ pub extern "C" fn PeerManager_get_peer_node_ids(this_arg: &PeerManager) -> crate
 /// [`socket_disconnected()`]: PeerManager::socket_disconnected
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PeerManager_new_outbound_connection(this_arg: &PeerManager, mut their_node_id: crate::c_types::PublicKey, mut descriptor: crate::lightning::ln::peer_handler::SocketDescriptor) -> crate::c_types::derived::CResult_CVec_u8ZPeerHandleErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.new_outbound_connection(their_node_id.into_rust(), descriptor);
+pub extern "C" fn PeerManager_new_outbound_connection(this_arg: &PeerManager, mut their_node_id: crate::c_types::PublicKey, mut descriptor: crate::lightning::ln::peer_handler::SocketDescriptor, mut remote_network_address: crate::c_types::derived::COption_NetAddressZ) -> crate::c_types::derived::CResult_CVec_u8ZPeerHandleErrorZ {
+	let mut local_remote_network_address = { /* remote_network_address*/ let remote_network_address_opt = remote_network_address; { } if remote_network_address_opt.is_none() { None } else { Some({ remote_network_address_opt.take().into_native() }) } };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.new_outbound_connection(their_node_id.into_rust(), descriptor, local_remote_network_address);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { item }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::peer_handler::PeerHandleError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 
-/// Indicates a new inbound connection has been established.
+/// Indicates a new inbound connection has been established to a node with an optional remote
+/// network address.
+///
+/// The remote network address adds the option to report a remote IP address back to a connecting
+/// peer using the init message.
+/// The user should pass the remote network address of the host they are connected to.
 ///
 /// May refuse the connection by returning an Err, but will never write bytes to the remote end
 /// (outbound connector always speaks first). Note that if an Err is returned here you MUST NOT
@@ -974,8 +986,9 @@ pub extern "C" fn PeerManager_new_outbound_connection(this_arg: &PeerManager, mu
 /// [`socket_disconnected()`]: PeerManager::socket_disconnected
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PeerManager_new_inbound_connection(this_arg: &PeerManager, mut descriptor: crate::lightning::ln::peer_handler::SocketDescriptor) -> crate::c_types::derived::CResult_NonePeerHandleErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.new_inbound_connection(descriptor);
+pub extern "C" fn PeerManager_new_inbound_connection(this_arg: &PeerManager, mut descriptor: crate::lightning::ln::peer_handler::SocketDescriptor, mut remote_network_address: crate::c_types::derived::COption_NetAddressZ) -> crate::c_types::derived::CResult_NonePeerHandleErrorZ {
+	let mut local_remote_network_address = { /* remote_network_address*/ let remote_network_address_opt = remote_network_address; { } if remote_network_address_opt.is_none() { None } else { Some({ remote_network_address_opt.take().into_native() }) } };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.new_inbound_connection(descriptor, local_remote_network_address);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::peer_handler::PeerHandleError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
@@ -1071,9 +1084,9 @@ pub extern "C" fn PeerManager_disconnect_all_peers(this_arg: &PeerManager) {
 /// Send pings to each peer and disconnect those which did not respond to the last round of
 /// pings.
 ///
-/// This may be called on any timescale you want, however, roughly once every five to ten
-/// seconds is preferred. The call rate determines both how often we send a ping to our peers
-/// and how much time they have to respond before we disconnect them.
+/// This may be called on any timescale you want, however, roughly once every ten seconds is
+/// preferred. The call rate determines both how often we send a ping to our peers and how much
+/// time they have to respond before we disconnect them.
 ///
 /// May call [`send_data`] on all [`SocketDescriptor`]s. Thus, be very careful with reentrancy
 /// issues!

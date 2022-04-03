@@ -571,11 +571,15 @@ pub enum Event {
 		/// The channel_id of the channel which has been closed. Note that on-chain transactions
 		/// resolving the channel are likely still awaiting confirmation.
 		channel_id: crate::c_types::ThirtyTwoBytes,
-		/// The `user_channel_id` value passed in to [`ChannelManager::create_channel`], or 0 for
-		/// an inbound channel. This will always be zero for objects serialized with LDK versions
-		/// prior to 0.0.102.
+		/// The `user_channel_id` value passed in to [`ChannelManager::create_channel`] for outbound
+		/// channels, or to [`ChannelManager::accept_inbound_channel`] for inbound channels if
+		/// [`UserConfig::manually_accept_inbound_channels`] config flag is set to true. Otherwise
+		/// `user_channel_id` will be 0 for an inbound channel.
+		/// This will always be zero for objects serialized with LDK versions prior to 0.0.102.
 		///
 		/// [`ChannelManager::create_channel`]: crate::ln::channelmanager::ChannelManager::create_channel
+		/// [`ChannelManager::accept_inbound_channel`]: crate::ln::channelmanager::ChannelManager::accept_inbound_channel
+		/// [`UserConfig::manually_accept_inbound_channels`]: crate::util::config::UserConfig::manually_accept_inbound_channels
 		user_channel_id: u64,
 		/// The reason the channel was closed.
 		reason: crate::lightning::util::events::ClosureReason,
@@ -637,6 +641,16 @@ pub enum Event {
 		funding_satoshis: u64,
 		/// Our starting balance in the channel if the request is accepted, in milli-satoshi.
 		push_msat: u64,
+		/// The features that this channel will operate with. If you reject the channel, a
+		/// well-behaved counterparty may automatically re-attempt the channel with a new set of
+		/// feature flags.
+		///
+		/// Note that if [`ChannelTypeFeatures::supports_scid_privacy`] returns true on this type,
+		/// the resulting [`ChannelManager`] will not be readable by versions of LDK prior to
+		/// 0.0.106.
+		///
+		/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
+		channel_type: crate::lightning::ln::features::ChannelTypeFeatures,
 	},
 }
 use lightning::util::events::Event as nativeEvent;
@@ -765,16 +779,18 @@ impl Event {
 					path: local_path_nonref,
 				}
 			},
-			Event::OpenChannelRequest {ref temporary_channel_id, ref counterparty_node_id, ref funding_satoshis, ref push_msat, } => {
+			Event::OpenChannelRequest {ref temporary_channel_id, ref counterparty_node_id, ref funding_satoshis, ref push_msat, ref channel_type, } => {
 				let mut temporary_channel_id_nonref = (*temporary_channel_id).clone();
 				let mut counterparty_node_id_nonref = (*counterparty_node_id).clone();
 				let mut funding_satoshis_nonref = (*funding_satoshis).clone();
 				let mut push_msat_nonref = (*push_msat).clone();
+				let mut channel_type_nonref = (*channel_type).clone();
 				nativeEvent::OpenChannelRequest {
 					temporary_channel_id: temporary_channel_id_nonref.data,
 					counterparty_node_id: counterparty_node_id_nonref.into_rust(),
 					funding_satoshis: funding_satoshis_nonref,
 					push_msat: push_msat_nonref,
+					channel_type: *unsafe { Box::from_raw(channel_type_nonref.take_inner()) },
 				}
 			},
 		}
@@ -870,12 +886,13 @@ impl Event {
 					path: local_path,
 				}
 			},
-			Event::OpenChannelRequest {mut temporary_channel_id, mut counterparty_node_id, mut funding_satoshis, mut push_msat, } => {
+			Event::OpenChannelRequest {mut temporary_channel_id, mut counterparty_node_id, mut funding_satoshis, mut push_msat, mut channel_type, } => {
 				nativeEvent::OpenChannelRequest {
 					temporary_channel_id: temporary_channel_id.data,
 					counterparty_node_id: counterparty_node_id.into_rust(),
 					funding_satoshis: funding_satoshis,
 					push_msat: push_msat,
+					channel_type: *unsafe { Box::from_raw(channel_type.take_inner()) },
 				}
 			},
 		}
@@ -1004,16 +1021,18 @@ impl Event {
 					path: local_path_nonref.into(),
 				}
 			},
-			nativeEvent::OpenChannelRequest {ref temporary_channel_id, ref counterparty_node_id, ref funding_satoshis, ref push_msat, } => {
+			nativeEvent::OpenChannelRequest {ref temporary_channel_id, ref counterparty_node_id, ref funding_satoshis, ref push_msat, ref channel_type, } => {
 				let mut temporary_channel_id_nonref = (*temporary_channel_id).clone();
 				let mut counterparty_node_id_nonref = (*counterparty_node_id).clone();
 				let mut funding_satoshis_nonref = (*funding_satoshis).clone();
 				let mut push_msat_nonref = (*push_msat).clone();
+				let mut channel_type_nonref = (*channel_type).clone();
 				Event::OpenChannelRequest {
 					temporary_channel_id: crate::c_types::ThirtyTwoBytes { data: temporary_channel_id_nonref },
 					counterparty_node_id: crate::c_types::PublicKey::from_rust(&counterparty_node_id_nonref),
 					funding_satoshis: funding_satoshis_nonref,
 					push_msat: push_msat_nonref,
+					channel_type: crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(channel_type_nonref), is_owned: true },
 				}
 			},
 		}
@@ -1109,12 +1128,13 @@ impl Event {
 					path: local_path.into(),
 				}
 			},
-			nativeEvent::OpenChannelRequest {mut temporary_channel_id, mut counterparty_node_id, mut funding_satoshis, mut push_msat, } => {
+			nativeEvent::OpenChannelRequest {mut temporary_channel_id, mut counterparty_node_id, mut funding_satoshis, mut push_msat, mut channel_type, } => {
 				Event::OpenChannelRequest {
 					temporary_channel_id: crate::c_types::ThirtyTwoBytes { data: temporary_channel_id },
 					counterparty_node_id: crate::c_types::PublicKey::from_rust(&counterparty_node_id),
 					funding_satoshis: funding_satoshis,
 					push_msat: push_msat,
+					channel_type: crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(channel_type), is_owned: true },
 				}
 			},
 		}
@@ -1229,12 +1249,13 @@ pub extern "C" fn Event_payment_path_successful(payment_id: crate::c_types::Thir
 }
 #[no_mangle]
 /// Utility method to constructs a new OpenChannelRequest-variant Event
-pub extern "C" fn Event_open_channel_request(temporary_channel_id: crate::c_types::ThirtyTwoBytes, counterparty_node_id: crate::c_types::PublicKey, funding_satoshis: u64, push_msat: u64) -> Event {
+pub extern "C" fn Event_open_channel_request(temporary_channel_id: crate::c_types::ThirtyTwoBytes, counterparty_node_id: crate::c_types::PublicKey, funding_satoshis: u64, push_msat: u64, channel_type: crate::lightning::ln::features::ChannelTypeFeatures) -> Event {
 	Event::OpenChannelRequest {
 		temporary_channel_id,
 		counterparty_node_id,
 		funding_satoshis,
 		push_msat,
+		channel_type,
 	}
 }
 #[no_mangle]
@@ -1399,6 +1420,14 @@ pub enum MessageSendEvent {
 		/// The reply_channel_range which should be sent.
 		msg: crate::lightning::ln::msgs::ReplyChannelRange,
 	},
+	/// Sends a timestamp filter for inbound gossip. This should be sent on each new connection to
+	/// enable receiving gossip messages from the peer.
+	SendGossipTimestampFilter {
+		/// The node_id of this message recipient
+		node_id: crate::c_types::PublicKey,
+		/// The gossip_timestamp_filter which should be sent.
+		msg: crate::lightning::ln::msgs::GossipTimestampFilter,
+	},
 }
 use lightning::util::events::MessageSendEvent as nativeMessageSendEvent;
 impl MessageSendEvent {
@@ -1553,6 +1582,14 @@ impl MessageSendEvent {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
+			MessageSendEvent::SendGossipTimestampFilter {ref node_id, ref msg, } => {
+				let mut node_id_nonref = (*node_id).clone();
+				let mut msg_nonref = (*msg).clone();
+				nativeMessageSendEvent::SendGossipTimestampFilter {
+					node_id: node_id_nonref.into_rust(),
+					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -1666,6 +1703,12 @@ impl MessageSendEvent {
 			},
 			MessageSendEvent::SendReplyChannelRange {mut node_id, mut msg, } => {
 				nativeMessageSendEvent::SendReplyChannelRange {
+					node_id: node_id.into_rust(),
+					msg: *unsafe { Box::from_raw(msg.take_inner()) },
+				}
+			},
+			MessageSendEvent::SendGossipTimestampFilter {mut node_id, mut msg, } => {
+				nativeMessageSendEvent::SendGossipTimestampFilter {
 					node_id: node_id.into_rust(),
 					msg: *unsafe { Box::from_raw(msg.take_inner()) },
 				}
@@ -1823,6 +1866,14 @@ impl MessageSendEvent {
 					msg: crate::lightning::ln::msgs::ReplyChannelRange { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
+			nativeMessageSendEvent::SendGossipTimestampFilter {ref node_id, ref msg, } => {
+				let mut node_id_nonref = (*node_id).clone();
+				let mut msg_nonref = (*msg).clone();
+				MessageSendEvent::SendGossipTimestampFilter {
+					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
+					msg: crate::lightning::ln::msgs::GossipTimestampFilter { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -1938,6 +1989,12 @@ impl MessageSendEvent {
 				MessageSendEvent::SendReplyChannelRange {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id),
 					msg: crate::lightning::ln::msgs::ReplyChannelRange { inner: ObjOps::heap_alloc(msg), is_owned: true },
+				}
+			},
+			nativeMessageSendEvent::SendGossipTimestampFilter {mut node_id, mut msg, } => {
+				MessageSendEvent::SendGossipTimestampFilter {
+					node_id: crate::c_types::PublicKey::from_rust(&node_id),
+					msg: crate::lightning::ln::msgs::GossipTimestampFilter { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
 		}
@@ -2097,6 +2154,14 @@ pub extern "C" fn MessageSendEvent_send_short_ids_query(node_id: crate::c_types:
 /// Utility method to constructs a new SendReplyChannelRange-variant MessageSendEvent
 pub extern "C" fn MessageSendEvent_send_reply_channel_range(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::ReplyChannelRange) -> MessageSendEvent {
 	MessageSendEvent::SendReplyChannelRange {
+		node_id,
+		msg,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new SendGossipTimestampFilter-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_gossip_timestamp_filter(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::GossipTimestampFilter) -> MessageSendEvent {
+	MessageSendEvent::SendGossipTimestampFilter {
 		node_id,
 		msg,
 	}

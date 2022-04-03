@@ -163,12 +163,33 @@ pub extern "C" fn Init_get_features(this_ptr: &Init) -> crate::lightning::ln::fe
 pub extern "C" fn Init_set_features(this_ptr: &mut Init, mut val: crate::lightning::ln::features::InitFeatures) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.features = *unsafe { Box::from_raw(val.take_inner()) };
 }
+/// The receipient's network address. This adds the option to report a remote IP address
+/// back to a connecting peer using the init message. A node can decide to use that information
+/// to discover a potential update to its public IPv4 address (NAT) and use
+/// that for a node_announcement update message containing the new address.
+#[no_mangle]
+pub extern "C" fn Init_get_remote_network_address(this_ptr: &Init) -> crate::c_types::derived::COption_NetAddressZ {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().remote_network_address;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NetAddressZ::None } else { crate::c_types::derived::COption_NetAddressZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::lightning::ln::msgs::NetAddress::native_into(inner_val.clone().unwrap()) }) };
+	local_inner_val
+}
+/// The receipient's network address. This adds the option to report a remote IP address
+/// back to a connecting peer using the init message. A node can decide to use that information
+/// to discover a potential update to its public IPv4 address (NAT) and use
+/// that for a node_announcement update message containing the new address.
+#[no_mangle]
+pub extern "C" fn Init_set_remote_network_address(this_ptr: &mut Init, mut val: crate::c_types::derived::COption_NetAddressZ) {
+	let mut local_val = { /* val*/ let val_opt = val; { } if val_opt.is_none() { None } else { Some({ val_opt.take().into_native() }) } };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.remote_network_address = local_val;
+}
 /// Constructs a new Init given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Init_new(mut features_arg: crate::lightning::ln::features::InitFeatures) -> Init {
+pub extern "C" fn Init_new(mut features_arg: crate::lightning::ln::features::InitFeatures, mut remote_network_address_arg: crate::c_types::derived::COption_NetAddressZ) -> Init {
+	let mut local_remote_network_address_arg = { /* remote_network_address_arg*/ let remote_network_address_arg_opt = remote_network_address_arg; { } if remote_network_address_arg_opt.is_none() { None } else { Some({ remote_network_address_arg_opt.take().into_native() }) } };
 	Init { inner: ObjOps::heap_alloc(nativeInit {
 		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
+		remote_network_address: local_remote_network_address_arg,
 	}), is_owned: true }
 }
 impl Clone for Init {
@@ -1445,13 +1466,30 @@ pub extern "C" fn FundingLocked_get_next_per_commitment_point(this_ptr: &Funding
 pub extern "C" fn FundingLocked_set_next_per_commitment_point(this_ptr: &mut FundingLocked, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.next_per_commitment_point = val.into_rust();
 }
+/// If set, provides a short_channel_id alias for this channel. The sender will accept payments
+/// to be forwarded over this SCID and forward them to this messages' recipient.
+#[no_mangle]
+pub extern "C" fn FundingLocked_get_short_channel_id_alias(this_ptr: &FundingLocked) -> crate::c_types::derived::COption_u64Z {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().short_channel_id_alias;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { inner_val.unwrap() }) };
+	local_inner_val
+}
+/// If set, provides a short_channel_id alias for this channel. The sender will accept payments
+/// to be forwarded over this SCID and forward them to this messages' recipient.
+#[no_mangle]
+pub extern "C" fn FundingLocked_set_short_channel_id_alias(this_ptr: &mut FundingLocked, mut val: crate::c_types::derived::COption_u64Z) {
+	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.short_channel_id_alias = local_val;
+}
 /// Constructs a new FundingLocked given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn FundingLocked_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut next_per_commitment_point_arg: crate::c_types::PublicKey) -> FundingLocked {
+pub extern "C" fn FundingLocked_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut next_per_commitment_point_arg: crate::c_types::PublicKey, mut short_channel_id_alias_arg: crate::c_types::derived::COption_u64Z) -> FundingLocked {
+	let mut local_short_channel_id_alias_arg = if short_channel_id_alias_arg.is_some() { Some( { short_channel_id_alias_arg.take() }) } else { None };
 	FundingLocked { inner: ObjOps::heap_alloc(nativeFundingLocked {
 		channel_id: channel_id_arg.data,
 		next_per_commitment_point: next_per_commitment_point_arg.into_rust(),
+		short_channel_id_alias: local_short_channel_id_alias_arg,
 	}), is_owned: true }
 }
 impl Clone for FundingLocked {
@@ -5206,7 +5244,7 @@ pub struct RoutingMessageHandler {
 	/// Called when a connection is established with a peer. This can be used to
 	/// perform routing table synchronization using a strategy defined by the
 	/// implementor.
-	pub sync_routing_table: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init),
+	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init),
 	/// Handles the reply of a query we initiated to learn about channels
 	/// for a given range of blocks. We can expect to receive one or more
 	/// replies to a single query.
@@ -5243,7 +5281,7 @@ pub(crate) extern "C" fn RoutingMessageHandler_clone_fields(orig: &RoutingMessag
 		handle_channel_update: Clone::clone(&orig.handle_channel_update),
 		get_next_channel_announcements: Clone::clone(&orig.get_next_channel_announcements),
 		get_next_node_announcements: Clone::clone(&orig.get_next_node_announcements),
-		sync_routing_table: Clone::clone(&orig.sync_routing_table),
+		peer_connected: Clone::clone(&orig.peer_connected),
 		handle_reply_channel_range: Clone::clone(&orig.handle_reply_channel_range),
 		handle_reply_short_channel_ids_end: Clone::clone(&orig.handle_reply_short_channel_ids_end),
 		handle_query_channel_range: Clone::clone(&orig.handle_query_channel_range),
@@ -5288,8 +5326,8 @@ impl rustRoutingMessageHandler for RoutingMessageHandler {
 		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 		local_ret
 	}
-	fn sync_routing_table(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut init: &lightning::ln::msgs::Init) {
-		(self.sync_routing_table)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false })
+	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut init: &lightning::ln::msgs::Init) {
+		(self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_reply_channel_range(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: lightning::ln::msgs::ReplyChannelRange) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_reply_channel_range)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::ReplyChannelRange { inner: ObjOps::heap_alloc(msg), is_owned: true });

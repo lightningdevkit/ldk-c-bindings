@@ -1,0 +1,7 @@
+Cargo.lock
+a.out
+a.out.*
+include/ldk_ver.h
+ldk_net.o
+src/version.rs
+target

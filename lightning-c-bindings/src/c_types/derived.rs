@@ -8088,73 +8088,77 @@ impl Clone for CResult_PaymentIdPaymentErrorZ {
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_PaymentIdPaymentErrorZ_clone(orig: &CResult_PaymentIdPaymentErrorZ) -> CResult_PaymentIdPaymentErrorZ { Clone::clone(&orig) }
 #[repr(C)]
-/// The contents of CResult_SiPrefixNoneZ
-pub union CResult_SiPrefixNoneZPtr {
+/// The contents of CResult_SiPrefixParseErrorZ
+pub union CResult_SiPrefixParseErrorZPtr {
 	/// A pointer to the contents in the success state.
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::lightning_invoice::SiPrefix,
-	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut core::ffi::c_void,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning_invoice::ParseError,
 }
 #[repr(C)]
-/// A CResult_SiPrefixNoneZ represents the result of a fallible operation,
-/// containing a crate::lightning_invoice::SiPrefix on success and a () on failure.
+/// A CResult_SiPrefixParseErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning_invoice::SiPrefix on success and a crate::lightning_invoice::ParseError on failure.
 /// `result_ok` indicates the overall state, and the contents are provided via `contents`.
-pub struct CResult_SiPrefixNoneZ {
-	/// The contents of this CResult_SiPrefixNoneZ, accessible via either
+pub struct CResult_SiPrefixParseErrorZ {
+	/// The contents of this CResult_SiPrefixParseErrorZ, accessible via either
 	/// `err` or `result` depending on the state of `result_ok`.
-	pub contents: CResult_SiPrefixNoneZPtr,
-	/// Whether this CResult_SiPrefixNoneZ represents a success state.
+	pub contents: CResult_SiPrefixParseErrorZPtr,
+	/// Whether this CResult_SiPrefixParseErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
-/// Creates a new CResult_SiPrefixNoneZ in the success state.
-pub extern "C" fn CResult_SiPrefixNoneZ_ok(o: crate::lightning_invoice::SiPrefix) -> CResult_SiPrefixNoneZ {
-	CResult_SiPrefixNoneZ {
-		contents: CResult_SiPrefixNoneZPtr {
+/// Creates a new CResult_SiPrefixParseErrorZ in the success state.
+pub extern "C" fn CResult_SiPrefixParseErrorZ_ok(o: crate::lightning_invoice::SiPrefix) -> CResult_SiPrefixParseErrorZ {
+	CResult_SiPrefixParseErrorZ {
+		contents: CResult_SiPrefixParseErrorZPtr {
 			result: Box::into_raw(Box::new(o)),
 		},
 		result_ok: true,
 	}
 }
 #[no_mangle]
-/// Creates a new CResult_SiPrefixNoneZ in the error state.
-pub extern "C" fn CResult_SiPrefixNoneZ_err() -> CResult_SiPrefixNoneZ {
-	CResult_SiPrefixNoneZ {
-		contents: CResult_SiPrefixNoneZPtr {
-			err: core::ptr::null_mut(),
+/// Creates a new CResult_SiPrefixParseErrorZ in the error state.
+pub extern "C" fn CResult_SiPrefixParseErrorZ_err(e: crate::lightning_invoice::ParseError) -> CResult_SiPrefixParseErrorZ {
+	CResult_SiPrefixParseErrorZ {
+		contents: CResult_SiPrefixParseErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
 		},
 		result_ok: false,
 	}
 }
 /// Checks if the given object is currently in the success state
 #[no_mangle]
-pub extern "C" fn CResult_SiPrefixNoneZ_is_ok(o: &CResult_SiPrefixNoneZ) -> bool {
+pub extern "C" fn CResult_SiPrefixParseErrorZ_is_ok(o: &CResult_SiPrefixParseErrorZ) -> bool {
 	o.result_ok
 }
 #[no_mangle]
-/// Frees any resources used by the CResult_SiPrefixNoneZ.
-pub extern "C" fn CResult_SiPrefixNoneZ_free(_res: CResult_SiPrefixNoneZ) { }
-impl Drop for CResult_SiPrefixNoneZ {
+/// Frees any resources used by the CResult_SiPrefixParseErrorZ.
+pub extern "C" fn CResult_SiPrefixParseErrorZ_free(_res: CResult_SiPrefixParseErrorZ) { }
+impl Drop for CResult_SiPrefixParseErrorZ {
 	fn drop(&mut self) {
 		if self.result_ok {
 			if unsafe { !(self.contents.result as *mut ()).is_null() } {
 				let _ = unsafe { Box::from_raw(self.contents.result) };
 			}
 		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
 		}
 	}
 }
-impl From<crate::c_types::CResultTempl<crate::lightning_invoice::SiPrefix, ()>> for CResult_SiPrefixNoneZ {
-	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::SiPrefix, ()>) -> Self {
+impl From<crate::c_types::CResultTempl<crate::lightning_invoice::SiPrefix, crate::lightning_invoice::ParseError>> for CResult_SiPrefixParseErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::SiPrefix, crate::lightning_invoice::ParseError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
 			unsafe { o.contents.result = core::ptr::null_mut() };
-			CResult_SiPrefixNoneZPtr { result }
+			CResult_SiPrefixParseErrorZPtr { result }
 		} else {
-			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = core::ptr::null_mut();
-			CResult_SiPrefixNoneZPtr { err: core::ptr::null_mut() }
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = core::ptr::null_mut(); }
+			CResult_SiPrefixParseErrorZPtr { err }
 		};
 		Self {
 			contents,
@@ -8162,91 +8166,95 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::SiPrefix, ()>> 
 		}
 	}
 }
-impl Clone for CResult_SiPrefixNoneZ {
+impl Clone for CResult_SiPrefixParseErrorZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
-			Self { result_ok: true, contents: CResult_SiPrefixNoneZPtr {
+			Self { result_ok: true, contents: CResult_SiPrefixParseErrorZPtr {
 				result: Box::into_raw(Box::new(<crate::lightning_invoice::SiPrefix>::clone(unsafe { &*self.contents.result })))
 			} }
 		} else {
-			Self { result_ok: false, contents: CResult_SiPrefixNoneZPtr {
-				err: core::ptr::null_mut()
+			Self { result_ok: false, contents: CResult_SiPrefixParseErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning_invoice::ParseError>::clone(unsafe { &*self.contents.err })))
 			} }
 		}
 	}
 }
 #[no_mangle]
-/// Creates a new CResult_SiPrefixNoneZ which has the same data as `orig`
+/// Creates a new CResult_SiPrefixParseErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_SiPrefixNoneZ_clone(orig: &CResult_SiPrefixNoneZ) -> CResult_SiPrefixNoneZ { Clone::clone(&orig) }
+pub extern "C" fn CResult_SiPrefixParseErrorZ_clone(orig: &CResult_SiPrefixParseErrorZ) -> CResult_SiPrefixParseErrorZ { Clone::clone(&orig) }
 #[repr(C)]
-/// The contents of CResult_InvoiceNoneZ
-pub union CResult_InvoiceNoneZPtr {
+/// The contents of CResult_InvoiceParseOrSemanticErrorZ
+pub union CResult_InvoiceParseOrSemanticErrorZPtr {
 	/// A pointer to the contents in the success state.
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::lightning_invoice::Invoice,
-	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut core::ffi::c_void,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning_invoice::ParseOrSemanticError,
 }
 #[repr(C)]
-/// A CResult_InvoiceNoneZ represents the result of a fallible operation,
-/// containing a crate::lightning_invoice::Invoice on success and a () on failure.
+/// A CResult_InvoiceParseOrSemanticErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning_invoice::Invoice on success and a crate::lightning_invoice::ParseOrSemanticError on failure.
 /// `result_ok` indicates the overall state, and the contents are provided via `contents`.
-pub struct CResult_InvoiceNoneZ {
-	/// The contents of this CResult_InvoiceNoneZ, accessible via either
+pub struct CResult_InvoiceParseOrSemanticErrorZ {
+	/// The contents of this CResult_InvoiceParseOrSemanticErrorZ, accessible via either
 	/// `err` or `result` depending on the state of `result_ok`.
-	pub contents: CResult_InvoiceNoneZPtr,
-	/// Whether this CResult_InvoiceNoneZ represents a success state.
+	pub contents: CResult_InvoiceParseOrSemanticErrorZPtr,
+	/// Whether this CResult_InvoiceParseOrSemanticErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
-/// Creates a new CResult_InvoiceNoneZ in the success state.
-pub extern "C" fn CResult_InvoiceNoneZ_ok(o: crate::lightning_invoice::Invoice) -> CResult_InvoiceNoneZ {
-	CResult_InvoiceNoneZ {
-		contents: CResult_InvoiceNoneZPtr {
+/// Creates a new CResult_InvoiceParseOrSemanticErrorZ in the success state.
+pub extern "C" fn CResult_InvoiceParseOrSemanticErrorZ_ok(o: crate::lightning_invoice::Invoice) -> CResult_InvoiceParseOrSemanticErrorZ {
+	CResult_InvoiceParseOrSemanticErrorZ {
+		contents: CResult_InvoiceParseOrSemanticErrorZPtr {
 			result: Box::into_raw(Box::new(o)),
 		},
 		result_ok: true,
 	}
 }
 #[no_mangle]
-/// Creates a new CResult_InvoiceNoneZ in the error state.
-pub extern "C" fn CResult_InvoiceNoneZ_err() -> CResult_InvoiceNoneZ {
-	CResult_InvoiceNoneZ {
-		contents: CResult_InvoiceNoneZPtr {
-			err: core::ptr::null_mut(),
+/// Creates a new CResult_InvoiceParseOrSemanticErrorZ in the error state.
+pub extern "C" fn CResult_InvoiceParseOrSemanticErrorZ_err(e: crate::lightning_invoice::ParseOrSemanticError) -> CResult_InvoiceParseOrSemanticErrorZ {
+	CResult_InvoiceParseOrSemanticErrorZ {
+		contents: CResult_InvoiceParseOrSemanticErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
 		},
 		result_ok: false,
 	}
 }
 /// Checks if the given object is currently in the success state
 #[no_mangle]
-pub extern "C" fn CResult_InvoiceNoneZ_is_ok(o: &CResult_InvoiceNoneZ) -> bool {
+pub extern "C" fn CResult_InvoiceParseOrSemanticErrorZ_is_ok(o: &CResult_InvoiceParseOrSemanticErrorZ) -> bool {
 	o.result_ok
 }
 #[no_mangle]
-/// Frees any resources used by the CResult_InvoiceNoneZ.
-pub extern "C" fn CResult_InvoiceNoneZ_free(_res: CResult_InvoiceNoneZ) { }
-impl Drop for CResult_InvoiceNoneZ {
+/// Frees any resources used by the CResult_InvoiceParseOrSemanticErrorZ.
+pub extern "C" fn CResult_InvoiceParseOrSemanticErrorZ_free(_res: CResult_InvoiceParseOrSemanticErrorZ) { }
+impl Drop for CResult_InvoiceParseOrSemanticErrorZ {
 	fn drop(&mut self) {
 		if self.result_ok {
 			if unsafe { !(self.contents.result as *mut ()).is_null() } {
 				let _ = unsafe { Box::from_raw(self.contents.result) };
 			}
 		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
 		}
 	}
 }
-impl From<crate::c_types::CResultTempl<crate::lightning_invoice::Invoice, ()>> for CResult_InvoiceNoneZ {
-	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::Invoice, ()>) -> Self {
+impl From<crate::c_types::CResultTempl<crate::lightning_invoice::Invoice, crate::lightning_invoice::ParseOrSemanticError>> for CResult_InvoiceParseOrSemanticErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::Invoice, crate::lightning_invoice::ParseOrSemanticError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
 			unsafe { o.contents.result = core::ptr::null_mut() };
-			CResult_InvoiceNoneZPtr { result }
+			CResult_InvoiceParseOrSemanticErrorZPtr { result }
 		} else {
-			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = core::ptr::null_mut();
-			CResult_InvoiceNoneZPtr { err: core::ptr::null_mut() }
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = core::ptr::null_mut(); }
+			CResult_InvoiceParseOrSemanticErrorZPtr { err }
 		};
 		Self {
 			contents,
@@ -8254,91 +8262,95 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::Invoice, ()>> f
 		}
 	}
 }
-impl Clone for CResult_InvoiceNoneZ {
+impl Clone for CResult_InvoiceParseOrSemanticErrorZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
-			Self { result_ok: true, contents: CResult_InvoiceNoneZPtr {
+			Self { result_ok: true, contents: CResult_InvoiceParseOrSemanticErrorZPtr {
 				result: Box::into_raw(Box::new(<crate::lightning_invoice::Invoice>::clone(unsafe { &*self.contents.result })))
 			} }
 		} else {
-			Self { result_ok: false, contents: CResult_InvoiceNoneZPtr {
-				err: core::ptr::null_mut()
+			Self { result_ok: false, contents: CResult_InvoiceParseOrSemanticErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning_invoice::ParseOrSemanticError>::clone(unsafe { &*self.contents.err })))
 			} }
 		}
 	}
 }
 #[no_mangle]
-/// Creates a new CResult_InvoiceNoneZ which has the same data as `orig`
+/// Creates a new CResult_InvoiceParseOrSemanticErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_InvoiceNoneZ_clone(orig: &CResult_InvoiceNoneZ) -> CResult_InvoiceNoneZ { Clone::clone(&orig) }
+pub extern "C" fn CResult_InvoiceParseOrSemanticErrorZ_clone(orig: &CResult_InvoiceParseOrSemanticErrorZ) -> CResult_InvoiceParseOrSemanticErrorZ { Clone::clone(&orig) }
 #[repr(C)]
-/// The contents of CResult_SignedRawInvoiceNoneZ
-pub union CResult_SignedRawInvoiceNoneZPtr {
+/// The contents of CResult_SignedRawInvoiceParseErrorZ
+pub union CResult_SignedRawInvoiceParseErrorZPtr {
 	/// A pointer to the contents in the success state.
 	/// Reading from this pointer when `result_ok` is not set is undefined.
 	pub result: *mut crate::lightning_invoice::SignedRawInvoice,
-	/// Note that this value is always NULL, as there are no contents in the Err variant
-	pub err: *mut core::ffi::c_void,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning_invoice::ParseError,
 }
 #[repr(C)]
-/// A CResult_SignedRawInvoiceNoneZ represents the result of a fallible operation,
-/// containing a crate::lightning_invoice::SignedRawInvoice on success and a () on failure.
+/// A CResult_SignedRawInvoiceParseErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning_invoice::SignedRawInvoice on success and a crate::lightning_invoice::ParseError on failure.
 /// `result_ok` indicates the overall state, and the contents are provided via `contents`.
-pub struct CResult_SignedRawInvoiceNoneZ {
-	/// The contents of this CResult_SignedRawInvoiceNoneZ, accessible via either
+pub struct CResult_SignedRawInvoiceParseErrorZ {
+	/// The contents of this CResult_SignedRawInvoiceParseErrorZ, accessible via either
 	/// `err` or `result` depending on the state of `result_ok`.
-	pub contents: CResult_SignedRawInvoiceNoneZPtr,
-	/// Whether this CResult_SignedRawInvoiceNoneZ represents a success state.
+	pub contents: CResult_SignedRawInvoiceParseErrorZPtr,
+	/// Whether this CResult_SignedRawInvoiceParseErrorZ represents a success state.
 	pub result_ok: bool,
 }
 #[no_mangle]
-/// Creates a new CResult_SignedRawInvoiceNoneZ in the success state.
-pub extern "C" fn CResult_SignedRawInvoiceNoneZ_ok(o: crate::lightning_invoice::SignedRawInvoice) -> CResult_SignedRawInvoiceNoneZ {
-	CResult_SignedRawInvoiceNoneZ {
-		contents: CResult_SignedRawInvoiceNoneZPtr {
+/// Creates a new CResult_SignedRawInvoiceParseErrorZ in the success state.
+pub extern "C" fn CResult_SignedRawInvoiceParseErrorZ_ok(o: crate::lightning_invoice::SignedRawInvoice) -> CResult_SignedRawInvoiceParseErrorZ {
+	CResult_SignedRawInvoiceParseErrorZ {
+		contents: CResult_SignedRawInvoiceParseErrorZPtr {
 			result: Box::into_raw(Box::new(o)),
 		},
 		result_ok: true,
 	}
 }
 #[no_mangle]
-/// Creates a new CResult_SignedRawInvoiceNoneZ in the error state.
-pub extern "C" fn CResult_SignedRawInvoiceNoneZ_err() -> CResult_SignedRawInvoiceNoneZ {
-	CResult_SignedRawInvoiceNoneZ {
-		contents: CResult_SignedRawInvoiceNoneZPtr {
-			err: core::ptr::null_mut(),
+/// Creates a new CResult_SignedRawInvoiceParseErrorZ in the error state.
+pub extern "C" fn CResult_SignedRawInvoiceParseErrorZ_err(e: crate::lightning_invoice::ParseError) -> CResult_SignedRawInvoiceParseErrorZ {
+	CResult_SignedRawInvoiceParseErrorZ {
+		contents: CResult_SignedRawInvoiceParseErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
 		},
 		result_ok: false,
 	}
 }
 /// Checks if the given object is currently in the success state
 #[no_mangle]
-pub extern "C" fn CResult_SignedRawInvoiceNoneZ_is_ok(o: &CResult_SignedRawInvoiceNoneZ) -> bool {
+pub extern "C" fn CResult_SignedRawInvoiceParseErrorZ_is_ok(o: &CResult_SignedRawInvoiceParseErrorZ) -> bool {
 	o.result_ok
 }
 #[no_mangle]
-/// Frees any resources used by the CResult_SignedRawInvoiceNoneZ.
-pub extern "C" fn CResult_SignedRawInvoiceNoneZ_free(_res: CResult_SignedRawInvoiceNoneZ) { }
-impl Drop for CResult_SignedRawInvoiceNoneZ {
+/// Frees any resources used by the CResult_SignedRawInvoiceParseErrorZ.
+pub extern "C" fn CResult_SignedRawInvoiceParseErrorZ_free(_res: CResult_SignedRawInvoiceParseErrorZ) { }
+impl Drop for CResult_SignedRawInvoiceParseErrorZ {
 	fn drop(&mut self) {
 		if self.result_ok {
 			if unsafe { !(self.contents.result as *mut ()).is_null() } {
 				let _ = unsafe { Box::from_raw(self.contents.result) };
 			}
 		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
 		}
 	}
 }
-impl From<crate::c_types::CResultTempl<crate::lightning_invoice::SignedRawInvoice, ()>> for CResult_SignedRawInvoiceNoneZ {
-	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::SignedRawInvoice, ()>) -> Self {
+impl From<crate::c_types::CResultTempl<crate::lightning_invoice::SignedRawInvoice, crate::lightning_invoice::ParseError>> for CResult_SignedRawInvoiceParseErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning_invoice::SignedRawInvoice, crate::lightning_invoice::ParseError>) -> Self {
 		let contents = if o.result_ok {
 			let result = unsafe { o.contents.result };
 			unsafe { o.contents.result = core::ptr::null_mut() };
-			CResult_SignedRawInvoiceNoneZPtr { result }
+			CResult_SignedRawInvoiceParseErrorZPtr { result }
 		} else {
-			let _ = unsafe { Box::from_raw(o.contents.err) };
-			o.contents.err = core::ptr::null_mut();
-			CResult_SignedRawInvoiceNoneZPtr { err: core::ptr::null_mut() }
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = core::ptr::null_mut(); }
+			CResult_SignedRawInvoiceParseErrorZPtr { err }
 		};
 		Self {
 			contents,
@@ -8346,23 +8358,23 @@ impl From<crate::c_types::CResultTempl<crate::lightning_invoice::SignedRawInvoic
 		}
 	}
 }
-impl Clone for CResult_SignedRawInvoiceNoneZ {
+impl Clone for CResult_SignedRawInvoiceParseErrorZ {
 	fn clone(&self) -> Self {
 		if self.result_ok {
-			Self { result_ok: true, contents: CResult_SignedRawInvoiceNoneZPtr {
+			Self { result_ok: true, contents: CResult_SignedRawInvoiceParseErrorZPtr {
 				result: Box::into_raw(Box::new(<crate::lightning_invoice::SignedRawInvoice>::clone(unsafe { &*self.contents.result })))
 			} }
 		} else {
-			Self { result_ok: false, contents: CResult_SignedRawInvoiceNoneZPtr {
-				err: core::ptr::null_mut()
+			Self { result_ok: false, contents: CResult_SignedRawInvoiceParseErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning_invoice::ParseError>::clone(unsafe { &*self.contents.err })))
 			} }
 		}
 	}
 }
 #[no_mangle]
-/// Creates a new CResult_SignedRawInvoiceNoneZ which has the same data as `orig`
+/// Creates a new CResult_SignedRawInvoiceParseErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn CResult_SignedRawInvoiceNoneZ_clone(orig: &CResult_SignedRawInvoiceNoneZ) -> CResult_SignedRawInvoiceNoneZ { Clone::clone(&orig) }
+pub extern "C" fn CResult_SignedRawInvoiceParseErrorZ_clone(orig: &CResult_SignedRawInvoiceParseErrorZ) -> CResult_SignedRawInvoiceParseErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A tuple of 3 elements. See the individual fields for the types contained.
 pub struct C3Tuple_RawInvoice_u832InvoiceSignatureZ {

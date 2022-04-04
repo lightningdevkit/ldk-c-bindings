@@ -331,12 +331,9 @@ public:
 		t2 = std::thread(&sock_read_data_thread, pipefds_1_to_2[0], &sock2, &net2);
 
 		// Note that we have to bind the result to a C++ class to make sure it gets free'd
-		LDKCOption_NetAddressZ remote_network_address = {
-			.tag = LDKCOption_NetAddressZ_None,
-		};
-		LDK::CResult_CVec_u8ZPeerHandleErrorZ con_res = PeerManager_new_outbound_connection(&net1, ChannelManager_get_our_node_id(&cm2), sock1, remote_network_address);
+		LDK::CResult_CVec_u8ZPeerHandleErrorZ con_res = PeerManager_new_outbound_connection(&net1, ChannelManager_get_our_node_id(&cm2), sock1, COption_NetAddressZ_none());
 		assert(con_res->result_ok);
-		LDK::CResult_NonePeerHandleErrorZ con_res2 = PeerManager_new_inbound_connection(&net2, sock2, remote_network_address);
+		LDK::CResult_NonePeerHandleErrorZ con_res2 = PeerManager_new_inbound_connection(&net2, sock2, COption_NetAddressZ_none());
 		assert(con_res2->result_ok);
 
 		auto writelen = write(pipefds_1_to_2[1], con_res->contents.result->data, con_res->contents.result->datalen);

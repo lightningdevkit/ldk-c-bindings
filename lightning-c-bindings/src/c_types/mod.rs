@@ -169,6 +169,71 @@ impl Secp256k1Error {
 			SecpError::NotEnoughMemory => Secp256k1Error::NotEnoughMemory,
 		}
 	}
+	pub(crate) fn into_rust(self) -> SecpError {
+		match self {
+			Secp256k1Error::IncorrectSignature => SecpError::IncorrectSignature,
+			Secp256k1Error::InvalidMessage => SecpError::InvalidMessage,
+			Secp256k1Error::InvalidPublicKey => SecpError::InvalidPublicKey,
+			Secp256k1Error::InvalidSignature => SecpError::InvalidSignature,
+			Secp256k1Error::InvalidSecretKey => SecpError::InvalidSecretKey,
+			Secp256k1Error::InvalidRecoveryId => SecpError::InvalidRecoveryId,
+			Secp256k1Error::InvalidTweak => SecpError::InvalidTweak,
+			Secp256k1Error::TweakCheckFailed => SecpError::TweakCheckFailed,
+			Secp256k1Error::NotEnoughMemory => SecpError::NotEnoughMemory,
+		}
+	}
+}
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+/// Represents an error returned from the bech32 library during validation of some bech32 data
+pub enum Bech32Error {
+	/// String does not contain the separator character
+	MissingSeparator,
+	/// The checksum does not match the rest of the data
+	InvalidChecksum,
+	/// The data or human-readable part is too long or too short
+	InvalidLength,
+	/// Some part of the string contains an invalid character
+	InvalidChar(u32),
+	/// Some part of the data has an invalid value
+	InvalidData(u8),
+	/// The bit conversion failed due to a padding issue
+	InvalidPadding,
+	/// The whole string must be of one case
+	MixedCase,
+}
+impl Bech32Error {
+	pub(crate) fn from_rust(err: bech32::Error) -> Self {
+		match err {
+			bech32::Error::MissingSeparator => Self::MissingSeparator,
+			bech32::Error::InvalidChecksum => Self::InvalidChecksum,
+			bech32::Error::InvalidLength => Self::InvalidLength,
+			bech32::Error::InvalidChar(c) => Self::InvalidChar(c as u32),
+			bech32::Error::InvalidData(d) => Self::InvalidData(d),
+			bech32::Error::InvalidPadding => Self::InvalidPadding,
+			bech32::Error::MixedCase => Self::MixedCase,
+		}
+	}
+	pub(crate) fn into_rust(self) -> bech32::Error {
+		match self {
+			Self::MissingSeparator => bech32::Error::MissingSeparator,
+			Self::InvalidChecksum => bech32::Error::InvalidChecksum,
+			Self::InvalidLength => bech32::Error::InvalidLength,
+			Self::InvalidChar(c) => bech32::Error::InvalidChar(core::char::from_u32(c).expect("Invalid UTF-8 character in Bech32Error::InvalidChar")),
+			Self::InvalidData(d) => bech32::Error::InvalidData(d),
+			Self::InvalidPadding => bech32::Error::InvalidPadding,
+			Self::MixedCase => bech32::Error::MixedCase,
+		}
+	}
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, PartialEq)]
+/// Sub-errors which don't have specific information in them use this type.
+pub struct Error {
+	/// Zero-Sized_types aren't consistent across Rust/C/C++, so we add some size here
+	pub _dummy: u8,
 }
 
 #[repr(C)]

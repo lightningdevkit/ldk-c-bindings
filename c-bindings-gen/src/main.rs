@@ -1245,13 +1245,22 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						writeln!(w, "\torig.clone()").unwrap();
 						writeln!(w, "}}").unwrap();
 					} else if path_matches_nongeneric(&trait_path.1, &["FromStr"]) {
-						if let Some(container) = types.get_c_mangled_container_type(
-								vec![&*i.self_ty, &syn::Type::Tuple(syn::TypeTuple { paren_token: Default::default(), elems: syn::punctuated::Punctuated::new() })],
-								Some(&gen_types), "Result") {
+						let mut err_opt = None;
+						for item in i.items.iter() {
+							match item {
+								syn::ImplItem::Type(ty) if format!("{}", ty.ident) == "Err" => {
+									err_opt = Some(&ty.ty);
+								},
+								_ => {}
+							}
+						}
+						let err_ty = err_opt.unwrap();
+						if let Some(container) = types.get_c_mangled_container_type(vec![&*i.self_ty, &err_ty], Some(&gen_types), "Result") {
 							writeln!(w, "#[no_mangle]").unwrap();
 							writeln!(w, "/// Read a {} object from a string", ident).unwrap();
 							writeln!(w, "pub extern \"C\" fn {}_from_str(s: crate::c_types::Str) -> {} {{", ident, container).unwrap();
 							writeln!(w, "\tmatch {}::from_str(s.into_str()) {{", resolved_path).unwrap();
+
 							writeln!(w, "\t\tOk(r) => {{").unwrap();
 							let new_var = types.write_to_c_conversion_new_var(w, &format_ident!("r"), &*i.self_ty, Some(&gen_types), false);
 							write!(w, "\t\t\tcrate::c_types::CResultTempl::ok(\n\t\t\t\t").unwrap();
@@ -1259,7 +1268,15 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							write!(w, "{}r", if new_var { "local_" } else { "" }).unwrap();
 							types.write_to_c_conversion_inline_suffix(w, &*i.self_ty, Some(&gen_types), false);
 							writeln!(w, "\n\t\t\t)\n\t\t}},").unwrap();
-							writeln!(w, "\t\tErr(e) => crate::c_types::CResultTempl::err(()),").unwrap();
+
+							writeln!(w, "\t\tErr(e) => {{").unwrap();
+							let new_var = types.write_to_c_conversion_new_var(w, &format_ident!("e"), &err_ty, Some(&gen_types), false);
+							write!(w, "\t\t\tcrate::c_types::CResultTempl::err(\n\t\t\t\t").unwrap();
+							types.write_to_c_conversion_inline_prefix(w, &err_ty, Some(&gen_types), false);
+							write!(w, "{}e", if new_var { "local_" } else { "" }).unwrap();
+							types.write_to_c_conversion_inline_suffix(w, &err_ty, Some(&gen_types), false);
+							writeln!(w, "\n\t\t\t)\n\t\t}},").unwrap();
+
 							writeln!(w, "\t}}.into()\n}}").unwrap();
 						}
 					} else if path_matches_nongeneric(&trait_path.1, &["Display"]) {

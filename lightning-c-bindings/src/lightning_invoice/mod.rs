@@ -49,39 +49,61 @@ use alloc::{vec::Vec, boxed::Box};
 }
 #[no_mangle]
 /// Read a SiPrefix object from a string
-pub extern "C" fn SiPrefix_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_SiPrefixNoneZ {
+pub extern "C" fn SiPrefix_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_SiPrefixParseErrorZ {
 	match lightning_invoice::SiPrefix::from_str(s.into_str()) {
 		Ok(r) => {
 			crate::c_types::CResultTempl::ok(
 				crate::lightning_invoice::SiPrefix::native_into(r)
 			)
 		},
-		Err(e) => crate::c_types::CResultTempl::err(()),
+		Err(e) => {
+			crate::c_types::CResultTempl::err(
+				crate::lightning_invoice::ParseError::native_into(e)
+			)
+		},
 	}.into()
 }
 #[no_mangle]
 /// Read a Invoice object from a string
-pub extern "C" fn Invoice_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_InvoiceNoneZ {
+pub extern "C" fn Invoice_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_InvoiceParseOrSemanticErrorZ {
 	match lightning_invoice::Invoice::from_str(s.into_str()) {
 		Ok(r) => {
 			crate::c_types::CResultTempl::ok(
 				crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(r), is_owned: true }
 			)
 		},
-		Err(e) => crate::c_types::CResultTempl::err(()),
+		Err(e) => {
+			crate::c_types::CResultTempl::err(
+				crate::lightning_invoice::ParseOrSemanticError::native_into(e)
+			)
+		},
 	}.into()
 }
 #[no_mangle]
 /// Read a SignedRawInvoice object from a string
-pub extern "C" fn SignedRawInvoice_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_SignedRawInvoiceNoneZ {
+pub extern "C" fn SignedRawInvoice_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_SignedRawInvoiceParseErrorZ {
 	match lightning_invoice::SignedRawInvoice::from_str(s.into_str()) {
 		Ok(r) => {
 			crate::c_types::CResultTempl::ok(
 				crate::lightning_invoice::SignedRawInvoice { inner: ObjOps::heap_alloc(r), is_owned: true }
 			)
 		},
-		Err(e) => crate::c_types::CResultTempl::err(()),
+		Err(e) => {
+			crate::c_types::CResultTempl::err(
+				crate::lightning_invoice::ParseError::native_into(e)
+			)
+		},
 	}.into()
+}
+#[no_mangle]
+/// Get the string representation of a ParseError object
+pub extern "C" fn ParseError_to_str(o: &crate::lightning_invoice::ParseError) -> Str {
+	alloc::format!("{}", &o.to_native()).into()
+}
+#[no_mangle]
+/// Get the string representation of a ParseOrSemanticError object
+pub extern "C" fn ParseOrSemanticError_to_str(o: &crate::lightning_invoice::ParseOrSemanticError) -> Str {
+	alloc::format!("{}", &o.to_native()).into()
 }
 }
 mod ser {
@@ -147,6 +169,400 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
+}
+/// Errors that indicate what is wrong with the invoice. They have some granularity for debug
+/// reasons, but should generally result in an \"invalid BOLT11 invoice\" message for the user.
+#[must_use]
+#[derive(Clone)]
+#[repr(C)]
+pub enum ParseError {
+	Bech32Error(crate::c_types::Bech32Error),
+	ParseAmountError(crate::c_types::Error),
+	MalformedSignature(crate::c_types::Secp256k1Error),
+	BadPrefix,
+	UnknownCurrency,
+	UnknownSiPrefix,
+	MalformedHRP,
+	TooShortDataPart,
+	UnexpectedEndOfTaggedFields,
+	DescriptionDecodeError(crate::c_types::Error),
+	PaddingError,
+	IntegerOverflowError,
+	InvalidSegWitProgramLength,
+	InvalidPubKeyHashLength,
+	InvalidScriptHashLength,
+	InvalidRecoveryId,
+	InvalidSliceLength(crate::c_types::Str),
+	/// Not an error, but used internally to signal that a part of the invoice should be ignored
+	/// according to BOLT11
+	Skip,
+}
+use lightning_invoice::ParseError as nativeParseError;
+impl ParseError {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeParseError {
+		match self {
+			ParseError::Bech32Error (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeParseError::Bech32Error (
+					a_nonref.into_rust(),
+				)
+			},
+			ParseError::ParseAmountError (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeParseError::ParseAmountError (
+					u8::from_str_radix(" a", 10).unwrap_err() /*a_nonref*/,
+				)
+			},
+			ParseError::MalformedSignature (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeParseError::MalformedSignature (
+					a_nonref.into_rust(),
+				)
+			},
+			ParseError::BadPrefix => nativeParseError::BadPrefix,
+			ParseError::UnknownCurrency => nativeParseError::UnknownCurrency,
+			ParseError::UnknownSiPrefix => nativeParseError::UnknownSiPrefix,
+			ParseError::MalformedHRP => nativeParseError::MalformedHRP,
+			ParseError::TooShortDataPart => nativeParseError::TooShortDataPart,
+			ParseError::UnexpectedEndOfTaggedFields => nativeParseError::UnexpectedEndOfTaggedFields,
+			ParseError::DescriptionDecodeError (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeParseError::DescriptionDecodeError (
+					core::str::from_utf8(&[0xff]).unwrap_err() /*a_nonref*/,
+				)
+			},
+			ParseError::PaddingError => nativeParseError::PaddingError,
+			ParseError::IntegerOverflowError => nativeParseError::IntegerOverflowError,
+			ParseError::InvalidSegWitProgramLength => nativeParseError::InvalidSegWitProgramLength,
+			ParseError::InvalidPubKeyHashLength => nativeParseError::InvalidPubKeyHashLength,
+			ParseError::InvalidScriptHashLength => nativeParseError::InvalidScriptHashLength,
+			ParseError::InvalidRecoveryId => nativeParseError::InvalidRecoveryId,
+			ParseError::InvalidSliceLength (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeParseError::InvalidSliceLength (
+					a_nonref.into_string(),
+				)
+			},
+			ParseError::Skip => nativeParseError::Skip,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeParseError {
+		match self {
+			ParseError::Bech32Error (mut a, ) => {
+				nativeParseError::Bech32Error (
+					a.into_rust(),
+				)
+			},
+			ParseError::ParseAmountError (mut a, ) => {
+				nativeParseError::ParseAmountError (
+					u8::from_str_radix(" a", 10).unwrap_err() /*a*/,
+				)
+			},
+			ParseError::MalformedSignature (mut a, ) => {
+				nativeParseError::MalformedSignature (
+					a.into_rust(),
+				)
+			},
+			ParseError::BadPrefix => nativeParseError::BadPrefix,
+			ParseError::UnknownCurrency => nativeParseError::UnknownCurrency,
+			ParseError::UnknownSiPrefix => nativeParseError::UnknownSiPrefix,
+			ParseError::MalformedHRP => nativeParseError::MalformedHRP,
+			ParseError::TooShortDataPart => nativeParseError::TooShortDataPart,
+			ParseError::UnexpectedEndOfTaggedFields => nativeParseError::UnexpectedEndOfTaggedFields,
+			ParseError::DescriptionDecodeError (mut a, ) => {
+				nativeParseError::DescriptionDecodeError (
+					core::str::from_utf8(&[0xff]).unwrap_err() /*a*/,
+				)
+			},
+			ParseError::PaddingError => nativeParseError::PaddingError,
+			ParseError::IntegerOverflowError => nativeParseError::IntegerOverflowError,
+			ParseError::InvalidSegWitProgramLength => nativeParseError::InvalidSegWitProgramLength,
+			ParseError::InvalidPubKeyHashLength => nativeParseError::InvalidPubKeyHashLength,
+			ParseError::InvalidScriptHashLength => nativeParseError::InvalidScriptHashLength,
+			ParseError::InvalidRecoveryId => nativeParseError::InvalidRecoveryId,
+			ParseError::InvalidSliceLength (mut a, ) => {
+				nativeParseError::InvalidSliceLength (
+					a.into_string(),
+				)
+			},
+			ParseError::Skip => nativeParseError::Skip,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeParseError) -> Self {
+		match native {
+			nativeParseError::Bech32Error (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				ParseError::Bech32Error (
+					crate::c_types::Bech32Error::from_rust(a_nonref),
+				)
+			},
+			nativeParseError::ParseAmountError (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				ParseError::ParseAmountError (
+					crate::c_types::Error { _dummy: 0 } /*a_nonref*/,
+				)
+			},
+			nativeParseError::MalformedSignature (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				ParseError::MalformedSignature (
+					crate::c_types::Secp256k1Error::from_rust(a_nonref),
+				)
+			},
+			nativeParseError::BadPrefix => ParseError::BadPrefix,
+			nativeParseError::UnknownCurrency => ParseError::UnknownCurrency,
+			nativeParseError::UnknownSiPrefix => ParseError::UnknownSiPrefix,
+			nativeParseError::MalformedHRP => ParseError::MalformedHRP,
+			nativeParseError::TooShortDataPart => ParseError::TooShortDataPart,
+			nativeParseError::UnexpectedEndOfTaggedFields => ParseError::UnexpectedEndOfTaggedFields,
+			nativeParseError::DescriptionDecodeError (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				ParseError::DescriptionDecodeError (
+					crate::c_types::Error { _dummy: 0 } /*a_nonref*/,
+				)
+			},
+			nativeParseError::PaddingError => ParseError::PaddingError,
+			nativeParseError::IntegerOverflowError => ParseError::IntegerOverflowError,
+			nativeParseError::InvalidSegWitProgramLength => ParseError::InvalidSegWitProgramLength,
+			nativeParseError::InvalidPubKeyHashLength => ParseError::InvalidPubKeyHashLength,
+			nativeParseError::InvalidScriptHashLength => ParseError::InvalidScriptHashLength,
+			nativeParseError::InvalidRecoveryId => ParseError::InvalidRecoveryId,
+			nativeParseError::InvalidSliceLength (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				ParseError::InvalidSliceLength (
+					a_nonref.into(),
+				)
+			},
+			nativeParseError::Skip => ParseError::Skip,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeParseError) -> Self {
+		match native {
+			nativeParseError::Bech32Error (mut a, ) => {
+				ParseError::Bech32Error (
+					crate::c_types::Bech32Error::from_rust(a),
+				)
+			},
+			nativeParseError::ParseAmountError (mut a, ) => {
+				ParseError::ParseAmountError (
+					crate::c_types::Error { _dummy: 0 } /*a*/,
+				)
+			},
+			nativeParseError::MalformedSignature (mut a, ) => {
+				ParseError::MalformedSignature (
+					crate::c_types::Secp256k1Error::from_rust(a),
+				)
+			},
+			nativeParseError::BadPrefix => ParseError::BadPrefix,
+			nativeParseError::UnknownCurrency => ParseError::UnknownCurrency,
+			nativeParseError::UnknownSiPrefix => ParseError::UnknownSiPrefix,
+			nativeParseError::MalformedHRP => ParseError::MalformedHRP,
+			nativeParseError::TooShortDataPart => ParseError::TooShortDataPart,
+			nativeParseError::UnexpectedEndOfTaggedFields => ParseError::UnexpectedEndOfTaggedFields,
+			nativeParseError::DescriptionDecodeError (mut a, ) => {
+				ParseError::DescriptionDecodeError (
+					crate::c_types::Error { _dummy: 0 } /*a*/,
+				)
+			},
+			nativeParseError::PaddingError => ParseError::PaddingError,
+			nativeParseError::IntegerOverflowError => ParseError::IntegerOverflowError,
+			nativeParseError::InvalidSegWitProgramLength => ParseError::InvalidSegWitProgramLength,
+			nativeParseError::InvalidPubKeyHashLength => ParseError::InvalidPubKeyHashLength,
+			nativeParseError::InvalidScriptHashLength => ParseError::InvalidScriptHashLength,
+			nativeParseError::InvalidRecoveryId => ParseError::InvalidRecoveryId,
+			nativeParseError::InvalidSliceLength (mut a, ) => {
+				ParseError::InvalidSliceLength (
+					a.into(),
+				)
+			},
+			nativeParseError::Skip => ParseError::Skip,
+		}
+	}
+}
+/// Frees any resources used by the ParseError
+#[no_mangle]
+pub extern "C" fn ParseError_free(this_ptr: ParseError) { }
+/// Creates a copy of the ParseError
+#[no_mangle]
+pub extern "C" fn ParseError_clone(orig: &ParseError) -> ParseError {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new Bech32Error-variant ParseError
+pub extern "C" fn ParseError_bech32_error(a: crate::c_types::Bech32Error) -> ParseError {
+	ParseError::Bech32Error(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new ParseAmountError-variant ParseError
+pub extern "C" fn ParseError_parse_amount_error(a: crate::c_types::Error) -> ParseError {
+	ParseError::ParseAmountError(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new MalformedSignature-variant ParseError
+pub extern "C" fn ParseError_malformed_signature(a: crate::c_types::Secp256k1Error) -> ParseError {
+	ParseError::MalformedSignature(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new BadPrefix-variant ParseError
+pub extern "C" fn ParseError_bad_prefix() -> ParseError {
+	ParseError::BadPrefix}
+#[no_mangle]
+/// Utility method to constructs a new UnknownCurrency-variant ParseError
+pub extern "C" fn ParseError_unknown_currency() -> ParseError {
+	ParseError::UnknownCurrency}
+#[no_mangle]
+/// Utility method to constructs a new UnknownSiPrefix-variant ParseError
+pub extern "C" fn ParseError_unknown_si_prefix() -> ParseError {
+	ParseError::UnknownSiPrefix}
+#[no_mangle]
+/// Utility method to constructs a new MalformedHRP-variant ParseError
+pub extern "C" fn ParseError_malformed_hrp() -> ParseError {
+	ParseError::MalformedHRP}
+#[no_mangle]
+/// Utility method to constructs a new TooShortDataPart-variant ParseError
+pub extern "C" fn ParseError_too_short_data_part() -> ParseError {
+	ParseError::TooShortDataPart}
+#[no_mangle]
+/// Utility method to constructs a new UnexpectedEndOfTaggedFields-variant ParseError
+pub extern "C" fn ParseError_unexpected_end_of_tagged_fields() -> ParseError {
+	ParseError::UnexpectedEndOfTaggedFields}
+#[no_mangle]
+/// Utility method to constructs a new DescriptionDecodeError-variant ParseError
+pub extern "C" fn ParseError_description_decode_error(a: crate::c_types::Error) -> ParseError {
+	ParseError::DescriptionDecodeError(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new PaddingError-variant ParseError
+pub extern "C" fn ParseError_padding_error() -> ParseError {
+	ParseError::PaddingError}
+#[no_mangle]
+/// Utility method to constructs a new IntegerOverflowError-variant ParseError
+pub extern "C" fn ParseError_integer_overflow_error() -> ParseError {
+	ParseError::IntegerOverflowError}
+#[no_mangle]
+/// Utility method to constructs a new InvalidSegWitProgramLength-variant ParseError
+pub extern "C" fn ParseError_invalid_seg_wit_program_length() -> ParseError {
+	ParseError::InvalidSegWitProgramLength}
+#[no_mangle]
+/// Utility method to constructs a new InvalidPubKeyHashLength-variant ParseError
+pub extern "C" fn ParseError_invalid_pub_key_hash_length() -> ParseError {
+	ParseError::InvalidPubKeyHashLength}
+#[no_mangle]
+/// Utility method to constructs a new InvalidScriptHashLength-variant ParseError
+pub extern "C" fn ParseError_invalid_script_hash_length() -> ParseError {
+	ParseError::InvalidScriptHashLength}
+#[no_mangle]
+/// Utility method to constructs a new InvalidRecoveryId-variant ParseError
+pub extern "C" fn ParseError_invalid_recovery_id() -> ParseError {
+	ParseError::InvalidRecoveryId}
+#[no_mangle]
+/// Utility method to constructs a new InvalidSliceLength-variant ParseError
+pub extern "C" fn ParseError_invalid_slice_length(a: crate::c_types::Str) -> ParseError {
+	ParseError::InvalidSliceLength(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new Skip-variant ParseError
+pub extern "C" fn ParseError_skip() -> ParseError {
+	ParseError::Skip}
+/// Indicates that something went wrong while parsing or validating the invoice. Parsing errors
+/// should be mostly seen as opaque and are only there for debugging reasons. Semantic errors
+/// like wrong signatures, missing fields etc. could mean that someone tampered with the invoice.
+#[must_use]
+#[derive(Clone)]
+#[repr(C)]
+pub enum ParseOrSemanticError {
+	/// The invoice couldn't be decoded
+	ParseError(crate::lightning_invoice::ParseError),
+	/// The invoice could be decoded but violates the BOLT11 standard
+	SemanticError(crate::lightning_invoice::SemanticError),
+}
+use lightning_invoice::ParseOrSemanticError as nativeParseOrSemanticError;
+impl ParseOrSemanticError {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeParseOrSemanticError {
+		match self {
+			ParseOrSemanticError::ParseError (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeParseOrSemanticError::ParseError (
+					a_nonref.into_native(),
+				)
+			},
+			ParseOrSemanticError::SemanticError (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeParseOrSemanticError::SemanticError (
+					a_nonref.into_native(),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeParseOrSemanticError {
+		match self {
+			ParseOrSemanticError::ParseError (mut a, ) => {
+				nativeParseOrSemanticError::ParseError (
+					a.into_native(),
+				)
+			},
+			ParseOrSemanticError::SemanticError (mut a, ) => {
+				nativeParseOrSemanticError::SemanticError (
+					a.into_native(),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeParseOrSemanticError) -> Self {
+		match native {
+			nativeParseOrSemanticError::ParseError (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				ParseOrSemanticError::ParseError (
+					crate::lightning_invoice::ParseError::native_into(a_nonref),
+				)
+			},
+			nativeParseOrSemanticError::SemanticError (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				ParseOrSemanticError::SemanticError (
+					crate::lightning_invoice::SemanticError::native_into(a_nonref),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeParseOrSemanticError) -> Self {
+		match native {
+			nativeParseOrSemanticError::ParseError (mut a, ) => {
+				ParseOrSemanticError::ParseError (
+					crate::lightning_invoice::ParseError::native_into(a),
+				)
+			},
+			nativeParseOrSemanticError::SemanticError (mut a, ) => {
+				ParseOrSemanticError::SemanticError (
+					crate::lightning_invoice::SemanticError::native_into(a),
+				)
+			},
+		}
+	}
+}
+/// Frees any resources used by the ParseOrSemanticError
+#[no_mangle]
+pub extern "C" fn ParseOrSemanticError_free(this_ptr: ParseOrSemanticError) { }
+/// Creates a copy of the ParseOrSemanticError
+#[no_mangle]
+pub extern "C" fn ParseOrSemanticError_clone(orig: &ParseOrSemanticError) -> ParseOrSemanticError {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new ParseError-variant ParseOrSemanticError
+pub extern "C" fn ParseOrSemanticError_parse_error(a: crate::lightning_invoice::ParseError) -> ParseOrSemanticError {
+	ParseOrSemanticError::ParseError(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new SemanticError-variant ParseOrSemanticError
+pub extern "C" fn ParseOrSemanticError_semantic_error(a: crate::lightning_invoice::SemanticError) -> ParseOrSemanticError {
+	ParseOrSemanticError::SemanticError(a, )
 }
 /// The maximum timestamp as [`Duration::as_secs`] since the Unix epoch allowed by [`BOLT 11`].
 ///

@@ -883,6 +883,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"core::convert::Infallible" => Some("crate::c_types::NotConstructable"),
 
+			"bitcoin::bech32::Error"|"bech32::Error"
+				if !is_ref => Some("crate::c_types::Bech32Error"),
+			"bitcoin::secp256k1::Error"|"secp256k1::Error"
+				if !is_ref => Some("crate::c_types::Secp256k1Error"),
+
+			"core::num::ParseIntError" => Some("crate::c_types::Error"),
+			"core::str::Utf8Error" => Some("crate::c_types::Error"),
+
 			"bitcoin::bech32::u5"|"bech32::u5" => Some("crate::c_types::u5"),
 			"core::num::NonZeroU8" => Some("u8"),
 
@@ -894,8 +902,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref  => Some("*const [u8; 32]"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some("crate::c_types::SecretKey"),
-			"bitcoin::secp256k1::Error"|"secp256k1::Error"
-				if !is_ref => Some("crate::c_types::Secp256k1Error"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
@@ -960,6 +966,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// cannot create a &String.
 
 			"core::convert::Infallible" => Some("panic!(\"You must never construct a NotConstructable! : "),
+
+			"bitcoin::bech32::Error"|"bech32::Error" if !is_ref => Some(""),
+			"bitcoin::secp256k1::Error"|"secp256k1::Error" if !is_ref => Some(""),
+
+			"core::num::ParseIntError" => Some("u8::from_str_radix(\" a\", 10).unwrap_err() /*"),
+			"core::str::Utf8Error" => Some("core::str::from_utf8(&[0xff]).unwrap_err() /*"),
 
 			"std::time::Duration"|"core::time::Duration" => Some("core::time::Duration::from_secs("),
 			"std::time::SystemTime" => Some("(::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs("),
@@ -1042,6 +1054,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::io::Error" if !is_ref => Some(".to_rust()"),
 
 			"core::convert::Infallible" => Some("\")"),
+
+			"bitcoin::bech32::Error"|"bech32::Error" if !is_ref => Some(".into_rust()"),
+			"bitcoin::secp256k1::Error"|"secp256k1::Error" if !is_ref => Some(".into_rust()"),
+
+			"core::num::ParseIntError" => Some("*/"),
+			"core::str::Utf8Error" => Some("*/"),
 
 			"std::time::Duration"|"core::time::Duration" => Some(")"),
 			"std::time::SystemTime" => Some("))"),
@@ -1133,6 +1151,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"core::convert::Infallible" => Some("panic!(\"Cannot construct an Infallible: "),
 
+			"bitcoin::bech32::Error"|"bech32::Error"
+				if !is_ref => Some("crate::c_types::Bech32Error::from_rust("),
+			"bitcoin::secp256k1::Error"|"secp256k1::Error"
+				if !is_ref => Some("crate::c_types::Secp256k1Error::from_rust("),
+
+			"core::num::ParseIntError" => Some("crate::c_types::Error { _dummy: 0 } /*"),
+			"core::str::Utf8Error" => Some("crate::c_types::Error { _dummy: 0 } /*"),
+
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(""),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
@@ -1143,8 +1169,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref => Some(""),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
-			"bitcoin::secp256k1::Error"|"secp256k1::Error"
-				if !is_ref => Some("crate::c_types::Secp256k1Error::from_rust("),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
@@ -1206,6 +1230,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"core::convert::Infallible" => Some("\")"),
 
+			"bitcoin::secp256k1::Error"|"bech32::Error"
+				if !is_ref => Some(")"),
+			"bitcoin::secp256k1::Error"|"secp256k1::Error"
+				if !is_ref => Some(")"),
+
+			"core::num::ParseIntError" => Some("*/"),
+			"core::str::Utf8Error" => Some("*/"),
+
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(".into()"),
 
 			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
@@ -1216,8 +1248,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if !is_ref => Some(")"),
 			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
 				if is_ref => Some(".as_ref()"),
-			"bitcoin::secp256k1::Error"|"secp256k1::Error"
-				if !is_ref => Some(")"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(")"),

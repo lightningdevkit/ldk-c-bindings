@@ -151,14 +151,66 @@ pub extern "C" fn ChannelHandshakeConfig_get_our_htlc_minimum_msat(this_ptr: &Ch
 pub extern "C" fn ChannelHandshakeConfig_set_our_htlc_minimum_msat(this_ptr: &mut ChannelHandshakeConfig, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.our_htlc_minimum_msat = val;
 }
+/// If set, we attempt to negotiate the `scid_privacy` (referred to as `scid_alias` in the
+/// BOLTs) option for outbound private channels. This provides better privacy by not including
+/// our real on-chain channel UTXO in each invoice and requiring that our counterparty only
+/// relay HTLCs to us using the channel's SCID alias.
+///
+/// If this option is set, channels may be created that will not be readable by LDK versions
+/// prior to 0.0.106, causing [`ChannelManager`]'s read method to return a
+/// [`DecodeError:InvalidValue`].
+///
+/// Note that setting this to true does *not* prevent us from opening channels with
+/// counterparties that do not support the `scid_alias` option; we will simply fall back to a
+/// private channel without that option.
+///
+/// Ignored if the channel is negotiated to be announced, see
+/// [`ChannelConfig::announced_channel`] and
+/// [`ChannelHandshakeLimits::force_announced_channel_preference`] for more.
+///
+/// Default value: false. This value is likely to change to true in the future.
+///
+/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
+/// [`DecodeError:InvalidValue`]: crate::ln::msgs::DecodeError::InvalidValue
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_get_negotiate_scid_privacy(this_ptr: &ChannelHandshakeConfig) -> bool {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().negotiate_scid_privacy;
+	*inner_val
+}
+/// If set, we attempt to negotiate the `scid_privacy` (referred to as `scid_alias` in the
+/// BOLTs) option for outbound private channels. This provides better privacy by not including
+/// our real on-chain channel UTXO in each invoice and requiring that our counterparty only
+/// relay HTLCs to us using the channel's SCID alias.
+///
+/// If this option is set, channels may be created that will not be readable by LDK versions
+/// prior to 0.0.106, causing [`ChannelManager`]'s read method to return a
+/// [`DecodeError:InvalidValue`].
+///
+/// Note that setting this to true does *not* prevent us from opening channels with
+/// counterparties that do not support the `scid_alias` option; we will simply fall back to a
+/// private channel without that option.
+///
+/// Ignored if the channel is negotiated to be announced, see
+/// [`ChannelConfig::announced_channel`] and
+/// [`ChannelHandshakeLimits::force_announced_channel_preference`] for more.
+///
+/// Default value: false. This value is likely to change to true in the future.
+///
+/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
+/// [`DecodeError:InvalidValue`]: crate::ln::msgs::DecodeError::InvalidValue
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_set_negotiate_scid_privacy(this_ptr: &mut ChannelHandshakeConfig, mut val: bool) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.negotiate_scid_privacy = val;
+}
 /// Constructs a new ChannelHandshakeConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our_to_self_delay_arg: u16, mut our_htlc_minimum_msat_arg: u64) -> ChannelHandshakeConfig {
+pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our_to_self_delay_arg: u16, mut our_htlc_minimum_msat_arg: u64, mut negotiate_scid_privacy_arg: bool) -> ChannelHandshakeConfig {
 	ChannelHandshakeConfig { inner: ObjOps::heap_alloc(nativeChannelHandshakeConfig {
 		minimum_depth: minimum_depth_arg,
 		our_to_self_delay: our_to_self_delay_arg,
 		our_htlc_minimum_msat: our_htlc_minimum_msat_arg,
+		negotiate_scid_privacy: negotiate_scid_privacy_arg,
 	}), is_owned: true }
 }
 impl Clone for ChannelHandshakeConfig {

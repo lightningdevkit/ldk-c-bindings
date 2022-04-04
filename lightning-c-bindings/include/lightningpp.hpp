@@ -18,7 +18,7 @@ class TrustedCommitmentTransaction;
 class ShutdownScript;
 class InvalidShutdownScript;
 class BackgroundProcessor;
-class ChannelManagerPersister;
+class Persister;
 class RouteHop;
 class Route;
 class RouteParameters;
@@ -278,6 +278,7 @@ class CResult_OutPointDecodeErrorZ;
 class CVec_ChannelDetailsZ;
 class CResult_SignDecodeErrorZ;
 class CVec_MessageSendEventZ;
+class COption_NetAddressZ;
 class C2Tuple_OutPointScriptZ;
 class CResult_RouteHintHopDecodeErrorZ;
 class CResult_C2Tuple_SignatureSignatureZNoneZ;
@@ -378,7 +379,6 @@ class CResult_RouteDecodeErrorZ;
 class CResult_BuiltCommitmentTransactionDecodeErrorZ;
 class COption_NoneZ;
 class CVec_TxOutZ;
-class CResult_ProbabilisticScoringParametersDecodeErrorZ;
 class CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ;
 class CResult_ChannelUpdateInfoDecodeErrorZ;
 class CVec_UpdateFailHTLCZ;
@@ -639,27 +639,29 @@ public:
 	const LDKBackgroundProcessor* operator &() const { return &self; }
 	const LDKBackgroundProcessor* operator ->() const { return &self; }
 };
-class ChannelManagerPersister {
+class Persister {
 private:
-	LDKChannelManagerPersister self;
+	LDKPersister self;
 public:
-	ChannelManagerPersister(const ChannelManagerPersister&) = delete;
-	ChannelManagerPersister(ChannelManagerPersister&& o) : self(o.self) { memset(&o, 0, sizeof(ChannelManagerPersister)); }
-	ChannelManagerPersister(LDKChannelManagerPersister&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKChannelManagerPersister)); }
-	operator LDKChannelManagerPersister() && { LDKChannelManagerPersister res = self; memset(&self, 0, sizeof(LDKChannelManagerPersister)); return res; }
-	~ChannelManagerPersister() { ChannelManagerPersister_free(self); }
-	ChannelManagerPersister& operator=(ChannelManagerPersister&& o) { ChannelManagerPersister_free(self); self = o.self; memset(&o, 0, sizeof(ChannelManagerPersister)); return *this; }
-	LDKChannelManagerPersister* operator &() { return &self; }
-	LDKChannelManagerPersister* operator ->() { return &self; }
-	const LDKChannelManagerPersister* operator &() const { return &self; }
-	const LDKChannelManagerPersister* operator ->() const { return &self; }
+	Persister(const Persister&) = delete;
+	Persister(Persister&& o) : self(o.self) { memset(&o, 0, sizeof(Persister)); }
+	Persister(LDKPersister&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKPersister)); }
+	operator LDKPersister() && { LDKPersister res = self; memset(&self, 0, sizeof(LDKPersister)); return res; }
+	~Persister() { Persister_free(self); }
+	Persister& operator=(Persister&& o) { Persister_free(self); self = o.self; memset(&o, 0, sizeof(Persister)); return *this; }
+	LDKPersister* operator &() { return &self; }
+	LDKPersister* operator ->() { return &self; }
+	const LDKPersister* operator &() const { return &self; }
+	const LDKPersister* operator ->() const { return &self; }
 	/**
 	 *  Persist the given [`ChannelManager`] to disk, returning an error if persistence failed
-	 *  (which will cause the [`BackgroundProcessor`] which called this method to exit.
-	 * 
-	 *  [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
+	 *  (which will cause the [`BackgroundProcessor`] which called this method to exit).
 	 */
 	inline LDK::CResult_NoneErrorZ persist_manager(const struct LDKChannelManager *NONNULL_PTR channel_manager);
+	/**
+	 *  Persist the given [`NetworkGraph`] to disk, returning an error if persistence failed.
+	 */
+	inline LDK::CResult_NoneErrorZ persist_graph(const struct LDKNetworkGraph *NONNULL_PTR network_graph);
 };
 class RouteHop {
 private:
@@ -3566,7 +3568,7 @@ public:
 	 *  perform routing table synchronization using a strategy defined by the
 	 *  implementor.
 	 */
-	inline void sync_routing_table(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init);
+	inline void peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init);
 	/**
 	 *  Handles the reply of a query we initiated to learn about channels
 	 *  for a given range of blocks. We can expect to receive one or more
@@ -5240,6 +5242,21 @@ public:
 	const LDKCVec_MessageSendEventZ* operator &() const { return &self; }
 	const LDKCVec_MessageSendEventZ* operator ->() const { return &self; }
 };
+class COption_NetAddressZ {
+private:
+	LDKCOption_NetAddressZ self;
+public:
+	COption_NetAddressZ(const COption_NetAddressZ&) = delete;
+	COption_NetAddressZ(COption_NetAddressZ&& o) : self(o.self) { memset(&o, 0, sizeof(COption_NetAddressZ)); }
+	COption_NetAddressZ(LDKCOption_NetAddressZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCOption_NetAddressZ)); }
+	operator LDKCOption_NetAddressZ() && { LDKCOption_NetAddressZ res = self; memset(&self, 0, sizeof(LDKCOption_NetAddressZ)); return res; }
+	~COption_NetAddressZ() { COption_NetAddressZ_free(self); }
+	COption_NetAddressZ& operator=(COption_NetAddressZ&& o) { COption_NetAddressZ_free(self); self = o.self; memset(&o, 0, sizeof(COption_NetAddressZ)); return *this; }
+	LDKCOption_NetAddressZ* operator &() { return &self; }
+	LDKCOption_NetAddressZ* operator ->() { return &self; }
+	const LDKCOption_NetAddressZ* operator &() const { return &self; }
+	const LDKCOption_NetAddressZ* operator ->() const { return &self; }
+};
 class C2Tuple_OutPointScriptZ {
 private:
 	LDKC2Tuple_OutPointScriptZ self;
@@ -6740,21 +6757,6 @@ public:
 	const LDKCVec_TxOutZ* operator &() const { return &self; }
 	const LDKCVec_TxOutZ* operator ->() const { return &self; }
 };
-class CResult_ProbabilisticScoringParametersDecodeErrorZ {
-private:
-	LDKCResult_ProbabilisticScoringParametersDecodeErrorZ self;
-public:
-	CResult_ProbabilisticScoringParametersDecodeErrorZ(const CResult_ProbabilisticScoringParametersDecodeErrorZ&) = delete;
-	CResult_ProbabilisticScoringParametersDecodeErrorZ(CResult_ProbabilisticScoringParametersDecodeErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_ProbabilisticScoringParametersDecodeErrorZ)); }
-	CResult_ProbabilisticScoringParametersDecodeErrorZ(LDKCResult_ProbabilisticScoringParametersDecodeErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_ProbabilisticScoringParametersDecodeErrorZ)); }
-	operator LDKCResult_ProbabilisticScoringParametersDecodeErrorZ() && { LDKCResult_ProbabilisticScoringParametersDecodeErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_ProbabilisticScoringParametersDecodeErrorZ)); return res; }
-	~CResult_ProbabilisticScoringParametersDecodeErrorZ() { CResult_ProbabilisticScoringParametersDecodeErrorZ_free(self); }
-	CResult_ProbabilisticScoringParametersDecodeErrorZ& operator=(CResult_ProbabilisticScoringParametersDecodeErrorZ&& o) { CResult_ProbabilisticScoringParametersDecodeErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_ProbabilisticScoringParametersDecodeErrorZ)); return *this; }
-	LDKCResult_ProbabilisticScoringParametersDecodeErrorZ* operator &() { return &self; }
-	LDKCResult_ProbabilisticScoringParametersDecodeErrorZ* operator ->() { return &self; }
-	const LDKCResult_ProbabilisticScoringParametersDecodeErrorZ* operator &() const { return &self; }
-	const LDKCResult_ProbabilisticScoringParametersDecodeErrorZ* operator ->() const { return &self; }
-};
 class CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
 private:
 	LDKCResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ self;
@@ -6816,8 +6818,12 @@ public:
 	const LDKCResult_FundingLockedDecodeErrorZ* operator ->() const { return &self; }
 };
 
-inline LDK::CResult_NoneErrorZ ChannelManagerPersister::persist_manager(const struct LDKChannelManager *NONNULL_PTR channel_manager) {
+inline LDK::CResult_NoneErrorZ Persister::persist_manager(const struct LDKChannelManager *NONNULL_PTR channel_manager) {
 	LDK::CResult_NoneErrorZ ret = (self.persist_manager)(self.this_arg, channel_manager);
+	return ret;
+}
+inline LDK::CResult_NoneErrorZ Persister::persist_graph(const struct LDKNetworkGraph *NONNULL_PTR network_graph) {
+	LDK::CResult_NoneErrorZ ret = (self.persist_graph)(self.this_arg, network_graph);
 	return ret;
 }
 inline void BroadcasterInterface::broadcast_transaction(struct LDKTransaction tx) {
@@ -7118,8 +7124,8 @@ inline LDK::CVec_NodeAnnouncementZ RoutingMessageHandler::get_next_node_announce
 	LDK::CVec_NodeAnnouncementZ ret = (self.get_next_node_announcements)(self.this_arg, starting_point, batch_amount);
 	return ret;
 }
-inline void RoutingMessageHandler::sync_routing_table(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init) {
-	(self.sync_routing_table)(self.this_arg, their_node_id, init);
+inline void RoutingMessageHandler::peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init) {
+	(self.peer_connected)(self.this_arg, their_node_id, init);
 }
 inline LDK::CResult_NoneLightningErrorZ RoutingMessageHandler::handle_reply_channel_range(struct LDKPublicKey their_node_id, struct LDKReplyChannelRange msg) {
 	LDK::CResult_NoneLightningErrorZ ret = (self.handle_reply_channel_range)(self.this_arg, their_node_id, msg);

@@ -19,6 +19,7 @@
 //! # use lightning::routing::network_graph::NetworkGraph;
 //! # use lightning::routing::router::{RouteParameters, find_route};
 //! # use lightning::routing::scoring::{ProbabilisticScorer, ProbabilisticScoringParameters, Scorer, ScoringParameters};
+//! # use lightning::chain::keysinterface::{KeysManager, KeysInterface};
 //! # use lightning::util::logger::{Logger, Record};
 //! # use secp256k1::key::PublicKey;
 //! #
@@ -39,8 +40,9 @@
 //!     ..ProbabilisticScoringParameters::default()
 //! };
 //! let scorer = ProbabilisticScorer::new(params, &network_graph);
+//! # let random_seed_bytes = [42u8; 32];
 //!
-//! let route = find_route(&payer, &route_params, &network_graph, None, &logger, &scorer);
+//! let route = find_route(&payer, &route_params, &network_graph, None, &logger, &scorer, &random_seed_bytes);
 //! # }
 //! ```
 //!
@@ -309,21 +311,24 @@ impl FixedPenaltyScorer {
 		ret
 	}
 }
-#[no_mangle]
-/// Serialize the FixedPenaltyScorer object into a byte array which can be read by FixedPenaltyScorer_read
-pub extern "C" fn FixedPenaltyScorer_write(obj: &FixedPenaltyScorer) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+impl Clone for FixedPenaltyScorer {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeFixedPenaltyScorer>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn FixedPenaltyScorer_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeFixedPenaltyScorer)).clone() })) as *mut c_void
 }
 #[no_mangle]
-pub(crate) extern "C" fn FixedPenaltyScorer_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeFixedPenaltyScorer) })
-}
-#[no_mangle]
-/// Read a FixedPenaltyScorer from a byte array, created by FixedPenaltyScorer_write
-pub extern "C" fn FixedPenaltyScorer_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_FixedPenaltyScorerDecodeErrorZ {
-	let res: Result<lightning::routing::scoring::FixedPenaltyScorer, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scoring::FixedPenaltyScorer { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
-	local_res
+/// Creates a copy of the FixedPenaltyScorer
+pub extern "C" fn FixedPenaltyScorer_clone(orig: &FixedPenaltyScorer) -> FixedPenaltyScorer {
+	orig.clone()
 }
 /// Creates a new scorer using `penalty_msat`.
 #[must_use]
@@ -371,6 +376,23 @@ extern "C" fn FixedPenaltyScorer_Score_payment_path_successful(this_arg: *mut c_
 	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local__path[..])
 }
 
+#[no_mangle]
+/// Serialize the FixedPenaltyScorer object into a byte array which can be read by FixedPenaltyScorer_read
+pub extern "C" fn FixedPenaltyScorer_write(obj: &FixedPenaltyScorer) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn FixedPenaltyScorer_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeFixedPenaltyScorer) })
+}
+#[no_mangle]
+/// Read a FixedPenaltyScorer from a byte array, created by FixedPenaltyScorer_write
+pub extern "C" fn FixedPenaltyScorer_read(ser: crate::c_types::u8slice, arg: u64) -> crate::c_types::derived::CResult_FixedPenaltyScorerDecodeErrorZ {
+	let arg_conv = arg;
+	let res: Result<lightning::routing::scoring::FixedPenaltyScorer, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scoring::FixedPenaltyScorer { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
 
 use lightning::routing::scoring::Scorer as nativeScorerImport;
 pub(crate) type nativeScorer = nativeScorerImport;
@@ -616,6 +638,25 @@ pub extern "C" fn ScoringParameters_new(mut base_penalty_msat_arg: u64, mut fail
 		failure_penalty_half_life: core::time::Duration::from_secs(failure_penalty_half_life_arg),
 	}), is_owned: true }
 }
+impl Clone for ScoringParameters {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeScoringParameters>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ScoringParameters_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeScoringParameters)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the ScoringParameters
+pub extern "C" fn ScoringParameters_clone(orig: &ScoringParameters) -> ScoringParameters {
+	orig.clone()
+}
 #[no_mangle]
 /// Serialize the ScoringParameters object into a byte array which can be read by ScoringParameters_read
 pub extern "C" fn ScoringParameters_write(obj: &ScoringParameters) -> crate::c_types::derived::CVec_u8Z {
@@ -783,6 +824,9 @@ use lightning::routing::scoring::ProbabilisticScoringParameters as nativeProbabi
 pub(crate) type nativeProbabilisticScoringParameters = nativeProbabilisticScoringParametersImport;
 
 /// Parameters for configuring [`ProbabilisticScorer`].
+///
+/// Used to configure base, liquidity, and amount penalties, the sum of which comprises the channel
+/// penalty (i.e., the amount in msats willing to be paid to avoid routing through the channel).
 #[must_use]
 #[repr(C)]
 pub struct ProbabilisticScoringParameters {
@@ -829,17 +873,32 @@ impl ProbabilisticScoringParameters {
 		ret
 	}
 }
-/// A multiplier used to determine the amount in msats willing to be paid to avoid routing
-/// through a channel, as per multiplying by the negative `log10` of the channel's success
-/// probability for a payment.
+/// A fixed penalty in msats to apply to each channel.
 ///
-/// The success probability is determined by the effective channel capacity, the payment amount,
-/// and knowledge learned from prior successful and unsuccessful payments. The lower bound of
-/// the success probability is 0.01, effectively limiting the penalty to the range
-/// `0..=2*liquidity_penalty_multiplier_msat`. The knowledge learned is decayed over time based
-/// on [`liquidity_offset_half_life`].
+/// Default value: 500 msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_get_base_penalty_msat(this_ptr: &ProbabilisticScoringParameters) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().base_penalty_msat;
+	*inner_val
+}
+/// A fixed penalty in msats to apply to each channel.
 ///
-/// Default value: 10,000 msat
+/// Default value: 500 msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_set_base_penalty_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.base_penalty_msat = val;
+}
+/// A multiplier used in conjunction with the negative `log10` of the channel's success
+/// probability for a payment to determine the liquidity penalty.
+///
+/// The penalty is based in part on the knowledge learned from prior successful and unsuccessful
+/// payments. This knowledge is decayed over time based on [`liquidity_offset_half_life`]. The
+/// penalty is effectively limited to `2 * liquidity_penalty_multiplier_msat` (corresponding to
+/// lower bounding the success probability to `0.01`) when the amount falls within the
+/// uncertainty bounds of the channel liquidity balance. Amounts above the upper bound will
+/// result in a `u64::max_value` penalty, however.
+///
+/// Default value: 40,000 msat
 ///
 /// [`liquidity_offset_half_life`]: Self::liquidity_offset_half_life
 #[no_mangle]
@@ -847,17 +906,17 @@ pub extern "C" fn ProbabilisticScoringParameters_get_liquidity_penalty_multiplie
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().liquidity_penalty_multiplier_msat;
 	*inner_val
 }
-/// A multiplier used to determine the amount in msats willing to be paid to avoid routing
-/// through a channel, as per multiplying by the negative `log10` of the channel's success
-/// probability for a payment.
+/// A multiplier used in conjunction with the negative `log10` of the channel's success
+/// probability for a payment to determine the liquidity penalty.
 ///
-/// The success probability is determined by the effective channel capacity, the payment amount,
-/// and knowledge learned from prior successful and unsuccessful payments. The lower bound of
-/// the success probability is 0.01, effectively limiting the penalty to the range
-/// `0..=2*liquidity_penalty_multiplier_msat`. The knowledge learned is decayed over time based
-/// on [`liquidity_offset_half_life`].
+/// The penalty is based in part on the knowledge learned from prior successful and unsuccessful
+/// payments. This knowledge is decayed over time based on [`liquidity_offset_half_life`]. The
+/// penalty is effectively limited to `2 * liquidity_penalty_multiplier_msat` (corresponding to
+/// lower bounding the success probability to `0.01`) when the amount falls within the
+/// uncertainty bounds of the channel liquidity balance. Amounts above the upper bound will
+/// result in a `u64::max_value` penalty, however.
 ///
-/// Default value: 10,000 msat
+/// Default value: 40,000 msat
 ///
 /// [`liquidity_offset_half_life`]: Self::liquidity_offset_half_life
 #[no_mangle]
@@ -899,13 +958,58 @@ pub extern "C" fn ProbabilisticScoringParameters_get_liquidity_offset_half_life(
 pub extern "C" fn ProbabilisticScoringParameters_set_liquidity_offset_half_life(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.liquidity_offset_half_life = core::time::Duration::from_secs(val);
 }
+/// A multiplier used in conjunction with a payment amount and the negative `log10` of the
+/// channel's success probability for the payment to determine the amount penalty.
+///
+/// The purpose of the amount penalty is to avoid having fees dominate the channel cost (i.e.,
+/// fees plus penalty) for large payments. The penalty is computed as the product of this
+/// multiplier and `2^20`ths of the payment amount, weighted by the negative `log10` of the
+/// success probability.
+///
+/// `-log10(success_probability) * amount_penalty_multiplier_msat * amount_msat / 2^20`
+///
+/// In practice, this means for 0.1 success probability (`-log10(0.1) == 1`) each `2^20`th of
+/// the amount will result in a penalty of the multiplier. And, as the success probability
+/// decreases, the negative `log10` weighting will increase dramatically. For higher success
+/// probabilities, the multiplier will have a decreasing effect as the negative `log10` will
+/// fall below `1`.
+///
+/// Default value: 256 msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_get_amount_penalty_multiplier_msat(this_ptr: &ProbabilisticScoringParameters) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().amount_penalty_multiplier_msat;
+	*inner_val
+}
+/// A multiplier used in conjunction with a payment amount and the negative `log10` of the
+/// channel's success probability for the payment to determine the amount penalty.
+///
+/// The purpose of the amount penalty is to avoid having fees dominate the channel cost (i.e.,
+/// fees plus penalty) for large payments. The penalty is computed as the product of this
+/// multiplier and `2^20`ths of the payment amount, weighted by the negative `log10` of the
+/// success probability.
+///
+/// `-log10(success_probability) * amount_penalty_multiplier_msat * amount_msat / 2^20`
+///
+/// In practice, this means for 0.1 success probability (`-log10(0.1) == 1`) each `2^20`th of
+/// the amount will result in a penalty of the multiplier. And, as the success probability
+/// decreases, the negative `log10` weighting will increase dramatically. For higher success
+/// probabilities, the multiplier will have a decreasing effect as the negative `log10` will
+/// fall below `1`.
+///
+/// Default value: 256 msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_set_amount_penalty_multiplier_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.amount_penalty_multiplier_msat = val;
+}
 /// Constructs a new ProbabilisticScoringParameters given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ProbabilisticScoringParameters_new(mut liquidity_penalty_multiplier_msat_arg: u64, mut liquidity_offset_half_life_arg: u64) -> ProbabilisticScoringParameters {
+pub extern "C" fn ProbabilisticScoringParameters_new(mut base_penalty_msat_arg: u64, mut liquidity_penalty_multiplier_msat_arg: u64, mut liquidity_offset_half_life_arg: u64, mut amount_penalty_multiplier_msat_arg: u64) -> ProbabilisticScoringParameters {
 	ProbabilisticScoringParameters { inner: ObjOps::heap_alloc(nativeProbabilisticScoringParameters {
+		base_penalty_msat: base_penalty_msat_arg,
 		liquidity_penalty_multiplier_msat: liquidity_penalty_multiplier_msat_arg,
 		liquidity_offset_half_life: core::time::Duration::from_secs(liquidity_offset_half_life_arg),
+		amount_penalty_multiplier_msat: amount_penalty_multiplier_msat_arg,
 	}), is_owned: true }
 }
 impl Clone for ProbabilisticScoringParameters {
@@ -926,22 +1030,6 @@ pub(crate) extern "C" fn ProbabilisticScoringParameters_clone_void(this_ptr: *co
 /// Creates a copy of the ProbabilisticScoringParameters
 pub extern "C" fn ProbabilisticScoringParameters_clone(orig: &ProbabilisticScoringParameters) -> ProbabilisticScoringParameters {
 	orig.clone()
-}
-#[no_mangle]
-/// Serialize the ProbabilisticScoringParameters object into a byte array which can be read by ProbabilisticScoringParameters_read
-pub extern "C" fn ProbabilisticScoringParameters_write(obj: &ProbabilisticScoringParameters) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
-}
-#[no_mangle]
-pub(crate) extern "C" fn ProbabilisticScoringParameters_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeProbabilisticScoringParameters) })
-}
-#[no_mangle]
-/// Read a ProbabilisticScoringParameters from a byte array, created by ProbabilisticScoringParameters_write
-pub extern "C" fn ProbabilisticScoringParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ProbabilisticScoringParametersDecodeErrorZ {
-	let res: Result<lightning::routing::scoring::ProbabilisticScoringParameters, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scoring::ProbabilisticScoringParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
-	local_res
 }
 /// Creates a new scorer using the given scoring parameters for sending payments from a node
 /// through a network graph.
@@ -996,6 +1084,17 @@ extern "C" fn ProbabilisticScorer_Score_payment_path_successful(this_arg: *mut c
 	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, &local_path[..])
 }
 
+mod approx {
+
+use alloc::str::FromStr;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
 #[no_mangle]
 /// Serialize the ProbabilisticScorer object into a byte array which can be read by ProbabilisticScorer_read
 pub extern "C" fn ProbabilisticScorer_write(obj: &ProbabilisticScorer) -> crate::c_types::derived::CVec_u8Z {

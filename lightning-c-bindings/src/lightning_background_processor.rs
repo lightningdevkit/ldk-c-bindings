@@ -93,39 +93,44 @@ impl BackgroundProcessor {
 		ret
 	}
 }
-/// Trait which handles persisting a [`ChannelManager`] to disk.
-///
-/// [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
+/// Trait that handles persisting a [`ChannelManager`] and [`NetworkGraph`] to disk.
 #[repr(C)]
-pub struct ChannelManagerPersister {
+pub struct Persister {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Persist the given [`ChannelManager`] to disk, returning an error if persistence failed
-	/// (which will cause the [`BackgroundProcessor`] which called this method to exit.
-	///
-	/// [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
+	/// (which will cause the [`BackgroundProcessor`] which called this method to exit).
 	#[must_use]
 	pub persist_manager: extern "C" fn (this_arg: *const c_void, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NoneErrorZ,
+	/// Persist the given [`NetworkGraph`] to disk, returning an error if persistence failed.
+	#[must_use]
+	pub persist_graph: extern "C" fn (this_arg: *const c_void, network_graph: &crate::lightning::routing::network_graph::NetworkGraph) -> crate::c_types::derived::CResult_NoneErrorZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
-unsafe impl Send for ChannelManagerPersister {}
-unsafe impl Sync for ChannelManagerPersister {}
+unsafe impl Send for Persister {}
+unsafe impl Sync for Persister {}
 #[no_mangle]
-pub(crate) extern "C" fn ChannelManagerPersister_clone_fields(orig: &ChannelManagerPersister) -> ChannelManagerPersister {
-	ChannelManagerPersister {
+pub(crate) extern "C" fn Persister_clone_fields(orig: &Persister) -> Persister {
+	Persister {
 		this_arg: orig.this_arg,
 		persist_manager: Clone::clone(&orig.persist_manager),
+		persist_graph: Clone::clone(&orig.persist_graph),
 		free: Clone::clone(&orig.free),
 	}
 }
 
-use lightning_background_processor::ChannelManagerPersister as rustChannelManagerPersister;
-impl rustChannelManagerPersister<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger> for ChannelManagerPersister {
+use lightning_background_processor::Persister as rustPersister;
+impl rustPersister<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger> for Persister {
 	fn persist_manager(&self, mut channel_manager: &lightning::ln::channelmanager::ChannelManager<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>) -> Result<(), std::io::Error> {
 		let mut ret = (self.persist_manager)(self.this_arg, &crate::lightning::ln::channelmanager::ChannelManager { inner: unsafe { ObjOps::nonnull_ptr_to_inner((channel_manager as *const lightning::ln::channelmanager::ChannelManager<_, _, _, _, _, _, >) as *mut _) }, is_owned: false });
+		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).to_rust() })};
+		local_ret
+	}
+	fn persist_graph(&self, mut network_graph: &lightning::routing::network_graph::NetworkGraph) -> Result<(), std::io::Error> {
+		let mut ret = (self.persist_graph)(self.this_arg, &crate::lightning::routing::network_graph::NetworkGraph { inner: unsafe { ObjOps::nonnull_ptr_to_inner((network_graph as *const lightning::routing::network_graph::NetworkGraph<>) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).to_rust() })};
 		local_ret
 	}
@@ -133,7 +138,7 @@ impl rustChannelManagerPersister<crate::lightning::chain::keysinterface::Sign, c
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl core::ops::Deref for ChannelManagerPersister {
+impl core::ops::Deref for Persister {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
@@ -141,8 +146,8 @@ impl core::ops::Deref for ChannelManagerPersister {
 }
 /// Calls the free function if one is set
 #[no_mangle]
-pub extern "C" fn ChannelManagerPersister_free(this_ptr: ChannelManagerPersister) { }
-impl Drop for ChannelManagerPersister {
+pub extern "C" fn Persister_free(this_ptr: Persister) { }
+impl Drop for Persister {
 	fn drop(&mut self) {
 		if let Some(f) = self.free {
 			f(self.this_arg);
@@ -153,17 +158,21 @@ impl Drop for ChannelManagerPersister {
 /// documentation].
 ///
 /// The thread runs indefinitely unless the object is dropped, [`stop`] is called, or
-/// `persist_manager` returns an error. In case of an error, the error is retrieved by calling
+/// [`Persister::persist_manager`] returns an error. In case of an error, the error is retrieved by calling
 /// either [`join`] or [`stop`].
 ///
 /// # Data Persistence
 ///
-/// `persist_manager` is responsible for writing out the [`ChannelManager`] to disk, and/or
+/// [`Persister::persist_manager`] is responsible for writing out the [`ChannelManager`] to disk, and/or
 /// uploading to one or more backup services. See [`ChannelManager::write`] for writing out a
 /// [`ChannelManager`]. See [`FilesystemPersister::persist_manager`] for Rust-Lightning's
 /// provided implementation.
 ///
-/// Typically, users should either implement [`ChannelManagerPersister`] to never return an
+/// [`Persister::persist_graph`] is responsible for writing out the [`NetworkGraph`] to disk. See
+/// [`NetworkGraph::write`] for writing out a [`NetworkGraph`]. See [`FilesystemPersister::persist_network_graph`]
+/// for Rust-Lightning's provided implementation.
+///
+/// Typically, users should either implement [`Persister::persist_manager`] to never return an
 /// error or call [`join`] and handle any error that may arise. For the latter case,
 /// `BackgroundProcessor` must be restarted by calling `start` again after handling the error.
 ///
@@ -180,12 +189,14 @@ impl Drop for ChannelManagerPersister {
 /// [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
 /// [`ChannelManager::write`]: lightning::ln::channelmanager::ChannelManager#impl-Writeable
 /// [`FilesystemPersister::persist_manager`]: lightning_persister::FilesystemPersister::persist_manager
+/// [`FilesystemPersister::persist_network_graph`]: lightning_persister::FilesystemPersister::persist_network_graph
 /// [`NetworkGraph`]: lightning::routing::network_graph::NetworkGraph
+/// [`NetworkGraph::write`]: lightning::routing::network_graph::NetworkGraph#impl-Writeable
 ///
 /// Note that net_graph_msg_handler (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning_background_processor::ChannelManagerPersister, mut event_handler: crate::lightning::util::events::EventHandler, chain_monitor: &crate::lightning::chain::chainmonitor::ChainMonitor, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager, mut net_graph_msg_handler: crate::lightning::routing::network_graph::NetGraphMsgHandler, peer_manager: &crate::lightning::ln::peer_handler::PeerManager, mut logger: crate::lightning::util::logger::Logger) -> BackgroundProcessor {
+pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning_background_processor::Persister, mut event_handler: crate::lightning::util::events::EventHandler, chain_monitor: &crate::lightning::chain::chainmonitor::ChainMonitor, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager, mut net_graph_msg_handler: crate::lightning::routing::network_graph::NetGraphMsgHandler, peer_manager: &crate::lightning::ln::peer_handler::PeerManager, mut logger: crate::lightning::util::logger::Logger) -> BackgroundProcessor {
 	let mut local_net_graph_msg_handler = if net_graph_msg_handler.inner.is_null() { None } else { Some( { net_graph_msg_handler.get_native_ref() }) };
 	let mut ret = lightning_background_processor::BackgroundProcessor::start(persister, event_handler, chain_monitor.get_native_ref(), channel_manager.get_native_ref(), local_net_graph_msg_handler, peer_manager.get_native_ref(), logger);
 	BackgroundProcessor { inner: ObjOps::heap_alloc(ret), is_owned: true }

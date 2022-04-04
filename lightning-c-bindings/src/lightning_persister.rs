@@ -116,6 +116,16 @@ pub extern "C" fn FilesystemPersister_persist_manager(mut data_dir: crate::c_typ
 	local_ret
 }
 
+/// Write the provided `NetworkGraph` to the path provided at `FilesystemPersister`
+/// initialization, within a file called \"network_graph\"
+#[must_use]
+#[no_mangle]
+pub extern "C" fn FilesystemPersister_persist_network_graph(mut data_dir: crate::c_types::Str, network_graph: &crate::lightning::routing::network_graph::NetworkGraph) -> crate::c_types::derived::CResult_NoneErrorZ {
+	let mut ret = lightning_persister::FilesystemPersister::persist_network_graph(data_dir.into_string(), network_graph.get_native_ref());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
+	local_ret
+}
+
 /// Read `ChannelMonitor`s from disk.
 #[must_use]
 #[no_mangle]

@@ -331,9 +331,12 @@ public:
 		t2 = std::thread(&sock_read_data_thread, pipefds_1_to_2[0], &sock2, &net2);
 
 		// Note that we have to bind the result to a C++ class to make sure it gets free'd
-		LDK::CResult_CVec_u8ZPeerHandleErrorZ con_res = PeerManager_new_outbound_connection(&net1, ChannelManager_get_our_node_id(&cm2), sock1);
+		LDKCOption_NetAddressZ remote_network_address = {
+			.tag = LDKCOption_NetAddressZ_None,
+		};
+		LDK::CResult_CVec_u8ZPeerHandleErrorZ con_res = PeerManager_new_outbound_connection(&net1, ChannelManager_get_our_node_id(&cm2), sock1, remote_network_address);
 		assert(con_res->result_ok);
-		LDK::CResult_NonePeerHandleErrorZ con_res2 = PeerManager_new_inbound_connection(&net2, sock2);
+		LDK::CResult_NonePeerHandleErrorZ con_res2 = PeerManager_new_inbound_connection(&net2, sock2, remote_network_address);
 		assert(con_res2->result_ok);
 
 		auto writelen = write(pipefds_1_to_2[1], con_res->contents.result->data, con_res->contents.result->datalen);
@@ -428,12 +431,13 @@ uint64_t get_chan_score(const void *this_arg, uint64_t scid, uint64_t htlc_amt, 
 struct CustomRouteFinderParams {
 	LDKLogger *logger;
 	LDKNetworkGraph *graph_ref;
+	LDKThirtyTwoBytes random_seed_bytes;
 };
 struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, struct LDKPublicKey payer, const struct LDKRouteParameters *NONNULL_PTR route_params, const uint8_t (*payment_hash)[32], struct LDKCVec_ChannelDetailsZ *first_hops, const struct LDKScore *NONNULL_PTR scorer) {
 	const struct CustomRouteFinderParams *params = (struct CustomRouteFinderParams *)this_arg;
 	assert(first_hops->datalen == 1);
 	assert(ChannelDetails_get_is_usable(&first_hops->data[0]));
-	return find_route(payer, route_params, params->graph_ref, first_hops, *params->logger, scorer);
+	return find_route(payer, route_params, params->graph_ref, first_hops, *params->logger, scorer, &params->random_seed_bytes.data);
 }
 
 int main() {
@@ -702,7 +706,8 @@ int main() {
 						.inner = NULL, .is_owned = false
 					}, Invoice_route_hints(invoice->contents.result), COption_u64Z_none(), 0xffffffff),
 				5000, Invoice_min_final_cltv_expiry(invoice->contents.result));
-			LDK::CResult_RouteLightningErrorZ route = find_route(ChannelManager_get_our_node_id(&cm1), &route_params, &net_graph2, &outbound_channels, logger1, &chan_scorer);
+			random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
+			LDK::CResult_RouteLightningErrorZ route = find_route(ChannelManager_get_our_node_id(&cm1), &route_params, &net_graph2, &outbound_channels, logger1, &chan_scorer, &random_bytes.data);
 			assert(route->result_ok);
 			LDK::CVec_CVec_RouteHopZZ paths = Route_get_paths(route->contents.result);
 			assert(paths->datalen == 1);
@@ -858,6 +863,7 @@ int main() {
 	struct CustomRouteFinderParams router_params = {
 		.logger = &logger1,
 		.graph_ref = &net_graph1,
+		.random_seed_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg),
 	};
 	LDKRouter sending_router = {
 		.this_arg = &router_params,

@@ -214,7 +214,10 @@ static void *sock_thread_fn(void* arg) {
 								if (newfd >= 0) {
 									// Received a new connection, register it!
 									LDKSocketDescriptor new_descriptor = get_descriptor(handler, newfd);
-									LDKCResult_NonePeerHandleErrorZ con_res = PeerManager_new_inbound_connection(&handler->ldk_peer_manager, new_descriptor);
+									LDKCOption_NetAddressZ remote_network_address = {
+										.tag = LDKCOption_NetAddressZ_None,
+									};
+									LDKCResult_NonePeerHandleErrorZ con_res = PeerManager_new_inbound_connection(&handler->ldk_peer_manager, new_descriptor, remote_network_address);
 									if (con_res.result_ok) {
 										if (register_socket(handler, newfd, 0))
 											shutdown(newfd, SHUT_RDWR);
@@ -378,7 +381,10 @@ int socket_connect(void* arg, LDKPublicKey pubkey, struct sockaddr *addr, size_t
 	if (register_socket(handler, fd, 0)) return -4;
 
 	LDKSocketDescriptor descriptor = get_descriptor(handler, fd);
-	LDKCResult_CVec_u8ZPeerHandleErrorZ con_res = PeerManager_new_outbound_connection(&handler->ldk_peer_manager, pubkey, descriptor);
+	LDKCOption_NetAddressZ remote_network_address = {
+		.tag = LDKCOption_NetAddressZ_None,
+	};
+	LDKCResult_CVec_u8ZPeerHandleErrorZ con_res = PeerManager_new_outbound_connection(&handler->ldk_peer_manager, pubkey, descriptor, remote_network_address);
 	if (con_res.result_ok) {
 		ssize_t write_count = send(fd, con_res.contents.result->data, con_res.contents.result->datalen, MSG_NOSIGNAL);
 		if (write_count != con_res.contents.result->datalen)

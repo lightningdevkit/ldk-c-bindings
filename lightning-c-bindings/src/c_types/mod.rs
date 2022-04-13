@@ -227,6 +227,12 @@ impl Bech32Error {
 		}
 	}
 }
+#[no_mangle]
+/// Creates a new Bech32Error which has the same data as `orig`
+pub extern "C" fn Bech32Error_clone(orig: &Bech32Error) -> Bech32Error { orig.clone() }
+#[no_mangle]
+/// Releases any memory held by the given `Bech32Error` (which is currently none)
+pub extern "C" fn Bech32Error_free(o: Bech32Error) { }
 
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq)]

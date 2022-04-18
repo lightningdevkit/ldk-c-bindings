@@ -569,7 +569,7 @@ impl Into<Str> for String {
 }
 impl Clone for Str {
 	fn clone(&self) -> Self {
-		self.into_str().clone().into()
+		String::from(self.into_str()).into()
 	}
 }
 

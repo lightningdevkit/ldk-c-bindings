@@ -557,10 +557,6 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		Self { crate_name, dependencies, module_path, imports, declared, priv_modules }
 	}
 
-	pub fn get_declared_type(&self, ident: &syn::Ident) -> Option<&DeclType<'crate_lft>> {
-		self.declared.get(ident)
-	}
-
 	pub fn maybe_resolve_declared(&self, id: &syn::Ident) -> Option<&DeclType<'crate_lft>> {
 		self.declared.get(id)
 	}
@@ -570,17 +566,6 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			Some(imp.clone())
 		} else if self.declared.get(id).is_some() {
 			Some(self.module_path.to_string() + "::" + &format!("{}", id))
-		} else { None }
-	}
-
-	pub fn maybe_resolve_non_ignored_ident(&self, id: &syn::Ident) -> Option<String> {
-		if let Some((imp, _)) = self.imports.get(id) {
-			Some(imp.clone())
-		} else if let Some(decl_type) = self.declared.get(id) {
-			match decl_type {
-				DeclType::StructIgnored => None,
-				_ => Some(self.module_path.to_string() + "::" + &format!("{}", id)),
-			}
 		} else { None }
 	}
 
@@ -1594,9 +1579,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	// *** Type definition during main.rs processing ***
 	// *************************************************
 
-	pub fn get_declared_type(&'a self, ident: &syn::Ident) -> Option<&'a DeclType<'c>> {
-		self.types.get_declared_type(ident)
-	}
 	/// Returns true if the object at the given path is mapped as X { inner: *mut origX, .. }.
 	pub fn c_type_has_inner_from_path(&self, full_path: &str) -> bool {
 		self.crate_types.opaques.get(full_path).is_some()
@@ -1619,10 +1601,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 	pub fn maybe_resolve_ident(&self, id: &syn::Ident) -> Option<String> {
 		self.types.maybe_resolve_ident(id)
-	}
-
-	pub fn maybe_resolve_non_ignored_ident(&self, id: &syn::Ident) -> Option<String> {
-		self.types.maybe_resolve_non_ignored_ident(id)
 	}
 
 	pub fn maybe_resolve_path(&self, p_arg: &syn::Path, generics: Option<&GenericTypes>) -> Option<String> {

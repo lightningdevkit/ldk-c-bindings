@@ -65,6 +65,17 @@ pub fn path_matches_nongeneric(p: &syn::Path, exp: &[&str]) -> bool {
 	true
 }
 
+pub fn string_path_to_syn_path(path: &str) -> syn::Path {
+	let mut segments = syn::punctuated::Punctuated::new();
+	for seg in path.split("::") {
+		segments.push(syn::PathSegment {
+			ident: syn::Ident::new(seg, Span::call_site()),
+			arguments: syn::PathArguments::None,
+		});
+	}
+	syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments }
+}
+
 #[derive(Debug, PartialEq)]
 pub enum ExportStatus {
 	Export,
@@ -391,7 +402,7 @@ pub enum DeclType<'a> {
 }
 
 pub struct ImportResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
-	crate_name: &'mod_lifetime str,
+	pub crate_name: &'mod_lifetime str,
 	dependencies: &'mod_lifetime HashSet<syn::Ident>,
 	module_path: &'mod_lifetime str,
 	imports: HashMap<syn::Ident, (String, syn::Path)>,
@@ -741,7 +752,7 @@ pub struct CrateTypes<'a> {
 	/// Aliases from paths to some other Type
 	pub type_aliases: HashMap<String, syn::Type>,
 	/// Value is an alias to Key (maybe with some generics)
-	pub reverse_alias_map: HashMap<String, Vec<(syn::Path, syn::PathArguments)>>,
+	pub reverse_alias_map: HashMap<String, Vec<(String, syn::PathArguments)>>,
 	/// Template continer types defined, map from mangled type name -> whether a destructor fn
 	/// exists.
 	///
@@ -785,7 +796,7 @@ impl<'a> CrateTypes<'a> {
 pub struct TypeResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
 	pub module_path: &'mod_lifetime str,
 	pub crate_types: &'mod_lifetime CrateTypes<'crate_lft>,
-	types: ImportResolver<'mod_lifetime, 'crate_lft>,
+	pub types: ImportResolver<'mod_lifetime, 'crate_lft>,
 }
 
 /// Returned by write_empty_rust_val_check_suffix to indicate what type of dereferencing needs to
@@ -2874,7 +2885,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		assert!(self.write_c_type_intern(w, t, generics, false, false, ptr_for_ref, true, false));
 	}
 	pub fn understood_c_path(&self, p: &syn::Path) -> bool {
-		if p.leading_colon.is_some() { return false; }
 		self.write_c_path_intern(&mut std::io::sink(), p, None, false, false, false, false, true)
 	}
 	pub fn understood_c_type(&self, t: &syn::Type, generics: Option<&GenericTypes>) -> bool {

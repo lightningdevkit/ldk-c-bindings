@@ -1375,11 +1375,18 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 					if !gen_types.as_mut().unwrap().learn_generics(&i.generics, types) {
 						gen_types = None;
 					}
-					'alias_impls: for (alias, arguments) in aliases {
+					let alias_module = rsplit_once(&resolved_path, "::").unwrap().0;
+
+					'alias_impls: for (alias_resolved, arguments) in aliases {
 						let mut new_ty_generics = Vec::new();
 						let mut need_generics = false;
 
-						let alias_resolved = types.resolve_path(&alias, None);
+						let alias_resolver_override;
+						let alias_resolver = if alias_module != types.module_path {
+							alias_resolver_override = ImportResolver::new(types.types.crate_name, &types.crate_types.lib_ast.dependencies,
+								alias_module, &types.crate_types.lib_ast.modules.get(alias_module).unwrap().items);
+							&alias_resolver_override
+						} else { &types.types };/*.maybe_resolve_path(&alias, None).unwrap();*/
 						for (idx, gen) in i.generics.params.iter().enumerate() {
 							match gen {
 								syn::GenericParam::Type(type_param) => {
@@ -1388,10 +1395,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 											if let syn::PathArguments::AngleBracketed(ref t) = &arguments {
 												assert!(idx < t.args.len());
 												if let syn::GenericArgument::Type(syn::Type::Path(p)) = &t.args[idx] {
-													if let Some(generic_arg) = types.maybe_resolve_path(&p.path, None) {
+													if let Some(generic_arg) = alias_resolver.maybe_resolve_path(&p.path, None) {
 
 														new_ty_generics.push((type_param.ident.clone(), syn::Type::Path(p.clone())));
-														let generic_bound = types.resolve_path(&trait_bound.path, None);
+														let generic_bound = types.maybe_resolve_path(&trait_bound.path, None)
+															.unwrap_or_else(|| format!("{}::{}", types.module_path, single_ident_generic_path_to_ident(&trait_bound.path).unwrap()));
 														if let Some(traits_impld) = types.crate_types.trait_impls.get(&generic_arg) {
 															for trait_impld in traits_impld {
 																if *trait_impld == generic_bound { continue 'bounds_check; }
@@ -1419,6 +1427,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							}
 						}
 						let mut params = syn::punctuated::Punctuated::new();
+						let alias = string_path_to_syn_path(&alias_resolved);
 						let real_aliased =
 							if need_generics {
 								let alias_generics = types.crate_types.opaques.get(&alias_resolved).unwrap().1;
@@ -1784,11 +1793,7 @@ fn convert_priv_mod<'a, 'b: 'a, W: std::io::Write>(w: &mut W, libast: &'b FullLi
 		match item {
 			syn::Item::Mod(m) => convert_priv_mod(w, libast, crate_types, out_dir, &format!("{}::{}", mod_path, module.ident), m),
 			syn::Item::Impl(i) => {
-				if let &syn::Type::Path(ref p) = &*i.self_ty {
-					if p.path.get_ident().is_some() {
-						writeln_impl(w, i, &mut types);
-					}
-				}
+				writeln_impl(w, i, &mut types);
 			},
 			_ => {},
 		}
@@ -2030,17 +2035,14 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						let type_path = format!("{}::{}", module, t.ident);
 						match &*t.ty {
 							syn::Type::Path(p) => {
-								let t_ident = &t.ident;
-
 								// If its a path with no generics, assume we don't map the aliased type and map it opaque
-								let path_obj = parse_quote!(#t_ident);
 								let args_obj = p.path.segments.last().unwrap().arguments.clone();
 								match crate_types.reverse_alias_map.entry(import_resolver.maybe_resolve_path(&p.path, None).unwrap()) {
-									hash_map::Entry::Occupied(mut e) => { e.get_mut().push((path_obj, args_obj)); },
-									hash_map::Entry::Vacant(e) => { e.insert(vec![(path_obj, args_obj)]); },
+									hash_map::Entry::Occupied(mut e) => { e.get_mut().push((type_path.clone(), args_obj)); },
+									hash_map::Entry::Vacant(e) => { e.insert(vec![(type_path.clone(), args_obj)]); },
 								}
 
-								crate_types.opaques.insert(type_path, (t_ident, &t.generics));
+								crate_types.opaques.insert(type_path, (&t.ident, &t.generics));
 							},
 							_ => {
 								crate_types.type_aliases.insert(type_path, import_resolver.resolve_imported_refs((*t.ty).clone()));

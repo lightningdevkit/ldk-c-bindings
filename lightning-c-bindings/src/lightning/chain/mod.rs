@@ -117,23 +117,23 @@ pub extern "C" fn BestBlock_clone(orig: &BestBlock) -> BestBlock {
 /// network.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BestBlock_from_genesis(mut network: crate::bitcoin::network::Network) -> BestBlock {
+pub extern "C" fn BestBlock_from_genesis(mut network: crate::bitcoin::network::Network) -> crate::lightning::chain::BestBlock {
 	let mut ret = lightning::chain::BestBlock::from_genesis(network.into_bitcoin());
-	BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::chain::BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns a `BestBlock` as identified by the given block hash and height.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BestBlock_new(mut block_hash: crate::c_types::ThirtyTwoBytes, mut height: u32) -> BestBlock {
+pub extern "C" fn BestBlock_new(mut block_hash: crate::c_types::ThirtyTwoBytes, mut height: u32) -> crate::lightning::chain::BestBlock {
 	let mut ret = lightning::chain::BestBlock::new(::bitcoin::hash_types::BlockHash::from_slice(&block_hash.data[..]).unwrap(), height);
-	BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::chain::BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns the best block hash.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BestBlock_block_hash(this_arg: &BestBlock) -> crate::c_types::ThirtyTwoBytes {
+pub extern "C" fn BestBlock_block_hash(this_arg: &crate::lightning::chain::BestBlock) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.block_hash();
 	crate::c_types::ThirtyTwoBytes { data: ret.into_inner() }
 }
@@ -141,7 +141,7 @@ pub extern "C" fn BestBlock_block_hash(this_arg: &BestBlock) -> crate::c_types::
 /// Returns the best block height.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BestBlock_height(this_arg: &BestBlock) -> u32 {
+pub extern "C" fn BestBlock_height(this_arg: &crate::lightning::chain::BestBlock) -> u32 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.height();
 	ret
 }

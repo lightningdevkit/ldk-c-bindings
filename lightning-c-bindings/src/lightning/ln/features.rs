@@ -39,6 +39,754 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_data_loss_protect_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_data_loss_protect_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_data_loss_protect_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_data_loss_protect_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_data_loss_protect(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_data_loss_protect();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_data_loss_protect_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_data_loss_protect_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_data_loss_protect_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_data_loss_protect_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_data_loss_protect(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_data_loss_protect();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_data_loss_protect(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_data_loss_protect();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_data_loss_protect(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_data_loss_protect();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_initial_routing_sync_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_initial_routing_sync_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_initial_routing_sync_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_initial_routing_sync_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_initial_routing_sync(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.initial_routing_sync();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_upfront_shutdown_script_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_upfront_shutdown_script_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_upfront_shutdown_script_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_upfront_shutdown_script_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_upfront_shutdown_script(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_upfront_shutdown_script();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_upfront_shutdown_script_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_upfront_shutdown_script_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_upfront_shutdown_script_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_upfront_shutdown_script_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_upfront_shutdown_script(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_upfront_shutdown_script();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_upfront_shutdown_script(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_upfront_shutdown_script();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_upfront_shutdown_script(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_upfront_shutdown_script();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_gossip_queries_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_gossip_queries_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_gossip_queries_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_gossip_queries_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_gossip_queries(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_gossip_queries();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_gossip_queries_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_gossip_queries_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_gossip_queries_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_gossip_queries_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_gossip_queries(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_gossip_queries();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_gossip_queries(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_gossip_queries();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_gossip_queries(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_gossip_queries();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_variable_length_onion_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_variable_length_onion_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_variable_length_onion_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_variable_length_onion_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_variable_length_onion(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_variable_length_onion();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_variable_length_onion_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_variable_length_onion_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_variable_length_onion_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_variable_length_onion_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_variable_length_onion(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_variable_length_onion();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_set_variable_length_onion_optional(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_variable_length_onion_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_set_variable_length_onion_required(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_variable_length_onion_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_supports_variable_length_onion(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_variable_length_onion();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_variable_length_onion(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_variable_length_onion();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_variable_length_onion(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_variable_length_onion();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_requires_variable_length_onion(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_variable_length_onion();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_static_remote_key_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_static_remote_key_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_static_remote_key_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_static_remote_key_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_static_remote_key(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_static_remote_key();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_static_remote_key_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_static_remote_key_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_static_remote_key_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_static_remote_key_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_static_remote_key(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_static_remote_key();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_static_remote_key_optional(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_static_remote_key_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_static_remote_key_required(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_static_remote_key_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_supports_static_remote_key(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_static_remote_key();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_static_remote_key(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_static_remote_key();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_static_remote_key(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_static_remote_key();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_requires_static_remote_key(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_static_remote_key();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_payment_secret_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_payment_secret_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_payment_secret_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_payment_secret_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_payment_secret(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_payment_secret();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_payment_secret_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_payment_secret_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_payment_secret_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_payment_secret_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_payment_secret(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_payment_secret();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_set_payment_secret_optional(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_payment_secret_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_set_payment_secret_required(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_payment_secret_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_supports_payment_secret(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_payment_secret();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_payment_secret(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_payment_secret();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_payment_secret(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_payment_secret();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_requires_payment_secret(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_payment_secret();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_basic_mpp_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_basic_mpp_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_basic_mpp_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_basic_mpp_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_basic_mpp(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_basic_mpp();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_basic_mpp_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_basic_mpp_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_basic_mpp_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_basic_mpp_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_basic_mpp(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_basic_mpp();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_set_basic_mpp_optional(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_basic_mpp_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_set_basic_mpp_required(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_basic_mpp_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_supports_basic_mpp(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_basic_mpp();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_basic_mpp(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_basic_mpp();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_basic_mpp(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_basic_mpp();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_requires_basic_mpp(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_basic_mpp();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_shutdown_any_segwit_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_shutdown_any_segwit_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_shutdown_any_segwit_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_shutdown_any_segwit_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_shutdown_anysegwit(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_shutdown_anysegwit();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_shutdown_any_segwit_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_shutdown_any_segwit_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_shutdown_any_segwit_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_shutdown_any_segwit_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_shutdown_anysegwit(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_shutdown_anysegwit();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_shutdown_anysegwit(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_shutdown_anysegwit();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_shutdown_anysegwit(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_shutdown_anysegwit();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_channel_type_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_channel_type_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_channel_type_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_channel_type_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_channel_type(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_channel_type();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_channel_type_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_channel_type_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_channel_type_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_channel_type_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_channel_type(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_channel_type();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_channel_type(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_channel_type();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_channel_type(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_channel_type();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_scid_privacy_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_scid_privacy_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_scid_privacy_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_scid_privacy_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_scid_privacy(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_scid_privacy();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_scid_privacy_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_scid_privacy_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_scid_privacy_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_scid_privacy_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_scid_privacy(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_scid_privacy();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_scid_privacy_optional(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_scid_privacy_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_scid_privacy_required(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_scid_privacy_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_supports_scid_privacy(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_scid_privacy();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_scid_privacy(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_scid_privacy();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_scid_privacy(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_scid_privacy();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_requires_scid_privacy(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_scid_privacy();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_keysend_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_keysend_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_keysend_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_keysend_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_keysend(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_keysend();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_keysend(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_keysend();
+	ret
+}
+
 }
 /// Checks if two InitFeaturess contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -447,24 +1195,24 @@ impl ChannelTypeFeatures {
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InitFeatures_empty() -> InitFeatures {
+pub extern "C" fn InitFeatures_empty() -> crate::lightning::ln::features::InitFeatures {
 	let mut ret = lightning::ln::features::InitFeatures::empty();
-	InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a Features with the bits set which are known by the implementation
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InitFeatures_known() -> InitFeatures {
+pub extern "C" fn InitFeatures_known() -> crate::lightning::ln::features::InitFeatures {
 	let mut ret = lightning::ln::features::InitFeatures::known();
-	InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
 /// \"required\".
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InitFeatures_requires_unknown_bits(this_arg: &InitFeatures) -> bool {
+pub extern "C" fn InitFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
 }
@@ -472,24 +1220,24 @@ pub extern "C" fn InitFeatures_requires_unknown_bits(this_arg: &InitFeatures) ->
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NodeFeatures_empty() -> NodeFeatures {
+pub extern "C" fn NodeFeatures_empty() -> crate::lightning::ln::features::NodeFeatures {
 	let mut ret = lightning::ln::features::NodeFeatures::empty();
-	NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a Features with the bits set which are known by the implementation
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NodeFeatures_known() -> NodeFeatures {
+pub extern "C" fn NodeFeatures_known() -> crate::lightning::ln::features::NodeFeatures {
 	let mut ret = lightning::ln::features::NodeFeatures::known();
-	NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
 /// \"required\".
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NodeFeatures_requires_unknown_bits(this_arg: &NodeFeatures) -> bool {
+pub extern "C" fn NodeFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
 }
@@ -497,24 +1245,24 @@ pub extern "C" fn NodeFeatures_requires_unknown_bits(this_arg: &NodeFeatures) ->
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelFeatures_empty() -> ChannelFeatures {
+pub extern "C" fn ChannelFeatures_empty() -> crate::lightning::ln::features::ChannelFeatures {
 	let mut ret = lightning::ln::features::ChannelFeatures::empty();
-	ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::ln::features::ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a Features with the bits set which are known by the implementation
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelFeatures_known() -> ChannelFeatures {
+pub extern "C" fn ChannelFeatures_known() -> crate::lightning::ln::features::ChannelFeatures {
 	let mut ret = lightning::ln::features::ChannelFeatures::known();
-	ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::ln::features::ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
 /// \"required\".
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelFeatures_requires_unknown_bits(this_arg: &ChannelFeatures) -> bool {
+pub extern "C" fn ChannelFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::ChannelFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
 }
@@ -522,24 +1270,24 @@ pub extern "C" fn ChannelFeatures_requires_unknown_bits(this_arg: &ChannelFeatur
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_empty() -> InvoiceFeatures {
+pub extern "C" fn InvoiceFeatures_empty() -> crate::lightning::ln::features::InvoiceFeatures {
 	let mut ret = lightning::ln::features::InvoiceFeatures::empty();
-	InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::ln::features::InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a Features with the bits set which are known by the implementation
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_known() -> InvoiceFeatures {
+pub extern "C" fn InvoiceFeatures_known() -> crate::lightning::ln::features::InvoiceFeatures {
 	let mut ret = lightning::ln::features::InvoiceFeatures::known();
-	InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::ln::features::InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
 /// \"required\".
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_requires_unknown_bits(this_arg: &InvoiceFeatures) -> bool {
+pub extern "C" fn InvoiceFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
 }
@@ -547,31 +1295,31 @@ pub extern "C" fn InvoiceFeatures_requires_unknown_bits(this_arg: &InvoiceFeatur
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelTypeFeatures_empty() -> ChannelTypeFeatures {
+pub extern "C" fn ChannelTypeFeatures_empty() -> crate::lightning::ln::features::ChannelTypeFeatures {
 	let mut ret = lightning::ln::features::ChannelTypeFeatures::empty();
-	ChannelTypeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a Features with the bits set which are known by the implementation
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelTypeFeatures_known() -> ChannelTypeFeatures {
+pub extern "C" fn ChannelTypeFeatures_known() -> crate::lightning::ln::features::ChannelTypeFeatures {
 	let mut ret = lightning::ln::features::ChannelTypeFeatures::known();
-	ChannelTypeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
 /// \"required\".
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelTypeFeatures_requires_unknown_bits(this_arg: &ChannelTypeFeatures) -> bool {
+pub extern "C" fn ChannelTypeFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
 }
 
 #[no_mangle]
 /// Serialize the InitFeatures object into a byte array which can be read by InitFeatures_read
-pub extern "C" fn InitFeatures_write(obj: &InitFeatures) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn InitFeatures_write(obj: &crate::lightning::ln::features::InitFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -587,7 +1335,7 @@ pub extern "C" fn InitFeatures_read(ser: crate::c_types::u8slice) -> crate::c_ty
 }
 #[no_mangle]
 /// Serialize the ChannelFeatures object into a byte array which can be read by ChannelFeatures_read
-pub extern "C" fn ChannelFeatures_write(obj: &ChannelFeatures) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ChannelFeatures_write(obj: &crate::lightning::ln::features::ChannelFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -603,7 +1351,7 @@ pub extern "C" fn ChannelFeatures_read(ser: crate::c_types::u8slice) -> crate::c
 }
 #[no_mangle]
 /// Serialize the NodeFeatures object into a byte array which can be read by NodeFeatures_read
-pub extern "C" fn NodeFeatures_write(obj: &NodeFeatures) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn NodeFeatures_write(obj: &crate::lightning::ln::features::NodeFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -619,7 +1367,7 @@ pub extern "C" fn NodeFeatures_read(ser: crate::c_types::u8slice) -> crate::c_ty
 }
 #[no_mangle]
 /// Serialize the InvoiceFeatures object into a byte array which can be read by InvoiceFeatures_read
-pub extern "C" fn InvoiceFeatures_write(obj: &InvoiceFeatures) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn InvoiceFeatures_write(obj: &crate::lightning::ln::features::InvoiceFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -635,7 +1383,7 @@ pub extern "C" fn InvoiceFeatures_read(ser: crate::c_types::u8slice) -> crate::c
 }
 #[no_mangle]
 /// Serialize the ChannelTypeFeatures object into a byte array which can be read by ChannelTypeFeatures_read
-pub extern "C" fn ChannelTypeFeatures_write(obj: &ChannelTypeFeatures) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ChannelTypeFeatures_write(obj: &crate::lightning::ln::features::ChannelTypeFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]

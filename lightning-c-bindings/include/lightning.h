@@ -24100,6 +24100,541 @@ struct LDKCVec_u8Z ChannelTypeFeatures_write(const struct LDKChannelTypeFeatures
 struct LDKCResult_ChannelTypeFeaturesDecodeErrorZ ChannelTypeFeatures_read(struct LDKu8slice ser);
 
 /**
+ * Set this feature as optional.
+ */
+void InitFeatures_set_data_loss_protect_optional(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InitFeatures_set_data_loss_protect_required(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InitFeatures_supports_data_loss_protect(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void NodeFeatures_set_data_loss_protect_optional(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void NodeFeatures_set_data_loss_protect_required(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool NodeFeatures_supports_data_loss_protect(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InitFeatures_requires_data_loss_protect(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool NodeFeatures_requires_data_loss_protect(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InitFeatures_set_initial_routing_sync_optional(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InitFeatures_set_initial_routing_sync_required(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InitFeatures_initial_routing_sync(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InitFeatures_set_upfront_shutdown_script_optional(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InitFeatures_set_upfront_shutdown_script_required(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InitFeatures_supports_upfront_shutdown_script(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void NodeFeatures_set_upfront_shutdown_script_optional(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void NodeFeatures_set_upfront_shutdown_script_required(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool NodeFeatures_supports_upfront_shutdown_script(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InitFeatures_requires_upfront_shutdown_script(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool NodeFeatures_requires_upfront_shutdown_script(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InitFeatures_set_gossip_queries_optional(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InitFeatures_set_gossip_queries_required(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InitFeatures_supports_gossip_queries(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void NodeFeatures_set_gossip_queries_optional(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void NodeFeatures_set_gossip_queries_required(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool NodeFeatures_supports_gossip_queries(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InitFeatures_requires_gossip_queries(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool NodeFeatures_requires_gossip_queries(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InitFeatures_set_variable_length_onion_optional(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InitFeatures_set_variable_length_onion_required(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InitFeatures_supports_variable_length_onion(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void NodeFeatures_set_variable_length_onion_optional(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void NodeFeatures_set_variable_length_onion_required(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool NodeFeatures_supports_variable_length_onion(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InvoiceFeatures_set_variable_length_onion_optional(struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InvoiceFeatures_set_variable_length_onion_required(struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InvoiceFeatures_supports_variable_length_onion(const struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InitFeatures_requires_variable_length_onion(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool NodeFeatures_requires_variable_length_onion(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InvoiceFeatures_requires_variable_length_onion(const struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InitFeatures_set_static_remote_key_optional(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InitFeatures_set_static_remote_key_required(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InitFeatures_supports_static_remote_key(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void NodeFeatures_set_static_remote_key_optional(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void NodeFeatures_set_static_remote_key_required(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool NodeFeatures_supports_static_remote_key(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void ChannelTypeFeatures_set_static_remote_key_optional(struct LDKChannelTypeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void ChannelTypeFeatures_set_static_remote_key_required(struct LDKChannelTypeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool ChannelTypeFeatures_supports_static_remote_key(const struct LDKChannelTypeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InitFeatures_requires_static_remote_key(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool NodeFeatures_requires_static_remote_key(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool ChannelTypeFeatures_requires_static_remote_key(const struct LDKChannelTypeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InitFeatures_set_payment_secret_optional(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InitFeatures_set_payment_secret_required(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InitFeatures_supports_payment_secret(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void NodeFeatures_set_payment_secret_optional(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void NodeFeatures_set_payment_secret_required(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool NodeFeatures_supports_payment_secret(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InvoiceFeatures_set_payment_secret_optional(struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InvoiceFeatures_set_payment_secret_required(struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InvoiceFeatures_supports_payment_secret(const struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InitFeatures_requires_payment_secret(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool NodeFeatures_requires_payment_secret(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InvoiceFeatures_requires_payment_secret(const struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InitFeatures_set_basic_mpp_optional(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InitFeatures_set_basic_mpp_required(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InitFeatures_supports_basic_mpp(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void NodeFeatures_set_basic_mpp_optional(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void NodeFeatures_set_basic_mpp_required(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool NodeFeatures_supports_basic_mpp(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InvoiceFeatures_set_basic_mpp_optional(struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InvoiceFeatures_set_basic_mpp_required(struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InvoiceFeatures_supports_basic_mpp(const struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InitFeatures_requires_basic_mpp(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool NodeFeatures_requires_basic_mpp(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InvoiceFeatures_requires_basic_mpp(const struct LDKInvoiceFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InitFeatures_set_shutdown_any_segwit_optional(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InitFeatures_set_shutdown_any_segwit_required(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InitFeatures_supports_shutdown_anysegwit(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void NodeFeatures_set_shutdown_any_segwit_optional(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void NodeFeatures_set_shutdown_any_segwit_required(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool NodeFeatures_supports_shutdown_anysegwit(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InitFeatures_requires_shutdown_anysegwit(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool NodeFeatures_requires_shutdown_anysegwit(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InitFeatures_set_channel_type_optional(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InitFeatures_set_channel_type_required(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InitFeatures_supports_channel_type(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void NodeFeatures_set_channel_type_optional(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void NodeFeatures_set_channel_type_required(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool NodeFeatures_supports_channel_type(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InitFeatures_requires_channel_type(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool NodeFeatures_requires_channel_type(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void InitFeatures_set_scid_privacy_optional(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void InitFeatures_set_scid_privacy_required(struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool InitFeatures_supports_scid_privacy(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void NodeFeatures_set_scid_privacy_optional(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void NodeFeatures_set_scid_privacy_required(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool NodeFeatures_supports_scid_privacy(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void ChannelTypeFeatures_set_scid_privacy_optional(struct LDKChannelTypeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void ChannelTypeFeatures_set_scid_privacy_required(struct LDKChannelTypeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool ChannelTypeFeatures_supports_scid_privacy(const struct LDKChannelTypeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool InitFeatures_requires_scid_privacy(const struct LDKInitFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool NodeFeatures_requires_scid_privacy(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool ChannelTypeFeatures_requires_scid_privacy(const struct LDKChannelTypeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as optional.
+ */
+void NodeFeatures_set_keysend_optional(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Set this feature as required.
+ */
+void NodeFeatures_set_keysend_required(struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is supported.
+ */
+MUST_USE_RES bool NodeFeatures_supports_keysend(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
+ * Checks if this feature is required.
+ */
+MUST_USE_RES bool NodeFeatures_requires_keysend(const struct LDKNodeFeatures *NONNULL_PTR this_arg);
+
+/**
  * Frees any resources used by the ShutdownScript, if is_owned is set and inner is non-NULL.
  */
 void ShutdownScript_free(struct LDKShutdownScript this_obj);

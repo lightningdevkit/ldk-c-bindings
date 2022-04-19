@@ -142,14 +142,14 @@ pub extern "C" fn OutPoint_hash(o: &OutPoint) -> u64 {
 /// Convert an `OutPoint` to a lightning channel id.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn OutPoint_to_channel_id(this_arg: &OutPoint) -> crate::c_types::ThirtyTwoBytes {
+pub extern "C" fn OutPoint_to_channel_id(this_arg: &crate::lightning::chain::transaction::OutPoint) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.to_channel_id();
 	crate::c_types::ThirtyTwoBytes { data: ret }
 }
 
 #[no_mangle]
 /// Serialize the OutPoint object into a byte array which can be read by OutPoint_read
-pub extern "C" fn OutPoint_write(obj: &OutPoint) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn OutPoint_write(obj: &crate::lightning::chain::transaction::OutPoint) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]

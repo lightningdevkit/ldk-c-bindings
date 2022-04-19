@@ -255,9 +255,9 @@ impl MultiThreadedLockableScore {
 /// Creates a new [`MultiThreadedLockableScore`] given an underlying [`Score`].
 #[must_use]
 #[no_mangle]
-pub extern "C" fn MultiThreadedLockableScore_new(mut score: crate::lightning::routing::scoring::Score) -> MultiThreadedLockableScore {
+pub extern "C" fn MultiThreadedLockableScore_new(mut score: crate::lightning::routing::scoring::Score) -> crate::lightning::routing::scoring::MultiThreadedLockableScore {
 	let mut ret = lightning::routing::scoring::MultiThreadedLockableScore::new(score);
-	MultiThreadedLockableScore { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::routing::scoring::MultiThreadedLockableScore { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 
@@ -333,9 +333,9 @@ pub extern "C" fn FixedPenaltyScorer_clone(orig: &FixedPenaltyScorer) -> FixedPe
 /// Creates a new scorer using `penalty_msat`.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn FixedPenaltyScorer_with_penalty(mut penalty_msat: u64) -> FixedPenaltyScorer {
+pub extern "C" fn FixedPenaltyScorer_with_penalty(mut penalty_msat: u64) -> crate::lightning::routing::scoring::FixedPenaltyScorer {
 	let mut ret = lightning::routing::scoring::FixedPenaltyScorer::with_penalty(penalty_msat);
-	FixedPenaltyScorer { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::routing::scoring::FixedPenaltyScorer { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 impl From<nativeFixedPenaltyScorer> for crate::lightning::routing::scoring::Score {
@@ -378,7 +378,7 @@ extern "C" fn FixedPenaltyScorer_Score_payment_path_successful(this_arg: *mut c_
 
 #[no_mangle]
 /// Serialize the FixedPenaltyScorer object into a byte array which can be read by FixedPenaltyScorer_read
-pub extern "C" fn FixedPenaltyScorer_write(obj: &FixedPenaltyScorer) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn FixedPenaltyScorer_write(obj: &crate::lightning::routing::scoring::FixedPenaltyScorer) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -659,7 +659,7 @@ pub extern "C" fn ScoringParameters_clone(orig: &ScoringParameters) -> ScoringPa
 }
 #[no_mangle]
 /// Serialize the ScoringParameters object into a byte array which can be read by ScoringParameters_read
-pub extern "C" fn ScoringParameters_write(obj: &ScoringParameters) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ScoringParameters_write(obj: &crate::lightning::routing::scoring::ScoringParameters) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -676,9 +676,9 @@ pub extern "C" fn ScoringParameters_read(ser: crate::c_types::u8slice) -> crate:
 /// Creates a new scorer using the given scoring parameters.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Scorer_new(mut params: crate::lightning::routing::scoring::ScoringParameters) -> Scorer {
+pub extern "C" fn Scorer_new(mut params: crate::lightning::routing::scoring::ScoringParameters) -> crate::lightning::routing::scoring::Scorer {
 	let mut ret = lightning::routing::scoring::Scorer::new(*unsafe { Box::from_raw(params.take_inner()) });
-	Scorer { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::routing::scoring::Scorer { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a "default" Scorer. See struct and individual field documentaiton for details on which values are used.
@@ -733,7 +733,7 @@ extern "C" fn Scorer_Score_payment_path_successful(this_arg: *mut c_void, mut pa
 
 #[no_mangle]
 /// Serialize the Scorer object into a byte array which can be read by Scorer_read
-pub extern "C" fn Scorer_write(obj: &Scorer) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn Scorer_write(obj: &crate::lightning::routing::scoring::Scorer) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -1035,9 +1035,9 @@ pub extern "C" fn ProbabilisticScoringParameters_clone(orig: &ProbabilisticScori
 /// through a network graph.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ProbabilisticScorer_new(mut params: crate::lightning::routing::scoring::ProbabilisticScoringParameters, network_graph: &crate::lightning::routing::network_graph::NetworkGraph) -> ProbabilisticScorer {
+pub extern "C" fn ProbabilisticScorer_new(mut params: crate::lightning::routing::scoring::ProbabilisticScoringParameters, network_graph: &crate::lightning::routing::network_graph::NetworkGraph) -> crate::lightning::routing::scoring::ProbabilisticScorer {
 	let mut ret = lightning::routing::scoring::ProbabilisticScorer::new(*unsafe { Box::from_raw(params.take_inner()) }, network_graph.get_native_ref());
-	ProbabilisticScorer { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::routing::scoring::ProbabilisticScorer { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a "default" ProbabilisticScoringParameters. See struct and individual field documentaiton for details on which values are used.
@@ -1097,7 +1097,7 @@ use alloc::{vec::Vec, boxed::Box};
 }
 #[no_mangle]
 /// Serialize the ProbabilisticScorer object into a byte array which can be read by ProbabilisticScorer_read
-pub extern "C" fn ProbabilisticScorer_write(obj: &ProbabilisticScorer) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ProbabilisticScorer_write(obj: &crate::lightning::routing::scoring::ProbabilisticScorer) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]

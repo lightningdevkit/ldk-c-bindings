@@ -188,9 +188,9 @@ impl DefaultRouter {
 /// `random_seed_bytes`.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn DefaultRouter_new(network_graph: &crate::lightning::routing::network_graph::NetworkGraph, mut logger: crate::lightning::util::logger::Logger, mut random_seed_bytes: crate::c_types::ThirtyTwoBytes) -> DefaultRouter {
+pub extern "C" fn DefaultRouter_new(network_graph: &crate::lightning::routing::network_graph::NetworkGraph, mut logger: crate::lightning::util::logger::Logger, mut random_seed_bytes: crate::c_types::ThirtyTwoBytes) -> crate::lightning_invoice::utils::DefaultRouter {
 	let mut ret = lightning_invoice::utils::DefaultRouter::new(network_graph.get_native_ref(), logger, random_seed_bytes.data);
-	DefaultRouter { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning_invoice::utils::DefaultRouter { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 impl From<nativeDefaultRouter> for crate::lightning_invoice::payment::Router {

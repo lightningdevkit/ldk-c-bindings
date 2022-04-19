@@ -196,10 +196,10 @@ impl Drop for Persister {
 /// Note that net_graph_msg_handler (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning_background_processor::Persister, mut event_handler: crate::lightning::util::events::EventHandler, chain_monitor: &crate::lightning::chain::chainmonitor::ChainMonitor, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager, mut net_graph_msg_handler: crate::lightning::routing::network_graph::NetGraphMsgHandler, peer_manager: &crate::lightning::ln::peer_handler::PeerManager, mut logger: crate::lightning::util::logger::Logger) -> BackgroundProcessor {
+pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning_background_processor::Persister, mut event_handler: crate::lightning::util::events::EventHandler, chain_monitor: &crate::lightning::chain::chainmonitor::ChainMonitor, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager, mut net_graph_msg_handler: crate::lightning::routing::network_graph::NetGraphMsgHandler, peer_manager: &crate::lightning::ln::peer_handler::PeerManager, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning_background_processor::BackgroundProcessor {
 	let mut local_net_graph_msg_handler = if net_graph_msg_handler.inner.is_null() { None } else { Some( { net_graph_msg_handler.get_native_ref() }) };
 	let mut ret = lightning_background_processor::BackgroundProcessor::start(persister, event_handler, chain_monitor.get_native_ref(), channel_manager.get_native_ref(), local_net_graph_msg_handler, peer_manager.get_native_ref(), logger);
-	BackgroundProcessor { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning_background_processor::BackgroundProcessor { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Join `BackgroundProcessor`'s thread, returning any error that occurred while persisting
@@ -213,7 +213,7 @@ pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning_back
 /// [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BackgroundProcessor_join(mut this_arg: BackgroundProcessor) -> crate::c_types::derived::CResult_NoneErrorZ {
+pub extern "C" fn BackgroundProcessor_join(mut this_arg: crate::lightning_background_processor::BackgroundProcessor) -> crate::c_types::derived::CResult_NoneErrorZ {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).join();
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
 	local_ret
@@ -230,7 +230,7 @@ pub extern "C" fn BackgroundProcessor_join(mut this_arg: BackgroundProcessor) ->
 /// [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BackgroundProcessor_stop(mut this_arg: BackgroundProcessor) -> crate::c_types::derived::CResult_NoneErrorZ {
+pub extern "C" fn BackgroundProcessor_stop(mut this_arg: crate::lightning_background_processor::BackgroundProcessor) -> crate::c_types::derived::CResult_NoneErrorZ {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).stop();
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
 	local_ret

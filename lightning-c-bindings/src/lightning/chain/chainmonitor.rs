@@ -368,10 +368,10 @@ impl ChainMonitor {
 /// transactions relevant to the watched channels.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChainMonitor_new(mut chain_source: crate::c_types::derived::COption_FilterZ, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut logger: crate::lightning::util::logger::Logger, mut feeest: crate::lightning::chain::chaininterface::FeeEstimator, mut persister: crate::lightning::chain::chainmonitor::Persist) -> ChainMonitor {
+pub extern "C" fn ChainMonitor_new(mut chain_source: crate::c_types::derived::COption_FilterZ, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut logger: crate::lightning::util::logger::Logger, mut feeest: crate::lightning::chain::chaininterface::FeeEstimator, mut persister: crate::lightning::chain::chainmonitor::Persist) -> crate::lightning::chain::chainmonitor::ChainMonitor {
 	let mut local_chain_source = { /* chain_source*/ let chain_source_opt = chain_source; { } if chain_source_opt.is_none() { None } else { Some({ chain_source_opt.take() }) } };
 	let mut ret = lightning::chain::chainmonitor::ChainMonitor::new(local_chain_source, broadcaster, logger, feeest, persister);
-	ChainMonitor { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::chain::chainmonitor::ChainMonitor { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Gets the balances in the contained [`ChannelMonitor`]s which are claimable on-chain or
@@ -385,7 +385,7 @@ pub extern "C" fn ChainMonitor_new(mut chain_source: crate::c_types::derived::CO
 /// inclusion in the return value.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChainMonitor_get_claimable_balances(this_arg: &ChainMonitor, mut ignored_channels: crate::c_types::derived::CVec_ChannelDetailsZ) -> crate::c_types::derived::CVec_BalanceZ {
+pub extern "C" fn ChainMonitor_get_claimable_balances(this_arg: &crate::lightning::chain::chainmonitor::ChainMonitor, mut ignored_channels: crate::c_types::derived::CVec_ChannelDetailsZ) -> crate::c_types::derived::CVec_BalanceZ {
 	let mut local_ignored_channels = Vec::new(); for mut item in ignored_channels.as_slice().iter() { local_ignored_channels.push( { item.get_native_ref() }); };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_claimable_balances(&local_ignored_channels[..]);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::chain::channelmonitor::Balance::native_into(item) }); };
@@ -399,7 +399,7 @@ pub extern "C" fn ChainMonitor_get_claimable_balances(this_arg: &ChainMonitor, m
 /// indefinitely.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChainMonitor_get_monitor(this_arg: &ChainMonitor, mut funding_txo: crate::lightning::chain::transaction::OutPoint) -> crate::c_types::derived::CResult_LockedChannelMonitorNoneZ {
+pub extern "C" fn ChainMonitor_get_monitor(this_arg: &crate::lightning::chain::chainmonitor::ChainMonitor, mut funding_txo: crate::lightning::chain::transaction::OutPoint) -> crate::c_types::derived::CResult_LockedChannelMonitorNoneZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_monitor(*unsafe { Box::from_raw(funding_txo.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::chainmonitor::LockedChannelMonitor { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
@@ -411,7 +411,7 @@ pub extern "C" fn ChainMonitor_get_monitor(this_arg: &ChainMonitor, mut funding_
 /// monitoring for on-chain state resolutions.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChainMonitor_list_monitors(this_arg: &ChainMonitor) -> crate::c_types::derived::CVec_OutPointZ {
+pub extern "C" fn ChainMonitor_list_monitors(this_arg: &crate::lightning::chain::chainmonitor::ChainMonitor) -> crate::c_types::derived::CVec_OutPointZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.list_monitors();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
 	local_ret.into()
@@ -432,7 +432,7 @@ pub extern "C" fn ChainMonitor_list_monitors(this_arg: &ChainMonitor) -> crate::
 /// registered [`ChannelMonitor`]s.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChainMonitor_channel_monitor_updated(this_arg: &ChainMonitor, mut funding_txo: crate::lightning::chain::transaction::OutPoint, mut completed_update_id: crate::lightning::chain::chainmonitor::MonitorUpdateId) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
+pub extern "C" fn ChainMonitor_channel_monitor_updated(this_arg: &crate::lightning::chain::chainmonitor::ChainMonitor, mut funding_txo: crate::lightning::chain::transaction::OutPoint, mut completed_update_id: crate::lightning::chain::chainmonitor::MonitorUpdateId) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel_monitor_updated(*unsafe { Box::from_raw(funding_txo.take_inner()) }, *unsafe { Box::from_raw(completed_update_id.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret

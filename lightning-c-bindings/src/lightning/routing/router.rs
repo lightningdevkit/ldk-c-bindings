@@ -199,7 +199,7 @@ pub extern "C" fn RouteHop_eq(a: &RouteHop, b: &RouteHop) -> bool {
 }
 #[no_mangle]
 /// Serialize the RouteHop object into a byte array which can be read by RouteHop_read
-pub extern "C" fn RouteHop_write(obj: &RouteHop) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn RouteHop_write(obj: &crate::lightning::routing::router::RouteHop) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -368,7 +368,7 @@ pub extern "C" fn Route_eq(a: &Route, b: &Route) -> bool {
 /// the amount passed to [`find_route`]'s `params.final_value_msat`.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Route_get_total_fees(this_arg: &Route) -> u64 {
+pub extern "C" fn Route_get_total_fees(this_arg: &crate::lightning::routing::router::Route) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_total_fees();
 	ret
 }
@@ -376,14 +376,14 @@ pub extern "C" fn Route_get_total_fees(this_arg: &Route) -> u64 {
 /// Returns the total amount paid on this [`Route`], excluding the fees.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Route_get_total_amount(this_arg: &Route) -> u64 {
+pub extern "C" fn Route_get_total_amount(this_arg: &crate::lightning::routing::router::Route) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_total_amount();
 	ret
 }
 
 #[no_mangle]
 /// Serialize the Route object into a byte array which can be read by Route_read
-pub extern "C" fn Route_write(obj: &Route) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn Route_write(obj: &crate::lightning::routing::router::Route) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -517,7 +517,7 @@ pub extern "C" fn RouteParameters_clone(orig: &RouteParameters) -> RouteParamete
 }
 #[no_mangle]
 /// Serialize the RouteParameters object into a byte array which can be read by RouteParameters_read
-pub extern "C" fn RouteParameters_write(obj: &RouteParameters) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn RouteParameters_write(obj: &crate::lightning::routing::router::RouteParameters) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -716,7 +716,7 @@ pub extern "C" fn PaymentParameters_eq(a: &PaymentParameters, b: &PaymentParamet
 }
 #[no_mangle]
 /// Serialize the PaymentParameters object into a byte array which can be read by PaymentParameters_read
-pub extern "C" fn PaymentParameters_write(obj: &PaymentParameters) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn PaymentParameters_write(obj: &crate::lightning::routing::router::PaymentParameters) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -733,17 +733,17 @@ pub extern "C" fn PaymentParameters_read(ser: crate::c_types::u8slice) -> crate:
 /// Creates a payee with the node id of the given `pubkey`.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PaymentParameters_from_node_id(mut payee_pubkey: crate::c_types::PublicKey) -> PaymentParameters {
+pub extern "C" fn PaymentParameters_from_node_id(mut payee_pubkey: crate::c_types::PublicKey) -> crate::lightning::routing::router::PaymentParameters {
 	let mut ret = lightning::routing::router::PaymentParameters::from_node_id(payee_pubkey.into_rust());
-	PaymentParameters { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::routing::router::PaymentParameters { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a payee with the node id of the given `pubkey` to use for keysend payments.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PaymentParameters_for_keysend(mut payee_pubkey: crate::c_types::PublicKey) -> PaymentParameters {
+pub extern "C" fn PaymentParameters_for_keysend(mut payee_pubkey: crate::c_types::PublicKey) -> crate::lightning::routing::router::PaymentParameters {
 	let mut ret = lightning::routing::router::PaymentParameters::for_keysend(payee_pubkey.into_rust());
-	PaymentParameters { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::routing::router::PaymentParameters { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 
@@ -857,7 +857,7 @@ pub extern "C" fn RouteHint_eq(a: &RouteHint, b: &RouteHint) -> bool {
 }
 #[no_mangle]
 /// Serialize the RouteHint object into a byte array which can be read by RouteHint_read
-pub extern "C" fn RouteHint_write(obj: &RouteHint) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn RouteHint_write(obj: &crate::lightning::routing::router::RouteHint) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -1047,7 +1047,7 @@ pub extern "C" fn RouteHintHop_eq(a: &RouteHintHop, b: &RouteHintHop) -> bool {
 }
 #[no_mangle]
 /// Serialize the RouteHintHop object into a byte array which can be read by RouteHintHop_read
-pub extern "C" fn RouteHintHop_write(obj: &RouteHintHop) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn RouteHintHop_write(obj: &crate::lightning::routing::router::RouteHintHop) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]

@@ -336,7 +336,7 @@ pub extern "C" fn ClosureReason_outdated_channel_manager() -> ClosureReason {
 	ClosureReason::OutdatedChannelManager}
 #[no_mangle]
 /// Serialize the ClosureReason object into a byte array which can be read by ClosureReason_read
-pub extern "C" fn ClosureReason_write(obj: &ClosureReason) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ClosureReason_write(obj: &crate::lightning::util::events::ClosureReason) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
 }
 #[no_mangle]
@@ -1260,7 +1260,7 @@ pub extern "C" fn Event_open_channel_request(temporary_channel_id: crate::c_type
 }
 #[no_mangle]
 /// Serialize the Event object into a byte array which can be read by Event_read
-pub extern "C" fn Event_write(obj: &Event) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn Event_write(obj: &crate::lightning::util::events::Event) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
 }
 #[no_mangle]

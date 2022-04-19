@@ -843,7 +843,7 @@ pub extern "C" fn ChannelConfig_default() -> ChannelConfig {
 }
 #[no_mangle]
 /// Serialize the ChannelConfig object into a byte array which can be read by ChannelConfig_read
-pub extern "C" fn ChannelConfig_write(obj: &ChannelConfig) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ChannelConfig_write(obj: &crate::lightning::util::config::ChannelConfig) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]

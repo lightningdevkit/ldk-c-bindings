@@ -43,6 +43,14 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 ";
 
+
+/// str.rsplit_once but with an older MSRV
+fn rsplit_once<'a>(inp: &'a str, pattern: &str) -> Option<(&'a str, &'a str)> {
+	let mut iter = inp.rsplitn(2, pattern);
+	let second_entry = iter.next().unwrap();
+	Some((iter.next().unwrap(), second_entry))
+}
+
 // *************************************
 // *** Manually-expanded conversions ***
 // *************************************
@@ -54,11 +62,10 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 		let full_obj_path;
 		let mut has_inner = false;
 		if let syn::Type::Path(ref p) = for_ty {
-			if let Some(ident) = single_ident_generic_path_to_ident(&p.path) {
-				for_obj = format!("{}", ident);
-				full_obj_path = for_obj.clone();
-				has_inner = types.c_type_has_inner_from_path(&types.resolve_path(&p.path, Some(generics)));
-			} else { return; }
+			let resolved_path = types.resolve_path(&p.path, Some(generics));
+			for_obj = format!("{}", p.path.segments.last().unwrap().ident);
+			full_obj_path = format!("crate::{}", resolved_path);
+			has_inner = types.c_type_has_inner_from_path(&resolved_path);
 		} else {
 			// We assume that anything that isn't a Path is somehow a generic that ends up in our
 			// derived-types module.
@@ -872,8 +879,12 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 	}
 	if let &syn::Type::Path(ref p) = &*i.self_ty {
 		if p.qself.is_some() { unimplemented!(); }
-		if let Some(ident) = single_ident_generic_path_to_ident(&p.path) {
-			if let Some(resolved_path) = types.maybe_resolve_non_ignored_ident(&ident) {
+		let ident = &p.path.segments.last().unwrap().ident;
+		if let Some(resolved_path) = types.maybe_resolve_path(&p.path, None) {
+			if types.crate_types.opaques.contains_key(&resolved_path) || types.crate_types.mirrored_enums.contains_key(&resolved_path) ||
+				// At least for core::infallible::Infallible we need to support mapping an
+				// out-of-crate trait implementation.
+				(types.understood_c_path(&p.path) && first_seg_is_stdlib(resolved_path.split("::").next().unwrap())) {
 				if !types.understood_c_path(&p.path) {
 					eprintln!("Not implementing anything for impl {} as the type is not understood (probably C-not exported)", ident);
 					return;
@@ -1300,7 +1311,8 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						maybe_convert_trait_impl(w, &trait_path.1, &*i.self_ty, types, &gen_types);
 					}
 				} else {
-					let declared_type = (*types.get_declared_type(&ident).unwrap()).clone();
+					let is_opaque = types.crate_types.opaques.contains_key(&resolved_path);
+					let is_mirrored_enum = types.crate_types.mirrored_enums.contains_key(&resolved_path);
 					for item in i.items.iter() {
 						match item {
 							syn::ImplItem::Method(m) => {
@@ -1318,11 +1330,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										writeln!(w, "#[must_use]").unwrap();
 									}
 									write!(w, "#[no_mangle]\npub extern \"C\" fn {}_{}(", ident, m.sig.ident).unwrap();
-									let ret_type = match &declared_type {
-										DeclType::MirroredEnum => format!("{}", ident),
-										DeclType::StructImported {..} => format!("{}", ident),
-										_ => unimplemented!(),
-									};
+									let ret_type = format!("crate::{}", resolved_path);
 									write_method_params(w, &m.sig, &ret_type, types, Some(&meth_gen_types), false, true);
 									write!(w, " {{\n\t").unwrap();
 									write_method_var_decl_body(w, &m.sig, "", types, Some(&meth_gen_types), false);
@@ -1339,18 +1347,18 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									if !takes_mut_self && !takes_self {
 										write!(w, "{}::{}(", resolved_path, m.sig.ident).unwrap();
 									} else {
-										match &declared_type {
-											DeclType::MirroredEnum => write!(w, "this_arg.to_native().{}(", m.sig.ident).unwrap(),
-											DeclType::StructImported {..} => {
-												if takes_owned_self {
-													write!(w, "(*unsafe {{ Box::from_raw(this_arg.take_inner()) }}).{}(", m.sig.ident).unwrap();
-												} else if takes_mut_self {
-													write!(w, "unsafe {{ &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut native{})) }}.{}(", ident, m.sig.ident).unwrap();
-												} else {
-													write!(w, "unsafe {{ &*ObjOps::untweak_ptr(this_arg.inner) }}.{}(", m.sig.ident).unwrap();
-												}
-											},
-											_ => unimplemented!(),
+										if is_mirrored_enum {
+											write!(w, "this_arg.to_native().{}(", m.sig.ident).unwrap();
+										} else if is_opaque {
+											if takes_owned_self {
+												write!(w, "(*unsafe {{ Box::from_raw(this_arg.take_inner()) }}).{}(", m.sig.ident).unwrap();
+											} else if takes_mut_self {
+												write!(w, "unsafe {{ &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::{}::native{})) }}.{}(", rsplit_once(&resolved_path, "::").unwrap().0, ident, m.sig.ident).unwrap();
+											} else {
+												write!(w, "unsafe {{ &*ObjOps::untweak_ptr(this_arg.inner) }}.{}(", m.sig.ident).unwrap();
+											}
+										} else {
+											unimplemented!();
 										}
 									}
 									write_method_call_params(w, &m.sig, "", types, Some(&meth_gen_types), &ret_type, false);
@@ -1367,11 +1375,18 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 					if !gen_types.as_mut().unwrap().learn_generics(&i.generics, types) {
 						gen_types = None;
 					}
-					'alias_impls: for (alias, arguments) in aliases {
+					let alias_module = rsplit_once(&resolved_path, "::").unwrap().0;
+
+					'alias_impls: for (alias_resolved, arguments) in aliases {
 						let mut new_ty_generics = Vec::new();
 						let mut need_generics = false;
 
-						let alias_resolved = types.resolve_path(&alias, None);
+						let alias_resolver_override;
+						let alias_resolver = if alias_module != types.module_path {
+							alias_resolver_override = ImportResolver::new(types.types.crate_name, &types.crate_types.lib_ast.dependencies,
+								alias_module, &types.crate_types.lib_ast.modules.get(alias_module).unwrap().items);
+							&alias_resolver_override
+						} else { &types.types };/*.maybe_resolve_path(&alias, None).unwrap();*/
 						for (idx, gen) in i.generics.params.iter().enumerate() {
 							match gen {
 								syn::GenericParam::Type(type_param) => {
@@ -1380,10 +1395,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 											if let syn::PathArguments::AngleBracketed(ref t) = &arguments {
 												assert!(idx < t.args.len());
 												if let syn::GenericArgument::Type(syn::Type::Path(p)) = &t.args[idx] {
-													if let Some(generic_arg) = types.maybe_resolve_path(&p.path, None) {
+													if let Some(generic_arg) = alias_resolver.maybe_resolve_path(&p.path, None) {
 
 														new_ty_generics.push((type_param.ident.clone(), syn::Type::Path(p.clone())));
-														let generic_bound = types.resolve_path(&trait_bound.path, None);
+														let generic_bound = types.maybe_resolve_path(&trait_bound.path, None)
+															.unwrap_or_else(|| format!("{}::{}", types.module_path, single_ident_generic_path_to_ident(&trait_bound.path).unwrap()));
 														if let Some(traits_impld) = types.crate_types.trait_impls.get(&generic_arg) {
 															for trait_impld in traits_impld {
 																if *trait_impld == generic_bound { continue 'bounds_check; }
@@ -1411,6 +1427,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							}
 						}
 						let mut params = syn::punctuated::Punctuated::new();
+						let alias = string_path_to_syn_path(&alias_resolved);
 						let real_aliased =
 							if need_generics {
 								let alias_generics = types.crate_types.opaques.get(&alias_resolved).unwrap().1;
@@ -1776,11 +1793,7 @@ fn convert_priv_mod<'a, 'b: 'a, W: std::io::Write>(w: &mut W, libast: &'b FullLi
 		match item {
 			syn::Item::Mod(m) => convert_priv_mod(w, libast, crate_types, out_dir, &format!("{}::{}", mod_path, module.ident), m),
 			syn::Item::Impl(i) => {
-				if let &syn::Type::Path(ref p) = &*i.self_ty {
-					if p.path.get_ident().is_some() {
-						writeln_impl(w, i, &mut types);
-					}
-				}
+				writeln_impl(w, i, &mut types);
 			},
 			_ => {},
 		}
@@ -2022,17 +2035,14 @@ fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a
 						let type_path = format!("{}::{}", module, t.ident);
 						match &*t.ty {
 							syn::Type::Path(p) => {
-								let t_ident = &t.ident;
-
 								// If its a path with no generics, assume we don't map the aliased type and map it opaque
-								let path_obj = parse_quote!(#t_ident);
 								let args_obj = p.path.segments.last().unwrap().arguments.clone();
 								match crate_types.reverse_alias_map.entry(import_resolver.maybe_resolve_path(&p.path, None).unwrap()) {
-									hash_map::Entry::Occupied(mut e) => { e.get_mut().push((path_obj, args_obj)); },
-									hash_map::Entry::Vacant(e) => { e.insert(vec![(path_obj, args_obj)]); },
+									hash_map::Entry::Occupied(mut e) => { e.get_mut().push((type_path.clone(), args_obj)); },
+									hash_map::Entry::Vacant(e) => { e.insert(vec![(type_path.clone(), args_obj)]); },
 								}
 
-								crate_types.opaques.insert(type_path, (t_ident, &t.generics));
+								crate_types.opaques.insert(type_path, (&t.ident, &t.generics));
 							},
 							_ => {
 								crate_types.type_aliases.insert(type_path, import_resolver.resolve_imported_refs((*t.ty).clone()));

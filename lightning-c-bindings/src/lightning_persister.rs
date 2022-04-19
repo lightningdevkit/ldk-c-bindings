@@ -93,15 +93,15 @@ impl FilesystemPersister {
 /// files.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn FilesystemPersister_new(mut path_to_channel_data: crate::c_types::Str) -> FilesystemPersister {
+pub extern "C" fn FilesystemPersister_new(mut path_to_channel_data: crate::c_types::Str) -> crate::lightning_persister::FilesystemPersister {
 	let mut ret = lightning_persister::FilesystemPersister::new(path_to_channel_data.into_string());
-	FilesystemPersister { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning_persister::FilesystemPersister { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Get the directory which was provided when this persister was initialized.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn FilesystemPersister_get_data_dir(this_arg: &FilesystemPersister) -> crate::c_types::Str {
+pub extern "C" fn FilesystemPersister_get_data_dir(this_arg: &crate::lightning_persister::FilesystemPersister) -> crate::c_types::Str {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_data_dir();
 	ret.into()
 }
@@ -129,7 +129,7 @@ pub extern "C" fn FilesystemPersister_persist_network_graph(mut data_dir: crate:
 /// Read `ChannelMonitor`s from disk.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn FilesystemPersister_read_channelmonitors(this_arg: &FilesystemPersister, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface) -> crate::c_types::derived::CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
+pub extern "C" fn FilesystemPersister_read_channelmonitors(this_arg: &crate::lightning_persister::FilesystemPersister, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface) -> crate::c_types::derived::CResult_CVec_C2Tuple_BlockHashChannelMonitorZZErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.read_channelmonitors(keys_manager);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let (mut orig_ret_0_0_0, mut orig_ret_0_0_1) = item; let mut local_ret_0_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_ret_0_0_1), is_owned: true }).into(); local_ret_0_0 }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
 	local_ret

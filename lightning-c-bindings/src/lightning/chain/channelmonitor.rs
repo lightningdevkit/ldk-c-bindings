@@ -141,7 +141,7 @@ pub extern "C" fn ChannelMonitorUpdate_clone(orig: &ChannelMonitorUpdate) -> Cha
 pub static CLOSED_CHANNEL_UPDATE_ID: u64 = lightning::chain::channelmonitor::CLOSED_CHANNEL_UPDATE_ID;
 #[no_mangle]
 /// Serialize the ChannelMonitorUpdate object into a byte array which can be read by ChannelMonitorUpdate_read
-pub extern "C" fn ChannelMonitorUpdate_write(obj: &ChannelMonitorUpdate) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ChannelMonitorUpdate_write(obj: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -334,7 +334,7 @@ pub extern "C" fn MonitorEvent_update_failed(a: crate::lightning::chain::transac
 }
 #[no_mangle]
 /// Serialize the MonitorEvent object into a byte array which can be read by MonitorEvent_read
-pub extern "C" fn MonitorEvent_write(obj: &MonitorEvent) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn MonitorEvent_write(obj: &crate::lightning::chain::channelmonitor::MonitorEvent) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
 }
 #[no_mangle]
@@ -418,7 +418,7 @@ pub extern "C" fn HTLCUpdate_clone(orig: &HTLCUpdate) -> HTLCUpdate {
 }
 #[no_mangle]
 /// Serialize the HTLCUpdate object into a byte array which can be read by HTLCUpdate_read
-pub extern "C" fn HTLCUpdate_write(obj: &HTLCUpdate) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn HTLCUpdate_write(obj: &crate::lightning::chain::channelmonitor::HTLCUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -737,7 +737,7 @@ impl ChannelMonitor {
 }
 #[no_mangle]
 /// Serialize the ChannelMonitor object into a byte array which can be read by ChannelMonitor_read
-pub extern "C" fn ChannelMonitor_write(obj: &ChannelMonitor) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ChannelMonitor_write(obj: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -750,7 +750,7 @@ pub(crate) extern "C" fn ChannelMonitor_write_void(obj: *const c_void) -> crate:
 /// panics if the given update is not the next update by update_id.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_update_monitor(this_arg: &ChannelMonitor, updates: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, broadcaster: &crate::lightning::chain::chaininterface::BroadcasterInterface, fee_estimator: &crate::lightning::chain::chaininterface::FeeEstimator, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_NoneNoneZ {
+pub extern "C" fn ChannelMonitor_update_monitor(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, updates: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, broadcaster: &crate::lightning::chain::chaininterface::BroadcasterInterface, fee_estimator: &crate::lightning::chain::chaininterface::FeeEstimator, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_NoneNoneZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_monitor(updates.get_native_ref(), broadcaster, fee_estimator, logger);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
@@ -760,7 +760,7 @@ pub extern "C" fn ChannelMonitor_update_monitor(this_arg: &ChannelMonitor, updat
 /// ChannelMonitor.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_get_latest_update_id(this_arg: &ChannelMonitor) -> u64 {
+pub extern "C" fn ChannelMonitor_get_latest_update_id(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_latest_update_id();
 	ret
 }
@@ -768,7 +768,7 @@ pub extern "C" fn ChannelMonitor_get_latest_update_id(this_arg: &ChannelMonitor)
 /// Gets the funding transaction outpoint of the channel this ChannelMonitor is monitoring for.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_get_funding_txo(this_arg: &ChannelMonitor) -> crate::c_types::derived::C2Tuple_OutPointScriptZ {
+pub extern "C" fn ChannelMonitor_get_funding_txo(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::C2Tuple_OutPointScriptZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_funding_txo();
 	let (mut orig_ret_0, mut orig_ret_1) = ret; let mut local_ret = (crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(orig_ret_0), is_owned: true }, orig_ret_1.into_bytes().into()).into();
 	local_ret
@@ -778,7 +778,7 @@ pub extern "C" fn ChannelMonitor_get_funding_txo(this_arg: &ChannelMonitor) -> c
 /// transaction), which we must learn about spends of via block_connected().
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_get_outputs_to_watch(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
+pub extern "C" fn ChannelMonitor_get_outputs_to_watch(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_C2Tuple_TxidCVec_C2Tuple_u32ScriptZZZZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_outputs_to_watch();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, orig_orig_ret_0_1_0_1.into_bytes().into()).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
@@ -788,7 +788,7 @@ pub extern "C" fn ChannelMonitor_get_outputs_to_watch(this_arg: &ChannelMonitor)
 /// calling `chain::Filter::register_output` and `chain::Filter::register_tx` until all outputs
 /// have been registered.
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_load_outputs_to_watch(this_arg: &ChannelMonitor, filter: &crate::lightning::chain::Filter) {
+pub extern "C" fn ChannelMonitor_load_outputs_to_watch(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, filter: &crate::lightning::chain::Filter) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.load_outputs_to_watch(filter)
 }
 
@@ -796,7 +796,7 @@ pub extern "C" fn ChannelMonitor_load_outputs_to_watch(this_arg: &ChannelMonitor
 /// ChannelManager via [`chain::Watch::release_pending_monitor_events`].
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_get_and_clear_pending_monitor_events(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_MonitorEventZ {
+pub extern "C" fn ChannelMonitor_get_and_clear_pending_monitor_events(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_MonitorEventZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_and_clear_pending_monitor_events();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::chain::channelmonitor::MonitorEvent::native_into(item) }); };
 	local_ret.into()
@@ -810,7 +810,7 @@ pub extern "C" fn ChannelMonitor_get_and_clear_pending_monitor_events(this_arg: 
 /// no internal locking in ChannelMonitors.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_get_and_clear_pending_events(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_EventZ {
+pub extern "C" fn ChannelMonitor_get_and_clear_pending_events(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_EventZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_and_clear_pending_events();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::util::events::Event::native_into(item) }); };
 	local_ret.into()
@@ -827,7 +827,7 @@ pub extern "C" fn ChannelMonitor_get_and_clear_pending_events(this_arg: &Channel
 /// In any-case, choice is up to the user.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_get_latest_holder_commitment_txn(this_arg: &ChannelMonitor, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionZ {
+pub extern "C" fn ChannelMonitor_get_latest_holder_commitment_txn(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_latest_holder_commitment_txn(logger);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::Transaction::from_bitcoin(&item) }); };
 	local_ret.into()
@@ -846,7 +846,7 @@ pub extern "C" fn ChannelMonitor_get_latest_holder_commitment_txn(this_arg: &Cha
 /// [`get_outputs_to_watch`]: #method.get_outputs_to_watch
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_block_connected(this_arg: &ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
+pub extern "C" fn ChannelMonitor_block_connected(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
 	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.block_connected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height, broadcaster, fee_estimator, logger);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
@@ -856,7 +856,7 @@ pub extern "C" fn ChannelMonitor_block_connected(this_arg: &ChannelMonitor, head
 /// Determines if the disconnected block contained any transactions of interest and updates
 /// appropriately.
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_block_disconnected(this_arg: &ChannelMonitor, header: *const [u8; 80], mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) {
+pub extern "C" fn ChannelMonitor_block_disconnected(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, header: *const [u8; 80], mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.block_disconnected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, broadcaster, fee_estimator, logger)
 }
 
@@ -869,7 +869,7 @@ pub extern "C" fn ChannelMonitor_block_disconnected(this_arg: &ChannelMonitor, h
 /// [`block_connected`]: Self::block_connected
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_transactions_confirmed(this_arg: &ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
+pub extern "C" fn ChannelMonitor_transactions_confirmed(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
 	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.transactions_confirmed(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height, broadcaster, fee_estimator, logger);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
@@ -883,7 +883,7 @@ pub extern "C" fn ChannelMonitor_transactions_confirmed(this_arg: &ChannelMonito
 ///
 /// [`block_disconnected`]: Self::block_disconnected
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_transaction_unconfirmed(this_arg: &ChannelMonitor, txid: *const [u8; 32], mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) {
+pub extern "C" fn ChannelMonitor_transaction_unconfirmed(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, txid: *const [u8; 32], mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.transaction_unconfirmed(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*txid }[..]).unwrap(), broadcaster, fee_estimator, logger)
 }
 
@@ -896,7 +896,7 @@ pub extern "C" fn ChannelMonitor_transaction_unconfirmed(this_arg: &ChannelMonit
 /// [`block_connected`]: Self::block_connected
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_best_block_updated(this_arg: &ChannelMonitor, header: *const [u8; 80], mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
+pub extern "C" fn ChannelMonitor_best_block_updated(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, header: *const [u8; 80], mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.best_block_updated(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, broadcaster, fee_estimator, logger);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
@@ -905,7 +905,7 @@ pub extern "C" fn ChannelMonitor_best_block_updated(this_arg: &ChannelMonitor, h
 /// Returns the set of txids that should be monitored for re-organization out of the chain.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_TxidZ {
+pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_TxidZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_relevant_txids();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.into_inner() } }); };
 	local_ret.into()
@@ -915,7 +915,7 @@ pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &ChannelMonitor) -
 /// [`chain::Confirm`] interfaces.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_current_best_block(this_arg: &ChannelMonitor) -> crate::lightning::chain::BestBlock {
+pub extern "C" fn ChannelMonitor_current_best_block(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::lightning::chain::BestBlock {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.current_best_block();
 	crate::lightning::chain::BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
@@ -936,7 +936,7 @@ pub extern "C" fn ChannelMonitor_current_best_block(this_arg: &ChannelMonitor) -
 /// may be returned here and their meanings.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_get_claimable_balances(this_arg: &ChannelMonitor) -> crate::c_types::derived::CVec_BalanceZ {
+pub extern "C" fn ChannelMonitor_get_claimable_balances(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_BalanceZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_claimable_balances();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::chain::channelmonitor::Balance::native_into(item) }); };
 	local_ret.into()

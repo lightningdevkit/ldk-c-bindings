@@ -3165,7 +3165,7 @@ pub extern "C" fn NetAddress_onion_v3(ed25519_pubkey: crate::c_types::ThirtyTwoB
 }
 #[no_mangle]
 /// Serialize the NetAddress object into a byte array which can be read by NetAddress_read
-pub extern "C" fn NetAddress_write(obj: &NetAddress) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn NetAddress_write(obj: &crate::lightning::ln::msgs::NetAddress) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
 }
 #[no_mangle]
@@ -5382,7 +5382,7 @@ use alloc::{vec::Vec, boxed::Box};
 }
 #[no_mangle]
 /// Serialize the AcceptChannel object into a byte array which can be read by AcceptChannel_read
-pub extern "C" fn AcceptChannel_write(obj: &AcceptChannel) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn AcceptChannel_write(obj: &crate::lightning::ln::msgs::AcceptChannel) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5398,7 +5398,7 @@ pub extern "C" fn AcceptChannel_read(ser: crate::c_types::u8slice) -> crate::c_t
 }
 #[no_mangle]
 /// Serialize the AnnouncementSignatures object into a byte array which can be read by AnnouncementSignatures_read
-pub extern "C" fn AnnouncementSignatures_write(obj: &AnnouncementSignatures) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn AnnouncementSignatures_write(obj: &crate::lightning::ln::msgs::AnnouncementSignatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5414,7 +5414,7 @@ pub extern "C" fn AnnouncementSignatures_read(ser: crate::c_types::u8slice) -> c
 }
 #[no_mangle]
 /// Serialize the ChannelReestablish object into a byte array which can be read by ChannelReestablish_read
-pub extern "C" fn ChannelReestablish_write(obj: &ChannelReestablish) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ChannelReestablish_write(obj: &crate::lightning::ln::msgs::ChannelReestablish) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5430,7 +5430,7 @@ pub extern "C" fn ChannelReestablish_read(ser: crate::c_types::u8slice) -> crate
 }
 #[no_mangle]
 /// Serialize the ClosingSigned object into a byte array which can be read by ClosingSigned_read
-pub extern "C" fn ClosingSigned_write(obj: &ClosingSigned) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ClosingSigned_write(obj: &crate::lightning::ln::msgs::ClosingSigned) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5446,7 +5446,7 @@ pub extern "C" fn ClosingSigned_read(ser: crate::c_types::u8slice) -> crate::c_t
 }
 #[no_mangle]
 /// Serialize the ClosingSignedFeeRange object into a byte array which can be read by ClosingSignedFeeRange_read
-pub extern "C" fn ClosingSignedFeeRange_write(obj: &ClosingSignedFeeRange) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ClosingSignedFeeRange_write(obj: &crate::lightning::ln::msgs::ClosingSignedFeeRange) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5462,7 +5462,7 @@ pub extern "C" fn ClosingSignedFeeRange_read(ser: crate::c_types::u8slice) -> cr
 }
 #[no_mangle]
 /// Serialize the CommitmentSigned object into a byte array which can be read by CommitmentSigned_read
-pub extern "C" fn CommitmentSigned_write(obj: &CommitmentSigned) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn CommitmentSigned_write(obj: &crate::lightning::ln::msgs::CommitmentSigned) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5478,7 +5478,7 @@ pub extern "C" fn CommitmentSigned_read(ser: crate::c_types::u8slice) -> crate::
 }
 #[no_mangle]
 /// Serialize the FundingCreated object into a byte array which can be read by FundingCreated_read
-pub extern "C" fn FundingCreated_write(obj: &FundingCreated) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn FundingCreated_write(obj: &crate::lightning::ln::msgs::FundingCreated) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5494,7 +5494,7 @@ pub extern "C" fn FundingCreated_read(ser: crate::c_types::u8slice) -> crate::c_
 }
 #[no_mangle]
 /// Serialize the FundingSigned object into a byte array which can be read by FundingSigned_read
-pub extern "C" fn FundingSigned_write(obj: &FundingSigned) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn FundingSigned_write(obj: &crate::lightning::ln::msgs::FundingSigned) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5510,7 +5510,7 @@ pub extern "C" fn FundingSigned_read(ser: crate::c_types::u8slice) -> crate::c_t
 }
 #[no_mangle]
 /// Serialize the FundingLocked object into a byte array which can be read by FundingLocked_read
-pub extern "C" fn FundingLocked_write(obj: &FundingLocked) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn FundingLocked_write(obj: &crate::lightning::ln::msgs::FundingLocked) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5526,7 +5526,7 @@ pub extern "C" fn FundingLocked_read(ser: crate::c_types::u8slice) -> crate::c_t
 }
 #[no_mangle]
 /// Serialize the Init object into a byte array which can be read by Init_read
-pub extern "C" fn Init_write(obj: &Init) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn Init_write(obj: &crate::lightning::ln::msgs::Init) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5542,7 +5542,7 @@ pub extern "C" fn Init_read(ser: crate::c_types::u8slice) -> crate::c_types::der
 }
 #[no_mangle]
 /// Serialize the OpenChannel object into a byte array which can be read by OpenChannel_read
-pub extern "C" fn OpenChannel_write(obj: &OpenChannel) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn OpenChannel_write(obj: &crate::lightning::ln::msgs::OpenChannel) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5558,7 +5558,7 @@ pub extern "C" fn OpenChannel_read(ser: crate::c_types::u8slice) -> crate::c_typ
 }
 #[no_mangle]
 /// Serialize the RevokeAndACK object into a byte array which can be read by RevokeAndACK_read
-pub extern "C" fn RevokeAndACK_write(obj: &RevokeAndACK) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn RevokeAndACK_write(obj: &crate::lightning::ln::msgs::RevokeAndACK) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5574,7 +5574,7 @@ pub extern "C" fn RevokeAndACK_read(ser: crate::c_types::u8slice) -> crate::c_ty
 }
 #[no_mangle]
 /// Serialize the Shutdown object into a byte array which can be read by Shutdown_read
-pub extern "C" fn Shutdown_write(obj: &Shutdown) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn Shutdown_write(obj: &crate::lightning::ln::msgs::Shutdown) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5590,7 +5590,7 @@ pub extern "C" fn Shutdown_read(ser: crate::c_types::u8slice) -> crate::c_types:
 }
 #[no_mangle]
 /// Serialize the UpdateFailHTLC object into a byte array which can be read by UpdateFailHTLC_read
-pub extern "C" fn UpdateFailHTLC_write(obj: &UpdateFailHTLC) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn UpdateFailHTLC_write(obj: &crate::lightning::ln::msgs::UpdateFailHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5606,7 +5606,7 @@ pub extern "C" fn UpdateFailHTLC_read(ser: crate::c_types::u8slice) -> crate::c_
 }
 #[no_mangle]
 /// Serialize the UpdateFailMalformedHTLC object into a byte array which can be read by UpdateFailMalformedHTLC_read
-pub extern "C" fn UpdateFailMalformedHTLC_write(obj: &UpdateFailMalformedHTLC) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn UpdateFailMalformedHTLC_write(obj: &crate::lightning::ln::msgs::UpdateFailMalformedHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5622,7 +5622,7 @@ pub extern "C" fn UpdateFailMalformedHTLC_read(ser: crate::c_types::u8slice) -> 
 }
 #[no_mangle]
 /// Serialize the UpdateFee object into a byte array which can be read by UpdateFee_read
-pub extern "C" fn UpdateFee_write(obj: &UpdateFee) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn UpdateFee_write(obj: &crate::lightning::ln::msgs::UpdateFee) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5638,7 +5638,7 @@ pub extern "C" fn UpdateFee_read(ser: crate::c_types::u8slice) -> crate::c_types
 }
 #[no_mangle]
 /// Serialize the UpdateFulfillHTLC object into a byte array which can be read by UpdateFulfillHTLC_read
-pub extern "C" fn UpdateFulfillHTLC_write(obj: &UpdateFulfillHTLC) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn UpdateFulfillHTLC_write(obj: &crate::lightning::ln::msgs::UpdateFulfillHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5654,7 +5654,7 @@ pub extern "C" fn UpdateFulfillHTLC_read(ser: crate::c_types::u8slice) -> crate:
 }
 #[no_mangle]
 /// Serialize the UpdateAddHTLC object into a byte array which can be read by UpdateAddHTLC_read
-pub extern "C" fn UpdateAddHTLC_write(obj: &UpdateAddHTLC) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn UpdateAddHTLC_write(obj: &crate::lightning::ln::msgs::UpdateAddHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5670,7 +5670,7 @@ pub extern "C" fn UpdateAddHTLC_read(ser: crate::c_types::u8slice) -> crate::c_t
 }
 #[no_mangle]
 /// Serialize the Ping object into a byte array which can be read by Ping_read
-pub extern "C" fn Ping_write(obj: &Ping) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn Ping_write(obj: &crate::lightning::ln::msgs::Ping) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5686,7 +5686,7 @@ pub extern "C" fn Ping_read(ser: crate::c_types::u8slice) -> crate::c_types::der
 }
 #[no_mangle]
 /// Serialize the Pong object into a byte array which can be read by Pong_read
-pub extern "C" fn Pong_write(obj: &Pong) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn Pong_write(obj: &crate::lightning::ln::msgs::Pong) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5702,7 +5702,7 @@ pub extern "C" fn Pong_read(ser: crate::c_types::u8slice) -> crate::c_types::der
 }
 #[no_mangle]
 /// Serialize the UnsignedChannelAnnouncement object into a byte array which can be read by UnsignedChannelAnnouncement_read
-pub extern "C" fn UnsignedChannelAnnouncement_write(obj: &UnsignedChannelAnnouncement) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn UnsignedChannelAnnouncement_write(obj: &crate::lightning::ln::msgs::UnsignedChannelAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5718,7 +5718,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_read(ser: crate::c_types::u8slice)
 }
 #[no_mangle]
 /// Serialize the ChannelAnnouncement object into a byte array which can be read by ChannelAnnouncement_read
-pub extern "C" fn ChannelAnnouncement_write(obj: &ChannelAnnouncement) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ChannelAnnouncement_write(obj: &crate::lightning::ln::msgs::ChannelAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5734,7 +5734,7 @@ pub extern "C" fn ChannelAnnouncement_read(ser: crate::c_types::u8slice) -> crat
 }
 #[no_mangle]
 /// Serialize the UnsignedChannelUpdate object into a byte array which can be read by UnsignedChannelUpdate_read
-pub extern "C" fn UnsignedChannelUpdate_write(obj: &UnsignedChannelUpdate) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn UnsignedChannelUpdate_write(obj: &crate::lightning::ln::msgs::UnsignedChannelUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5750,7 +5750,7 @@ pub extern "C" fn UnsignedChannelUpdate_read(ser: crate::c_types::u8slice) -> cr
 }
 #[no_mangle]
 /// Serialize the ChannelUpdate object into a byte array which can be read by ChannelUpdate_read
-pub extern "C" fn ChannelUpdate_write(obj: &ChannelUpdate) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ChannelUpdate_write(obj: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5766,7 +5766,7 @@ pub extern "C" fn ChannelUpdate_read(ser: crate::c_types::u8slice) -> crate::c_t
 }
 #[no_mangle]
 /// Serialize the ErrorMessage object into a byte array which can be read by ErrorMessage_read
-pub extern "C" fn ErrorMessage_write(obj: &ErrorMessage) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ErrorMessage_write(obj: &crate::lightning::ln::msgs::ErrorMessage) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5782,7 +5782,7 @@ pub extern "C" fn ErrorMessage_read(ser: crate::c_types::u8slice) -> crate::c_ty
 }
 #[no_mangle]
 /// Serialize the WarningMessage object into a byte array which can be read by WarningMessage_read
-pub extern "C" fn WarningMessage_write(obj: &WarningMessage) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn WarningMessage_write(obj: &crate::lightning::ln::msgs::WarningMessage) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5798,7 +5798,7 @@ pub extern "C" fn WarningMessage_read(ser: crate::c_types::u8slice) -> crate::c_
 }
 #[no_mangle]
 /// Serialize the UnsignedNodeAnnouncement object into a byte array which can be read by UnsignedNodeAnnouncement_read
-pub extern "C" fn UnsignedNodeAnnouncement_write(obj: &UnsignedNodeAnnouncement) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn UnsignedNodeAnnouncement_write(obj: &crate::lightning::ln::msgs::UnsignedNodeAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5814,7 +5814,7 @@ pub extern "C" fn UnsignedNodeAnnouncement_read(ser: crate::c_types::u8slice) ->
 }
 #[no_mangle]
 /// Serialize the NodeAnnouncement object into a byte array which can be read by NodeAnnouncement_read
-pub extern "C" fn NodeAnnouncement_write(obj: &NodeAnnouncement) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn NodeAnnouncement_write(obj: &crate::lightning::ln::msgs::NodeAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5837,7 +5837,7 @@ pub extern "C" fn QueryShortChannelIds_read(ser: crate::c_types::u8slice) -> cra
 }
 #[no_mangle]
 /// Serialize the QueryShortChannelIds object into a byte array which can be read by QueryShortChannelIds_read
-pub extern "C" fn QueryShortChannelIds_write(obj: &QueryShortChannelIds) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn QueryShortChannelIds_write(obj: &crate::lightning::ln::msgs::QueryShortChannelIds) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5846,7 +5846,7 @@ pub(crate) extern "C" fn QueryShortChannelIds_write_void(obj: *const c_void) -> 
 }
 #[no_mangle]
 /// Serialize the ReplyShortChannelIdsEnd object into a byte array which can be read by ReplyShortChannelIdsEnd_read
-pub extern "C" fn ReplyShortChannelIdsEnd_write(obj: &ReplyShortChannelIdsEnd) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ReplyShortChannelIdsEnd_write(obj: &crate::lightning::ln::msgs::ReplyShortChannelIdsEnd) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5863,14 +5863,14 @@ pub extern "C" fn ReplyShortChannelIdsEnd_read(ser: crate::c_types::u8slice) -> 
 ///\n\t * Calculates the overflow safe ending block height for the query.\n\t * Overflow returns `0xffffffff`, otherwise returns `first_blocknum + number_of_blocks`\n\t 
 #[must_use]
 #[no_mangle]
-pub extern "C" fn QueryChannelRange_end_blocknum(this_arg: &QueryChannelRange) -> u32 {
+pub extern "C" fn QueryChannelRange_end_blocknum(this_arg: &crate::lightning::ln::msgs::QueryChannelRange) -> u32 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.end_blocknum();
 	ret
 }
 
 #[no_mangle]
 /// Serialize the QueryChannelRange object into a byte array which can be read by QueryChannelRange_read
-pub extern "C" fn QueryChannelRange_write(obj: &QueryChannelRange) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn QueryChannelRange_write(obj: &crate::lightning::ln::msgs::QueryChannelRange) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5893,7 +5893,7 @@ pub extern "C" fn ReplyChannelRange_read(ser: crate::c_types::u8slice) -> crate:
 }
 #[no_mangle]
 /// Serialize the ReplyChannelRange object into a byte array which can be read by ReplyChannelRange_read
-pub extern "C" fn ReplyChannelRange_write(obj: &ReplyChannelRange) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ReplyChannelRange_write(obj: &crate::lightning::ln::msgs::ReplyChannelRange) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -5902,7 +5902,7 @@ pub(crate) extern "C" fn ReplyChannelRange_write_void(obj: *const c_void) -> cra
 }
 #[no_mangle]
 /// Serialize the GossipTimestampFilter object into a byte array which can be read by GossipTimestampFilter_read
-pub extern "C" fn GossipTimestampFilter_write(obj: &GossipTimestampFilter) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn GossipTimestampFilter_write(obj: &crate::lightning::ln::msgs::GossipTimestampFilter) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]

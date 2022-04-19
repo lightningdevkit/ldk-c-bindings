@@ -1105,7 +1105,7 @@ pub extern "C" fn SiPrefix_eq(a: &SiPrefix, b: &SiPrefix) -> bool {
 /// This is effectively 10^12 * the prefix multiplier
 #[must_use]
 #[no_mangle]
-pub extern "C" fn SiPrefix_multiplier(this_arg: &SiPrefix) -> u64 {
+pub extern "C" fn SiPrefix_multiplier(this_arg: &crate::lightning_invoice::SiPrefix) -> u64 {
 	let mut ret = this_arg.to_native().multiplier();
 	ret
 }
@@ -2022,7 +2022,7 @@ pub extern "C" fn PrivateRoute_eq(a: &PrivateRoute, b: &PrivateRoute) -> bool {
 ///  3. signature
 #[must_use]
 #[no_mangle]
-pub extern "C" fn SignedRawInvoice_into_parts(mut this_arg: SignedRawInvoice) -> crate::c_types::derived::C3Tuple_RawInvoice_u832InvoiceSignatureZ {
+pub extern "C" fn SignedRawInvoice_into_parts(mut this_arg: crate::lightning_invoice::SignedRawInvoice) -> crate::c_types::derived::C3Tuple_RawInvoice_u832InvoiceSignatureZ {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).into_parts();
 	let (mut orig_ret_0, mut orig_ret_1, mut orig_ret_2) = ret; let mut local_ret = (crate::lightning_invoice::RawInvoice { inner: ObjOps::heap_alloc(orig_ret_0), is_owned: true }, crate::c_types::ThirtyTwoBytes { data: orig_ret_1 }, crate::lightning_invoice::InvoiceSignature { inner: ObjOps::heap_alloc(orig_ret_2), is_owned: true }).into();
 	local_ret
@@ -2031,7 +2031,7 @@ pub extern "C" fn SignedRawInvoice_into_parts(mut this_arg: SignedRawInvoice) ->
 /// The `RawInvoice` which was signed.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn SignedRawInvoice_raw_invoice(this_arg: &SignedRawInvoice) -> crate::lightning_invoice::RawInvoice {
+pub extern "C" fn SignedRawInvoice_raw_invoice(this_arg: &crate::lightning_invoice::SignedRawInvoice) -> crate::lightning_invoice::RawInvoice {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.raw_invoice();
 	crate::lightning_invoice::RawInvoice { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning_invoice::RawInvoice<>) as *mut _) }, is_owned: false }
 }
@@ -2039,7 +2039,7 @@ pub extern "C" fn SignedRawInvoice_raw_invoice(this_arg: &SignedRawInvoice) -> c
 /// The hash of the `RawInvoice` that was signed.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn SignedRawInvoice_hash(this_arg: &SignedRawInvoice) -> *const [u8; 32] {
+pub extern "C" fn SignedRawInvoice_hash(this_arg: &crate::lightning_invoice::SignedRawInvoice) -> *const [u8; 32] {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.hash();
 	ret
 }
@@ -2047,7 +2047,7 @@ pub extern "C" fn SignedRawInvoice_hash(this_arg: &SignedRawInvoice) -> *const [
 /// InvoiceSignature for the invoice.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn SignedRawInvoice_signature(this_arg: &SignedRawInvoice) -> crate::lightning_invoice::InvoiceSignature {
+pub extern "C" fn SignedRawInvoice_signature(this_arg: &crate::lightning_invoice::SignedRawInvoice) -> crate::lightning_invoice::InvoiceSignature {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signature();
 	crate::lightning_invoice::InvoiceSignature { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning_invoice::InvoiceSignature<>) as *mut _) }, is_owned: false }
 }
@@ -2055,7 +2055,7 @@ pub extern "C" fn SignedRawInvoice_signature(this_arg: &SignedRawInvoice) -> cra
 /// Recovers the public key used for signing the invoice from the recoverable signature.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn SignedRawInvoice_recover_payee_pub_key(this_arg: &SignedRawInvoice) -> crate::c_types::derived::CResult_PayeePubKeyErrorZ {
+pub extern "C" fn SignedRawInvoice_recover_payee_pub_key(this_arg: &crate::lightning_invoice::SignedRawInvoice) -> crate::c_types::derived::CResult_PayeePubKeyErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.recover_payee_pub_key();
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PayeePubKey { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
@@ -2065,7 +2065,7 @@ pub extern "C" fn SignedRawInvoice_recover_payee_pub_key(this_arg: &SignedRawInv
 /// valid for the recovered signature (which should always be true?).
 #[must_use]
 #[no_mangle]
-pub extern "C" fn SignedRawInvoice_check_signature(this_arg: &SignedRawInvoice) -> bool {
+pub extern "C" fn SignedRawInvoice_check_signature(this_arg: &crate::lightning_invoice::SignedRawInvoice) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.check_signature();
 	ret
 }
@@ -2073,7 +2073,7 @@ pub extern "C" fn SignedRawInvoice_check_signature(this_arg: &SignedRawInvoice) 
 /// Calculate the hash of the encoded `RawInvoice`
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_hash(this_arg: &RawInvoice) -> crate::c_types::ThirtyTwoBytes {
+pub extern "C" fn RawInvoice_hash(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.hash();
 	crate::c_types::ThirtyTwoBytes { data: ret }
 }
@@ -2082,7 +2082,7 @@ pub extern "C" fn RawInvoice_hash(this_arg: &RawInvoice) -> crate::c_types::Thir
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_payment_hash(this_arg: &RawInvoice) -> crate::lightning_invoice::Sha256 {
+pub extern "C" fn RawInvoice_payment_hash(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::lightning_invoice::Sha256 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_hash();
 	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::Sha256<>) as *mut _ }, is_owned: false };
 	local_ret
@@ -2092,7 +2092,7 @@ pub extern "C" fn RawInvoice_payment_hash(this_arg: &RawInvoice) -> crate::light
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_description(this_arg: &RawInvoice) -> crate::lightning_invoice::Description {
+pub extern "C" fn RawInvoice_description(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::lightning_invoice::Description {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.description();
 	let mut local_ret = crate::lightning_invoice::Description { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::Description<>) as *mut _ }, is_owned: false };
 	local_ret
@@ -2102,7 +2102,7 @@ pub extern "C" fn RawInvoice_description(this_arg: &RawInvoice) -> crate::lightn
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_payee_pub_key(this_arg: &RawInvoice) -> crate::lightning_invoice::PayeePubKey {
+pub extern "C" fn RawInvoice_payee_pub_key(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::lightning_invoice::PayeePubKey {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payee_pub_key();
 	let mut local_ret = crate::lightning_invoice::PayeePubKey { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::PayeePubKey<>) as *mut _ }, is_owned: false };
 	local_ret
@@ -2112,7 +2112,7 @@ pub extern "C" fn RawInvoice_payee_pub_key(this_arg: &RawInvoice) -> crate::ligh
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_description_hash(this_arg: &RawInvoice) -> crate::lightning_invoice::Sha256 {
+pub extern "C" fn RawInvoice_description_hash(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::lightning_invoice::Sha256 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.description_hash();
 	let mut local_ret = crate::lightning_invoice::Sha256 { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::Sha256<>) as *mut _ }, is_owned: false };
 	local_ret
@@ -2122,7 +2122,7 @@ pub extern "C" fn RawInvoice_description_hash(this_arg: &RawInvoice) -> crate::l
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_expiry_time(this_arg: &RawInvoice) -> crate::lightning_invoice::ExpiryTime {
+pub extern "C" fn RawInvoice_expiry_time(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::lightning_invoice::ExpiryTime {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.expiry_time();
 	let mut local_ret = crate::lightning_invoice::ExpiryTime { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::ExpiryTime<>) as *mut _ }, is_owned: false };
 	local_ret
@@ -2132,7 +2132,7 @@ pub extern "C" fn RawInvoice_expiry_time(this_arg: &RawInvoice) -> crate::lightn
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_min_final_cltv_expiry(this_arg: &RawInvoice) -> crate::lightning_invoice::MinFinalCltvExpiry {
+pub extern "C" fn RawInvoice_min_final_cltv_expiry(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::lightning_invoice::MinFinalCltvExpiry {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.min_final_cltv_expiry();
 	let mut local_ret = crate::lightning_invoice::MinFinalCltvExpiry { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::MinFinalCltvExpiry<>) as *mut _ }, is_owned: false };
 	local_ret
@@ -2142,7 +2142,7 @@ pub extern "C" fn RawInvoice_min_final_cltv_expiry(this_arg: &RawInvoice) -> cra
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_payment_secret(this_arg: &RawInvoice) -> crate::c_types::ThirtyTwoBytes {
+pub extern "C" fn RawInvoice_payment_secret(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_secret();
 	let mut local_ret = if ret.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (ret.unwrap()).0 } } };
 	local_ret
@@ -2152,7 +2152,7 @@ pub extern "C" fn RawInvoice_payment_secret(this_arg: &RawInvoice) -> crate::c_t
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_features(this_arg: &RawInvoice) -> crate::lightning::ln::features::InvoiceFeatures {
+pub extern "C" fn RawInvoice_features(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::lightning::ln::features::InvoiceFeatures {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.features();
 	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::ln::features::InvoiceFeatures<>) as *mut _ }, is_owned: false };
 	local_ret
@@ -2160,7 +2160,7 @@ pub extern "C" fn RawInvoice_features(this_arg: &RawInvoice) -> crate::lightning
 
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_private_routes(this_arg: &RawInvoice) -> crate::c_types::derived::CVec_PrivateRouteZ {
+pub extern "C" fn RawInvoice_private_routes(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::c_types::derived::CVec_PrivateRouteZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.private_routes();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning_invoice::PrivateRoute { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning_invoice::PrivateRoute<>) as *mut _) }, is_owned: false } }); };
 	local_ret.into()
@@ -2168,7 +2168,7 @@ pub extern "C" fn RawInvoice_private_routes(this_arg: &RawInvoice) -> crate::c_t
 
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_amount_pico_btc(this_arg: &RawInvoice) -> crate::c_types::derived::COption_u64Z {
+pub extern "C" fn RawInvoice_amount_pico_btc(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::c_types::derived::COption_u64Z {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.amount_pico_btc();
 	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { ret.unwrap() }) };
 	local_ret
@@ -2176,7 +2176,7 @@ pub extern "C" fn RawInvoice_amount_pico_btc(this_arg: &RawInvoice) -> crate::c_
 
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_currency(this_arg: &RawInvoice) -> crate::lightning_invoice::Currency {
+pub extern "C" fn RawInvoice_currency(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::lightning_invoice::Currency {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.currency();
 	crate::lightning_invoice::Currency::native_into(ret)
 }
@@ -2219,7 +2219,7 @@ pub extern "C" fn PositiveTimestamp_from_duration_since_epoch(mut duration: u64)
 /// Returns the Unix timestamp representing the stored time
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PositiveTimestamp_as_unix_timestamp(this_arg: &PositiveTimestamp) -> u64 {
+pub extern "C" fn PositiveTimestamp_as_unix_timestamp(this_arg: &crate::lightning_invoice::PositiveTimestamp) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_unix_timestamp();
 	ret
 }
@@ -2227,7 +2227,7 @@ pub extern "C" fn PositiveTimestamp_as_unix_timestamp(this_arg: &PositiveTimesta
 /// Returns the duration of the stored time since the Unix epoch
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PositiveTimestamp_as_duration_since_epoch(this_arg: &PositiveTimestamp) -> u64 {
+pub extern "C" fn PositiveTimestamp_as_duration_since_epoch(this_arg: &crate::lightning_invoice::PositiveTimestamp) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_duration_since_epoch();
 	ret.as_secs()
 }
@@ -2235,7 +2235,7 @@ pub extern "C" fn PositiveTimestamp_as_duration_since_epoch(this_arg: &PositiveT
 /// Returns the [`SystemTime`] representing the stored time
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PositiveTimestamp_as_time(this_arg: &PositiveTimestamp) -> u64 {
+pub extern "C" fn PositiveTimestamp_as_time(this_arg: &crate::lightning_invoice::PositiveTimestamp) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_time();
 	ret.duration_since(::std::time::SystemTime::UNIX_EPOCH).expect("Times must be post-1970").as_secs()
 }
@@ -2243,7 +2243,7 @@ pub extern "C" fn PositiveTimestamp_as_time(this_arg: &PositiveTimestamp) -> u64
 /// Transform the `Invoice` into it's unchecked version
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_into_signed_raw(mut this_arg: Invoice) -> crate::lightning_invoice::SignedRawInvoice {
+pub extern "C" fn Invoice_into_signed_raw(mut this_arg: crate::lightning_invoice::Invoice) -> crate::lightning_invoice::SignedRawInvoice {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).into_signed_raw();
 	crate::lightning_invoice::SignedRawInvoice { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
@@ -2251,7 +2251,7 @@ pub extern "C" fn Invoice_into_signed_raw(mut this_arg: Invoice) -> crate::light
 /// Check that the invoice is signed correctly and that key recovery works
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_check_signature(this_arg: &Invoice) -> crate::c_types::derived::CResult_NoneSemanticErrorZ {
+pub extern "C" fn Invoice_check_signature(this_arg: &crate::lightning_invoice::Invoice) -> crate::c_types::derived::CResult_NoneSemanticErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.check_signature();
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SemanticError::native_into(e) }).into() };
 	local_ret
@@ -2288,7 +2288,7 @@ pub extern "C" fn Invoice_from_signed(mut signed_invoice: crate::lightning_invoi
 /// Returns the `Invoice`'s timestamp (should equal its creation time)
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_timestamp(this_arg: &Invoice) -> u64 {
+pub extern "C" fn Invoice_timestamp(this_arg: &crate::lightning_invoice::Invoice) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.timestamp();
 	ret.duration_since(::std::time::SystemTime::UNIX_EPOCH).expect("Times must be post-1970").as_secs()
 }
@@ -2296,7 +2296,7 @@ pub extern "C" fn Invoice_timestamp(this_arg: &Invoice) -> u64 {
 /// Returns the `Invoice`'s timestamp as a duration since the Unix epoch
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_duration_since_epoch(this_arg: &Invoice) -> u64 {
+pub extern "C" fn Invoice_duration_since_epoch(this_arg: &crate::lightning_invoice::Invoice) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.duration_since_epoch();
 	ret.as_secs()
 }
@@ -2304,7 +2304,7 @@ pub extern "C" fn Invoice_duration_since_epoch(this_arg: &Invoice) -> u64 {
 /// Returns the hash to which we will receive the preimage on completion of the payment
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_payment_hash(this_arg: &Invoice) -> *const [u8; 32] {
+pub extern "C" fn Invoice_payment_hash(this_arg: &crate::lightning_invoice::Invoice) -> *const [u8; 32] {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_hash();
 	ret.as_inner()
 }
@@ -2314,7 +2314,7 @@ pub extern "C" fn Invoice_payment_hash(this_arg: &Invoice) -> *const [u8; 32] {
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_payee_pub_key(this_arg: &Invoice) -> crate::c_types::PublicKey {
+pub extern "C" fn Invoice_payee_pub_key(this_arg: &crate::lightning_invoice::Invoice) -> crate::c_types::PublicKey {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payee_pub_key();
 	let mut local_ret = if ret.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(ret.unwrap())) } };
 	local_ret
@@ -2323,7 +2323,7 @@ pub extern "C" fn Invoice_payee_pub_key(this_arg: &Invoice) -> crate::c_types::P
 /// Get the payment secret if one was included in the invoice
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_payment_secret(this_arg: &Invoice) -> *const [u8; 32] {
+pub extern "C" fn Invoice_payment_secret(this_arg: &crate::lightning_invoice::Invoice) -> *const [u8; 32] {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_secret();
 	&ret.0
 }
@@ -2333,7 +2333,7 @@ pub extern "C" fn Invoice_payment_secret(this_arg: &Invoice) -> *const [u8; 32] 
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_features(this_arg: &Invoice) -> crate::lightning::ln::features::InvoiceFeatures {
+pub extern "C" fn Invoice_features(this_arg: &crate::lightning_invoice::Invoice) -> crate::lightning::ln::features::InvoiceFeatures {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.features();
 	let mut local_ret = crate::lightning::ln::features::InvoiceFeatures { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::ln::features::InvoiceFeatures<>) as *mut _ }, is_owned: false };
 	local_ret
@@ -2342,7 +2342,7 @@ pub extern "C" fn Invoice_features(this_arg: &Invoice) -> crate::lightning::ln::
 /// Recover the payee's public key (only to be used if none was included in the invoice)
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_recover_payee_pub_key(this_arg: &Invoice) -> crate::c_types::PublicKey {
+pub extern "C" fn Invoice_recover_payee_pub_key(this_arg: &crate::lightning_invoice::Invoice) -> crate::c_types::PublicKey {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.recover_payee_pub_key();
 	crate::c_types::PublicKey::from_rust(&ret)
 }
@@ -2350,7 +2350,7 @@ pub extern "C" fn Invoice_recover_payee_pub_key(this_arg: &Invoice) -> crate::c_
 /// Returns the invoice's expiry time, if present, otherwise [`DEFAULT_EXPIRY_TIME`].
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_expiry_time(this_arg: &Invoice) -> u64 {
+pub extern "C" fn Invoice_expiry_time(this_arg: &crate::lightning_invoice::Invoice) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.expiry_time();
 	ret.as_secs()
 }
@@ -2358,7 +2358,7 @@ pub extern "C" fn Invoice_expiry_time(this_arg: &Invoice) -> u64 {
 /// Returns whether the invoice has expired.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_is_expired(this_arg: &Invoice) -> bool {
+pub extern "C" fn Invoice_is_expired(this_arg: &crate::lightning_invoice::Invoice) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_expired();
 	ret
 }
@@ -2367,7 +2367,7 @@ pub extern "C" fn Invoice_is_expired(this_arg: &Invoice) -> bool {
 /// `at_time` is the timestamp as a duration since the Unix epoch.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_would_expire(this_arg: &Invoice, mut at_time: u64) -> bool {
+pub extern "C" fn Invoice_would_expire(this_arg: &crate::lightning_invoice::Invoice, mut at_time: u64) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.would_expire(core::time::Duration::from_secs(at_time));
 	ret
 }
@@ -2376,7 +2376,7 @@ pub extern "C" fn Invoice_would_expire(this_arg: &Invoice, mut at_time: u64) -> 
 /// [`DEFAULT_MIN_FINAL_CLTV_EXPIRY`].
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_min_final_cltv_expiry(this_arg: &Invoice) -> u64 {
+pub extern "C" fn Invoice_min_final_cltv_expiry(this_arg: &crate::lightning_invoice::Invoice) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.min_final_cltv_expiry();
 	ret
 }
@@ -2384,7 +2384,7 @@ pub extern "C" fn Invoice_min_final_cltv_expiry(this_arg: &Invoice) -> u64 {
 /// Returns a list of all routes included in the invoice
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_private_routes(this_arg: &Invoice) -> crate::c_types::derived::CVec_PrivateRouteZ {
+pub extern "C" fn Invoice_private_routes(this_arg: &crate::lightning_invoice::Invoice) -> crate::c_types::derived::CVec_PrivateRouteZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.private_routes();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning_invoice::PrivateRoute { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning_invoice::PrivateRoute<>) as *mut _) }, is_owned: false } }); };
 	local_ret.into()
@@ -2393,7 +2393,7 @@ pub extern "C" fn Invoice_private_routes(this_arg: &Invoice) -> crate::c_types::
 /// Returns a list of all routes included in the invoice as the underlying hints
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_route_hints(this_arg: &Invoice) -> crate::c_types::derived::CVec_RouteHintZ {
+pub extern "C" fn Invoice_route_hints(this_arg: &crate::lightning_invoice::Invoice) -> crate::c_types::derived::CVec_RouteHintZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.route_hints();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::routing::router::RouteHint { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
 	local_ret.into()
@@ -2402,7 +2402,7 @@ pub extern "C" fn Invoice_route_hints(this_arg: &Invoice) -> crate::c_types::der
 /// Returns the currency for which the invoice was issued
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_currency(this_arg: &Invoice) -> crate::lightning_invoice::Currency {
+pub extern "C" fn Invoice_currency(this_arg: &crate::lightning_invoice::Invoice) -> crate::lightning_invoice::Currency {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.currency();
 	crate::lightning_invoice::Currency::native_into(ret)
 }
@@ -2410,7 +2410,7 @@ pub extern "C" fn Invoice_currency(this_arg: &Invoice) -> crate::lightning_invoi
 /// Returns the amount if specified in the invoice as millisatoshis.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_amount_milli_satoshis(this_arg: &Invoice) -> crate::c_types::derived::COption_u64Z {
+pub extern "C" fn Invoice_amount_milli_satoshis(this_arg: &crate::lightning_invoice::Invoice) -> crate::c_types::derived::COption_u64Z {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.amount_milli_satoshis();
 	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { ret.unwrap() }) };
 	local_ret
@@ -2431,7 +2431,7 @@ pub extern "C" fn Description_new(mut description: crate::c_types::Str) -> crate
 /// Returns the underlying description `String`
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Description_into_inner(mut this_arg: Description) -> crate::c_types::Str {
+pub extern "C" fn Description_into_inner(mut this_arg: crate::lightning_invoice::Description) -> crate::c_types::Str {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).into_inner();
 	ret.into()
 }
@@ -2455,7 +2455,7 @@ pub extern "C" fn ExpiryTime_from_duration(mut duration: u64) -> crate::lightnin
 /// Returns the expiry time in seconds
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ExpiryTime_as_seconds(this_arg: &ExpiryTime) -> u64 {
+pub extern "C" fn ExpiryTime_as_seconds(this_arg: &crate::lightning_invoice::ExpiryTime) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_seconds();
 	ret
 }
@@ -2463,7 +2463,7 @@ pub extern "C" fn ExpiryTime_as_seconds(this_arg: &ExpiryTime) -> u64 {
 /// Returns a reference to the underlying `Duration` (=expiry time)
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ExpiryTime_as_duration(this_arg: &ExpiryTime) -> u64 {
+pub extern "C" fn ExpiryTime_as_duration(this_arg: &crate::lightning_invoice::ExpiryTime) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_duration();
 	ret.as_secs()
 }
@@ -2480,7 +2480,7 @@ pub extern "C" fn PrivateRoute_new(mut hops: crate::lightning::routing::router::
 /// Returns the underlying list of hops
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PrivateRoute_into_inner(mut this_arg: PrivateRoute) -> crate::lightning::routing::router::RouteHint {
+pub extern "C" fn PrivateRoute_into_inner(mut this_arg: crate::lightning_invoice::PrivateRoute) -> crate::lightning::routing::router::RouteHint {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).into_inner();
 	crate::lightning::routing::router::RouteHint { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }

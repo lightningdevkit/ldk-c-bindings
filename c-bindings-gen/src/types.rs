@@ -65,6 +65,17 @@ pub fn path_matches_nongeneric(p: &syn::Path, exp: &[&str]) -> bool {
 	true
 }
 
+pub fn string_path_to_syn_path(path: &str) -> syn::Path {
+	let mut segments = syn::punctuated::Punctuated::new();
+	for seg in path.split("::") {
+		segments.push(syn::PathSegment {
+			ident: syn::Ident::new(seg, Span::call_site()),
+			arguments: syn::PathArguments::None,
+		});
+	}
+	syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments }
+}
+
 #[derive(Debug, PartialEq)]
 pub enum ExportStatus {
 	Export,
@@ -391,7 +402,7 @@ pub enum DeclType<'a> {
 }
 
 pub struct ImportResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
-	crate_name: &'mod_lifetime str,
+	pub crate_name: &'mod_lifetime str,
 	dependencies: &'mod_lifetime HashSet<syn::Ident>,
 	module_path: &'mod_lifetime str,
 	imports: HashMap<syn::Ident, (String, syn::Path)>,
@@ -546,10 +557,6 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		Self { crate_name, dependencies, module_path, imports, declared, priv_modules }
 	}
 
-	pub fn get_declared_type(&self, ident: &syn::Ident) -> Option<&DeclType<'crate_lft>> {
-		self.declared.get(ident)
-	}
-
 	pub fn maybe_resolve_declared(&self, id: &syn::Ident) -> Option<&DeclType<'crate_lft>> {
 		self.declared.get(id)
 	}
@@ -559,17 +566,6 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			Some(imp.clone())
 		} else if self.declared.get(id).is_some() {
 			Some(self.module_path.to_string() + "::" + &format!("{}", id))
-		} else { None }
-	}
-
-	pub fn maybe_resolve_non_ignored_ident(&self, id: &syn::Ident) -> Option<String> {
-		if let Some((imp, _)) = self.imports.get(id) {
-			Some(imp.clone())
-		} else if let Some(decl_type) = self.declared.get(id) {
-			match decl_type {
-				DeclType::StructIgnored => None,
-				_ => Some(self.module_path.to_string() + "::" + &format!("{}", id)),
-			}
 		} else { None }
 	}
 
@@ -741,7 +737,7 @@ pub struct CrateTypes<'a> {
 	/// Aliases from paths to some other Type
 	pub type_aliases: HashMap<String, syn::Type>,
 	/// Value is an alias to Key (maybe with some generics)
-	pub reverse_alias_map: HashMap<String, Vec<(syn::Path, syn::PathArguments)>>,
+	pub reverse_alias_map: HashMap<String, Vec<(String, syn::PathArguments)>>,
 	/// Template continer types defined, map from mangled type name -> whether a destructor fn
 	/// exists.
 	///
@@ -785,7 +781,7 @@ impl<'a> CrateTypes<'a> {
 pub struct TypeResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
 	pub module_path: &'mod_lifetime str,
 	pub crate_types: &'mod_lifetime CrateTypes<'crate_lft>,
-	types: ImportResolver<'mod_lifetime, 'crate_lft>,
+	pub types: ImportResolver<'mod_lifetime, 'crate_lft>,
 }
 
 /// Returned by write_empty_rust_val_check_suffix to indicate what type of dereferencing needs to
@@ -1583,9 +1579,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	// *** Type definition during main.rs processing ***
 	// *************************************************
 
-	pub fn get_declared_type(&'a self, ident: &syn::Ident) -> Option<&'a DeclType<'c>> {
-		self.types.get_declared_type(ident)
-	}
 	/// Returns true if the object at the given path is mapped as X { inner: *mut origX, .. }.
 	pub fn c_type_has_inner_from_path(&self, full_path: &str) -> bool {
 		self.crate_types.opaques.get(full_path).is_some()
@@ -1608,10 +1601,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 	pub fn maybe_resolve_ident(&self, id: &syn::Ident) -> Option<String> {
 		self.types.maybe_resolve_ident(id)
-	}
-
-	pub fn maybe_resolve_non_ignored_ident(&self, id: &syn::Ident) -> Option<String> {
-		self.types.maybe_resolve_non_ignored_ident(id)
 	}
 
 	pub fn maybe_resolve_path(&self, p_arg: &syn::Path, generics: Option<&GenericTypes>) -> Option<String> {
@@ -2874,7 +2863,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		assert!(self.write_c_type_intern(w, t, generics, false, false, ptr_for_ref, true, false));
 	}
 	pub fn understood_c_path(&self, p: &syn::Path) -> bool {
-		if p.leading_colon.is_some() { return false; }
 		self.write_c_path_intern(&mut std::io::sink(), p, None, false, false, false, false, true)
 	}
 	pub fn understood_c_type(&self, t: &syn::Type, generics: Option<&GenericTypes>) -> bool {

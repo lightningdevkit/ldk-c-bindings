@@ -584,9 +584,9 @@ pub extern "C" fn PaymentError_sending(a: crate::lightning::ln::channelmanager::
 /// `retry_attempts` has been exceeded for a given [`Invoice`].
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoicePayer_new(mut payer: crate::lightning_invoice::payment::Payer, mut router: crate::lightning_invoice::payment::Router, scorer: &crate::lightning::routing::scoring::MultiThreadedLockableScore, mut logger: crate::lightning::util::logger::Logger, mut event_handler: crate::lightning::util::events::EventHandler, mut retry_attempts: crate::lightning_invoice::payment::RetryAttempts) -> InvoicePayer {
+pub extern "C" fn InvoicePayer_new(mut payer: crate::lightning_invoice::payment::Payer, mut router: crate::lightning_invoice::payment::Router, scorer: &crate::lightning::routing::scoring::MultiThreadedLockableScore, mut logger: crate::lightning::util::logger::Logger, mut event_handler: crate::lightning::util::events::EventHandler, mut retry_attempts: crate::lightning_invoice::payment::RetryAttempts) -> crate::lightning_invoice::payment::InvoicePayer {
 	let mut ret = lightning_invoice::payment::InvoicePayer::new(payer, router, scorer.get_native_ref(), logger, event_handler, *unsafe { Box::from_raw(retry_attempts.take_inner()) });
-	InvoicePayer { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning_invoice::payment::InvoicePayer { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Pays the given [`Invoice`], caching it for later use in case a retry is needed.
@@ -596,7 +596,7 @@ pub extern "C" fn InvoicePayer_new(mut payer: crate::lightning_invoice::payment:
 /// for you.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoicePayer_pay_invoice(this_arg: &InvoicePayer, invoice: &crate::lightning_invoice::Invoice) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
+pub extern "C" fn InvoicePayer_pay_invoice(this_arg: &crate::lightning_invoice::payment::InvoicePayer, invoice: &crate::lightning_invoice::Invoice) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.pay_invoice(invoice.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::PaymentError::native_into(e) }).into() };
 	local_ret
@@ -610,7 +610,7 @@ pub extern "C" fn InvoicePayer_pay_invoice(this_arg: &InvoicePayer, invoice: &cr
 /// for you.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoicePayer_pay_zero_value_invoice(this_arg: &InvoicePayer, invoice: &crate::lightning_invoice::Invoice, mut amount_msats: u64) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
+pub extern "C" fn InvoicePayer_pay_zero_value_invoice(this_arg: &crate::lightning_invoice::payment::InvoicePayer, invoice: &crate::lightning_invoice::Invoice, mut amount_msats: u64) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.pay_zero_value_invoice(invoice.get_native_ref(), amount_msats);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::PaymentError::native_into(e) }).into() };
 	local_ret
@@ -623,7 +623,7 @@ pub extern "C" fn InvoicePayer_pay_zero_value_invoice(this_arg: &InvoicePayer, i
 /// been paid before. Because [`InvoicePayer`] is stateless no effort is made to do so for you.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoicePayer_pay_pubkey(this_arg: &InvoicePayer, mut pubkey: crate::c_types::PublicKey, mut payment_preimage: crate::c_types::ThirtyTwoBytes, mut amount_msats: u64, mut final_cltv_expiry_delta: u32) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
+pub extern "C" fn InvoicePayer_pay_pubkey(this_arg: &crate::lightning_invoice::payment::InvoicePayer, mut pubkey: crate::c_types::PublicKey, mut payment_preimage: crate::c_types::ThirtyTwoBytes, mut amount_msats: u64, mut final_cltv_expiry_delta: u32) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.pay_pubkey(pubkey.into_rust(), ::lightning::ln::PaymentPreimage(payment_preimage.data), amount_msats, final_cltv_expiry_delta);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::PaymentError::native_into(e) }).into() };
 	local_ret
@@ -634,7 +634,7 @@ pub extern "C" fn InvoicePayer_pay_pubkey(this_arg: &InvoicePayer, mut pubkey: c
 /// Should be called once a payment has failed or succeeded if not using [`InvoicePayer`] as an
 /// [`EventHandler`]. Otherwise, calling this method is unnecessary.
 #[no_mangle]
-pub extern "C" fn InvoicePayer_remove_cached_payment(this_arg: &InvoicePayer, payment_hash: *const [u8; 32]) {
+pub extern "C" fn InvoicePayer_remove_cached_payment(this_arg: &crate::lightning_invoice::payment::InvoicePayer, payment_hash: *const [u8; 32]) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.remove_cached_payment(&::lightning::ln::PaymentHash(unsafe { *payment_hash }))
 }
 

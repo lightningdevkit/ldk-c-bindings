@@ -21,7 +21,8 @@ cd "$ORIG_PWD"
 # Generate (and reasonably test) C bindings
 
 # First we set various compiler flags...
-HOST_PLATFORM="$(rustc --version --verbose | grep "host:")"
+HOST_PLATFORM="$(rustc --version --verbose | grep "host:" | awk '{ print $2 }')"
+ENV_TARGET=$(echo $HOST_PLATFORM | sed 's/-/_/g')
 
 # Set path to include our rustc wrapper as well as cbindgen
 export LDK_RUSTC_PATH="$(which rustc)"
@@ -44,9 +45,9 @@ BASE_CFLAGS="$BASE_CFLAGS -frandom-seed=42"
 LOCAL_CFLAGS="-Wall -Wno-nullability-completeness -pthread -Iinclude/"
 
 HOST_OSX=false
-if [ "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+if [ "$HOST_PLATFORM" = "x86_64-apple-darwin" ]; then
 	HOST_OSX=true
-elif [ "$HOST_PLATFORM" = "host: aarch64-apple-darwin" ]; then
+elif [ "$HOST_PLATFORM" = "aarch64-apple-darwin" ]; then
 	HOST_OSX=true
 fi
 
@@ -54,8 +55,8 @@ BASE_HOST_CFLAGS="$BASE_CFLAGS"
 
 if [ "$HOST_OSX" = "true" ]; then
 	export MACOSX_DEPLOYMENT_TARGET=10.9
-	LOCAL_CFLAGS="$LOCAL_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
-	BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
+	LOCAL_CFLAGS="$LOCAL_CFLAGS --target=$HOST_PLATFORM -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
+	BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS --target=$HOST_PLATFORM -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
 	# Targeting aarch64 appears to be supported only starting with Big Sur, so check it before use
 	clang -o /dev/null $BASE_HOST_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14 genbindings_path_map_test_file.c &&
 	export CFLAGS_aarch64_apple_darwin="$BASE_HOST_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14" ||
@@ -64,7 +65,6 @@ fi
 
 rm genbindings_path_map_test_file.c
 
-ENV_TARGET=$(rustc --version --verbose | grep host | awk '{ print $2 }' | sed 's/-/_/g')
 case "$ENV_TARGET" in
 	"x86_64"*)
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge"
@@ -332,7 +332,7 @@ if [ "$2" = "true" ]; then
 fi
 
 # Then, check with memory sanitizer, if we're on Linux and have rustc nightly
-if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" ]; then
+if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" ]; then
 	if cargo +nightly --version >/dev/null 2>&1; then
 		LLVM_V=$(rustc +nightly --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 2); }')
 		if [ -x "$(which clang-$LLVM_V)" ]; then
@@ -435,7 +435,7 @@ if [ "$CLANG" != "" -a "$CLANGPP" = "" ]; then
 fi
 
 # Finally, if we're on OSX or on Linux, build the final debug binary with address sanitizer (and leave it there)
-if [ "$HOST_PLATFORM" = "host: x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "host: x86_64-apple-darwin" ]; then
+if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "x86_64-apple-darwin" ]; then
 	if [ "$CLANGPP" != "" ]; then
 		if [ "$HOST_OSX" = "true" ]; then
 			# OSX sed is for some reason not compatible with GNU sed

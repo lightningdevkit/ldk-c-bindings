@@ -70,6 +70,10 @@ case "$ENV_TARGET" in
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge"
 		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
 		;;
+	"aarch64_apple_darwin")
+		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14"
+		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -mcpu=apple-a14"
+		;;
 	*)
 		# Assume this isn't targeted at another host and build for the host's CPU.
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=native"

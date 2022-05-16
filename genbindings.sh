@@ -229,6 +229,7 @@ else
 fi
 
 # Build C++ class methods which call trait methods
+echo "Updating C++ header, this may take some time, especially on macOS"
 set +x # Echoing every command is very verbose here
 OLD_IFS="$IFS"
 export IFS=''

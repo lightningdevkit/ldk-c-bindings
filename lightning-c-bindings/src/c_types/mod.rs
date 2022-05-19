@@ -12,6 +12,7 @@ use bitcoin::secp256k1::Error as SecpError;
 use bitcoin::secp256k1::recovery::RecoveryId;
 use bitcoin::secp256k1::recovery::RecoverableSignature as SecpRecoverableSignature;
 use bitcoin::bech32;
+use bitcoin::util::address;
 
 use core::convert::TryInto; // Bindings need at least rustc 1.34
 use core::ffi::c_void;
@@ -44,6 +45,18 @@ impl From<bech32::u5> for u5 {
 }
 impl Into<bech32::u5> for u5 {
 	fn into(self) -> bech32::u5 { bech32::u5::try_from_u8(self.0).expect("u5 objects must be in the range 0..32") }
+}
+
+/// Integer in the range `0..=16`
+#[derive(PartialEq, Eq, Copy, Clone)]
+#[repr(C)]
+pub struct WitnessVersion(u8);
+
+impl From<address::WitnessVersion> for WitnessVersion {
+	fn from(o: address::WitnessVersion) -> Self { Self(o.into_num()) }
+}
+impl Into<address::WitnessVersion> for WitnessVersion {
+	fn into(self) -> address::WitnessVersion { address::WitnessVersion::from_num(self.0).expect("WitnessVersion objects must be in the range 0..=16") }
 }
 
 #[derive(Clone)]

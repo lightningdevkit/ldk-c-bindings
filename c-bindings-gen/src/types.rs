@@ -890,14 +890,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::bech32::u5"|"bech32::u5" => Some("crate::c_types::u5"),
 			"core::num::NonZeroU8" => Some("u8"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				=> Some("crate::c_types::PublicKey"),
-			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature"),
-			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some("crate::c_types::RecoverableSignature"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if is_ref  => Some("*const [u8; 32]"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if !is_ref => Some("crate::c_types::SecretKey"),
+			"bitcoin::secp256k1::PublicKey" => Some("crate::c_types::PublicKey"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some("crate::c_types::Signature"),
+			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature"),
+			"bitcoin::secp256k1::SecretKey" if is_ref  => Some("*const [u8; 32]"),
+			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
@@ -975,17 +972,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(""),
 			"core::num::NonZeroU8" => Some("core::num::NonZeroU8::new("),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				if is_ref => Some("&"),
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				=> Some(""),
-			"bitcoin::secp256k1::Signature" if is_ref => Some("&"),
-			"bitcoin::secp256k1::Signature" => Some(""),
-			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(""),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if is_ref => Some("&::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if !is_ref => Some(""),
+			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" if is_ref => Some("&"),
+			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some(""),
+			"bitcoin::secp256k1::ecdsa::Signature" if is_ref => Some("&"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some(""),
+			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(""),
+			"bitcoin::secp256k1::SecretKey" if is_ref => Some("&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *"),
+			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(""),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("&::bitcoin::blockdata::script::Script::from(Vec::from("),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("::bitcoin::blockdata::script::Script::from("),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("&"),
@@ -1063,14 +1056,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(".into()"),
 			"core::num::NonZeroU8" => Some(").expect(\"Value must be non-zero\")"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				=> Some(".into_rust()"),
-			"bitcoin::secp256k1::Signature" => Some(".into_rust()"),
-			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(".into_rust()"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if !is_ref => Some(".into_rust()"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if is_ref => Some("}[..]).unwrap()"),
+			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some(".into_rust()"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some(".into_rust()"),
+			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(".into_rust()"),
+			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(".into_rust()"),
+			"bitcoin::secp256k1::SecretKey" if is_ref => Some("}[..]).unwrap()"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some(".to_slice()))"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_rust())"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(".into_bitcoin()"),
@@ -1157,14 +1147,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(""),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				=> Some("crate::c_types::PublicKey::from_rust(&"),
-			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature::from_rust(&"),
-			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some("crate::c_types::RecoverableSignature::from_rust(&"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if is_ref => Some(""),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
+			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some("crate::c_types::PublicKey::from_rust(&"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some("crate::c_types::Signature::from_rust(&"),
+			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature::from_rust(&"),
+			"bitcoin::secp256k1::SecretKey" if is_ref => Some(""),
+			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
@@ -1236,14 +1223,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(".into()"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				=> Some(")"),
-			"bitcoin::secp256k1::Signature" => Some(")"),
-			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(")"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if !is_ref => Some(")"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if is_ref => Some(".as_ref()"),
+			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some(")"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some(")"),
+			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(")"),
+			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(")"),
+			"bitcoin::secp256k1::SecretKey" if is_ref => Some(".as_ref()"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(")"),
@@ -1277,8 +1261,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	fn empty_val_check_suffix_from_path(&self, full_path: &str) -> Option<&str> {
 		match full_path {
 			"lightning::ln::PaymentSecret" => Some(".data == [0; 32]"),
-			"secp256k1::key::PublicKey"|"bitcoin::secp256k1::key::PublicKey" => Some(".is_null()"),
-			"bitcoin::secp256k1::Signature" => Some(".is_null()"),
+			"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => Some(".is_null()"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some(".is_null()"),
 			_ => None
 		}
 	}

@@ -901,6 +901,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut"),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network"),
+			"bitcoin::util::address::WitnessVersion" => Some("crate::c_types::WitnessVersion"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref  => Some("*const [u8; 80]"),
 			"bitcoin::blockdata::block::Block" if is_ref  => Some("crate::c_types::u8slice"),
 
@@ -986,6 +987,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::C_to_bitcoin_outpoint("),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(""),
 			"bitcoin::network::constants::Network" => Some(""),
+			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" => Some("&::bitcoin::consensus::encode::deserialize(unsafe { &*"),
 			"bitcoin::blockdata::block::Block" if is_ref => Some("&::bitcoin::consensus::encode::deserialize("),
 
@@ -1067,6 +1069,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(".into_rust()"),
 			"bitcoin::network::constants::Network" => Some(".into_bitcoin()"),
+			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" => Some(" }).unwrap()"),
 			"bitcoin::blockdata::block::Block" => Some(".to_slice()).unwrap()"),
 
@@ -1159,6 +1162,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::bitcoin_to_C_outpoint("),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network::from_bitcoin("),
+			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some("&local_"),
 			"bitcoin::blockdata::block::Block" if is_ref => Some("crate::c_types::u8slice::from_slice(&local_"),
 
@@ -1234,6 +1238,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(")"),
 			"bitcoin::network::constants::Network" => Some(")"),
+			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some(""),
 			"bitcoin::blockdata::block::Block" if is_ref => Some(")"),
 

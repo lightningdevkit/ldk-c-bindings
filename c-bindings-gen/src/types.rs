@@ -1510,7 +1510,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 									], ") }", ContainerPrefixLocation::PerConv)),
 							}
 						},
-						syn::Type::Tuple(_) => {
+						syn::Type::Tuple(_)|syn::Type::Array(_) => {
 							return Some(("if ", vec![(".is_some() { Some(".to_string(), format!("{}.take()", var_access))], ") } else { None }", ContainerPrefixLocation::PerConv))
 						},
 						_ => unimplemented!(),

@@ -1503,7 +1503,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 				if let Some(t) = single_contained {
 					match t {
-						syn::Type::Reference(_)|syn::Type::Path(_)|syn::Type::Slice(_) => {
+						syn::Type::Reference(_)|syn::Type::Path(_)|syn::Type::Slice(_)|syn::Type::Array(_) => {
 							let mut v = Vec::new();
 							let ret_ref = self.write_empty_rust_val_check_suffix(generics, &mut v, t);
 							let s = String::from_utf8(v).unwrap();
@@ -1799,7 +1799,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			syn::Type::Path(p) => {
 				let resolved = self.resolve_path(&p.path, generics);
 				if let Some(arr_ty) = self.is_real_type_array(&resolved) {
-					write!(w, ".data").unwrap();
 					return self.write_empty_rust_val_check_suffix(generics, w, &arr_ty);
 				}
 				if self.crate_types.opaques.get(&resolved).is_some() {
@@ -1819,7 +1818,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			syn::Type::Array(a) => {
 				if let syn::Expr::Lit(l) = &a.len {
 					if let syn::Lit::Int(i) = &l.lit {
-						write!(w, " == [0; {}]", i.base10_digits()).unwrap();
+						write!(w, ".data == [0; {}]", i.base10_digits()).unwrap();
 						EmptyValExpectedTy::NonPointer
 					} else { unimplemented!(); }
 				} else { unimplemented!(); }

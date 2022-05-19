@@ -141,6 +141,10 @@ OUT_F="$(pwd)/lightning-c-bindings/include/ldk_rust_types.h"
 OUT_CPP="$(pwd)/lightning-c-bindings/include/lightningpp.hpp"
 BIN="$(pwd)/c-bindings-gen/target/release/c-bindings-gen"
 
+function is_gnu_sed(){
+  sed --version >/dev/null 2>&1
+}
+
 function add_crate() {
 	pushd "$LIGHTNING_PATH/$1"
 	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check --no-default-features $3 -- --cfg=c_bindings -Zunpretty=expanded > /tmp/$1-crate-source.txt
@@ -155,20 +159,20 @@ pub mod $2 {
 	echo "}" >> /tmp/$1-crate-source.txt
 	cat /tmp/$1-crate-source.txt >> /tmp/crate-source.txt
 	rm /tmp/$1-crate-source.txt
-	if [ "$HOST_OSX" = "true" ]; then
+	if is_gnu_sed; then
+		sed -E -i 's|#*'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'", default-features = false }|' lightning-c-bindings/Cargo.toml
+	else
 		# OSX sed is for some reason not compatible with GNU sed
 		sed -E -i '' 's|#*'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'", default-features = false }|' lightning-c-bindings/Cargo.toml
-	else
-		sed -E -i 's|#*'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'", default-features = false }|' lightning-c-bindings/Cargo.toml
 	fi
 }
 
 function drop_crate() {
-	if [ "$HOST_OSX" = "true" ]; then
+	if is_gnu_sed; then
+		sed -E -i 's|'$1' = \{ (.*)|#'$1' = \{ \1|' lightning-c-bindings/Cargo.toml
+	else
 		# OSX sed is for some reason not compatible with GNU sed
 		sed -E -i '' 's|'$1' = \{ (.*)|#'$1' = \{ \1|' lightning-c-bindings/Cargo.toml
-	else
-		sed -E -i 's|'$1' = \{ (.*)|#'$1' = \{ \1|' lightning-c-bindings/Cargo.toml
 	fi
 }
 
@@ -213,19 +217,19 @@ cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1
 # cbindgen is relatively braindead when exporting typedefs -
 # it happily exports all our typedefs for private types, even with the
 # generics we specified in C mode! So we drop all those types manually here.
-if [ "$HOST_OSX" = "true" ]; then
+if is_gnu_sed; then
+	sed -i 's/typedef LDKnative.*Import.*LDKnative.*;//g' include/lightning.h
+
+	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
+	# doesn't actually use it anyway, so drop the import.
+	sed -i 's/#include <stdlib.h>/#include "ldk_rust_types.h"/g' include/lightning.h
+else
 	# OSX sed is for some reason not compatible with GNU sed
 	sed -i '' 's/typedef LDKnative.*Import.*LDKnative.*;//g' include/lightning.h
 
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.
 	sed -i '' 's/#include <stdlib.h>/#include "ldk_rust_types.h"/g' include/lightning.h
-else
-	sed -i 's/typedef LDKnative.*Import.*LDKnative.*;//g' include/lightning.h
-
-	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
-	# doesn't actually use it anyway, so drop the import.
-	sed -i 's/#include <stdlib.h>/#include "ldk_rust_types.h"/g' include/lightning.h
 fi
 
 # Build C++ class methods which call trait methods
@@ -438,12 +442,13 @@ fi
 # Finally, if we're on OSX or on Linux, build the final debug binary with address sanitizer (and leave it there)
 if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "x86_64-apple-darwin" ]; then
 	if [ "$CLANGPP" != "" ]; then
-		if [ "$HOST_OSX" = "true" ]; then
+		if is_gnu_sed; then
+			sed -i.bk 's/,"cdylib"]/]/g' Cargo.toml
+		else
 			# OSX sed is for some reason not compatible with GNU sed
 			sed -i .bk 's/,"cdylib"]/]/g' Cargo.toml
-		else
-			sed -i.bk 's/,"cdylib"]/]/g' Cargo.toml
 		fi
+
 		if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
 			RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" RUSTC_BOOTSTRAP=1 cargo rustc $CARGO_BUILD_ARGS --target aarch64-apple-darwin -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
 		fi

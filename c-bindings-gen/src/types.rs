@@ -438,6 +438,10 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
 					let crate_name_ident = format_ident!("{}", crate_name);
 					path.push(parse_quote!(#crate_name_ident));
+				} else if format!("{}", $ident) == "self" {
+					let mut path_iter = partial_path.rsplitn(2, "::");
+					path_iter.next().unwrap();
+					new_path = path_iter.next().unwrap().to_owned();
 				} else {
 					new_path = format!("{}{}{}", partial_path, $ident, $path_suffix);
 				}
@@ -452,7 +456,8 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			},
 			syn::UseTree::Name(n) => {
 				push_path!(n.ident, "");
-				imports.insert(n.ident.clone(), (new_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
+				let imported_ident = syn::Ident::new(new_path.rsplitn(2, "::").next().unwrap(), Span::call_site());
+				imports.insert(imported_ident, (new_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
 			},
 			syn::UseTree::Group(g) => {
 				for i in g.items.iter() {

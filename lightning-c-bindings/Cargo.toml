@@ -19,8 +19,8 @@ no-std = ["bitcoin/no-std", "lightning/no-std", "lightning-invoice/no-std", "cor
 std = ["bitcoin/std", "lightning/std", "lightning-invoice/std"]
 
 [dependencies]
-bitcoin = { version = "0.27", default-features = false }
-secp256k1 = { version = "0.20.3", features = ["global-context-less-secure"] }
+bitcoin = { version = "0.28", default-features = false }
+secp256k1 = { version = "0.22", features = ["global-context", "recovery"] }
 # Note that the following line is matched by genbindings to update the path
 lightning = { git = "https://github.com/lightningdevkit/rust-lightning", branch = "0.0.106-bindings", default-features = false }
 lightning-persister = { git = "https://github.com/lightningdevkit/rust-lightning", branch = "0.0.106-bindings", default-features = false }

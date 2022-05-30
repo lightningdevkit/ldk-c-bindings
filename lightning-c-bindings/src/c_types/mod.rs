@@ -5,12 +5,12 @@ pub mod derived;
 
 use bitcoin::Transaction as BitcoinTransaction;
 use bitcoin::hashes::Hash;
-use bitcoin::secp256k1::key::PublicKey as SecpPublicKey;
-use bitcoin::secp256k1::key::SecretKey as SecpSecretKey;
-use bitcoin::secp256k1::Signature as SecpSignature;
+use bitcoin::secp256k1::PublicKey as SecpPublicKey;
+use bitcoin::secp256k1::SecretKey as SecpSecretKey;
+use bitcoin::secp256k1::ecdsa::Signature as SecpSignature;
 use bitcoin::secp256k1::Error as SecpError;
-use bitcoin::secp256k1::recovery::RecoveryId;
-use bitcoin::secp256k1::recovery::RecoverableSignature as SecpRecoverableSignature;
+use bitcoin::secp256k1::ecdsa::RecoveryId;
+use bitcoin::secp256k1::ecdsa::RecoverableSignature as SecpRecoverableSignature;
 use bitcoin::bech32;
 
 use core::convert::TryInto; // Bindings need at least rustc 1.34
@@ -146,14 +146,18 @@ pub enum Secp256k1Error {
 	InvalidSignature,
 	/// Bad secret key
 	InvalidSecretKey,
+	/// Bad shared secret.
+	InvalidSharedSecret,
 	/// Bad recovery id
 	InvalidRecoveryId,
 	/// Invalid tweak for add_assign or mul_assign
 	InvalidTweak,
-	/// tweak_add_check failed on an xonly public key
-	TweakCheckFailed,
 	/// Didn't pass enough memory to context creation with preallocated memory
 	NotEnoughMemory,
+	/// Bad set of public keys.
+	InvalidPublicKeySum,
+	/// The only valid parity values are 0 or 1.
+	InvalidParityValue,
 }
 impl Secp256k1Error {
 	pub(crate) fn from_rust(err: SecpError) -> Self {
@@ -163,23 +167,28 @@ impl Secp256k1Error {
 			SecpError::InvalidPublicKey => Secp256k1Error::InvalidPublicKey,
 			SecpError::InvalidSignature => Secp256k1Error::InvalidSignature,
 			SecpError::InvalidSecretKey => Secp256k1Error::InvalidSecretKey,
+			SecpError::InvalidSharedSecret => Secp256k1Error::InvalidSharedSecret,
 			SecpError::InvalidRecoveryId => Secp256k1Error::InvalidRecoveryId,
 			SecpError::InvalidTweak => Secp256k1Error::InvalidTweak,
-			SecpError::TweakCheckFailed => Secp256k1Error::TweakCheckFailed,
 			SecpError::NotEnoughMemory => Secp256k1Error::NotEnoughMemory,
+			SecpError::InvalidPublicKeySum => Secp256k1Error::InvalidPublicKeySum,
+			SecpError::InvalidParityValue(_) => Secp256k1Error::InvalidParityValue,
 		}
 	}
 	pub(crate) fn into_rust(self) -> SecpError {
+		let invalid_parity = secp256k1::Parity::from_i32(42).unwrap_err();
 		match self {
 			Secp256k1Error::IncorrectSignature => SecpError::IncorrectSignature,
 			Secp256k1Error::InvalidMessage => SecpError::InvalidMessage,
 			Secp256k1Error::InvalidPublicKey => SecpError::InvalidPublicKey,
 			Secp256k1Error::InvalidSignature => SecpError::InvalidSignature,
 			Secp256k1Error::InvalidSecretKey => SecpError::InvalidSecretKey,
+			Secp256k1Error::InvalidSharedSecret => SecpError::InvalidSharedSecret,
 			Secp256k1Error::InvalidRecoveryId => SecpError::InvalidRecoveryId,
 			Secp256k1Error::InvalidTweak => SecpError::InvalidTweak,
-			Secp256k1Error::TweakCheckFailed => SecpError::TweakCheckFailed,
 			Secp256k1Error::NotEnoughMemory => SecpError::NotEnoughMemory,
+			Secp256k1Error::InvalidPublicKeySum => SecpError::InvalidPublicKeySum,
+			Secp256k1Error::InvalidParityValue => SecpError::InvalidParityValue(invalid_parity),
 		}
 	}
 }

@@ -1922,6 +1922,11 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 									type_resolver.crate_types.priv_structs.get(&real_ty).map(|r| *r)).unwrap();
 								let mut resolved_generics = t.generics.clone();
 
+								// Assume blindly that the bounds in the struct definition where
+								// clause matches any equivalent bounds on the type alias.
+								assert!(resolved_generics.where_clause.is_none());
+								resolved_generics.where_clause = real_generic_bounds.where_clause.clone();
+
 								if let syn::PathArguments::AngleBracketed(real_generics) = &p.path.segments.last().unwrap().arguments {
 									for (real_idx, real_param) in real_generics.args.iter().enumerate() {
 										if let syn::GenericArgument::Type(syn::Type::Path(real_param_path)) = real_param {

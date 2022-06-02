@@ -227,12 +227,13 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								non_lifetimes_processed = true;
 								if path != "std::ops::Deref" && path != "core::ops::Deref" {
 									new_typed_generics.insert(&type_param.ident, Some(path));
-								} else if trait_bound.path.segments.len() == 1 {
+								} else {
 									// If we're templated on Deref<Target = ConcreteThing>, store
 									// the reference type in `default_generics` which handles full
 									// types and not just paths.
 									if let syn::PathArguments::AngleBracketed(ref args) =
 											trait_bound.path.segments[0].arguments {
+										assert_eq!(trait_bound.path.segments.len(), 1);
 										for subargument in args.args.iter() {
 											match subargument {
 												syn::GenericArgument::Lifetime(_) => {},

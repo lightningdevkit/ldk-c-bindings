@@ -711,6 +711,10 @@ impl FullLibraryAST {
 fn initial_clonable_types() -> HashSet<String> {
 	let mut res = HashSet::new();
 	res.insert("crate::c_types::u5".to_owned());
+	res.insert("crate::c_types::FourBytes".to_owned());
+	res.insert("crate::c_types::TwelveBytes".to_owned());
+	res.insert("crate::c_types::SixteenBytes".to_owned());
+	res.insert("crate::c_types::TwentyBytes".to_owned());
 	res.insert("crate::c_types::ThirtyTwoBytes".to_owned());
 	res.insert("crate::c_types::SecretKey".to_owned());
 	res.insert("crate::c_types::PublicKey".to_owned());
@@ -718,8 +722,17 @@ fn initial_clonable_types() -> HashSet<String> {
 	res.insert("crate::c_types::TxOut".to_owned());
 	res.insert("crate::c_types::Signature".to_owned());
 	res.insert("crate::c_types::RecoverableSignature".to_owned());
+	res.insert("crate::c_types::Bech32Error".to_owned());
 	res.insert("crate::c_types::Secp256k1Error".to_owned());
 	res.insert("crate::c_types::IOError".to_owned());
+	res.insert("crate::c_types::Error".to_owned());
+	res.insert("crate::c_types::Str".to_owned());
+
+	// Because some types are manually-mapped to CVec_u8Z we may end up checking if its clonable
+	// before we ever get to constructing the type fully via
+	// `write_c_mangled_container_path_intern` (which will add it here too), so we have to manually
+	// add it on startup.
+	res.insert("crate::c_types::derived::CVec_u8Z".to_owned());
 	res
 }
 

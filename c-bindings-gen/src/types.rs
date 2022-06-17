@@ -1352,7 +1352,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						if let syn::Lit::Int(i) = &l.lit {
 							if i.base10_digits().parse::<usize>().unwrap() >= 32 {
 								let mut buf = Vec::new();
-								self.write_rust_type(&mut buf, generics, &a.elem);
+								self.write_rust_type(&mut buf, generics, &a.elem, false);
 								let ty = String::from_utf8(buf).unwrap();
 								ty == "u8"
 							} else {
@@ -1652,7 +1652,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 
-	fn write_rust_path<W: std::io::Write>(&self, w: &mut W, generics_resolver: Option<&GenericTypes>, path: &syn::Path) {
+	fn write_rust_path<W: std::io::Write>(&self, w: &mut W, generics_resolver: Option<&GenericTypes>, path: &syn::Path, with_ref_lifetime: bool) {
 		if let Some(resolved) = self.maybe_resolve_path(&path, generics_resolver) {
 			if self.is_primitive(&resolved) {
 				write!(w, "{}", path.get_ident().unwrap()).unwrap();
@@ -1670,7 +1670,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				}
 			}
 			if let syn::PathArguments::AngleBracketed(args) = &path.segments.iter().last().unwrap().arguments {
-				self.write_rust_generic_arg(w, generics_resolver, args.args.iter());
+				self.write_rust_generic_arg(w, generics_resolver, args.args.iter(), with_ref_lifetime);
 			}
 		} else {
 			if path.leading_colon.is_some() {
@@ -1680,7 +1680,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if idx != 0 { write!(w, "::").unwrap(); }
 				write!(w, "{}", seg.ident).unwrap();
 				if let syn::PathArguments::AngleBracketed(args) = &seg.arguments {
-					self.write_rust_generic_arg(w, generics_resolver, args.args.iter());
+					self.write_rust_generic_arg(w, generics_resolver, args.args.iter(), with_ref_lifetime);
 				}
 			}
 		}
@@ -1700,7 +1700,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						match bound {
 							syn::TypeParamBound::Trait(tb) => {
 								if tb.paren_token.is_some() || tb.lifetimes.is_some() { unimplemented!(); }
-								self.write_rust_path(w, generics_resolver, &tb.path);
+								self.write_rust_path(w, generics_resolver, &tb.path, false);
 							},
 							_ => unimplemented!(),
 						}
@@ -1713,38 +1713,40 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		if had_params { write!(w, ">").unwrap(); }
 	}
 
-	pub fn write_rust_generic_arg<'b, W: std::io::Write>(&self, w: &mut W, generics_resolver: Option<&GenericTypes>, generics: impl Iterator<Item=&'b syn::GenericArgument>) {
+	pub fn write_rust_generic_arg<'b, W: std::io::Write>(&self, w: &mut W, generics_resolver: Option<&GenericTypes>, generics: impl Iterator<Item=&'b syn::GenericArgument>, with_ref_lifetime: bool) {
 		write!(w, "<").unwrap();
 		for (idx, arg) in generics.enumerate() {
 			if idx != 0 { write!(w, ", ").unwrap(); }
 			match arg {
-				syn::GenericArgument::Type(t) => self.write_rust_type(w, generics_resolver, t),
+				syn::GenericArgument::Type(t) => self.write_rust_type(w, generics_resolver, t, with_ref_lifetime),
 				_ => unimplemented!(),
 			}
 		}
 		write!(w, ">").unwrap();
 	}
-	pub fn write_rust_type<W: std::io::Write>(&self, w: &mut W, generics: Option<&GenericTypes>, t: &syn::Type) {
+	pub fn write_rust_type<W: std::io::Write>(&self, w: &mut W, generics: Option<&GenericTypes>, t: &syn::Type, with_ref_lifetime: bool) {
 		match generics.resolve_type(t) {
 			syn::Type::Path(p) => {
 				if p.qself.is_some() {
 					unimplemented!();
 				}
-				self.write_rust_path(w, generics, &p.path);
+				self.write_rust_path(w, generics, &p.path, with_ref_lifetime);
 			},
 			syn::Type::Reference(r) => {
 				write!(w, "&").unwrap();
 				if let Some(lft) = &r.lifetime {
 					write!(w, "'{} ", lft.ident).unwrap();
+				} else if with_ref_lifetime {
+					write!(w, "'static ").unwrap();
 				}
 				if r.mutability.is_some() {
 					write!(w, "mut ").unwrap();
 				}
-				self.write_rust_type(w, generics, &*r.elem);
+				self.write_rust_type(w, generics, &*r.elem, with_ref_lifetime);
 			},
 			syn::Type::Array(a) => {
 				write!(w, "[").unwrap();
-				self.write_rust_type(w, generics, &a.elem);
+				self.write_rust_type(w, generics, &a.elem, with_ref_lifetime);
 				if let syn::Expr::Lit(l) = &a.len {
 					if let syn::Lit::Int(i) = &l.lit {
 						write!(w, "; {}]", i).unwrap();
@@ -1753,14 +1755,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			}
 			syn::Type::Slice(s) => {
 				write!(w, "[").unwrap();
-				self.write_rust_type(w, generics, &s.elem);
+				self.write_rust_type(w, generics, &s.elem, with_ref_lifetime);
 				write!(w, "]").unwrap();
 			},
 			syn::Type::Tuple(s) => {
 				write!(w, "(").unwrap();
 				for (idx, t) in s.elems.iter().enumerate() {
 					if idx != 0 { write!(w, ", ").unwrap(); }
-					self.write_rust_type(w, generics, &t);
+					self.write_rust_type(w, generics, &t, with_ref_lifetime);
 				}
 				write!(w, ")").unwrap();
 			},
@@ -2759,7 +2761,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// lifetime, of which the only real available choice is `static`, obviously.
 				write!(w, "&'static {}", crate_pfx).unwrap();
 				if !c_ty {
-					self.write_rust_path(w, generics, path);
+					self.write_rust_path(w, generics, path, with_ref_lifetime);
 				} else {
 					// We shouldn't be mapping references in types, so panic here
 					unimplemented!();

@@ -163,7 +163,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 
 				write!(w, "\tlet res: ").unwrap();
 				// At least in one case we need type annotations here, so provide them.
-				types.write_rust_type(w, Some(generics), &res_ty);
+				types.write_rust_type(w, Some(generics), &res_ty, false);
 
 				if t == "lightning::util::ser::ReadableArgs" {
 					writeln!(w, " = crate::c_types::deserialize_obj_arg(ser, arg_conv);").unwrap();
@@ -484,7 +484,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 										}
 										_ => panic!("5"),
 									}
-									$type_resolver.write_rust_type(w, Some(&gen_types), &*arg.ty);
+									$type_resolver.write_rust_type(w, Some(&gen_types), &*arg.ty, false);
 								}
 							}
 						}
@@ -492,7 +492,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						match &m.sig.output {
 							syn::ReturnType::Type(_, rtype) => {
 								write!(w, " -> ").unwrap();
-								$type_resolver.write_rust_type(w, Some(&gen_types), &*rtype)
+								$type_resolver.write_rust_type(w, Some(&gen_types), &*rtype, false)
 							},
 							_ => {},
 						}

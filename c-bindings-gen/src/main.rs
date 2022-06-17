@@ -2046,6 +2046,49 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 	}
 }
 
+
+/// Walk the FullLibraryAST, determining if impl aliases need to be marked cloneable.
+fn walk_ast_second_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &CrateTypes<'a>) {
+	for (module, astmod) in ast_storage.modules.iter() {
+		let orig_crate = module.splitn(2, "::").next().unwrap();
+		let ASTModule { ref attrs, ref items, .. } = astmod;
+		assert_eq!(export_status(&attrs), ExportStatus::Export);
+
+		let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, module, items);
+		let mut types = TypeResolver::new(module, import_resolver, crate_types);
+
+		for item in items.iter() {
+			match item {
+				syn::Item::Impl(i) => {
+					match export_status(&i.attrs) {
+						ExportStatus::Export => {},
+						ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+						ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
+					}
+					if let Some(trait_path) = i.trait_.as_ref() {
+						if path_matches_nongeneric(&trait_path.1, &["core", "clone", "Clone"]) ||
+						   path_matches_nongeneric(&trait_path.1, &["Clone"])
+						{
+							if let &syn::Type::Path(ref p) = &*i.self_ty {
+								if let Some(resolved_path) = types.maybe_resolve_path(&p.path, None) {
+									create_alias_for_impl(resolved_path, i, &mut types, |aliased_impl, types| {
+										if let &syn::Type::Path(ref p) = &*aliased_impl.self_ty {
+											if let Some(resolved_aliased_path) = types.maybe_resolve_path(&p.path, None) {
+												crate_types.set_clonable("crate::".to_owned() + &resolved_aliased_path);
+											}
+										}
+									});
+								}
+							}
+						}
+					}
+				}
+				_ => {}
+			}
+		}
+	}
+}
+
 fn walk_private_mod<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, module: String, items: &'a syn::ItemMod, crate_types: &mut CrateTypes<'a>) {
 	let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, &module, &items.content.as_ref().unwrap().1);
 	for item in items.content.as_ref().unwrap().1.iter() {
@@ -2071,7 +2114,7 @@ fn walk_private_mod<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, modul
 }
 
 /// Walk the FullLibraryAST, deciding how things will be mapped and adding tracking to CrateTypes.
-fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a>) {
+fn walk_ast_first_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a>) {
 	for (module, astmod) in ast_storage.modules.iter() {
 		let ASTModule { ref attrs, ref items, submods: _ } = astmod;
 		assert_eq!(export_status(&attrs), ExportStatus::Export);
@@ -2226,7 +2269,11 @@ fn main() {
 	// ...then walk the ASTs tracking what types we will map, and how, so that we can resolve them
 	// when parsing other file ASTs...
 	let mut libtypes = CrateTypes::new(&mut derived_templates, &libast);
-	walk_ast(&libast, &mut libtypes);
+	walk_ast_first_pass(&libast, &mut libtypes);
+
+	// ... using the generated data, determine a few additional fields, specifically which type
+	// aliases are to be clone-able...
+	walk_ast_second_pass(&libast, &libtypes);
 
 	// ... finally, do the actual file conversion/mapping, writing out types as we go.
 	convert_file(&libast, &libtypes, &args[1], &mut header_file, &mut cpp_header_file);

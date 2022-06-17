@@ -1594,8 +1594,37 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 
 	let mut needs_free = false;
 	let mut constr = Vec::new();
+	let mut is_clonable = true;
 
-	writeln!(w, "#[must_use]\n#[derive(Clone)]\n#[repr(C)]\npub enum {} {{", e.ident).unwrap();
+	for var in e.variants.iter() {
+		if let syn::Fields::Named(fields) = &var.fields {
+			needs_free = true;
+			for field in fields.named.iter() {
+				if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
+
+				let mut ty_checks = Vec::new();
+				types.write_c_type(&mut ty_checks, &field.ty, Some(&gen_types), false);
+				if !types.is_clonable(&String::from_utf8(ty_checks).unwrap()) {
+					is_clonable = false;
+				}
+			}
+		} else if let syn::Fields::Unnamed(fields) = &var.fields {
+			for field in fields.unnamed.iter() {
+				let mut ty_checks = Vec::new();
+				types.write_c_type(&mut ty_checks, &field.ty, Some(&gen_types), false);
+				let ty = String::from_utf8(ty_checks).unwrap();
+				if ty != "" && !types.is_clonable(&ty) {
+					is_clonable = false;
+				}
+			}
+		}
+	}
+
+	if is_clonable {
+		writeln!(w, "#[derive(Clone)]").unwrap();
+		types.crate_types.set_clonable(format!("{}::{}", types.module_path, e.ident));
+	}
+	writeln!(w, "#[must_use]\n#[repr(C)]\npub enum {} {{", e.ident).unwrap();
 	for var in e.variants.iter() {
 		assert_eq!(export_status(&var.attrs), ExportStatus::Export); // We can't partially-export a mirrored enum
 		writeln_docs(w, &var.attrs, "\t");
@@ -1803,9 +1832,13 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 		}
 	}
 
-	write_conv!(format!("to_native(&self) -> native{}", e.ident), false, true);
+	if is_clonable {
+		write_conv!(format!("to_native(&self) -> native{}", e.ident), false, true);
+	}
 	write_conv!(format!("into_native(self) -> native{}", e.ident), false, false);
-	write_conv!(format!("from_native(native: &native{}) -> Self", e.ident), true, true);
+	if is_clonable {
+		write_conv!(format!("from_native(native: &native{}) -> Self", e.ident), true, true);
+	}
 	write_conv!(format!("native_into(native: native{}) -> Self", e.ident), true, false);
 	writeln!(w, "}}").unwrap();
 
@@ -1813,11 +1846,13 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 		writeln!(w, "/// Frees any resources used by the {}", e.ident).unwrap();
 		writeln!(w, "#[no_mangle]\npub extern \"C\" fn {}_free(this_ptr: {}) {{ }}", e.ident, e.ident).unwrap();
 	}
-	writeln!(w, "/// Creates a copy of the {}", e.ident).unwrap();
-	writeln!(w, "#[no_mangle]").unwrap();
-	writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", e.ident, e.ident, e.ident).unwrap();
-	writeln!(w, "\torig.clone()").unwrap();
-	writeln!(w, "}}").unwrap();
+	if is_clonable {
+		writeln!(w, "/// Creates a copy of the {}", e.ident).unwrap();
+		writeln!(w, "#[no_mangle]").unwrap();
+		writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", e.ident, e.ident, e.ident).unwrap();
+		writeln!(w, "\torig.clone()").unwrap();
+		writeln!(w, "}}").unwrap();
+	}
 	w.write_all(&constr).unwrap();
 	write_cpp_wrapper(cpp_headers, &format!("{}", e.ident), needs_free, None);
 }

@@ -1652,7 +1652,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 
-	fn write_rust_path<W: std::io::Write>(&self, w: &mut W, generics_resolver: Option<&GenericTypes>, path: &syn::Path, with_ref_lifetime: bool) {
+	fn write_rust_path<W: std::io::Write>(&self, w: &mut W, generics_resolver: Option<&GenericTypes>, path: &syn::Path, with_ref_lifetime: bool, generated_crate_ref: bool) {
 		if let Some(resolved) = self.maybe_resolve_path(&path, generics_resolver) {
 			if self.is_primitive(&resolved) {
 				write!(w, "{}", path.get_ident().unwrap()).unwrap();
@@ -1661,9 +1661,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// checking for "bitcoin" explicitly.
 				if resolved.starts_with("bitcoin::") || Self::in_rust_prelude(&resolved) {
 					write!(w, "{}", resolved).unwrap();
-				// If we're printing a generic argument, it needs to reference the crate, otherwise
-				// the original crate:
-				} else if self.maybe_resolve_path(&path, None).as_ref() == Some(&resolved) {
+				} else if !generated_crate_ref {
+					// If we're printing a generic argument, it needs to reference the crate, otherwise
+					// the original crate.
 					write!(w, "{}", self.real_rust_type_mapping(&resolved)).unwrap();
 				} else {
 					write!(w, "crate::{}", resolved).unwrap();
@@ -1700,7 +1700,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						match bound {
 							syn::TypeParamBound::Trait(tb) => {
 								if tb.paren_token.is_some() || tb.lifetimes.is_some() { unimplemented!(); }
-								self.write_rust_path(w, generics_resolver, &tb.path, false);
+								self.write_rust_path(w, generics_resolver, &tb.path, false, false);
 							},
 							_ => unimplemented!(),
 						}
@@ -1724,13 +1724,19 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 		write!(w, ">").unwrap();
 	}
-	pub fn write_rust_type<W: std::io::Write>(&self, w: &mut W, generics: Option<&GenericTypes>, t: &syn::Type, with_ref_lifetime: bool) {
-		match generics.resolve_type(t) {
+	fn do_write_rust_type<W: std::io::Write>(&self, w: &mut W, generics: Option<&GenericTypes>, t: &syn::Type, with_ref_lifetime: bool, force_crate_ref: bool) {
+		let real_ty = generics.resolve_type(t);
+		let mut generate_crate_ref = force_crate_ref || t != real_ty;
+		match real_ty {
 			syn::Type::Path(p) => {
 				if p.qself.is_some() {
 					unimplemented!();
 				}
-				self.write_rust_path(w, generics, &p.path, with_ref_lifetime);
+				if let Some(resolved_ty) = self.maybe_resolve_path(&p.path, generics) {
+					generate_crate_ref |= self.maybe_resolve_path(&p.path, None).as_ref() != Some(&resolved_ty);
+					if self.crate_types.traits.get(&resolved_ty).is_none() { generate_crate_ref = false; }
+				}
+				self.write_rust_path(w, generics, &p.path, with_ref_lifetime, generate_crate_ref);
 			},
 			syn::Type::Reference(r) => {
 				write!(w, "&").unwrap();
@@ -1742,11 +1748,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if r.mutability.is_some() {
 					write!(w, "mut ").unwrap();
 				}
-				self.write_rust_type(w, generics, &*r.elem, with_ref_lifetime);
+				self.do_write_rust_type(w, generics, &*r.elem, with_ref_lifetime, generate_crate_ref);
 			},
 			syn::Type::Array(a) => {
 				write!(w, "[").unwrap();
-				self.write_rust_type(w, generics, &a.elem, with_ref_lifetime);
+				self.do_write_rust_type(w, generics, &a.elem, with_ref_lifetime, generate_crate_ref);
 				if let syn::Expr::Lit(l) = &a.len {
 					if let syn::Lit::Int(i) = &l.lit {
 						write!(w, "; {}]", i).unwrap();
@@ -1755,20 +1761,24 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			}
 			syn::Type::Slice(s) => {
 				write!(w, "[").unwrap();
-				self.write_rust_type(w, generics, &s.elem, with_ref_lifetime);
+				self.do_write_rust_type(w, generics, &s.elem, with_ref_lifetime, generate_crate_ref);
 				write!(w, "]").unwrap();
 			},
 			syn::Type::Tuple(s) => {
 				write!(w, "(").unwrap();
 				for (idx, t) in s.elems.iter().enumerate() {
 					if idx != 0 { write!(w, ", ").unwrap(); }
-					self.write_rust_type(w, generics, &t, with_ref_lifetime);
+					self.do_write_rust_type(w, generics, &t, with_ref_lifetime, generate_crate_ref);
 				}
 				write!(w, ")").unwrap();
 			},
 			_ => unimplemented!(),
 		}
 	}
+	pub fn write_rust_type<W: std::io::Write>(&self, w: &mut W, generics: Option<&GenericTypes>, t: &syn::Type, with_ref_lifetime: bool) {
+		self.do_write_rust_type(w, generics, t, with_ref_lifetime, false);
+	}
+
 
 	/// Prints a constructor for something which is "uninitialized" (but obviously not actually
 	/// unint'd memory).
@@ -2761,7 +2771,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// lifetime, of which the only real available choice is `static`, obviously.
 				write!(w, "&'static {}", crate_pfx).unwrap();
 				if !c_ty {
-					self.write_rust_path(w, generics, path, with_ref_lifetime);
+					self.write_rust_path(w, generics, path, with_ref_lifetime, false);
 				} else {
 					// We shouldn't be mapping references in types, so panic here
 					unimplemented!();

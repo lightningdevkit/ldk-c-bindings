@@ -1339,14 +1339,27 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		"crate::c_types"
 	}
 
+	/// This should just be a closure, but doing so gets an error like
+	/// error: reached the recursion limit while instantiating `types::TypeResolver::is_transpar...c/types.rs:1358:104: 1358:110]>>`
+	/// which implies the concrete function instantiation of `is_transparent_container` ends up
+	/// being recursive.
+	fn deref_type<'one, 'b: 'one> (obj: &'one &'b syn::Type) -> &'b syn::Type { *obj }
+
 	/// Returns true if the path containing the given args is a "transparent" container, ie an
 	/// Option or a container which does not require a generated continer class.
 	fn is_transparent_container<'i, I: Iterator<Item=&'i syn::Type>>(&self, full_path: &str, _is_ref: bool, mut args: I, generics: Option<&GenericTypes>) -> bool {
 		if full_path == "Option" {
 			let inner = args.next().unwrap();
 			assert!(args.next().is_none());
-			match inner {
-				syn::Type::Reference(_) => true,
+			match generics.resolve_type(inner) {
+				syn::Type::Reference(r) => {
+					let elem = &*r.elem;
+					match elem {
+						syn::Type::Path(_) =>
+							self.is_transparent_container(full_path, true, [elem].iter().map(Self::deref_type), generics),
+						_ => true,
+					}
+				},
 				syn::Type::Array(a) => {
 					if let syn::Expr::Lit(l) = &a.len {
 						if let syn::Lit::Int(i) = &l.lit {
@@ -1368,7 +1381,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						if self.c_type_has_inner_from_path(&resolved) { return true; }
 						if self.is_primitive(&resolved) { return false; }
 						if self.c_type_from_path(&resolved, false, false).is_some() { true } else { false }
-					} else { true }
+					} else { unimplemented!(); }
 				},
 				syn::Type::Tuple(_) => false,
 				_ => unimplemented!(),

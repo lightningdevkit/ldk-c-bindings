@@ -705,6 +705,7 @@ impl FullLibraryAST {
 							let modname = if module != "" {
 								module.clone() + "::" + &modident
 							} else {
+								self.dependencies.insert(m.ident);
 								modident.clone()
 							};
 							self.load_module(modname, m.attrs, m.content.unwrap().1);

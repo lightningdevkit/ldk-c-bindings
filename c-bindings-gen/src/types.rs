@@ -268,7 +268,8 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 						if p.qself.is_some() { return false; }
 						if p.path.leading_colon.is_some() { return false; }
 						let mut p_iter = p.path.segments.iter();
-						if let Some(gen) = new_typed_generics.get_mut(&p_iter.next().unwrap().ident) {
+						let p_ident = &p_iter.next().unwrap().ident;
+						if let Some(gen) = new_typed_generics.get_mut(p_ident) {
 							if gen.is_some() { return false; }
 							if &format!("{}", p_iter.next().unwrap().ident) != "Target" {return false; }
 
@@ -281,7 +282,16 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 									if non_lifetimes_processed { return false; }
 									non_lifetimes_processed = true;
 									assert_simple_bound(&trait_bound);
-									*gen = Some(types.resolve_path(&trait_bound.path, None));
+									let resolved = types.resolve_path(&trait_bound.path, None);
+									let ref_ty = syn::Type::Reference(syn::TypeReference {
+										and_token: syn::Token![&](Span::call_site()),
+										lifetime: None, mutability: None,
+										elem: Box::new(syn::Type::Path(syn::TypePath {
+											qself: None, path: string_path_to_syn_path(&resolved)
+										})),
+									});
+									self.default_generics.insert(p_ident, (ref_ty.clone(), ref_ty));
+									*gen = Some(resolved);
 								}
 							}
 						} else { return false; }

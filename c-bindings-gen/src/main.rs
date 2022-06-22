@@ -449,7 +449,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						if m.default.is_some() { unimplemented!(); }
 						if m.sig.constness.is_some() || m.sig.asyncness.is_some() || m.sig.unsafety.is_some() ||
 								m.sig.abi.is_some() || m.sig.variadic.is_some() {
-							unimplemented!();
+							panic!("1");
 						}
 						let mut meth_gen_types = gen_types.push_ctx();
 						assert!(meth_gen_types.learn_generics(&m.sig.generics, $type_resolver));
@@ -462,7 +462,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						for inp in m.sig.inputs.iter() {
 							match inp {
 								syn::FnArg::Receiver(recv) => {
-									if !recv.attrs.is_empty() || recv.reference.is_none() { unimplemented!(); }
+									if !recv.attrs.is_empty() || recv.reference.is_none() { panic!("2"); }
 									write!(w, "&").unwrap();
 									if let Some(lft) = &recv.reference.as_ref().unwrap().1 {
 										write!(w, "'{} ", lft.ident).unwrap();
@@ -474,16 +474,16 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 									}
 								},
 								syn::FnArg::Typed(arg) => {
-									if !arg.attrs.is_empty() { unimplemented!(); }
+									if !arg.attrs.is_empty() { panic!("3"); }
 									match &*arg.pat {
 										syn::Pat::Ident(ident) => {
 											if !ident.attrs.is_empty() || ident.by_ref.is_some() ||
 													ident.mutability.is_some() || ident.subpat.is_some() {
-												unimplemented!();
+												panic!("4");
 											}
 											write!(w, ", mut {}{}: ", if $type_resolver.skip_arg(&*arg.ty, Some(&meth_gen_types)) { "_" } else { "" }, ident.ident).unwrap();
 										}
-										_ => unimplemented!(),
+										_ => panic!("5"),
 									}
 									$type_resolver.write_rust_type(w, Some(&gen_types), &*arg.ty);
 								}
@@ -500,7 +500,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						write!(w, " {{\n\t\t").unwrap();
 						match export_status(&m.attrs) {
 							ExportStatus::NoExport => {
-								unimplemented!();
+								panic!("6");
 							},
 							_ => {},
 						}
@@ -526,14 +526,14 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						writeln!(w, "\n\t}}").unwrap();
 					},
 					&syn::TraitItem::Type(ref t) => {
-						if t.default.is_some() || t.generics.lt_token.is_some() { unimplemented!(); }
+						if t.default.is_some() || t.generics.lt_token.is_some() { panic!("10"); }
 						let mut bounds_iter = t.bounds.iter();
 						loop {
 							match bounds_iter.next().unwrap() {
 								syn::TypeParamBound::Trait(tr) => {
 									writeln!(w, "\ttype {} = crate::{};", t.ident, $type_resolver.resolve_path(&tr.path, Some(&gen_types))).unwrap();
 									for bound in bounds_iter {
-										if let syn::TypeParamBound::Trait(_) = bound { unimplemented!(); }
+										if let syn::TypeParamBound::Trait(_) = bound { panic!("11"); }
 									}
 									break;
 								},
@@ -541,7 +541,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 							}
 						}
 					},
-					_ => unimplemented!(),
+					_ => panic!("12"),
 				}
 			}
 		}

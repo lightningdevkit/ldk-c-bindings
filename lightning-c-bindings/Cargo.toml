@@ -26,6 +26,7 @@ lightning = { git = "https://github.com/lightningdevkit/rust-lightning", branch 
 lightning-persister = { git = "https://github.com/lightningdevkit/rust-lightning", branch = "0.0.106-bindings", default-features = false }
 lightning-invoice = { git = "https://github.com/lightningdevkit/rust-lightning", branch = "0.0.106-bindings", default-features = false }
 lightning-background-processor = { git = "https://github.com/lightningdevkit/rust-lightning", branch = "0.0.106-bindings", default-features = false }
+lightning-rapid-gossip-sync = { git = "https://github.com/lightningdevkit/rust-lightning", branch = "0.0.106-bindings", default-features = false }
 
 core2 = { version = "0.3.0", optional = true, default-features = false }
 

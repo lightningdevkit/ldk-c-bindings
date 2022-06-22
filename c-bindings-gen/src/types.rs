@@ -2201,7 +2201,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// For slices (and Options), we refuse to directly map them as is_ref when they
 				// aren't opaque types containing an inner pointer. This is due to the fact that,
 				// in both cases, the actual higher-level type is non-is_ref.
-				let ty_has_inner = if $args_len == 1 {
+				let (ty_has_inner, ty_is_trait) = if $args_len == 1 {
 					let ty = $args_iter().next().unwrap();
 					if $container_type == "Slice" && to_c {
 						// "To C ptr_for_ref" means "return the regular object with is_owned
@@ -2211,12 +2211,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					}
 					if let syn::Type::Reference(t) = ty {
 						if let syn::Type::Path(p) = &*t.elem {
-							self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics))
-						} else { false }
+							let resolved = self.resolve_path(&p.path, generics);
+							(self.c_type_has_inner_from_path(&resolved), self.crate_types.traits.get(&resolved).is_some())
+						} else { (false, false) }
 					} else if let syn::Type::Path(p) = ty {
-						self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics))
-					} else { false }
-				} else { true };
+						let resolved = self.resolve_path(&p.path, generics);
+						(self.c_type_has_inner_from_path(&resolved), self.crate_types.traits.get(&resolved).is_some())
+					} else { (false, false) }
+				} else { (true, false) };
 
 				// Options get a bunch of special handling, since in general we map Option<>al
 				// types into the same C type as non-Option-wrapped types. This ends up being
@@ -2240,7 +2242,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						// If the inner element contains an inner pointer, we will just use that,
 						// avoiding the need to map elements to references. Otherwise we'll need to
 						// do an extra mapping step.
-						needs_ref_map = !only_contained_has_inner && $container_type == "Option";
+						needs_ref_map = !only_contained_has_inner && !ty_is_trait && $container_type == "Option";
 					} else {
 						only_contained_type = Some(arg);
 						only_contained_type_nonref = Some(arg);
@@ -2488,10 +2490,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	// ******************************************************
 
 	fn write_template_generics<'b, W: std::io::Write>(&self, w: &mut W, args: &mut dyn Iterator<Item=&'b syn::Type>, generics: Option<&GenericTypes>, is_ref: bool) -> bool {
-		for (idx, t) in args.enumerate() {
+		for (idx, orig_t) in args.enumerate() {
 			if idx != 0 {
 				write!(w, ", ").unwrap();
 			}
+			let t = generics.resolve_type(orig_t);
 			if let syn::Type::Reference(r_arg) = t {
 				assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
 
@@ -2503,6 +2506,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if let syn::Type::Path(p_arg) = &*r_arg.elem {
 					let resolved = self.resolve_path(&p_arg.path, generics);
 					assert!(self.crate_types.opaques.get(&resolved).is_some() ||
+							self.crate_types.traits.get(&resolved).is_some() ||
 							self.c_type_from_path(&resolved, true, true).is_some(), "Template generics should be opaque or have a predefined mapping");
 				} else { unimplemented!(); }
 			} else if let syn::Type::Path(p_arg) = t {

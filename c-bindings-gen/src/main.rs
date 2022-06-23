@@ -331,7 +331,6 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 					ExportStatus::TestOnly => continue,
 					ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 				}
-				if m.default.is_some() { unimplemented!(); }
 
 				let mut meth_gen_types = gen_types.push_ctx();
 				assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
@@ -446,7 +445,6 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				match item {
 					syn::TraitItem::Method(m) => {
 						if let ExportStatus::TestOnly = export_status(&m.attrs) { continue; }
-						if m.default.is_some() { unimplemented!(); }
 						if m.sig.constness.is_some() || m.sig.asyncness.is_some() || m.sig.unsafety.is_some() ||
 								m.sig.abi.is_some() || m.sig.variadic.is_some() {
 							panic!("1");
@@ -1050,7 +1048,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						writeln!(w, "\t}}\n}}\n").unwrap();
 
 						macro_rules! impl_meth {
-							($m: expr, $trait_meth: expr, $trait_path: expr, $trait: expr, $indent: expr) => {
+							($m: expr, $trait_meth: expr, $trait_path: expr, $trait: expr, $indent: expr, $types: expr) => {
 								let trait_method = $trait.items.iter().filter_map(|item| {
 									if let syn::TraitItem::Method(t_m) = item { Some(t_m) } else { None }
 								}).find(|trait_meth| trait_meth.sig.ident == $m.sig.ident).unwrap();
@@ -1065,14 +1063,14 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 								}
 								write!(w, "extern \"C\" fn {}_{}_{}(", ident, $trait.ident, $m.sig.ident).unwrap();
 								let mut meth_gen_types = gen_types.push_ctx();
-								assert!(meth_gen_types.learn_generics(&$m.sig.generics, types));
+								assert!(meth_gen_types.learn_generics(&$m.sig.generics, $types));
 								let mut uncallable_function = false;
 								for inp in $m.sig.inputs.iter() {
 									match inp {
 										syn::FnArg::Typed(arg) => {
-											if types.skip_arg(&*arg.ty, Some(&meth_gen_types)) { continue; }
+											if $types.skip_arg(&*arg.ty, Some(&meth_gen_types)) { continue; }
 											let mut c_type = Vec::new();
-											types.write_c_type(&mut c_type, &*arg.ty, Some(&meth_gen_types), false);
+											$types.write_c_type(&mut c_type, &*arg.ty, Some(&meth_gen_types), false);
 											if is_type_unconstructable(&String::from_utf8(c_type).unwrap()) {
 												uncallable_function = true;
 											}
@@ -1081,16 +1079,16 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									}
 								}
 								if uncallable_function {
-									let mut trait_resolver = get_module_type_resolver!(full_trait_path, types.crate_libs, types.crate_types);
+									let mut trait_resolver = get_module_type_resolver!(full_trait_path, $types.crate_libs, $types.crate_types);
 									write_method_params(w, &$trait_meth.sig, "c_void", &mut trait_resolver, Some(&meth_gen_types), true, true);
 								} else {
-									write_method_params(w, &$m.sig, "c_void", types, Some(&meth_gen_types), true, true);
+									write_method_params(w, &$m.sig, "c_void", $types, Some(&meth_gen_types), true, true);
 								}
 								write!(w, " {{\n\t").unwrap();
 								if uncallable_function {
 									write!(w, "unreachable!();").unwrap();
 								} else {
-									write_method_var_decl_body(w, &$m.sig, "", types, Some(&meth_gen_types), false);
+									write_method_var_decl_body(w, &$m.sig, "", $types, Some(&meth_gen_types), false);
 									let mut takes_self = false;
 									for inp in $m.sig.inputs.iter() {
 										if let syn::FnArg::Receiver(_) = inp {
@@ -1120,7 +1118,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										},
 										_ => {},
 									}
-									write_method_call_params(w, &$m.sig, "", types, Some(&meth_gen_types), &real_type, false);
+									write_method_call_params(w, &$m.sig, "", $types, Some(&meth_gen_types), &real_type, false);
 								}
 								write!(w, "\n}}\n").unwrap();
 								if let syn::ReturnType::Type(_, rtype) = &$m.sig.output {
@@ -1130,7 +1128,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										writeln!(w, "\t// This is a bit race-y in the general case, but for our specific use-cases today, we're safe").unwrap();
 										writeln!(w, "\t// Specifically, we must ensure that the first time we're called it can never be in parallel").unwrap();
 										write!(w, "\tif ").unwrap();
-										types.write_empty_rust_val_check(Some(&meth_gen_types), w, &*r.elem, &format!("trait_self_arg.{}", $m.sig.ident));
+										$types.write_empty_rust_val_check(Some(&meth_gen_types), w, &*r.elem, &format!("trait_self_arg.{}", $m.sig.ident));
 										writeln!(w, " {{").unwrap();
 										writeln!(w, "\t\tunsafe {{ &mut *(trait_self_arg as *const {}  as *mut {}) }}.{} = {}_{}_{}(trait_self_arg.this_arg);", $trait.ident, $trait.ident, $m.sig.ident, ident, $trait.ident, $m.sig.ident).unwrap();
 										writeln!(w, "\t}}").unwrap();
@@ -1140,24 +1138,29 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							}
 						}
 
-						'impl_item_loop: for item in i.items.iter() {
-							match item {
-								syn::ImplItem::Method(m) => {
-									for trait_item in trait_obj.items.iter() {
-										match trait_item {
-											syn::TraitItem::Method(meth) => {
+						'impl_item_loop: for trait_item in trait_obj.items.iter() {
+							match trait_item {
+								syn::TraitItem::Method(meth) => {
+									for item in i.items.iter() {
+										match item {
+											syn::ImplItem::Method(m) => {
 												if meth.sig.ident == m.sig.ident {
-													impl_meth!(m, meth, full_trait_path, trait_obj, "");
+													impl_meth!(m, meth, full_trait_path, trait_obj, "", types);
 													continue 'impl_item_loop;
 												}
 											},
-											_ => {},
+											syn::ImplItem::Type(_) => {},
+											_ => unimplemented!(),
 										}
 									}
-									unreachable!();
+									assert!(meth.default.is_some());
+									let old_gen_types = gen_types;
+									gen_types = GenericTypes::new(Some(resolved_path.clone()));
+									let mut trait_resolver = get_module_type_resolver!(full_trait_path, types.crate_libs, types.crate_types);
+									impl_meth!(meth, meth, full_trait_path, trait_obj, "", &mut trait_resolver);
+									gen_types = old_gen_types;
 								},
-								syn::ImplItem::Type(_) => {},
-								_ => unimplemented!(),
+								_ => {},
 							}
 						}
 						if requires_clone {

@@ -576,7 +576,7 @@ pub fn write_method_params<W: std::io::Write>(w: &mut W, sig: &syn::Signature, t
 					},
 					_ => unimplemented!(),
 				}
-				w.write(&c_type).unwrap();
+				w.write_all(&c_type).unwrap();
 			}
 		}
 	}

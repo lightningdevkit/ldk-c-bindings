@@ -18,8 +18,8 @@ use alloc::{vec::Vec, boxed::Box};
 
 /// Indicates an error on the client's part (usually some variant of attempting to use too-low or
 /// too-high values)
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum APIError {
 	/// Indicates the API was wholly misused (see err for more). Cases where these can be returned
@@ -66,7 +66,9 @@ pub enum APIError {
 		script: crate::lightning::ln::script::ShutdownScript,
 	},
 }
-use lightning::util::errors::APIError as nativeAPIError;
+use lightning::util::errors::APIError as APIErrorImport;
+pub(crate) type nativeAPIError = APIErrorImport;
+
 impl APIError {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeAPIError {

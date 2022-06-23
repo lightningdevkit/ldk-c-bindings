@@ -455,11 +455,16 @@ pub extern "C" fn ChainMonitor_as_Listen(this_arg: &ChainMonitor) -> crate::ligh
 	crate::lightning::chain::Listen {
 		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
+		filtered_block_connected: ChainMonitor_Listen_filtered_block_connected,
 		block_connected: ChainMonitor_Listen_block_connected,
 		block_disconnected: ChainMonitor_Listen_block_disconnected,
 	}
 }
 
+extern "C" fn ChainMonitor_Listen_filtered_block_connected(this_arg: *const c_void, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32) {
+	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
+	<nativeChainMonitor as lightning::chain::Listen<>>::filtered_block_connected(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height)
+}
 extern "C" fn ChainMonitor_Listen_block_connected(this_arg: *const c_void, mut block: crate::c_types::u8slice, mut height: u32) {
 	<nativeChainMonitor as lightning::chain::Listen<>>::block_connected(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, &::bitcoin::consensus::encode::deserialize(block.to_slice()).unwrap(), height)
 }
@@ -544,9 +549,9 @@ extern "C" fn ChainMonitor_Watch_update_channel(this_arg: *const c_void, mut fun
 	local_ret
 }
 #[must_use]
-extern "C" fn ChainMonitor_Watch_release_pending_monitor_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_MonitorEventZ {
+extern "C" fn ChainMonitor_Watch_release_pending_monitor_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_OutPointCVec_MonitorEventZZZ {
 	let mut ret = <nativeChainMonitor as lightning::chain::Watch<_>>::release_pending_monitor_events(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::chain::channelmonitor::MonitorEvent::native_into(item) }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { crate::lightning::chain::channelmonitor::MonitorEvent::native_into(item) }); }; let mut local_ret_0 = (crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
 }
 

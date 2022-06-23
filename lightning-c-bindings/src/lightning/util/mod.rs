@@ -21,6 +21,7 @@ pub mod errors;
 pub mod ser;
 pub mod message_signing;
 pub mod invoice;
+pub mod persist;
 pub mod logger;
 pub mod config;
 mod fuzz_wrappers {
@@ -88,6 +89,17 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 }
+}
+mod fairrwlock {
+
+use alloc::str::FromStr;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
 }
 mod zbase32 {
 
@@ -165,6 +177,17 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 }
+}
+mod time {
+
+use alloc::str::FromStr;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
 }
 mod macro_logger {
 

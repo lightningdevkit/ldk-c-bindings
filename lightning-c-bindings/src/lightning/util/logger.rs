@@ -22,8 +22,8 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 /// An enum representing the available verbosity levels of the logger.
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum Level {
 	/// Designates extremely verbose information, including gossip-induced messages
@@ -39,7 +39,9 @@ pub enum Level {
 	/// Designates very serious errors
 	Error,
 }
-use lightning::util::logger::Level as nativeLevel;
+use lightning::util::logger::Level as LevelImport;
+pub(crate) type nativeLevel = LevelImport;
+
 impl Level {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeLevel {

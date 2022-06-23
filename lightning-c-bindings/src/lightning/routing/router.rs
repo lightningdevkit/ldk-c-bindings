@@ -8,7 +8,7 @@
 
 //! The top-level routing/network map tracking logic lives here.
 //!
-//! You probably want to create a NetGraphMsgHandler and use that as your RoutingMessageHandler and then
+//! You probably want to create a P2PGossipSync and use that as your RoutingMessageHandler and then
 //! interrogate it to get routes for your own payments.
 
 use alloc::str::FromStr;
@@ -266,11 +266,10 @@ impl Route {
 	}
 }
 /// The list of routes taken for a single (potentially-)multi-part payment. The pubkey of the
-/// last RouteHop in each path must be the same.
-/// Each entry represents a list of hops, NOT INCLUDING our own, where the last hop is the
-/// destination. Thus, this must always be at least length one. While the maximum length of any
-/// given path is variable, keeping the length of any path to less than 20 should currently
-/// ensure it is viable.
+/// last RouteHop in each path must be the same. Each entry represents a list of hops, NOT
+/// INCLUDING our own, where the last hop is the destination. Thus, this must always be at
+/// least length one. While the maximum length of any given path is variable, keeping the length
+/// of any path less or equal to 19 should currently ensure it is viable.
 #[no_mangle]
 pub extern "C" fn Route_get_paths(this_ptr: &Route) -> crate::c_types::derived::CVec_CVec_RouteHopZZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().paths;
@@ -278,11 +277,10 @@ pub extern "C" fn Route_get_paths(this_ptr: &Route) -> crate::c_types::derived::
 	local_inner_val.into()
 }
 /// The list of routes taken for a single (potentially-)multi-part payment. The pubkey of the
-/// last RouteHop in each path must be the same.
-/// Each entry represents a list of hops, NOT INCLUDING our own, where the last hop is the
-/// destination. Thus, this must always be at least length one. While the maximum length of any
-/// given path is variable, keeping the length of any path to less than 20 should currently
-/// ensure it is viable.
+/// last RouteHop in each path must be the same. Each entry represents a list of hops, NOT
+/// INCLUDING our own, where the last hop is the destination. Thus, this must always be at
+/// least length one. While the maximum length of any given path is variable, keeping the length
+/// of any path less or equal to 19 should currently ensure it is viable.
 #[no_mangle]
 pub extern "C" fn Route_set_paths(this_ptr: &mut Route, mut val: crate::c_types::derived::CVec_CVec_RouteHopZZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { let mut local_val_0 = Vec::new(); for mut item in item.into_rust().drain(..) { local_val_0.push( { *unsafe { Box::from_raw(item.take_inner()) } }); }; local_val_0 }); };
@@ -403,8 +401,8 @@ pub(crate) type nativeRouteParameters = nativeRouteParametersImport;
 
 /// Parameters needed to find a [`Route`].
 ///
-/// Passed to [`find_route`] and also provided in [`Event::PaymentPathFailed`] for retrying a failed
-/// payment path.
+/// Passed to [`find_route`] and [`build_route_from_hops`], but also provided in
+/// [`Event::PaymentPathFailed`] for retrying a failed payment path.
 ///
 /// [`Event::PaymentPathFailed`]: crate::util::events::Event::PaymentPathFailed
 #[must_use]
@@ -946,13 +944,13 @@ pub extern "C" fn RouteHintHop_set_short_channel_id(this_ptr: &mut RouteHintHop,
 }
 /// The fees which must be paid to use this channel
 #[no_mangle]
-pub extern "C" fn RouteHintHop_get_fees(this_ptr: &RouteHintHop) -> crate::lightning::routing::network_graph::RoutingFees {
+pub extern "C" fn RouteHintHop_get_fees(this_ptr: &RouteHintHop) -> crate::lightning::routing::gossip::RoutingFees {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().fees;
-	crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::network_graph::RoutingFees<>) as *mut _) }, is_owned: false }
+	crate::lightning::routing::gossip::RoutingFees { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::gossip::RoutingFees<>) as *mut _) }, is_owned: false }
 }
 /// The fees which must be paid to use this channel
 #[no_mangle]
-pub extern "C" fn RouteHintHop_set_fees(this_ptr: &mut RouteHintHop, mut val: crate::lightning::routing::network_graph::RoutingFees) {
+pub extern "C" fn RouteHintHop_set_fees(this_ptr: &mut RouteHintHop, mut val: crate::lightning::routing::gossip::RoutingFees) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.fees = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// The difference in CLTV values between this node and the next node.
@@ -995,7 +993,7 @@ pub extern "C" fn RouteHintHop_set_htlc_maximum_msat(this_ptr: &mut RouteHintHop
 /// Constructs a new RouteHintHop given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RouteHintHop_new(mut src_node_id_arg: crate::c_types::PublicKey, mut short_channel_id_arg: u64, mut fees_arg: crate::lightning::routing::network_graph::RoutingFees, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: crate::c_types::derived::COption_u64Z, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z) -> RouteHintHop {
+pub extern "C" fn RouteHintHop_new(mut src_node_id_arg: crate::c_types::PublicKey, mut short_channel_id_arg: u64, mut fees_arg: crate::lightning::routing::gossip::RoutingFees, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: crate::c_types::derived::COption_u64Z, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z) -> RouteHintHop {
 	let mut local_htlc_minimum_msat_arg = if htlc_minimum_msat_arg.is_some() { Some( { htlc_minimum_msat_arg.take() }) } else { None };
 	let mut local_htlc_maximum_msat_arg = if htlc_maximum_msat_arg.is_some() { Some( { htlc_maximum_msat_arg.take() }) } else { None };
 	RouteHintHop { inner: ObjOps::heap_alloc(nativeRouteHintHop {
@@ -1069,8 +1067,8 @@ pub extern "C" fn RouteHintHop_read(ser: crate::c_types::u8slice) -> crate::c_ty
 /// Private routing paths between a public node and the target may be included in `params.payee`.
 ///
 /// If some channels aren't announced, it may be useful to fill in `first_hops` with the results
-/// from [`ChannelManager::list_usable_channels`]. If it is filled in, the view of our local
-/// channels from [`NetworkGraph`] will be ignored, and only those in `first_hops` will be used.
+/// from [`ChannelManager::list_usable_channels`]. If it is filled in, the view of these channels
+/// from `network_graph` will be ignored, and only those in `first_hops` will be used.
 ///
 /// The fees on channels from us to the next hop are ignored as they are assumed to all be equal.
 /// However, the enabled/disabled bit on such channels as well as the `htlc_minimum_msat` /
@@ -1089,12 +1087,25 @@ pub extern "C" fn RouteHintHop_read(ser: crate::c_types::u8slice) -> crate::c_ty
 ///
 /// [`ChannelManager::list_usable_channels`]: crate::ln::channelmanager::ChannelManager::list_usable_channels
 /// [`Event::PaymentPathFailed`]: crate::util::events::Event::PaymentPathFailed
+/// [`NetworkGraph`]: crate::routing::gossip::NetworkGraph
 ///
 /// Note that first_hops (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn find_route(mut our_node_pubkey: crate::c_types::PublicKey, route_params: &crate::lightning::routing::router::RouteParameters, network: &crate::lightning::routing::network_graph::NetworkGraph, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut logger: crate::lightning::util::logger::Logger, scorer: &crate::lightning::routing::scoring::Score, random_seed_bytes: *const [u8; 32]) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+pub extern "C" fn find_route(mut our_node_pubkey: crate::c_types::PublicKey, route_params: &crate::lightning::routing::router::RouteParameters, network_graph: &crate::lightning::routing::gossip::ReadOnlyNetworkGraph, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut logger: crate::lightning::util::logger::Logger, scorer: &crate::lightning::routing::scoring::Score, random_seed_bytes: *const [u8; 32]) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
 	let mut local_first_hops_base = if first_hops == core::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { item.get_native_ref() }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
-	let mut ret = lightning::routing::router::find_route::<crate::lightning::util::logger::Logger, crate::lightning::routing::scoring::Score>(&our_node_pubkey.into_rust(), route_params.get_native_ref(), network.get_native_ref(), local_first_hops, logger, scorer, unsafe { &*random_seed_bytes});
+	let mut ret = lightning::routing::router::find_route::<crate::lightning::util::logger::Logger, crate::lightning::routing::scoring::Score>(&our_node_pubkey.into_rust(), route_params.get_native_ref(), network_graph.get_native_ref(), local_first_hops, logger, scorer, unsafe { &*random_seed_bytes});
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_ret
+}
+
+/// Construct a route from us (payer) to the target node (payee) via the given hops (which should
+/// exclude the payer, but include the payee). This may be useful, e.g., for probing the chosen path.
+///
+/// Re-uses logic from `find_route`, so the restrictions described there also apply here.
+#[no_mangle]
+pub extern "C" fn build_route_from_hops(mut our_node_pubkey: crate::c_types::PublicKey, mut hops: crate::c_types::derived::CVec_PublicKeyZ, route_params: &crate::lightning::routing::router::RouteParameters, network_graph: &crate::lightning::routing::gossip::ReadOnlyNetworkGraph, mut logger: crate::lightning::util::logger::Logger, random_seed_bytes: *const [u8; 32]) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+	let mut local_hops = Vec::new(); for mut item in hops.into_rust().drain(..) { local_hops.push( { item.into_rust() }); };
+	let mut ret = lightning::routing::router::build_route_from_hops::<crate::lightning::util::logger::Logger>(&our_node_pubkey.into_rust(), &local_hops[..], route_params.get_native_ref(), network_graph.get_native_ref(), logger, unsafe { &*random_seed_bytes});
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }

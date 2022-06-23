@@ -17,7 +17,7 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 
-use lightning::routing::network_graph::NodeId as nativeNodeIdImport;
+use lightning::routing::gossip::NodeId as nativeNodeIdImport;
 pub(crate) type nativeNodeId = nativeNodeIdImport;
 
 /// Represents the compressed public key of a node
@@ -89,15 +89,15 @@ pub extern "C" fn NodeId_clone(orig: &NodeId) -> NodeId {
 /// Create a new NodeId from a public key
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NodeId_from_pubkey(mut pubkey: crate::c_types::PublicKey) -> crate::lightning::routing::network_graph::NodeId {
-	let mut ret = lightning::routing::network_graph::NodeId::from_pubkey(&pubkey.into_rust());
-	crate::lightning::routing::network_graph::NodeId { inner: ObjOps::heap_alloc(ret), is_owned: true }
+pub extern "C" fn NodeId_from_pubkey(mut pubkey: crate::c_types::PublicKey) -> crate::lightning::routing::gossip::NodeId {
+	let mut ret = lightning::routing::gossip::NodeId::from_pubkey(&pubkey.into_rust());
+	crate::lightning::routing::gossip::NodeId { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Get the public key slice from this NodeId
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NodeId_as_slice(this_arg: &crate::lightning::routing::network_graph::NodeId) -> crate::c_types::u8slice {
+pub extern "C" fn NodeId_as_slice(this_arg: &crate::lightning::routing::gossip::NodeId) -> crate::c_types::u8slice {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_slice();
 	let mut local_ret = crate::c_types::u8slice::from_slice(ret);
 	local_ret
@@ -115,7 +115,7 @@ pub extern "C" fn NodeId_hash(o: &NodeId) -> u64 {
 }
 #[no_mangle]
 /// Serialize the NodeId object into a byte array which can be read by NodeId_read
-pub extern "C" fn NodeId_write(obj: &crate::lightning::routing::network_graph::NodeId) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn NodeId_write(obj: &crate::lightning::routing::gossip::NodeId) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -125,13 +125,13 @@ pub(crate) extern "C" fn NodeId_write_void(obj: *const c_void) -> crate::c_types
 #[no_mangle]
 /// Read a NodeId from a byte array, created by NodeId_write
 pub extern "C" fn NodeId_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeIdDecodeErrorZ {
-	let res: Result<lightning::routing::network_graph::NodeId, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::NodeId { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let res: Result<lightning::routing::gossip::NodeId, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeId { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 
-use lightning::routing::network_graph::NetworkGraph as nativeNetworkGraphImport;
-pub(crate) type nativeNetworkGraph = nativeNetworkGraphImport;
+use lightning::routing::gossip::NetworkGraph as nativeNetworkGraphImport;
+pub(crate) type nativeNetworkGraph = nativeNetworkGraphImport<crate::lightning::util::logger::Logger>;
 
 /// Represents the network as nodes and channels between them
 #[must_use]
@@ -180,27 +180,8 @@ impl NetworkGraph {
 		ret
 	}
 }
-impl Clone for NetworkGraph {
-	fn clone(&self) -> Self {
-		Self {
-			inner: if <*mut nativeNetworkGraph>::is_null(self.inner) { core::ptr::null_mut() } else {
-				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
-			is_owned: true,
-		}
-	}
-}
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn NetworkGraph_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNetworkGraph)).clone() })) as *mut c_void
-}
-#[no_mangle]
-/// Creates a copy of the NetworkGraph
-pub extern "C" fn NetworkGraph_clone(orig: &NetworkGraph) -> NetworkGraph {
-	orig.clone()
-}
 
-use lightning::routing::network_graph::ReadOnlyNetworkGraph as nativeReadOnlyNetworkGraphImport;
+use lightning::routing::gossip::ReadOnlyNetworkGraph as nativeReadOnlyNetworkGraphImport;
 pub(crate) type nativeReadOnlyNetworkGraph = nativeReadOnlyNetworkGraphImport<'static>;
 
 /// A read-only view of [`NetworkGraph`].
@@ -253,9 +234,9 @@ impl ReadOnlyNetworkGraph {
 /// Update to the [`NetworkGraph`] based on payment failure information conveyed via the Onion
 /// return packet by a node along the route. See [BOLT #4] for details.
 ///
-/// [BOLT #4]: https://github.com/lightningnetwork/lightning-rfc/blob/master/04-onion-routing.md
-#[must_use]
+/// [BOLT #4]: https://github.com/lightning/bolts/blob/master/04-onion-routing.md
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum NetworkUpdate {
 	/// An error indicating a `channel_update` messages should be applied via
@@ -264,17 +245,17 @@ pub enum NetworkUpdate {
 		/// The update to apply via [`NetworkGraph::update_channel`].
 		msg: crate::lightning::ln::msgs::ChannelUpdate,
 	},
-	/// An error indicating only that a channel has been closed, which should be applied via
-	/// [`NetworkGraph::close_channel_from_update`].
-	ChannelClosed {
+	/// An error indicating that a channel failed to route a payment, which should be applied via
+	/// [`NetworkGraph::channel_failed`].
+	ChannelFailure {
 		/// The short channel id of the closed channel.
 		short_channel_id: u64,
 		/// Whether the channel should be permanently removed or temporarily disabled until a new
 		/// `channel_update` message is received.
 		is_permanent: bool,
 	},
-	/// An error indicating only that a node has failed, which should be applied via
-	/// [`NetworkGraph::fail_node`].
+	/// An error indicating that a node failed to route a payment, which should be applied via
+	/// [`NetworkGraph::node_failed`].
 	NodeFailure {
 		/// The node id of the failed node.
 		node_id: crate::c_types::PublicKey,
@@ -283,7 +264,9 @@ pub enum NetworkUpdate {
 		is_permanent: bool,
 	},
 }
-use lightning::routing::network_graph::NetworkUpdate as nativeNetworkUpdate;
+use lightning::routing::gossip::NetworkUpdate as NetworkUpdateImport;
+pub(crate) type nativeNetworkUpdate = NetworkUpdateImport;
+
 impl NetworkUpdate {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeNetworkUpdate {
@@ -294,10 +277,10 @@ impl NetworkUpdate {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
-			NetworkUpdate::ChannelClosed {ref short_channel_id, ref is_permanent, } => {
+			NetworkUpdate::ChannelFailure {ref short_channel_id, ref is_permanent, } => {
 				let mut short_channel_id_nonref = (*short_channel_id).clone();
 				let mut is_permanent_nonref = (*is_permanent).clone();
-				nativeNetworkUpdate::ChannelClosed {
+				nativeNetworkUpdate::ChannelFailure {
 					short_channel_id: short_channel_id_nonref,
 					is_permanent: is_permanent_nonref,
 				}
@@ -320,8 +303,8 @@ impl NetworkUpdate {
 					msg: *unsafe { Box::from_raw(msg.take_inner()) },
 				}
 			},
-			NetworkUpdate::ChannelClosed {mut short_channel_id, mut is_permanent, } => {
-				nativeNetworkUpdate::ChannelClosed {
+			NetworkUpdate::ChannelFailure {mut short_channel_id, mut is_permanent, } => {
+				nativeNetworkUpdate::ChannelFailure {
 					short_channel_id: short_channel_id,
 					is_permanent: is_permanent,
 				}
@@ -343,10 +326,10 @@ impl NetworkUpdate {
 					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
-			nativeNetworkUpdate::ChannelClosed {ref short_channel_id, ref is_permanent, } => {
+			nativeNetworkUpdate::ChannelFailure {ref short_channel_id, ref is_permanent, } => {
 				let mut short_channel_id_nonref = (*short_channel_id).clone();
 				let mut is_permanent_nonref = (*is_permanent).clone();
-				NetworkUpdate::ChannelClosed {
+				NetworkUpdate::ChannelFailure {
 					short_channel_id: short_channel_id_nonref,
 					is_permanent: is_permanent_nonref,
 				}
@@ -369,8 +352,8 @@ impl NetworkUpdate {
 					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
-			nativeNetworkUpdate::ChannelClosed {mut short_channel_id, mut is_permanent, } => {
-				NetworkUpdate::ChannelClosed {
+			nativeNetworkUpdate::ChannelFailure {mut short_channel_id, mut is_permanent, } => {
+				NetworkUpdate::ChannelFailure {
 					short_channel_id: short_channel_id,
 					is_permanent: is_permanent,
 				}
@@ -400,9 +383,9 @@ pub extern "C" fn NetworkUpdate_channel_update_message(msg: crate::lightning::ln
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new ChannelClosed-variant NetworkUpdate
-pub extern "C" fn NetworkUpdate_channel_closed(short_channel_id: u64, is_permanent: bool) -> NetworkUpdate {
-	NetworkUpdate::ChannelClosed {
+/// Utility method to constructs a new ChannelFailure-variant NetworkUpdate
+pub extern "C" fn NetworkUpdate_channel_failure(short_channel_id: u64, is_permanent: bool) -> NetworkUpdate {
+	NetworkUpdate::ChannelFailure {
 		short_channel_id,
 		is_permanent,
 	}
@@ -417,44 +400,19 @@ pub extern "C" fn NetworkUpdate_node_failure(node_id: crate::c_types::PublicKey,
 }
 #[no_mangle]
 /// Serialize the NetworkUpdate object into a byte array which can be read by NetworkUpdate_read
-pub extern "C" fn NetworkUpdate_write(obj: &crate::lightning::routing::network_graph::NetworkUpdate) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn NetworkUpdate_write(obj: &crate::lightning::routing::gossip::NetworkUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
 }
 #[no_mangle]
 /// Read a NetworkUpdate from a byte array, created by NetworkUpdate_write
 pub extern "C" fn NetworkUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_NetworkUpdateZDecodeErrorZ {
-	let res: Result<Option<lightning::routing::network_graph::NetworkUpdate>, lightning::ln::msgs::DecodeError> = crate::c_types::maybe_deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_NetworkUpdateZ::None } else { crate::c_types::derived::COption_NetworkUpdateZ::Some( { crate::lightning::routing::network_graph::NetworkUpdate::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let res: Result<Option<lightning::routing::gossip::NetworkUpdate>, lightning::ln::msgs::DecodeError> = crate::c_types::maybe_deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_NetworkUpdateZ::None } else { crate::c_types::derived::COption_NetworkUpdateZ::Some( { crate::lightning::routing::gossip::NetworkUpdate::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
-impl From<nativeNetGraphMsgHandler> for crate::lightning::util::events::EventHandler {
-	fn from(obj: nativeNetGraphMsgHandler) -> Self {
-		let mut rust_obj = NetGraphMsgHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
-		let mut ret = NetGraphMsgHandler_as_EventHandler(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
-		ret.free = Some(NetGraphMsgHandler_free_void);
-		ret
-	}
-}
-/// Constructs a new EventHandler which calls the relevant methods on this_arg.
-/// This copies the `inner` pointer in this_arg and thus the returned EventHandler must be freed before this_arg is
-#[no_mangle]
-pub extern "C" fn NetGraphMsgHandler_as_EventHandler(this_arg: &NetGraphMsgHandler) -> crate::lightning::util::events::EventHandler {
-	crate::lightning::util::events::EventHandler {
-		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
-		free: None,
-		handle_event: NetGraphMsgHandler_EventHandler_handle_event,
-	}
-}
 
-extern "C" fn NetGraphMsgHandler_EventHandler_handle_event(this_arg: *const c_void, event: &crate::lightning::util::events::Event) {
-	<nativeNetGraphMsgHandler as lightning::util::events::EventHandler<>>::handle_event(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, &event.to_native())
-}
-
-
-use lightning::routing::network_graph::NetGraphMsgHandler as nativeNetGraphMsgHandlerImport;
-pub(crate) type nativeNetGraphMsgHandler = nativeNetGraphMsgHandlerImport<&'static lightning::routing::network_graph::NetworkGraph, crate::lightning::chain::Access, crate::lightning::util::logger::Logger>;
+use lightning::routing::gossip::P2PGossipSync as nativeP2PGossipSyncImport;
+pub(crate) type nativeP2PGossipSync = nativeP2PGossipSyncImport<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::chain::Access, crate::lightning::util::logger::Logger>;
 
 /// Receives and validates network updates from peers,
 /// stores authentic and relevant data as a network graph.
@@ -466,12 +424,12 @@ pub(crate) type nativeNetGraphMsgHandler = nativeNetGraphMsgHandlerImport<&'stat
 /// [`NetworkGraph`].
 #[must_use]
 #[repr(C)]
-pub struct NetGraphMsgHandler {
+pub struct P2PGossipSync {
 	/// A pointer to the opaque Rust object.
 
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeNetGraphMsgHandler,
+	pub inner: *mut nativeP2PGossipSync,
 	/// Indicates that this is the only struct which contains the same pointer.
 
 	/// Rust functions which take ownership of an object provided via an argument require
@@ -479,31 +437,31 @@ pub struct NetGraphMsgHandler {
 	pub is_owned: bool,
 }
 
-impl Drop for NetGraphMsgHandler {
+impl Drop for P2PGossipSync {
 	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeNetGraphMsgHandler>::is_null(self.inner) {
+		if self.is_owned && !<*mut nativeP2PGossipSync>::is_null(self.inner) {
 			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
-/// Frees any resources used by the NetGraphMsgHandler, if is_owned is set and inner is non-NULL.
+/// Frees any resources used by the P2PGossipSync, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn NetGraphMsgHandler_free(this_obj: NetGraphMsgHandler) { }
+pub extern "C" fn P2PGossipSync_free(this_obj: P2PGossipSync) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn NetGraphMsgHandler_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNetGraphMsgHandler); }
+pub(crate) extern "C" fn P2PGossipSync_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeP2PGossipSync); }
 }
 #[allow(unused)]
-impl NetGraphMsgHandler {
-	pub(crate) fn get_native_ref(&self) -> &'static nativeNetGraphMsgHandler {
+impl P2PGossipSync {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeP2PGossipSync {
 		unsafe { &*ObjOps::untweak_ptr(self.inner) }
 	}
-	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeNetGraphMsgHandler {
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeP2PGossipSync {
 		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
 	}
 	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-	pub(crate) fn take_inner(mut self) -> *mut nativeNetGraphMsgHandler {
+	pub(crate) fn take_inner(mut self) -> *mut nativeP2PGossipSync {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = core::ptr::null_mut();
@@ -517,145 +475,170 @@ impl NetGraphMsgHandler {
 /// channel owners' keys.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetGraphMsgHandler_new(network_graph: &crate::lightning::routing::network_graph::NetworkGraph, mut chain_access: crate::c_types::derived::COption_AccessZ, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning::routing::network_graph::NetGraphMsgHandler {
+pub extern "C" fn P2PGossipSync_new(network_graph: &crate::lightning::routing::gossip::NetworkGraph, mut chain_access: crate::c_types::derived::COption_AccessZ, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning::routing::gossip::P2PGossipSync {
 	let mut local_chain_access = { /* chain_access*/ let chain_access_opt = chain_access; { } if chain_access_opt.is_none() { None } else { Some({ chain_access_opt.take() }) } };
-	let mut ret = lightning::routing::network_graph::NetGraphMsgHandler::new(network_graph.get_native_ref(), local_chain_access, logger);
-	crate::lightning::routing::network_graph::NetGraphMsgHandler { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	let mut ret = lightning::routing::gossip::P2PGossipSync::new(network_graph.get_native_ref(), local_chain_access, logger);
+	crate::lightning::routing::gossip::P2PGossipSync { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Adds a provider used to check new announcements. Does not affect
 /// existing announcements unless they are updated.
 /// Add, update or remove the provider would replace the current one.
 #[no_mangle]
-pub extern "C" fn NetGraphMsgHandler_add_chain_access(this_arg: &mut crate::lightning::routing::network_graph::NetGraphMsgHandler, mut chain_access: crate::c_types::derived::COption_AccessZ) {
+pub extern "C" fn P2PGossipSync_add_chain_access(this_arg: &mut crate::lightning::routing::gossip::P2PGossipSync, mut chain_access: crate::c_types::derived::COption_AccessZ) {
 	let mut local_chain_access = { /* chain_access*/ let chain_access_opt = chain_access; { } if chain_access_opt.is_none() { None } else { Some({ chain_access_opt.take() }) } };
-	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::network_graph::nativeNetGraphMsgHandler)) }.add_chain_access(local_chain_access)
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::gossip::nativeP2PGossipSync)) }.add_chain_access(local_chain_access)
 }
 
-impl From<nativeNetGraphMsgHandler> for crate::lightning::ln::msgs::RoutingMessageHandler {
-	fn from(obj: nativeNetGraphMsgHandler) -> Self {
-		let mut rust_obj = NetGraphMsgHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
-		let mut ret = NetGraphMsgHandler_as_RoutingMessageHandler(&rust_obj);
+impl From<nativeNetworkGraph> for crate::lightning::util::events::EventHandler {
+	fn from(obj: nativeNetworkGraph) -> Self {
+		let mut rust_obj = NetworkGraph { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let mut ret = NetworkGraph_as_EventHandler(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
 		rust_obj.inner = core::ptr::null_mut();
-		ret.free = Some(NetGraphMsgHandler_free_void);
+		ret.free = Some(NetworkGraph_free_void);
+		ret
+	}
+}
+/// Constructs a new EventHandler which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned EventHandler must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn NetworkGraph_as_EventHandler(this_arg: &NetworkGraph) -> crate::lightning::util::events::EventHandler {
+	crate::lightning::util::events::EventHandler {
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
+		free: None,
+		handle_event: NetworkGraph_EventHandler_handle_event,
+	}
+}
+
+extern "C" fn NetworkGraph_EventHandler_handle_event(this_arg: *const c_void, event: &crate::lightning::util::events::Event) {
+	<nativeNetworkGraph as lightning::util::events::EventHandler<>>::handle_event(unsafe { &mut *(this_arg as *mut nativeNetworkGraph) }, &event.to_native())
+}
+
+impl From<nativeP2PGossipSync> for crate::lightning::ln::msgs::RoutingMessageHandler {
+	fn from(obj: nativeP2PGossipSync) -> Self {
+		let mut rust_obj = P2PGossipSync { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let mut ret = P2PGossipSync_as_RoutingMessageHandler(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
+		rust_obj.inner = core::ptr::null_mut();
+		ret.free = Some(P2PGossipSync_free_void);
 		ret
 	}
 }
 /// Constructs a new RoutingMessageHandler which calls the relevant methods on this_arg.
 /// This copies the `inner` pointer in this_arg and thus the returned RoutingMessageHandler must be freed before this_arg is
 #[no_mangle]
-pub extern "C" fn NetGraphMsgHandler_as_RoutingMessageHandler(this_arg: &NetGraphMsgHandler) -> crate::lightning::ln::msgs::RoutingMessageHandler {
+pub extern "C" fn P2PGossipSync_as_RoutingMessageHandler(this_arg: &P2PGossipSync) -> crate::lightning::ln::msgs::RoutingMessageHandler {
 	crate::lightning::ln::msgs::RoutingMessageHandler {
 		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
-		handle_node_announcement: NetGraphMsgHandler_RoutingMessageHandler_handle_node_announcement,
-		handle_channel_announcement: NetGraphMsgHandler_RoutingMessageHandler_handle_channel_announcement,
-		handle_channel_update: NetGraphMsgHandler_RoutingMessageHandler_handle_channel_update,
-		get_next_channel_announcements: NetGraphMsgHandler_RoutingMessageHandler_get_next_channel_announcements,
-		get_next_node_announcements: NetGraphMsgHandler_RoutingMessageHandler_get_next_node_announcements,
-		peer_connected: NetGraphMsgHandler_RoutingMessageHandler_peer_connected,
-		handle_reply_channel_range: NetGraphMsgHandler_RoutingMessageHandler_handle_reply_channel_range,
-		handle_reply_short_channel_ids_end: NetGraphMsgHandler_RoutingMessageHandler_handle_reply_short_channel_ids_end,
-		handle_query_channel_range: NetGraphMsgHandler_RoutingMessageHandler_handle_query_channel_range,
-		handle_query_short_channel_ids: NetGraphMsgHandler_RoutingMessageHandler_handle_query_short_channel_ids,
+		handle_node_announcement: P2PGossipSync_RoutingMessageHandler_handle_node_announcement,
+		handle_channel_announcement: P2PGossipSync_RoutingMessageHandler_handle_channel_announcement,
+		handle_channel_update: P2PGossipSync_RoutingMessageHandler_handle_channel_update,
+		get_next_channel_announcements: P2PGossipSync_RoutingMessageHandler_get_next_channel_announcements,
+		get_next_node_announcements: P2PGossipSync_RoutingMessageHandler_get_next_node_announcements,
+		peer_connected: P2PGossipSync_RoutingMessageHandler_peer_connected,
+		handle_reply_channel_range: P2PGossipSync_RoutingMessageHandler_handle_reply_channel_range,
+		handle_reply_short_channel_ids_end: P2PGossipSync_RoutingMessageHandler_handle_reply_short_channel_ids_end,
+		handle_query_channel_range: P2PGossipSync_RoutingMessageHandler_handle_query_channel_range,
+		handle_query_short_channel_ids: P2PGossipSync_RoutingMessageHandler_handle_query_short_channel_ids,
 		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider {
 			this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 			free: None,
-			get_and_clear_pending_msg_events: NetGraphMsgHandler_MessageSendEventsProvider_get_and_clear_pending_msg_events,
+			get_and_clear_pending_msg_events: P2PGossipSync_MessageSendEventsProvider_get_and_clear_pending_msg_events,
 		},
 	}
 }
 
 #[must_use]
-extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_handle_node_announcement(this_arg: *const c_void, msg: &crate::lightning::ln::msgs::NodeAnnouncement) -> crate::c_types::derived::CResult_boolLightningErrorZ {
-	let mut ret = <nativeNetGraphMsgHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_node_announcement(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, msg.get_native_ref());
+extern "C" fn P2PGossipSync_RoutingMessageHandler_handle_node_announcement(this_arg: *const c_void, msg: &crate::lightning::ln::msgs::NodeAnnouncement) -> crate::c_types::derived::CResult_boolLightningErrorZ {
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::handle_node_announcement(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_handle_channel_announcement(this_arg: *const c_void, msg: &crate::lightning::ln::msgs::ChannelAnnouncement) -> crate::c_types::derived::CResult_boolLightningErrorZ {
-	let mut ret = <nativeNetGraphMsgHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_channel_announcement(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, msg.get_native_ref());
+extern "C" fn P2PGossipSync_RoutingMessageHandler_handle_channel_announcement(this_arg: *const c_void, msg: &crate::lightning::ln::msgs::ChannelAnnouncement) -> crate::c_types::derived::CResult_boolLightningErrorZ {
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::handle_channel_announcement(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_handle_channel_update(this_arg: *const c_void, msg: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CResult_boolLightningErrorZ {
-	let mut ret = <nativeNetGraphMsgHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_channel_update(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, msg.get_native_ref());
+extern "C" fn P2PGossipSync_RoutingMessageHandler_handle_channel_update(this_arg: *const c_void, msg: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CResult_boolLightningErrorZ {
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::handle_channel_update(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_get_next_channel_announcements(this_arg: *const c_void, mut starting_point: u64, mut batch_amount: u8) -> crate::c_types::derived::CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
-	let mut ret = <nativeNetGraphMsgHandler as lightning::ln::msgs::RoutingMessageHandler<>>::get_next_channel_announcements(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, starting_point, batch_amount);
+extern "C" fn P2PGossipSync_RoutingMessageHandler_get_next_channel_announcements(this_arg: *const c_void, mut starting_point: u64, mut batch_amount: u8) -> crate::c_types::derived::CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::get_next_channel_announcements(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, starting_point, batch_amount);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item; let mut local_orig_ret_0_1 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_1.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_1.unwrap())) } }, is_owned: true }; let mut local_orig_ret_0_2 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_2.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_2.unwrap())) } }, is_owned: true }; let mut local_ret_0 = (crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, local_orig_ret_0_1, local_orig_ret_0_2).into(); local_ret_0 }); };
 	local_ret.into()
 }
 #[must_use]
-extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_get_next_node_announcements(this_arg: *const c_void, mut starting_point: crate::c_types::PublicKey, mut batch_amount: u8) -> crate::c_types::derived::CVec_NodeAnnouncementZ {
+extern "C" fn P2PGossipSync_RoutingMessageHandler_get_next_node_announcements(this_arg: *const c_void, mut starting_point: crate::c_types::PublicKey, mut batch_amount: u8) -> crate::c_types::derived::CVec_NodeAnnouncementZ {
 	let mut local_starting_point_base = if starting_point.is_null() { None } else { Some( { starting_point.into_rust() }) }; let mut local_starting_point = local_starting_point_base.as_ref();
-	let mut ret = <nativeNetGraphMsgHandler as lightning::ln::msgs::RoutingMessageHandler<>>::get_next_node_announcements(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, local_starting_point, batch_amount);
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::get_next_node_announcements(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, local_starting_point, batch_amount);
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::ln::msgs::NodeAnnouncement { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
 	local_ret.into()
 }
-extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, init_msg: &crate::lightning::ln::msgs::Init) {
-	<nativeNetGraphMsgHandler as lightning::ln::msgs::RoutingMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, &their_node_id.into_rust(), init_msg.get_native_ref())
+extern "C" fn P2PGossipSync_RoutingMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, init_msg: &crate::lightning::ln::msgs::Init) {
+	<nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, &their_node_id.into_rust(), init_msg.get_native_ref())
 }
 #[must_use]
-extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_handle_reply_channel_range(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _msg: crate::lightning::ln::msgs::ReplyChannelRange) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut ret = <nativeNetGraphMsgHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_reply_channel_range(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, &_their_node_id.into_rust(), *unsafe { Box::from_raw(_msg.take_inner()) });
+extern "C" fn P2PGossipSync_RoutingMessageHandler_handle_reply_channel_range(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _msg: crate::lightning::ln::msgs::ReplyChannelRange) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::handle_reply_channel_range(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, &_their_node_id.into_rust(), *unsafe { Box::from_raw(_msg.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_handle_reply_short_channel_ids_end(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _msg: crate::lightning::ln::msgs::ReplyShortChannelIdsEnd) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut ret = <nativeNetGraphMsgHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_reply_short_channel_ids_end(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, &_their_node_id.into_rust(), *unsafe { Box::from_raw(_msg.take_inner()) });
+extern "C" fn P2PGossipSync_RoutingMessageHandler_handle_reply_short_channel_ids_end(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _msg: crate::lightning::ln::msgs::ReplyShortChannelIdsEnd) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::handle_reply_short_channel_ids_end(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, &_their_node_id.into_rust(), *unsafe { Box::from_raw(_msg.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_handle_query_channel_range(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut msg: crate::lightning::ln::msgs::QueryChannelRange) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut ret = <nativeNetGraphMsgHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_query_channel_range(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, &their_node_id.into_rust(), *unsafe { Box::from_raw(msg.take_inner()) });
+extern "C" fn P2PGossipSync_RoutingMessageHandler_handle_query_channel_range(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut msg: crate::lightning::ln::msgs::QueryChannelRange) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::handle_query_channel_range(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, &their_node_id.into_rust(), *unsafe { Box::from_raw(msg.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn NetGraphMsgHandler_RoutingMessageHandler_handle_query_short_channel_ids(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _msg: crate::lightning::ln::msgs::QueryShortChannelIds) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut ret = <nativeNetGraphMsgHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_query_short_channel_ids(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, &_their_node_id.into_rust(), *unsafe { Box::from_raw(_msg.take_inner()) });
+extern "C" fn P2PGossipSync_RoutingMessageHandler_handle_query_short_channel_ids(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _msg: crate::lightning::ln::msgs::QueryShortChannelIds) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::handle_query_short_channel_ids(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, &_their_node_id.into_rust(), *unsafe { Box::from_raw(_msg.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 
-impl From<nativeNetGraphMsgHandler> for crate::lightning::util::events::MessageSendEventsProvider {
-	fn from(obj: nativeNetGraphMsgHandler) -> Self {
-		let mut rust_obj = NetGraphMsgHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
-		let mut ret = NetGraphMsgHandler_as_MessageSendEventsProvider(&rust_obj);
+impl From<nativeP2PGossipSync> for crate::lightning::util::events::MessageSendEventsProvider {
+	fn from(obj: nativeP2PGossipSync) -> Self {
+		let mut rust_obj = P2PGossipSync { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let mut ret = P2PGossipSync_as_MessageSendEventsProvider(&rust_obj);
 		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
 		rust_obj.inner = core::ptr::null_mut();
-		ret.free = Some(NetGraphMsgHandler_free_void);
+		ret.free = Some(P2PGossipSync_free_void);
 		ret
 	}
 }
 /// Constructs a new MessageSendEventsProvider which calls the relevant methods on this_arg.
 /// This copies the `inner` pointer in this_arg and thus the returned MessageSendEventsProvider must be freed before this_arg is
 #[no_mangle]
-pub extern "C" fn NetGraphMsgHandler_as_MessageSendEventsProvider(this_arg: &NetGraphMsgHandler) -> crate::lightning::util::events::MessageSendEventsProvider {
+pub extern "C" fn P2PGossipSync_as_MessageSendEventsProvider(this_arg: &P2PGossipSync) -> crate::lightning::util::events::MessageSendEventsProvider {
 	crate::lightning::util::events::MessageSendEventsProvider {
 		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
-		get_and_clear_pending_msg_events: NetGraphMsgHandler_MessageSendEventsProvider_get_and_clear_pending_msg_events,
+		get_and_clear_pending_msg_events: P2PGossipSync_MessageSendEventsProvider_get_and_clear_pending_msg_events,
 	}
 }
 
 #[must_use]
-extern "C" fn NetGraphMsgHandler_MessageSendEventsProvider_get_and_clear_pending_msg_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_MessageSendEventZ {
-	let mut ret = <nativeNetGraphMsgHandler as lightning::util::events::MessageSendEventsProvider<>>::get_and_clear_pending_msg_events(unsafe { &mut *(this_arg as *mut nativeNetGraphMsgHandler) }, );
+extern "C" fn P2PGossipSync_MessageSendEventsProvider_get_and_clear_pending_msg_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_MessageSendEventZ {
+	let mut ret = <nativeP2PGossipSync as lightning::util::events::MessageSendEventsProvider<>>::get_and_clear_pending_msg_events(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, );
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::util::events::MessageSendEvent::native_into(item) }); };
 	local_ret.into()
 }
 
 
-use lightning::routing::network_graph::ChannelUpdateInfo as nativeChannelUpdateInfoImport;
+use lightning::routing::gossip::ChannelUpdateInfo as nativeChannelUpdateInfoImport;
 pub(crate) type nativeChannelUpdateInfo = nativeChannelUpdateInfoImport;
 
 /// Details about one direction of a channel as received within a [`ChannelUpdate`].
@@ -766,13 +749,13 @@ pub extern "C" fn ChannelUpdateInfo_set_htlc_maximum_msat(this_ptr: &mut Channel
 }
 /// Fees charged when the channel is used for routing
 #[no_mangle]
-pub extern "C" fn ChannelUpdateInfo_get_fees(this_ptr: &ChannelUpdateInfo) -> crate::lightning::routing::network_graph::RoutingFees {
+pub extern "C" fn ChannelUpdateInfo_get_fees(this_ptr: &ChannelUpdateInfo) -> crate::lightning::routing::gossip::RoutingFees {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().fees;
-	crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::network_graph::RoutingFees<>) as *mut _) }, is_owned: false }
+	crate::lightning::routing::gossip::RoutingFees { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::gossip::RoutingFees<>) as *mut _) }, is_owned: false }
 }
 /// Fees charged when the channel is used for routing
 #[no_mangle]
-pub extern "C" fn ChannelUpdateInfo_set_fees(this_ptr: &mut ChannelUpdateInfo, mut val: crate::lightning::routing::network_graph::RoutingFees) {
+pub extern "C" fn ChannelUpdateInfo_set_fees(this_ptr: &mut ChannelUpdateInfo, mut val: crate::lightning::routing::gossip::RoutingFees) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.fees = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Most recent update for the channel received from the network
@@ -801,7 +784,7 @@ pub extern "C" fn ChannelUpdateInfo_set_last_update_message(this_ptr: &mut Chann
 /// Constructs a new ChannelUpdateInfo given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelUpdateInfo_new(mut last_update_arg: u32, mut enabled_arg: bool, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: u64, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z, mut fees_arg: crate::lightning::routing::network_graph::RoutingFees, mut last_update_message_arg: crate::lightning::ln::msgs::ChannelUpdate) -> ChannelUpdateInfo {
+pub extern "C" fn ChannelUpdateInfo_new(mut last_update_arg: u32, mut enabled_arg: bool, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: u64, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z, mut fees_arg: crate::lightning::routing::gossip::RoutingFees, mut last_update_message_arg: crate::lightning::ln::msgs::ChannelUpdate) -> ChannelUpdateInfo {
 	let mut local_htlc_maximum_msat_arg = if htlc_maximum_msat_arg.is_some() { Some( { htlc_maximum_msat_arg.take() }) } else { None };
 	let mut local_last_update_message_arg = if last_update_message_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(last_update_message_arg.take_inner()) } }) };
 	ChannelUpdateInfo { inner: ObjOps::heap_alloc(nativeChannelUpdateInfo {
@@ -835,7 +818,7 @@ pub extern "C" fn ChannelUpdateInfo_clone(orig: &ChannelUpdateInfo) -> ChannelUp
 }
 #[no_mangle]
 /// Serialize the ChannelUpdateInfo object into a byte array which can be read by ChannelUpdateInfo_read
-pub extern "C" fn ChannelUpdateInfo_write(obj: &crate::lightning::routing::network_graph::ChannelUpdateInfo) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ChannelUpdateInfo_write(obj: &crate::lightning::routing::gossip::ChannelUpdateInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -845,12 +828,12 @@ pub(crate) extern "C" fn ChannelUpdateInfo_write_void(obj: *const c_void) -> cra
 #[no_mangle]
 /// Read a ChannelUpdateInfo from a byte array, created by ChannelUpdateInfo_write
 pub extern "C" fn ChannelUpdateInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelUpdateInfoDecodeErrorZ {
-	let res: Result<lightning::routing::network_graph::ChannelUpdateInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::ChannelUpdateInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let res: Result<lightning::routing::gossip::ChannelUpdateInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::ChannelUpdateInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 
-use lightning::routing::network_graph::ChannelInfo as nativeChannelInfoImport;
+use lightning::routing::gossip::ChannelInfo as nativeChannelInfoImport;
 pub(crate) type nativeChannelInfo = nativeChannelInfoImport;
 
 /// Details about a channel (both directions).
@@ -914,57 +897,57 @@ pub extern "C" fn ChannelInfo_set_features(this_ptr: &mut ChannelInfo, mut val: 
 }
 /// Source node of the first direction of a channel
 #[no_mangle]
-pub extern "C" fn ChannelInfo_get_node_one(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::NodeId {
+pub extern "C" fn ChannelInfo_get_node_one(this_ptr: &ChannelInfo) -> crate::lightning::routing::gossip::NodeId {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_one;
-	crate::lightning::routing::network_graph::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::network_graph::NodeId<>) as *mut _) }, is_owned: false }
+	crate::lightning::routing::gossip::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::gossip::NodeId<>) as *mut _) }, is_owned: false }
 }
 /// Source node of the first direction of a channel
 #[no_mangle]
-pub extern "C" fn ChannelInfo_set_node_one(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::NodeId) {
+pub extern "C" fn ChannelInfo_set_node_one(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::gossip::NodeId) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_one = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Details about the first direction of a channel
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn ChannelInfo_get_one_to_two(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::ChannelUpdateInfo {
+pub extern "C" fn ChannelInfo_get_one_to_two(this_ptr: &ChannelInfo) -> crate::lightning::routing::gossip::ChannelUpdateInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().one_to_two;
-	let mut local_inner_val = crate::lightning::routing::network_graph::ChannelUpdateInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::ChannelUpdateInfo<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::gossip::ChannelUpdateInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::gossip::ChannelUpdateInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Details about the first direction of a channel
 ///
 /// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn ChannelInfo_set_one_to_two(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::ChannelUpdateInfo) {
+pub extern "C" fn ChannelInfo_set_one_to_two(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::gossip::ChannelUpdateInfo) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.one_to_two = local_val;
 }
 /// Source node of the second direction of a channel
 #[no_mangle]
-pub extern "C" fn ChannelInfo_get_node_two(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::NodeId {
+pub extern "C" fn ChannelInfo_get_node_two(this_ptr: &ChannelInfo) -> crate::lightning::routing::gossip::NodeId {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_two;
-	crate::lightning::routing::network_graph::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::network_graph::NodeId<>) as *mut _) }, is_owned: false }
+	crate::lightning::routing::gossip::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::gossip::NodeId<>) as *mut _) }, is_owned: false }
 }
 /// Source node of the second direction of a channel
 #[no_mangle]
-pub extern "C" fn ChannelInfo_set_node_two(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::NodeId) {
+pub extern "C" fn ChannelInfo_set_node_two(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::gossip::NodeId) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_two = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Details about the second direction of a channel
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn ChannelInfo_get_two_to_one(this_ptr: &ChannelInfo) -> crate::lightning::routing::network_graph::ChannelUpdateInfo {
+pub extern "C" fn ChannelInfo_get_two_to_one(this_ptr: &ChannelInfo) -> crate::lightning::routing::gossip::ChannelUpdateInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().two_to_one;
-	let mut local_inner_val = crate::lightning::routing::network_graph::ChannelUpdateInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::ChannelUpdateInfo<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::gossip::ChannelUpdateInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::gossip::ChannelUpdateInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Details about the second direction of a channel
 ///
 /// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn ChannelInfo_set_two_to_one(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::network_graph::ChannelUpdateInfo) {
+pub extern "C" fn ChannelInfo_set_two_to_one(this_ptr: &mut ChannelInfo, mut val: crate::lightning::routing::gossip::ChannelUpdateInfo) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.two_to_one = local_val;
 }
@@ -1023,9 +1006,20 @@ pub(crate) extern "C" fn ChannelInfo_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn ChannelInfo_clone(orig: &ChannelInfo) -> ChannelInfo {
 	orig.clone()
 }
+/// Returns a [`ChannelUpdateInfo`] based on the direction implied by the channel_flag.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelInfo_get_directional_info(this_arg: &crate::lightning::routing::gossip::ChannelInfo, mut channel_flags: u8) -> crate::lightning::routing::gossip::ChannelUpdateInfo {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_directional_info(channel_flags);
+	let mut local_ret = crate::lightning::routing::gossip::ChannelUpdateInfo { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::routing::gossip::ChannelUpdateInfo<>) as *mut _ }, is_owned: false };
+	local_ret
+}
+
 #[no_mangle]
 /// Serialize the ChannelInfo object into a byte array which can be read by ChannelInfo_read
-pub extern "C" fn ChannelInfo_write(obj: &crate::lightning::routing::network_graph::ChannelInfo) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn ChannelInfo_write(obj: &crate::lightning::routing::gossip::ChannelInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -1035,12 +1029,12 @@ pub(crate) extern "C" fn ChannelInfo_write_void(obj: *const c_void) -> crate::c_
 #[no_mangle]
 /// Read a ChannelInfo from a byte array, created by ChannelInfo_write
 pub extern "C" fn ChannelInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelInfoDecodeErrorZ {
-	let res: Result<lightning::routing::network_graph::ChannelInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::ChannelInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let res: Result<lightning::routing::gossip::ChannelInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::ChannelInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 
-use lightning::routing::network_graph::DirectedChannelInfo as nativeDirectedChannelInfoImport;
+use lightning::routing::gossip::DirectedChannelInfo as nativeDirectedChannelInfoImport;
 pub(crate) type nativeDirectedChannelInfo = nativeDirectedChannelInfoImport<'static>;
 
 /// A wrapper around [`ChannelInfo`] representing information about the channel as directed from a
@@ -1113,9 +1107,9 @@ pub extern "C" fn DirectedChannelInfo_clone(orig: &DirectedChannelInfo) -> Direc
 /// Returns information for the channel.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn DirectedChannelInfo_channel(this_arg: &crate::lightning::routing::network_graph::DirectedChannelInfo) -> crate::lightning::routing::network_graph::ChannelInfo {
+pub extern "C" fn DirectedChannelInfo_channel(this_arg: &crate::lightning::routing::gossip::DirectedChannelInfo) -> crate::lightning::routing::gossip::ChannelInfo {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel();
-	crate::lightning::routing::network_graph::ChannelInfo { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::routing::network_graph::ChannelInfo<>) as *mut _) }, is_owned: false }
+	crate::lightning::routing::gossip::ChannelInfo { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::routing::gossip::ChannelInfo<>) as *mut _) }, is_owned: false }
 }
 
 /// Returns information for the direction.
@@ -1123,30 +1117,38 @@ pub extern "C" fn DirectedChannelInfo_channel(this_arg: &crate::lightning::routi
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn DirectedChannelInfo_direction(this_arg: &crate::lightning::routing::network_graph::DirectedChannelInfo) -> crate::lightning::routing::network_graph::ChannelUpdateInfo {
+pub extern "C" fn DirectedChannelInfo_direction(this_arg: &crate::lightning::routing::gossip::DirectedChannelInfo) -> crate::lightning::routing::gossip::ChannelUpdateInfo {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.direction();
-	let mut local_ret = crate::lightning::routing::network_graph::ChannelUpdateInfo { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::routing::network_graph::ChannelUpdateInfo<>) as *mut _ }, is_owned: false };
+	let mut local_ret = crate::lightning::routing::gossip::ChannelUpdateInfo { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::routing::gossip::ChannelUpdateInfo<>) as *mut _ }, is_owned: false };
 	local_ret
+}
+
+/// Returns the maximum HTLC amount allowed over the channel in the direction.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn DirectedChannelInfo_htlc_maximum_msat(this_arg: &crate::lightning::routing::gossip::DirectedChannelInfo) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.htlc_maximum_msat();
+	ret
 }
 
 /// Returns the [`EffectiveCapacity`] of the channel in the direction.
 ///
 /// This is either the total capacity from the funding transaction, if known, or the
 /// `htlc_maximum_msat` for the direction as advertised by the gossip network, if known,
-/// whichever is smaller.
+/// otherwise.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn DirectedChannelInfo_effective_capacity(this_arg: &crate::lightning::routing::network_graph::DirectedChannelInfo) -> crate::lightning::routing::network_graph::EffectiveCapacity {
+pub extern "C" fn DirectedChannelInfo_effective_capacity(this_arg: &crate::lightning::routing::gossip::DirectedChannelInfo) -> crate::lightning::routing::gossip::EffectiveCapacity {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.effective_capacity();
-	crate::lightning::routing::network_graph::EffectiveCapacity::native_into(ret)
+	crate::lightning::routing::gossip::EffectiveCapacity::native_into(ret)
 }
 
 /// The effective capacity of a channel for routing purposes.
 ///
 /// While this may be smaller than the actual channel capacity, amounts greater than
 /// [`Self::as_msat`] should not be routed through the channel.
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum EffectiveCapacity {
 	/// The available liquidity in the channel known from being a channel counterparty, and thus a
@@ -1173,7 +1175,9 @@ pub enum EffectiveCapacity {
 	/// the total capacity or the `htlc_maximum_msat` was not advertised on the gossip network.
 	Unknown,
 }
-use lightning::routing::network_graph::EffectiveCapacity as nativeEffectiveCapacity;
+use lightning::routing::gossip::EffectiveCapacity as EffectiveCapacityImport;
+pub(crate) type nativeEffectiveCapacity = EffectiveCapacityImport;
+
 impl EffectiveCapacity {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeEffectiveCapacity {
@@ -1311,17 +1315,17 @@ pub extern "C" fn EffectiveCapacity_unknown() -> EffectiveCapacity {
 /// use when making routing decisions.
 
 #[no_mangle]
-pub static UNKNOWN_CHANNEL_CAPACITY_MSAT: u64 = lightning::routing::network_graph::UNKNOWN_CHANNEL_CAPACITY_MSAT;
+pub static UNKNOWN_CHANNEL_CAPACITY_MSAT: u64 = lightning::routing::gossip::UNKNOWN_CHANNEL_CAPACITY_MSAT;
 /// Returns the effective capacity denominated in millisatoshi.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn EffectiveCapacity_as_msat(this_arg: &crate::lightning::routing::network_graph::EffectiveCapacity) -> u64 {
+pub extern "C" fn EffectiveCapacity_as_msat(this_arg: &crate::lightning::routing::gossip::EffectiveCapacity) -> u64 {
 	let mut ret = this_arg.to_native().as_msat();
 	ret
 }
 
 
-use lightning::routing::network_graph::RoutingFees as nativeRoutingFeesImport;
+use lightning::routing::gossip::RoutingFees as nativeRoutingFeesImport;
 pub(crate) type nativeRoutingFees = nativeRoutingFeesImport;
 
 /// Fees for routing via a given channel or a node
@@ -1444,7 +1448,7 @@ pub extern "C" fn RoutingFees_hash(o: &RoutingFees) -> u64 {
 }
 #[no_mangle]
 /// Serialize the RoutingFees object into a byte array which can be read by RoutingFees_read
-pub extern "C" fn RoutingFees_write(obj: &crate::lightning::routing::network_graph::RoutingFees) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn RoutingFees_write(obj: &crate::lightning::routing::gossip::RoutingFees) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -1454,12 +1458,12 @@ pub(crate) extern "C" fn RoutingFees_write_void(obj: *const c_void) -> crate::c_
 #[no_mangle]
 /// Read a RoutingFees from a byte array, created by RoutingFees_write
 pub extern "C" fn RoutingFees_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RoutingFeesDecodeErrorZ {
-	let res: Result<lightning::routing::network_graph::RoutingFees, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::RoutingFees { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let res: Result<lightning::routing::gossip::RoutingFees, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::RoutingFees { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 
-use lightning::routing::network_graph::NodeAnnouncementInfo as nativeNodeAnnouncementInfoImport;
+use lightning::routing::gossip::NodeAnnouncementInfo as nativeNodeAnnouncementInfoImport;
 pub(crate) type nativeNodeAnnouncementInfo = nativeNodeAnnouncementInfoImport;
 
 /// Information received in the latest node_announcement from this node.
@@ -1624,7 +1628,7 @@ pub extern "C" fn NodeAnnouncementInfo_clone(orig: &NodeAnnouncementInfo) -> Nod
 }
 #[no_mangle]
 /// Serialize the NodeAnnouncementInfo object into a byte array which can be read by NodeAnnouncementInfo_read
-pub extern "C" fn NodeAnnouncementInfo_write(obj: &crate::lightning::routing::network_graph::NodeAnnouncementInfo) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn NodeAnnouncementInfo_write(obj: &crate::lightning::routing::gossip::NodeAnnouncementInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -1634,12 +1638,12 @@ pub(crate) extern "C" fn NodeAnnouncementInfo_write_void(obj: *const c_void) -> 
 #[no_mangle]
 /// Read a NodeAnnouncementInfo from a byte array, created by NodeAnnouncementInfo_write
 pub extern "C" fn NodeAnnouncementInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeAnnouncementInfoDecodeErrorZ {
-	let res: Result<lightning::routing::network_graph::NodeAnnouncementInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::NodeAnnouncementInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let res: Result<lightning::routing::gossip::NodeAnnouncementInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeAnnouncementInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 
-use lightning::routing::network_graph::NodeInfo as nativeNodeInfoImport;
+use lightning::routing::gossip::NodeInfo as nativeNodeInfoImport;
 pub(crate) type nativeNodeInfo = nativeNodeInfoImport;
 
 /// Details about a node in the network, known from the network announcement.
@@ -1701,9 +1705,9 @@ pub extern "C" fn NodeInfo_set_channels(this_ptr: &mut NodeInfo, mut val: crate:
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn NodeInfo_get_lowest_inbound_channel_fees(this_ptr: &NodeInfo) -> crate::lightning::routing::network_graph::RoutingFees {
+pub extern "C" fn NodeInfo_get_lowest_inbound_channel_fees(this_ptr: &NodeInfo) -> crate::lightning::routing::gossip::RoutingFees {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().lowest_inbound_channel_fees;
-	let mut local_inner_val = crate::lightning::routing::network_graph::RoutingFees { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::RoutingFees<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::gossip::RoutingFees { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::gossip::RoutingFees<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// Lowest fees enabling routing via any of the enabled, known channels to a node.
@@ -1712,7 +1716,7 @@ pub extern "C" fn NodeInfo_get_lowest_inbound_channel_fees(this_ptr: &NodeInfo) 
 ///
 /// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn NodeInfo_set_lowest_inbound_channel_fees(this_ptr: &mut NodeInfo, mut val: crate::lightning::routing::network_graph::RoutingFees) {
+pub extern "C" fn NodeInfo_set_lowest_inbound_channel_fees(this_ptr: &mut NodeInfo, mut val: crate::lightning::routing::gossip::RoutingFees) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.lowest_inbound_channel_fees = local_val;
 }
@@ -1722,9 +1726,9 @@ pub extern "C" fn NodeInfo_set_lowest_inbound_channel_fees(this_ptr: &mut NodeIn
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn NodeInfo_get_announcement_info(this_ptr: &NodeInfo) -> crate::lightning::routing::network_graph::NodeAnnouncementInfo {
+pub extern "C" fn NodeInfo_get_announcement_info(this_ptr: &NodeInfo) -> crate::lightning::routing::gossip::NodeAnnouncementInfo {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().announcement_info;
-	let mut local_inner_val = crate::lightning::routing::network_graph::NodeAnnouncementInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::network_graph::NodeAnnouncementInfo<>) as *mut _ }, is_owned: false };
+	let mut local_inner_val = crate::lightning::routing::gossip::NodeAnnouncementInfo { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::gossip::NodeAnnouncementInfo<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
 /// More information about a node from node_announcement.
@@ -1733,14 +1737,14 @@ pub extern "C" fn NodeInfo_get_announcement_info(this_ptr: &NodeInfo) -> crate::
 ///
 /// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn NodeInfo_set_announcement_info(this_ptr: &mut NodeInfo, mut val: crate::lightning::routing::network_graph::NodeAnnouncementInfo) {
+pub extern "C" fn NodeInfo_set_announcement_info(this_ptr: &mut NodeInfo, mut val: crate::lightning::routing::gossip::NodeAnnouncementInfo) {
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.announcement_info = local_val;
 }
 /// Constructs a new NodeInfo given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NodeInfo_new(mut channels_arg: crate::c_types::derived::CVec_u64Z, mut lowest_inbound_channel_fees_arg: crate::lightning::routing::network_graph::RoutingFees, mut announcement_info_arg: crate::lightning::routing::network_graph::NodeAnnouncementInfo) -> NodeInfo {
+pub extern "C" fn NodeInfo_new(mut channels_arg: crate::c_types::derived::CVec_u64Z, mut lowest_inbound_channel_fees_arg: crate::lightning::routing::gossip::RoutingFees, mut announcement_info_arg: crate::lightning::routing::gossip::NodeAnnouncementInfo) -> NodeInfo {
 	let mut local_channels_arg = Vec::new(); for mut item in channels_arg.into_rust().drain(..) { local_channels_arg.push( { item }); };
 	let mut local_lowest_inbound_channel_fees_arg = if lowest_inbound_channel_fees_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(lowest_inbound_channel_fees_arg.take_inner()) } }) };
 	let mut local_announcement_info_arg = if announcement_info_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(announcement_info_arg.take_inner()) } }) };
@@ -1771,7 +1775,7 @@ pub extern "C" fn NodeInfo_clone(orig: &NodeInfo) -> NodeInfo {
 }
 #[no_mangle]
 /// Serialize the NodeInfo object into a byte array which can be read by NodeInfo_read
-pub extern "C" fn NodeInfo_write(obj: &crate::lightning::routing::network_graph::NodeInfo) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn NodeInfo_write(obj: &crate::lightning::routing::gossip::NodeInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -1781,13 +1785,13 @@ pub(crate) extern "C" fn NodeInfo_write_void(obj: *const c_void) -> crate::c_typ
 #[no_mangle]
 /// Read a NodeInfo from a byte array, created by NodeInfo_write
 pub extern "C" fn NodeInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeInfoDecodeErrorZ {
-	let res: Result<lightning::routing::network_graph::NodeInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::NodeInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let res: Result<lightning::routing::gossip::NodeInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]
 /// Serialize the NetworkGraph object into a byte array which can be read by NetworkGraph_read
-pub extern "C" fn NetworkGraph_write(obj: &crate::lightning::routing::network_graph::NetworkGraph) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn NetworkGraph_write(obj: &crate::lightning::routing::gossip::NetworkGraph) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -1796,37 +1800,55 @@ pub(crate) extern "C" fn NetworkGraph_write_void(obj: *const c_void) -> crate::c
 }
 #[no_mangle]
 /// Read a NetworkGraph from a byte array, created by NetworkGraph_write
-pub extern "C" fn NetworkGraph_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NetworkGraphDecodeErrorZ {
-	let res: Result<lightning::routing::network_graph::NetworkGraph, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::network_graph::NetworkGraph { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+pub extern "C" fn NetworkGraph_read(ser: crate::c_types::u8slice, arg: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_NetworkGraphDecodeErrorZ {
+	let arg_conv = arg;
+	let res: Result<lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NetworkGraph { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 /// Creates a new, empty, network graph.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_new(mut genesis_hash: crate::c_types::ThirtyTwoBytes) -> crate::lightning::routing::network_graph::NetworkGraph {
-	let mut ret = lightning::routing::network_graph::NetworkGraph::new(::bitcoin::hash_types::BlockHash::from_slice(&genesis_hash.data[..]).unwrap());
-	crate::lightning::routing::network_graph::NetworkGraph { inner: ObjOps::heap_alloc(ret), is_owned: true }
+pub extern "C" fn NetworkGraph_new(mut genesis_hash: crate::c_types::ThirtyTwoBytes, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning::routing::gossip::NetworkGraph {
+	let mut ret = lightning::routing::gossip::NetworkGraph::new(::bitcoin::hash_types::BlockHash::from_slice(&genesis_hash.data[..]).unwrap(), logger);
+	crate::lightning::routing::gossip::NetworkGraph { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Returns a read-only view of the network graph.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_read_only(this_arg: &crate::lightning::routing::network_graph::NetworkGraph) -> crate::lightning::routing::network_graph::ReadOnlyNetworkGraph {
+pub extern "C" fn NetworkGraph_read_only(this_arg: &crate::lightning::routing::gossip::NetworkGraph) -> crate::lightning::routing::gossip::ReadOnlyNetworkGraph {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.read_only();
-	crate::lightning::routing::network_graph::ReadOnlyNetworkGraph { inner: ObjOps::heap_alloc(ret), is_owned: true }
+	crate::lightning::routing::gossip::ReadOnlyNetworkGraph { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// The unix timestamp provided by the most recent rapid gossip sync.
+/// It will be set by the rapid sync process after every sync completion.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NetworkGraph_get_last_rapid_gossip_sync_timestamp(this_arg: &crate::lightning::routing::gossip::NetworkGraph) -> crate::c_types::derived::COption_u32Z {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_last_rapid_gossip_sync_timestamp();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u32Z::None } else { crate::c_types::derived::COption_u32Z::Some( { ret.unwrap() }) };
+	local_ret
+}
+
+/// Update the unix timestamp provided by the most recent rapid gossip sync.
+/// This should be done automatically by the rapid sync process after every sync completion.
+#[no_mangle]
+pub extern "C" fn NetworkGraph_set_last_rapid_gossip_sync_timestamp(this_arg: &crate::lightning::routing::gossip::NetworkGraph, mut last_rapid_gossip_sync_timestamp: u32) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.set_last_rapid_gossip_sync_timestamp(last_rapid_gossip_sync_timestamp)
 }
 
 /// For an already known node (from channel announcements), update its stored properties from a
 /// given node announcement.
 ///
-/// You probably don't want to call this directly, instead relying on a NetGraphMsgHandler's
+/// You probably don't want to call this directly, instead relying on a P2PGossipSync's
 /// RoutingMessageHandler implementation to call it indirectly. This may be useful to accept
 /// routing messages from a source using a protocol other than the lightning P2P protocol.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_update_node_from_announcement(this_arg: &crate::lightning::routing::network_graph::NetworkGraph, msg: &crate::lightning::ln::msgs::NodeAnnouncement) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_node_from_announcement(msg.get_native_ref(), secp256k1::SECP256K1);
+pub extern "C" fn NetworkGraph_update_node_from_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::NodeAnnouncement) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_node_from_announcement(msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
@@ -1837,7 +1859,7 @@ pub extern "C" fn NetworkGraph_update_node_from_announcement(this_arg: &crate::l
 /// peers.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_update_node_from_unsigned_announcement(this_arg: &crate::lightning::routing::network_graph::NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedNodeAnnouncement) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+pub extern "C" fn NetworkGraph_update_node_from_unsigned_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedNodeAnnouncement) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_node_from_unsigned_announcement(msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
@@ -1845,7 +1867,7 @@ pub extern "C" fn NetworkGraph_update_node_from_unsigned_announcement(this_arg: 
 
 /// Store or update channel info from a channel announcement.
 ///
-/// You probably don't want to call this directly, instead relying on a NetGraphMsgHandler's
+/// You probably don't want to call this directly, instead relying on a P2PGossipSync's
 /// RoutingMessageHandler implementation to call it indirectly. This may be useful to accept
 /// routing messages from a source using a protocol other than the lightning P2P protocol.
 ///
@@ -1853,9 +1875,9 @@ pub extern "C" fn NetworkGraph_update_node_from_unsigned_announcement(this_arg: 
 /// the corresponding UTXO exists on chain and is correctly-formatted.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_update_channel_from_announcement(this_arg: &crate::lightning::routing::network_graph::NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelAnnouncement, mut chain_access: crate::c_types::derived::COption_AccessZ) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+pub extern "C" fn NetworkGraph_update_channel_from_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelAnnouncement, mut chain_access: crate::c_types::derived::COption_AccessZ) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
 	let mut local_chain_access = { /* chain_access*/ let chain_access_opt = chain_access; { } if chain_access_opt.is_none() { None } else { Some({ chain_access_opt.take() }) } };
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_from_announcement(msg.get_native_ref(), &local_chain_access, secp256k1::SECP256K1);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_from_announcement(msg.get_native_ref(), &local_chain_access);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
@@ -1868,26 +1890,40 @@ pub extern "C" fn NetworkGraph_update_channel_from_announcement(this_arg: &crate
 /// the corresponding UTXO exists on chain and is correctly-formatted.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_update_channel_from_unsigned_announcement(this_arg: &crate::lightning::routing::network_graph::NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelAnnouncement, mut chain_access: crate::c_types::derived::COption_AccessZ) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+pub extern "C" fn NetworkGraph_update_channel_from_unsigned_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelAnnouncement, mut chain_access: crate::c_types::derived::COption_AccessZ) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
 	let mut local_chain_access = { /* chain_access*/ let chain_access_opt = chain_access; { } if chain_access_opt.is_none() { None } else { Some({ chain_access_opt.take() }) } };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_from_unsigned_announcement(msg.get_native_ref(), &local_chain_access);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 
-/// Close a channel if a corresponding HTLC fail was sent.
+/// Update channel from partial announcement data received via rapid gossip sync
+///
+/// `timestamp: u64`: Timestamp emulating the backdated original announcement receipt (by the
+/// rapid gossip sync server)
+///
+/// All other parameters as used in [`msgs::UnsignedChannelAnnouncement`] fields.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NetworkGraph_add_channel_from_partial_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, mut short_channel_id: u64, mut timestamp: u64, mut features: crate::lightning::ln::features::ChannelFeatures, mut node_id_1: crate::c_types::PublicKey, mut node_id_2: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.add_channel_from_partial_announcement(short_channel_id, timestamp, *unsafe { Box::from_raw(features.take_inner()) }, node_id_1.into_rust(), node_id_2.into_rust());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_ret
+}
+
+/// Marks a channel in the graph as failed if a corresponding HTLC fail was sent.
 /// If permanent, removes a channel from the local storage.
 /// May cause the removal of nodes too, if this was their last channel.
 /// If not permanent, makes channels unavailable for routing.
 #[no_mangle]
-pub extern "C" fn NetworkGraph_close_channel_from_update(this_arg: &crate::lightning::routing::network_graph::NetworkGraph, mut short_channel_id: u64, mut is_permanent: bool) {
-	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.close_channel_from_update(short_channel_id, is_permanent)
+pub extern "C" fn NetworkGraph_channel_failed(this_arg: &crate::lightning::routing::gossip::NetworkGraph, mut short_channel_id: u64, mut is_permanent: bool) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel_failed(short_channel_id, is_permanent)
 }
 
 /// Marks a node in the graph as failed.
 #[no_mangle]
-pub extern "C" fn NetworkGraph_fail_node(this_arg: &crate::lightning::routing::network_graph::NetworkGraph, mut _node_id: crate::c_types::PublicKey, mut is_permanent: bool) {
-	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.fail_node(&_node_id.into_rust(), is_permanent)
+pub extern "C" fn NetworkGraph_node_failed(this_arg: &crate::lightning::routing::gossip::NetworkGraph, mut _node_id: crate::c_types::PublicKey, mut is_permanent: bool) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.node_failed(&_node_id.into_rust(), is_permanent)
 }
 
 /// Removes information about channels that we haven't heard any updates about in some time.
@@ -1904,7 +1940,7 @@ pub extern "C" fn NetworkGraph_fail_node(this_arg: &crate::lightning::routing::n
 /// This method is only available with the `std` feature. See
 /// [`NetworkGraph::remove_stale_channels_with_time`] for `no-std` use.
 #[no_mangle]
-pub extern "C" fn NetworkGraph_remove_stale_channels(this_arg: &crate::lightning::routing::network_graph::NetworkGraph) {
+pub extern "C" fn NetworkGraph_remove_stale_channels(this_arg: &crate::lightning::routing::gossip::NetworkGraph) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.remove_stale_channels()
 }
 
@@ -1919,14 +1955,14 @@ pub extern "C" fn NetworkGraph_remove_stale_channels(this_arg: &crate::lightning
 /// This function takes the current unix time as an argument. For users with the `std` feature
 /// enabled, [`NetworkGraph::remove_stale_channels`] may be preferable.
 #[no_mangle]
-pub extern "C" fn NetworkGraph_remove_stale_channels_with_time(this_arg: &crate::lightning::routing::network_graph::NetworkGraph, mut current_time_unix: u64) {
+pub extern "C" fn NetworkGraph_remove_stale_channels_with_time(this_arg: &crate::lightning::routing::gossip::NetworkGraph, mut current_time_unix: u64) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.remove_stale_channels_with_time(current_time_unix)
 }
 
 /// For an already known (from announcement) channel, update info about one of the directions
 /// of the channel.
 ///
-/// You probably don't want to call this directly, instead relying on a NetGraphMsgHandler's
+/// You probably don't want to call this directly, instead relying on a P2PGossipSync's
 /// RoutingMessageHandler implementation to call it indirectly. This may be useful to accept
 /// routing messages from a source using a protocol other than the lightning P2P protocol.
 ///
@@ -1934,8 +1970,8 @@ pub extern "C" fn NetworkGraph_remove_stale_channels_with_time(this_arg: &crate:
 /// materially in the future will be rejected.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_update_channel(this_arg: &crate::lightning::routing::network_graph::NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel(msg.get_native_ref(), secp256k1::SECP256K1);
+pub extern "C" fn NetworkGraph_update_channel(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel(msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
@@ -1948,7 +1984,7 @@ pub extern "C" fn NetworkGraph_update_channel(this_arg: &crate::lightning::routi
 /// materially in the future will be rejected.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_update_channel_unsigned(this_arg: &crate::lightning::routing::network_graph::NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelUpdate) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+pub extern "C" fn NetworkGraph_update_channel_unsigned(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelUpdate) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_unsigned(msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
@@ -1959,7 +1995,7 @@ pub extern "C" fn NetworkGraph_update_channel_unsigned(this_arg: &crate::lightni
 /// or if node announcement for the node was never received.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ReadOnlyNetworkGraph_get_addresses(this_arg: &crate::lightning::routing::network_graph::ReadOnlyNetworkGraph, mut pubkey: crate::c_types::PublicKey) -> crate::c_types::derived::COption_CVec_NetAddressZZ {
+pub extern "C" fn ReadOnlyNetworkGraph_get_addresses(this_arg: &crate::lightning::routing::gossip::ReadOnlyNetworkGraph, mut pubkey: crate::c_types::PublicKey) -> crate::c_types::derived::COption_CVec_NetAddressZZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_addresses(&pubkey.into_rust());
 	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_NetAddressZZ::None } else { crate::c_types::derived::COption_CVec_NetAddressZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::lightning::ln::msgs::NetAddress::native_into(item) }); }; local_ret_0.into() }) };
 	local_ret

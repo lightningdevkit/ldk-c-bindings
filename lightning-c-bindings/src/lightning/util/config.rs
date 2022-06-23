@@ -74,7 +74,15 @@ impl ChannelHandshakeConfig {
 /// Applied only for inbound channels (see ChannelHandshakeLimits::max_minimum_depth for the
 /// equivalent limit applied to outbound channels).
 ///
+/// A lower-bound of 1 is applied, requiring all channels to have a confirmed commitment
+/// transaction before operation. If you wish to accept channels with zero confirmations, see
+/// [`UserConfig::manually_accept_inbound_channels`] and
+/// [`ChannelManager::accept_inbound_channel_from_trusted_peer_0conf`].
+///
 /// Default value: 6.
+///
+/// [`ChannelManager::accept_inbound_channel`]: crate::ln::channelmanager::ChannelManager::accept_inbound_channel
+/// [`ChannelManager::accept_inbound_channel_from_trusted_peer_0conf`]: crate::ln::channelmanager::ChannelManager::accept_inbound_channel_from_trusted_peer_0conf
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_get_minimum_depth(this_ptr: &ChannelHandshakeConfig) -> u32 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().minimum_depth;
@@ -84,7 +92,15 @@ pub extern "C" fn ChannelHandshakeConfig_get_minimum_depth(this_ptr: &ChannelHan
 /// Applied only for inbound channels (see ChannelHandshakeLimits::max_minimum_depth for the
 /// equivalent limit applied to outbound channels).
 ///
+/// A lower-bound of 1 is applied, requiring all channels to have a confirmed commitment
+/// transaction before operation. If you wish to accept channels with zero confirmations, see
+/// [`UserConfig::manually_accept_inbound_channels`] and
+/// [`ChannelManager::accept_inbound_channel_from_trusted_peer_0conf`].
+///
 /// Default value: 6.
+///
+/// [`ChannelManager::accept_inbound_channel`]: crate::ln::channelmanager::ChannelManager::accept_inbound_channel
+/// [`ChannelManager::accept_inbound_channel_from_trusted_peer_0conf`]: crate::ln::channelmanager::ChannelManager::accept_inbound_channel_from_trusted_peer_0conf
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_set_minimum_depth(this_ptr: &mut ChannelHandshakeConfig, mut val: u32) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.minimum_depth = val;
@@ -151,6 +167,61 @@ pub extern "C" fn ChannelHandshakeConfig_get_our_htlc_minimum_msat(this_ptr: &Ch
 pub extern "C" fn ChannelHandshakeConfig_set_our_htlc_minimum_msat(this_ptr: &mut ChannelHandshakeConfig, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.our_htlc_minimum_msat = val;
 }
+/// Sets the percentage of the channel value we will cap the total value of outstanding inbound
+/// HTLCs to.
+///
+/// This can be set to a value between 1-100, where the value corresponds to the percent of the
+/// channel value in whole percentages.
+///
+/// Note that:
+/// * If configured to another value than the default value 10, any new channels created with
+/// the non default value will cause versions of LDK prior to 0.0.104 to refuse to read the
+/// `ChannelManager`.
+///
+/// * This caps the total value for inbound HTLCs in-flight only, and there's currently
+/// no way to configure the cap for the total value of outbound HTLCs in-flight.
+///
+/// * The requirements for your node being online to ensure the safety of HTLC-encumbered funds
+/// are different from the non-HTLC-encumbered funds. This makes this an important knob to
+/// restrict exposure to loss due to being offline for too long.
+/// See [`ChannelHandshakeConfig::our_to_self_delay`] and [`ChannelConfig::cltv_expiry_delta`]
+/// for more information.
+///
+/// Default value: 10.
+/// Minimum value: 1, any values less than 1 will be treated as 1 instead.
+/// Maximum value: 100, any values larger than 100 will be treated as 100 instead.
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_get_max_inbound_htlc_value_in_flight_percent_of_channel(this_ptr: &ChannelHandshakeConfig) -> u8 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().max_inbound_htlc_value_in_flight_percent_of_channel;
+	*inner_val
+}
+/// Sets the percentage of the channel value we will cap the total value of outstanding inbound
+/// HTLCs to.
+///
+/// This can be set to a value between 1-100, where the value corresponds to the percent of the
+/// channel value in whole percentages.
+///
+/// Note that:
+/// * If configured to another value than the default value 10, any new channels created with
+/// the non default value will cause versions of LDK prior to 0.0.104 to refuse to read the
+/// `ChannelManager`.
+///
+/// * This caps the total value for inbound HTLCs in-flight only, and there's currently
+/// no way to configure the cap for the total value of outbound HTLCs in-flight.
+///
+/// * The requirements for your node being online to ensure the safety of HTLC-encumbered funds
+/// are different from the non-HTLC-encumbered funds. This makes this an important knob to
+/// restrict exposure to loss due to being offline for too long.
+/// See [`ChannelHandshakeConfig::our_to_self_delay`] and [`ChannelConfig::cltv_expiry_delta`]
+/// for more information.
+///
+/// Default value: 10.
+/// Minimum value: 1, any values less than 1 will be treated as 1 instead.
+/// Maximum value: 100, any values larger than 100 will be treated as 100 instead.
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_set_max_inbound_htlc_value_in_flight_percent_of_channel(this_ptr: &mut ChannelHandshakeConfig, mut val: u8) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.max_inbound_htlc_value_in_flight_percent_of_channel = val;
+}
 /// If set, we attempt to negotiate the `scid_privacy` (referred to as `scid_alias` in the
 /// BOLTs) option for outbound private channels. This provides better privacy by not including
 /// our real on-chain channel UTXO in each invoice and requiring that our counterparty only
@@ -205,11 +276,12 @@ pub extern "C" fn ChannelHandshakeConfig_set_negotiate_scid_privacy(this_ptr: &m
 /// Constructs a new ChannelHandshakeConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our_to_self_delay_arg: u16, mut our_htlc_minimum_msat_arg: u64, mut negotiate_scid_privacy_arg: bool) -> ChannelHandshakeConfig {
+pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our_to_self_delay_arg: u16, mut our_htlc_minimum_msat_arg: u64, mut max_inbound_htlc_value_in_flight_percent_of_channel_arg: u8, mut negotiate_scid_privacy_arg: bool) -> ChannelHandshakeConfig {
 	ChannelHandshakeConfig { inner: ObjOps::heap_alloc(nativeChannelHandshakeConfig {
 		minimum_depth: minimum_depth_arg,
 		our_to_self_delay: our_to_self_delay_arg,
 		our_htlc_minimum_msat: our_htlc_minimum_msat_arg,
+		max_inbound_htlc_value_in_flight_percent_of_channel: max_inbound_htlc_value_in_flight_percent_of_channel_arg,
 		negotiate_scid_privacy: negotiate_scid_privacy_arg,
 	}), is_owned: true }
 }
@@ -299,7 +371,7 @@ impl ChannelHandshakeLimits {
 		ret
 	}
 }
-/// Minimum allowed satoshis when a channel is funded, this is supplied by the sender and so
+/// Minimum allowed satoshis when a channel is funded. This is supplied by the sender and so
 /// only applies to inbound channels.
 ///
 /// Default value: 0.
@@ -308,13 +380,30 @@ pub extern "C" fn ChannelHandshakeLimits_get_min_funding_satoshis(this_ptr: &Cha
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().min_funding_satoshis;
 	*inner_val
 }
-/// Minimum allowed satoshis when a channel is funded, this is supplied by the sender and so
+/// Minimum allowed satoshis when a channel is funded. This is supplied by the sender and so
 /// only applies to inbound channels.
 ///
 /// Default value: 0.
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeLimits_set_min_funding_satoshis(this_ptr: &mut ChannelHandshakeLimits, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.min_funding_satoshis = val;
+}
+/// Maximum allowed satoshis when a channel is funded. This is supplied by the sender and so
+/// only applies to inbound channels.
+///
+/// Default value: 2^24 - 1.
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeLimits_get_max_funding_satoshis(this_ptr: &ChannelHandshakeLimits) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().max_funding_satoshis;
+	*inner_val
+}
+/// Maximum allowed satoshis when a channel is funded. This is supplied by the sender and so
+/// only applies to inbound channels.
+///
+/// Default value: 2^24 - 1.
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeLimits_set_max_funding_satoshis(this_ptr: &mut ChannelHandshakeLimits, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.max_funding_satoshis = val;
 }
 /// The remote node sets a limit on the minimum size of HTLCs we can send to them. This allows
 /// you to limit the maximum minimum-size they can require.
@@ -407,6 +496,49 @@ pub extern "C" fn ChannelHandshakeLimits_get_max_minimum_depth(this_ptr: &Channe
 pub extern "C" fn ChannelHandshakeLimits_set_max_minimum_depth(this_ptr: &mut ChannelHandshakeLimits, mut val: u32) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.max_minimum_depth = val;
 }
+/// Whether we implicitly trust funding transactions generated by us for our own outbound
+/// channels to not be double-spent.
+///
+/// If this is set, we assume that our own funding transactions are *never* double-spent, and
+/// thus we can trust them without any confirmations. This is generally a reasonable
+/// assumption, given we're the only ones who could ever double-spend it (assuming we have sole
+/// control of the signing keys).
+///
+/// You may wish to un-set this if you allow the user to (or do in an automated fashion)
+/// double-spend the funding transaction to RBF with an alternative channel open.
+///
+/// This only applies if our counterparty set their confirmations-required value to 0, and we
+/// always trust our own funding transaction at 1 confirmation irrespective of this value.
+/// Thus, this effectively acts as a `min_minimum_depth`, with the only possible values being
+/// `true` (0) and `false` (1).
+///
+/// Default value: true
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeLimits_get_trust_own_funding_0conf(this_ptr: &ChannelHandshakeLimits) -> bool {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().trust_own_funding_0conf;
+	*inner_val
+}
+/// Whether we implicitly trust funding transactions generated by us for our own outbound
+/// channels to not be double-spent.
+///
+/// If this is set, we assume that our own funding transactions are *never* double-spent, and
+/// thus we can trust them without any confirmations. This is generally a reasonable
+/// assumption, given we're the only ones who could ever double-spend it (assuming we have sole
+/// control of the signing keys).
+///
+/// You may wish to un-set this if you allow the user to (or do in an automated fashion)
+/// double-spend the funding transaction to RBF with an alternative channel open.
+///
+/// This only applies if our counterparty set their confirmations-required value to 0, and we
+/// always trust our own funding transaction at 1 confirmation irrespective of this value.
+/// Thus, this effectively acts as a `min_minimum_depth`, with the only possible values being
+/// `true` (0) and `false` (1).
+///
+/// Default value: true
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeLimits_set_trust_own_funding_0conf(this_ptr: &mut ChannelHandshakeLimits, mut val: bool) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.trust_own_funding_0conf = val;
+}
 /// Set to force an incoming channel to match our announced channel preference in
 /// [`ChannelConfig::announced_channel`].
 ///
@@ -458,14 +590,16 @@ pub extern "C" fn ChannelHandshakeLimits_set_their_to_self_delay(this_ptr: &mut 
 /// Constructs a new ChannelHandshakeLimits given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelHandshakeLimits_new(mut min_funding_satoshis_arg: u64, mut max_htlc_minimum_msat_arg: u64, mut min_max_htlc_value_in_flight_msat_arg: u64, mut max_channel_reserve_satoshis_arg: u64, mut min_max_accepted_htlcs_arg: u16, mut max_minimum_depth_arg: u32, mut force_announced_channel_preference_arg: bool, mut their_to_self_delay_arg: u16) -> ChannelHandshakeLimits {
+pub extern "C" fn ChannelHandshakeLimits_new(mut min_funding_satoshis_arg: u64, mut max_funding_satoshis_arg: u64, mut max_htlc_minimum_msat_arg: u64, mut min_max_htlc_value_in_flight_msat_arg: u64, mut max_channel_reserve_satoshis_arg: u64, mut min_max_accepted_htlcs_arg: u16, mut max_minimum_depth_arg: u32, mut trust_own_funding_0conf_arg: bool, mut force_announced_channel_preference_arg: bool, mut their_to_self_delay_arg: u16) -> ChannelHandshakeLimits {
 	ChannelHandshakeLimits { inner: ObjOps::heap_alloc(nativeChannelHandshakeLimits {
 		min_funding_satoshis: min_funding_satoshis_arg,
+		max_funding_satoshis: max_funding_satoshis_arg,
 		max_htlc_minimum_msat: max_htlc_minimum_msat_arg,
 		min_max_htlc_value_in_flight_msat: min_max_htlc_value_in_flight_msat_arg,
 		max_channel_reserve_satoshis: max_channel_reserve_satoshis_arg,
 		min_max_accepted_htlcs: min_max_accepted_htlcs_arg,
 		max_minimum_depth: max_minimum_depth_arg,
+		trust_own_funding_0conf: trust_own_funding_0conf_arg,
 		force_announced_channel_preference: force_announced_channel_preference_arg,
 		their_to_self_delay: their_to_self_delay_arg,
 	}), is_owned: true }

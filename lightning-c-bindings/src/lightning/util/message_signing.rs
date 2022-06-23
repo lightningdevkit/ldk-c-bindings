@@ -35,7 +35,7 @@ use alloc::{vec::Vec, boxed::Box};
 /// Signatures are EC recoverable, meaning that given the message and the signature the PublicKey of the signer can be extracted.
 #[no_mangle]
 pub extern "C" fn sign(mut msg: crate::c_types::u8slice, sk: *const [u8; 32]) -> crate::c_types::derived::CResult_StringErrorZ {
-	let mut ret = lightning::util::message_signing::sign(msg.to_slice(), &::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *sk}[..]).unwrap());
+	let mut ret = lightning::util::message_signing::sign(msg.to_slice(), &::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *sk}[..]).unwrap());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
 }

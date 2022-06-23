@@ -176,12 +176,12 @@ LDKCResult_NoneChannelMonitorUpdateErrZ update_channel_monitor(const void *this_
 	mons_updated += 1;
 	return CResult_NoneChannelMonitorUpdateErrZ_ok();
 }
-LDKCVec_MonitorEventZ monitors_pending_monitor_events(const void *this_arg) {
+LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ monitors_pending_monitor_events(const void *this_arg) {
 	NodeMonitors* arg = (NodeMonitors*) this_arg;
 	std::unique_lock<std::mutex> l(arg->mut);
 
 	if (arg->mons.size() == 0) {
-		return LDKCVec_MonitorEventZ {
+		return LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ {
 			.data = NULL,
 			.datalen = 0,
 		};
@@ -189,7 +189,16 @@ LDKCVec_MonitorEventZ monitors_pending_monitor_events(const void *this_arg) {
 		// We only ever actually have one channel per node, plus concatenating two
 		// Rust Vecs to each other from C++ will require a bit of effort.
 		assert(arg->mons.size() == 1);
-		return ChannelMonitor_get_and_clear_pending_monitor_events(&arg->mons[0].second);
+		LDK::CVec_MonitorEventZ events = ChannelMonitor_get_and_clear_pending_monitor_events(&arg->mons[0].second);
+		LDK::C2Tuple_OutPointScriptZ funding_info = ChannelMonitor_get_funding_txo(&arg->mons[0].second);
+		LDK::OutPoint outpoint = std::move(funding_info->a);
+		LDK::C2Tuple_OutPointCVec_MonitorEventZZ pair = C2Tuple_OutPointCVec_MonitorEventZZ_new(std::move(outpoint), std::move(events));
+		auto vec = LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ {
+			.data = (LDKC2Tuple_OutPointCVec_MonitorEventZZ*)malloc(sizeof(LDKC2Tuple_OutPointCVec_MonitorEventZZ)),
+			.datalen = 1,
+		};
+		vec.data[0] = std::move(pair);
+		return vec;
 	}
 }
 
@@ -421,7 +430,8 @@ LDKCVec_C2Tuple_PublicKeyTypeZZ create_custom_msg(const void* this_arg) {
 	return ret;
 }
 
-uint64_t get_chan_score(const void *this_arg, uint64_t scid, uint64_t htlc_amt, uint64_t chan_capacity, const LDKNodeId *src, const LDKNodeId *dst) {
+uint64_t get_chan_score(const void *this_arg, uint64_t scid, const LDKNodeId *src, const LDKNodeId *dst, LDKChannelUsage usage_in) {
+	LDK::ChannelUsage usage(std::move(usage_in));
 	return 42;
 }
 
@@ -434,7 +444,8 @@ struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, s
 	const struct CustomRouteFinderParams *params = (struct CustomRouteFinderParams *)this_arg;
 	assert(first_hops->datalen == 1);
 	assert(ChannelDetails_get_is_usable(&first_hops->data[0]));
-	return find_route(payer, route_params, params->graph_ref, first_hops, *params->logger, scorer, &params->random_seed_bytes.data);
+	LDK::ReadOnlyNetworkGraph graph_lock = NetworkGraph_read_only(params->graph_ref);
+	return find_route(payer, route_params, &graph_lock, first_hops, *params->logger, scorer, &params->random_seed_bytes.data);
 }
 
 int main() {
@@ -478,8 +489,8 @@ int main() {
 		.free = NULL,
 	};
 
-	LDK::NetworkGraph net_graph1 = NetworkGraph_new(genesis_hash);
-	LDK::NetGraphMsgHandler graph_msg_handler1 = NetGraphMsgHandler_new(&net_graph1, COption_AccessZ_none(), logger1);
+	LDK::NetworkGraph net_graph1 = NetworkGraph_new(genesis_hash, logger1);
+	LDK::P2PGossipSync graph_msg_handler1 = P2PGossipSync_new(&net_graph1, COption_AccessZ_none(), logger1);
 	LDKSecretKey node_secret1;
 
 	LDKLogger logger2 {
@@ -498,8 +509,8 @@ int main() {
 		.free = NULL,
 	};
 
-	LDK::NetworkGraph net_graph2 = NetworkGraph_new(genesis_hash);
-	LDK::NetGraphMsgHandler graph_msg_handler2 = NetGraphMsgHandler_new(&net_graph2, COption_AccessZ_none(), logger2);
+	LDK::NetworkGraph net_graph2 = NetworkGraph_new(genesis_hash, logger2);
+	LDK::P2PGossipSync graph_msg_handler2 = P2PGossipSync_new(&net_graph2, COption_AccessZ_none(), logger2);
 	LDKSecretKey node_secret2;
 
 	LDK::CVec_u8Z cm1_ser = LDKCVec_u8Z {}; // ChannelManager 1 serialization at the end of the ser-des scope
@@ -520,7 +531,7 @@ int main() {
 		LDK::CVec_ChannelDetailsZ channels = ChannelManager_list_channels(&cm1);
 		assert(channels->datalen == 0);
 
-		LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), NetGraphMsgHandler_as_RoutingMessageHandler(&graph_msg_handler1));
+		LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), P2PGossipSync_as_RoutingMessageHandler(&graph_msg_handler1));
 
 		LDK::IgnoringMessageHandler ignoring_handler1 = IgnoringMessageHandler_new();
 		LDK::CustomMessageHandler custom_msg_handler1 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler1);
@@ -552,7 +563,7 @@ int main() {
 		LDK::CVec_ChannelDetailsZ channels2 = ChannelManager_list_channels(&cm2);
 		assert(channels2->datalen == 0);
 
-		LDK::RoutingMessageHandler net_msgs2 = NetGraphMsgHandler_as_RoutingMessageHandler(&graph_msg_handler2);
+		LDK::RoutingMessageHandler net_msgs2 = P2PGossipSync_as_RoutingMessageHandler(&graph_msg_handler2);
 		LDK::CResult_ChannelAnnouncementDecodeErrorZ chan_ann = ChannelAnnouncement_read(LDKu8slice { .data = valid_node_announcement, .datalen = sizeof(valid_node_announcement) });
 		assert(chan_ann->result_ok);
 		LDK::CResult_boolLightningErrorZ ann_res = net_msgs2->handle_channel_announcement(net_msgs2->this_arg, chan_ann->contents.result);
@@ -605,7 +616,7 @@ int main() {
 				assert(!memcmp(queue.events[0]->funding_generation_ready.output_script.data, channel_open_block + 58 + 81, 34));
 				LDKTransaction funding_transaction { .data = const_cast<uint8_t*>(channel_open_block + 81), .datalen = sizeof(channel_open_block) - 81, .data_is_owned = false };
 
-				LDK::CResult_NoneAPIErrorZ fund_res = ChannelManager_funding_transaction_generated(&cm1, &queue.events[0]->funding_generation_ready.temporary_channel_id.data, funding_transaction);
+				LDK::CResult_NoneAPIErrorZ fund_res = ChannelManager_funding_transaction_generated(&cm1, &queue.events[0]->funding_generation_ready.temporary_channel_id.data, queue.events[0]->funding_generation_ready.counterparty_node_id, funding_transaction);
 				assert(fund_res->result_ok);
 				break;
 			}
@@ -688,7 +699,7 @@ int main() {
 				.chars = (const uint8_t *)"Invoice Description",
 				.len =             strlen("Invoice Description"),
 				.chars_is_owned = false
-			});
+			}, 3600);
 		assert(invoice->result_ok);
 		LDKThirtyTwoBytes payment_hash;
 		memcpy(payment_hash.data, Invoice_payment_hash(invoice->contents.result), 32);
@@ -704,7 +715,10 @@ int main() {
 					}, Invoice_route_hints(invoice->contents.result), COption_u64Z_none(), 0xffffffff),
 				5000, Invoice_min_final_cltv_expiry(invoice->contents.result));
 			random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
-			LDK::CResult_RouteLightningErrorZ route = find_route(ChannelManager_get_our_node_id(&cm1), &route_params, &net_graph2, &outbound_channels, logger1, &chan_scorer, &random_bytes.data);
+			LDK::ReadOnlyNetworkGraph graph_lock = NetworkGraph_read_only(&net_graph2);
+
+			LDK::CResult_RouteLightningErrorZ route = find_route(ChannelManager_get_our_node_id(&cm1), &route_params, &graph_lock, &outbound_channels, logger1, &chan_scorer, &random_bytes.data);
+
 			assert(route->result_ok);
 			LDK::CVec_CVec_RouteHopZZ paths = Route_get_paths(route->contents.result);
 			assert(paths->datalen == 1);
@@ -751,9 +765,16 @@ int main() {
 			assert(queue.events[0]->payment_received.purpose.tag == LDKPaymentPurpose_InvoicePayment);
 			assert(!memcmp(queue.events[0]->payment_received.purpose.invoice_payment.payment_secret.data,
 					Invoice_payment_secret(invoice->contents.result), 32));
-			assert(queue.events[0]->payment_received.amt == 5000);
+			assert(queue.events[0]->payment_received.amount_msat == 5000);
 			memcpy(payment_preimage.data, queue.events[0]->payment_received.purpose.invoice_payment.payment_preimage.data, 32);
-			assert(ChannelManager_claim_funds(&cm2, payment_preimage));
+			ChannelManager_claim_funds(&cm2, payment_preimage);
+
+			queue.events.clear();
+			ev2.process_pending_events(handler);
+			assert(queue.events.size() == 1);
+			assert(queue.events[0]->tag == LDKEvent_PaymentClaimed);
+			assert(!memcmp(queue.events[0]->payment_claimed.payment_hash.data, payment_hash.data, 32));
+			assert(queue.events[0]->payment_claimed.purpose.tag == LDKPaymentPurpose_InvoicePayment);
 		}
 		PeerManager_process_events(&net2);
 		// Wait until we've passed through a full set of monitor updates (ie new preimage + CS/RAA messages)
@@ -809,11 +830,11 @@ int main() {
 	// Attempt to close the channel...
 	uint8_t chan_id[32];
 	for (int i = 0; i < 32; i++) { chan_id[i] = channel_open_txid[31-i]; }
-	LDK::CResult_NoneAPIErrorZ close_res = ChannelManager_close_channel(&cm1, &chan_id);
+	LDK::CResult_NoneAPIErrorZ close_res = ChannelManager_close_channel(&cm1, &chan_id, ChannelManager_get_our_node_id(&cm2));
 	assert(!close_res->result_ok); // Note that we can't close while disconnected!
 
 	// Open a connection!
-	LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), NetGraphMsgHandler_as_RoutingMessageHandler(&graph_msg_handler1));
+	LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), P2PGossipSync_as_RoutingMessageHandler(&graph_msg_handler1));
 	random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
 
 	LDKPublicKey chan_2_node_id = ChannelManager_get_our_node_id(&cm2);
@@ -830,7 +851,7 @@ int main() {
 	};
 	LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, &random_bytes.data, logger1, std::move(custom_msg_handler1));
 
-	LDK::MessageHandler msg_handler2 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm2), NetGraphMsgHandler_as_RoutingMessageHandler(&graph_msg_handler2));
+	LDK::MessageHandler msg_handler2 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm2), P2PGossipSync_as_RoutingMessageHandler(&graph_msg_handler2));
 	CustomMsgQueue peer_2_custom_messages;
 	LDKCustomMessageHandler custom_msg_handler2 = {
 		.this_arg = &peer_2_custom_messages,
@@ -867,11 +888,11 @@ int main() {
 		.find_route = custom_find_route,
 		.free = NULL,
 	};
-	LDK::ProbabilisticScorer scorer = ProbabilisticScorer_new(ProbabilisticScoringParameters_default(), &net_graph1);
+	LDK::ProbabilisticScorer scorer = ProbabilisticScorer_new(ProbabilisticScoringParameters_default(), &net_graph1, logger1);
 	LDK::MultiThreadedLockableScore scorer_mtx = MultiThreadedLockableScore_new(ProbabilisticScorer_as_Score(&scorer));
 	EventQueue queue1;
 	LDKEventHandler handler1 = { .this_arg = &queue1, .handle_event = handle_event, .free = NULL };
-	LDK::InvoicePayer payer = InvoicePayer_new(ChannelManager_as_Payer(&cm1), sending_router, &scorer_mtx, logger1, handler1, RetryAttempts_new(0));
+	LDK::InvoicePayer payer = InvoicePayer_new(ChannelManager_as_Payer(&cm1), sending_router, &scorer_mtx, logger1, handler1, Retry_attempts(0));
 
 	LDK::CResult_InvoiceSignOrCreationErrorZ invoice_res2 = create_invoice_from_channelmanager(&cm2,
 		KeysManager_as_KeysInterface(&keys2),
@@ -880,7 +901,7 @@ int main() {
 			.chars = (const uint8_t *)"Invoice 2 Description",
 			.len =             strlen("Invoice 2 Description"),
 			.chars_is_owned = false
-		});
+		}, 3600);
 	assert(invoice_res2->result_ok);
 	const LDKInvoice *invoice2 = invoice_res2->contents.result;
 	LDK::CResult_PaymentIdPaymentErrorZ invoice_pay_res = InvoicePayer_pay_invoice(&payer, invoice2);
@@ -914,8 +935,16 @@ int main() {
 			assert(event_data->purpose.tag == LDKPaymentPurpose_InvoicePayment);
 			assert(!memcmp(event_data->purpose.invoice_payment.payment_secret.data,
 					Invoice_payment_secret(invoice2), 32));
-			assert(event_data->amt == 10000);
-			assert(ChannelManager_claim_funds(&cm2, event_data->purpose.invoice_payment.payment_preimage));
+			assert(event_data->amount_msat == 10000);
+			ChannelManager_claim_funds(&cm2, event_data->purpose.invoice_payment.payment_preimage);
+
+			queue2.events.clear();
+			ev2.process_pending_events(handler2);
+			assert(queue2.events.size() == 1);
+			assert(queue2.events[0]->tag == LDKEvent_PaymentClaimed);
+			assert(!memcmp(queue2.events[0]->payment_claimed.payment_hash.data, Invoice_payment_hash(invoice2), 32));
+			assert(queue2.events[0]->payment_claimed.purpose.tag == LDKPaymentPurpose_InvoicePayment);
+
 			break;
 		}
 		std::this_thread::yield();
@@ -935,7 +964,7 @@ int main() {
 
 	// Actually close the channel
 	num_txs_broadcasted = 0;
-	close_res = ChannelManager_close_channel(&cm1, &chan_id);
+	close_res = ChannelManager_close_channel(&cm1, &chan_id, ChannelManager_get_our_node_id(&cm2));
 	assert(close_res->result_ok);
 	PeerManager_process_events(&net1);
 	while (num_txs_broadcasted != 2) {

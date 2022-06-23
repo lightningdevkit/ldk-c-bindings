@@ -31,8 +31,8 @@ LDKCResult_NoneChannelMonitorUpdateErrZ add_channel_monitor(const void *this_arg
 LDKCResult_NoneChannelMonitorUpdateErrZ update_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, LDKChannelMonitorUpdate monitor) {
 	return CResult_NoneChannelMonitorUpdateErrZ_ok();
 }
-LDKCVec_MonitorEventZ monitors_pending_monitor_events(const void *this_arg) {
-	LDKCVec_MonitorEventZ empty_htlc_vec = {
+LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ monitors_pending_monitor_events(const void *this_arg) {
+	LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ empty_htlc_vec = {
 		.data = NULL,
 		.datalen = 0,
 	};

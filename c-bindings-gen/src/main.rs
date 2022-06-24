@@ -1610,15 +1610,15 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 				writeln_field_docs(w, &field.attrs, "\t\t", types, Some(&gen_types), &field.ty);
 				write!(w, "\t\t{}: ", field.ident.as_ref().unwrap()).unwrap();
 				write!(&mut constr, "{}{}: ", if idx != 0 { ", " } else { "" }, field.ident.as_ref().unwrap()).unwrap();
-				types.write_c_type(w, &field.ty, Some(&gen_types), false);
-				types.write_c_type(&mut constr, &field.ty, Some(&gen_types), false);
+				types.write_c_type(w, &field.ty, Some(&gen_types), true);
+				types.write_c_type(&mut constr, &field.ty, Some(&gen_types), true);
 				writeln!(w, ",").unwrap();
 			}
 			write!(w, "\t}}").unwrap();
 		} else if let syn::Fields::Unnamed(fields) = &var.fields {
 			if fields.unnamed.len() == 1 {
 				let mut empty_check = Vec::new();
-				types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), false);
+				types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), true);
 				if empty_check.is_empty() {
 					empty_tuple_variant = true;
 				}
@@ -1629,7 +1629,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 				for (idx, field) in fields.unnamed.iter().enumerate() {
 					if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
 					write!(&mut constr, "{}: ", ('a' as u8 + idx as u8) as char).unwrap();
-					types.write_c_type(w, &field.ty, Some(&gen_types), false);
+					types.write_c_type(w, &field.ty, Some(&gen_types), true);
 					types.write_c_type(&mut constr, &field.ty, Some(&gen_types), false);
 					if idx != fields.unnamed.len() - 1 {
 						write!(w, ",").unwrap();
@@ -1650,8 +1650,19 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 		} else if let syn::Fields::Unnamed(fields) = &var.fields {
 			if !empty_tuple_variant {
 				write!(&mut constr, "(").unwrap();
-				for idx in 0..fields.unnamed.len() {
-					write!(&mut constr, "{}, ", ('a' as u8 + idx as u8) as char).unwrap();
+				for (idx, field) in fields.unnamed.iter().enumerate() {
+					let mut ref_c_ty = Vec::new();
+					let mut nonref_c_ty = Vec::new();
+					types.write_c_type(&mut ref_c_ty, &field.ty, Some(&gen_types), false);
+					types.write_c_type(&mut nonref_c_ty, &field.ty, Some(&gen_types), true);
+
+					if ref_c_ty != nonref_c_ty {
+						// We blindly assume references in field types are always opaque types, and
+						// print out an opaque reference -> owned reference conversion here.
+						write!(&mut constr, "{} {{ inner: {}.inner, is_owned: false }}, ", String::from_utf8(nonref_c_ty).unwrap(), ('a' as u8 + idx as u8) as char).unwrap();
+					} else {
+						write!(&mut constr, "{}, ", ('a' as u8 + idx as u8) as char).unwrap();
+					}
 				}
 				writeln!(&mut constr, ")").unwrap();
 			} else {
@@ -1682,7 +1693,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 				} else if let syn::Fields::Unnamed(fields) = &var.fields {
 					if fields.unnamed.len() == 1 {
 						let mut empty_check = Vec::new();
-						types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), false);
+						types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), true);
 						if empty_check.is_empty() {
 							empty_tuple_variant = true;
 						}

@@ -597,7 +597,16 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		(s, i) => {
 			if let Some(supertrait) = types.crate_types.traits.get(s) {
 				let resolver = get_module_type_resolver!(s, types.crate_libs, types.crate_types);
-				writeln!(w, "impl {} for {} {{", s, trait_name).unwrap();
+
+				// Blindly assume that the same imports where `supertrait` is defined are also
+				// imported here. This will almost certainly break at some point, but it should be
+				// a compilation failure when it does so.
+				write!(w, "impl").unwrap();
+				maybe_write_lifetime_generics(w, &supertrait.generics, types);
+				write!(w, " {}", s).unwrap();
+				maybe_write_generics(w, &supertrait.generics, types, false);
+				writeln!(w, " for {} {{", trait_name).unwrap();
+
 				impl_trait_for_c!(supertrait, format!(".{}", i), &resolver);
 				writeln!(w, "}}").unwrap();
 			} else {

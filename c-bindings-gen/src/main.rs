@@ -1383,171 +1383,173 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 					}
 				}
 			} else if let Some(resolved_path) = types.maybe_resolve_ident(&ident) {
-				if let Some(aliases) = types.crate_types.reverse_alias_map.get(&resolved_path).cloned() {
-					let mut gen_types = Some(GenericTypes::new(Some(resolved_path.clone())));
-					if !gen_types.as_mut().unwrap().learn_generics(&i.generics, types) {
-						gen_types = None;
-					}
-					let alias_module = rsplit_once(&resolved_path, "::").unwrap().0;
-
-					'alias_impls: for (alias_resolved, arguments) in aliases {
-						let mut new_ty_generics = Vec::new();
-						let mut new_ty_bounds = Vec::new();
-						let mut need_generics = false;
-
-						let alias_resolver_override;
-						let alias_resolver = if alias_module != types.module_path {
-							alias_resolver_override = ImportResolver::new(types.types.crate_name, &types.crate_types.lib_ast.dependencies,
-								alias_module, &types.crate_types.lib_ast.modules.get(alias_module).unwrap().items);
-							&alias_resolver_override
-						} else { &types.types };/*.maybe_resolve_path(&alias, None).unwrap();*/
-						let mut where_clause = Some(syn::WhereClause {
-							where_token: syn::Token![where](Span::call_site()),
-							predicates: syn::punctuated::Punctuated::new()
-						});
-						for (idx, gen) in i.generics.params.iter().enumerate() {
-							match gen {
-								syn::GenericParam::Type(type_param) => {
-									'bounds_check: for bound in type_param.bounds.iter() {
-										if let syn::TypeParamBound::Trait(trait_bound) = bound {
-											if let syn::PathArguments::AngleBracketed(ref t) = &arguments {
-												assert!(idx < t.args.len());
-												if let syn::GenericArgument::Type(syn::Type::Path(p)) = &t.args[idx] {
-													let generic_bound = types.maybe_resolve_path(&trait_bound.path, None)
-														.unwrap_or_else(|| format!("{}::{}", types.module_path, single_ident_generic_path_to_ident(&trait_bound.path).unwrap()));
-
-													if let Some(generic_arg) = alias_resolver.maybe_resolve_path(&p.path, None) {
-														new_ty_generics.push((type_param.ident.clone(), syn::Type::Path(p.clone())));
-														if let Some(traits_impld) = types.crate_types.trait_impls.get(&generic_arg) {
-															for trait_impld in traits_impld {
-																if *trait_impld == generic_bound { continue 'bounds_check; }
-															}
-															eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
-															continue 'alias_impls;
-														} else {
-															eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
-															continue 'alias_impls;
-														}
-													} else if gen_types.is_some() {
-														let resp =  types.maybe_resolve_path(&p.path, gen_types.as_ref());
-														if generic_bound == "core::ops::Deref" && resp.is_some() {
-															new_ty_bounds.push((type_param.ident.clone(),
-																string_path_to_syn_path("core::ops::Deref")));
-															let mut bounds = syn::punctuated::Punctuated::new();
-															bounds.push(syn::TypeParamBound::Trait(syn::TraitBound {
-																paren_token: None,
-																modifier: syn::TraitBoundModifier::None,
-																lifetimes: None,
-																path: string_path_to_syn_path(&types.resolve_path(&p.path, gen_types.as_ref())),
-															}));
-															let mut path = string_path_to_syn_path(&format!("{}::Target", type_param.ident));
-															path.leading_colon = None;
-															where_clause.as_mut().unwrap().predicates.push(syn::WherePredicate::Type(syn::PredicateType {
-																lifetimes: None,
-																bounded_ty: syn::Type::Path(syn::TypePath { qself: None, path }),
-																colon_token: syn::Token![:](Span::call_site()),
-																bounds,
-															}));
-														} else {
-															new_ty_generics.push((type_param.ident.clone(),
-																gen_types.as_ref().resolve_type(&syn::Type::Path(p.clone())).clone()));
-														}
-														need_generics = true;
-													} else {
-														unimplemented!();
-													}
-												} else { unimplemented!(); }
-											} else { unimplemented!(); }
-										} else { unimplemented!(); }
-									}
-								},
-								syn::GenericParam::Lifetime(_) => {},
-								syn::GenericParam::Const(_) => unimplemented!(),
-							}
-						}
-						let mut params = syn::punctuated::Punctuated::new();
-						let alias = string_path_to_syn_path(&alias_resolved);
-						let real_aliased =
-							if need_generics {
-								let alias_generics = types.crate_types.opaques.get(&alias_resolved).unwrap().1;
-
-								// If we need generics on the alias, create impl generic bounds...
-								assert_eq!(new_ty_generics.len() + new_ty_bounds.len(), i.generics.params.len());
-								let mut args = syn::punctuated::Punctuated::new();
-								for (ident, param) in new_ty_generics.drain(..) {
-									// TODO: We blindly assume that generics in the type alias and
-									// the aliased type have the same names, which we really shouldn't.
-									if alias_generics.params.iter().any(|generic|
-										if let syn::GenericParam::Type(t) = generic { t.ident == ident } else { false })
-									{
-										args.push(parse_quote!(#ident));
-									}
-									params.push(syn::GenericParam::Type(syn::TypeParam {
-										attrs: Vec::new(),
-										ident,
-										colon_token: None,
-										bounds: syn::punctuated::Punctuated::new(),
-										eq_token: Some(syn::token::Eq(Span::call_site())),
-										default: Some(param),
-									}));
-								}
-								for (ident, param) in new_ty_bounds.drain(..) {
-									// TODO: We blindly assume that generics in the type alias and
-									// the aliased type have the same names, which we really shouldn't.
-									if alias_generics.params.iter().any(|generic|
-										if let syn::GenericParam::Type(t) = generic { t.ident == ident } else { false })
-									{
-										args.push(parse_quote!(#ident));
-									}
-									params.push(syn::GenericParam::Type(syn::TypeParam {
-										attrs: Vec::new(),
-										ident,
-										colon_token: Some(syn::token::Colon(Span::call_site())),
-										bounds: syn::punctuated::Punctuated::from_iter(
-											Some(syn::TypeParamBound::Trait(syn::TraitBound {
-												path: param, paren_token: None, lifetimes: None,
-												modifier: syn::TraitBoundModifier::None,
-											}))
-										),
-										eq_token: None,
-										default: None,
-									}));
-								}
-								// ... and swap the last segment of the impl self_ty to use the generic bounds.
-								let mut res = alias.clone();
-								res.segments.last_mut().unwrap().arguments = syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
-									colon2_token: None,
-									lt_token: syn::token::Lt(Span::call_site()),
-									args,
-									gt_token: syn::token::Gt(Span::call_site()),
-								});
-								res
-							} else { alias.clone() };
-						let aliased_impl = syn::ItemImpl {
-							attrs: i.attrs.clone(),
-							brace_token: syn::token::Brace(Span::call_site()),
-							defaultness: None,
-							generics: syn::Generics {
-								lt_token: None,
-								params,
-								gt_token: None,
-								where_clause,
-							},
-							impl_token: syn::Token![impl](Span::call_site()),
-							items: i.items.clone(),
-							self_ty: Box::new(syn::Type::Path(syn::TypePath { qself: None, path: real_aliased })),
-							trait_: i.trait_.clone(),
-							unsafety: None,
-						};
-						writeln_impl(w, &aliased_impl, types);
-					}
-				} else {
-					eprintln!("Not implementing anything for {} due to it being marked not exported", ident);
-				}
+				create_alias_for_impl(resolved_path, i, types, move |aliased_impl, types| writeln_impl(w, &aliased_impl, types));
 			} else {
 				eprintln!("Not implementing anything for {} due to no-resolve (probably the type isn't pub)", ident);
 			}
 		}
+	}
+}
+
+fn create_alias_for_impl<F: FnMut(syn::ItemImpl, &mut TypeResolver)>(resolved_path: String, i: &syn::ItemImpl, types: &mut TypeResolver, mut callback: F) {
+	if let Some(aliases) = types.crate_types.reverse_alias_map.get(&resolved_path).cloned() {
+		let mut gen_types = Some(GenericTypes::new(Some(resolved_path.clone())));
+		if !gen_types.as_mut().unwrap().learn_generics(&i.generics, types) {
+			gen_types = None;
+		}
+		let alias_module = rsplit_once(&resolved_path, "::").unwrap().0;
+
+		'alias_impls: for (alias_resolved, arguments) in aliases {
+			let mut new_ty_generics = Vec::new();
+			let mut new_ty_bounds = Vec::new();
+			let mut need_generics = false;
+
+			let alias_resolver_override;
+			let alias_resolver = if alias_module != types.module_path {
+				alias_resolver_override = ImportResolver::new(types.types.crate_name, &types.crate_types.lib_ast.dependencies,
+					alias_module, &types.crate_types.lib_ast.modules.get(alias_module).unwrap().items);
+				&alias_resolver_override
+			} else { &types.types };
+			let mut where_clause = syn::WhereClause { where_token: syn::Token![where](Span::call_site()),
+				predicates: syn::punctuated::Punctuated::new()
+			};
+			for (idx, gen) in i.generics.params.iter().enumerate() {
+				match gen {
+					syn::GenericParam::Type(type_param) => {
+						'bounds_check: for bound in type_param.bounds.iter() {
+							if let syn::TypeParamBound::Trait(trait_bound) = bound {
+								if let syn::PathArguments::AngleBracketed(ref t) = &arguments {
+									assert!(idx < t.args.len());
+									if let syn::GenericArgument::Type(syn::Type::Path(p)) = &t.args[idx] {
+										let generic_bound = types.maybe_resolve_path(&trait_bound.path, None)
+											.unwrap_or_else(|| format!("{}::{}", types.module_path, single_ident_generic_path_to_ident(&trait_bound.path).unwrap()));
+
+										if let Some(generic_arg) = alias_resolver.maybe_resolve_path(&p.path, None) {
+											new_ty_generics.push((type_param.ident.clone(), syn::Type::Path(p.clone())));
+											if let Some(traits_impld) = types.crate_types.trait_impls.get(&generic_arg) {
+												for trait_impld in traits_impld {
+													if *trait_impld == generic_bound { continue 'bounds_check; }
+												}
+												eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
+												continue 'alias_impls;
+											} else {
+												eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
+												continue 'alias_impls;
+											}
+										} else if gen_types.is_some() {
+											let resp =  types.maybe_resolve_path(&p.path, gen_types.as_ref());
+											if generic_bound == "core::ops::Deref" && resp.is_some() {
+												new_ty_bounds.push((type_param.ident.clone(),
+													string_path_to_syn_path("core::ops::Deref")));
+												let mut bounds = syn::punctuated::Punctuated::new();
+												bounds.push(syn::TypeParamBound::Trait(syn::TraitBound {
+													paren_token: None,
+													modifier: syn::TraitBoundModifier::None,
+													lifetimes: None,
+													path: string_path_to_syn_path(&types.resolve_path(&p.path, gen_types.as_ref())),
+												}));
+												let mut path = string_path_to_syn_path(&format!("{}::Target", type_param.ident));
+												path.leading_colon = None;
+												where_clause.predicates.push(syn::WherePredicate::Type(syn::PredicateType {
+													lifetimes: None,
+													bounded_ty: syn::Type::Path(syn::TypePath { qself: None, path }),
+													colon_token: syn::Token![:](Span::call_site()),
+													bounds,
+												}));
+											} else {
+												new_ty_generics.push((type_param.ident.clone(),
+													gen_types.as_ref().resolve_type(&syn::Type::Path(p.clone())).clone()));
+											}
+											need_generics = true;
+										} else {
+											unimplemented!();
+										}
+									} else { unimplemented!(); }
+								} else { unimplemented!(); }
+							} else { unimplemented!(); }
+						}
+					},
+					syn::GenericParam::Lifetime(_) => {},
+					syn::GenericParam::Const(_) => unimplemented!(),
+				}
+			}
+			let mut params = syn::punctuated::Punctuated::new();
+			let alias = string_path_to_syn_path(&alias_resolved);
+			let real_aliased =
+				if need_generics {
+					let alias_generics = types.crate_types.opaques.get(&alias_resolved).unwrap().1;
+
+					// If we need generics on the alias, create impl generic bounds...
+					assert_eq!(new_ty_generics.len() + new_ty_bounds.len(), i.generics.params.len());
+					let mut args = syn::punctuated::Punctuated::new();
+					for (ident, param) in new_ty_generics.drain(..) {
+						// TODO: We blindly assume that generics in the type alias and
+						// the aliased type have the same names, which we really shouldn't.
+						if alias_generics.params.iter().any(|generic|
+							if let syn::GenericParam::Type(t) = generic { t.ident == ident } else { false })
+						{
+							args.push(parse_quote!(#ident));
+						}
+						params.push(syn::GenericParam::Type(syn::TypeParam {
+							attrs: Vec::new(),
+							ident,
+							colon_token: None,
+							bounds: syn::punctuated::Punctuated::new(),
+							eq_token: Some(syn::token::Eq(Span::call_site())),
+							default: Some(param),
+						}));
+					}
+					for (ident, param) in new_ty_bounds.drain(..) {
+						// TODO: We blindly assume that generics in the type alias and
+						// the aliased type have the same names, which we really shouldn't.
+						if alias_generics.params.iter().any(|generic|
+							if let syn::GenericParam::Type(t) = generic { t.ident == ident } else { false })
+						{
+							args.push(parse_quote!(#ident));
+						}
+						params.push(syn::GenericParam::Type(syn::TypeParam {
+							attrs: Vec::new(),
+							ident,
+							colon_token: Some(syn::token::Colon(Span::call_site())),
+							bounds: syn::punctuated::Punctuated::from_iter(
+								Some(syn::TypeParamBound::Trait(syn::TraitBound {
+									path: param, paren_token: None, lifetimes: None,
+									modifier: syn::TraitBoundModifier::None,
+								}))
+							),
+							eq_token: None,
+							default: None,
+						}));
+					}
+					// ... and swap the last segment of the impl self_ty to use the generic bounds.
+					let mut res = alias.clone();
+					res.segments.last_mut().unwrap().arguments = syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
+						colon2_token: None,
+						lt_token: syn::token::Lt(Span::call_site()),
+						args,
+						gt_token: syn::token::Gt(Span::call_site()),
+					});
+					res
+				} else { alias.clone() };
+			callback(syn::ItemImpl {
+				attrs: i.attrs.clone(),
+				brace_token: syn::token::Brace(Span::call_site()),
+				defaultness: None,
+				generics: syn::Generics {
+					lt_token: None,
+					params,
+					gt_token: None,
+					where_clause: Some(where_clause),
+				},
+				impl_token: syn::Token![impl](Span::call_site()),
+				items: i.items.clone(),
+				self_ty: Box::new(syn::Type::Path(syn::TypePath { qself: None, path: real_aliased })),
+				trait_: i.trait_.clone(),
+				unsafety: None,
+			}, types);
+		}
+	} else {
+		eprintln!("Not implementing anything for {} due to it being marked not exported", resolved_path);
 	}
 }
 

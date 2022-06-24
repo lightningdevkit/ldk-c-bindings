@@ -1715,7 +1715,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 						let mut sink = ::std::io::sink();
 						let mut out: &mut dyn std::io::Write = if $ref { &mut sink } else { w };
 						let new_var = if $to_c {
-							types.write_to_c_conversion_new_var(&mut out, $field_ident, &$field.ty, Some(&gen_types), false)
+							types.write_to_c_conversion_new_var(&mut out, $field_ident, &$field.ty, Some(&gen_types), true)
 						} else {
 							types.write_from_c_conversion_new_var(&mut out, $field_ident, &$field.ty, Some(&gen_types))
 						};
@@ -1725,7 +1725,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 								if new_var {
 									let nonref_ident = format_ident!("{}_nonref", $field_ident);
 									if $to_c {
-										types.write_to_c_conversion_new_var(w, &nonref_ident, &$field.ty, Some(&gen_types), false);
+										types.write_to_c_conversion_new_var(w, &nonref_ident, &$field.ty, Some(&gen_types), true);
 									} else {
 										types.write_from_c_conversion_new_var(w, &nonref_ident, &$field.ty, Some(&gen_types));
 									}
@@ -1757,14 +1757,14 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 					($field: expr, $field_ident: expr) => { {
 						if export_status(&$field.attrs) == ExportStatus::TestOnly { continue; }
 						if $to_c {
-							types.write_to_c_conversion_inline_prefix(w, &$field.ty, Some(&gen_types), false);
+							types.write_to_c_conversion_inline_prefix(w, &$field.ty, Some(&gen_types), true);
 						} else {
 							types.write_from_c_conversion_prefix(w, &$field.ty, Some(&gen_types));
 						}
 						write!(w, "{}{}", $field_ident,
 							if $ref { "_nonref" } else { "" }).unwrap();
 						if $to_c {
-							types.write_to_c_conversion_inline_suffix(w, &$field.ty, Some(&gen_types), false);
+							types.write_to_c_conversion_inline_suffix(w, &$field.ty, Some(&gen_types), true);
 						} else {
 							types.write_from_c_conversion_suffix(w, &$field.ty, Some(&gen_types));
 						}

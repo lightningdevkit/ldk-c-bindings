@@ -283,14 +283,16 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 									non_lifetimes_processed = true;
 									assert_simple_bound(&trait_bound);
 									let resolved = types.resolve_path(&trait_bound.path, None);
-									let ref_ty = syn::Type::Reference(syn::TypeReference {
-										and_token: syn::Token![&](Span::call_site()),
-										lifetime: None, mutability: None,
-										elem: Box::new(syn::Type::Path(syn::TypePath {
-											qself: None, path: string_path_to_syn_path(&resolved)
-										})),
+									let ty = syn::Type::Path(syn::TypePath {
+										qself: None, path: string_path_to_syn_path(&resolved)
 									});
-									self.default_generics.insert(p_ident, (ref_ty.clone(), ref_ty));
+									let ref_ty = parse_quote!(&#ty);
+									if types.crate_types.traits.get(&resolved).is_some() {
+										self.default_generics.insert(p_ident, (ty, ref_ty));
+									} else {
+										self.default_generics.insert(p_ident, (ref_ty.clone(), ref_ty));
+									}
+
 									*gen = Some(resolved);
 								}
 							}

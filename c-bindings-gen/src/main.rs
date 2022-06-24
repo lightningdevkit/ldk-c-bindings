@@ -1661,7 +1661,10 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 		writeln!(&mut constr, "}}").unwrap();
 		writeln!(w, ",").unwrap();
 	}
-	writeln!(w, "}}\nuse {}::{} as native{};\nimpl {} {{", types.module_path, e.ident, e.ident, e.ident).unwrap();
+	writeln!(w, "}}\nuse {}::{} as {}Import;", types.module_path, e.ident, e.ident).unwrap();
+	write!(w, "pub(crate) type native{} = {}Import", e.ident, e.ident).unwrap();
+	maybe_write_generics(w, &e.generics, &types, true);
+	writeln!(w, ";\n\nimpl {} {{", e.ident).unwrap();
 
 	macro_rules! write_conv {
 		($fn_sig: expr, $to_c: expr, $ref: expr) => {

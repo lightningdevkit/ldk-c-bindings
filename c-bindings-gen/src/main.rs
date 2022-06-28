@@ -1625,14 +1625,17 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 			}
 			if !empty_tuple_variant {
 				needs_free = true;
-				write!(w, "(").unwrap();
+				writeln!(w, "(").unwrap();
 				for (idx, field) in fields.unnamed.iter().enumerate() {
 					if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
-					write!(&mut constr, "{}: ", ('a' as u8 + idx as u8) as char).unwrap();
+					writeln_field_docs(w, &field.attrs, "\t\t", types, Some(&gen_types), &field.ty);
+					write!(w, "\t\t").unwrap();
 					types.write_c_type(w, &field.ty, Some(&gen_types), true);
+
+					write!(&mut constr, "{}: ", ('a' as u8 + idx as u8) as char).unwrap();
 					types.write_c_type(&mut constr, &field.ty, Some(&gen_types), false);
 					if idx != fields.unnamed.len() - 1 {
-						write!(w, ",").unwrap();
+						writeln!(w, ",").unwrap();
 						write!(&mut constr, ",").unwrap();
 					}
 				}

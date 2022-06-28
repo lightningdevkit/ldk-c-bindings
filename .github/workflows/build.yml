@@ -27,7 +27,12 @@ jobs:
           touch src/version.rs
           RUSTFLAGS="--cfg=c_bindings" cargo check --features std
       - name: Install cbindgen
-        run: cargo install --version 0.20.0 cbindgen
+        run: |
+          git clone https://github.com/eqrion/cbindgen
+          cd cbindgen/
+          git checkout v0.20.0
+          cargo update -p indexmap --precise "1.6.2" --verbose
+          cargo install --locked --path .
       - name: Checkout Rust-Lightning git
         run: |
           git clone https://github.com/rust-bitcoin/rust-lightning
@@ -78,7 +83,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install cbindgen
-        run: cargo install --version 0.20.0 cbindgen
+        run: cargo install cbindgen
       - name: Checkout Rust-Lightning git
         run: |
           git clone https://github.com/rust-bitcoin/rust-lightning

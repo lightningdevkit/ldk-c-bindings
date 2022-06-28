@@ -70,8 +70,8 @@ impl Drop for BroadcasterInterface {
 }
 /// An enum that represents the speed at which we want a transaction to confirm used for feerate
 /// estimation.
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum ConfirmationTarget {
 	/// We are happy with this transaction confirming slowly when feerate drops some.
@@ -81,7 +81,9 @@ pub enum ConfirmationTarget {
 	/// We'd like this transaction to confirm in the next few blocks.
 	HighPriority,
 }
-use lightning::chain::chaininterface::ConfirmationTarget as nativeConfirmationTarget;
+use lightning::chain::chaininterface::ConfirmationTarget as ConfirmationTargetImport;
+pub(crate) type nativeConfirmationTarget = ConfirmationTargetImport;
+
 impl ConfirmationTarget {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeConfirmationTarget {

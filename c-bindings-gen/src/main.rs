@@ -22,6 +22,7 @@ use std::collections::{HashMap, hash_map};
 use std::env;
 use std::fs::File;
 use std::io::{Read, Write};
+use std::iter::FromIterator;
 use std::process;
 
 use proc_macro2::Span;
@@ -162,7 +163,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 
 				write!(w, "\tlet res: ").unwrap();
 				// At least in one case we need type annotations here, so provide them.
-				types.write_rust_type(w, Some(generics), &res_ty);
+				types.write_rust_type(w, Some(generics), &res_ty, false);
 
 				if t == "lightning::util::ser::ReadableArgs" {
 					writeln!(w, " = crate::c_types::deserialize_obj_arg(ser, arg_conv);").unwrap();
@@ -331,7 +332,6 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 					ExportStatus::TestOnly => continue,
 					ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 				}
-				if m.default.is_some() { unimplemented!(); }
 
 				let mut meth_gen_types = gen_types.push_ctx();
 				assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
@@ -446,10 +446,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				match item {
 					syn::TraitItem::Method(m) => {
 						if let ExportStatus::TestOnly = export_status(&m.attrs) { continue; }
-						if m.default.is_some() { unimplemented!(); }
 						if m.sig.constness.is_some() || m.sig.asyncness.is_some() || m.sig.unsafety.is_some() ||
 								m.sig.abi.is_some() || m.sig.variadic.is_some() {
-							unimplemented!();
+							panic!("1");
 						}
 						let mut meth_gen_types = gen_types.push_ctx();
 						assert!(meth_gen_types.learn_generics(&m.sig.generics, $type_resolver));
@@ -462,7 +461,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						for inp in m.sig.inputs.iter() {
 							match inp {
 								syn::FnArg::Receiver(recv) => {
-									if !recv.attrs.is_empty() || recv.reference.is_none() { unimplemented!(); }
+									if !recv.attrs.is_empty() || recv.reference.is_none() { panic!("2"); }
 									write!(w, "&").unwrap();
 									if let Some(lft) = &recv.reference.as_ref().unwrap().1 {
 										write!(w, "'{} ", lft.ident).unwrap();
@@ -474,18 +473,18 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 									}
 								},
 								syn::FnArg::Typed(arg) => {
-									if !arg.attrs.is_empty() { unimplemented!(); }
+									if !arg.attrs.is_empty() { panic!("3"); }
 									match &*arg.pat {
 										syn::Pat::Ident(ident) => {
 											if !ident.attrs.is_empty() || ident.by_ref.is_some() ||
 													ident.mutability.is_some() || ident.subpat.is_some() {
-												unimplemented!();
+												panic!("4");
 											}
 											write!(w, ", mut {}{}: ", if $type_resolver.skip_arg(&*arg.ty, Some(&meth_gen_types)) { "_" } else { "" }, ident.ident).unwrap();
 										}
-										_ => unimplemented!(),
+										_ => panic!("5"),
 									}
-									$type_resolver.write_rust_type(w, Some(&gen_types), &*arg.ty);
+									$type_resolver.write_rust_type(w, Some(&gen_types), &*arg.ty, false);
 								}
 							}
 						}
@@ -493,14 +492,14 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						match &m.sig.output {
 							syn::ReturnType::Type(_, rtype) => {
 								write!(w, " -> ").unwrap();
-								$type_resolver.write_rust_type(w, Some(&gen_types), &*rtype)
+								$type_resolver.write_rust_type(w, Some(&gen_types), &*rtype, false)
 							},
 							_ => {},
 						}
 						write!(w, " {{\n\t\t").unwrap();
 						match export_status(&m.attrs) {
 							ExportStatus::NoExport => {
-								unimplemented!();
+								panic!("6");
 							},
 							_ => {},
 						}
@@ -526,14 +525,14 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						writeln!(w, "\n\t}}").unwrap();
 					},
 					&syn::TraitItem::Type(ref t) => {
-						if t.default.is_some() || t.generics.lt_token.is_some() { unimplemented!(); }
+						if t.default.is_some() || t.generics.lt_token.is_some() { panic!("10"); }
 						let mut bounds_iter = t.bounds.iter();
 						loop {
 							match bounds_iter.next().unwrap() {
 								syn::TypeParamBound::Trait(tr) => {
 									writeln!(w, "\ttype {} = crate::{};", t.ident, $type_resolver.resolve_path(&tr.path, Some(&gen_types))).unwrap();
 									for bound in bounds_iter {
-										if let syn::TypeParamBound::Trait(_) = bound { unimplemented!(); }
+										if let syn::TypeParamBound::Trait(_) = bound { panic!("11"); }
 									}
 									break;
 								},
@@ -541,7 +540,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 							}
 						}
 					},
-					_ => unimplemented!(),
+					_ => panic!("12"),
 				}
 			}
 		}
@@ -598,7 +597,16 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		(s, i) => {
 			if let Some(supertrait) = types.crate_types.traits.get(s) {
 				let resolver = get_module_type_resolver!(s, types.crate_libs, types.crate_types);
-				writeln!(w, "impl {} for {} {{", s, trait_name).unwrap();
+
+				// Blindly assume that the same imports where `supertrait` is defined are also
+				// imported here. This will almost certainly break at some point, but it should be
+				// a compilation failure when it does so.
+				write!(w, "impl").unwrap();
+				maybe_write_lifetime_generics(w, &supertrait.generics, types);
+				write!(w, " {}", s).unwrap();
+				maybe_write_generics(w, &supertrait.generics, types, false);
+				writeln!(w, " for {} {{", trait_name).unwrap();
+
 				impl_trait_for_c!(supertrait, format!(".{}", i), &resolver);
 				writeln!(w, "}}").unwrap();
 			} else {
@@ -1050,7 +1058,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						writeln!(w, "\t}}\n}}\n").unwrap();
 
 						macro_rules! impl_meth {
-							($m: expr, $trait_meth: expr, $trait_path: expr, $trait: expr, $indent: expr) => {
+							($m: expr, $trait_meth: expr, $trait_path: expr, $trait: expr, $indent: expr, $types: expr) => {
 								let trait_method = $trait.items.iter().filter_map(|item| {
 									if let syn::TraitItem::Method(t_m) = item { Some(t_m) } else { None }
 								}).find(|trait_meth| trait_meth.sig.ident == $m.sig.ident).unwrap();
@@ -1065,14 +1073,14 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 								}
 								write!(w, "extern \"C\" fn {}_{}_{}(", ident, $trait.ident, $m.sig.ident).unwrap();
 								let mut meth_gen_types = gen_types.push_ctx();
-								assert!(meth_gen_types.learn_generics(&$m.sig.generics, types));
+								assert!(meth_gen_types.learn_generics(&$m.sig.generics, $types));
 								let mut uncallable_function = false;
 								for inp in $m.sig.inputs.iter() {
 									match inp {
 										syn::FnArg::Typed(arg) => {
-											if types.skip_arg(&*arg.ty, Some(&meth_gen_types)) { continue; }
+											if $types.skip_arg(&*arg.ty, Some(&meth_gen_types)) { continue; }
 											let mut c_type = Vec::new();
-											types.write_c_type(&mut c_type, &*arg.ty, Some(&meth_gen_types), false);
+											$types.write_c_type(&mut c_type, &*arg.ty, Some(&meth_gen_types), false);
 											if is_type_unconstructable(&String::from_utf8(c_type).unwrap()) {
 												uncallable_function = true;
 											}
@@ -1081,16 +1089,16 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									}
 								}
 								if uncallable_function {
-									let mut trait_resolver = get_module_type_resolver!(full_trait_path, types.crate_libs, types.crate_types);
+									let mut trait_resolver = get_module_type_resolver!(full_trait_path, $types.crate_libs, $types.crate_types);
 									write_method_params(w, &$trait_meth.sig, "c_void", &mut trait_resolver, Some(&meth_gen_types), true, true);
 								} else {
-									write_method_params(w, &$m.sig, "c_void", types, Some(&meth_gen_types), true, true);
+									write_method_params(w, &$m.sig, "c_void", $types, Some(&meth_gen_types), true, true);
 								}
 								write!(w, " {{\n\t").unwrap();
 								if uncallable_function {
 									write!(w, "unreachable!();").unwrap();
 								} else {
-									write_method_var_decl_body(w, &$m.sig, "", types, Some(&meth_gen_types), false);
+									write_method_var_decl_body(w, &$m.sig, "", $types, Some(&meth_gen_types), false);
 									let mut takes_self = false;
 									for inp in $m.sig.inputs.iter() {
 										if let syn::FnArg::Receiver(_) = inp {
@@ -1120,7 +1128,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										},
 										_ => {},
 									}
-									write_method_call_params(w, &$m.sig, "", types, Some(&meth_gen_types), &real_type, false);
+									write_method_call_params(w, &$m.sig, "", $types, Some(&meth_gen_types), &real_type, false);
 								}
 								write!(w, "\n}}\n").unwrap();
 								if let syn::ReturnType::Type(_, rtype) = &$m.sig.output {
@@ -1130,7 +1138,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										writeln!(w, "\t// This is a bit race-y in the general case, but for our specific use-cases today, we're safe").unwrap();
 										writeln!(w, "\t// Specifically, we must ensure that the first time we're called it can never be in parallel").unwrap();
 										write!(w, "\tif ").unwrap();
-										types.write_empty_rust_val_check(Some(&meth_gen_types), w, &*r.elem, &format!("trait_self_arg.{}", $m.sig.ident));
+										$types.write_empty_rust_val_check(Some(&meth_gen_types), w, &*r.elem, &format!("trait_self_arg.{}", $m.sig.ident));
 										writeln!(w, " {{").unwrap();
 										writeln!(w, "\t\tunsafe {{ &mut *(trait_self_arg as *const {}  as *mut {}) }}.{} = {}_{}_{}(trait_self_arg.this_arg);", $trait.ident, $trait.ident, $m.sig.ident, ident, $trait.ident, $m.sig.ident).unwrap();
 										writeln!(w, "\t}}").unwrap();
@@ -1140,24 +1148,29 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							}
 						}
 
-						'impl_item_loop: for item in i.items.iter() {
-							match item {
-								syn::ImplItem::Method(m) => {
-									for trait_item in trait_obj.items.iter() {
-										match trait_item {
-											syn::TraitItem::Method(meth) => {
+						'impl_item_loop: for trait_item in trait_obj.items.iter() {
+							match trait_item {
+								syn::TraitItem::Method(meth) => {
+									for item in i.items.iter() {
+										match item {
+											syn::ImplItem::Method(m) => {
 												if meth.sig.ident == m.sig.ident {
-													impl_meth!(m, meth, full_trait_path, trait_obj, "");
+													impl_meth!(m, meth, full_trait_path, trait_obj, "", types);
 													continue 'impl_item_loop;
 												}
 											},
-											_ => {},
+											syn::ImplItem::Type(_) => {},
+											_ => unimplemented!(),
 										}
 									}
-									unreachable!();
+									assert!(meth.default.is_some());
+									let old_gen_types = gen_types;
+									gen_types = GenericTypes::new(Some(resolved_path.clone()));
+									let mut trait_resolver = get_module_type_resolver!(full_trait_path, types.crate_libs, types.crate_types);
+									impl_meth!(meth, meth, full_trait_path, trait_obj, "", &mut trait_resolver);
+									gen_types = old_gen_types;
 								},
-								syn::ImplItem::Type(_) => {},
-								_ => unimplemented!(),
+								_ => {},
 							}
 						}
 						if requires_clone {
@@ -1370,123 +1383,173 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 					}
 				}
 			} else if let Some(resolved_path) = types.maybe_resolve_ident(&ident) {
-				if let Some(aliases) = types.crate_types.reverse_alias_map.get(&resolved_path).cloned() {
-					let mut gen_types = Some(GenericTypes::new(Some(resolved_path.clone())));
-					if !gen_types.as_mut().unwrap().learn_generics(&i.generics, types) {
-						gen_types = None;
-					}
-					let alias_module = rsplit_once(&resolved_path, "::").unwrap().0;
-
-					'alias_impls: for (alias_resolved, arguments) in aliases {
-						let mut new_ty_generics = Vec::new();
-						let mut need_generics = false;
-
-						let alias_resolver_override;
-						let alias_resolver = if alias_module != types.module_path {
-							alias_resolver_override = ImportResolver::new(types.types.crate_name, &types.crate_types.lib_ast.dependencies,
-								alias_module, &types.crate_types.lib_ast.modules.get(alias_module).unwrap().items);
-							&alias_resolver_override
-						} else { &types.types };/*.maybe_resolve_path(&alias, None).unwrap();*/
-						for (idx, gen) in i.generics.params.iter().enumerate() {
-							match gen {
-								syn::GenericParam::Type(type_param) => {
-									'bounds_check: for bound in type_param.bounds.iter() {
-										if let syn::TypeParamBound::Trait(trait_bound) = bound {
-											if let syn::PathArguments::AngleBracketed(ref t) = &arguments {
-												assert!(idx < t.args.len());
-												if let syn::GenericArgument::Type(syn::Type::Path(p)) = &t.args[idx] {
-													if let Some(generic_arg) = alias_resolver.maybe_resolve_path(&p.path, None) {
-
-														new_ty_generics.push((type_param.ident.clone(), syn::Type::Path(p.clone())));
-														let generic_bound = types.maybe_resolve_path(&trait_bound.path, None)
-															.unwrap_or_else(|| format!("{}::{}", types.module_path, single_ident_generic_path_to_ident(&trait_bound.path).unwrap()));
-														if let Some(traits_impld) = types.crate_types.trait_impls.get(&generic_arg) {
-															for trait_impld in traits_impld {
-																if *trait_impld == generic_bound { continue 'bounds_check; }
-															}
-															eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
-															continue 'alias_impls;
-														} else {
-															eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
-															continue 'alias_impls;
-														}
-													} else if gen_types.is_some() {
-														new_ty_generics.push((type_param.ident.clone(),
-															gen_types.as_ref().resolve_type(&syn::Type::Path(p.clone())).clone()));
-														need_generics = true;
-													} else {
-														unimplemented!();
-													}
-												} else { unimplemented!(); }
-											} else { unimplemented!(); }
-										} else { unimplemented!(); }
-									}
-								},
-								syn::GenericParam::Lifetime(_) => {},
-								syn::GenericParam::Const(_) => unimplemented!(),
-							}
-						}
-						let mut params = syn::punctuated::Punctuated::new();
-						let alias = string_path_to_syn_path(&alias_resolved);
-						let real_aliased =
-							if need_generics {
-								let alias_generics = types.crate_types.opaques.get(&alias_resolved).unwrap().1;
-
-								// If we need generics on the alias, create impl generic bounds...
-								assert_eq!(new_ty_generics.len(), i.generics.params.len());
-								let mut args = syn::punctuated::Punctuated::new();
-								for (ident, param) in new_ty_generics.drain(..) {
-									// TODO: We blindly assume that generics in the type alias and
-									// the aliased type have the same names, which we really shouldn't.
-									if alias_generics.params.iter().any(|generic|
-										if let syn::GenericParam::Type(t) = generic { t.ident == ident } else { false })
-									{
-										args.push(parse_quote!(#ident));
-									}
-									params.push(syn::GenericParam::Type(syn::TypeParam {
-										attrs: Vec::new(),
-										ident,
-										colon_token: None,
-										bounds: syn::punctuated::Punctuated::new(),
-										eq_token: Some(syn::token::Eq(Span::call_site())),
-										default: Some(param),
-									}));
-								}
-								// ... and swap the last segment of the impl self_ty to use the generic bounds.
-								let mut res = alias.clone();
-								res.segments.last_mut().unwrap().arguments = syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
-									colon2_token: None,
-									lt_token: syn::token::Lt(Span::call_site()),
-									args,
-									gt_token: syn::token::Gt(Span::call_site()),
-								});
-								res
-							} else { alias.clone() };
-						let aliased_impl = syn::ItemImpl {
-							attrs: i.attrs.clone(),
-							brace_token: syn::token::Brace(Span::call_site()),
-							defaultness: None,
-							generics: syn::Generics {
-								lt_token: None,
-								params,
-								gt_token: None,
-								where_clause: None,
-							},
-							impl_token: syn::Token![impl](Span::call_site()),
-							items: i.items.clone(),
-							self_ty: Box::new(syn::Type::Path(syn::TypePath { qself: None, path: real_aliased })),
-							trait_: i.trait_.clone(),
-							unsafety: None,
-						};
-						writeln_impl(w, &aliased_impl, types);
-					}
-				} else {
-					eprintln!("Not implementing anything for {} due to it being marked not exported", ident);
-				}
+				create_alias_for_impl(resolved_path, i, types, move |aliased_impl, types| writeln_impl(w, &aliased_impl, types));
 			} else {
 				eprintln!("Not implementing anything for {} due to no-resolve (probably the type isn't pub)", ident);
 			}
 		}
+	}
+}
+
+fn create_alias_for_impl<F: FnMut(syn::ItemImpl, &mut TypeResolver)>(resolved_path: String, i: &syn::ItemImpl, types: &mut TypeResolver, mut callback: F) {
+	if let Some(aliases) = types.crate_types.reverse_alias_map.get(&resolved_path).cloned() {
+		let mut gen_types = Some(GenericTypes::new(Some(resolved_path.clone())));
+		if !gen_types.as_mut().unwrap().learn_generics(&i.generics, types) {
+			gen_types = None;
+		}
+		let alias_module = rsplit_once(&resolved_path, "::").unwrap().0;
+
+		'alias_impls: for (alias_resolved, arguments) in aliases {
+			let mut new_ty_generics = Vec::new();
+			let mut new_ty_bounds = Vec::new();
+			let mut need_generics = false;
+
+			let alias_resolver_override;
+			let alias_resolver = if alias_module != types.module_path {
+				alias_resolver_override = ImportResolver::new(types.types.crate_name, &types.crate_types.lib_ast.dependencies,
+					alias_module, &types.crate_types.lib_ast.modules.get(alias_module).unwrap().items);
+				&alias_resolver_override
+			} else { &types.types };
+			let mut where_clause = syn::WhereClause { where_token: syn::Token![where](Span::call_site()),
+				predicates: syn::punctuated::Punctuated::new()
+			};
+			for (idx, gen) in i.generics.params.iter().enumerate() {
+				match gen {
+					syn::GenericParam::Type(type_param) => {
+						'bounds_check: for bound in type_param.bounds.iter() {
+							if let syn::TypeParamBound::Trait(trait_bound) = bound {
+								if let syn::PathArguments::AngleBracketed(ref t) = &arguments {
+									assert!(idx < t.args.len());
+									if let syn::GenericArgument::Type(syn::Type::Path(p)) = &t.args[idx] {
+										let generic_bound = types.maybe_resolve_path(&trait_bound.path, None)
+											.unwrap_or_else(|| format!("{}::{}", types.module_path, single_ident_generic_path_to_ident(&trait_bound.path).unwrap()));
+
+										if let Some(generic_arg) = alias_resolver.maybe_resolve_path(&p.path, None) {
+											new_ty_generics.push((type_param.ident.clone(), syn::Type::Path(p.clone())));
+											if let Some(traits_impld) = types.crate_types.trait_impls.get(&generic_arg) {
+												for trait_impld in traits_impld {
+													if *trait_impld == generic_bound { continue 'bounds_check; }
+												}
+												eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
+												continue 'alias_impls;
+											} else {
+												eprintln!("struct {}'s generic arg {} didn't match bound {}", alias_resolved, generic_arg, generic_bound);
+												continue 'alias_impls;
+											}
+										} else if gen_types.is_some() {
+											let resp =  types.maybe_resolve_path(&p.path, gen_types.as_ref());
+											if generic_bound == "core::ops::Deref" && resp.is_some() {
+												new_ty_bounds.push((type_param.ident.clone(),
+													string_path_to_syn_path("core::ops::Deref")));
+												let mut bounds = syn::punctuated::Punctuated::new();
+												bounds.push(syn::TypeParamBound::Trait(syn::TraitBound {
+													paren_token: None,
+													modifier: syn::TraitBoundModifier::None,
+													lifetimes: None,
+													path: string_path_to_syn_path(&types.resolve_path(&p.path, gen_types.as_ref())),
+												}));
+												let mut path = string_path_to_syn_path(&format!("{}::Target", type_param.ident));
+												path.leading_colon = None;
+												where_clause.predicates.push(syn::WherePredicate::Type(syn::PredicateType {
+													lifetimes: None,
+													bounded_ty: syn::Type::Path(syn::TypePath { qself: None, path }),
+													colon_token: syn::Token![:](Span::call_site()),
+													bounds,
+												}));
+											} else {
+												new_ty_generics.push((type_param.ident.clone(),
+													gen_types.as_ref().resolve_type(&syn::Type::Path(p.clone())).clone()));
+											}
+											need_generics = true;
+										} else {
+											unimplemented!();
+										}
+									} else { unimplemented!(); }
+								} else { unimplemented!(); }
+							} else { unimplemented!(); }
+						}
+					},
+					syn::GenericParam::Lifetime(_) => {},
+					syn::GenericParam::Const(_) => unimplemented!(),
+				}
+			}
+			let mut params = syn::punctuated::Punctuated::new();
+			let alias = string_path_to_syn_path(&alias_resolved);
+			let real_aliased =
+				if need_generics {
+					let alias_generics = types.crate_types.opaques.get(&alias_resolved).unwrap().1;
+
+					// If we need generics on the alias, create impl generic bounds...
+					assert_eq!(new_ty_generics.len() + new_ty_bounds.len(), i.generics.params.len());
+					let mut args = syn::punctuated::Punctuated::new();
+					for (ident, param) in new_ty_generics.drain(..) {
+						// TODO: We blindly assume that generics in the type alias and
+						// the aliased type have the same names, which we really shouldn't.
+						if alias_generics.params.iter().any(|generic|
+							if let syn::GenericParam::Type(t) = generic { t.ident == ident } else { false })
+						{
+							args.push(parse_quote!(#ident));
+						}
+						params.push(syn::GenericParam::Type(syn::TypeParam {
+							attrs: Vec::new(),
+							ident,
+							colon_token: None,
+							bounds: syn::punctuated::Punctuated::new(),
+							eq_token: Some(syn::token::Eq(Span::call_site())),
+							default: Some(param),
+						}));
+					}
+					for (ident, param) in new_ty_bounds.drain(..) {
+						// TODO: We blindly assume that generics in the type alias and
+						// the aliased type have the same names, which we really shouldn't.
+						if alias_generics.params.iter().any(|generic|
+							if let syn::GenericParam::Type(t) = generic { t.ident == ident } else { false })
+						{
+							args.push(parse_quote!(#ident));
+						}
+						params.push(syn::GenericParam::Type(syn::TypeParam {
+							attrs: Vec::new(),
+							ident,
+							colon_token: Some(syn::token::Colon(Span::call_site())),
+							bounds: syn::punctuated::Punctuated::from_iter(
+								Some(syn::TypeParamBound::Trait(syn::TraitBound {
+									path: param, paren_token: None, lifetimes: None,
+									modifier: syn::TraitBoundModifier::None,
+								}))
+							),
+							eq_token: None,
+							default: None,
+						}));
+					}
+					// ... and swap the last segment of the impl self_ty to use the generic bounds.
+					let mut res = alias.clone();
+					res.segments.last_mut().unwrap().arguments = syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
+						colon2_token: None,
+						lt_token: syn::token::Lt(Span::call_site()),
+						args,
+						gt_token: syn::token::Gt(Span::call_site()),
+					});
+					res
+				} else { alias.clone() };
+			callback(syn::ItemImpl {
+				attrs: i.attrs.clone(),
+				brace_token: syn::token::Brace(Span::call_site()),
+				defaultness: None,
+				generics: syn::Generics {
+					lt_token: None,
+					params,
+					gt_token: None,
+					where_clause: Some(where_clause),
+				},
+				impl_token: syn::Token![impl](Span::call_site()),
+				items: i.items.clone(),
+				self_ty: Box::new(syn::Type::Path(syn::TypePath { qself: None, path: real_aliased })),
+				trait_: i.trait_.clone(),
+				unsafety: None,
+			}, types);
+		}
+	} else {
+		eprintln!("Not implementing anything for {} due to it being marked not exported", resolved_path);
 	}
 }
 
@@ -1531,8 +1594,37 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 
 	let mut needs_free = false;
 	let mut constr = Vec::new();
+	let mut is_clonable = true;
 
-	writeln!(w, "#[must_use]\n#[derive(Clone)]\n#[repr(C)]\npub enum {} {{", e.ident).unwrap();
+	for var in e.variants.iter() {
+		if let syn::Fields::Named(fields) = &var.fields {
+			needs_free = true;
+			for field in fields.named.iter() {
+				if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
+
+				let mut ty_checks = Vec::new();
+				types.write_c_type(&mut ty_checks, &field.ty, Some(&gen_types), false);
+				if !types.is_clonable(&String::from_utf8(ty_checks).unwrap()) {
+					is_clonable = false;
+				}
+			}
+		} else if let syn::Fields::Unnamed(fields) = &var.fields {
+			for field in fields.unnamed.iter() {
+				let mut ty_checks = Vec::new();
+				types.write_c_type(&mut ty_checks, &field.ty, Some(&gen_types), false);
+				let ty = String::from_utf8(ty_checks).unwrap();
+				if ty != "" && !types.is_clonable(&ty) {
+					is_clonable = false;
+				}
+			}
+		}
+	}
+
+	if is_clonable {
+		writeln!(w, "#[derive(Clone)]").unwrap();
+		types.crate_types.set_clonable(format!("{}::{}", types.module_path, e.ident));
+	}
+	writeln!(w, "#[must_use]\n#[repr(C)]\npub enum {} {{", e.ident).unwrap();
 	for var in e.variants.iter() {
 		assert_eq!(export_status(&var.attrs), ExportStatus::Export); // We can't partially-export a mirrored enum
 		writeln_docs(w, &var.attrs, "\t");
@@ -1549,29 +1641,32 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 				writeln_field_docs(w, &field.attrs, "\t\t", types, Some(&gen_types), &field.ty);
 				write!(w, "\t\t{}: ", field.ident.as_ref().unwrap()).unwrap();
 				write!(&mut constr, "{}{}: ", if idx != 0 { ", " } else { "" }, field.ident.as_ref().unwrap()).unwrap();
-				types.write_c_type(w, &field.ty, Some(&gen_types), false);
-				types.write_c_type(&mut constr, &field.ty, Some(&gen_types), false);
+				types.write_c_type(w, &field.ty, Some(&gen_types), true);
+				types.write_c_type(&mut constr, &field.ty, Some(&gen_types), true);
 				writeln!(w, ",").unwrap();
 			}
 			write!(w, "\t}}").unwrap();
 		} else if let syn::Fields::Unnamed(fields) = &var.fields {
 			if fields.unnamed.len() == 1 {
 				let mut empty_check = Vec::new();
-				types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), false);
+				types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), true);
 				if empty_check.is_empty() {
 					empty_tuple_variant = true;
 				}
 			}
 			if !empty_tuple_variant {
 				needs_free = true;
-				write!(w, "(").unwrap();
+				writeln!(w, "(").unwrap();
 				for (idx, field) in fields.unnamed.iter().enumerate() {
 					if export_status(&field.attrs) == ExportStatus::TestOnly { continue; }
+					writeln_field_docs(w, &field.attrs, "\t\t", types, Some(&gen_types), &field.ty);
+					write!(w, "\t\t").unwrap();
+					types.write_c_type(w, &field.ty, Some(&gen_types), true);
+
 					write!(&mut constr, "{}: ", ('a' as u8 + idx as u8) as char).unwrap();
-					types.write_c_type(w, &field.ty, Some(&gen_types), false);
 					types.write_c_type(&mut constr, &field.ty, Some(&gen_types), false);
 					if idx != fields.unnamed.len() - 1 {
-						write!(w, ",").unwrap();
+						writeln!(w, ",").unwrap();
 						write!(&mut constr, ",").unwrap();
 					}
 				}
@@ -1589,8 +1684,19 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 		} else if let syn::Fields::Unnamed(fields) = &var.fields {
 			if !empty_tuple_variant {
 				write!(&mut constr, "(").unwrap();
-				for idx in 0..fields.unnamed.len() {
-					write!(&mut constr, "{}, ", ('a' as u8 + idx as u8) as char).unwrap();
+				for (idx, field) in fields.unnamed.iter().enumerate() {
+					let mut ref_c_ty = Vec::new();
+					let mut nonref_c_ty = Vec::new();
+					types.write_c_type(&mut ref_c_ty, &field.ty, Some(&gen_types), false);
+					types.write_c_type(&mut nonref_c_ty, &field.ty, Some(&gen_types), true);
+
+					if ref_c_ty != nonref_c_ty {
+						// We blindly assume references in field types are always opaque types, and
+						// print out an opaque reference -> owned reference conversion here.
+						write!(&mut constr, "{} {{ inner: {}.inner, is_owned: false }}, ", String::from_utf8(nonref_c_ty).unwrap(), ('a' as u8 + idx as u8) as char).unwrap();
+					} else {
+						write!(&mut constr, "{}, ", ('a' as u8 + idx as u8) as char).unwrap();
+					}
 				}
 				writeln!(&mut constr, ")").unwrap();
 			} else {
@@ -1600,7 +1706,10 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 		writeln!(&mut constr, "}}").unwrap();
 		writeln!(w, ",").unwrap();
 	}
-	writeln!(w, "}}\nuse {}::{} as native{};\nimpl {} {{", types.module_path, e.ident, e.ident, e.ident).unwrap();
+	writeln!(w, "}}\nuse {}::{} as {}Import;", types.module_path, e.ident, e.ident).unwrap();
+	write!(w, "pub(crate) type native{} = {}Import", e.ident, e.ident).unwrap();
+	maybe_write_generics(w, &e.generics, &types, true);
+	writeln!(w, ";\n\nimpl {} {{", e.ident).unwrap();
 
 	macro_rules! write_conv {
 		($fn_sig: expr, $to_c: expr, $ref: expr) => {
@@ -1618,7 +1727,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 				} else if let syn::Fields::Unnamed(fields) = &var.fields {
 					if fields.unnamed.len() == 1 {
 						let mut empty_check = Vec::new();
-						types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), false);
+						types.write_c_type(&mut empty_check, &fields.unnamed[0].ty, Some(&gen_types), true);
 						if empty_check.is_empty() {
 							empty_tuple_variant = true;
 						}
@@ -1640,7 +1749,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 						let mut sink = ::std::io::sink();
 						let mut out: &mut dyn std::io::Write = if $ref { &mut sink } else { w };
 						let new_var = if $to_c {
-							types.write_to_c_conversion_new_var(&mut out, $field_ident, &$field.ty, Some(&gen_types), false)
+							types.write_to_c_conversion_new_var(&mut out, $field_ident, &$field.ty, Some(&gen_types), true)
 						} else {
 							types.write_from_c_conversion_new_var(&mut out, $field_ident, &$field.ty, Some(&gen_types))
 						};
@@ -1650,7 +1759,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 								if new_var {
 									let nonref_ident = format_ident!("{}_nonref", $field_ident);
 									if $to_c {
-										types.write_to_c_conversion_new_var(w, &nonref_ident, &$field.ty, Some(&gen_types), false);
+										types.write_to_c_conversion_new_var(w, &nonref_ident, &$field.ty, Some(&gen_types), true);
 									} else {
 										types.write_from_c_conversion_new_var(w, &nonref_ident, &$field.ty, Some(&gen_types));
 									}
@@ -1682,14 +1791,14 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 					($field: expr, $field_ident: expr) => { {
 						if export_status(&$field.attrs) == ExportStatus::TestOnly { continue; }
 						if $to_c {
-							types.write_to_c_conversion_inline_prefix(w, &$field.ty, Some(&gen_types), false);
+							types.write_to_c_conversion_inline_prefix(w, &$field.ty, Some(&gen_types), true);
 						} else {
 							types.write_from_c_conversion_prefix(w, &$field.ty, Some(&gen_types));
 						}
 						write!(w, "{}{}", $field_ident,
 							if $ref { "_nonref" } else { "" }).unwrap();
 						if $to_c {
-							types.write_to_c_conversion_inline_suffix(w, &$field.ty, Some(&gen_types), false);
+							types.write_to_c_conversion_inline_suffix(w, &$field.ty, Some(&gen_types), true);
 						} else {
 							types.write_from_c_conversion_suffix(w, &$field.ty, Some(&gen_types));
 						}
@@ -1723,9 +1832,13 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 		}
 	}
 
-	write_conv!(format!("to_native(&self) -> native{}", e.ident), false, true);
+	if is_clonable {
+		write_conv!(format!("to_native(&self) -> native{}", e.ident), false, true);
+	}
 	write_conv!(format!("into_native(self) -> native{}", e.ident), false, false);
-	write_conv!(format!("from_native(native: &native{}) -> Self", e.ident), true, true);
+	if is_clonable {
+		write_conv!(format!("from_native(native: &native{}) -> Self", e.ident), true, true);
+	}
 	write_conv!(format!("native_into(native: native{}) -> Self", e.ident), true, false);
 	writeln!(w, "}}").unwrap();
 
@@ -1733,11 +1846,13 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 		writeln!(w, "/// Frees any resources used by the {}", e.ident).unwrap();
 		writeln!(w, "#[no_mangle]\npub extern \"C\" fn {}_free(this_ptr: {}) {{ }}", e.ident, e.ident).unwrap();
 	}
-	writeln!(w, "/// Creates a copy of the {}", e.ident).unwrap();
-	writeln!(w, "#[no_mangle]").unwrap();
-	writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", e.ident, e.ident, e.ident).unwrap();
-	writeln!(w, "\torig.clone()").unwrap();
-	writeln!(w, "}}").unwrap();
+	if is_clonable {
+		writeln!(w, "/// Creates a copy of the {}", e.ident).unwrap();
+		writeln!(w, "#[no_mangle]").unwrap();
+		writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", e.ident, e.ident, e.ident).unwrap();
+		writeln!(w, "\torig.clone()").unwrap();
+		writeln!(w, "}}").unwrap();
+	}
 	w.write_all(&constr).unwrap();
 	write_cpp_wrapper(cpp_headers, &format!("{}", e.ident), needs_free, None);
 }
@@ -1922,6 +2037,11 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 									type_resolver.crate_types.priv_structs.get(&real_ty).map(|r| *r)).unwrap();
 								let mut resolved_generics = t.generics.clone();
 
+								// Assume blindly that the bounds in the struct definition where
+								// clause matches any equivalent bounds on the type alias.
+								assert!(resolved_generics.where_clause.is_none());
+								resolved_generics.where_clause = real_generic_bounds.where_clause.clone();
+
 								if let syn::PathArguments::AngleBracketed(real_generics) = &p.path.segments.last().unwrap().arguments {
 									for (real_idx, real_param) in real_generics.args.iter().enumerate() {
 										if let syn::GenericArgument::Type(syn::Type::Path(real_param_path)) = real_param {
@@ -1961,6 +2081,49 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 	}
 }
 
+
+/// Walk the FullLibraryAST, determining if impl aliases need to be marked cloneable.
+fn walk_ast_second_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &CrateTypes<'a>) {
+	for (module, astmod) in ast_storage.modules.iter() {
+		let orig_crate = module.splitn(2, "::").next().unwrap();
+		let ASTModule { ref attrs, ref items, .. } = astmod;
+		assert_eq!(export_status(&attrs), ExportStatus::Export);
+
+		let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, module, items);
+		let mut types = TypeResolver::new(module, import_resolver, crate_types);
+
+		for item in items.iter() {
+			match item {
+				syn::Item::Impl(i) => {
+					match export_status(&i.attrs) {
+						ExportStatus::Export => {},
+						ExportStatus::NoExport|ExportStatus::TestOnly => continue,
+						ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
+					}
+					if let Some(trait_path) = i.trait_.as_ref() {
+						if path_matches_nongeneric(&trait_path.1, &["core", "clone", "Clone"]) ||
+						   path_matches_nongeneric(&trait_path.1, &["Clone"])
+						{
+							if let &syn::Type::Path(ref p) = &*i.self_ty {
+								if let Some(resolved_path) = types.maybe_resolve_path(&p.path, None) {
+									create_alias_for_impl(resolved_path, i, &mut types, |aliased_impl, types| {
+										if let &syn::Type::Path(ref p) = &*aliased_impl.self_ty {
+											if let Some(resolved_aliased_path) = types.maybe_resolve_path(&p.path, None) {
+												crate_types.set_clonable("crate::".to_owned() + &resolved_aliased_path);
+											}
+										}
+									});
+								}
+							}
+						}
+					}
+				}
+				_ => {}
+			}
+		}
+	}
+}
+
 fn walk_private_mod<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, module: String, items: &'a syn::ItemMod, crate_types: &mut CrateTypes<'a>) {
 	let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, &module, &items.content.as_ref().unwrap().1);
 	for item in items.content.as_ref().unwrap().1.iter() {
@@ -1986,7 +2149,7 @@ fn walk_private_mod<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, modul
 }
 
 /// Walk the FullLibraryAST, deciding how things will be mapped and adding tracking to CrateTypes.
-fn walk_ast<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a>) {
+fn walk_ast_first_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut CrateTypes<'a>) {
 	for (module, astmod) in ast_storage.modules.iter() {
 		let ASTModule { ref attrs, ref items, submods: _ } = astmod;
 		assert_eq!(export_status(&attrs), ExportStatus::Export);
@@ -2141,7 +2304,11 @@ fn main() {
 	// ...then walk the ASTs tracking what types we will map, and how, so that we can resolve them
 	// when parsing other file ASTs...
 	let mut libtypes = CrateTypes::new(&mut derived_templates, &libast);
-	walk_ast(&libast, &mut libtypes);
+	walk_ast_first_pass(&libast, &mut libtypes);
+
+	// ... using the generated data, determine a few additional fields, specifically which type
+	// aliases are to be clone-able...
+	walk_ast_second_pass(&libast, &libtypes);
 
 	// ... finally, do the actual file conversion/mapping, writing out types as we go.
 	convert_file(&libast, &libtypes, &args[1], &mut header_file, &mut cpp_header_file);

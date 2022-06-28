@@ -11,8 +11,8 @@
 //! Instead of actually servicing sockets ourselves we require that you implement the
 //! SocketDescriptor interface and use that to receive actions which you should perform on the
 //! socket, and call into PeerManager with bytes read from the socket. The PeerManager will then
-//! call into the provided message handlers (probably a ChannelManager and NetGraphmsgHandler) with messages
-//! they should handle, and encoding/sending response messages.
+//! call into the provided message handlers (probably a ChannelManager and P2PGossipSync) with
+//! messages they should handle, and encoding/sending response messages.
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -67,12 +67,12 @@ impl lightning::ln::wire::CustomMessageReader for CustomMessageHandler {
 
 use lightning::ln::peer_handler::CustomMessageHandler as rustCustomMessageHandler;
 impl rustCustomMessageHandler for CustomMessageHandler {
-	fn handle_custom_message(&self, mut msg: crate::lightning::ln::wire::Type, mut sender_node_id: &bitcoin::secp256k1::key::PublicKey) -> Result<(), lightning::ln::msgs::LightningError> {
+	fn handle_custom_message(&self, mut msg: crate::lightning::ln::wire::Type, mut sender_node_id: &bitcoin::secp256k1::PublicKey) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_custom_message)(self.this_arg, Into::into(msg), crate::c_types::PublicKey::from_rust(&sender_node_id));
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn get_and_clear_pending_msg(&self) -> Vec<(bitcoin::secp256k1::key::PublicKey, crate::lightning::ln::wire::Type)> {
+	fn get_and_clear_pending_msg(&self) -> Vec<(bitcoin::secp256k1::PublicKey, crate::lightning::ln::wire::Type)> {
 		let mut ret = (self.get_and_clear_pending_msg)(self.this_arg);
 		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item.to_rust(); let mut local_ret_0 = (orig_ret_0_0.into_rust(), orig_ret_0_1); local_ret_0 }); };
 		local_ret
@@ -459,7 +459,7 @@ pub extern "C" fn ErroringMessageHandler_as_ChannelMessageHandler(this_arg: &Err
 		handle_accept_channel: ErroringMessageHandler_ChannelMessageHandler_handle_accept_channel,
 		handle_funding_created: ErroringMessageHandler_ChannelMessageHandler_handle_funding_created,
 		handle_funding_signed: ErroringMessageHandler_ChannelMessageHandler_handle_funding_signed,
-		handle_funding_locked: ErroringMessageHandler_ChannelMessageHandler_handle_funding_locked,
+		handle_channel_ready: ErroringMessageHandler_ChannelMessageHandler_handle_channel_ready,
 		handle_shutdown: ErroringMessageHandler_ChannelMessageHandler_handle_shutdown,
 		handle_closing_signed: ErroringMessageHandler_ChannelMessageHandler_handle_closing_signed,
 		handle_update_add_htlc: ErroringMessageHandler_ChannelMessageHandler_handle_update_add_htlc,
@@ -495,8 +495,8 @@ extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_funding_create
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_funding_signed(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::FundingSigned) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_funding_signed(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
 }
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_funding_locked(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::FundingLocked) {
-	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_funding_locked(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_channel_ready(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelReady) {
+	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_ready(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
 }
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_shutdown(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, _their_features: &crate::lightning::ln::features::InitFeatures, msg: &crate::lightning::ln::msgs::Shutdown) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_shutdown(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), _their_features.get_native_ref(), msg.get_native_ref())
@@ -528,17 +528,17 @@ extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_update_fee(thi
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_announcement_signatures(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::AnnouncementSignatures) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_announcement_signatures(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
 }
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_channel_reestablish(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelReestablish) {
-	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_reestablish(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
-}
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_channel_update(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _msg: &crate::lightning::ln::msgs::ChannelUpdate) {
-	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_update(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), _msg.get_native_ref())
-}
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_peer_disconnected(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _no_connection_possible: bool) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::peer_disconnected(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), _no_connection_possible)
 }
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_peer_connected(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _msg: &crate::lightning::ln::msgs::Init) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), _msg.get_native_ref())
+}
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_channel_reestablish(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelReestablish) {
+	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_reestablish(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
+}
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_channel_update(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _msg: &crate::lightning::ln::msgs::ChannelUpdate) {
+	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_update(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), _msg.get_native_ref())
 }
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_error(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _msg: &crate::lightning::ln::msgs::ErrorMessage) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_error(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), _msg.get_native_ref())
@@ -613,20 +613,18 @@ pub extern "C" fn MessageHandler_set_chan_handler(this_ptr: &mut MessageHandler,
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chan_handler = val;
 }
 /// A message handler which handles messages updating our knowledge of the network channel
-/// graph. Usually this is just a [`NetGraphMsgHandler`] object or an
-/// [`IgnoringMessageHandler`].
+/// graph. Usually this is just a [`P2PGossipSync`] object or an [`IgnoringMessageHandler`].
 ///
-/// [`NetGraphMsgHandler`]: crate::routing::network_graph::NetGraphMsgHandler
+/// [`P2PGossipSync`]: crate::routing::gossip::P2PGossipSync
 #[no_mangle]
 pub extern "C" fn MessageHandler_get_route_handler(this_ptr: &MessageHandler) -> *const crate::lightning::ln::msgs::RoutingMessageHandler {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().route_handler;
 	inner_val
 }
 /// A message handler which handles messages updating our knowledge of the network channel
-/// graph. Usually this is just a [`NetGraphMsgHandler`] object or an
-/// [`IgnoringMessageHandler`].
+/// graph. Usually this is just a [`P2PGossipSync`] object or an [`IgnoringMessageHandler`].
 ///
-/// [`NetGraphMsgHandler`]: crate::routing::network_graph::NetGraphMsgHandler
+/// [`P2PGossipSync`]: crate::routing::gossip::P2PGossipSync
 #[no_mangle]
 pub extern "C" fn MessageHandler_set_route_handler(this_ptr: &mut MessageHandler, mut val: crate::lightning::ln::msgs::RoutingMessageHandler) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.route_handler = val;
@@ -811,15 +809,25 @@ impl PeerHandleError {
 		ret
 	}
 }
-/// Used to indicate that we probably can't make any future connections to this peer, implying
-/// we should go ahead and force-close any channels we have with it.
+/// Used to indicate that we probably can't make any future connections to this peer (e.g.
+/// because we required features that our peer was missing, or vice versa).
+///
+/// While LDK's [`ChannelManager`] will not do it automatically, you likely wish to force-close
+/// any channels with this peer or check for new versions of LDK.
+///
+/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
 #[no_mangle]
 pub extern "C" fn PeerHandleError_get_no_connection_possible(this_ptr: &PeerHandleError) -> bool {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().no_connection_possible;
 	*inner_val
 }
-/// Used to indicate that we probably can't make any future connections to this peer, implying
-/// we should go ahead and force-close any channels we have with it.
+/// Used to indicate that we probably can't make any future connections to this peer (e.g.
+/// because we required features that our peer was missing, or vice versa).
+///
+/// While LDK's [`ChannelManager`] will not do it automatically, you likely wish to force-close
+/// any channels with this peer or check for new versions of LDK.
+///
+/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
 #[no_mangle]
 pub extern "C" fn PeerHandleError_set_no_connection_possible(this_ptr: &mut PeerHandleError, mut val: bool) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.no_connection_possible = val;
@@ -1044,6 +1052,10 @@ pub extern "C" fn PeerManager_read_event(this_arg: &crate::lightning::ln::peer_h
 ///
 /// You don't have to call this function explicitly if you are using [`lightning-net-tokio`]
 /// or one of the other clients provided in our language bindings.
+///
+/// Note that if there are any other calls to this function waiting on lock(s) this may return
+/// without doing any work. All available events that need handling will be handled before the
+/// other calls return.
 ///
 /// [`send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
 /// [`ChannelManager::process_pending_htlc_forwards`]: crate::ln::channelmanager::ChannelManager::process_pending_htlc_forwards

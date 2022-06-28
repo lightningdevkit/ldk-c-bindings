@@ -7,7 +7,7 @@
 // source was automatically generated.
 
 //! This crate provides data structures to represent
-//! [lightning BOLT11](https://github.com/lightningnetwork/lightning-rfc/blob/master/11-payment-encoding.md)
+//! [lightning BOLT11](https://github.com/lightning/bolts/blob/master/11-payment-encoding.md)
 //! invoices and functions to create, encode and decode these. If you just want to use the standard
 //! en-/decoding functionality this should get you started:
 //!
@@ -26,6 +26,17 @@ use alloc::{vec::Vec, boxed::Box};
 pub mod payment;
 pub mod utils;
 pub mod constants;
+mod time_utils {
+
+use alloc::str::FromStr;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
 mod de {
 
 use alloc::str::FromStr;
@@ -172,32 +183,39 @@ use alloc::{vec::Vec, boxed::Box};
 }
 /// Errors that indicate what is wrong with the invoice. They have some granularity for debug
 /// reasons, but should generally result in an \"invalid BOLT11 invoice\" message for the user.
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum ParseError {
-	Bech32Error(crate::c_types::Bech32Error),
-	ParseAmountError(crate::c_types::Error),
-	MalformedSignature(crate::c_types::Secp256k1Error),
+	Bech32Error(
+		crate::c_types::Bech32Error),
+	ParseAmountError(
+		crate::c_types::Error),
+	MalformedSignature(
+		crate::c_types::Secp256k1Error),
 	BadPrefix,
 	UnknownCurrency,
 	UnknownSiPrefix,
 	MalformedHRP,
 	TooShortDataPart,
 	UnexpectedEndOfTaggedFields,
-	DescriptionDecodeError(crate::c_types::Error),
+	DescriptionDecodeError(
+		crate::c_types::Error),
 	PaddingError,
 	IntegerOverflowError,
 	InvalidSegWitProgramLength,
 	InvalidPubKeyHashLength,
 	InvalidScriptHashLength,
 	InvalidRecoveryId,
-	InvalidSliceLength(crate::c_types::Str),
+	InvalidSliceLength(
+		crate::c_types::Str),
 	/// Not an error, but used internally to signal that a part of the invoice should be ignored
 	/// according to BOLT11
 	Skip,
 }
-use lightning_invoice::ParseError as nativeParseError;
+use lightning_invoice::ParseError as ParseErrorImport;
+pub(crate) type nativeParseError = ParseErrorImport;
+
 impl ParseError {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeParseError {
@@ -470,16 +488,20 @@ pub extern "C" fn ParseError_skip() -> ParseError {
 /// Indicates that something went wrong while parsing or validating the invoice. Parsing errors
 /// should be mostly seen as opaque and are only there for debugging reasons. Semantic errors
 /// like wrong signatures, missing fields etc. could mean that someone tampered with the invoice.
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum ParseOrSemanticError {
 	/// The invoice couldn't be decoded
-	ParseError(crate::lightning_invoice::ParseError),
+	ParseError(
+		crate::lightning_invoice::ParseError),
 	/// The invoice could be decoded but violates the BOLT11 standard
-	SemanticError(crate::lightning_invoice::SemanticError),
+	SemanticError(
+		crate::lightning_invoice::SemanticError),
 }
-use lightning_invoice::ParseOrSemanticError as nativeParseOrSemanticError;
+use lightning_invoice::ParseOrSemanticError as ParseOrSemanticErrorImport;
+pub(crate) type nativeParseOrSemanticError = ParseOrSemanticErrorImport;
+
 impl ParseOrSemanticError {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeParseOrSemanticError {
@@ -1022,8 +1044,8 @@ pub extern "C" fn PositiveTimestamp_clone(orig: &PositiveTimestamp) -> PositiveT
 	orig.clone()
 }
 /// SI prefixes for the human readable part
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum SiPrefix {
 	/// 10^-3
@@ -1035,7 +1057,9 @@ pub enum SiPrefix {
 	/// 10^-12
 	Pico,
 }
-use lightning_invoice::SiPrefix as nativeSiPrefix;
+use lightning_invoice::SiPrefix as SiPrefixImport;
+pub(crate) type nativeSiPrefix = SiPrefixImport;
+
 impl SiPrefix {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeSiPrefix {
@@ -1111,8 +1135,8 @@ pub extern "C" fn SiPrefix_multiplier(this_arg: &crate::lightning_invoice::SiPre
 }
 
 /// Enum representing the crypto currencies (or networks) supported by this library
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum Currency {
 	/// Bitcoin mainnet
@@ -1126,7 +1150,9 @@ pub enum Currency {
 	/// Bitcoin signet
 	Signet,
 }
-use lightning_invoice::Currency as nativeCurrency;
+use lightning_invoice::Currency as CurrencyImport;
+pub(crate) type nativeCurrency = CurrencyImport;
+
 impl Currency {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeCurrency {
@@ -1693,18 +1719,22 @@ pub extern "C" fn MinFinalCltvExpiry_eq(a: &MinFinalCltvExpiry, b: &MinFinalCltv
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 /// Fallback address in case no LN payment is possible
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum Fallback {
 	SegWitProgram {
 		version: crate::c_types::u5,
 		program: crate::c_types::derived::CVec_u8Z,
 	},
-	PubKeyHash(crate::c_types::TwentyBytes),
-	ScriptHash(crate::c_types::TwentyBytes),
+	PubKeyHash(
+		crate::c_types::TwentyBytes),
+	ScriptHash(
+		crate::c_types::TwentyBytes),
 }
-use lightning_invoice::Fallback as nativeFallback;
+use lightning_invoice::Fallback as FallbackImport;
+pub(crate) type nativeFallback = FallbackImport;
+
 impl Fallback {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeFallback {
@@ -2486,8 +2516,8 @@ pub extern "C" fn PrivateRoute_into_inner(mut this_arg: crate::lightning_invoice
 }
 
 /// Errors that may occur when constructing a new `RawInvoice` or `Invoice`
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum CreationError {
 	/// The supplied description string was longer than 639 __bytes__ (see [`Description::new(…)`](./struct.Description.html#method.new))
@@ -2504,7 +2534,9 @@ pub enum CreationError {
 	/// [phantom invoices]: crate::utils::create_phantom_invoice
 	MissingRouteHints,
 }
-use lightning_invoice::CreationError as nativeCreationError;
+use lightning_invoice::CreationError as CreationErrorImport;
+pub(crate) type nativeCreationError = CreationErrorImport;
+
 impl CreationError {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeCreationError {
@@ -2585,8 +2617,8 @@ pub extern "C" fn CreationError_to_str(o: &crate::lightning_invoice::CreationErr
 }
 /// Errors that may occur when converting a `RawInvoice` to an `Invoice`. They relate to the
 /// requirements sections in BOLT #11
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum SemanticError {
 	/// The invoice is missing the mandatory payment hash
@@ -2611,7 +2643,9 @@ pub enum SemanticError {
 	/// The invoice's amount was not a whole number of millisatoshis
 	ImpreciseAmount,
 }
-use lightning_invoice::SemanticError as nativeSemanticError;
+use lightning_invoice::SemanticError as SemanticErrorImport;
+pub(crate) type nativeSemanticError = SemanticErrorImport;
+
 impl SemanticError {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeSemanticError {
@@ -2732,16 +2766,19 @@ pub extern "C" fn SemanticError_to_str(o: &crate::lightning_invoice::SemanticErr
 }
 /// When signing using a fallible method either an user-supplied `SignError` or a `CreationError`
 /// may occur.
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum SignOrCreationError {
 	/// An error occurred during signing
 	SignError,
 	/// An error occurred while building the transaction
-	CreationError(crate::lightning_invoice::CreationError),
+	CreationError(
+		crate::lightning_invoice::CreationError),
 }
-use lightning_invoice::SignOrCreationError as nativeSignOrCreationError;
+use lightning_invoice::SignOrCreationError as SignOrCreationErrorImport;
+pub(crate) type nativeSignOrCreationError = SignOrCreationErrorImport<>;
+
 impl SignOrCreationError {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeSignOrCreationError {

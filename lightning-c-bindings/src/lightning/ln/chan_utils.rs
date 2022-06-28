@@ -50,7 +50,7 @@ use lightning::ln::chan_utils::CounterpartyCommitmentSecrets as nativeCounterpar
 pub(crate) type nativeCounterpartyCommitmentSecrets = nativeCounterpartyCommitmentSecretsImport;
 
 /// Implements the per-commitment secret storage scheme from
-/// [BOLT 3](https://github.com/lightningnetwork/lightning-rfc/blob/dcbf8583976df087c79c3ce0b535311212e6812d/03-transactions.md#efficient-per-commitment-secret-storage).
+/// [BOLT 3](https://github.com/lightning/bolts/blob/dcbf8583976df087c79c3ce0b535311212e6812d/03-transactions.md#efficient-per-commitment-secret-storage).
 ///
 /// Allows us to keep track of all of the revocation secrets of our counterparty in just 50*32 bytes
 /// or so.
@@ -181,7 +181,7 @@ pub extern "C" fn CounterpartyCommitmentSecrets_read(ser: crate::c_types::u8slic
 /// generated (ie our own).
 #[no_mangle]
 pub extern "C" fn derive_private_key(mut per_commitment_point: crate::c_types::PublicKey, base_secret: *const [u8; 32]) -> crate::c_types::derived::CResult_SecretKeyErrorZ {
-	let mut ret = lightning::ln::chan_utils::derive_private_key(secp256k1::SECP256K1, &per_commitment_point.into_rust(), &::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *base_secret}[..]).unwrap());
+	let mut ret = lightning::ln::chan_utils::derive_private_key(secp256k1::global::SECP256K1, &per_commitment_point.into_rust(), &::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *base_secret}[..]).unwrap());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::SecretKey::from_rust(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
 }
@@ -194,7 +194,7 @@ pub extern "C" fn derive_private_key(mut per_commitment_point: crate::c_types::P
 /// generated (ie our own).
 #[no_mangle]
 pub extern "C" fn derive_public_key(mut per_commitment_point: crate::c_types::PublicKey, mut base_point: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_PublicKeyErrorZ {
-	let mut ret = lightning::ln::chan_utils::derive_public_key(secp256k1::SECP256K1, &per_commitment_point.into_rust(), &base_point.into_rust());
+	let mut ret = lightning::ln::chan_utils::derive_public_key(secp256k1::global::SECP256K1, &per_commitment_point.into_rust(), &base_point.into_rust());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::PublicKey::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
 }
@@ -210,7 +210,7 @@ pub extern "C" fn derive_public_key(mut per_commitment_point: crate::c_types::Pu
 /// generated (ie our own).
 #[no_mangle]
 pub extern "C" fn derive_private_revocation_key(per_commitment_secret: *const [u8; 32], countersignatory_revocation_base_secret: *const [u8; 32]) -> crate::c_types::derived::CResult_SecretKeyErrorZ {
-	let mut ret = lightning::ln::chan_utils::derive_private_revocation_key(secp256k1::SECP256K1, &::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *per_commitment_secret}[..]).unwrap(), &::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *countersignatory_revocation_base_secret}[..]).unwrap());
+	let mut ret = lightning::ln::chan_utils::derive_private_revocation_key(secp256k1::global::SECP256K1, &::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *per_commitment_secret}[..]).unwrap(), &::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *countersignatory_revocation_base_secret}[..]).unwrap());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::SecretKey::from_rust(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
 }
@@ -228,7 +228,7 @@ pub extern "C" fn derive_private_revocation_key(per_commitment_secret: *const [u
 /// generated (ie our own).
 #[no_mangle]
 pub extern "C" fn derive_public_revocation_key(mut per_commitment_point: crate::c_types::PublicKey, mut countersignatory_revocation_base_point: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_PublicKeyErrorZ {
-	let mut ret = lightning::ln::chan_utils::derive_public_revocation_key(secp256k1::SECP256K1, &per_commitment_point.into_rust(), &countersignatory_revocation_base_point.into_rust());
+	let mut ret = lightning::ln::chan_utils::derive_public_revocation_key(secp256k1::global::SECP256K1, &per_commitment_point.into_rust(), &countersignatory_revocation_base_point.into_rust());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::PublicKey::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
 }
@@ -576,7 +576,7 @@ pub extern "C" fn ChannelPublicKeys_read(ser: crate::c_types::u8slice) -> crate:
 #[must_use]
 #[no_mangle]
 pub extern "C" fn TxCreationKeys_derive_new(mut per_commitment_point: crate::c_types::PublicKey, mut broadcaster_delayed_payment_base: crate::c_types::PublicKey, mut broadcaster_htlc_base: crate::c_types::PublicKey, mut countersignatory_revocation_base: crate::c_types::PublicKey, mut countersignatory_htlc_base: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_TxCreationKeysErrorZ {
-	let mut ret = lightning::ln::chan_utils::TxCreationKeys::derive_new(secp256k1::SECP256K1, &per_commitment_point.into_rust(), &broadcaster_delayed_payment_base.into_rust(), &broadcaster_htlc_base.into_rust(), &countersignatory_revocation_base.into_rust(), &countersignatory_htlc_base.into_rust());
+	let mut ret = lightning::ln::chan_utils::TxCreationKeys::derive_new(secp256k1::global::SECP256K1, &per_commitment_point.into_rust(), &broadcaster_delayed_payment_base.into_rust(), &broadcaster_htlc_base.into_rust(), &countersignatory_revocation_base.into_rust(), &countersignatory_htlc_base.into_rust());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::TxCreationKeys { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
 }
@@ -586,7 +586,7 @@ pub extern "C" fn TxCreationKeys_derive_new(mut per_commitment_point: crate::c_t
 #[must_use]
 #[no_mangle]
 pub extern "C" fn TxCreationKeys_from_channel_static_keys(mut per_commitment_point: crate::c_types::PublicKey, broadcaster_keys: &crate::lightning::ln::chan_utils::ChannelPublicKeys, countersignatory_keys: &crate::lightning::ln::chan_utils::ChannelPublicKeys) -> crate::c_types::derived::CResult_TxCreationKeysErrorZ {
-	let mut ret = lightning::ln::chan_utils::TxCreationKeys::from_channel_static_keys(&per_commitment_point.into_rust(), broadcaster_keys.get_native_ref(), countersignatory_keys.get_native_ref(), secp256k1::SECP256K1);
+	let mut ret = lightning::ln::chan_utils::TxCreationKeys::from_channel_static_keys(&per_commitment_point.into_rust(), broadcaster_keys.get_native_ref(), countersignatory_keys.get_native_ref(), secp256k1::global::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::TxCreationKeys { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
 }
@@ -1510,7 +1510,7 @@ pub extern "C" fn BuiltCommitmentTransaction_get_sighash_all(this_arg: &crate::l
 #[must_use]
 #[no_mangle]
 pub extern "C" fn BuiltCommitmentTransaction_sign(this_arg: &crate::lightning::ln::chan_utils::BuiltCommitmentTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64) -> crate::c_types::Signature {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign(&::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, secp256k1::SECP256K1);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, secp256k1::global::SECP256K1);
 	crate::c_types::Signature::from_rust(&ret)
 }
 
@@ -1744,7 +1744,7 @@ pub extern "C" fn TrustedClosingTransaction_get_sighash_all(this_arg: &crate::li
 #[must_use]
 #[no_mangle]
 pub extern "C" fn TrustedClosingTransaction_sign(this_arg: &crate::lightning::ln::chan_utils::TrustedClosingTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64) -> crate::c_types::Signature {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign(&::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, secp256k1::SECP256K1);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, secp256k1::global::SECP256K1);
 	crate::c_types::Signature::from_rust(&ret)
 }
 
@@ -1893,7 +1893,7 @@ pub extern "C" fn CommitmentTransaction_trust(this_arg: &crate::lightning::ln::c
 #[must_use]
 #[no_mangle]
 pub extern "C" fn CommitmentTransaction_verify(this_arg: &crate::lightning::ln::chan_utils::CommitmentTransaction, channel_parameters: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters, broadcaster_keys: &crate::lightning::ln::chan_utils::ChannelPublicKeys, countersignatory_keys: &crate::lightning::ln::chan_utils::ChannelPublicKeys) -> crate::c_types::derived::CResult_TrustedCommitmentTransactionNoneZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.verify(channel_parameters.get_native_ref(), broadcaster_keys.get_native_ref(), countersignatory_keys.get_native_ref(), secp256k1::SECP256K1);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.verify(channel_parameters.get_native_ref(), broadcaster_keys.get_native_ref(), countersignatory_keys.get_native_ref(), secp256k1::global::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::TrustedCommitmentTransaction { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
@@ -1991,11 +1991,11 @@ pub extern "C" fn TrustedCommitmentTransaction_opt_anchors(this_arg: &crate::lig
 ///
 /// The returned Vec has one entry for each HTLC, and in the same order.
 ///
-/// This function is only valid in the holder commitment context, it always uses SigHashType::All.
+/// This function is only valid in the holder commitment context, it always uses EcdsaSighashType::All.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn TrustedCommitmentTransaction_get_htlc_sigs(this_arg: &crate::lightning::ln::chan_utils::TrustedCommitmentTransaction, htlc_base_key: *const [u8; 32], channel_parameters: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters) -> crate::c_types::derived::CResult_CVec_SignatureZNoneZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_htlc_sigs(&::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *htlc_base_key}[..]).unwrap(), channel_parameters.get_native_ref(), secp256k1::SECP256K1);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_htlc_sigs(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *htlc_base_key}[..]).unwrap(), channel_parameters.get_native_ref(), secp256k1::global::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { crate::c_types::Signature::from_rust(&item) }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }

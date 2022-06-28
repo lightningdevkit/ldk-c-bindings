@@ -22,7 +22,7 @@ pub(crate) type nativeShutdownScript = nativeShutdownScriptImport;
 
 /// A script pubkey for shutting down a channel as defined by [BOLT #2].
 ///
-/// [BOLT #2]: https://github.com/lightningnetwork/lightning-rfc/blob/master/02-peer-protocol.md
+/// [BOLT #2]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md
 #[must_use]
 #[repr(C)]
 pub struct ShutdownScript {
@@ -141,7 +141,7 @@ impl InvalidShutdownScript {
 }
 /// The script that did not meet the requirements from [BOLT #2].
 ///
-/// [BOLT #2]: https://github.com/lightningnetwork/lightning-rfc/blob/master/02-peer-protocol.md
+/// [BOLT #2]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md
 #[no_mangle]
 pub extern "C" fn InvalidShutdownScript_get_script(this_ptr: &InvalidShutdownScript) -> crate::c_types::u8slice {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().script;
@@ -149,7 +149,7 @@ pub extern "C" fn InvalidShutdownScript_get_script(this_ptr: &InvalidShutdownScr
 }
 /// The script that did not meet the requirements from [BOLT #2].
 ///
-/// [BOLT #2]: https://github.com/lightningnetwork/lightning-rfc/blob/master/02-peer-protocol.md
+/// [BOLT #2]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md
 #[no_mangle]
 pub extern "C" fn InvalidShutdownScript_set_script(this_ptr: &mut InvalidShutdownScript, mut val: crate::c_types::derived::CVec_u8Z) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.script = ::bitcoin::blockdata::script::Script::from(val.into_rust());
@@ -223,8 +223,8 @@ pub extern "C" fn ShutdownScript_new_p2wsh(script_hash: *const [u8; 32]) -> crat
 /// This function may return an error if `program` is invalid for the segwit `version`.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ShutdownScript_new_witness_program(mut version: u8, mut program: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ShutdownScriptInvalidShutdownScriptZ {
-	let mut ret = lightning::ln::script::ShutdownScript::new_witness_program(core::num::NonZeroU8::new(version).expect("Value must be non-zero"), program.to_slice());
+pub extern "C" fn ShutdownScript_new_witness_program(mut version: crate::c_types::WitnessVersion, mut program: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ShutdownScriptInvalidShutdownScriptZ {
+	let mut ret = lightning::ln::script::ShutdownScript::new_witness_program(version.into(), program.to_slice());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::script::InvalidShutdownScript { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }

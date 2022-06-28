@@ -190,7 +190,7 @@ pub struct GenericTypes<'a, 'b> {
 	self_ty: Option<String>,
 	parent: Option<&'b GenericTypes<'b, 'b>>,
 	typed_generics: HashMap<&'a syn::Ident, String>,
-	default_generics: HashMap<&'a syn::Ident, (syn::Type, syn::Type)>,
+	default_generics: HashMap<&'a syn::Ident, (syn::Type, syn::Type, syn::Type)>,
 }
 impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 	pub fn new(self_ty: Option<String>) -> Self {
@@ -226,20 +226,25 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								if non_lifetimes_processed { return false; }
 								non_lifetimes_processed = true;
 								if path != "std::ops::Deref" && path != "core::ops::Deref" {
+									let p = string_path_to_syn_path(&path);
+									let ref_ty = parse_quote!(&#p);
+									let mut_ref_ty = parse_quote!(&mut #p);
+									self.default_generics.insert(&type_param.ident, (syn::Type::Path(syn::TypePath { qself: None, path: p }), ref_ty, mut_ref_ty));
 									new_typed_generics.insert(&type_param.ident, Some(path));
-								} else if trait_bound.path.segments.len() == 1 {
+								} else {
 									// If we're templated on Deref<Target = ConcreteThing>, store
 									// the reference type in `default_generics` which handles full
 									// types and not just paths.
 									if let syn::PathArguments::AngleBracketed(ref args) =
 											trait_bound.path.segments[0].arguments {
+										assert_eq!(trait_bound.path.segments.len(), 1);
 										for subargument in args.args.iter() {
 											match subargument {
 												syn::GenericArgument::Lifetime(_) => {},
 												syn::GenericArgument::Binding(ref b) => {
 													if &format!("{}", b.ident) != "Target" { return false; }
 													let default = &b.ty;
-													self.default_generics.insert(&type_param.ident, (parse_quote!(&#default), parse_quote!(&#default)));
+													self.default_generics.insert(&type_param.ident, (parse_quote!(&#default), parse_quote!(&#default), parse_quote!(&mut #default)));
 													break 'bound_loop;
 												},
 												_ => unimplemented!(),
@@ -254,7 +259,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 					}
 					if let Some(default) = type_param.default.as_ref() {
 						assert!(type_param.bounds.is_empty());
-						self.default_generics.insert(&type_param.ident, (default.clone(), parse_quote!(&#default)));
+						self.default_generics.insert(&type_param.ident, (default.clone(), parse_quote!(&#default), parse_quote!(&mut #default)));
 					}
 				},
 				_ => {},
@@ -268,7 +273,8 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 						if p.qself.is_some() { return false; }
 						if p.path.leading_colon.is_some() { return false; }
 						let mut p_iter = p.path.segments.iter();
-						if let Some(gen) = new_typed_generics.get_mut(&p_iter.next().unwrap().ident) {
+						let p_ident = &p_iter.next().unwrap().ident;
+						if let Some(gen) = new_typed_generics.get_mut(p_ident) {
 							if gen.is_some() { return false; }
 							if &format!("{}", p_iter.next().unwrap().ident) != "Target" {return false; }
 
@@ -281,7 +287,19 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 									if non_lifetimes_processed { return false; }
 									non_lifetimes_processed = true;
 									assert_simple_bound(&trait_bound);
-									*gen = Some(types.resolve_path(&trait_bound.path, None));
+									let resolved = types.resolve_path(&trait_bound.path, None);
+									let ty = syn::Type::Path(syn::TypePath {
+										qself: None, path: string_path_to_syn_path(&resolved)
+									});
+									let ref_ty = parse_quote!(&#ty);
+									let mut_ref_ty = parse_quote!(&mut #ty);
+									if types.crate_types.traits.get(&resolved).is_some() {
+										self.default_generics.insert(p_ident, (ty, ref_ty, mut_ref_ty));
+									} else {
+										self.default_generics.insert(p_ident, (ref_ty.clone(), ref_ty, mut_ref_ty));
+									}
+
+									*gen = Some(resolved);
 								}
 							}
 						} else { return false; }
@@ -370,16 +388,20 @@ impl<'a, 'b, 'c: 'a + 'b> ResolveType<'c> for Option<&GenericTypes<'a, 'b>> {
 			match ty {
 				syn::Type::Path(p) => {
 					if let Some(ident) = p.path.get_ident() {
-						if let Some((ty, _)) = us.default_generics.get(ident) {
-							return ty;
+						if let Some((ty, _, _)) = us.default_generics.get(ident) {
+							return self.resolve_type(ty);
 						}
 					}
 				},
-				syn::Type::Reference(syn::TypeReference { elem, .. }) => {
+				syn::Type::Reference(syn::TypeReference { elem, mutability, .. }) => {
 					if let syn::Type::Path(p) = &**elem {
 						if let Some(ident) = p.path.get_ident() {
-							if let Some((_, refty)) = us.default_generics.get(ident) {
-								return refty;
+							if let Some((_, refty, mut_ref_ty)) = us.default_generics.get(ident) {
+								if mutability.is_some() {
+									return self.resolve_type(mut_ref_ty);
+								} else {
+									return self.resolve_type(refty);
+								}
 							}
 						}
 					}
@@ -438,6 +460,10 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
 					let crate_name_ident = format_ident!("{}", crate_name);
 					path.push(parse_quote!(#crate_name_ident));
+				} else if format!("{}", $ident) == "self" {
+					let mut path_iter = partial_path.rsplitn(2, "::");
+					path_iter.next().unwrap();
+					new_path = path_iter.next().unwrap().to_owned();
 				} else {
 					new_path = format!("{}{}{}", partial_path, $ident, $path_suffix);
 				}
@@ -452,7 +478,8 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			},
 			syn::UseTree::Name(n) => {
 				push_path!(n.ident, "");
-				imports.insert(n.ident.clone(), (new_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
+				let imported_ident = syn::Ident::new(new_path.rsplitn(2, "::").next().unwrap(), Span::call_site());
+				imports.insert(imported_ident, (new_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
 			},
 			syn::UseTree::Group(g) => {
 				for i in g.items.iter() {
@@ -678,6 +705,7 @@ impl FullLibraryAST {
 							let modname = if module != "" {
 								module.clone() + "::" + &modident
 							} else {
+								self.dependencies.insert(m.ident);
 								modident.clone()
 							};
 							self.load_module(modname, m.attrs, m.content.unwrap().1);
@@ -711,6 +739,10 @@ impl FullLibraryAST {
 fn initial_clonable_types() -> HashSet<String> {
 	let mut res = HashSet::new();
 	res.insert("crate::c_types::u5".to_owned());
+	res.insert("crate::c_types::FourBytes".to_owned());
+	res.insert("crate::c_types::TwelveBytes".to_owned());
+	res.insert("crate::c_types::SixteenBytes".to_owned());
+	res.insert("crate::c_types::TwentyBytes".to_owned());
 	res.insert("crate::c_types::ThirtyTwoBytes".to_owned());
 	res.insert("crate::c_types::SecretKey".to_owned());
 	res.insert("crate::c_types::PublicKey".to_owned());
@@ -718,8 +750,17 @@ fn initial_clonable_types() -> HashSet<String> {
 	res.insert("crate::c_types::TxOut".to_owned());
 	res.insert("crate::c_types::Signature".to_owned());
 	res.insert("crate::c_types::RecoverableSignature".to_owned());
+	res.insert("crate::c_types::Bech32Error".to_owned());
 	res.insert("crate::c_types::Secp256k1Error".to_owned());
 	res.insert("crate::c_types::IOError".to_owned());
+	res.insert("crate::c_types::Error".to_owned());
+	res.insert("crate::c_types::Str".to_owned());
+
+	// Because some types are manually-mapped to CVec_u8Z we may end up checking if its clonable
+	// before we ever get to constructing the type fully via
+	// `write_c_mangled_container_path_intern` (which will add it here too), so we have to manually
+	// add it on startup.
+	res.insert("crate::c_types::derived::CVec_u8Z".to_owned());
 	res
 }
 
@@ -827,7 +868,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	/// Returns true we if can just skip passing this to C entirely
 	fn no_arg_path_to_rust(&self, full_path: &str) -> &str {
 		if full_path == "bitcoin::secp256k1::Secp256k1" {
-			"secp256k1::SECP256K1"
+			"secp256k1::global::SECP256K1"
 		} else { unimplemented!(); }
 	}
 
@@ -874,7 +915,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration"|"core::time::Duration" => Some("u64"),
 			"std::time::SystemTime" => Some("u64"),
-			"std::io::Error" => Some("crate::c_types::IOError"),
+			"std::io::Error"|"lightning::io::Error" => Some("crate::c_types::IOError"),
 			"core::fmt::Arguments" if is_ref => Some("crate::c_types::Str"),
 
 			"core::convert::Infallible" => Some("crate::c_types::NotConstructable"),
@@ -890,20 +931,18 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::bech32::u5"|"bech32::u5" => Some("crate::c_types::u5"),
 			"core::num::NonZeroU8" => Some("u8"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				=> Some("crate::c_types::PublicKey"),
-			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature"),
-			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some("crate::c_types::RecoverableSignature"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if is_ref  => Some("*const [u8; 32]"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if !is_ref => Some("crate::c_types::SecretKey"),
+			"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => Some("crate::c_types::PublicKey"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some("crate::c_types::Signature"),
+			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature"),
+			"bitcoin::secp256k1::SecretKey" if is_ref  => Some("*const [u8; 32]"),
+			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut"),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network"),
+			"bitcoin::util::address::WitnessVersion" => Some("crate::c_types::WitnessVersion"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref  => Some("*const [u8; 80]"),
 			"bitcoin::blockdata::block::Block" if is_ref  => Some("crate::c_types::u8slice"),
 
@@ -957,7 +996,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"str" if is_ref => Some(""),
 			"alloc::string::String"|"String" => Some(""),
-			"std::io::Error" if !is_ref => Some(""),
+			"std::io::Error"|"lightning::io::Error" => Some(""),
 			// Note that we'll panic for String if is_ref, as we only have non-owned memory, we
 			// cannot create a &String.
 
@@ -975,17 +1014,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(""),
 			"core::num::NonZeroU8" => Some("core::num::NonZeroU8::new("),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				if is_ref => Some("&"),
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				=> Some(""),
-			"bitcoin::secp256k1::Signature" if is_ref => Some("&"),
-			"bitcoin::secp256k1::Signature" => Some(""),
-			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(""),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if is_ref => Some("&::bitcoin::secp256k1::key::SecretKey::from_slice(&unsafe { *"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if !is_ref => Some(""),
+			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" if is_ref => Some("&"),
+			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some(""),
+			"bitcoin::secp256k1::ecdsa::Signature" if is_ref => Some("&"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some(""),
+			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(""),
+			"bitcoin::secp256k1::SecretKey" if is_ref => Some("&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *"),
+			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(""),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("&::bitcoin::blockdata::script::Script::from(Vec::from("),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("::bitcoin::blockdata::script::Script::from("),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("&"),
@@ -993,6 +1028,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::C_to_bitcoin_outpoint("),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(""),
 			"bitcoin::network::constants::Network" => Some(""),
+			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" => Some("&::bitcoin::consensus::encode::deserialize(unsafe { &*"),
 			"bitcoin::blockdata::block::Block" if is_ref => Some("&::bitcoin::consensus::encode::deserialize("),
 
@@ -1047,7 +1083,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"str" if is_ref => Some(".into_str()"),
 			"alloc::string::String"|"String" => Some(".into_string()"),
-			"std::io::Error" if !is_ref => Some(".to_rust()"),
+			"std::io::Error"|"lightning::io::Error" => Some(".to_rust()"),
 
 			"core::convert::Infallible" => Some("\")"),
 
@@ -1063,20 +1099,18 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(".into()"),
 			"core::num::NonZeroU8" => Some(").expect(\"Value must be non-zero\")"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				=> Some(".into_rust()"),
-			"bitcoin::secp256k1::Signature" => Some(".into_rust()"),
-			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(".into_rust()"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if !is_ref => Some(".into_rust()"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if is_ref => Some("}[..]).unwrap()"),
+			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some(".into_rust()"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some(".into_rust()"),
+			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(".into_rust()"),
+			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(".into_rust()"),
+			"bitcoin::secp256k1::SecretKey" if is_ref => Some("}[..]).unwrap()"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some(".to_slice()))"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_rust())"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(".into_bitcoin()"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(".into_rust()"),
 			"bitcoin::network::constants::Network" => Some(".into_bitcoin()"),
+			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" => Some(" }).unwrap()"),
 			"bitcoin::blockdata::block::Block" => Some(".to_slice()).unwrap()"),
 
@@ -1142,7 +1176,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration"|"core::time::Duration" => Some(""),
 			"std::time::SystemTime" => Some(""),
-			"std::io::Error" if !is_ref => Some("crate::c_types::IOError::from_rust("),
+			"std::io::Error"|"lightning::io::Error" => Some("crate::c_types::IOError::from_rust("),
 			"core::fmt::Arguments" => Some("alloc::format!(\"{}\", "),
 
 			"core::convert::Infallible" => Some("panic!(\"Cannot construct an Infallible: "),
@@ -1157,14 +1191,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(""),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				=> Some("crate::c_types::PublicKey::from_rust(&"),
-			"bitcoin::secp256k1::Signature" => Some("crate::c_types::Signature::from_rust(&"),
-			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some("crate::c_types::RecoverableSignature::from_rust(&"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if is_ref => Some(""),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
+			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some("crate::c_types::PublicKey::from_rust(&"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some("crate::c_types::Signature::from_rust(&"),
+			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature::from_rust(&"),
+			"bitcoin::secp256k1::SecretKey" if is_ref => Some(""),
+			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
@@ -1172,6 +1203,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::bitcoin_to_C_outpoint("),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network::from_bitcoin("),
+			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some("&local_"),
 			"bitcoin::blockdata::block::Block" if is_ref => Some("crate::c_types::u8slice::from_slice(&local_"),
 
@@ -1221,7 +1253,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration"|"core::time::Duration" => Some(".as_secs()"),
 			"std::time::SystemTime" => Some(".duration_since(::std::time::SystemTime::UNIX_EPOCH).expect(\"Times must be post-1970\").as_secs()"),
-			"std::io::Error" if !is_ref => Some(")"),
+			"std::io::Error"|"lightning::io::Error" => Some(")"),
 			"core::fmt::Arguments" => Some(").into()"),
 
 			"core::convert::Infallible" => Some("\")"),
@@ -1236,20 +1268,18 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(".into()"),
 
-			"bitcoin::secp256k1::key::PublicKey"|"bitcoin::secp256k1::PublicKey"|"secp256k1::key::PublicKey"
-				=> Some(")"),
-			"bitcoin::secp256k1::Signature" => Some(")"),
-			"bitcoin::secp256k1::recovery::RecoverableSignature" => Some(")"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if !is_ref => Some(")"),
-			"bitcoin::secp256k1::key::SecretKey"|"bitcoin::secp256k1::SecretKey"
-				if is_ref => Some(".as_ref()"),
+			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some(")"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some(")"),
+			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(")"),
+			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(")"),
+			"bitcoin::secp256k1::SecretKey" if is_ref => Some(".as_ref()"),
 			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(")"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(")"),
 			"bitcoin::network::constants::Network" => Some(")"),
+			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some(""),
 			"bitcoin::blockdata::block::Block" if is_ref => Some(")"),
 
@@ -1277,8 +1307,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	fn empty_val_check_suffix_from_path(&self, full_path: &str) -> Option<&str> {
 		match full_path {
 			"lightning::ln::PaymentSecret" => Some(".data == [0; 32]"),
-			"secp256k1::key::PublicKey"|"bitcoin::secp256k1::key::PublicKey" => Some(".is_null()"),
-			"bitcoin::secp256k1::Signature" => Some(".is_null()"),
+			"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => Some(".is_null()"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some(".is_null()"),
 			_ => None
 		}
 	}
@@ -1310,20 +1340,33 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		"crate::c_types"
 	}
 
+	/// This should just be a closure, but doing so gets an error like
+	/// error: reached the recursion limit while instantiating `types::TypeResolver::is_transpar...c/types.rs:1358:104: 1358:110]>>`
+	/// which implies the concrete function instantiation of `is_transparent_container` ends up
+	/// being recursive.
+	fn deref_type<'one, 'b: 'one> (obj: &'one &'b syn::Type) -> &'b syn::Type { *obj }
+
 	/// Returns true if the path containing the given args is a "transparent" container, ie an
 	/// Option or a container which does not require a generated continer class.
 	fn is_transparent_container<'i, I: Iterator<Item=&'i syn::Type>>(&self, full_path: &str, _is_ref: bool, mut args: I, generics: Option<&GenericTypes>) -> bool {
 		if full_path == "Option" {
 			let inner = args.next().unwrap();
 			assert!(args.next().is_none());
-			match inner {
-				syn::Type::Reference(_) => true,
+			match generics.resolve_type(inner) {
+				syn::Type::Reference(r) => {
+					let elem = &*r.elem;
+					match elem {
+						syn::Type::Path(_) =>
+							self.is_transparent_container(full_path, true, [elem].iter().map(Self::deref_type), generics),
+						_ => true,
+					}
+				},
 				syn::Type::Array(a) => {
 					if let syn::Expr::Lit(l) = &a.len {
 						if let syn::Lit::Int(i) = &l.lit {
 							if i.base10_digits().parse::<usize>().unwrap() >= 32 {
 								let mut buf = Vec::new();
-								self.write_rust_type(&mut buf, generics, &a.elem);
+								self.write_rust_type(&mut buf, generics, &a.elem, false);
 								let ty = String::from_utf8(buf).unwrap();
 								ty == "u8"
 							} else {
@@ -1339,7 +1382,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						if self.c_type_has_inner_from_path(&resolved) { return true; }
 						if self.is_primitive(&resolved) { return false; }
 						if self.c_type_from_path(&resolved, false, false).is_some() { true } else { false }
-					} else { true }
+					} else { unimplemented!(); }
 				},
 				syn::Type::Tuple(_) => false,
 				_ => unimplemented!(),
@@ -1501,7 +1544,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 				if let Some(t) = single_contained {
 					match t {
-						syn::Type::Reference(_)|syn::Type::Path(_)|syn::Type::Slice(_) => {
+						syn::Type::Reference(_)|syn::Type::Path(_)|syn::Type::Slice(_)|syn::Type::Array(_) => {
 							let mut v = Vec::new();
 							let ret_ref = self.write_empty_rust_val_check_suffix(generics, &mut v, t);
 							let s = String::from_utf8(v).unwrap();
@@ -1623,7 +1666,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 
-	fn write_rust_path<W: std::io::Write>(&self, w: &mut W, generics_resolver: Option<&GenericTypes>, path: &syn::Path) {
+	fn write_rust_path<W: std::io::Write>(&self, w: &mut W, generics_resolver: Option<&GenericTypes>, path: &syn::Path, with_ref_lifetime: bool, generated_crate_ref: bool) {
 		if let Some(resolved) = self.maybe_resolve_path(&path, generics_resolver) {
 			if self.is_primitive(&resolved) {
 				write!(w, "{}", path.get_ident().unwrap()).unwrap();
@@ -1632,16 +1675,16 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// checking for "bitcoin" explicitly.
 				if resolved.starts_with("bitcoin::") || Self::in_rust_prelude(&resolved) {
 					write!(w, "{}", resolved).unwrap();
-				// If we're printing a generic argument, it needs to reference the crate, otherwise
-				// the original crate:
-				} else if self.maybe_resolve_path(&path, None).as_ref() == Some(&resolved) {
+				} else if !generated_crate_ref {
+					// If we're printing a generic argument, it needs to reference the crate, otherwise
+					// the original crate.
 					write!(w, "{}", self.real_rust_type_mapping(&resolved)).unwrap();
 				} else {
 					write!(w, "crate::{}", resolved).unwrap();
 				}
 			}
 			if let syn::PathArguments::AngleBracketed(args) = &path.segments.iter().last().unwrap().arguments {
-				self.write_rust_generic_arg(w, generics_resolver, args.args.iter());
+				self.write_rust_generic_arg(w, generics_resolver, args.args.iter(), with_ref_lifetime);
 			}
 		} else {
 			if path.leading_colon.is_some() {
@@ -1651,7 +1694,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if idx != 0 { write!(w, "::").unwrap(); }
 				write!(w, "{}", seg.ident).unwrap();
 				if let syn::PathArguments::AngleBracketed(args) = &seg.arguments {
-					self.write_rust_generic_arg(w, generics_resolver, args.args.iter());
+					self.write_rust_generic_arg(w, generics_resolver, args.args.iter(), with_ref_lifetime);
 				}
 			}
 		}
@@ -1671,7 +1714,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						match bound {
 							syn::TypeParamBound::Trait(tb) => {
 								if tb.paren_token.is_some() || tb.lifetimes.is_some() { unimplemented!(); }
-								self.write_rust_path(w, generics_resolver, &tb.path);
+								self.write_rust_path(w, generics_resolver, &tb.path, false, false);
 							},
 							_ => unimplemented!(),
 						}
@@ -1684,38 +1727,46 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		if had_params { write!(w, ">").unwrap(); }
 	}
 
-	pub fn write_rust_generic_arg<'b, W: std::io::Write>(&self, w: &mut W, generics_resolver: Option<&GenericTypes>, generics: impl Iterator<Item=&'b syn::GenericArgument>) {
+	pub fn write_rust_generic_arg<'b, W: std::io::Write>(&self, w: &mut W, generics_resolver: Option<&GenericTypes>, generics: impl Iterator<Item=&'b syn::GenericArgument>, with_ref_lifetime: bool) {
 		write!(w, "<").unwrap();
 		for (idx, arg) in generics.enumerate() {
 			if idx != 0 { write!(w, ", ").unwrap(); }
 			match arg {
-				syn::GenericArgument::Type(t) => self.write_rust_type(w, generics_resolver, t),
+				syn::GenericArgument::Type(t) => self.write_rust_type(w, generics_resolver, t, with_ref_lifetime),
 				_ => unimplemented!(),
 			}
 		}
 		write!(w, ">").unwrap();
 	}
-	pub fn write_rust_type<W: std::io::Write>(&self, w: &mut W, generics: Option<&GenericTypes>, t: &syn::Type) {
-		match generics.resolve_type(t) {
+	fn do_write_rust_type<W: std::io::Write>(&self, w: &mut W, generics: Option<&GenericTypes>, t: &syn::Type, with_ref_lifetime: bool, force_crate_ref: bool) {
+		let real_ty = generics.resolve_type(t);
+		let mut generate_crate_ref = force_crate_ref || t != real_ty;
+		match real_ty {
 			syn::Type::Path(p) => {
 				if p.qself.is_some() {
 					unimplemented!();
 				}
-				self.write_rust_path(w, generics, &p.path);
+				if let Some(resolved_ty) = self.maybe_resolve_path(&p.path, generics) {
+					generate_crate_ref |= self.maybe_resolve_path(&p.path, None).as_ref() != Some(&resolved_ty);
+					if self.crate_types.traits.get(&resolved_ty).is_none() { generate_crate_ref = false; }
+				}
+				self.write_rust_path(w, generics, &p.path, with_ref_lifetime, generate_crate_ref);
 			},
 			syn::Type::Reference(r) => {
 				write!(w, "&").unwrap();
 				if let Some(lft) = &r.lifetime {
 					write!(w, "'{} ", lft.ident).unwrap();
+				} else if with_ref_lifetime {
+					write!(w, "'static ").unwrap();
 				}
 				if r.mutability.is_some() {
 					write!(w, "mut ").unwrap();
 				}
-				self.write_rust_type(w, generics, &*r.elem);
+				self.do_write_rust_type(w, generics, &*r.elem, with_ref_lifetime, generate_crate_ref);
 			},
 			syn::Type::Array(a) => {
 				write!(w, "[").unwrap();
-				self.write_rust_type(w, generics, &a.elem);
+				self.do_write_rust_type(w, generics, &a.elem, with_ref_lifetime, generate_crate_ref);
 				if let syn::Expr::Lit(l) = &a.len {
 					if let syn::Lit::Int(i) = &l.lit {
 						write!(w, "; {}]", i).unwrap();
@@ -1724,20 +1775,24 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			}
 			syn::Type::Slice(s) => {
 				write!(w, "[").unwrap();
-				self.write_rust_type(w, generics, &s.elem);
+				self.do_write_rust_type(w, generics, &s.elem, with_ref_lifetime, generate_crate_ref);
 				write!(w, "]").unwrap();
 			},
 			syn::Type::Tuple(s) => {
 				write!(w, "(").unwrap();
 				for (idx, t) in s.elems.iter().enumerate() {
 					if idx != 0 { write!(w, ", ").unwrap(); }
-					self.write_rust_type(w, generics, &t);
+					self.do_write_rust_type(w, generics, &t, with_ref_lifetime, generate_crate_ref);
 				}
 				write!(w, ")").unwrap();
 			},
 			_ => unimplemented!(),
 		}
 	}
+	pub fn write_rust_type<W: std::io::Write>(&self, w: &mut W, generics: Option<&GenericTypes>, t: &syn::Type, with_ref_lifetime: bool) {
+		self.do_write_rust_type(w, generics, t, with_ref_lifetime, false);
+	}
+
 
 	/// Prints a constructor for something which is "uninitialized" (but obviously not actually
 	/// unint'd memory).
@@ -1797,7 +1852,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			syn::Type::Path(p) => {
 				let resolved = self.resolve_path(&p.path, generics);
 				if let Some(arr_ty) = self.is_real_type_array(&resolved) {
-					write!(w, ".data").unwrap();
 					return self.write_empty_rust_val_check_suffix(generics, w, &arr_ty);
 				}
 				if self.crate_types.opaques.get(&resolved).is_some() {
@@ -1817,7 +1871,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			syn::Type::Array(a) => {
 				if let syn::Expr::Lit(l) = &a.len {
 					if let syn::Lit::Int(i) = &l.lit {
-						write!(w, " == [0; {}]", i.base10_digits()).unwrap();
+						write!(w, ".data == [0; {}]", i.base10_digits()).unwrap();
 						EmptyValExpectedTy::NonPointer
 					} else { unimplemented!(); }
 				} else { unimplemented!(); }
@@ -2148,7 +2202,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// For slices (and Options), we refuse to directly map them as is_ref when they
 				// aren't opaque types containing an inner pointer. This is due to the fact that,
 				// in both cases, the actual higher-level type is non-is_ref.
-				let ty_has_inner = if $args_len == 1 {
+				let (ty_has_inner, ty_is_trait) = if $args_len == 1 {
 					let ty = $args_iter().next().unwrap();
 					if $container_type == "Slice" && to_c {
 						// "To C ptr_for_ref" means "return the regular object with is_owned
@@ -2158,12 +2212,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					}
 					if let syn::Type::Reference(t) = ty {
 						if let syn::Type::Path(p) = &*t.elem {
-							self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics))
-						} else { false }
+							let resolved = self.resolve_path(&p.path, generics);
+							(self.c_type_has_inner_from_path(&resolved), self.crate_types.traits.get(&resolved).is_some())
+						} else { (false, false) }
 					} else if let syn::Type::Path(p) = ty {
-						self.c_type_has_inner_from_path(&self.resolve_path(&p.path, generics))
-					} else { false }
-				} else { true };
+						let resolved = self.resolve_path(&p.path, generics);
+						(self.c_type_has_inner_from_path(&resolved), self.crate_types.traits.get(&resolved).is_some())
+					} else { (false, false) }
+				} else { (true, false) };
 
 				// Options get a bunch of special handling, since in general we map Option<>al
 				// types into the same C type as non-Option-wrapped types. This ends up being
@@ -2187,7 +2243,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						// If the inner element contains an inner pointer, we will just use that,
 						// avoiding the need to map elements to references. Otherwise we'll need to
 						// do an extra mapping step.
-						needs_ref_map = !only_contained_has_inner && $container_type == "Option";
+						needs_ref_map = !only_contained_has_inner && !ty_is_trait && $container_type == "Option";
 					} else {
 						only_contained_type = Some(arg);
 						only_contained_type_nonref = Some(arg);
@@ -2435,10 +2491,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	// ******************************************************
 
 	fn write_template_generics<'b, W: std::io::Write>(&self, w: &mut W, args: &mut dyn Iterator<Item=&'b syn::Type>, generics: Option<&GenericTypes>, is_ref: bool) -> bool {
-		for (idx, t) in args.enumerate() {
+		for (idx, orig_t) in args.enumerate() {
 			if idx != 0 {
 				write!(w, ", ").unwrap();
 			}
+			let t = generics.resolve_type(orig_t);
 			if let syn::Type::Reference(r_arg) = t {
 				assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
 
@@ -2450,6 +2507,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if let syn::Type::Path(p_arg) = &*r_arg.elem {
 					let resolved = self.resolve_path(&p_arg.path, generics);
 					assert!(self.crate_types.opaques.get(&resolved).is_some() ||
+							self.crate_types.traits.get(&resolved).is_some() ||
 							self.c_type_from_path(&resolved, true, true).is_some(), "Template generics should be opaque or have a predefined mapping");
 				} else { unimplemented!(); }
 			} else if let syn::Type::Path(p_arg) = t {
@@ -2731,7 +2789,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				// lifetime, of which the only real available choice is `static`, obviously.
 				write!(w, "&'static {}", crate_pfx).unwrap();
 				if !c_ty {
-					self.write_rust_path(w, generics, path);
+					self.write_rust_path(w, generics, path, with_ref_lifetime, false);
 				} else {
 					// We shouldn't be mapping references in types, so panic here
 					unimplemented!();

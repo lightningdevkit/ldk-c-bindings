@@ -37,15 +37,15 @@
 //! # use lightning::ln::{PaymentHash, PaymentPreimage, PaymentSecret};
 //! # use lightning::ln::channelmanager::{ChannelDetails, PaymentId, PaymentSendFailure};
 //! # use lightning::ln::msgs::LightningError;
-//! # use lightning::routing::scoring::Score;
-//! # use lightning::routing::network_graph::NodeId;
+//! # use lightning::routing::gossip::NodeId;
 //! # use lightning::routing::router::{Route, RouteHop, RouteParameters};
+//! # use lightning::routing::scoring::{ChannelUsage, Score};
 //! # use lightning::util::events::{Event, EventHandler, EventsProvider};
 //! # use lightning::util::logger::{Logger, Record};
 //! # use lightning::util::ser::{Writeable, Writer};
 //! # use lightning_invoice::Invoice;
-//! # use lightning_invoice::payment::{InvoicePayer, Payer, RetryAttempts, Router};
-//! # use secp256k1::key::PublicKey;
+//! # use lightning_invoice::payment::{InvoicePayer, Payer, Retry, Router};
+//! # use secp256k1::PublicKey;
 //! # use std::cell::RefCell;
 //! # use std::ops::Deref;
 //! #
@@ -89,7 +89,7 @@
 //! # }
 //! # impl Score for FakeScorer {
 //! #     fn channel_penalty_msat(
-//! #         &self, _short_channel_id: u64, _send_amt: u64, _chan_amt: u64, _source: &NodeId, _target: &NodeId
+//! #         &self, _short_channel_id: u64, _source: &NodeId, _target: &NodeId, _usage: ChannelUsage
 //! #     ) -> u64 { 0 }
 //! #     fn payment_path_failed(&mut self, _path: &[&RouteHop], _short_channel_id: u64) {}
 //! #     fn payment_path_successful(&mut self, _path: &[&RouteHop]) {}
@@ -112,7 +112,7 @@
 //! # let router = FakeRouter {};
 //! # let scorer = RefCell::new(FakeScorer {});
 //! # let logger = FakeLogger {};
-//! let invoice_payer = InvoicePayer::new(&payer, router, &scorer, &logger, event_handler, RetryAttempts(2));
+//! let invoice_payer = InvoicePayer::new(&payer, router, &scorer, &logger, event_handler, Retry::Attempts(2));
 //!
 //! let invoice = \"...\";
 //! if let Ok(invoice) = invoice.parse::<Invoice>() {
@@ -242,7 +242,7 @@ pub(crate) extern "C" fn Payer_clone_fields(orig: &Payer) -> Payer {
 
 use lightning_invoice::payment::Payer as rustPayer;
 impl rustPayer for Payer {
-	fn node_id(&self) -> secp256k1::key::PublicKey {
+	fn node_id(&self) -> secp256k1::PublicKey {
 		let mut ret = (self.node_id)(self.this_arg);
 		ret.into_rust()
 	}
@@ -318,7 +318,7 @@ pub(crate) extern "C" fn Router_clone_fields(orig: &Router) -> Router {
 
 use lightning_invoice::payment::Router as rustRouter;
 impl rustRouter<crate::lightning::routing::scoring::Score> for Router {
-	fn find_route(&self, mut payer: &secp256k1::key::PublicKey, mut route_params: &lightning::routing::router::RouteParameters, mut payment_hash: &lightning::ln::PaymentHash, mut first_hops: Option<&[&lightning::ln::channelmanager::ChannelDetails]>, mut scorer: &crate::lightning::routing::scoring::Score) -> Result<lightning::routing::router::Route, lightning::ln::msgs::LightningError> {
+	fn find_route(&self, mut payer: &secp256k1::PublicKey, mut route_params: &lightning::routing::router::RouteParameters, mut payment_hash: &lightning::ln::PaymentHash, mut first_hops: Option<&[&lightning::ln::channelmanager::ChannelDetails]>, mut scorer: &crate::lightning::routing::scoring::Score) -> Result<lightning::routing::router::Route, lightning::ln::msgs::LightningError> {
 		let mut local_first_hops_base = if first_hops.is_none() { SmartPtr::null() } else { SmartPtr::from_obj( { let mut local_first_hops_0 = Vec::new(); for item in (first_hops.unwrap()).iter() { local_first_hops_0.push( { crate::lightning::ln::channelmanager::ChannelDetails { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::ln::channelmanager::ChannelDetails<>) as *mut _) }, is_owned: false } }); }; local_first_hops_0.into() }) }; let mut local_first_hops = *local_first_hops_base;
 		let mut ret = (self.find_route)(self.this_arg, crate::c_types::PublicKey::from_rust(&payer), &crate::lightning::routing::router::RouteParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((route_params as *const lightning::routing::router::RouteParameters<>) as *mut _) }, is_owned: false }, &payment_hash.0, local_first_hops, scorer);
 		let mut local_ret = match ret.result_ok { true => Ok( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).take_inner()) } }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
@@ -344,129 +344,143 @@ impl Drop for Router {
 		}
 	}
 }
-
-use lightning_invoice::payment::RetryAttempts as nativeRetryAttemptsImport;
-pub(crate) type nativeRetryAttempts = nativeRetryAttemptsImport;
-
-/// Number of attempts to retry payment path failures for an [`Invoice`].
+/// Strategies available to retry payment path failures for an [`Invoice`].
 ///
-/// Note that this is the number of *path* failures, not full payment retries. For multi-path
-/// payments, if this is less than the total number of paths, we will never even retry all of the
-/// payment's paths.
+#[derive(Clone)]
 #[must_use]
 #[repr(C)]
-pub struct RetryAttempts {
-	/// A pointer to the opaque Rust object.
-
-	/// Nearly everywhere, inner must be non-null, however in places where
-	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeRetryAttempts,
-	/// Indicates that this is the only struct which contains the same pointer.
-
-	/// Rust functions which take ownership of an object provided via an argument require
-	/// this to be true and invalidate the object pointed to by inner.
-	pub is_owned: bool,
+pub enum Retry {
+	/// Max number of attempts to retry payment.
+	///
+	/// Note that this is the number of *path* failures, not full payment retries. For multi-path
+	/// payments, if this is less than the total number of paths, we will never even retry all of the
+	/// payment's paths.
+	Attempts(
+		usize),
+	/// Time elapsed before abandoning retries for a payment.
+	Timeout(
+		u64),
 }
+use lightning_invoice::payment::Retry as RetryImport;
+pub(crate) type nativeRetry = RetryImport;
 
-impl Drop for RetryAttempts {
-	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeRetryAttempts>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+impl Retry {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeRetry {
+		match self {
+			Retry::Attempts (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeRetry::Attempts (
+					a_nonref,
+				)
+			},
+			Retry::Timeout (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeRetry::Timeout (
+					core::time::Duration::from_secs(a_nonref),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeRetry {
+		match self {
+			Retry::Attempts (mut a, ) => {
+				nativeRetry::Attempts (
+					a,
+				)
+			},
+			Retry::Timeout (mut a, ) => {
+				nativeRetry::Timeout (
+					core::time::Duration::from_secs(a),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeRetry) -> Self {
+		match native {
+			nativeRetry::Attempts (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				Retry::Attempts (
+					a_nonref,
+				)
+			},
+			nativeRetry::Timeout (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				Retry::Timeout (
+					a_nonref.as_secs(),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeRetry) -> Self {
+		match native {
+			nativeRetry::Attempts (mut a, ) => {
+				Retry::Attempts (
+					a,
+				)
+			},
+			nativeRetry::Timeout (mut a, ) => {
+				Retry::Timeout (
+					a.as_secs(),
+				)
+			},
 		}
 	}
 }
-/// Frees any resources used by the RetryAttempts, if is_owned is set and inner is non-NULL.
+/// Frees any resources used by the Retry
 #[no_mangle]
-pub extern "C" fn RetryAttempts_free(this_obj: RetryAttempts) { }
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn RetryAttempts_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRetryAttempts); }
-}
-#[allow(unused)]
-impl RetryAttempts {
-	pub(crate) fn get_native_ref(&self) -> &'static nativeRetryAttempts {
-		unsafe { &*ObjOps::untweak_ptr(self.inner) }
-	}
-	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeRetryAttempts {
-		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
-	}
-	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-	pub(crate) fn take_inner(mut self) -> *mut nativeRetryAttempts {
-		assert!(self.is_owned);
-		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = core::ptr::null_mut();
-		ret
-	}
-}
+pub extern "C" fn Retry_free(this_ptr: Retry) { }
+/// Creates a copy of the Retry
 #[no_mangle]
-pub extern "C" fn RetryAttempts_get_a(this_ptr: &RetryAttempts) -> usize {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().0;
-	*inner_val
-}
-#[no_mangle]
-pub extern "C" fn RetryAttempts_set_a(this_ptr: &mut RetryAttempts, mut val: usize) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.0 = val;
-}
-/// Constructs a new RetryAttempts given each field
-#[must_use]
-#[no_mangle]
-pub extern "C" fn RetryAttempts_new(mut a_arg: usize) -> RetryAttempts {
-	RetryAttempts { inner: ObjOps::heap_alloc(lightning_invoice::payment::RetryAttempts (
-		a_arg,
-	)), is_owned: true }
-}
-impl Clone for RetryAttempts {
-	fn clone(&self) -> Self {
-		Self {
-			inner: if <*mut nativeRetryAttempts>::is_null(self.inner) { core::ptr::null_mut() } else {
-				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
-			is_owned: true,
-		}
-	}
-}
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn RetryAttempts_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRetryAttempts)).clone() })) as *mut c_void
-}
-#[no_mangle]
-/// Creates a copy of the RetryAttempts
-pub extern "C" fn RetryAttempts_clone(orig: &RetryAttempts) -> RetryAttempts {
+pub extern "C" fn Retry_clone(orig: &Retry) -> Retry {
 	orig.clone()
 }
-/// Checks if two RetryAttemptss contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
 #[no_mangle]
-pub extern "C" fn RetryAttempts_eq(a: &RetryAttempts, b: &RetryAttempts) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+/// Utility method to constructs a new Attempts-variant Retry
+pub extern "C" fn Retry_attempts(a: usize) -> Retry {
+	Retry::Attempts(a, )
 }
-/// Checks if two RetryAttemptss contain equal inner contents.
 #[no_mangle]
-pub extern "C" fn RetryAttempts_hash(o: &RetryAttempts) -> u64 {
-	if o.inner.is_null() { return 0; }
+/// Utility method to constructs a new Timeout-variant Retry
+pub extern "C" fn Retry_timeout(a: u64) -> Retry {
+	Retry::Timeout(a, )
+}
+/// Checks if two Retrys contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn Retry_eq(a: &Retry, b: &Retry) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
+/// Checks if two Retrys contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn Retry_hash(o: &Retry) -> u64 {
 	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
 	let mut hasher = core::hash::SipHasher::new();
-	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hash::hash(&o.to_native(), &mut hasher);
 	core::hash::Hasher::finish(&hasher)
 }
 /// An error that may occur when making a payment.
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum PaymentError {
 	/// An error resulting from the provided [`Invoice`] or payment hash.
-	Invoice(crate::c_types::Str),
+	Invoice(
+		crate::c_types::Str),
 	/// An error occurring when finding a route.
-	Routing(crate::lightning::ln::msgs::LightningError),
+	Routing(
+		crate::lightning::ln::msgs::LightningError),
 	/// An error occurring when sending a payment.
-	Sending(crate::lightning::ln::channelmanager::PaymentSendFailure),
+	Sending(
+		crate::lightning::ln::channelmanager::PaymentSendFailure),
 }
-use lightning_invoice::payment::PaymentError as nativePaymentError;
+use lightning_invoice::payment::PaymentError as PaymentErrorImport;
+pub(crate) type nativePaymentError = PaymentErrorImport;
+
 impl PaymentError {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativePaymentError {
@@ -581,11 +595,11 @@ pub extern "C" fn PaymentError_sending(a: crate::lightning::ln::channelmanager::
 /// Creates an invoice payer that retries failed payment paths.
 ///
 /// Will forward any [`Event::PaymentPathFailed`] events to the decorated `event_handler` once
-/// `retry_attempts` has been exceeded for a given [`Invoice`].
+/// `retry` has been exceeded for a given [`Invoice`].
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoicePayer_new(mut payer: crate::lightning_invoice::payment::Payer, mut router: crate::lightning_invoice::payment::Router, scorer: &crate::lightning::routing::scoring::MultiThreadedLockableScore, mut logger: crate::lightning::util::logger::Logger, mut event_handler: crate::lightning::util::events::EventHandler, mut retry_attempts: crate::lightning_invoice::payment::RetryAttempts) -> crate::lightning_invoice::payment::InvoicePayer {
-	let mut ret = lightning_invoice::payment::InvoicePayer::new(payer, router, scorer.get_native_ref(), logger, event_handler, *unsafe { Box::from_raw(retry_attempts.take_inner()) });
+pub extern "C" fn InvoicePayer_new(mut payer: crate::lightning_invoice::payment::Payer, mut router: crate::lightning_invoice::payment::Router, scorer: &crate::lightning::routing::scoring::MultiThreadedLockableScore, mut logger: crate::lightning::util::logger::Logger, mut event_handler: crate::lightning::util::events::EventHandler, mut retry: crate::lightning_invoice::payment::Retry) -> crate::lightning_invoice::payment::InvoicePayer {
+	let mut ret = lightning_invoice::payment::InvoicePayer::new(payer, router, scorer.get_native_ref(), logger, event_handler, retry.into_native());
 	crate::lightning_invoice::payment::InvoicePayer { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 

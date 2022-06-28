@@ -156,14 +156,16 @@ pub extern "C" fn ChannelMonitorUpdate_read(ser: crate::c_types::u8slice) -> cra
 	local_res
 }
 /// An event to be processed by the ChannelManager.
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum MonitorEvent {
 	/// A monitor event containing an HTLCUpdate.
-	HTLCEvent(crate::lightning::chain::channelmonitor::HTLCUpdate),
+	HTLCEvent(
+		crate::lightning::chain::channelmonitor::HTLCUpdate),
 	/// A monitor event that the Channel's commitment transaction was confirmed.
-	CommitmentTxConfirmed(crate::lightning::chain::transaction::OutPoint),
+	CommitmentTxConfirmed(
+		crate::lightning::chain::transaction::OutPoint),
 	/// Indicates a [`ChannelMonitor`] update has completed. See
 	/// [`ChannelMonitorUpdateErr::TemporaryFailure`] for more information on how this is used.
 	///
@@ -182,9 +184,12 @@ pub enum MonitorEvent {
 	/// [`ChannelMonitorUpdateErr::PermanentFailure`] for more information on how this is used.
 	///
 	/// [`ChannelMonitorUpdateErr::PermanentFailure`]: super::ChannelMonitorUpdateErr::PermanentFailure
-	UpdateFailed(crate::lightning::chain::transaction::OutPoint),
+	UpdateFailed(
+		crate::lightning::chain::transaction::OutPoint),
 }
-use lightning::chain::channelmonitor::MonitorEvent as nativeMonitorEvent;
+use lightning::chain::channelmonitor::MonitorEvent as MonitorEventImport;
+pub(crate) type nativeMonitorEvent = MonitorEventImport;
+
 impl MonitorEvent {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeMonitorEvent {
@@ -446,8 +451,8 @@ pub static ANTI_REORG_DELAY: u32 = lightning::chain::channelmonitor::ANTI_REORG_
 ///
 /// See [`ChannelMonitor::get_claimable_balances`] for more details on when these will or will not
 /// be provided.
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum Balance {
 	/// The channel is not yet closed (or the commitment or closing transaction has not yet
@@ -495,7 +500,9 @@ pub enum Balance {
 		claimable_height: u32,
 	},
 }
-use lightning::chain::channelmonitor::Balance as nativeBalance;
+use lightning::chain::channelmonitor::Balance as BalanceImport;
+pub(crate) type nativeBalance = BalanceImport;
+
 impl Balance {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeBalance {

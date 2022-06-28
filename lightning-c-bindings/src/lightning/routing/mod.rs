@@ -16,6 +16,6 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
-pub mod network_graph;
+pub mod gossip;
 pub mod router;
 pub mod scoring;

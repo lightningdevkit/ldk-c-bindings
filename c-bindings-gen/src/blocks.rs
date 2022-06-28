@@ -460,7 +460,7 @@ fn writeln_docs_impl<'a, W: std::io::Write, I>(w: &mut W, attrs: &[syn::Attribut
 			},
 		}
 	}
-	if let Some((types, generics, inp, outp, field)) = method_args_ret {
+	if let Some((types, generics, inp, outp, field_ty)) = method_args_ret {
 		let mut nullable_found = false;
 		for (name, inp) in inp {
 			if types.skip_arg(inp, generics) { continue; }
@@ -491,8 +491,13 @@ fn writeln_docs_impl<'a, W: std::io::Write, I>(w: &mut W, attrs: &[syn::Attribut
 			nullable_found = true;
 			writeln!(w, "{}/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None", prefix).unwrap();
 		}
+		let field = field_ty.map(|ty| generics.resolve_type(ty));
 		if if let Some(syn::Type::Reference(syn::TypeReference { elem, .. })) = field {
 			if let syn::Type::Path(syn::TypePath { ref path, .. }) = &**elem {
+				let resolved_path = types.resolve_path(path, generics);
+				if types.crate_types.opaques.get(&resolved_path).is_some() {
+					writeln!(w, "{}/// Note that this field is expected to be a reference.", prefix).unwrap();
+				}
 				types.is_path_transparent_container(path, generics, true)
 			} else { false }
 		} else if let Some(syn::Type::Path(syn::TypePath { ref path, .. })) = field {
@@ -571,7 +576,7 @@ pub fn write_method_params<W: std::io::Write>(w: &mut W, sig: &syn::Signature, t
 					},
 					_ => unimplemented!(),
 				}
-				w.write(&c_type).unwrap();
+				w.write_all(&c_type).unwrap();
 			}
 		}
 	}

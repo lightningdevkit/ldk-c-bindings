@@ -5,13 +5,14 @@ pub mod derived;
 
 use bitcoin::Transaction as BitcoinTransaction;
 use bitcoin::hashes::Hash;
-use bitcoin::secp256k1::key::PublicKey as SecpPublicKey;
-use bitcoin::secp256k1::key::SecretKey as SecpSecretKey;
-use bitcoin::secp256k1::Signature as SecpSignature;
+use bitcoin::secp256k1::PublicKey as SecpPublicKey;
+use bitcoin::secp256k1::SecretKey as SecpSecretKey;
+use bitcoin::secp256k1::ecdsa::Signature as SecpSignature;
 use bitcoin::secp256k1::Error as SecpError;
-use bitcoin::secp256k1::recovery::RecoveryId;
-use bitcoin::secp256k1::recovery::RecoverableSignature as SecpRecoverableSignature;
+use bitcoin::secp256k1::ecdsa::RecoveryId;
+use bitcoin::secp256k1::ecdsa::RecoverableSignature as SecpRecoverableSignature;
 use bitcoin::bech32;
+use bitcoin::util::address;
 
 use core::convert::TryInto; // Bindings need at least rustc 1.34
 use core::ffi::c_void;
@@ -44,6 +45,18 @@ impl From<bech32::u5> for u5 {
 }
 impl Into<bech32::u5> for u5 {
 	fn into(self) -> bech32::u5 { bech32::u5::try_from_u8(self.0).expect("u5 objects must be in the range 0..32") }
+}
+
+/// Integer in the range `0..=16`
+#[derive(PartialEq, Eq, Copy, Clone)]
+#[repr(C)]
+pub struct WitnessVersion(u8);
+
+impl From<address::WitnessVersion> for WitnessVersion {
+	fn from(o: address::WitnessVersion) -> Self { Self(o.into_num()) }
+}
+impl Into<address::WitnessVersion> for WitnessVersion {
+	fn into(self) -> address::WitnessVersion { address::WitnessVersion::from_num(self.0).expect("WitnessVersion objects must be in the range 0..=16") }
 }
 
 #[derive(Clone)]
@@ -146,14 +159,18 @@ pub enum Secp256k1Error {
 	InvalidSignature,
 	/// Bad secret key
 	InvalidSecretKey,
+	/// Bad shared secret.
+	InvalidSharedSecret,
 	/// Bad recovery id
 	InvalidRecoveryId,
 	/// Invalid tweak for add_assign or mul_assign
 	InvalidTweak,
-	/// tweak_add_check failed on an xonly public key
-	TweakCheckFailed,
 	/// Didn't pass enough memory to context creation with preallocated memory
 	NotEnoughMemory,
+	/// Bad set of public keys.
+	InvalidPublicKeySum,
+	/// The only valid parity values are 0 or 1.
+	InvalidParityValue,
 }
 impl Secp256k1Error {
 	pub(crate) fn from_rust(err: SecpError) -> Self {
@@ -163,23 +180,28 @@ impl Secp256k1Error {
 			SecpError::InvalidPublicKey => Secp256k1Error::InvalidPublicKey,
 			SecpError::InvalidSignature => Secp256k1Error::InvalidSignature,
 			SecpError::InvalidSecretKey => Secp256k1Error::InvalidSecretKey,
+			SecpError::InvalidSharedSecret => Secp256k1Error::InvalidSharedSecret,
 			SecpError::InvalidRecoveryId => Secp256k1Error::InvalidRecoveryId,
 			SecpError::InvalidTweak => Secp256k1Error::InvalidTweak,
-			SecpError::TweakCheckFailed => Secp256k1Error::TweakCheckFailed,
 			SecpError::NotEnoughMemory => Secp256k1Error::NotEnoughMemory,
+			SecpError::InvalidPublicKeySum => Secp256k1Error::InvalidPublicKeySum,
+			SecpError::InvalidParityValue(_) => Secp256k1Error::InvalidParityValue,
 		}
 	}
 	pub(crate) fn into_rust(self) -> SecpError {
+		let invalid_parity = secp256k1::Parity::from_i32(42).unwrap_err();
 		match self {
 			Secp256k1Error::IncorrectSignature => SecpError::IncorrectSignature,
 			Secp256k1Error::InvalidMessage => SecpError::InvalidMessage,
 			Secp256k1Error::InvalidPublicKey => SecpError::InvalidPublicKey,
 			Secp256k1Error::InvalidSignature => SecpError::InvalidSignature,
 			Secp256k1Error::InvalidSecretKey => SecpError::InvalidSecretKey,
+			Secp256k1Error::InvalidSharedSecret => SecpError::InvalidSharedSecret,
 			Secp256k1Error::InvalidRecoveryId => SecpError::InvalidRecoveryId,
 			Secp256k1Error::InvalidTweak => SecpError::InvalidTweak,
-			Secp256k1Error::TweakCheckFailed => SecpError::TweakCheckFailed,
 			Secp256k1Error::NotEnoughMemory => SecpError::NotEnoughMemory,
+			Secp256k1Error::InvalidPublicKeySum => SecpError::InvalidPublicKeySum,
+			Secp256k1Error::InvalidParityValue => SecpError::InvalidParityValue(invalid_parity),
 		}
 	}
 }
@@ -266,51 +288,50 @@ pub enum IOError {
 	Other,
 	UnexpectedEof,
 }
-#[cfg(feature = "std")]
 impl IOError {
-	pub(crate) fn from_rust(err: std::io::Error) -> Self {
+	pub(crate) fn from_rust(err: io::Error) -> Self {
 		match err.kind() {
-			std::io::ErrorKind::NotFound => IOError::NotFound,
-			std::io::ErrorKind::PermissionDenied => IOError::PermissionDenied,
-			std::io::ErrorKind::ConnectionRefused => IOError::ConnectionRefused,
-			std::io::ErrorKind::ConnectionReset => IOError::ConnectionReset,
-			std::io::ErrorKind::ConnectionAborted => IOError::ConnectionAborted,
-			std::io::ErrorKind::NotConnected => IOError::NotConnected,
-			std::io::ErrorKind::AddrInUse => IOError::AddrInUse,
-			std::io::ErrorKind::AddrNotAvailable => IOError::AddrNotAvailable,
-			std::io::ErrorKind::BrokenPipe => IOError::BrokenPipe,
-			std::io::ErrorKind::AlreadyExists => IOError::AlreadyExists,
-			std::io::ErrorKind::WouldBlock => IOError::WouldBlock,
-			std::io::ErrorKind::InvalidInput => IOError::InvalidInput,
-			std::io::ErrorKind::InvalidData => IOError::InvalidData,
-			std::io::ErrorKind::TimedOut => IOError::TimedOut,
-			std::io::ErrorKind::WriteZero => IOError::WriteZero,
-			std::io::ErrorKind::Interrupted => IOError::Interrupted,
-			std::io::ErrorKind::Other => IOError::Other,
-			std::io::ErrorKind::UnexpectedEof => IOError::UnexpectedEof,
+			io::ErrorKind::NotFound => IOError::NotFound,
+			io::ErrorKind::PermissionDenied => IOError::PermissionDenied,
+			io::ErrorKind::ConnectionRefused => IOError::ConnectionRefused,
+			io::ErrorKind::ConnectionReset => IOError::ConnectionReset,
+			io::ErrorKind::ConnectionAborted => IOError::ConnectionAborted,
+			io::ErrorKind::NotConnected => IOError::NotConnected,
+			io::ErrorKind::AddrInUse => IOError::AddrInUse,
+			io::ErrorKind::AddrNotAvailable => IOError::AddrNotAvailable,
+			io::ErrorKind::BrokenPipe => IOError::BrokenPipe,
+			io::ErrorKind::AlreadyExists => IOError::AlreadyExists,
+			io::ErrorKind::WouldBlock => IOError::WouldBlock,
+			io::ErrorKind::InvalidInput => IOError::InvalidInput,
+			io::ErrorKind::InvalidData => IOError::InvalidData,
+			io::ErrorKind::TimedOut => IOError::TimedOut,
+			io::ErrorKind::WriteZero => IOError::WriteZero,
+			io::ErrorKind::Interrupted => IOError::Interrupted,
+			io::ErrorKind::Other => IOError::Other,
+			io::ErrorKind::UnexpectedEof => IOError::UnexpectedEof,
 			_ => IOError::Other,
 		}
 	}
-	pub(crate) fn to_rust(&self) -> std::io::Error {
-		std::io::Error::new(match self {
-			IOError::NotFound => std::io::ErrorKind::NotFound,
-			IOError::PermissionDenied => std::io::ErrorKind::PermissionDenied,
-			IOError::ConnectionRefused => std::io::ErrorKind::ConnectionRefused,
-			IOError::ConnectionReset => std::io::ErrorKind::ConnectionReset,
-			IOError::ConnectionAborted => std::io::ErrorKind::ConnectionAborted,
-			IOError::NotConnected => std::io::ErrorKind::NotConnected,
-			IOError::AddrInUse => std::io::ErrorKind::AddrInUse,
-			IOError::AddrNotAvailable => std::io::ErrorKind::AddrNotAvailable,
-			IOError::BrokenPipe => std::io::ErrorKind::BrokenPipe,
-			IOError::AlreadyExists => std::io::ErrorKind::AlreadyExists,
-			IOError::WouldBlock => std::io::ErrorKind::WouldBlock,
-			IOError::InvalidInput => std::io::ErrorKind::InvalidInput,
-			IOError::InvalidData => std::io::ErrorKind::InvalidData,
-			IOError::TimedOut => std::io::ErrorKind::TimedOut,
-			IOError::WriteZero => std::io::ErrorKind::WriteZero,
-			IOError::Interrupted => std::io::ErrorKind::Interrupted,
-			IOError::Other => std::io::ErrorKind::Other,
-			IOError::UnexpectedEof => std::io::ErrorKind::UnexpectedEof,
+	pub(crate) fn to_rust(&self) -> io::Error {
+		io::Error::new(match self {
+			IOError::NotFound => io::ErrorKind::NotFound,
+			IOError::PermissionDenied => io::ErrorKind::PermissionDenied,
+			IOError::ConnectionRefused => io::ErrorKind::ConnectionRefused,
+			IOError::ConnectionReset => io::ErrorKind::ConnectionReset,
+			IOError::ConnectionAborted => io::ErrorKind::ConnectionAborted,
+			IOError::NotConnected => io::ErrorKind::NotConnected,
+			IOError::AddrInUse => io::ErrorKind::AddrInUse,
+			IOError::AddrNotAvailable => io::ErrorKind::AddrNotAvailable,
+			IOError::BrokenPipe => io::ErrorKind::BrokenPipe,
+			IOError::AlreadyExists => io::ErrorKind::AlreadyExists,
+			IOError::WouldBlock => io::ErrorKind::WouldBlock,
+			IOError::InvalidInput => io::ErrorKind::InvalidInput,
+			IOError::InvalidData => io::ErrorKind::InvalidData,
+			IOError::TimedOut => io::ErrorKind::TimedOut,
+			IOError::WriteZero => io::ErrorKind::WriteZero,
+			IOError::Interrupted => io::ErrorKind::Interrupted,
+			IOError::Other => io::ErrorKind::Other,
+			IOError::UnexpectedEof => io::ErrorKind::UnexpectedEof,
 		}, "")
 	}
 }

@@ -147,8 +147,8 @@ pub extern "C" fn BestBlock_height(this_arg: &crate::lightning::chain::BestBlock
 }
 
 /// An error when accessing the chain via [`Access`].
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum AccessError {
 	/// The requested chain is unknown.
@@ -156,7 +156,9 @@ pub enum AccessError {
 	/// The requested transaction doesn't exist or hasn't confirmed.
 	UnknownTx,
 }
-use lightning::chain::AccessError as nativeAccessError;
+use lightning::chain::AccessError as AccessErrorImport;
+pub(crate) type nativeAccessError = AccessErrorImport;
+
 impl AccessError {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeAccessError {
@@ -211,7 +213,7 @@ pub struct Access {
 	/// Returns an error if `genesis_hash` is for a different chain or if such a transaction output
 	/// is unknown.
 	///
-	/// [`short_channel_id`]: https://github.com/lightningnetwork/lightning-rfc/blob/master/07-routing-gossip.md#definition-of-short_channel_id
+	/// [`short_channel_id`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#definition-of-short_channel_id
 	#[must_use]
 	pub get_utxo: extern "C" fn (this_arg: *const c_void, genesis_hash: *const [u8; 32], short_channel_id: u64) -> crate::c_types::derived::CResult_TxOutAccessErrorZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
@@ -263,11 +265,18 @@ impl Drop for Access {
 /// sourcing chain data using a block-oriented API should prefer this interface over [`Confirm`].
 /// Such clients fetch the entire header chain whereas clients using [`Confirm`] only fetch headers
 /// when needed.
+///
+/// By using [`Listen::filtered_block_connected`] this interface supports clients fetching the
+/// entire header chain and only blocks with matching transaction data using BIP 157 filters or
+/// other similar filtering.
 #[repr(C)]
 pub struct Listen {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
+	/// Notifies the listener that a block was added at the given height, with the transaction data
+	/// possibly filtered.
+	pub filtered_block_connected: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, height: u32),
 	/// Notifies the listener that a block was added at the given height.
 	pub block_connected: extern "C" fn (this_arg: *const c_void, block: crate::c_types::u8slice, height: u32),
 	/// Notifies the listener that a block was removed at the given height.
@@ -282,6 +291,7 @@ unsafe impl Sync for Listen {}
 pub(crate) extern "C" fn Listen_clone_fields(orig: &Listen) -> Listen {
 	Listen {
 		this_arg: orig.this_arg,
+		filtered_block_connected: Clone::clone(&orig.filtered_block_connected),
 		block_connected: Clone::clone(&orig.block_connected),
 		block_disconnected: Clone::clone(&orig.block_disconnected),
 		free: Clone::clone(&orig.free),
@@ -290,6 +300,11 @@ pub(crate) extern "C" fn Listen_clone_fields(orig: &Listen) -> Listen {
 
 use lightning::chain::Listen as rustListen;
 impl rustListen for Listen {
+	fn filtered_block_connected(&self, mut header: &bitcoin::blockdata::block::BlockHeader, mut txdata: &lightning::chain::transaction::TransactionData, mut height: u32) {
+		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
+		let mut local_txdata = Vec::new(); for item in txdata.iter() { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item; let mut local_txdata_0 = (orig_txdata_0_0, crate::c_types::Transaction::from_bitcoin(&orig_txdata_0_1)).into(); local_txdata_0 }); };
+		(self.filtered_block_connected)(self.this_arg, &local_header, local_txdata.into(), height)
+	}
 	fn block_connected(&self, mut block: &bitcoin::blockdata::block::Block, mut height: u32) {
 		let mut local_block = ::bitcoin::consensus::encode::serialize(block);
 		(self.block_connected)(self.this_arg, crate::c_types::u8slice::from_slice(&local_block), height)
@@ -456,8 +471,8 @@ impl Drop for Confirm {
 	}
 }
 /// An error enum representing a failure to persist a channel monitor update.
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum ChannelMonitorUpdateErr {
 	/// Used to indicate a temporary failure (eg connection to a watchtower or remote backup of
@@ -521,7 +536,9 @@ pub enum ChannelMonitorUpdateErr {
 	/// lagging behind on block processing.
 	PermanentFailure,
 }
-use lightning::chain::ChannelMonitorUpdateErr as nativeChannelMonitorUpdateErr;
+use lightning::chain::ChannelMonitorUpdateErr as ChannelMonitorUpdateErrImport;
+pub(crate) type nativeChannelMonitorUpdateErr = ChannelMonitorUpdateErrImport;
+
 impl ChannelMonitorUpdateErr {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeChannelMonitorUpdateErr {
@@ -621,7 +638,7 @@ pub struct Watch {
 	/// For details on asynchronous [`ChannelMonitor`] updating and returning
 	/// [`MonitorEvent::UpdateCompleted`] here, see [`ChannelMonitorUpdateErr::TemporaryFailure`].
 	#[must_use]
-	pub release_pending_monitor_events: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_MonitorEventZ,
+	pub release_pending_monitor_events: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_OutPointCVec_MonitorEventZZZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -651,9 +668,9 @@ impl rustWatch<crate::lightning::chain::keysinterface::Sign> for Watch {
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
-	fn release_pending_monitor_events(&self) -> Vec<lightning::chain::channelmonitor::MonitorEvent> {
+	fn release_pending_monitor_events(&self) -> Vec<(lightning::chain::transaction::OutPoint, Vec<lightning::chain::channelmonitor::MonitorEvent>)> {
 		let mut ret = (self.release_pending_monitor_events)(self.this_arg);
-		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { item.into_native() }); };
+		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item.to_rust(); let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.into_rust().drain(..) { local_orig_ret_0_1.push( { item.into_native() }); }; let mut local_ret_0 = (*unsafe { Box::from_raw(orig_ret_0_0.take_inner()) }, local_orig_ret_0_1); local_ret_0 }); };
 		local_ret
 	}
 }

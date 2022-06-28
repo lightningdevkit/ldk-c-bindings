@@ -9,7 +9,7 @@
 //! Wire encoding/decoding for Lightning messages according to [BOLT #1], and for
 //! custom message through the [`CustomMessageReader`] trait.
 //! 
-//! [BOLT #1]: https://github.com/lightningnetwork/lightning-rfc/blob/master/01-messaging.md
+//! [BOLT #1]: https://github.com/lightning/bolts/blob/master/01-messaging.md
 
 use alloc::str::FromStr;
 use core::ffi::c_void;

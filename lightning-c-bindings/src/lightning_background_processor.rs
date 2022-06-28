@@ -31,8 +31,8 @@ pub(crate) type nativeBackgroundProcessor = nativeBackgroundProcessorImport;
 ///   [`ChannelManager`] persistence should be done in the background.
 /// * Calling [`ChannelManager::timer_tick_occurred`] and [`PeerManager::timer_tick_occurred`]
 ///   at the appropriate intervals.
-/// * Calling [`NetworkGraph::remove_stale_channels`] (if a [`NetGraphMsgHandler`] is provided to
-///   [`BackgroundProcessor::start`]).
+/// * Calling [`NetworkGraph::remove_stale_channels`] (if a [`GossipSync`] with a [`NetworkGraph`]
+///   is provided to [`BackgroundProcessor::start`]).
 ///
 /// It will also call [`PeerManager::process_events`] periodically though this shouldn't be relied
 /// upon as doing so may result in high latency.
@@ -93,67 +93,75 @@ impl BackgroundProcessor {
 		ret
 	}
 }
-/// Trait that handles persisting a [`ChannelManager`] and [`NetworkGraph`] to disk.
+/// Either [`P2PGossipSync`] or [`RapidGossipSync`].
+#[must_use]
 #[repr(C)]
-pub struct Persister {
-	/// An opaque pointer which is passed to your function implementations as an argument.
-	/// This has no meaning in the LDK, and can be NULL or any other value.
-	pub this_arg: *mut c_void,
-	/// Persist the given [`ChannelManager`] to disk, returning an error if persistence failed
-	/// (which will cause the [`BackgroundProcessor`] which called this method to exit).
-	#[must_use]
-	pub persist_manager: extern "C" fn (this_arg: *const c_void, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NoneErrorZ,
-	/// Persist the given [`NetworkGraph`] to disk, returning an error if persistence failed.
-	#[must_use]
-	pub persist_graph: extern "C" fn (this_arg: *const c_void, network_graph: &crate::lightning::routing::network_graph::NetworkGraph) -> crate::c_types::derived::CResult_NoneErrorZ,
-	/// Frees any resources associated with this object given its this_arg pointer.
-	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
-	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
+pub enum GossipSync {
+	/// Gossip sync via the lightning peer-to-peer network as defined by BOLT 7.
+	P2P(
+		/// Note that this field is expected to be a reference.
+		crate::lightning::routing::gossip::P2PGossipSync),
+	/// Rapid gossip sync from a trusted server.
+	Rapid(
+		/// Note that this field is expected to be a reference.
+		crate::lightning_rapid_gossip_sync::RapidGossipSync),
+	/// No gossip sync.
+	None,
 }
-unsafe impl Send for Persister {}
-unsafe impl Sync for Persister {}
-#[no_mangle]
-pub(crate) extern "C" fn Persister_clone_fields(orig: &Persister) -> Persister {
-	Persister {
-		this_arg: orig.this_arg,
-		persist_manager: Clone::clone(&orig.persist_manager),
-		persist_graph: Clone::clone(&orig.persist_graph),
-		free: Clone::clone(&orig.free),
-	}
-}
+use lightning_background_processor::GossipSync as GossipSyncImport;
+pub(crate) type nativeGossipSync = GossipSyncImport<&'static lightning::routing::gossip::P2PGossipSync<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::chain::Access, crate::lightning::util::logger::Logger>, &'static lightning_rapid_gossip_sync::RapidGossipSync<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::util::logger::Logger>, &'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::chain::Access, crate::lightning::util::logger::Logger>;
 
-use lightning_background_processor::Persister as rustPersister;
-impl rustPersister<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger> for Persister {
-	fn persist_manager(&self, mut channel_manager: &lightning::ln::channelmanager::ChannelManager<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>) -> Result<(), std::io::Error> {
-		let mut ret = (self.persist_manager)(self.this_arg, &crate::lightning::ln::channelmanager::ChannelManager { inner: unsafe { ObjOps::nonnull_ptr_to_inner((channel_manager as *const lightning::ln::channelmanager::ChannelManager<_, _, _, _, _, _, >) as *mut _) }, is_owned: false });
-		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).to_rust() })};
-		local_ret
+impl GossipSync {
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeGossipSync {
+		match self {
+			GossipSync::P2P (mut a, ) => {
+				nativeGossipSync::P2P (
+					a.get_native_ref(),
+				)
+			},
+			GossipSync::Rapid (mut a, ) => {
+				nativeGossipSync::Rapid (
+					a.get_native_ref(),
+				)
+			},
+			GossipSync::None => nativeGossipSync::None,
+		}
 	}
-	fn persist_graph(&self, mut network_graph: &lightning::routing::network_graph::NetworkGraph) -> Result<(), std::io::Error> {
-		let mut ret = (self.persist_graph)(self.this_arg, &crate::lightning::routing::network_graph::NetworkGraph { inner: unsafe { ObjOps::nonnull_ptr_to_inner((network_graph as *const lightning::routing::network_graph::NetworkGraph<>) as *mut _) }, is_owned: false });
-		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).to_rust() })};
-		local_ret
-	}
-}
-
-// We're essentially a pointer already, or at least a set of pointers, so allow us to be used
-// directly as a Deref trait in higher-level structs:
-impl core::ops::Deref for Persister {
-	type Target = Self;
-	fn deref(&self) -> &Self {
-		self
-	}
-}
-/// Calls the free function if one is set
-#[no_mangle]
-pub extern "C" fn Persister_free(this_ptr: Persister) { }
-impl Drop for Persister {
-	fn drop(&mut self) {
-		if let Some(f) = self.free {
-			f(self.this_arg);
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeGossipSync) -> Self {
+		match native {
+			nativeGossipSync::P2P (mut a, ) => {
+				GossipSync::P2P (
+					crate::lightning::routing::gossip::P2PGossipSync { inner: unsafe { ObjOps::nonnull_ptr_to_inner((a as *const lightning::routing::gossip::P2PGossipSync<_, _, _, >) as *mut _) }, is_owned: false },
+				)
+			},
+			nativeGossipSync::Rapid (mut a, ) => {
+				GossipSync::Rapid (
+					crate::lightning_rapid_gossip_sync::RapidGossipSync { inner: unsafe { ObjOps::nonnull_ptr_to_inner((a as *const lightning_rapid_gossip_sync::RapidGossipSync<_, _, >) as *mut _) }, is_owned: false },
+				)
+			},
+			nativeGossipSync::None => GossipSync::None,
 		}
 	}
 }
+/// Frees any resources used by the GossipSync
+#[no_mangle]
+pub extern "C" fn GossipSync_free(this_ptr: GossipSync) { }
+#[no_mangle]
+/// Utility method to constructs a new P2P-variant GossipSync
+pub extern "C" fn GossipSync_p2_p(a: &crate::lightning::routing::gossip::P2PGossipSync) -> GossipSync {
+	GossipSync::P2P(crate::lightning::routing::gossip::P2PGossipSync { inner: a.inner, is_owned: false }, )
+}
+#[no_mangle]
+/// Utility method to constructs a new Rapid-variant GossipSync
+pub extern "C" fn GossipSync_rapid(a: &crate::lightning_rapid_gossip_sync::RapidGossipSync) -> GossipSync {
+	GossipSync::Rapid(crate::lightning_rapid_gossip_sync::RapidGossipSync { inner: a.inner, is_owned: false }, )
+}
+#[no_mangle]
+/// Utility method to constructs a new None-variant GossipSync
+pub extern "C" fn GossipSync_none() -> GossipSync {
+	GossipSync::None}
 /// Start a background thread that takes care of responsibilities enumerated in the [top-level
 /// documentation].
 ///
@@ -165,12 +173,12 @@ impl Drop for Persister {
 ///
 /// [`Persister::persist_manager`] is responsible for writing out the [`ChannelManager`] to disk, and/or
 /// uploading to one or more backup services. See [`ChannelManager::write`] for writing out a
-/// [`ChannelManager`]. See [`FilesystemPersister::persist_manager`] for Rust-Lightning's
+/// [`ChannelManager`]. See the `lightning-persister` crate for LDK's
 /// provided implementation.
 ///
-/// [`Persister::persist_graph`] is responsible for writing out the [`NetworkGraph`] to disk. See
-/// [`NetworkGraph::write`] for writing out a [`NetworkGraph`]. See [`FilesystemPersister::persist_network_graph`]
-/// for Rust-Lightning's provided implementation.
+/// [`Persister::persist_graph`] is responsible for writing out the [`NetworkGraph`] to disk, if
+/// [`GossipSync`] is supplied. See [`NetworkGraph::write`] for writing out a [`NetworkGraph`].
+/// See the `lightning-persister` crate for LDK's provided implementation.
 ///
 /// Typically, users should either implement [`Persister::persist_manager`] to never return an
 /// error or call [`join`] and handle any error that may arise. For the latter case,
@@ -181,24 +189,30 @@ impl Drop for Persister {
 /// `event_handler` is responsible for handling events that users should be notified of (e.g.,
 /// payment failed). [`BackgroundProcessor`] may decorate the given [`EventHandler`] with common
 /// functionality implemented by other handlers.
-/// * [`NetGraphMsgHandler`] if given will update the [`NetworkGraph`] based on payment failures.
+/// * [`P2PGossipSync`] if given will update the [`NetworkGraph`] based on payment failures.
+///
+/// # Rapid Gossip Sync
+///
+/// If rapid gossip sync is meant to run at startup, pass a [`RapidGossipSync`] to `gossip_sync`
+/// to indicate that the [`BackgroundProcessor`] should not prune the [`NetworkGraph`] instance
+/// until the [`RapidGossipSync`] instance completes its first sync.
 ///
 /// [top-level documentation]: BackgroundProcessor
 /// [`join`]: Self::join
 /// [`stop`]: Self::stop
 /// [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
 /// [`ChannelManager::write`]: lightning::ln::channelmanager::ChannelManager#impl-Writeable
-/// [`FilesystemPersister::persist_manager`]: lightning_persister::FilesystemPersister::persist_manager
-/// [`FilesystemPersister::persist_network_graph`]: lightning_persister::FilesystemPersister::persist_network_graph
-/// [`NetworkGraph`]: lightning::routing::network_graph::NetworkGraph
-/// [`NetworkGraph::write`]: lightning::routing::network_graph::NetworkGraph#impl-Writeable
+/// [`Persister::persist_manager`]: lightning::util::persist::Persister::persist_manager
+/// [`Persister::persist_graph`]: lightning::util::persist::Persister::persist_graph
+/// [`NetworkGraph`]: lightning::routing::gossip::NetworkGraph
+/// [`NetworkGraph::write`]: lightning::routing::gossip::NetworkGraph#impl-Writeable
 ///
-/// Note that net_graph_msg_handler (or a relevant inner pointer) may be NULL or all-0s to represent None
+/// Note that scorer (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning_background_processor::Persister, mut event_handler: crate::lightning::util::events::EventHandler, chain_monitor: &crate::lightning::chain::chainmonitor::ChainMonitor, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager, mut net_graph_msg_handler: crate::lightning::routing::network_graph::NetGraphMsgHandler, peer_manager: &crate::lightning::ln::peer_handler::PeerManager, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning_background_processor::BackgroundProcessor {
-	let mut local_net_graph_msg_handler = if net_graph_msg_handler.inner.is_null() { None } else { Some( { net_graph_msg_handler.get_native_ref() }) };
-	let mut ret = lightning_background_processor::BackgroundProcessor::start(persister, event_handler, chain_monitor.get_native_ref(), channel_manager.get_native_ref(), local_net_graph_msg_handler, peer_manager.get_native_ref(), logger);
+pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning::util::persist::Persister, mut event_handler: crate::lightning::util::events::EventHandler, chain_monitor: &crate::lightning::chain::chainmonitor::ChainMonitor, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager, mut gossip_sync: crate::lightning_background_processor::GossipSync, peer_manager: &crate::lightning::ln::peer_handler::PeerManager, mut logger: crate::lightning::util::logger::Logger, mut scorer: crate::lightning::routing::scoring::MultiThreadedLockableScore) -> crate::lightning_background_processor::BackgroundProcessor {
+	let mut local_scorer = if scorer.inner.is_null() { None } else { Some( { scorer.get_native_ref() }) };
+	let mut ret = lightning_background_processor::BackgroundProcessor::start(persister, event_handler, chain_monitor.get_native_ref(), channel_manager.get_native_ref(), gossip_sync.into_native(), peer_manager.get_native_ref(), logger, local_scorer);
 	crate::lightning_background_processor::BackgroundProcessor { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 

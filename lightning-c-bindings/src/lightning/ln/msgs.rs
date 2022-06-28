@@ -1394,18 +1394,18 @@ pub extern "C" fn FundingSigned_clone(orig: &FundingSigned) -> FundingSigned {
 	orig.clone()
 }
 
-use lightning::ln::msgs::FundingLocked as nativeFundingLockedImport;
-pub(crate) type nativeFundingLocked = nativeFundingLockedImport;
+use lightning::ln::msgs::ChannelReady as nativeChannelReadyImport;
+pub(crate) type nativeChannelReady = nativeChannelReadyImport;
 
-/// A funding_locked message to be sent or received from a peer
+/// A channel_ready message to be sent or received from a peer
 #[must_use]
 #[repr(C)]
-pub struct FundingLocked {
+pub struct ChannelReady {
 	/// A pointer to the opaque Rust object.
 
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeFundingLocked,
+	pub inner: *mut nativeChannelReady,
 	/// Indicates that this is the only struct which contains the same pointer.
 
 	/// Rust functions which take ownership of an object provided via an argument require
@@ -1413,31 +1413,31 @@ pub struct FundingLocked {
 	pub is_owned: bool,
 }
 
-impl Drop for FundingLocked {
+impl Drop for ChannelReady {
 	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeFundingLocked>::is_null(self.inner) {
+		if self.is_owned && !<*mut nativeChannelReady>::is_null(self.inner) {
 			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
-/// Frees any resources used by the FundingLocked, if is_owned is set and inner is non-NULL.
+/// Frees any resources used by the ChannelReady, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn FundingLocked_free(this_obj: FundingLocked) { }
+pub extern "C" fn ChannelReady_free(this_obj: ChannelReady) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn FundingLocked_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeFundingLocked); }
+pub(crate) extern "C" fn ChannelReady_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelReady); }
 }
 #[allow(unused)]
-impl FundingLocked {
-	pub(crate) fn get_native_ref(&self) -> &'static nativeFundingLocked {
+impl ChannelReady {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeChannelReady {
 		unsafe { &*ObjOps::untweak_ptr(self.inner) }
 	}
-	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeFundingLocked {
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeChannelReady {
 		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
 	}
 	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-	pub(crate) fn take_inner(mut self) -> *mut nativeFundingLocked {
+	pub(crate) fn take_inner(mut self) -> *mut nativeChannelReady {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = core::ptr::null_mut();
@@ -1446,30 +1446,30 @@ impl FundingLocked {
 }
 /// The channel ID
 #[no_mangle]
-pub extern "C" fn FundingLocked_get_channel_id(this_ptr: &FundingLocked) -> *const [u8; 32] {
+pub extern "C" fn ChannelReady_get_channel_id(this_ptr: &ChannelReady) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
 	inner_val
 }
 /// The channel ID
 #[no_mangle]
-pub extern "C" fn FundingLocked_set_channel_id(this_ptr: &mut FundingLocked, mut val: crate::c_types::ThirtyTwoBytes) {
+pub extern "C" fn ChannelReady_set_channel_id(this_ptr: &mut ChannelReady, mut val: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
 }
 /// The per-commitment point of the second commitment transaction
 #[no_mangle]
-pub extern "C" fn FundingLocked_get_next_per_commitment_point(this_ptr: &FundingLocked) -> crate::c_types::PublicKey {
+pub extern "C" fn ChannelReady_get_next_per_commitment_point(this_ptr: &ChannelReady) -> crate::c_types::PublicKey {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().next_per_commitment_point;
 	crate::c_types::PublicKey::from_rust(&inner_val)
 }
 /// The per-commitment point of the second commitment transaction
 #[no_mangle]
-pub extern "C" fn FundingLocked_set_next_per_commitment_point(this_ptr: &mut FundingLocked, mut val: crate::c_types::PublicKey) {
+pub extern "C" fn ChannelReady_set_next_per_commitment_point(this_ptr: &mut ChannelReady, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.next_per_commitment_point = val.into_rust();
 }
 /// If set, provides a short_channel_id alias for this channel. The sender will accept payments
 /// to be forwarded over this SCID and forward them to this messages' recipient.
 #[no_mangle]
-pub extern "C" fn FundingLocked_get_short_channel_id_alias(this_ptr: &FundingLocked) -> crate::c_types::derived::COption_u64Z {
+pub extern "C" fn ChannelReady_get_short_channel_id_alias(this_ptr: &ChannelReady) -> crate::c_types::derived::COption_u64Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().short_channel_id_alias;
 	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { inner_val.unwrap() }) };
 	local_inner_val
@@ -1477,25 +1477,25 @@ pub extern "C" fn FundingLocked_get_short_channel_id_alias(this_ptr: &FundingLoc
 /// If set, provides a short_channel_id alias for this channel. The sender will accept payments
 /// to be forwarded over this SCID and forward them to this messages' recipient.
 #[no_mangle]
-pub extern "C" fn FundingLocked_set_short_channel_id_alias(this_ptr: &mut FundingLocked, mut val: crate::c_types::derived::COption_u64Z) {
+pub extern "C" fn ChannelReady_set_short_channel_id_alias(this_ptr: &mut ChannelReady, mut val: crate::c_types::derived::COption_u64Z) {
 	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.short_channel_id_alias = local_val;
 }
-/// Constructs a new FundingLocked given each field
+/// Constructs a new ChannelReady given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn FundingLocked_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut next_per_commitment_point_arg: crate::c_types::PublicKey, mut short_channel_id_alias_arg: crate::c_types::derived::COption_u64Z) -> FundingLocked {
+pub extern "C" fn ChannelReady_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut next_per_commitment_point_arg: crate::c_types::PublicKey, mut short_channel_id_alias_arg: crate::c_types::derived::COption_u64Z) -> ChannelReady {
 	let mut local_short_channel_id_alias_arg = if short_channel_id_alias_arg.is_some() { Some( { short_channel_id_alias_arg.take() }) } else { None };
-	FundingLocked { inner: ObjOps::heap_alloc(nativeFundingLocked {
+	ChannelReady { inner: ObjOps::heap_alloc(nativeChannelReady {
 		channel_id: channel_id_arg.data,
 		next_per_commitment_point: next_per_commitment_point_arg.into_rust(),
 		short_channel_id_alias: local_short_channel_id_alias_arg,
 	}), is_owned: true }
 }
-impl Clone for FundingLocked {
+impl Clone for ChannelReady {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeFundingLocked>::is_null(self.inner) { core::ptr::null_mut() } else {
+			inner: if <*mut nativeChannelReady>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1503,12 +1503,12 @@ impl Clone for FundingLocked {
 }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn FundingLocked_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeFundingLocked)).clone() })) as *mut c_void
+pub(crate) extern "C" fn ChannelReady_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelReady)).clone() })) as *mut c_void
 }
 #[no_mangle]
-/// Creates a copy of the FundingLocked
-pub extern "C" fn FundingLocked_clone(orig: &FundingLocked) -> FundingLocked {
+/// Creates a copy of the ChannelReady
+pub extern "C" fn ChannelReady_clone(orig: &ChannelReady) -> ChannelReady {
 	orig.clone()
 }
 
@@ -2946,8 +2946,8 @@ pub extern "C" fn AnnouncementSignatures_clone(orig: &AnnouncementSignatures) ->
 	orig.clone()
 }
 /// An address which can be used to connect to a remote peer
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum NetAddress {
 	/// An IPv4 address/port on which the peer is listening.
@@ -2968,7 +2968,8 @@ pub enum NetAddress {
 	///
 	/// This field is deprecated and the Tor network generally no longer supports V2 Onion
 	/// addresses. Thus, the details are not parsed here.
-	OnionV2(crate::c_types::TwelveBytes),
+	OnionV2(
+		crate::c_types::TwelveBytes),
 	/// A new-style Tor onion address/port on which the peer is listening.
 	/// To create the human-readable \"hostname\", concatenate ed25519_pubkey, checksum, and version,
 	/// wrap as base32 and append \".onion\".
@@ -2983,7 +2984,9 @@ pub enum NetAddress {
 		port: u16,
 	},
 }
-use lightning::ln::msgs::NetAddress as nativeNetAddress;
+use lightning::ln::msgs::NetAddress as NetAddressImport;
+pub(crate) type nativeNetAddress = NetAddressImport;
+
 impl NetAddress {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeNetAddress {
@@ -3848,6 +3851,14 @@ pub extern "C" fn UnsignedChannelUpdate_get_fee_proportional_millionths(this_ptr
 pub extern "C" fn UnsignedChannelUpdate_set_fee_proportional_millionths(this_ptr: &mut UnsignedChannelUpdate, mut val: u32) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.fee_proportional_millionths = val;
 }
+/// Excess data which was signed as a part of the message which we do not (yet) understand how
+/// to decode. This is stored to ensure forward-compatibility as new fields are added to the
+/// lightning gossip
+#[no_mangle]
+pub extern "C" fn UnsignedChannelUpdate_set_excess_data(this_ptr: &mut UnsignedChannelUpdate, mut val: crate::c_types::derived::CVec_u8Z) {
+	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.excess_data = local_val;
+}
 impl Clone for UnsignedChannelUpdate {
 	fn clone(&self) -> Self {
 		Self {
@@ -4549,8 +4560,8 @@ pub extern "C" fn GossipTimestampFilter_clone(orig: &GossipTimestampFilter) -> G
 	orig.clone()
 }
 /// Used to put an error message in a LightningError
-#[must_use]
 #[derive(Clone)]
+#[must_use]
 #[repr(C)]
 pub enum ErrorAction {
 	/// The peer took some action which made us think they were useless. Disconnect them.
@@ -4564,7 +4575,8 @@ pub enum ErrorAction {
 	IgnoreError,
 	/// The peer did something harmless that we weren't able to meaningfully process.
 	/// If the error is logged, log it at the given level.
-	IgnoreAndLog(crate::lightning::util::logger::Level),
+	IgnoreAndLog(
+		crate::lightning::util::logger::Level),
 	/// The peer provided us with a gossip message which we'd already seen. In most cases this
 	/// should be ignored, but it may result in the message being forwarded if it is a duplicate of
 	/// our own channel announcements.
@@ -4584,7 +4596,9 @@ pub enum ErrorAction {
 		log_level: crate::lightning::util::logger::Level,
 	},
 }
-use lightning::ln::msgs::ErrorAction as nativeErrorAction;
+use lightning::ln::msgs::ErrorAction as ErrorActionImport;
+pub(crate) type nativeErrorAction = ErrorActionImport;
+
 impl ErrorAction {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeErrorAction {
@@ -5043,8 +5057,8 @@ pub struct ChannelMessageHandler {
 	pub handle_funding_created: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::FundingCreated),
 	/// Handle an incoming funding_signed message from the given peer.
 	pub handle_funding_signed: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::FundingSigned),
-	/// Handle an incoming funding_locked message from the given peer.
-	pub handle_funding_locked: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::FundingLocked),
+	/// Handle an incoming channel_ready message from the given peer.
+	pub handle_channel_ready: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelReady),
 	/// Handle an incoming shutdown message from the given peer.
 	pub handle_shutdown: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, their_features: &crate::lightning::ln::features::InitFeatures, msg: &crate::lightning::ln::msgs::Shutdown),
 	/// Handle an incoming closing_signed message from the given peer.
@@ -5094,7 +5108,7 @@ pub(crate) extern "C" fn ChannelMessageHandler_clone_fields(orig: &ChannelMessag
 		handle_accept_channel: Clone::clone(&orig.handle_accept_channel),
 		handle_funding_created: Clone::clone(&orig.handle_funding_created),
 		handle_funding_signed: Clone::clone(&orig.handle_funding_signed),
-		handle_funding_locked: Clone::clone(&orig.handle_funding_locked),
+		handle_channel_ready: Clone::clone(&orig.handle_channel_ready),
 		handle_shutdown: Clone::clone(&orig.handle_shutdown),
 		handle_closing_signed: Clone::clone(&orig.handle_closing_signed),
 		handle_update_add_htlc: Clone::clone(&orig.handle_update_add_htlc),
@@ -5124,64 +5138,64 @@ impl lightning::util::events::MessageSendEventsProvider for ChannelMessageHandle
 
 use lightning::ln::msgs::ChannelMessageHandler as rustChannelMessageHandler;
 impl rustChannelMessageHandler for ChannelMessageHandler {
-	fn handle_open_channel(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut their_features: lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::OpenChannel) {
+	fn handle_open_channel(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut their_features: lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::OpenChannel) {
 		(self.handle_open_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(their_features), is_owned: true }, &crate::lightning::ln::msgs::OpenChannel { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::OpenChannel<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_accept_channel(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut their_features: lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::AcceptChannel) {
+	fn handle_accept_channel(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut their_features: lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::AcceptChannel) {
 		(self.handle_accept_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(their_features), is_owned: true }, &crate::lightning::ln::msgs::AcceptChannel { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::AcceptChannel<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_funding_created(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::FundingCreated) {
+	fn handle_funding_created(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::FundingCreated) {
 		(self.handle_funding_created)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingCreated { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::FundingCreated<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_funding_signed(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::FundingSigned) {
+	fn handle_funding_signed(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::FundingSigned) {
 		(self.handle_funding_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::FundingSigned<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_funding_locked(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::FundingLocked) {
-		(self.handle_funding_locked)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingLocked { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::FundingLocked<>) as *mut _) }, is_owned: false })
+	fn handle_channel_ready(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::ChannelReady) {
+		(self.handle_channel_ready)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ChannelReady { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ChannelReady<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_shutdown(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut their_features: &lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::Shutdown) {
+	fn handle_shutdown(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut their_features: &lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::Shutdown) {
 		(self.handle_shutdown)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::features::InitFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((their_features as *const lightning::ln::features::InitFeatures<>) as *mut _) }, is_owned: false }, &crate::lightning::ln::msgs::Shutdown { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Shutdown<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_closing_signed(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ClosingSigned) {
+	fn handle_closing_signed(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::ClosingSigned) {
 		(self.handle_closing_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ClosingSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ClosingSigned<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_update_add_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateAddHTLC) {
+	fn handle_update_add_htlc(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::UpdateAddHTLC) {
 		(self.handle_update_add_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateAddHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::UpdateAddHTLC<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_update_fulfill_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFulfillHTLC) {
+	fn handle_update_fulfill_htlc(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::UpdateFulfillHTLC) {
 		(self.handle_update_fulfill_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFulfillHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::UpdateFulfillHTLC<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_update_fail_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFailHTLC) {
+	fn handle_update_fail_htlc(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::UpdateFailHTLC) {
 		(self.handle_update_fail_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFailHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::UpdateFailHTLC<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_update_fail_malformed_htlc(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFailMalformedHTLC) {
+	fn handle_update_fail_malformed_htlc(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::UpdateFailMalformedHTLC) {
 		(self.handle_update_fail_malformed_htlc)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFailMalformedHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::UpdateFailMalformedHTLC<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_commitment_signed(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::CommitmentSigned) {
+	fn handle_commitment_signed(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::CommitmentSigned) {
 		(self.handle_commitment_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::CommitmentSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::CommitmentSigned<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_revoke_and_ack(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::RevokeAndACK) {
+	fn handle_revoke_and_ack(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::RevokeAndACK) {
 		(self.handle_revoke_and_ack)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::RevokeAndACK { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::RevokeAndACK<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_update_fee(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::UpdateFee) {
+	fn handle_update_fee(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::UpdateFee) {
 		(self.handle_update_fee)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::UpdateFee { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::UpdateFee<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_announcement_signatures(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::AnnouncementSignatures) {
+	fn handle_announcement_signatures(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::AnnouncementSignatures) {
 		(self.handle_announcement_signatures)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::AnnouncementSignatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::AnnouncementSignatures<>) as *mut _) }, is_owned: false })
 	}
-	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut no_connection_possible: bool) {
+	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut no_connection_possible: bool) {
 		(self.peer_disconnected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), no_connection_possible)
 	}
-	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::Init) {
+	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::Init) {
 		(self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_channel_reestablish(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ChannelReestablish) {
+	fn handle_channel_reestablish(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::ChannelReestablish) {
 		(self.handle_channel_reestablish)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ChannelReestablish { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ChannelReestablish<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_channel_update(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ChannelUpdate) {
+	fn handle_channel_update(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::ChannelUpdate) {
 		(self.handle_channel_update)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ChannelUpdate { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ChannelUpdate<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_error(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: &lightning::ln::msgs::ErrorMessage) {
+	fn handle_error(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::ErrorMessage) {
 		(self.handle_error)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ErrorMessage { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ErrorMessage<>) as *mut _) }, is_owned: false })
 	}
 }
@@ -5320,31 +5334,31 @@ impl rustRoutingMessageHandler for RoutingMessageHandler {
 		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item.to_rust(); let mut local_orig_ret_0_1 = if orig_ret_0_1.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(orig_ret_0_1.take_inner()) } }) }; let mut local_orig_ret_0_2 = if orig_ret_0_2.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(orig_ret_0_2.take_inner()) } }) }; let mut local_ret_0 = (*unsafe { Box::from_raw(orig_ret_0_0.take_inner()) }, local_orig_ret_0_1, local_orig_ret_0_2); local_ret_0 }); };
 		local_ret
 	}
-	fn get_next_node_announcements(&self, mut starting_point: Option<&bitcoin::secp256k1::key::PublicKey>, mut batch_amount: u8) -> Vec<lightning::ln::msgs::NodeAnnouncement> {
+	fn get_next_node_announcements(&self, mut starting_point: Option<&bitcoin::secp256k1::PublicKey>, mut batch_amount: u8) -> Vec<lightning::ln::msgs::NodeAnnouncement> {
 		let mut local_starting_point = if starting_point.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(starting_point.unwrap())) } };
 		let mut ret = (self.get_next_node_announcements)(self.this_arg, local_starting_point, batch_amount);
 		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 		local_ret
 	}
-	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut init: &lightning::ln::msgs::Init) {
+	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init) {
 		(self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_reply_channel_range(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: lightning::ln::msgs::ReplyChannelRange) -> Result<(), lightning::ln::msgs::LightningError> {
+	fn handle_reply_channel_range(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: lightning::ln::msgs::ReplyChannelRange) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_reply_channel_range)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::ReplyChannelRange { inner: ObjOps::heap_alloc(msg), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn handle_reply_short_channel_ids_end(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: lightning::ln::msgs::ReplyShortChannelIdsEnd) -> Result<(), lightning::ln::msgs::LightningError> {
+	fn handle_reply_short_channel_ids_end(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: lightning::ln::msgs::ReplyShortChannelIdsEnd) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_reply_short_channel_ids_end)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::ReplyShortChannelIdsEnd { inner: ObjOps::heap_alloc(msg), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn handle_query_channel_range(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: lightning::ln::msgs::QueryChannelRange) -> Result<(), lightning::ln::msgs::LightningError> {
+	fn handle_query_channel_range(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: lightning::ln::msgs::QueryChannelRange) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_query_channel_range)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::QueryChannelRange { inner: ObjOps::heap_alloc(msg), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn handle_query_short_channel_ids(&self, mut their_node_id: &bitcoin::secp256k1::key::PublicKey, mut msg: lightning::ln::msgs::QueryShortChannelIds) -> Result<(), lightning::ln::msgs::LightningError> {
+	fn handle_query_short_channel_ids(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: lightning::ln::msgs::QueryShortChannelIds) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_query_short_channel_ids)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::QueryShortChannelIds { inner: ObjOps::heap_alloc(msg), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
@@ -5509,19 +5523,19 @@ pub extern "C" fn FundingSigned_read(ser: crate::c_types::u8slice) -> crate::c_t
 	local_res
 }
 #[no_mangle]
-/// Serialize the FundingLocked object into a byte array which can be read by FundingLocked_read
-pub extern "C" fn FundingLocked_write(obj: &crate::lightning::ln::msgs::FundingLocked) -> crate::c_types::derived::CVec_u8Z {
+/// Serialize the ChannelReady object into a byte array which can be read by ChannelReady_read
+pub extern "C" fn ChannelReady_write(obj: &crate::lightning::ln::msgs::ChannelReady) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
-pub(crate) extern "C" fn FundingLocked_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeFundingLocked) })
+pub(crate) extern "C" fn ChannelReady_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelReady) })
 }
 #[no_mangle]
-/// Read a FundingLocked from a byte array, created by FundingLocked_write
-pub extern "C" fn FundingLocked_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_FundingLockedDecodeErrorZ {
-	let res: Result<lightning::ln::msgs::FundingLocked, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::FundingLocked { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+/// Read a ChannelReady from a byte array, created by ChannelReady_write
+pub extern "C" fn ChannelReady_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelReadyDecodeErrorZ {
+	let res: Result<lightning::ln::msgs::ChannelReady, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ChannelReady { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 #[no_mangle]

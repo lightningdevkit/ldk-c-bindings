@@ -444,8 +444,7 @@ struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, s
 	const struct CustomRouteFinderParams *params = (struct CustomRouteFinderParams *)this_arg;
 	assert(first_hops->datalen == 1);
 	assert(ChannelDetails_get_is_usable(&first_hops->data[0]));
-	LDK::ReadOnlyNetworkGraph graph_lock = NetworkGraph_read_only(params->graph_ref);
-	return find_route(payer, route_params, &graph_lock, first_hops, *params->logger, scorer, &params->random_seed_bytes.data);
+	return find_route(payer, route_params, params->graph_ref, first_hops, *params->logger, scorer, &params->random_seed_bytes.data);
 }
 
 int main() {
@@ -715,9 +714,8 @@ int main() {
 					}, Invoice_route_hints(invoice->contents.result), COption_u64Z_none(), 0xffffffff),
 				5000, Invoice_min_final_cltv_expiry(invoice->contents.result));
 			random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
-			LDK::ReadOnlyNetworkGraph graph_lock = NetworkGraph_read_only(&net_graph2);
 
-			LDK::CResult_RouteLightningErrorZ route = find_route(ChannelManager_get_our_node_id(&cm1), &route_params, &graph_lock, &outbound_channels, logger1, &chan_scorer, &random_bytes.data);
+			LDK::CResult_RouteLightningErrorZ route = find_route(ChannelManager_get_our_node_id(&cm1), &route_params, &net_graph2, &outbound_channels, logger1, &chan_scorer, &random_bytes.data);
 
 			assert(route->result_ok);
 			LDK::CVec_CVec_RouteHopZZ paths = Route_get_paths(route->contents.result);

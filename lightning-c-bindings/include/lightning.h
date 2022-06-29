@@ -26843,7 +26843,7 @@ struct LDKCResult_RouteHintHopDecodeErrorZ RouteHintHop_read(struct LDKu8slice s
  *
  * Note that first_hops (or a relevant inner pointer) may be NULL or all-0s to represent None
  */
-struct LDKCResult_RouteLightningErrorZ find_route(struct LDKPublicKey our_node_pubkey, const struct LDKRouteParameters *NONNULL_PTR route_params, const struct LDKReadOnlyNetworkGraph *NONNULL_PTR network_graph, struct LDKCVec_ChannelDetailsZ *first_hops, struct LDKLogger logger, const struct LDKScore *NONNULL_PTR scorer, const uint8_t (*random_seed_bytes)[32]);
+struct LDKCResult_RouteLightningErrorZ find_route(struct LDKPublicKey our_node_pubkey, const struct LDKRouteParameters *NONNULL_PTR route_params, const struct LDKNetworkGraph *NONNULL_PTR network_graph, struct LDKCVec_ChannelDetailsZ *first_hops, struct LDKLogger logger, const struct LDKScore *NONNULL_PTR scorer, const uint8_t (*random_seed_bytes)[32]);
 
 /**
  * Construct a route from us (payer) to the target node (payee) via the given hops (which should
@@ -26851,7 +26851,7 @@ struct LDKCResult_RouteLightningErrorZ find_route(struct LDKPublicKey our_node_p
  *
  * Re-uses logic from `find_route`, so the restrictions described there also apply here.
  */
-struct LDKCResult_RouteLightningErrorZ build_route_from_hops(struct LDKPublicKey our_node_pubkey, struct LDKCVec_PublicKeyZ hops, const struct LDKRouteParameters *NONNULL_PTR route_params, const struct LDKReadOnlyNetworkGraph *NONNULL_PTR network_graph, struct LDKLogger logger, const uint8_t (*random_seed_bytes)[32]);
+struct LDKCResult_RouteLightningErrorZ build_route_from_hops(struct LDKPublicKey our_node_pubkey, struct LDKCVec_PublicKeyZ hops, const struct LDKRouteParameters *NONNULL_PTR route_params, const struct LDKNetworkGraph *NONNULL_PTR network_graph, struct LDKLogger logger, const uint8_t (*random_seed_bytes)[32]);
 
 /**
  * Calls the free function if one is set

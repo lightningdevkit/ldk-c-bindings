@@ -229,20 +229,20 @@ pub extern "C" fn ChannelHandshakeConfig_set_max_inbound_htlc_value_in_flight_pe
 ///
 /// If this option is set, channels may be created that will not be readable by LDK versions
 /// prior to 0.0.106, causing [`ChannelManager`]'s read method to return a
-/// [`DecodeError:InvalidValue`].
+/// [`DecodeError::InvalidValue`].
 ///
 /// Note that setting this to true does *not* prevent us from opening channels with
 /// counterparties that do not support the `scid_alias` option; we will simply fall back to a
 /// private channel without that option.
 ///
 /// Ignored if the channel is negotiated to be announced, see
-/// [`ChannelConfig::announced_channel`] and
+/// [`ChannelHandshakeConfig::announced_channel`] and
 /// [`ChannelHandshakeLimits::force_announced_channel_preference`] for more.
 ///
 /// Default value: false. This value is likely to change to true in the future.
 ///
 /// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
-/// [`DecodeError:InvalidValue`]: crate::ln::msgs::DecodeError::InvalidValue
+/// [`DecodeError::InvalidValue`]: crate::ln::msgs::DecodeError::InvalidValue
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_get_negotiate_scid_privacy(this_ptr: &ChannelHandshakeConfig) -> bool {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().negotiate_scid_privacy;
@@ -255,34 +255,98 @@ pub extern "C" fn ChannelHandshakeConfig_get_negotiate_scid_privacy(this_ptr: &C
 ///
 /// If this option is set, channels may be created that will not be readable by LDK versions
 /// prior to 0.0.106, causing [`ChannelManager`]'s read method to return a
-/// [`DecodeError:InvalidValue`].
+/// [`DecodeError::InvalidValue`].
 ///
 /// Note that setting this to true does *not* prevent us from opening channels with
 /// counterparties that do not support the `scid_alias` option; we will simply fall back to a
 /// private channel without that option.
 ///
 /// Ignored if the channel is negotiated to be announced, see
-/// [`ChannelConfig::announced_channel`] and
+/// [`ChannelHandshakeConfig::announced_channel`] and
 /// [`ChannelHandshakeLimits::force_announced_channel_preference`] for more.
 ///
 /// Default value: false. This value is likely to change to true in the future.
 ///
 /// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
-/// [`DecodeError:InvalidValue`]: crate::ln::msgs::DecodeError::InvalidValue
+/// [`DecodeError::InvalidValue`]: crate::ln::msgs::DecodeError::InvalidValue
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_set_negotiate_scid_privacy(this_ptr: &mut ChannelHandshakeConfig, mut val: bool) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.negotiate_scid_privacy = val;
 }
+/// Set to announce the channel publicly and notify all nodes that they can route via this
+/// channel.
+///
+/// This should only be set to true for nodes which expect to be online reliably.
+///
+/// As the node which funds a channel picks this value this will only apply for new outbound
+/// channels unless [`ChannelHandshakeLimits::force_announced_channel_preference`] is set.
+///
+/// Default value: false.
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_get_announced_channel(this_ptr: &ChannelHandshakeConfig) -> bool {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().announced_channel;
+	*inner_val
+}
+/// Set to announce the channel publicly and notify all nodes that they can route via this
+/// channel.
+///
+/// This should only be set to true for nodes which expect to be online reliably.
+///
+/// As the node which funds a channel picks this value this will only apply for new outbound
+/// channels unless [`ChannelHandshakeLimits::force_announced_channel_preference`] is set.
+///
+/// Default value: false.
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_set_announced_channel(this_ptr: &mut ChannelHandshakeConfig, mut val: bool) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.announced_channel = val;
+}
+/// When set, we commit to an upfront shutdown_pubkey at channel open. If our counterparty
+/// supports it, they will then enforce the mutual-close output to us matches what we provided
+/// at intialization, preventing us from closing to an alternate pubkey.
+///
+/// This is set to true by default to provide a slight increase in security, though ultimately
+/// any attacker who is able to take control of a channel can just as easily send the funds via
+/// lightning payments, so we never require that our counterparties support this option.
+///
+/// The upfront key committed is provided from [`KeysInterface::get_shutdown_scriptpubkey`].
+///
+/// Default value: true.
+///
+/// [`KeysInterface::get_shutdown_scriptpubkey`]: crate::chain::keysinterface::KeysInterface::get_shutdown_scriptpubkey
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_get_commit_upfront_shutdown_pubkey(this_ptr: &ChannelHandshakeConfig) -> bool {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().commit_upfront_shutdown_pubkey;
+	*inner_val
+}
+/// When set, we commit to an upfront shutdown_pubkey at channel open. If our counterparty
+/// supports it, they will then enforce the mutual-close output to us matches what we provided
+/// at intialization, preventing us from closing to an alternate pubkey.
+///
+/// This is set to true by default to provide a slight increase in security, though ultimately
+/// any attacker who is able to take control of a channel can just as easily send the funds via
+/// lightning payments, so we never require that our counterparties support this option.
+///
+/// The upfront key committed is provided from [`KeysInterface::get_shutdown_scriptpubkey`].
+///
+/// Default value: true.
+///
+/// [`KeysInterface::get_shutdown_scriptpubkey`]: crate::chain::keysinterface::KeysInterface::get_shutdown_scriptpubkey
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_set_commit_upfront_shutdown_pubkey(this_ptr: &mut ChannelHandshakeConfig, mut val: bool) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.commit_upfront_shutdown_pubkey = val;
+}
 /// Constructs a new ChannelHandshakeConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our_to_self_delay_arg: u16, mut our_htlc_minimum_msat_arg: u64, mut max_inbound_htlc_value_in_flight_percent_of_channel_arg: u8, mut negotiate_scid_privacy_arg: bool) -> ChannelHandshakeConfig {
+pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our_to_self_delay_arg: u16, mut our_htlc_minimum_msat_arg: u64, mut max_inbound_htlc_value_in_flight_percent_of_channel_arg: u8, mut negotiate_scid_privacy_arg: bool, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool) -> ChannelHandshakeConfig {
 	ChannelHandshakeConfig { inner: ObjOps::heap_alloc(nativeChannelHandshakeConfig {
 		minimum_depth: minimum_depth_arg,
 		our_to_self_delay: our_to_self_delay_arg,
 		our_htlc_minimum_msat: our_htlc_minimum_msat_arg,
 		max_inbound_htlc_value_in_flight_percent_of_channel: max_inbound_htlc_value_in_flight_percent_of_channel_arg,
 		negotiate_scid_privacy: negotiate_scid_privacy_arg,
+		announced_channel: announced_channel_arg,
+		commit_upfront_shutdown_pubkey: commit_upfront_shutdown_pubkey_arg,
 	}), is_owned: true }
 }
 impl Clone for ChannelHandshakeConfig {
@@ -540,10 +604,10 @@ pub extern "C" fn ChannelHandshakeLimits_set_trust_own_funding_0conf(this_ptr: &
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.trust_own_funding_0conf = val;
 }
 /// Set to force an incoming channel to match our announced channel preference in
-/// [`ChannelConfig::announced_channel`].
+/// [`ChannelHandshakeConfig::announced_channel`].
 ///
 /// For a node which is not online reliably, this should be set to true and
-/// [`ChannelConfig::announced_channel`] set to false, ensuring that no announced (aka public)
+/// [`ChannelHandshakeConfig::announced_channel`] set to false, ensuring that no announced (aka public)
 /// channels will ever be opened.
 ///
 /// Default value: true.
@@ -553,10 +617,10 @@ pub extern "C" fn ChannelHandshakeLimits_get_force_announced_channel_preference(
 	*inner_val
 }
 /// Set to force an incoming channel to match our announced channel preference in
-/// [`ChannelConfig::announced_channel`].
+/// [`ChannelHandshakeConfig::announced_channel`].
 ///
 /// For a node which is not online reliably, this should be set to true and
-/// [`ChannelConfig::announced_channel`] set to false, ensuring that no announced (aka public)
+/// [`ChannelHandshakeConfig::announced_channel`] set to false, ensuring that no announced (aka public)
 /// channels will ever be opened.
 ///
 /// Default value: true.
@@ -782,68 +846,6 @@ pub extern "C" fn ChannelConfig_get_cltv_expiry_delta(this_ptr: &ChannelConfig) 
 pub extern "C" fn ChannelConfig_set_cltv_expiry_delta(this_ptr: &mut ChannelConfig, mut val: u16) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.cltv_expiry_delta = val;
 }
-/// Set to announce the channel publicly and notify all nodes that they can route via this
-/// channel.
-///
-/// This should only be set to true for nodes which expect to be online reliably.
-///
-/// As the node which funds a channel picks this value this will only apply for new outbound
-/// channels unless [`ChannelHandshakeLimits::force_announced_channel_preference`] is set.
-///
-/// This cannot be changed after the initial channel handshake.
-///
-/// Default value: false.
-#[no_mangle]
-pub extern "C" fn ChannelConfig_get_announced_channel(this_ptr: &ChannelConfig) -> bool {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().announced_channel;
-	*inner_val
-}
-/// Set to announce the channel publicly and notify all nodes that they can route via this
-/// channel.
-///
-/// This should only be set to true for nodes which expect to be online reliably.
-///
-/// As the node which funds a channel picks this value this will only apply for new outbound
-/// channels unless [`ChannelHandshakeLimits::force_announced_channel_preference`] is set.
-///
-/// This cannot be changed after the initial channel handshake.
-///
-/// Default value: false.
-#[no_mangle]
-pub extern "C" fn ChannelConfig_set_announced_channel(this_ptr: &mut ChannelConfig, mut val: bool) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.announced_channel = val;
-}
-/// When set, we commit to an upfront shutdown_pubkey at channel open. If our counterparty
-/// supports it, they will then enforce the mutual-close output to us matches what we provided
-/// at intialization, preventing us from closing to an alternate pubkey.
-///
-/// This is set to true by default to provide a slight increase in security, though ultimately
-/// any attacker who is able to take control of a channel can just as easily send the funds via
-/// lightning payments, so we never require that our counterparties support this option.
-///
-/// This cannot be changed after a channel has been initialized.
-///
-/// Default value: true.
-#[no_mangle]
-pub extern "C" fn ChannelConfig_get_commit_upfront_shutdown_pubkey(this_ptr: &ChannelConfig) -> bool {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().commit_upfront_shutdown_pubkey;
-	*inner_val
-}
-/// When set, we commit to an upfront shutdown_pubkey at channel open. If our counterparty
-/// supports it, they will then enforce the mutual-close output to us matches what we provided
-/// at intialization, preventing us from closing to an alternate pubkey.
-///
-/// This is set to true by default to provide a slight increase in security, though ultimately
-/// any attacker who is able to take control of a channel can just as easily send the funds via
-/// lightning payments, so we never require that our counterparties support this option.
-///
-/// This cannot be changed after a channel has been initialized.
-///
-/// Default value: true.
-#[no_mangle]
-pub extern "C" fn ChannelConfig_set_commit_upfront_shutdown_pubkey(this_ptr: &mut ChannelConfig, mut val: bool) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.commit_upfront_shutdown_pubkey = val;
-}
 /// Limit our total exposure to in-flight HTLCs which are burned to fees as they are too
 /// small to claim on-chain.
 ///
@@ -939,13 +941,11 @@ pub extern "C" fn ChannelConfig_set_force_close_avoidance_max_fee_satoshis(this_
 /// Constructs a new ChannelConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelConfig_new(mut forwarding_fee_proportional_millionths_arg: u32, mut forwarding_fee_base_msat_arg: u32, mut cltv_expiry_delta_arg: u16, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool, mut max_dust_htlc_exposure_msat_arg: u64, mut force_close_avoidance_max_fee_satoshis_arg: u64) -> ChannelConfig {
+pub extern "C" fn ChannelConfig_new(mut forwarding_fee_proportional_millionths_arg: u32, mut forwarding_fee_base_msat_arg: u32, mut cltv_expiry_delta_arg: u16, mut max_dust_htlc_exposure_msat_arg: u64, mut force_close_avoidance_max_fee_satoshis_arg: u64) -> ChannelConfig {
 	ChannelConfig { inner: ObjOps::heap_alloc(nativeChannelConfig {
 		forwarding_fee_proportional_millionths: forwarding_fee_proportional_millionths_arg,
 		forwarding_fee_base_msat: forwarding_fee_base_msat_arg,
 		cltv_expiry_delta: cltv_expiry_delta_arg,
-		announced_channel: announced_channel_arg,
-		commit_upfront_shutdown_pubkey: commit_upfront_shutdown_pubkey_arg,
 		max_dust_htlc_exposure_msat: max_dust_htlc_exposure_msat_arg,
 		force_close_avoidance_max_fee_satoshis: force_close_avoidance_max_fee_satoshis_arg,
 	}), is_owned: true }
@@ -1045,45 +1045,45 @@ impl UserConfig {
 		ret
 	}
 }
-/// Channel config that we propose to our counterparty.
+/// Channel handshake config that we propose to our counterparty.
 #[no_mangle]
-pub extern "C" fn UserConfig_get_own_channel_config(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelHandshakeConfig {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().own_channel_config;
+pub extern "C" fn UserConfig_get_channel_handshake_config(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelHandshakeConfig {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_handshake_config;
 	crate::lightning::util::config::ChannelHandshakeConfig { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::util::config::ChannelHandshakeConfig<>) as *mut _) }, is_owned: false }
 }
-/// Channel config that we propose to our counterparty.
+/// Channel handshake config that we propose to our counterparty.
 #[no_mangle]
-pub extern "C" fn UserConfig_set_own_channel_config(this_ptr: &mut UserConfig, mut val: crate::lightning::util::config::ChannelHandshakeConfig) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.own_channel_config = *unsafe { Box::from_raw(val.take_inner()) };
+pub extern "C" fn UserConfig_set_channel_handshake_config(this_ptr: &mut UserConfig, mut val: crate::lightning::util::config::ChannelHandshakeConfig) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_handshake_config = *unsafe { Box::from_raw(val.take_inner()) };
 }
-/// Limits applied to our counterparty's proposed channel config settings.
+/// Limits applied to our counterparty's proposed channel handshake config settings.
 #[no_mangle]
-pub extern "C" fn UserConfig_get_peer_channel_config_limits(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelHandshakeLimits {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().peer_channel_config_limits;
+pub extern "C" fn UserConfig_get_channel_handshake_limits(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelHandshakeLimits {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_handshake_limits;
 	crate::lightning::util::config::ChannelHandshakeLimits { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::util::config::ChannelHandshakeLimits<>) as *mut _) }, is_owned: false }
 }
-/// Limits applied to our counterparty's proposed channel config settings.
+/// Limits applied to our counterparty's proposed channel handshake config settings.
 #[no_mangle]
-pub extern "C" fn UserConfig_set_peer_channel_config_limits(this_ptr: &mut UserConfig, mut val: crate::lightning::util::config::ChannelHandshakeLimits) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.peer_channel_config_limits = *unsafe { Box::from_raw(val.take_inner()) };
+pub extern "C" fn UserConfig_set_channel_handshake_limits(this_ptr: &mut UserConfig, mut val: crate::lightning::util::config::ChannelHandshakeLimits) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_handshake_limits = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Channel config which affects behavior during channel lifetime.
 #[no_mangle]
-pub extern "C" fn UserConfig_get_channel_options(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelConfig {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_options;
+pub extern "C" fn UserConfig_get_channel_config(this_ptr: &UserConfig) -> crate::lightning::util::config::ChannelConfig {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_config;
 	crate::lightning::util::config::ChannelConfig { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::util::config::ChannelConfig<>) as *mut _) }, is_owned: false }
 }
 /// Channel config which affects behavior during channel lifetime.
 #[no_mangle]
-pub extern "C" fn UserConfig_set_channel_options(this_ptr: &mut UserConfig, mut val: crate::lightning::util::config::ChannelConfig) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_options = *unsafe { Box::from_raw(val.take_inner()) };
+pub extern "C" fn UserConfig_set_channel_config(this_ptr: &mut UserConfig, mut val: crate::lightning::util::config::ChannelConfig) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_config = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// If this is set to false, we will reject any HTLCs which were to be forwarded over private
 /// channels. This prevents us from taking on HTLC-forwarding risk when we intend to run as a
 /// node which is not online reliably.
 ///
 /// For nodes which are not online reliably, you should set all channels to *not* be announced
-/// (using [`ChannelConfig::announced_channel`] and
+/// (using [`ChannelHandshakeConfig::announced_channel`] and
 /// [`ChannelHandshakeLimits::force_announced_channel_preference`]) and set this to false to
 /// ensure you are not exposed to any forwarding risk.
 ///
@@ -1104,7 +1104,7 @@ pub extern "C" fn UserConfig_get_accept_forwards_to_priv_channels(this_ptr: &Use
 /// node which is not online reliably.
 ///
 /// For nodes which are not online reliably, you should set all channels to *not* be announced
-/// (using [`ChannelConfig::announced_channel`] and
+/// (using [`ChannelHandshakeConfig::announced_channel`] and
 /// [`ChannelHandshakeLimits::force_announced_channel_preference`]) and set this to false to
 /// ensure you are not exposed to any forwarding risk.
 ///
@@ -1170,11 +1170,11 @@ pub extern "C" fn UserConfig_set_manually_accept_inbound_channels(this_ptr: &mut
 /// Constructs a new UserConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn UserConfig_new(mut own_channel_config_arg: crate::lightning::util::config::ChannelHandshakeConfig, mut peer_channel_config_limits_arg: crate::lightning::util::config::ChannelHandshakeLimits, mut channel_options_arg: crate::lightning::util::config::ChannelConfig, mut accept_forwards_to_priv_channels_arg: bool, mut accept_inbound_channels_arg: bool, mut manually_accept_inbound_channels_arg: bool) -> UserConfig {
+pub extern "C" fn UserConfig_new(mut channel_handshake_config_arg: crate::lightning::util::config::ChannelHandshakeConfig, mut channel_handshake_limits_arg: crate::lightning::util::config::ChannelHandshakeLimits, mut channel_config_arg: crate::lightning::util::config::ChannelConfig, mut accept_forwards_to_priv_channels_arg: bool, mut accept_inbound_channels_arg: bool, mut manually_accept_inbound_channels_arg: bool) -> UserConfig {
 	UserConfig { inner: ObjOps::heap_alloc(nativeUserConfig {
-		own_channel_config: *unsafe { Box::from_raw(own_channel_config_arg.take_inner()) },
-		peer_channel_config_limits: *unsafe { Box::from_raw(peer_channel_config_limits_arg.take_inner()) },
-		channel_options: *unsafe { Box::from_raw(channel_options_arg.take_inner()) },
+		channel_handshake_config: *unsafe { Box::from_raw(channel_handshake_config_arg.take_inner()) },
+		channel_handshake_limits: *unsafe { Box::from_raw(channel_handshake_limits_arg.take_inner()) },
+		channel_config: *unsafe { Box::from_raw(channel_config_arg.take_inner()) },
 		accept_forwards_to_priv_channels: accept_forwards_to_priv_channels_arg,
 		accept_inbound_channels: accept_inbound_channels_arg,
 		manually_accept_inbound_channels: manually_accept_inbound_channels_arg,

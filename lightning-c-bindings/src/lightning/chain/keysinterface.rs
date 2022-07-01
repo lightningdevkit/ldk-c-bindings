@@ -1042,7 +1042,9 @@ pub struct KeysInterface {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
-	/// Get node secret key (aka node_id or network_key) based on the provided [`Recipient`].
+	/// Get node secret key based on the provided [`Recipient`].
+	///
+	/// The node_id/network_key is the public key that corresponds to this secret key.
 	///
 	/// This method must return the same value each time it is called with a given `Recipient`
 	/// parameter.

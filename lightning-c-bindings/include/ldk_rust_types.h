@@ -96,6 +96,8 @@ struct nativeRoutingFeesOpaque;
 typedef struct nativeRoutingFeesOpaque LDKnativeRoutingFees;
 struct nativeNodeAnnouncementInfoOpaque;
 typedef struct nativeNodeAnnouncementInfoOpaque LDKnativeNodeAnnouncementInfo;
+struct nativeNodeAliasOpaque;
+typedef struct nativeNodeAliasOpaque LDKnativeNodeAlias;
 struct nativeNodeInfoOpaque;
 typedef struct nativeNodeInfoOpaque LDKnativeNodeInfo;
 struct nativeDelayedPaymentOutputDescriptorOpaque;

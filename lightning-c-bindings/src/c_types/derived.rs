@@ -3951,6 +3951,131 @@ impl Clone for CResult_FixedPenaltyScorerDecodeErrorZ {
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_FixedPenaltyScorerDecodeErrorZ_clone(orig: &CResult_FixedPenaltyScorerDecodeErrorZ) -> CResult_FixedPenaltyScorerDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
+/// A tuple of 2 elements. See the individual fields for the types contained.
+pub struct C2Tuple_u64u64Z {
+	/// The element at position 0
+	pub a: u64,
+	/// The element at position 1
+	pub b: u64,
+}
+impl From<(u64, u64)> for C2Tuple_u64u64Z {
+	fn from (tup: (u64, u64)) -> Self {
+		Self {
+			a: tup.0,
+			b: tup.1,
+		}
+	}
+}
+impl C2Tuple_u64u64Z {
+	#[allow(unused)] pub(crate) fn to_rust(mut self) -> (u64, u64) {
+		(self.a, self.b)
+	}
+}
+impl Clone for C2Tuple_u64u64Z {
+	fn clone(&self) -> Self {
+		Self {
+			a: Clone::clone(&self.a),
+			b: Clone::clone(&self.b),
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new tuple which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn C2Tuple_u64u64Z_clone(orig: &C2Tuple_u64u64Z) -> C2Tuple_u64u64Z { Clone::clone(&orig) }
+/// Creates a new C2Tuple_u64u64Z from the contained elements.
+#[no_mangle]
+pub extern "C" fn C2Tuple_u64u64Z_new(a: u64, b: u64) -> C2Tuple_u64u64Z {
+	C2Tuple_u64u64Z { a, b, }
+}
+
+#[no_mangle]
+/// Frees any resources used by the C2Tuple_u64u64Z.
+pub extern "C" fn C2Tuple_u64u64Z_free(_res: C2Tuple_u64u64Z) { }
+#[repr(C)]
+#[derive(Clone)]
+/// An enum which can either contain a crate::c_types::derived::C2Tuple_u64u64Z or not
+pub enum COption_C2Tuple_u64u64ZZ {
+	/// When we're in this state, this COption_C2Tuple_u64u64ZZ contains a crate::c_types::derived::C2Tuple_u64u64Z
+	Some(crate::c_types::derived::C2Tuple_u64u64Z),
+	/// When we're in this state, this COption_C2Tuple_u64u64ZZ contains nothing
+	None
+}
+impl COption_C2Tuple_u64u64ZZ {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::None = self { false } else { true }
+	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> crate::c_types::derived::C2Tuple_u64u64Z {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+/// Constructs a new COption_C2Tuple_u64u64ZZ containing a crate::c_types::derived::C2Tuple_u64u64Z
+pub extern "C" fn COption_C2Tuple_u64u64ZZ_some(o: crate::c_types::derived::C2Tuple_u64u64Z) -> COption_C2Tuple_u64u64ZZ {
+	COption_C2Tuple_u64u64ZZ::Some(o)
+}
+#[no_mangle]
+/// Constructs a new COption_C2Tuple_u64u64ZZ containing nothing
+pub extern "C" fn COption_C2Tuple_u64u64ZZ_none() -> COption_C2Tuple_u64u64ZZ {
+	COption_C2Tuple_u64u64ZZ::None
+}
+#[no_mangle]
+/// Frees any resources associated with the crate::c_types::derived::C2Tuple_u64u64Z, if we are in the Some state
+pub extern "C" fn COption_C2Tuple_u64u64ZZ_free(_res: COption_C2Tuple_u64u64ZZ) { }
+#[no_mangle]
+/// Creates a new COption_C2Tuple_u64u64ZZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn COption_C2Tuple_u64u64ZZ_clone(orig: &COption_C2Tuple_u64u64ZZ) -> COption_C2Tuple_u64u64ZZ { Clone::clone(&orig) }
+#[repr(C)]
+/// A dynamically-allocated array of crate::lightning::routing::gossip::NodeIds of arbitrary size.
+/// This corresponds to std::vector in C++
+pub struct CVec_NodeIdZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+	pub data: *mut crate::lightning::routing::gossip::NodeId,
+	/// The number of elements pointed to by `data`.
+	pub datalen: usize
+}
+impl CVec_NodeIdZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::lightning::routing::gossip::NodeId> {
+		if self.datalen == 0 { return Vec::new(); }
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
+		self.datalen = 0;
+		ret
+	}
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::lightning::routing::gossip::NodeId] {
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
+	}
+}
+impl From<Vec<crate::lightning::routing::gossip::NodeId>> for CVec_NodeIdZ {
+	fn from(v: Vec<crate::lightning::routing::gossip::NodeId>) -> Self {
+		let datalen = v.len();
+		let data = Box::into_raw(v.into_boxed_slice());
+		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
+	}
+}
+#[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
+pub extern "C" fn CVec_NodeIdZ_free(_res: CVec_NodeIdZ) { }
+impl Drop for CVec_NodeIdZ {
+	fn drop(&mut self) {
+		if self.datalen == 0 { return; }
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
+	}
+}
+impl Clone for CVec_NodeIdZ {
+	fn clone(&self) -> Self {
+		let mut res = Vec::new();
+		if self.datalen == 0 { return Self::from(res); }
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
+		Self::from(res)
+	}
+}
+#[repr(C)]
 /// The contents of CResult_ProbabilisticScorerDecodeErrorZ
 pub union CResult_ProbabilisticScorerDecodeErrorZPtr {
 	/// A pointer to the contents in the success state.
@@ -5489,6 +5614,102 @@ impl Clone for CResult_NodeAnnouncementInfoDecodeErrorZ {
 /// Creates a new CResult_NodeAnnouncementInfoDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NodeAnnouncementInfoDecodeErrorZ_clone(orig: &CResult_NodeAnnouncementInfoDecodeErrorZ) -> CResult_NodeAnnouncementInfoDecodeErrorZ { Clone::clone(&orig) }
+#[repr(C)]
+/// The contents of CResult_NodeAliasDecodeErrorZ
+pub union CResult_NodeAliasDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::lightning::routing::gossip::NodeAlias,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_NodeAliasDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::lightning::routing::gossip::NodeAlias on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_NodeAliasDecodeErrorZ {
+	/// The contents of this CResult_NodeAliasDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_NodeAliasDecodeErrorZPtr,
+	/// Whether this CResult_NodeAliasDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_NodeAliasDecodeErrorZ in the success state.
+pub extern "C" fn CResult_NodeAliasDecodeErrorZ_ok(o: crate::lightning::routing::gossip::NodeAlias) -> CResult_NodeAliasDecodeErrorZ {
+	CResult_NodeAliasDecodeErrorZ {
+		contents: CResult_NodeAliasDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_NodeAliasDecodeErrorZ in the error state.
+pub extern "C" fn CResult_NodeAliasDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_NodeAliasDecodeErrorZ {
+	CResult_NodeAliasDecodeErrorZ {
+		contents: CResult_NodeAliasDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_NodeAliasDecodeErrorZ_is_ok(o: &CResult_NodeAliasDecodeErrorZ) -> bool {
+	o.result_ok
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_NodeAliasDecodeErrorZ.
+pub extern "C" fn CResult_NodeAliasDecodeErrorZ_free(_res: CResult_NodeAliasDecodeErrorZ) { }
+impl Drop for CResult_NodeAliasDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::lightning::routing::gossip::NodeAlias, crate::lightning::ln::msgs::DecodeError>> for CResult_NodeAliasDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::lightning::routing::gossip::NodeAlias, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = core::ptr::null_mut() };
+			CResult_NodeAliasDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = core::ptr::null_mut(); }
+			CResult_NodeAliasDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_NodeAliasDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_NodeAliasDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::lightning::routing::gossip::NodeAlias>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_NodeAliasDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_NodeAliasDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_NodeAliasDecodeErrorZ_clone(orig: &CResult_NodeAliasDecodeErrorZ) -> CResult_NodeAliasDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 /// A dynamically-allocated array of u64s of arbitrary size.
 /// This corresponds to std::vector in C++
@@ -7975,6 +8196,52 @@ impl Clone for CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ {
 /// Creates a new CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ_clone(orig: &CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ) -> CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ { Clone::clone(&orig) }
+#[repr(C)]
+/// A dynamically-allocated array of crate::c_types::ThirtyTwoBytess of arbitrary size.
+/// This corresponds to std::vector in C++
+pub struct CVec_ThirtyTwoBytesZ {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+	pub data: *mut crate::c_types::ThirtyTwoBytes,
+	/// The number of elements pointed to by `data`.
+	pub datalen: usize
+}
+impl CVec_ThirtyTwoBytesZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::ThirtyTwoBytes> {
+		if self.datalen == 0 { return Vec::new(); }
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
+		self.datalen = 0;
+		ret
+	}
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::ThirtyTwoBytes] {
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
+	}
+}
+impl From<Vec<crate::c_types::ThirtyTwoBytes>> for CVec_ThirtyTwoBytesZ {
+	fn from(v: Vec<crate::c_types::ThirtyTwoBytes>) -> Self {
+		let datalen = v.len();
+		let data = Box::into_raw(v.into_boxed_slice());
+		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
+	}
+}
+#[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
+pub extern "C" fn CVec_ThirtyTwoBytesZ_free(_res: CVec_ThirtyTwoBytesZ) { }
+impl Drop for CVec_ThirtyTwoBytesZ {
+	fn drop(&mut self) {
+		if self.datalen == 0 { return; }
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
+	}
+}
+impl Clone for CVec_ThirtyTwoBytesZ {
+	fn clone(&self) -> Self {
+		let mut res = Vec::new();
+		if self.datalen == 0 { return Self::from(res); }
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
+		Self::from(res)
+	}
+}
 #[repr(C)]
 /// A tuple of 2 elements. See the individual fields for the types contained.
 pub struct C2Tuple_PaymentHashPaymentSecretZ {

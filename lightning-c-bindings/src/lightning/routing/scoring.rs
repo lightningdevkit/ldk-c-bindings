@@ -771,16 +771,26 @@ pub extern "C" fn ProbabilisticScoringParameters_get_amount_penalty_multiplier_m
 pub extern "C" fn ProbabilisticScoringParameters_set_amount_penalty_multiplier_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.amount_penalty_multiplier_msat = val;
 }
-/// Constructs a new ProbabilisticScoringParameters given each field
-#[must_use]
+/// This penalty is applied when `htlc_maximum_msat` is equal to or larger than half of the
+/// channel's capacity, which makes us prefer nodes with a smaller `htlc_maximum_msat`. We
+/// treat such nodes preferentially as this makes balance discovery attacks harder to execute,
+/// thereby creating an incentive to restrict `htlc_maximum_msat` and improve privacy.
+///
+/// Default value: 250 msat
 #[no_mangle]
-pub extern "C" fn ProbabilisticScoringParameters_new(mut base_penalty_msat_arg: u64, mut liquidity_penalty_multiplier_msat_arg: u64, mut liquidity_offset_half_life_arg: u64, mut amount_penalty_multiplier_msat_arg: u64) -> ProbabilisticScoringParameters {
-	ProbabilisticScoringParameters { inner: ObjOps::heap_alloc(nativeProbabilisticScoringParameters {
-		base_penalty_msat: base_penalty_msat_arg,
-		liquidity_penalty_multiplier_msat: liquidity_penalty_multiplier_msat_arg,
-		liquidity_offset_half_life: core::time::Duration::from_secs(liquidity_offset_half_life_arg),
-		amount_penalty_multiplier_msat: amount_penalty_multiplier_msat_arg,
-	}), is_owned: true }
+pub extern "C" fn ProbabilisticScoringParameters_get_anti_probing_penalty_msat(this_ptr: &ProbabilisticScoringParameters) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().anti_probing_penalty_msat;
+	*inner_val
+}
+/// This penalty is applied when `htlc_maximum_msat` is equal to or larger than half of the
+/// channel's capacity, which makes us prefer nodes with a smaller `htlc_maximum_msat`. We
+/// treat such nodes preferentially as this makes balance discovery attacks harder to execute,
+/// thereby creating an incentive to restrict `htlc_maximum_msat` and improve privacy.
+///
+/// Default value: 250 msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_set_anti_probing_penalty_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.anti_probing_penalty_msat = val;
 }
 impl Clone for ProbabilisticScoringParameters {
 	fn clone(&self) -> Self {
@@ -817,6 +827,43 @@ pub extern "C" fn ProbabilisticScorer_new(mut params: crate::lightning::routing:
 #[no_mangle]
 pub extern "C" fn ProbabilisticScorer_debug_log_liquidity_stats(this_arg: &crate::lightning::routing::scoring::ProbabilisticScorer) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.debug_log_liquidity_stats()
+}
+
+/// Query the estimated minimum and maximum liquidity available for sending a payment over the
+/// channel with `scid` towards the given `target` node.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ProbabilisticScorer_estimated_channel_liquidity_range(this_arg: &crate::lightning::routing::scoring::ProbabilisticScorer, mut scid: u64, target: &crate::lightning::routing::gossip::NodeId) -> crate::c_types::derived::COption_C2Tuple_u64u64ZZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.estimated_channel_liquidity_range(scid, target.get_native_ref());
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_C2Tuple_u64u64ZZ::None } else { crate::c_types::derived::COption_C2Tuple_u64u64ZZ::Some( { let (mut orig_ret_0_0, mut orig_ret_0_1) = (ret.unwrap()); let mut local_ret_0 = (orig_ret_0_0, orig_ret_0_1).into(); local_ret_0 }) };
+	local_ret
+}
+
+/// Marks the node with the given `node_id` as banned, i.e.,
+/// it will be avoided during path finding.
+#[no_mangle]
+pub extern "C" fn ProbabilisticScorer_add_banned(this_arg: &mut crate::lightning::routing::scoring::ProbabilisticScorer, node_id: &crate::lightning::routing::gossip::NodeId) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::scoring::nativeProbabilisticScorer)) }.add_banned(node_id.get_native_ref())
+}
+
+/// Removes the node with the given `node_id` from the list of nodes to avoid.
+#[no_mangle]
+pub extern "C" fn ProbabilisticScorer_remove_banned(this_arg: &mut crate::lightning::routing::scoring::ProbabilisticScorer, node_id: &crate::lightning::routing::gossip::NodeId) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::scoring::nativeProbabilisticScorer)) }.remove_banned(node_id.get_native_ref())
+}
+
+/// Clears the list of nodes that are avoided during path finding.
+#[no_mangle]
+pub extern "C" fn ProbabilisticScorer_clear_banned(this_arg: &mut crate::lightning::routing::scoring::ProbabilisticScorer) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::scoring::nativeProbabilisticScorer)) }.clear_banned()
+}
+
+/// Marks all nodes in the given list as banned, i.e.,
+/// they will be avoided during path finding.
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_add_banned_from_list(this_arg: &mut crate::lightning::routing::scoring::ProbabilisticScoringParameters, mut node_ids: crate::c_types::derived::CVec_NodeIdZ) {
+	let mut local_node_ids = Vec::new(); for mut item in node_ids.into_rust().drain(..) { local_node_ids.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::scoring::nativeProbabilisticScoringParameters)) }.add_banned_from_list(local_node_ids)
 }
 
 /// Creates a "default" ProbabilisticScoringParameters. See struct and individual field documentaiton for details on which values are used.

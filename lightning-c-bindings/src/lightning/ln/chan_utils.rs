@@ -943,7 +943,7 @@ pub extern "C" fn ChannelTransactionParameters_set_funding_outpoint(this_ptr: &m
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_get_opt_anchors(this_ptr: &ChannelTransactionParameters) -> crate::c_types::derived::COption_NoneZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().opt_anchors;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NoneZ::None } else { crate::c_types::derived::COption_NoneZ::Some /* { () /**/ } */};
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NoneZ::None } else { crate::c_types::derived::COption_NoneZ::Some /*  { () /**/ } */ };
 	local_inner_val
 }
 /// Are anchors used for this channel.  Boolean is serialization backwards-compatible

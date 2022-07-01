@@ -1477,12 +1477,18 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				}
 				if let Some(t) = single_contained {
 					if let syn::Type::Tuple(syn::TypeTuple { elems, .. }) = t {
-						assert!(elems.is_empty());
 						let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
-						return Some(("if ", vec![
-							(format!(".is_none() {{ {}::None }} else {{ {}::Some /*",
-								inner_name, inner_name), format!(""))
-							], " */}", ContainerPrefixLocation::PerConv));
+						if elems.is_empty() {
+							return Some(("if ", vec![
+								(format!(".is_none() {{ {}::None }} else {{ {}::Some /* ",
+									inner_name, inner_name), format!(""))
+								], " */ }", ContainerPrefixLocation::PerConv));
+						} else {
+							return Some(("if ", vec![
+								(format!(".is_none() {{ {}::None }} else {{ {}::Some(",
+									inner_name, inner_name), format!("({}.unwrap())", var_access))
+								], ") }", ContainerPrefixLocation::PerConv));
+						}
 					}
 					if let syn::Type::Reference(syn::TypeReference { elem, .. }) = t {
 						if let syn::Type::Slice(_) = &**elem {

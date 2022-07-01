@@ -1167,6 +1167,8 @@ pub enum EffectiveCapacity {
 	Total {
 		/// The funding amount denominated in millisatoshi.
 		capacity_msat: u64,
+		/// The maximum HTLC amount denominated in millisatoshi.
+		htlc_maximum_msat: crate::c_types::derived::COption_u64Z,
 	},
 	/// A capacity sufficient to route any payment, typically used for private channels provided by
 	/// an invoice.
@@ -1194,10 +1196,13 @@ impl EffectiveCapacity {
 					amount_msat: amount_msat_nonref,
 				}
 			},
-			EffectiveCapacity::Total {ref capacity_msat, } => {
+			EffectiveCapacity::Total {ref capacity_msat, ref htlc_maximum_msat, } => {
 				let mut capacity_msat_nonref = (*capacity_msat).clone();
+				let mut htlc_maximum_msat_nonref = (*htlc_maximum_msat).clone();
+				let mut local_htlc_maximum_msat_nonref = if htlc_maximum_msat_nonref.is_some() { Some( { htlc_maximum_msat_nonref.take() }) } else { None };
 				nativeEffectiveCapacity::Total {
 					capacity_msat: capacity_msat_nonref,
+					htlc_maximum_msat: local_htlc_maximum_msat_nonref,
 				}
 			},
 			EffectiveCapacity::Infinite => nativeEffectiveCapacity::Infinite,
@@ -1217,9 +1222,11 @@ impl EffectiveCapacity {
 					amount_msat: amount_msat,
 				}
 			},
-			EffectiveCapacity::Total {mut capacity_msat, } => {
+			EffectiveCapacity::Total {mut capacity_msat, mut htlc_maximum_msat, } => {
+				let mut local_htlc_maximum_msat = if htlc_maximum_msat.is_some() { Some( { htlc_maximum_msat.take() }) } else { None };
 				nativeEffectiveCapacity::Total {
 					capacity_msat: capacity_msat,
+					htlc_maximum_msat: local_htlc_maximum_msat,
 				}
 			},
 			EffectiveCapacity::Infinite => nativeEffectiveCapacity::Infinite,
@@ -1241,10 +1248,13 @@ impl EffectiveCapacity {
 					amount_msat: amount_msat_nonref,
 				}
 			},
-			nativeEffectiveCapacity::Total {ref capacity_msat, } => {
+			nativeEffectiveCapacity::Total {ref capacity_msat, ref htlc_maximum_msat, } => {
 				let mut capacity_msat_nonref = (*capacity_msat).clone();
+				let mut htlc_maximum_msat_nonref = (*htlc_maximum_msat).clone();
+				let mut local_htlc_maximum_msat_nonref = if htlc_maximum_msat_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { htlc_maximum_msat_nonref.unwrap() }) };
 				EffectiveCapacity::Total {
 					capacity_msat: capacity_msat_nonref,
+					htlc_maximum_msat: local_htlc_maximum_msat_nonref,
 				}
 			},
 			nativeEffectiveCapacity::Infinite => EffectiveCapacity::Infinite,
@@ -1264,9 +1274,11 @@ impl EffectiveCapacity {
 					amount_msat: amount_msat,
 				}
 			},
-			nativeEffectiveCapacity::Total {mut capacity_msat, } => {
+			nativeEffectiveCapacity::Total {mut capacity_msat, mut htlc_maximum_msat, } => {
+				let mut local_htlc_maximum_msat = if htlc_maximum_msat.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { htlc_maximum_msat.unwrap() }) };
 				EffectiveCapacity::Total {
 					capacity_msat: capacity_msat,
+					htlc_maximum_msat: local_htlc_maximum_msat,
 				}
 			},
 			nativeEffectiveCapacity::Infinite => EffectiveCapacity::Infinite,
@@ -1298,9 +1310,10 @@ pub extern "C" fn EffectiveCapacity_maximum_htlc(amount_msat: u64) -> EffectiveC
 }
 #[no_mangle]
 /// Utility method to constructs a new Total-variant EffectiveCapacity
-pub extern "C" fn EffectiveCapacity_total(capacity_msat: u64) -> EffectiveCapacity {
+pub extern "C" fn EffectiveCapacity_total(capacity_msat: u64, htlc_maximum_msat: crate::c_types::derived::COption_u64Z) -> EffectiveCapacity {
 	EffectiveCapacity::Total {
 		capacity_msat,
+		htlc_maximum_msat,
 	}
 }
 #[no_mangle]
@@ -1552,16 +1565,16 @@ pub extern "C" fn NodeAnnouncementInfo_set_rgb(this_ptr: &mut NodeAnnouncementIn
 /// May be invalid or malicious (eg control chars),
 /// should not be exposed to the user.
 #[no_mangle]
-pub extern "C" fn NodeAnnouncementInfo_get_alias(this_ptr: &NodeAnnouncementInfo) -> *const [u8; 32] {
+pub extern "C" fn NodeAnnouncementInfo_get_alias(this_ptr: &NodeAnnouncementInfo) -> crate::lightning::routing::gossip::NodeAlias {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().alias;
-	inner_val
+	crate::lightning::routing::gossip::NodeAlias { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::gossip::NodeAlias<>) as *mut _) }, is_owned: false }
 }
 /// Moniker assigned to the node.
 /// May be invalid or malicious (eg control chars),
 /// should not be exposed to the user.
 #[no_mangle]
-pub extern "C" fn NodeAnnouncementInfo_set_alias(this_ptr: &mut NodeAnnouncementInfo, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.alias = val.data;
+pub extern "C" fn NodeAnnouncementInfo_set_alias(this_ptr: &mut NodeAnnouncementInfo, mut val: crate::lightning::routing::gossip::NodeAlias) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.alias = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Internet-level addresses via which one can connect to the node
 #[no_mangle]
@@ -1595,14 +1608,14 @@ pub extern "C" fn NodeAnnouncementInfo_set_announcement_message(this_ptr: &mut N
 /// Constructs a new NodeAnnouncementInfo given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NodeAnnouncementInfo_new(mut features_arg: crate::lightning::ln::features::NodeFeatures, mut last_update_arg: u32, mut rgb_arg: crate::c_types::ThreeBytes, mut alias_arg: crate::c_types::ThirtyTwoBytes, mut addresses_arg: crate::c_types::derived::CVec_NetAddressZ, mut announcement_message_arg: crate::lightning::ln::msgs::NodeAnnouncement) -> NodeAnnouncementInfo {
+pub extern "C" fn NodeAnnouncementInfo_new(mut features_arg: crate::lightning::ln::features::NodeFeatures, mut last_update_arg: u32, mut rgb_arg: crate::c_types::ThreeBytes, mut alias_arg: crate::lightning::routing::gossip::NodeAlias, mut addresses_arg: crate::c_types::derived::CVec_NetAddressZ, mut announcement_message_arg: crate::lightning::ln::msgs::NodeAnnouncement) -> NodeAnnouncementInfo {
 	let mut local_addresses_arg = Vec::new(); for mut item in addresses_arg.into_rust().drain(..) { local_addresses_arg.push( { item.into_native() }); };
 	let mut local_announcement_message_arg = if announcement_message_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(announcement_message_arg.take_inner()) } }) };
 	NodeAnnouncementInfo { inner: ObjOps::heap_alloc(nativeNodeAnnouncementInfo {
 		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
 		last_update: last_update_arg,
 		rgb: rgb_arg.data,
-		alias: alias_arg.data,
+		alias: *unsafe { Box::from_raw(alias_arg.take_inner()) },
 		addresses: local_addresses_arg,
 		announcement_message: local_announcement_message_arg,
 	}), is_owned: true }
@@ -1640,6 +1653,112 @@ pub(crate) extern "C" fn NodeAnnouncementInfo_write_void(obj: *const c_void) -> 
 pub extern "C" fn NodeAnnouncementInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeAnnouncementInfoDecodeErrorZ {
 	let res: Result<lightning::routing::gossip::NodeAnnouncementInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeAnnouncementInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
+
+use lightning::routing::gossip::NodeAlias as nativeNodeAliasImport;
+pub(crate) type nativeNodeAlias = nativeNodeAliasImport;
+
+/// A user-defined name for a node, which may be used when displaying the node in a graph.
+///
+/// Since node aliases are provided by third parties, they are a potential avenue for injection
+/// attacks. Care must be taken when processing.
+#[must_use]
+#[repr(C)]
+pub struct NodeAlias {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeNodeAlias,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for NodeAlias {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeNodeAlias>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the NodeAlias, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn NodeAlias_free(this_obj: NodeAlias) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn NodeAlias_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeAlias); }
+}
+#[allow(unused)]
+impl NodeAlias {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeNodeAlias {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeNodeAlias {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeNodeAlias {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+#[no_mangle]
+pub extern "C" fn NodeAlias_get_a(this_ptr: &NodeAlias) -> *const [u8; 32] {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().0;
+	inner_val
+}
+#[no_mangle]
+pub extern "C" fn NodeAlias_set_a(this_ptr: &mut NodeAlias, mut val: crate::c_types::ThirtyTwoBytes) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.0 = val.data;
+}
+/// Constructs a new NodeAlias given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeAlias_new(mut a_arg: crate::c_types::ThirtyTwoBytes) -> NodeAlias {
+	NodeAlias { inner: ObjOps::heap_alloc(lightning::routing::gossip::NodeAlias (
+		a_arg.data,
+	)), is_owned: true }
+}
+impl Clone for NodeAlias {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeNodeAlias>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn NodeAlias_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNodeAlias)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the NodeAlias
+pub extern "C" fn NodeAlias_clone(orig: &NodeAlias) -> NodeAlias {
+	orig.clone()
+}
+#[no_mangle]
+/// Serialize the NodeAlias object into a byte array which can be read by NodeAlias_read
+pub extern "C" fn NodeAlias_write(obj: &crate::lightning::routing::gossip::NodeAlias) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn NodeAlias_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNodeAlias) })
+}
+#[no_mangle]
+/// Read a NodeAlias from a byte array, created by NodeAlias_write
+pub extern "C" fn NodeAlias_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeAliasDecodeErrorZ {
+	let res: Result<lightning::routing::gossip::NodeAlias, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeAlias { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
 

@@ -1074,10 +1074,31 @@ pub extern "C" fn ChannelDetails_set_inbound_htlc_maximum_msat(this_ptr: &mut Ch
 	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.inbound_htlc_maximum_msat = local_val;
 }
+/// Set of configurable parameters that affect channel operation.
+///
+/// This field is only `None` for `ChannelDetails` objects serialized prior to LDK 0.0.109.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn ChannelDetails_get_config(this_ptr: &ChannelDetails) -> crate::lightning::util::config::ChannelConfig {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().config;
+	let mut local_inner_val = crate::lightning::util::config::ChannelConfig { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::util::config::ChannelConfig<>) as *mut _ }, is_owned: false };
+	local_inner_val
+}
+/// Set of configurable parameters that affect channel operation.
+///
+/// This field is only `None` for `ChannelDetails` objects serialized prior to LDK 0.0.109.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn ChannelDetails_set_config(this_ptr: &mut ChannelDetails, mut val: crate::lightning::util::config::ChannelConfig) {
+	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.config = local_val;
+}
 /// Constructs a new ChannelDetails given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelDetails_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut counterparty_arg: crate::lightning::ln::channelmanager::ChannelCounterparty, mut funding_txo_arg: crate::lightning::chain::transaction::OutPoint, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures, mut short_channel_id_arg: crate::c_types::derived::COption_u64Z, mut outbound_scid_alias_arg: crate::c_types::derived::COption_u64Z, mut inbound_scid_alias_arg: crate::c_types::derived::COption_u64Z, mut channel_value_satoshis_arg: u64, mut unspendable_punishment_reserve_arg: crate::c_types::derived::COption_u64Z, mut user_channel_id_arg: u64, mut balance_msat_arg: u64, mut outbound_capacity_msat_arg: u64, mut next_outbound_htlc_limit_msat_arg: u64, mut inbound_capacity_msat_arg: u64, mut confirmations_required_arg: crate::c_types::derived::COption_u32Z, mut force_close_spend_delay_arg: crate::c_types::derived::COption_u16Z, mut is_outbound_arg: bool, mut is_channel_ready_arg: bool, mut is_usable_arg: bool, mut is_public_arg: bool, mut inbound_htlc_minimum_msat_arg: crate::c_types::derived::COption_u64Z, mut inbound_htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z) -> ChannelDetails {
+pub extern "C" fn ChannelDetails_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut counterparty_arg: crate::lightning::ln::channelmanager::ChannelCounterparty, mut funding_txo_arg: crate::lightning::chain::transaction::OutPoint, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures, mut short_channel_id_arg: crate::c_types::derived::COption_u64Z, mut outbound_scid_alias_arg: crate::c_types::derived::COption_u64Z, mut inbound_scid_alias_arg: crate::c_types::derived::COption_u64Z, mut channel_value_satoshis_arg: u64, mut unspendable_punishment_reserve_arg: crate::c_types::derived::COption_u64Z, mut user_channel_id_arg: u64, mut balance_msat_arg: u64, mut outbound_capacity_msat_arg: u64, mut next_outbound_htlc_limit_msat_arg: u64, mut inbound_capacity_msat_arg: u64, mut confirmations_required_arg: crate::c_types::derived::COption_u32Z, mut force_close_spend_delay_arg: crate::c_types::derived::COption_u16Z, mut is_outbound_arg: bool, mut is_channel_ready_arg: bool, mut is_usable_arg: bool, mut is_public_arg: bool, mut inbound_htlc_minimum_msat_arg: crate::c_types::derived::COption_u64Z, mut inbound_htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z, mut config_arg: crate::lightning::util::config::ChannelConfig) -> ChannelDetails {
 	let mut local_funding_txo_arg = if funding_txo_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(funding_txo_arg.take_inner()) } }) };
 	let mut local_channel_type_arg = if channel_type_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(channel_type_arg.take_inner()) } }) };
 	let mut local_short_channel_id_arg = if short_channel_id_arg.is_some() { Some( { short_channel_id_arg.take() }) } else { None };
@@ -1088,6 +1109,7 @@ pub extern "C" fn ChannelDetails_new(mut channel_id_arg: crate::c_types::ThirtyT
 	let mut local_force_close_spend_delay_arg = if force_close_spend_delay_arg.is_some() { Some( { force_close_spend_delay_arg.take() }) } else { None };
 	let mut local_inbound_htlc_minimum_msat_arg = if inbound_htlc_minimum_msat_arg.is_some() { Some( { inbound_htlc_minimum_msat_arg.take() }) } else { None };
 	let mut local_inbound_htlc_maximum_msat_arg = if inbound_htlc_maximum_msat_arg.is_some() { Some( { inbound_htlc_maximum_msat_arg.take() }) } else { None };
+	let mut local_config_arg = if config_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(config_arg.take_inner()) } }) };
 	ChannelDetails { inner: ObjOps::heap_alloc(nativeChannelDetails {
 		channel_id: channel_id_arg.data,
 		counterparty: *unsafe { Box::from_raw(counterparty_arg.take_inner()) },
@@ -1111,6 +1133,7 @@ pub extern "C" fn ChannelDetails_new(mut channel_id_arg: crate::c_types::ThirtyT
 		is_public: is_public_arg,
 		inbound_htlc_minimum_msat: local_inbound_htlc_minimum_msat_arg,
 		inbound_htlc_maximum_msat: local_inbound_htlc_maximum_msat_arg,
+		config: local_config_arg,
 	}), is_owned: true }
 }
 impl Clone for ChannelDetails {
@@ -1644,14 +1667,28 @@ pub extern "C" fn ChannelManager_close_channel_with_target_feerate(this_arg: &cr
 	local_ret
 }
 
-/// Force closes a channel, immediately broadcasting the latest local commitment transaction to
-/// the chain and rejecting new HTLCs on the given channel. Fails if `channel_id` is unknown to
+/// Force closes a channel, immediately broadcasting the latest local transaction(s) and
+/// rejecting new HTLCs on the given channel. Fails if `channel_id` is unknown to
 /// the manager, or if the `counterparty_node_id` isn't the counterparty of the corresponding
 /// channel.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_force_close_channel(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, channel_id: *const [u8; 32], mut counterparty_node_id: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.force_close_channel(unsafe { &*channel_id}, &counterparty_node_id.into_rust());
+pub extern "C" fn ChannelManager_force_close_broadcasting_latest_txn(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, channel_id: *const [u8; 32], mut counterparty_node_id: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.force_close_broadcasting_latest_txn(unsafe { &*channel_id}, &counterparty_node_id.into_rust());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
+	local_ret
+}
+
+/// Force closes a channel, rejecting new HTLCs on the given channel but skips broadcasting
+/// the latest local transaction(s). Fails if `channel_id` is unknown to the manager, or if the
+/// `counterparty_node_id` isn't the counterparty of the corresponding channel.
+///
+/// You can always get the latest local transaction(s) to broadcast from
+/// [`ChannelMonitor::get_latest_holder_commitment_txn`].
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_force_close_without_broadcasting_txn(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, channel_id: *const [u8; 32], mut counterparty_node_id: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.force_close_without_broadcasting_txn(unsafe { &*channel_id}, &counterparty_node_id.into_rust());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -1659,8 +1696,15 @@ pub extern "C" fn ChannelManager_force_close_channel(this_arg: &crate::lightning
 /// Force close all channels, immediately broadcasting the latest local commitment transaction
 /// for each to the chain and rejecting new HTLCs on each.
 #[no_mangle]
-pub extern "C" fn ChannelManager_force_close_all_channels(this_arg: &crate::lightning::ln::channelmanager::ChannelManager) {
-	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.force_close_all_channels()
+pub extern "C" fn ChannelManager_force_close_all_channels_broadcasting_latest_txn(this_arg: &crate::lightning::ln::channelmanager::ChannelManager) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.force_close_all_channels_broadcasting_latest_txn()
+}
+
+/// Force close all channels rejecting new HTLCs on each but without broadcasting the latest
+/// local transaction(s).
+#[no_mangle]
+pub extern "C" fn ChannelManager_force_close_all_channels_without_broadcasting_txn(this_arg: &crate::lightning::ln::channelmanager::ChannelManager) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.force_close_all_channels_without_broadcasting_txn()
 }
 
 /// Sends a payment along a given route.
@@ -1780,6 +1824,9 @@ pub extern "C" fn ChannelManager_send_spontaneous_payment(this_arg: &crate::ligh
 /// Returns an [`APIError::APIMisuseError`] if the funding_transaction spent non-SegWit outputs
 /// or if no output was found which matches the parameters in [`Event::FundingGenerationReady`].
 ///
+/// Returns [`APIError::APIMisuseError`] if the funding transaction is not final for propagation
+/// across the p2p network.
+///
 /// Returns [`APIError::ChannelUnavailable`] if a funding transaction has already been provided
 /// for the channel or if the channel has been closed as indicated by [`Event::ChannelClosed`].
 ///
@@ -1794,6 +1841,11 @@ pub extern "C" fn ChannelManager_send_spontaneous_payment(this_arg: &crate::ligh
 /// Note that this includes RBF or similar transaction replacement strategies - lightning does
 /// not currently support replacing a funding transaction on an existing channel. Instead,
 /// create a new channel with a conflicting funding transaction.
+///
+/// Note to keep the miner incentives aligned in moving the blockchain forward, we recommend
+/// the wallet software generating the funding transaction to apply anti-fee sniping as
+/// implemented by Bitcoin Core wallet. See <https://bitcoinops.org/en/topics/fee-sniping/>
+/// for more details.
 ///
 /// [`Event::FundingGenerationReady`]: crate::util::events::Event::FundingGenerationReady
 /// [`Event::ChannelClosed`]: crate::util::events::Event::ChannelClosed
@@ -1829,6 +1881,37 @@ pub extern "C" fn ChannelManager_broadcast_node_announcement(this_arg: &crate::l
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.broadcast_node_announcement(rgb.data, alias.data, local_addresses)
 }
 
+/// Atomically updates the [`ChannelConfig`] for the given channels.
+///
+/// Once the updates are applied, each eligible channel (advertised with a known short channel
+/// ID and a change in [`forwarding_fee_proportional_millionths`], [`forwarding_fee_base_msat`],
+/// or [`cltv_expiry_delta`]) has a [`BroadcastChannelUpdate`] event message generated
+/// containing the new [`ChannelUpdate`] message which should be broadcast to the network.
+///
+/// Returns [`ChannelUnavailable`] when a channel is not found or an incorrect
+/// `counterparty_node_id` is provided.
+///
+/// Returns [`APIMisuseError`] when a [`cltv_expiry_delta`] update is to be applied with a value
+/// below [`MIN_CLTV_EXPIRY_DELTA`].
+///
+/// If an error is returned, none of the updates should be considered applied.
+///
+/// [`forwarding_fee_proportional_millionths`]: ChannelConfig::forwarding_fee_proportional_millionths
+/// [`forwarding_fee_base_msat`]: ChannelConfig::forwarding_fee_base_msat
+/// [`cltv_expiry_delta`]: ChannelConfig::cltv_expiry_delta
+/// [`BroadcastChannelUpdate`]: events::MessageSendEvent::BroadcastChannelUpdate
+/// [`ChannelUpdate`]: msgs::ChannelUpdate
+/// [`ChannelUnavailable`]: APIError::ChannelUnavailable
+/// [`APIMisuseError`]: APIError::APIMisuseError
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_update_channel_config(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut counterparty_node_id: crate::c_types::PublicKey, mut channel_ids: crate::c_types::derived::CVec_ThirtyTwoBytesZ, config: &crate::lightning::util::config::ChannelConfig) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
+	let mut local_channel_ids = Vec::new(); for mut item in channel_ids.into_rust().drain(..) { local_channel_ids.push( { item.data }); };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_config(&counterparty_node_id.into_rust(), &local_channel_ids.iter().map(|a| *a).collect::<Vec<_>>()[..], config.get_native_ref());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
+	local_ret
+}
+
 /// Processes HTLCs which are pending waiting on random forward delay.
 ///
 /// Should only really ever be called in response to a PendingHTLCsForwardable event.
@@ -1845,6 +1928,8 @@ pub extern "C" fn ChannelManager_process_pending_htlc_forwards(this_arg: &crate:
 ///  * Broadcasting `ChannelUpdate` messages if we've been disconnected from our peer for more
 ///    than a minute, informing the network that they should no longer attempt to route over
 ///    the channel.
+///  * Expiring a channel's previous `ChannelConfig` if necessary to only allow forwarding HTLCs
+///    with the current `ChannelConfig`.
 ///
 /// Note that this may cause reentrancy through `chain::Watch::update_channel` calls or feerate
 /// estimate fetches.

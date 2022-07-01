@@ -1477,12 +1477,18 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				}
 				if let Some(t) = single_contained {
 					if let syn::Type::Tuple(syn::TypeTuple { elems, .. }) = t {
-						assert!(elems.is_empty());
 						let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
-						return Some(("if ", vec![
-							(format!(".is_none() {{ {}::None }} else {{ {}::Some /*",
-								inner_name, inner_name), format!(""))
-							], " */}", ContainerPrefixLocation::PerConv));
+						if elems.is_empty() {
+							return Some(("if ", vec![
+								(format!(".is_none() {{ {}::None }} else {{ {}::Some /* ",
+									inner_name, inner_name), format!(""))
+								], " */ }", ContainerPrefixLocation::PerConv));
+						} else {
+							return Some(("if ", vec![
+								(format!(".is_none() {{ {}::None }} else {{ {}::Some(",
+									inner_name, inner_name), format!("({}.unwrap())", var_access))
+								], ") }", ContainerPrefixLocation::PerConv));
+						}
 					}
 					if let syn::Type::Reference(syn::TypeReference { elem, .. }) = t {
 						if let syn::Type::Slice(_) = &**elem {
@@ -2039,6 +2045,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							write!(w, "{}", sliceconv(false, None)).unwrap();
 						}
 					}
+				} else if let syn::Type::Array(_) = &*s.elem {
+					write!(w, "{}", sliceconv(false, Some(".map(|a| *a)"))).unwrap();
 				} else { unimplemented!(); }
 			},
 			syn::Type::Tuple(t) => {
@@ -2390,6 +2398,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					is_ref = false;
 					ptr_for_ref = true;
 					convert_container!("Slice", 1, || ty.iter());
+					unimplemented!("convert_container should return true as container_lookup should succeed for slices");
+				} else if let syn::Type::Array(_) = &*s.elem {
+					is_ref = false;
+					ptr_for_ref = true;
+					let arr_elem = [(*s.elem).clone()];
+					convert_container!("Slice", 1, || arr_elem.iter());
 					unimplemented!("convert_container should return true as container_lookup should succeed for slices");
 				} else { unimplemented!() }
 			},
@@ -2901,6 +2915,22 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					let mut segments = syn::punctuated::Punctuated::new();
 					segments.push(parse_quote!(Vec<#args>));
 					self.write_c_type_intern(w, &syn::Type::Path(syn::TypePath { qself: None, path: syn::Path { leading_colon: None, segments } }), generics, false, is_mut, ptr_for_ref, with_ref_lifetime, c_ty)
+				} else if let syn::Type::Array(a) = &*s.elem {
+					if let syn::Expr::Lit(l) = &a.len {
+						if let syn::Lit::Int(i) = &l.lit {
+							let mut buf = Vec::new();
+							self.write_rust_type(&mut buf, generics, &*a.elem, false);
+							let arr_ty = String::from_utf8(buf).unwrap();
+
+							let arr_str = format!("[{}; {}]", arr_ty, i.base10_digits());
+							let ty = self.c_type_from_path(&arr_str, false, ptr_for_ref).unwrap()
+								.rsplitn(2, "::").next().unwrap();
+
+							let mangled_container = format!("CVec_{}Z", ty);
+							write!(w, "{}::{}", Self::generated_container_path(), mangled_container).unwrap();
+							self.check_create_container(mangled_container, "Vec", vec![&*s.elem], generics, false)
+						} else { false }
+					} else { false }
 				} else { false }
 			},
 			syn::Type::Tuple(t) => {

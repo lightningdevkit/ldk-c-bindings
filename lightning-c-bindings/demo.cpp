@@ -555,7 +555,7 @@ int main() {
 		LDK::ChannelHandshakeConfig handshake_config2 = ChannelHandshakeConfig_default();
 		ChannelHandshakeConfig_set_minimum_depth(&handshake_config2, 2);
 		LDK::UserConfig config2 = UserConfig_default();
-		UserConfig_set_own_channel_config(&config2, std::move(handshake_config2));
+		UserConfig_set_channel_handshake_config(&config2, std::move(handshake_config2));
 
 		LDK::ChannelManager cm2 = ChannelManager_new(fee_est, mon2, broadcast, logger2, KeysManager_as_KeysInterface(&keys2), std::move(config2), ChainParameters_new(network, BestBlock_new(chain_tip, 0)));
 
@@ -711,7 +711,7 @@ int main() {
 			LDK::RouteParameters route_params = RouteParameters_new(PaymentParameters_new(
 					ChannelManager_get_our_node_id(&cm2), LDKInvoiceFeatures {
 						.inner = NULL, .is_owned = false
-					}, Invoice_route_hints(invoice->contents.result), COption_u64Z_none(), 0xffffffff),
+					}, Invoice_route_hints(invoice->contents.result), COption_u64Z_none(), 0xffffffff, 1),
 				5000, Invoice_min_final_cltv_expiry(invoice->contents.result));
 			random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
 

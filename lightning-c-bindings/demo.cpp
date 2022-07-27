@@ -167,7 +167,7 @@ LDKCResult_NoneChannelMonitorUpdateErrZ update_channel_monitor(const void *this_
 			LDKBroadcasterInterface broadcaster = {
 				.broadcast_transaction = broadcast_tx,
 			};
-			LDK::CResult_NoneNoneZ res = ChannelMonitor_update_monitor(&mon.second, &update, &broadcaster, &fee_est, arg->logger);
+			LDK::CResult_NoneNoneZ res = ChannelMonitor_update_monitor(&mon.second, &update, &broadcaster, fee_est, arg->logger);
 			assert(res->result_ok);
 		}
 	}
@@ -176,12 +176,12 @@ LDKCResult_NoneChannelMonitorUpdateErrZ update_channel_monitor(const void *this_
 	mons_updated += 1;
 	return CResult_NoneChannelMonitorUpdateErrZ_ok();
 }
-LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ monitors_pending_monitor_events(const void *this_arg) {
+LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ monitors_pending_monitor_events(const void *this_arg) {
 	NodeMonitors* arg = (NodeMonitors*) this_arg;
 	std::unique_lock<std::mutex> l(arg->mut);
 
 	if (arg->mons.size() == 0) {
-		return LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ {
+		return LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ {
 			.data = NULL,
 			.datalen = 0,
 		};
@@ -192,12 +192,13 @@ LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ monitors_pending_monitor_events(con
 		LDK::CVec_MonitorEventZ events = ChannelMonitor_get_and_clear_pending_monitor_events(&arg->mons[0].second);
 		LDK::C2Tuple_OutPointScriptZ funding_info = ChannelMonitor_get_funding_txo(&arg->mons[0].second);
 		LDK::OutPoint outpoint = std::move(funding_info->a);
-		LDK::C2Tuple_OutPointCVec_MonitorEventZZ pair = C2Tuple_OutPointCVec_MonitorEventZZ_new(std::move(outpoint), std::move(events));
-		auto vec = LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ {
-			.data = (LDKC2Tuple_OutPointCVec_MonitorEventZZ*)malloc(sizeof(LDKC2Tuple_OutPointCVec_MonitorEventZZ)),
+		LDKPublicKey counterparty_node_id = ChannelMonitor_get_counterparty_node_id(&arg->mons[0].second);
+		LDK::C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ tuple = C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ_new(std::move(outpoint), std::move(events), std::move(counterparty_node_id));
+		auto vec = LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ {
+			.data = (LDKC3Tuple_OutPointCVec_MonitorEventZPublicKeyZ*)malloc(sizeof(LDKC3Tuple_OutPointCVec_MonitorEventZPublicKeyZ)),
 			.datalen = 1,
 		};
-		vec.data[0] = std::move(pair);
+		vec.data[0] = std::move(tuple);
 		return vec;
 	}
 }
@@ -711,7 +712,8 @@ int main() {
 			LDK::RouteParameters route_params = RouteParameters_new(PaymentParameters_new(
 					ChannelManager_get_our_node_id(&cm2), LDKInvoiceFeatures {
 						.inner = NULL, .is_owned = false
-					}, Invoice_route_hints(invoice->contents.result), COption_u64Z_none(), 0xffffffff, 1),
+					}, Invoice_route_hints(invoice->contents.result), COption_u64Z_none(), 0xffffffff,
+					1, 2, LDKCVec_u64Z { .data = NULL, .datalen = 0 }),
 				5000, Invoice_min_final_cltv_expiry(invoice->contents.result));
 			random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
 

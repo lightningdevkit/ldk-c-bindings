@@ -83,6 +83,10 @@ pub struct Score {
 	pub payment_path_failed: extern "C" fn (this_arg: *mut c_void, path: crate::c_types::derived::CVec_RouteHopZ, short_channel_id: u64),
 	/// Handles updating channel penalties after successfully routing along a path.
 	pub payment_path_successful: extern "C" fn (this_arg: *mut c_void, path: crate::c_types::derived::CVec_RouteHopZ),
+	/// Handles updating channel penalties after a probe over the given path failed.
+	pub probe_failed: extern "C" fn (this_arg: *mut c_void, path: crate::c_types::derived::CVec_RouteHopZ, short_channel_id: u64),
+	/// Handles updating channel penalties after a probe over the given path succeeded.
+	pub probe_successful: extern "C" fn (this_arg: *mut c_void, path: crate::c_types::derived::CVec_RouteHopZ),
 	/// Serialize the object into a byte array
 	pub write: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_u8Z,
 	/// Frees any resources associated with this object given its this_arg pointer.
@@ -98,6 +102,8 @@ pub(crate) extern "C" fn Score_clone_fields(orig: &Score) -> Score {
 		channel_penalty_msat: Clone::clone(&orig.channel_penalty_msat),
 		payment_path_failed: Clone::clone(&orig.payment_path_failed),
 		payment_path_successful: Clone::clone(&orig.payment_path_successful),
+		probe_failed: Clone::clone(&orig.probe_failed),
+		probe_successful: Clone::clone(&orig.probe_successful),
 		write: Clone::clone(&orig.write),
 		free: Clone::clone(&orig.free),
 	}
@@ -122,6 +128,14 @@ impl rustScore for Score {
 	fn payment_path_successful(&mut self, mut path: &[&lightning::routing::router::RouteHop]) {
 		let mut local_path = Vec::new(); for item in path.iter() { local_path.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::routing::router::RouteHop<>) as *mut _) }, is_owned: false } }); };
 		(self.payment_path_successful)(self.this_arg, local_path.into())
+	}
+	fn probe_failed(&mut self, mut path: &[&lightning::routing::router::RouteHop], mut short_channel_id: u64) {
+		let mut local_path = Vec::new(); for item in path.iter() { local_path.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::routing::router::RouteHop<>) as *mut _) }, is_owned: false } }); };
+		(self.probe_failed)(self.this_arg, local_path.into(), short_channel_id)
+	}
+	fn probe_successful(&mut self, mut path: &[&lightning::routing::router::RouteHop]) {
+		let mut local_path = Vec::new(); for item in path.iter() { local_path.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::routing::router::RouteHop<>) as *mut _) }, is_owned: false } }); };
+		(self.probe_successful)(self.this_arg, local_path.into())
 	}
 }
 
@@ -482,6 +496,8 @@ pub extern "C" fn FixedPenaltyScorer_as_Score(this_arg: &FixedPenaltyScorer) -> 
 		channel_penalty_msat: FixedPenaltyScorer_Score_channel_penalty_msat,
 		payment_path_failed: FixedPenaltyScorer_Score_payment_path_failed,
 		payment_path_successful: FixedPenaltyScorer_Score_payment_path_successful,
+		probe_failed: FixedPenaltyScorer_Score_probe_failed,
+		probe_successful: FixedPenaltyScorer_Score_probe_successful,
 		write: FixedPenaltyScorer_write_void,
 	}
 }
@@ -498,6 +514,14 @@ extern "C" fn FixedPenaltyScorer_Score_payment_path_failed(this_arg: *mut c_void
 extern "C" fn FixedPenaltyScorer_Score_payment_path_successful(this_arg: *mut c_void, mut _path: crate::c_types::derived::CVec_RouteHopZ) {
 	let mut local__path = Vec::new(); for mut item in _path.as_slice().iter() { local__path.push( { item.get_native_ref() }); };
 	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local__path[..])
+}
+extern "C" fn FixedPenaltyScorer_Score_probe_failed(this_arg: *mut c_void, mut _path: crate::c_types::derived::CVec_RouteHopZ, mut _short_channel_id: u64) {
+	let mut local__path = Vec::new(); for mut item in _path.as_slice().iter() { local__path.push( { item.get_native_ref() }); };
+	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::probe_failed(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local__path[..], _short_channel_id)
+}
+extern "C" fn FixedPenaltyScorer_Score_probe_successful(this_arg: *mut c_void, mut _path: crate::c_types::derived::CVec_RouteHopZ) {
+	let mut local__path = Vec::new(); for mut item in _path.as_slice().iter() { local__path.push( { item.get_native_ref() }); };
+	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::probe_successful(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local__path[..])
 }
 
 #[no_mangle]
@@ -597,6 +621,9 @@ pub(crate) type nativeProbabilisticScoringParameters = nativeProbabilisticScorin
 ///
 /// Used to configure base, liquidity, and amount penalties, the sum of which comprises the channel
 /// penalty (i.e., the amount in msats willing to be paid to avoid routing through the channel).
+///
+/// The penalty applied to any channel by the [`ProbabilisticScorer`] is the sum of each of the
+/// parameters here.
 #[must_use]
 #[repr(C)]
 pub struct ProbabilisticScoringParameters {
@@ -657,6 +684,39 @@ pub extern "C" fn ProbabilisticScoringParameters_get_base_penalty_msat(this_ptr:
 #[no_mangle]
 pub extern "C" fn ProbabilisticScoringParameters_set_base_penalty_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.base_penalty_msat = val;
+}
+/// A multiplier used with the payment amount to calculate a fixed penalty applied to each
+/// channel, in excess of the [`base_penalty_msat`].
+///
+/// The purpose of the amount penalty is to avoid having fees dominate the channel cost (i.e.,
+/// fees plus penalty) for large payments. The penalty is computed as the product of this
+/// multiplier and `2^30`ths of the payment amount.
+///
+/// ie `base_penalty_amount_multiplier_msat * amount_msat / 2^30`
+///
+/// Default value: 8,192 msat
+///
+/// [`base_penalty_msat`]: Self::base_penalty_msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_get_base_penalty_amount_multiplier_msat(this_ptr: &ProbabilisticScoringParameters) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().base_penalty_amount_multiplier_msat;
+	*inner_val
+}
+/// A multiplier used with the payment amount to calculate a fixed penalty applied to each
+/// channel, in excess of the [`base_penalty_msat`].
+///
+/// The purpose of the amount penalty is to avoid having fees dominate the channel cost (i.e.,
+/// fees plus penalty) for large payments. The penalty is computed as the product of this
+/// multiplier and `2^30`ths of the payment amount.
+///
+/// ie `base_penalty_amount_multiplier_msat * amount_msat / 2^30`
+///
+/// Default value: 8,192 msat
+///
+/// [`base_penalty_msat`]: Self::base_penalty_msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_set_base_penalty_amount_multiplier_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.base_penalty_amount_multiplier_msat = val;
 }
 /// A multiplier used in conjunction with the negative `log10` of the channel's success
 /// probability for a payment to determine the liquidity penalty.
@@ -736,7 +796,7 @@ pub extern "C" fn ProbabilisticScoringParameters_set_liquidity_offset_half_life(
 /// multiplier and `2^20`ths of the payment amount, weighted by the negative `log10` of the
 /// success probability.
 ///
-/// `-log10(success_probability) * amount_penalty_multiplier_msat * amount_msat / 2^20`
+/// `-log10(success_probability) * liquidity_penalty_amount_multiplier_msat * amount_msat / 2^20`
 ///
 /// In practice, this means for 0.1 success probability (`-log10(0.1) == 1`) each `2^20`th of
 /// the amount will result in a penalty of the multiplier. And, as the success probability
@@ -746,8 +806,8 @@ pub extern "C" fn ProbabilisticScoringParameters_set_liquidity_offset_half_life(
 ///
 /// Default value: 256 msat
 #[no_mangle]
-pub extern "C" fn ProbabilisticScoringParameters_get_amount_penalty_multiplier_msat(this_ptr: &ProbabilisticScoringParameters) -> u64 {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().amount_penalty_multiplier_msat;
+pub extern "C" fn ProbabilisticScoringParameters_get_liquidity_penalty_amount_multiplier_msat(this_ptr: &ProbabilisticScoringParameters) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().liquidity_penalty_amount_multiplier_msat;
 	*inner_val
 }
 /// A multiplier used in conjunction with a payment amount and the negative `log10` of the
@@ -758,7 +818,7 @@ pub extern "C" fn ProbabilisticScoringParameters_get_amount_penalty_multiplier_m
 /// multiplier and `2^20`ths of the payment amount, weighted by the negative `log10` of the
 /// success probability.
 ///
-/// `-log10(success_probability) * amount_penalty_multiplier_msat * amount_msat / 2^20`
+/// `-log10(success_probability) * liquidity_penalty_amount_multiplier_msat * amount_msat / 2^20`
 ///
 /// In practice, this means for 0.1 success probability (`-log10(0.1) == 1`) each `2^20`th of
 /// the amount will result in a penalty of the multiplier. And, as the success probability
@@ -768,8 +828,8 @@ pub extern "C" fn ProbabilisticScoringParameters_get_amount_penalty_multiplier_m
 ///
 /// Default value: 256 msat
 #[no_mangle]
-pub extern "C" fn ProbabilisticScoringParameters_set_amount_penalty_multiplier_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.amount_penalty_multiplier_msat = val;
+pub extern "C" fn ProbabilisticScoringParameters_set_liquidity_penalty_amount_multiplier_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.liquidity_penalty_amount_multiplier_msat = val;
 }
 /// This penalty is applied when `htlc_maximum_msat` is equal to or larger than half of the
 /// channel's capacity, which makes us prefer nodes with a smaller `htlc_maximum_msat`. We
@@ -791,6 +851,49 @@ pub extern "C" fn ProbabilisticScoringParameters_get_anti_probing_penalty_msat(t
 #[no_mangle]
 pub extern "C" fn ProbabilisticScoringParameters_set_anti_probing_penalty_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.anti_probing_penalty_msat = val;
+}
+/// This penalty is applied when the amount we're attempting to send over a channel exceeds our
+/// current estimate of the channel's available liquidity.
+///
+/// Note that in this case all other penalties, including the
+/// [`liquidity_penalty_multiplier_msat`] and [`liquidity_penalty_amount_multiplier_msat`]-based
+/// penalties, as well as the [`base_penalty_msat`] and the [`anti_probing_penalty_msat`], if
+/// applicable, are still included in the overall penalty.
+///
+/// If you wish to avoid creating paths with such channels entirely, setting this to a value of
+/// `u64::max_value()` will guarantee that.
+///
+/// Default value: 1_0000_0000_000 msat (1 Bitcoin)
+///
+/// [`liquidity_penalty_multiplier_msat`]: Self::liquidity_penalty_multiplier_msat
+/// [`liquidity_penalty_amount_multiplier_msat`]: Self::liquidity_penalty_amount_multiplier_msat
+/// [`base_penalty_msat`]: Self::base_penalty_msat
+/// [`anti_probing_penalty_msat`]: Self::anti_probing_penalty_msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_get_considered_impossible_penalty_msat(this_ptr: &ProbabilisticScoringParameters) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().considered_impossible_penalty_msat;
+	*inner_val
+}
+/// This penalty is applied when the amount we're attempting to send over a channel exceeds our
+/// current estimate of the channel's available liquidity.
+///
+/// Note that in this case all other penalties, including the
+/// [`liquidity_penalty_multiplier_msat`] and [`liquidity_penalty_amount_multiplier_msat`]-based
+/// penalties, as well as the [`base_penalty_msat`] and the [`anti_probing_penalty_msat`], if
+/// applicable, are still included in the overall penalty.
+///
+/// If you wish to avoid creating paths with such channels entirely, setting this to a value of
+/// `u64::max_value()` will guarantee that.
+///
+/// Default value: 1_0000_0000_000 msat (1 Bitcoin)
+///
+/// [`liquidity_penalty_multiplier_msat`]: Self::liquidity_penalty_multiplier_msat
+/// [`liquidity_penalty_amount_multiplier_msat`]: Self::liquidity_penalty_amount_multiplier_msat
+/// [`base_penalty_msat`]: Self::base_penalty_msat
+/// [`anti_probing_penalty_msat`]: Self::anti_probing_penalty_msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_set_considered_impossible_penalty_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.considered_impossible_penalty_msat = val;
 }
 impl Clone for ProbabilisticScoringParameters {
 	fn clone(&self) -> Self {
@@ -852,10 +955,22 @@ pub extern "C" fn ProbabilisticScorer_remove_banned(this_arg: &mut crate::lightn
 	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::scoring::nativeProbabilisticScorer)) }.remove_banned(node_id.get_native_ref())
 }
 
-/// Clears the list of nodes that are avoided during path finding.
+/// Sets a manual penalty for the given node.
 #[no_mangle]
-pub extern "C" fn ProbabilisticScorer_clear_banned(this_arg: &mut crate::lightning::routing::scoring::ProbabilisticScorer) {
-	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::scoring::nativeProbabilisticScorer)) }.clear_banned()
+pub extern "C" fn ProbabilisticScorer_set_manual_penalty(this_arg: &mut crate::lightning::routing::scoring::ProbabilisticScorer, node_id: &crate::lightning::routing::gossip::NodeId, mut penalty: u64) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::scoring::nativeProbabilisticScorer)) }.set_manual_penalty(node_id.get_native_ref(), penalty)
+}
+
+/// Removes the node with the given `node_id` from the list of manual penalties.
+#[no_mangle]
+pub extern "C" fn ProbabilisticScorer_remove_manual_penalty(this_arg: &mut crate::lightning::routing::scoring::ProbabilisticScorer, node_id: &crate::lightning::routing::gossip::NodeId) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::scoring::nativeProbabilisticScorer)) }.remove_manual_penalty(node_id.get_native_ref())
+}
+
+/// Clears the list of manual penalties that are applied during path finding.
+#[no_mangle]
+pub extern "C" fn ProbabilisticScorer_clear_manual_penalties(this_arg: &mut crate::lightning::routing::scoring::ProbabilisticScorer) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::scoring::nativeProbabilisticScorer)) }.clear_manual_penalties()
 }
 
 /// Marks all nodes in the given list as banned, i.e.,
@@ -892,6 +1007,8 @@ pub extern "C" fn ProbabilisticScorer_as_Score(this_arg: &ProbabilisticScorer) -
 		channel_penalty_msat: ProbabilisticScorer_Score_channel_penalty_msat,
 		payment_path_failed: ProbabilisticScorer_Score_payment_path_failed,
 		payment_path_successful: ProbabilisticScorer_Score_payment_path_successful,
+		probe_failed: ProbabilisticScorer_Score_probe_failed,
+		probe_successful: ProbabilisticScorer_Score_probe_successful,
 		write: ProbabilisticScorer_write_void,
 	}
 }
@@ -908,6 +1025,14 @@ extern "C" fn ProbabilisticScorer_Score_payment_path_failed(this_arg: *mut c_voi
 extern "C" fn ProbabilisticScorer_Score_payment_path_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
 	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
 	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, &local_path[..])
+}
+extern "C" fn ProbabilisticScorer_Score_probe_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::probe_failed(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, &local_path[..], short_channel_id)
+}
+extern "C" fn ProbabilisticScorer_Score_probe_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::probe_successful(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, &local_path[..])
 }
 
 mod approx {

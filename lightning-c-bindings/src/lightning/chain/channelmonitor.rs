@@ -757,7 +757,7 @@ pub(crate) extern "C" fn ChannelMonitor_write_void(obj: *const c_void) -> crate:
 /// panics if the given update is not the next update by update_id.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_update_monitor(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, updates: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, broadcaster: &crate::lightning::chain::chaininterface::BroadcasterInterface, fee_estimator: &crate::lightning::chain::chaininterface::FeeEstimator, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_NoneNoneZ {
+pub extern "C" fn ChannelMonitor_update_monitor(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, updates: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate, broadcaster: &crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_NoneNoneZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_monitor(updates.get_native_ref(), broadcaster, fee_estimator, logger);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
@@ -821,6 +821,20 @@ pub extern "C" fn ChannelMonitor_get_and_clear_pending_events(this_arg: &crate::
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_and_clear_pending_events();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::util::events::Event::native_into(item) }); };
 	local_ret.into()
+}
+
+/// Gets the `node_id` of the counterparty for this channel.
+///
+/// Will be `None` for channels constructed on LDK versions prior to 0.0.110 and always `Some`
+/// otherwise.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelMonitor_get_counterparty_node_id(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::PublicKey {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_counterparty_node_id();
+	let mut local_ret = if ret.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(ret.unwrap())) } };
+	local_ret
 }
 
 /// Used by ChannelManager deserialization to broadcast the latest holder state if its copy of

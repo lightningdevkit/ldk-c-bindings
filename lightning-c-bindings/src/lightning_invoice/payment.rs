@@ -93,6 +93,8 @@
 //! #     ) -> u64 { 0 }
 //! #     fn payment_path_failed(&mut self, _path: &[&RouteHop], _short_channel_id: u64) {}
 //! #     fn payment_path_successful(&mut self, _path: &[&RouteHop]) {}
+//! #     fn probe_failed(&mut self, _path: &[&RouteHop], _short_channel_id: u64) {}
+//! #     fn probe_successful(&mut self, _path: &[&RouteHop]) {}
 //! # }
 //! #
 //! # struct FakeLogger {}

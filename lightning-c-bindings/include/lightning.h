@@ -1851,6 +1851,22 @@ typedef struct LDKCOption_u64Z {
    };
 } LDKCOption_u64Z;
 
+/**
+ * A dynamically-allocated array of u64s of arbitrary size.
+ * This corresponds to std::vector in C++
+ */
+typedef struct LDKCVec_u64Z {
+   /**
+    * The elements in the array.
+    * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+    */
+   uint64_t *data;
+   /**
+    * The number of elements pointed to by `data`.
+    */
+   uintptr_t datalen;
+} LDKCVec_u64Z;
+
 
 
 /**
@@ -2353,6 +2369,133 @@ typedef struct LDKCResult_COption_ClosureReasonZDecodeErrorZ {
    bool result_ok;
 } LDKCResult_COption_ClosureReasonZDecodeErrorZ;
 
+/**
+ * Intended destination of a failed HTLC as indicated in [`Event::HTLCHandlingFailed`].
+ */
+typedef enum LDKHTLCDestination_Tag {
+   /**
+    * We tried forwarding to a channel but failed to do so. An example of such an instance is when
+    * there is insufficient capacity in our outbound channel.
+    */
+   LDKHTLCDestination_NextHopChannel,
+   /**
+    * Scenario where we are unsure of the next node to forward the HTLC to.
+    */
+   LDKHTLCDestination_UnknownNextHop,
+   /**
+    * Failure scenario where an HTLC may have been forwarded to be intended for us,
+    * but is invalid for some reason, so we reject it.
+    *
+    * Some of the reasons may include:
+    * * HTLC Timeouts
+    * * Expected MPP amount to claim does not equal HTLC total
+    * * Claimable amount does not match expected amount
+    */
+   LDKHTLCDestination_FailedPayment,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKHTLCDestination_Sentinel,
+} LDKHTLCDestination_Tag;
+
+typedef struct LDKHTLCDestination_LDKNextHopChannel_Body {
+   /**
+    * The `node_id` of the next node. For backwards compatibility, this field is
+    * marked as optional, versions prior to 0.0.110 may not always be able to provide
+    * counterparty node information.
+    *
+    * Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+    */
+   struct LDKPublicKey node_id;
+   /**
+    * The outgoing `channel_id` between us and the next node.
+    */
+   struct LDKThirtyTwoBytes channel_id;
+} LDKHTLCDestination_LDKNextHopChannel_Body;
+
+typedef struct LDKHTLCDestination_LDKUnknownNextHop_Body {
+   /**
+    * Short channel id we are requesting to forward an HTLC to.
+    */
+   uint64_t requested_forward_scid;
+} LDKHTLCDestination_LDKUnknownNextHop_Body;
+
+typedef struct LDKHTLCDestination_LDKFailedPayment_Body {
+   /**
+    * The payment hash of the payment we attempted to process.
+    */
+   struct LDKThirtyTwoBytes payment_hash;
+} LDKHTLCDestination_LDKFailedPayment_Body;
+
+typedef struct MUST_USE_STRUCT LDKHTLCDestination {
+   LDKHTLCDestination_Tag tag;
+   union {
+      LDKHTLCDestination_LDKNextHopChannel_Body next_hop_channel;
+      LDKHTLCDestination_LDKUnknownNextHop_Body unknown_next_hop;
+      LDKHTLCDestination_LDKFailedPayment_Body failed_payment;
+   };
+} LDKHTLCDestination;
+
+/**
+ * An enum which can either contain a crate::lightning::util::events::HTLCDestination or not
+ */
+typedef enum LDKCOption_HTLCDestinationZ_Tag {
+   /**
+    * When we're in this state, this COption_HTLCDestinationZ contains a crate::lightning::util::events::HTLCDestination
+    */
+   LDKCOption_HTLCDestinationZ_Some,
+   /**
+    * When we're in this state, this COption_HTLCDestinationZ contains nothing
+    */
+   LDKCOption_HTLCDestinationZ_None,
+   /**
+    * Must be last for serialization purposes
+    */
+   LDKCOption_HTLCDestinationZ_Sentinel,
+} LDKCOption_HTLCDestinationZ_Tag;
+
+typedef struct LDKCOption_HTLCDestinationZ {
+   LDKCOption_HTLCDestinationZ_Tag tag;
+   union {
+      struct {
+         struct LDKHTLCDestination some;
+      };
+   };
+} LDKCOption_HTLCDestinationZ;
+
+/**
+ * The contents of CResult_COption_HTLCDestinationZDecodeErrorZ
+ */
+typedef union LDKCResult_COption_HTLCDestinationZDecodeErrorZPtr {
+   /**
+    * A pointer to the contents in the success state.
+    * Reading from this pointer when `result_ok` is not set is undefined.
+    */
+   struct LDKCOption_HTLCDestinationZ *result;
+   /**
+    * A pointer to the contents in the error state.
+    * Reading from this pointer when `result_ok` is set is undefined.
+    */
+   struct LDKDecodeError *err;
+} LDKCResult_COption_HTLCDestinationZDecodeErrorZPtr;
+
+/**
+ * A CResult_COption_HTLCDestinationZDecodeErrorZ represents the result of a fallible operation,
+ * containing a crate::c_types::derived::COption_HTLCDestinationZ on success and a crate::lightning::ln::msgs::DecodeError on failure.
+ * `result_ok` indicates the overall state, and the contents are provided via `contents`.
+ */
+typedef struct LDKCResult_COption_HTLCDestinationZDecodeErrorZ {
+   /**
+    * The contents of this CResult_COption_HTLCDestinationZDecodeErrorZ, accessible via either
+    * `err` or `result` depending on the state of `result_ok`.
+    */
+   union LDKCResult_COption_HTLCDestinationZDecodeErrorZPtr contents;
+   /**
+    * Whether this CResult_COption_HTLCDestinationZDecodeErrorZ represents a success state.
+    */
+   bool result_ok;
+} LDKCResult_COption_HTLCDestinationZDecodeErrorZ;
+
 
 
 /**
@@ -2757,6 +2900,14 @@ typedef enum LDKEvent_Tag {
     */
    LDKEvent_PaymentPathFailed,
    /**
+    * Indicates that a probe payment we sent returned successful, i.e., only failed at the destination.
+    */
+   LDKEvent_ProbeSuccessful,
+   /**
+    * Indicates that a probe payment we sent failed at an intermediary node on the path.
+    */
+   LDKEvent_ProbeFailed,
+   /**
     * Used to indicate that [`ChannelManager::process_pending_htlc_forwards`] should be called at
     * a time in the future.
     *
@@ -2800,6 +2951,21 @@ typedef enum LDKEvent_Tag {
     * [`UserConfig::manually_accept_inbound_channels`]: crate::util::config::UserConfig::manually_accept_inbound_channels
     */
    LDKEvent_OpenChannelRequest,
+   /**
+    * Indicates that the HTLC was accepted, but could not be processed when or after attempting to
+    * forward it.
+    *
+    * Some scenarios where this event may be sent include:
+    * * Insufficient capacity in the outbound channel
+    * * While waiting to forward the HTLC, the channel it is meant to be forwarded through closes
+    * * When an unknown SCID is requested for forwarding a payment.
+    * * Claiming an amount for an MPP payment that exceeds the HTLC total
+    * * The HTLC has timed out
+    *
+    * This event, however, does not get generated if an HTLC fails to meet the forwarding
+    * requirements (i.e. insufficient fees paid, or a CLTV that is too soon).
+    */
+   LDKEvent_HTLCHandlingFailed,
    /**
     * Must be last for serialization purposes
     */
@@ -3034,6 +3200,52 @@ typedef struct LDKEvent_LDKPaymentPathFailed_Body {
    struct LDKRouteParameters retry;
 } LDKEvent_LDKPaymentPathFailed_Body;
 
+typedef struct LDKEvent_LDKProbeSuccessful_Body {
+   /**
+    * The id returned by [`ChannelManager::send_probe`].
+    *
+    * [`ChannelManager::send_probe`]: crate::ln::channelmanager::ChannelManager::send_probe
+    */
+   struct LDKThirtyTwoBytes payment_id;
+   /**
+    * The hash generated by [`ChannelManager::send_probe`].
+    *
+    * [`ChannelManager::send_probe`]: crate::ln::channelmanager::ChannelManager::send_probe
+    */
+   struct LDKThirtyTwoBytes payment_hash;
+   /**
+    * The payment path that was successful.
+    */
+   struct LDKCVec_RouteHopZ path;
+} LDKEvent_LDKProbeSuccessful_Body;
+
+typedef struct LDKEvent_LDKProbeFailed_Body {
+   /**
+    * The id returned by [`ChannelManager::send_probe`].
+    *
+    * [`ChannelManager::send_probe`]: crate::ln::channelmanager::ChannelManager::send_probe
+    */
+   struct LDKThirtyTwoBytes payment_id;
+   /**
+    * The hash generated by [`ChannelManager::send_probe`].
+    *
+    * [`ChannelManager::send_probe`]: crate::ln::channelmanager::ChannelManager::send_probe
+    */
+   struct LDKThirtyTwoBytes payment_hash;
+   /**
+    * The payment path that failed.
+    */
+   struct LDKCVec_RouteHopZ path;
+   /**
+    * The channel responsible for the failed probe.
+    *
+    * Note that for route hints or for the first hop in a path this may be an SCID alias and
+    * may not refer to a channel in the public network graph. These aliases may also collide
+    * with channels in the public network graph.
+    */
+   struct LDKCOption_u64Z short_channel_id;
+} LDKEvent_LDKProbeFailed_Body;
+
 typedef struct LDKEvent_LDKPendingHTLCsForwardable_Body {
    /**
     * The minimum amount of time that should be waited prior to calling
@@ -3176,6 +3388,17 @@ typedef struct LDKEvent_LDKOpenChannelRequest_Body {
    struct LDKChannelTypeFeatures channel_type;
 } LDKEvent_LDKOpenChannelRequest_Body;
 
+typedef struct LDKEvent_LDKHTLCHandlingFailed_Body {
+   /**
+    * The channel over which the HTLC was received.
+    */
+   struct LDKThirtyTwoBytes prev_channel_id;
+   /**
+    * Destination of the HTLC that failed to be processed.
+    */
+   struct LDKHTLCDestination failed_next_destination;
+} LDKEvent_LDKHTLCHandlingFailed_Body;
+
 typedef struct MUST_USE_STRUCT LDKEvent {
    LDKEvent_Tag tag;
    union {
@@ -3186,12 +3409,15 @@ typedef struct MUST_USE_STRUCT LDKEvent {
       LDKEvent_LDKPaymentFailed_Body payment_failed;
       LDKEvent_LDKPaymentPathSuccessful_Body payment_path_successful;
       LDKEvent_LDKPaymentPathFailed_Body payment_path_failed;
+      LDKEvent_LDKProbeSuccessful_Body probe_successful;
+      LDKEvent_LDKProbeFailed_Body probe_failed;
       LDKEvent_LDKPendingHTLCsForwardable_Body pending_htl_cs_forwardable;
       LDKEvent_LDKSpendableOutputs_Body spendable_outputs;
       LDKEvent_LDKPaymentForwarded_Body payment_forwarded;
       LDKEvent_LDKChannelClosed_Body channel_closed;
       LDKEvent_LDKDiscardFunding_Body discard_funding;
       LDKEvent_LDKOpenChannelRequest_Body open_channel_request;
+      LDKEvent_LDKHTLCHandlingFailed_Body htlc_handling_failed;
    };
 } LDKEvent;
 
@@ -4306,9 +4532,9 @@ typedef struct LDKCVec_MonitorEventZ {
 } LDKCVec_MonitorEventZ;
 
 /**
- * A tuple of 2 elements. See the individual fields for the types contained.
+ * A tuple of 3 elements. See the individual fields for the types contained.
  */
-typedef struct LDKC2Tuple_OutPointCVec_MonitorEventZZ {
+typedef struct LDKC3Tuple_OutPointCVec_MonitorEventZPublicKeyZ {
    /**
     * The element at position 0
     */
@@ -4317,23 +4543,27 @@ typedef struct LDKC2Tuple_OutPointCVec_MonitorEventZZ {
     * The element at position 1
     */
    struct LDKCVec_MonitorEventZ b;
-} LDKC2Tuple_OutPointCVec_MonitorEventZZ;
+   /**
+    * The element at position 2
+    */
+   struct LDKPublicKey c;
+} LDKC3Tuple_OutPointCVec_MonitorEventZPublicKeyZ;
 
 /**
- * A dynamically-allocated array of crate::c_types::derived::C2Tuple_OutPointCVec_MonitorEventZZs of arbitrary size.
+ * A dynamically-allocated array of crate::c_types::derived::C3Tuple_OutPointCVec_MonitorEventZPublicKeyZs of arbitrary size.
  * This corresponds to std::vector in C++
  */
-typedef struct LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ {
+typedef struct LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ {
    /**
     * The elements in the array.
     * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
     */
-   struct LDKC2Tuple_OutPointCVec_MonitorEventZZ *data;
+   struct LDKC3Tuple_OutPointCVec_MonitorEventZPublicKeyZ *data;
    /**
     * The number of elements pointed to by `data`.
     */
    uintptr_t datalen;
-} LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ;
+} LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ;
 
 /**
  * An enum which can either contain a crate::c_types::derived::C2Tuple_usizeTransactionZ or not
@@ -5295,6 +5525,30 @@ typedef struct LDKTwelveBytes {
    uint8_t data[12];
 } LDKTwelveBytes;
 
+
+
+/**
+ * Represents a hostname for serialization purposes.
+ * Only the character set and length will be validated.
+ * The character set consists of ASCII alphanumeric characters, hyphens, and periods.
+ * Its length is guaranteed to be representable by a single byte.
+ * This serialization is used by BOLT 7 hostnames.
+ */
+typedef struct MUST_USE_STRUCT LDKHostname {
+   /**
+    * A pointer to the opaque Rust object.
+    * Nearly everywhere, inner must be non-null, however in places where
+    * the Rust equivalent takes an Option, it may be set to null to indicate None.
+    */
+   LDKnativeHostname *inner;
+   /**
+    * Indicates that this is the only struct which contains the same pointer.
+    * Rust functions which take ownership of an object provided via an argument require
+    * this to be true and invalidate the object pointed to by inner.
+    */
+   bool is_owned;
+} LDKHostname;
+
 /**
  * An address which can be used to connect to a remote peer
  */
@@ -5320,6 +5574,10 @@ typedef enum LDKNetAddress_Tag {
     * wrap as base32 and append \".onion\".
     */
    LDKNetAddress_OnionV3,
+   /**
+    * A hostname/port on which the peer is listening.
+    */
+   LDKNetAddress_Hostname,
    /**
     * Must be last for serialization purposes
     */
@@ -5367,6 +5625,17 @@ typedef struct LDKNetAddress_LDKOnionV3_Body {
    uint16_t port;
 } LDKNetAddress_LDKOnionV3_Body;
 
+typedef struct LDKNetAddress_LDKHostname_Body {
+   /**
+    * The hostname on which the node is listening.
+    */
+   struct LDKHostname hostname;
+   /**
+    * The port on which the node is listening.
+    */
+   uint16_t port;
+} LDKNetAddress_LDKHostname_Body;
+
 typedef struct MUST_USE_STRUCT LDKNetAddress {
    LDKNetAddress_Tag tag;
    union {
@@ -5376,6 +5645,7 @@ typedef struct MUST_USE_STRUCT LDKNetAddress {
          struct LDKTwelveBytes onion_v2;
       };
       LDKNetAddress_LDKOnionV3_Body onion_v3;
+      LDKNetAddress_LDKHostname_Body hostname;
    };
 } LDKNetAddress;
 
@@ -5503,22 +5773,6 @@ typedef struct LDKCResult_NodeAliasDecodeErrorZ {
     */
    bool result_ok;
 } LDKCResult_NodeAliasDecodeErrorZ;
-
-/**
- * A dynamically-allocated array of u64s of arbitrary size.
- * This corresponds to std::vector in C++
- */
-typedef struct LDKCVec_u64Z {
-   /**
-    * The elements in the array.
-    * If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
-    */
-   uint64_t *data;
-   /**
-    * The number of elements pointed to by `data`.
-    */
-   uintptr_t datalen;
-} LDKCVec_u64Z;
 
 
 
@@ -7445,7 +7699,7 @@ typedef struct LDKWatch {
     * For details on asynchronous [`ChannelMonitor`] updating and returning
     * [`MonitorEvent::UpdateCompleted`] here, see [`ChannelMonitorUpdateErr::TemporaryFailure`].
     */
-   struct LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ (*release_pending_monitor_events)(const void *this_arg);
+   struct LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ (*release_pending_monitor_events)(const void *this_arg);
    /**
     * Frees any resources associated with this object given its this_arg pointer.
     * Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -7589,12 +7843,12 @@ typedef struct LDKFeeEstimator {
    /**
     * Gets estimated satoshis of fee required per 1000 Weight-Units.
     *
-    * Must return a value no smaller than 253 (ie 1 satoshi-per-byte rounded up to ensure later
-    * round-downs don't put us below 1 satoshi-per-byte).
+    * LDK will wrap this method and ensure that the value returned is no smaller than 253
+    * (ie 1 satoshi-per-byte rounded up to ensure later round-downs don't put us below 1 satoshi-per-byte).
     *
-    * This method can be implemented with the following unit conversions:
-    *  * max(satoshis-per-byte * 250, 253)
-    *  * max(satoshis-per-kbyte / 4, 253)
+    * The following unit conversions can be used to convert to sats/KW:
+    *  * satoshis-per-byte * 250
+    *  * satoshis-per-kbyte / 4
     */
    uint32_t (*get_est_sat_per_1000_weight)(const void *this_arg, enum LDKConfirmationTarget confirmation_target);
    /**
@@ -11152,6 +11406,14 @@ typedef struct LDKScore {
     */
    void (*payment_path_successful)(void *this_arg, struct LDKCVec_RouteHopZ path);
    /**
+    * Handles updating channel penalties after a probe over the given path failed.
+    */
+   void (*probe_failed)(void *this_arg, struct LDKCVec_RouteHopZ path, uint64_t short_channel_id);
+   /**
+    * Handles updating channel penalties after a probe over the given path succeeded.
+    */
+   void (*probe_successful)(void *this_arg, struct LDKCVec_RouteHopZ path);
+   /**
     * Serialize the object into a byte array
     */
    struct LDKCVec_u8Z (*write)(const void *this_arg);
@@ -12396,6 +12658,9 @@ typedef struct LDKLockableScore {
  *
  * Used to configure base, liquidity, and amount penalties, the sum of which comprises the channel
  * penalty (i.e., the amount in msats willing to be paid to avoid routing through the channel).
+ *
+ * The penalty applied to any channel by the [`ProbabilisticScorer`] is the sum of each of the
+ * parameters here.
  */
 typedef struct MUST_USE_STRUCT LDKProbabilisticScoringParameters {
    /**
@@ -12819,6 +13084,8 @@ extern const uintptr_t MAX_BUF_SIZE;
 
 extern const uint64_t MIN_RELAY_FEE_SAT_PER_1000_WEIGHT;
 
+extern const uint32_t FEERATE_FLOOR_SATS_PER_KW;
+
 extern const uint64_t CLOSED_CHANNEL_UPDATE_ID;
 
 extern const uint32_t ANTI_REORG_DELAY;
@@ -12835,7 +13102,7 @@ extern const uint64_t UNKNOWN_CHANNEL_CAPACITY_MSAT;
 
 extern const uint32_t DEFAULT_MAX_TOTAL_CLTV_EXPIRY_DELTA;
 
-extern const uint8_t DEFAULT_MAX_MPP_PATH_COUNT;
+extern const uint8_t DEFAULT_MAX_PATH_COUNT;
 
 extern const uint64_t MAX_TIMESTAMP;
 
@@ -13548,6 +13815,11 @@ void COption_u64Z_free(struct LDKCOption_u64Z _res);
 struct LDKCOption_u64Z COption_u64Z_clone(const struct LDKCOption_u64Z *NONNULL_PTR orig);
 
 /**
+ * Frees the buffer pointed to by `data` if `datalen` is non-0.
+ */
+void CVec_u64Z_free(struct LDKCVec_u64Z _res);
+
+/**
  * Creates a new CResult_PaymentParametersDecodeErrorZ in the success state.
  */
 struct LDKCResult_PaymentParametersDecodeErrorZ CResult_PaymentParametersDecodeErrorZ_ok(struct LDKPaymentParameters o);
@@ -13740,6 +14012,53 @@ void CResult_COption_ClosureReasonZDecodeErrorZ_free(struct LDKCResult_COption_C
 struct LDKCResult_COption_ClosureReasonZDecodeErrorZ CResult_COption_ClosureReasonZDecodeErrorZ_clone(const struct LDKCResult_COption_ClosureReasonZDecodeErrorZ *NONNULL_PTR orig);
 
 /**
+ * Constructs a new COption_HTLCDestinationZ containing a crate::lightning::util::events::HTLCDestination
+ */
+struct LDKCOption_HTLCDestinationZ COption_HTLCDestinationZ_some(struct LDKHTLCDestination o);
+
+/**
+ * Constructs a new COption_HTLCDestinationZ containing nothing
+ */
+struct LDKCOption_HTLCDestinationZ COption_HTLCDestinationZ_none(void);
+
+/**
+ * Frees any resources associated with the crate::lightning::util::events::HTLCDestination, if we are in the Some state
+ */
+void COption_HTLCDestinationZ_free(struct LDKCOption_HTLCDestinationZ _res);
+
+/**
+ * Creates a new COption_HTLCDestinationZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCOption_HTLCDestinationZ COption_HTLCDestinationZ_clone(const struct LDKCOption_HTLCDestinationZ *NONNULL_PTR orig);
+
+/**
+ * Creates a new CResult_COption_HTLCDestinationZDecodeErrorZ in the success state.
+ */
+struct LDKCResult_COption_HTLCDestinationZDecodeErrorZ CResult_COption_HTLCDestinationZDecodeErrorZ_ok(struct LDKCOption_HTLCDestinationZ o);
+
+/**
+ * Creates a new CResult_COption_HTLCDestinationZDecodeErrorZ in the error state.
+ */
+struct LDKCResult_COption_HTLCDestinationZDecodeErrorZ CResult_COption_HTLCDestinationZDecodeErrorZ_err(struct LDKDecodeError e);
+
+/**
+ * Checks if the given object is currently in the success state
+ */
+bool CResult_COption_HTLCDestinationZDecodeErrorZ_is_ok(const struct LDKCResult_COption_HTLCDestinationZDecodeErrorZ *NONNULL_PTR o);
+
+/**
+ * Frees any resources used by the CResult_COption_HTLCDestinationZDecodeErrorZ.
+ */
+void CResult_COption_HTLCDestinationZDecodeErrorZ_free(struct LDKCResult_COption_HTLCDestinationZDecodeErrorZ _res);
+
+/**
+ * Creates a new CResult_COption_HTLCDestinationZDecodeErrorZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCResult_COption_HTLCDestinationZDecodeErrorZ CResult_COption_HTLCDestinationZDecodeErrorZ_clone(const struct LDKCResult_COption_HTLCDestinationZDecodeErrorZ *NONNULL_PTR orig);
+
+/**
  * Constructs a new COption_NetworkUpdateZ containing a crate::lightning::routing::gossip::NetworkUpdate
  */
 struct LDKCOption_NetworkUpdateZ COption_NetworkUpdateZ_some(struct LDKNetworkUpdate o);
@@ -13904,22 +14223,22 @@ void CVec_MonitorEventZ_free(struct LDKCVec_MonitorEventZ _res);
  * Creates a new tuple which has the same data as `orig`
  * but with all dynamically-allocated buffers duplicated in new buffers.
  */
-struct LDKC2Tuple_OutPointCVec_MonitorEventZZ C2Tuple_OutPointCVec_MonitorEventZZ_clone(const struct LDKC2Tuple_OutPointCVec_MonitorEventZZ *NONNULL_PTR orig);
+struct LDKC3Tuple_OutPointCVec_MonitorEventZPublicKeyZ C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ_clone(const struct LDKC3Tuple_OutPointCVec_MonitorEventZPublicKeyZ *NONNULL_PTR orig);
 
 /**
- * Creates a new C2Tuple_OutPointCVec_MonitorEventZZ from the contained elements.
+ * Creates a new C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ from the contained elements.
  */
-struct LDKC2Tuple_OutPointCVec_MonitorEventZZ C2Tuple_OutPointCVec_MonitorEventZZ_new(struct LDKOutPoint a, struct LDKCVec_MonitorEventZ b);
+struct LDKC3Tuple_OutPointCVec_MonitorEventZPublicKeyZ C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ_new(struct LDKOutPoint a, struct LDKCVec_MonitorEventZ b, struct LDKPublicKey c);
 
 /**
- * Frees any resources used by the C2Tuple_OutPointCVec_MonitorEventZZ.
+ * Frees any resources used by the C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ.
  */
-void C2Tuple_OutPointCVec_MonitorEventZZ_free(struct LDKC2Tuple_OutPointCVec_MonitorEventZZ _res);
+void C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ_free(struct LDKC3Tuple_OutPointCVec_MonitorEventZPublicKeyZ _res);
 
 /**
  * Frees the buffer pointed to by `data` if `datalen` is non-0.
  */
-void CVec_C2Tuple_OutPointCVec_MonitorEventZZZ_free(struct LDKCVec_C2Tuple_OutPointCVec_MonitorEventZZZ _res);
+void CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ_free(struct LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ _res);
 
 /**
  * Constructs a new COption_C2Tuple_usizeTransactionZZ containing a crate::c_types::derived::C2Tuple_usizeTransactionZ
@@ -14439,11 +14758,6 @@ void CResult_NodeAliasDecodeErrorZ_free(struct LDKCResult_NodeAliasDecodeErrorZ 
  * but with all dynamically-allocated buffers duplicated in new buffers.
  */
 struct LDKCResult_NodeAliasDecodeErrorZ CResult_NodeAliasDecodeErrorZ_clone(const struct LDKCResult_NodeAliasDecodeErrorZ *NONNULL_PTR orig);
-
-/**
- * Frees the buffer pointed to by `data` if `datalen` is non-0.
- */
-void CVec_u64Z_free(struct LDKCVec_u64Z _res);
 
 /**
  * Creates a new CResult_NodeInfoDecodeErrorZ in the success state.
@@ -17211,6 +17525,41 @@ struct LDKCVec_u8Z ClosureReason_write(const struct LDKClosureReason *NONNULL_PT
 struct LDKCResult_COption_ClosureReasonZDecodeErrorZ ClosureReason_read(struct LDKu8slice ser);
 
 /**
+ * Frees any resources used by the HTLCDestination
+ */
+void HTLCDestination_free(struct LDKHTLCDestination this_ptr);
+
+/**
+ * Creates a copy of the HTLCDestination
+ */
+struct LDKHTLCDestination HTLCDestination_clone(const struct LDKHTLCDestination *NONNULL_PTR orig);
+
+/**
+ * Utility method to constructs a new NextHopChannel-variant HTLCDestination
+ */
+struct LDKHTLCDestination HTLCDestination_next_hop_channel(struct LDKPublicKey node_id, struct LDKThirtyTwoBytes channel_id);
+
+/**
+ * Utility method to constructs a new UnknownNextHop-variant HTLCDestination
+ */
+struct LDKHTLCDestination HTLCDestination_unknown_next_hop(uint64_t requested_forward_scid);
+
+/**
+ * Utility method to constructs a new FailedPayment-variant HTLCDestination
+ */
+struct LDKHTLCDestination HTLCDestination_failed_payment(struct LDKThirtyTwoBytes payment_hash);
+
+/**
+ * Serialize the HTLCDestination object into a byte array which can be read by HTLCDestination_read
+ */
+struct LDKCVec_u8Z HTLCDestination_write(const struct LDKHTLCDestination *NONNULL_PTR obj);
+
+/**
+ * Read a HTLCDestination from a byte array, created by HTLCDestination_write
+ */
+struct LDKCResult_COption_HTLCDestinationZDecodeErrorZ HTLCDestination_read(struct LDKu8slice ser);
+
+/**
  * Frees any resources used by the Event
  */
 void Event_free(struct LDKEvent this_ptr);
@@ -17256,6 +17605,16 @@ struct LDKEvent Event_payment_path_successful(struct LDKThirtyTwoBytes payment_i
 struct LDKEvent Event_payment_path_failed(struct LDKThirtyTwoBytes payment_id, struct LDKThirtyTwoBytes payment_hash, bool rejected_by_dest, struct LDKCOption_NetworkUpdateZ network_update, bool all_paths_failed, struct LDKCVec_RouteHopZ path, struct LDKCOption_u64Z short_channel_id, struct LDKRouteParameters retry);
 
 /**
+ * Utility method to constructs a new ProbeSuccessful-variant Event
+ */
+struct LDKEvent Event_probe_successful(struct LDKThirtyTwoBytes payment_id, struct LDKThirtyTwoBytes payment_hash, struct LDKCVec_RouteHopZ path);
+
+/**
+ * Utility method to constructs a new ProbeFailed-variant Event
+ */
+struct LDKEvent Event_probe_failed(struct LDKThirtyTwoBytes payment_id, struct LDKThirtyTwoBytes payment_hash, struct LDKCVec_RouteHopZ path, struct LDKCOption_u64Z short_channel_id);
+
+/**
  * Utility method to constructs a new PendingHTLCsForwardable-variant Event
  */
 struct LDKEvent Event_pending_htlcs_forwardable(uint64_t time_forwardable);
@@ -17284,6 +17643,11 @@ struct LDKEvent Event_discard_funding(struct LDKThirtyTwoBytes channel_id, struc
  * Utility method to constructs a new OpenChannelRequest-variant Event
  */
 struct LDKEvent Event_open_channel_request(struct LDKThirtyTwoBytes temporary_channel_id, struct LDKPublicKey counterparty_node_id, uint64_t funding_satoshis, uint64_t push_msat, struct LDKChannelTypeFeatures channel_type);
+
+/**
+ * Utility method to constructs a new HTLCHandlingFailed-variant Event
+ */
+struct LDKEvent Event_htlchandling_failed(struct LDKThirtyTwoBytes prev_channel_id, struct LDKHTLCDestination failed_next_destination);
 
 /**
  * Serialize the Event object into a byte array which can be read by Event_read
@@ -17473,6 +17837,21 @@ void BigSize_set_a(struct LDKBigSize *NONNULL_PTR this_ptr, uint64_t val);
  * Constructs a new BigSize given each field
  */
 MUST_USE_RES struct LDKBigSize BigSize_new(uint64_t a_arg);
+
+/**
+ * Frees any resources used by the Hostname, if is_owned is set and inner is non-NULL.
+ */
+void Hostname_free(struct LDKHostname this_obj);
+
+/**
+ * Creates a copy of the Hostname
+ */
+struct LDKHostname Hostname_clone(const struct LDKHostname *NONNULL_PTR orig);
+
+/**
+ * Returns the length of the hostname.
+ */
+MUST_USE_RES uint8_t Hostname_len(const struct LDKHostname *NONNULL_PTR this_arg);
 
 /**
  * Creates a digital signature of a message given a SecretKey, like the node's secret.
@@ -18933,7 +19312,7 @@ struct LDKCVec_u8Z ChannelMonitor_write(const struct LDKChannelMonitor *NONNULL_
  *
  * panics if the given update is not the next update by update_id.
  */
-MUST_USE_RES struct LDKCResult_NoneNoneZ ChannelMonitor_update_monitor(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const struct LDKChannelMonitorUpdate *NONNULL_PTR updates, const struct LDKBroadcasterInterface *NONNULL_PTR broadcaster, const struct LDKFeeEstimator *NONNULL_PTR fee_estimator, const struct LDKLogger *NONNULL_PTR logger);
+MUST_USE_RES struct LDKCResult_NoneNoneZ ChannelMonitor_update_monitor(const struct LDKChannelMonitor *NONNULL_PTR this_arg, const struct LDKChannelMonitorUpdate *NONNULL_PTR updates, const struct LDKBroadcasterInterface *NONNULL_PTR broadcaster, struct LDKFeeEstimator fee_estimator, const struct LDKLogger *NONNULL_PTR logger);
 
 /**
  * Gets the update_id from the latest ChannelMonitorUpdate which was applied to this
@@ -18974,6 +19353,16 @@ MUST_USE_RES struct LDKCVec_MonitorEventZ ChannelMonitor_get_and_clear_pending_m
  * no internal locking in ChannelMonitors.
  */
 MUST_USE_RES struct LDKCVec_EventZ ChannelMonitor_get_and_clear_pending_events(const struct LDKChannelMonitor *NONNULL_PTR this_arg);
+
+/**
+ * Gets the `node_id` of the counterparty for this channel.
+ *
+ * Will be `None` for channels constructed on LDK versions prior to 0.0.110 and always `Some`
+ * otherwise.
+ *
+ * Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+ */
+MUST_USE_RES struct LDKPublicKey ChannelMonitor_get_counterparty_node_id(const struct LDKChannelMonitor *NONNULL_PTR this_arg);
 
 /**
  * Used by ChannelManager deserialization to broadcast the latest holder state if its copy of
@@ -20628,6 +21017,13 @@ void ChannelManager_abandon_payment(const struct LDKChannelManager *NONNULL_PTR 
 MUST_USE_RES struct LDKCResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ ChannelManager_send_spontaneous_payment(const struct LDKChannelManager *NONNULL_PTR this_arg, const struct LDKRoute *NONNULL_PTR route, struct LDKThirtyTwoBytes payment_preimage);
 
 /**
+ * Send a payment that is probing the given route for liquidity. We calculate the
+ * [`PaymentHash`] of probes based on a static secret and a random [`PaymentId`], which allows
+ * us to easily discern them from real payments.
+ */
+MUST_USE_RES struct LDKCResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ ChannelManager_send_probe(const struct LDKChannelManager *NONNULL_PTR this_arg, struct LDKCVec_RouteHopZ hops);
+
+/**
  * Call this upon creation of a funding transaction for the given channel.
  *
  * Returns an [`APIError::APIMisuseError`] if the funding_transaction spent non-SegWit outputs
@@ -20677,7 +21073,7 @@ MUST_USE_RES struct LDKCResult_NoneAPIErrorZ ChannelManager_funding_transaction_
  * tying these addresses together and to this node. If you wish to preserve user privacy,
  * addresses should likely contain only Tor Onion addresses.
  *
- * Panics if `addresses` is absurdly large (more than 500).
+ * Panics if `addresses` is absurdly large (more than 100).
  *
  * [`get_and_clear_pending_msg_events`]: MessageSendEventsProvider::get_and_clear_pending_msg_events
  */
@@ -22501,6 +22897,11 @@ struct LDKNetAddress NetAddress_onion_v2(struct LDKTwelveBytes a);
 struct LDKNetAddress NetAddress_onion_v3(struct LDKThirtyTwoBytes ed25519_pubkey, uint16_t checksum, uint8_t version, uint16_t port);
 
 /**
+ * Utility method to constructs a new Hostname-variant NetAddress
+ */
+struct LDKNetAddress NetAddress_hostname(struct LDKHostname hostname, uint16_t port);
+
+/**
  * Serialize the NetAddress object into a byte array which can be read by NetAddress_read
  */
 struct LDKCVec_u8Z NetAddress_write(const struct LDKNetAddress *NONNULL_PTR obj);
@@ -22839,6 +23240,16 @@ uint64_t UnsignedChannelUpdate_get_htlc_minimum_msat(const struct LDKUnsignedCha
 void UnsignedChannelUpdate_set_htlc_minimum_msat(struct LDKUnsignedChannelUpdate *NONNULL_PTR this_ptr, uint64_t val);
 
 /**
+ * The maximum HTLC value incoming to sender, in milli-satoshi. Used to be optional.
+ */
+uint64_t UnsignedChannelUpdate_get_htlc_maximum_msat(const struct LDKUnsignedChannelUpdate *NONNULL_PTR this_ptr);
+
+/**
+ * The maximum HTLC value incoming to sender, in milli-satoshi. Used to be optional.
+ */
+void UnsignedChannelUpdate_set_htlc_maximum_msat(struct LDKUnsignedChannelUpdate *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
  * The base HTLC fee charged by sender, in milli-satoshi
  */
 uint32_t UnsignedChannelUpdate_get_fee_base_msat(const struct LDKUnsignedChannelUpdate *NONNULL_PTR this_ptr);
@@ -22864,6 +23275,11 @@ void UnsignedChannelUpdate_set_fee_proportional_millionths(struct LDKUnsignedCha
  * lightning gossip
  */
 void UnsignedChannelUpdate_set_excess_data(struct LDKUnsignedChannelUpdate *NONNULL_PTR this_ptr, struct LDKCVec_u8Z val);
+
+/**
+ * Constructs a new UnsignedChannelUpdate given each field
+ */
+MUST_USE_RES struct LDKUnsignedChannelUpdate UnsignedChannelUpdate_new(struct LDKThirtyTwoBytes chain_hash_arg, uint64_t short_channel_id_arg, uint32_t timestamp_arg, uint8_t flags_arg, uint16_t cltv_expiry_delta_arg, uint64_t htlc_minimum_msat_arg, uint64_t htlc_maximum_msat_arg, uint32_t fee_base_msat_arg, uint32_t fee_proportional_millionths_arg, struct LDKCVec_u8Z excess_data_arg);
 
 /**
  * Creates a copy of the UnsignedChannelUpdate
@@ -23800,8 +24216,7 @@ MUST_USE_RES struct LDKCVec_PublicKeyZ PeerManager_get_peer_node_ids(const struc
  * peer using the init message.
  * The user should pass the remote network address of the host they are connected to.
  *
- * Note that if an Err is returned here you MUST NOT call socket_disconnected for the new
- * descriptor but must disconnect the connection immediately.
+ * If an `Err` is returned here you must disconnect the connection immediately.
  *
  * Returns a small number of bytes to send to the remote node (currently always 50).
  *
@@ -23821,9 +24236,8 @@ MUST_USE_RES struct LDKCResult_CVec_u8ZPeerHandleErrorZ PeerManager_new_outbound
  * The user should pass the remote network address of the host they are connected to.
  *
  * May refuse the connection by returning an Err, but will never write bytes to the remote end
- * (outbound connector always speaks first). Note that if an Err is returned here you MUST NOT
- * call socket_disconnected for the new descriptor but must disconnect the connection
- * immediately.
+ * (outbound connector always speaks first). If an `Err` is returned here you must disconnect
+ * the connection immediately.
  *
  * Panics if descriptor is duplicative with some other descriptor which has not yet been
  * [`socket_disconnected()`].
@@ -25964,12 +26378,12 @@ void ChannelUpdateInfo_set_htlc_minimum_msat(struct LDKChannelUpdateInfo *NONNUL
 /**
  * The maximum value which may be relayed to the next hop via the channel.
  */
-struct LDKCOption_u64Z ChannelUpdateInfo_get_htlc_maximum_msat(const struct LDKChannelUpdateInfo *NONNULL_PTR this_ptr);
+uint64_t ChannelUpdateInfo_get_htlc_maximum_msat(const struct LDKChannelUpdateInfo *NONNULL_PTR this_ptr);
 
 /**
  * The maximum value which may be relayed to the next hop via the channel.
  */
-void ChannelUpdateInfo_set_htlc_maximum_msat(struct LDKChannelUpdateInfo *NONNULL_PTR this_ptr, struct LDKCOption_u64Z val);
+void ChannelUpdateInfo_set_htlc_maximum_msat(struct LDKChannelUpdateInfo *NONNULL_PTR this_ptr, uint64_t val);
 
 /**
  * Fees charged when the channel is used for routing
@@ -26004,7 +26418,7 @@ void ChannelUpdateInfo_set_last_update_message(struct LDKChannelUpdateInfo *NONN
 /**
  * Constructs a new ChannelUpdateInfo given each field
  */
-MUST_USE_RES struct LDKChannelUpdateInfo ChannelUpdateInfo_new(uint32_t last_update_arg, bool enabled_arg, uint16_t cltv_expiry_delta_arg, uint64_t htlc_minimum_msat_arg, struct LDKCOption_u64Z htlc_maximum_msat_arg, struct LDKRoutingFees fees_arg, struct LDKChannelUpdate last_update_message_arg);
+MUST_USE_RES struct LDKChannelUpdateInfo ChannelUpdateInfo_new(uint32_t last_update_arg, bool enabled_arg, uint16_t cltv_expiry_delta_arg, uint64_t htlc_minimum_msat_arg, uint64_t htlc_maximum_msat_arg, struct LDKRoutingFees fees_arg, struct LDKChannelUpdate last_update_message_arg);
 
 /**
  * Creates a copy of the ChannelUpdateInfo
@@ -26612,6 +27026,20 @@ MUST_USE_RES struct LDKCResult_NoneLightningErrorZ NetworkGraph_update_channel(c
 MUST_USE_RES struct LDKCResult_NoneLightningErrorZ NetworkGraph_update_channel_unsigned(const struct LDKNetworkGraph *NONNULL_PTR this_arg, const struct LDKUnsignedChannelUpdate *NONNULL_PTR msg);
 
 /**
+ * Returns information on a channel with the given id.
+ *
+ * Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+ */
+MUST_USE_RES struct LDKChannelInfo ReadOnlyNetworkGraph_channel(const struct LDKReadOnlyNetworkGraph *NONNULL_PTR this_arg, uint64_t short_channel_id);
+
+/**
+ * Returns information on a node with the given id.
+ *
+ * Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+ */
+MUST_USE_RES struct LDKNodeInfo ReadOnlyNetworkGraph_node(const struct LDKReadOnlyNetworkGraph *NONNULL_PTR this_arg, const struct LDKNodeId *NONNULL_PTR node_id);
+
+/**
  * Get network addresses by node id.
  * Returns None if the requested node is completely unknown,
  * or if node announcement for the node was never received.
@@ -26942,21 +27370,62 @@ uint32_t PaymentParameters_get_max_total_cltv_expiry_delta(const struct LDKPayme
 void PaymentParameters_set_max_total_cltv_expiry_delta(struct LDKPaymentParameters *NONNULL_PTR this_ptr, uint32_t val);
 
 /**
- * The maximum number of paths that may be used by MPP payments.
- * Defaults to [`DEFAULT_MAX_MPP_PATH_COUNT`].
+ * The maximum number of paths that may be used by (MPP) payments.
+ * Defaults to [`DEFAULT_MAX_PATH_COUNT`].
  */
-uint8_t PaymentParameters_get_max_mpp_path_count(const struct LDKPaymentParameters *NONNULL_PTR this_ptr);
+uint8_t PaymentParameters_get_max_path_count(const struct LDKPaymentParameters *NONNULL_PTR this_ptr);
 
 /**
- * The maximum number of paths that may be used by MPP payments.
- * Defaults to [`DEFAULT_MAX_MPP_PATH_COUNT`].
+ * The maximum number of paths that may be used by (MPP) payments.
+ * Defaults to [`DEFAULT_MAX_PATH_COUNT`].
  */
-void PaymentParameters_set_max_mpp_path_count(struct LDKPaymentParameters *NONNULL_PTR this_ptr, uint8_t val);
+void PaymentParameters_set_max_path_count(struct LDKPaymentParameters *NONNULL_PTR this_ptr, uint8_t val);
+
+/**
+ * Selects the maximum share of a channel's total capacity which will be sent over a channel,
+ * as a power of 1/2. A higher value prefers to send the payment using more MPP parts whereas
+ * a lower value prefers to send larger MPP parts, potentially saturating channels and
+ * increasing failure probability for those paths.
+ *
+ * Note that this restriction will be relaxed during pathfinding after paths which meet this
+ * restriction have been found. While paths which meet this criteria will be searched for, it
+ * is ultimately up to the scorer to select them over other paths.
+ *
+ * A value of 0 will allow payments up to and including a channel's total announced usable
+ * capacity, a value of one will only use up to half its capacity, two 1/4, etc.
+ *
+ * Default value: 2
+ */
+uint8_t PaymentParameters_get_max_channel_saturation_power_of_half(const struct LDKPaymentParameters *NONNULL_PTR this_ptr);
+
+/**
+ * Selects the maximum share of a channel's total capacity which will be sent over a channel,
+ * as a power of 1/2. A higher value prefers to send the payment using more MPP parts whereas
+ * a lower value prefers to send larger MPP parts, potentially saturating channels and
+ * increasing failure probability for those paths.
+ *
+ * Note that this restriction will be relaxed during pathfinding after paths which meet this
+ * restriction have been found. While paths which meet this criteria will be searched for, it
+ * is ultimately up to the scorer to select them over other paths.
+ *
+ * A value of 0 will allow payments up to and including a channel's total announced usable
+ * capacity, a value of one will only use up to half its capacity, two 1/4, etc.
+ *
+ * Default value: 2
+ */
+void PaymentParameters_set_max_channel_saturation_power_of_half(struct LDKPaymentParameters *NONNULL_PTR this_ptr, uint8_t val);
+
+/**
+ * A list of SCIDs which this payment was previously attempted over and which caused the
+ * payment to fail. Future attempts for the same payment shouldn't be relayed through any of
+ * these SCIDs.
+ */
+void PaymentParameters_set_previously_failed_channels(struct LDKPaymentParameters *NONNULL_PTR this_ptr, struct LDKCVec_u64Z val);
 
 /**
  * Constructs a new PaymentParameters given each field
  */
-MUST_USE_RES struct LDKPaymentParameters PaymentParameters_new(struct LDKPublicKey payee_pubkey_arg, struct LDKInvoiceFeatures features_arg, struct LDKCVec_RouteHintZ route_hints_arg, struct LDKCOption_u64Z expiry_time_arg, uint32_t max_total_cltv_expiry_delta_arg, uint8_t max_mpp_path_count_arg);
+MUST_USE_RES struct LDKPaymentParameters PaymentParameters_new(struct LDKPublicKey payee_pubkey_arg, struct LDKInvoiceFeatures features_arg, struct LDKCVec_RouteHintZ route_hints_arg, struct LDKCOption_u64Z expiry_time_arg, uint32_t max_total_cltv_expiry_delta_arg, uint8_t max_path_count_arg, uint8_t max_channel_saturation_power_of_half_arg, struct LDKCVec_u64Z previously_failed_channels_arg);
 
 /**
  * Creates a copy of the PaymentParameters
@@ -27304,6 +27773,38 @@ uint64_t ProbabilisticScoringParameters_get_base_penalty_msat(const struct LDKPr
 void ProbabilisticScoringParameters_set_base_penalty_msat(struct LDKProbabilisticScoringParameters *NONNULL_PTR this_ptr, uint64_t val);
 
 /**
+ * A multiplier used with the payment amount to calculate a fixed penalty applied to each
+ * channel, in excess of the [`base_penalty_msat`].
+ *
+ * The purpose of the amount penalty is to avoid having fees dominate the channel cost (i.e.,
+ * fees plus penalty) for large payments. The penalty is computed as the product of this
+ * multiplier and `2^30`ths of the payment amount.
+ *
+ * ie `base_penalty_amount_multiplier_msat * amount_msat / 2^30`
+ *
+ * Default value: 8,192 msat
+ *
+ * [`base_penalty_msat`]: Self::base_penalty_msat
+ */
+uint64_t ProbabilisticScoringParameters_get_base_penalty_amount_multiplier_msat(const struct LDKProbabilisticScoringParameters *NONNULL_PTR this_ptr);
+
+/**
+ * A multiplier used with the payment amount to calculate a fixed penalty applied to each
+ * channel, in excess of the [`base_penalty_msat`].
+ *
+ * The purpose of the amount penalty is to avoid having fees dominate the channel cost (i.e.,
+ * fees plus penalty) for large payments. The penalty is computed as the product of this
+ * multiplier and `2^30`ths of the payment amount.
+ *
+ * ie `base_penalty_amount_multiplier_msat * amount_msat / 2^30`
+ *
+ * Default value: 8,192 msat
+ *
+ * [`base_penalty_msat`]: Self::base_penalty_msat
+ */
+void ProbabilisticScoringParameters_set_base_penalty_amount_multiplier_msat(struct LDKProbabilisticScoringParameters *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
  * A multiplier used in conjunction with the negative `log10` of the channel's success
  * probability for a payment to determine the liquidity penalty.
  *
@@ -27380,7 +27881,7 @@ void ProbabilisticScoringParameters_set_liquidity_offset_half_life(struct LDKPro
  * multiplier and `2^20`ths of the payment amount, weighted by the negative `log10` of the
  * success probability.
  *
- * `-log10(success_probability) * amount_penalty_multiplier_msat * amount_msat / 2^20`
+ * `-log10(success_probability) * liquidity_penalty_amount_multiplier_msat * amount_msat / 2^20`
  *
  * In practice, this means for 0.1 success probability (`-log10(0.1) == 1`) each `2^20`th of
  * the amount will result in a penalty of the multiplier. And, as the success probability
@@ -27390,7 +27891,7 @@ void ProbabilisticScoringParameters_set_liquidity_offset_half_life(struct LDKPro
  *
  * Default value: 256 msat
  */
-uint64_t ProbabilisticScoringParameters_get_amount_penalty_multiplier_msat(const struct LDKProbabilisticScoringParameters *NONNULL_PTR this_ptr);
+uint64_t ProbabilisticScoringParameters_get_liquidity_penalty_amount_multiplier_msat(const struct LDKProbabilisticScoringParameters *NONNULL_PTR this_ptr);
 
 /**
  * A multiplier used in conjunction with a payment amount and the negative `log10` of the
@@ -27401,7 +27902,7 @@ uint64_t ProbabilisticScoringParameters_get_amount_penalty_multiplier_msat(const
  * multiplier and `2^20`ths of the payment amount, weighted by the negative `log10` of the
  * success probability.
  *
- * `-log10(success_probability) * amount_penalty_multiplier_msat * amount_msat / 2^20`
+ * `-log10(success_probability) * liquidity_penalty_amount_multiplier_msat * amount_msat / 2^20`
  *
  * In practice, this means for 0.1 success probability (`-log10(0.1) == 1`) each `2^20`th of
  * the amount will result in a penalty of the multiplier. And, as the success probability
@@ -27411,7 +27912,7 @@ uint64_t ProbabilisticScoringParameters_get_amount_penalty_multiplier_msat(const
  *
  * Default value: 256 msat
  */
-void ProbabilisticScoringParameters_set_amount_penalty_multiplier_msat(struct LDKProbabilisticScoringParameters *NONNULL_PTR this_ptr, uint64_t val);
+void ProbabilisticScoringParameters_set_liquidity_penalty_amount_multiplier_msat(struct LDKProbabilisticScoringParameters *NONNULL_PTR this_ptr, uint64_t val);
 
 /**
  * This penalty is applied when `htlc_maximum_msat` is equal to or larger than half of the
@@ -27432,6 +27933,48 @@ uint64_t ProbabilisticScoringParameters_get_anti_probing_penalty_msat(const stru
  * Default value: 250 msat
  */
 void ProbabilisticScoringParameters_set_anti_probing_penalty_msat(struct LDKProbabilisticScoringParameters *NONNULL_PTR this_ptr, uint64_t val);
+
+/**
+ * This penalty is applied when the amount we're attempting to send over a channel exceeds our
+ * current estimate of the channel's available liquidity.
+ *
+ * Note that in this case all other penalties, including the
+ * [`liquidity_penalty_multiplier_msat`] and [`liquidity_penalty_amount_multiplier_msat`]-based
+ * penalties, as well as the [`base_penalty_msat`] and the [`anti_probing_penalty_msat`], if
+ * applicable, are still included in the overall penalty.
+ *
+ * If you wish to avoid creating paths with such channels entirely, setting this to a value of
+ * `u64::max_value()` will guarantee that.
+ *
+ * Default value: 1_0000_0000_000 msat (1 Bitcoin)
+ *
+ * [`liquidity_penalty_multiplier_msat`]: Self::liquidity_penalty_multiplier_msat
+ * [`liquidity_penalty_amount_multiplier_msat`]: Self::liquidity_penalty_amount_multiplier_msat
+ * [`base_penalty_msat`]: Self::base_penalty_msat
+ * [`anti_probing_penalty_msat`]: Self::anti_probing_penalty_msat
+ */
+uint64_t ProbabilisticScoringParameters_get_considered_impossible_penalty_msat(const struct LDKProbabilisticScoringParameters *NONNULL_PTR this_ptr);
+
+/**
+ * This penalty is applied when the amount we're attempting to send over a channel exceeds our
+ * current estimate of the channel's available liquidity.
+ *
+ * Note that in this case all other penalties, including the
+ * [`liquidity_penalty_multiplier_msat`] and [`liquidity_penalty_amount_multiplier_msat`]-based
+ * penalties, as well as the [`base_penalty_msat`] and the [`anti_probing_penalty_msat`], if
+ * applicable, are still included in the overall penalty.
+ *
+ * If you wish to avoid creating paths with such channels entirely, setting this to a value of
+ * `u64::max_value()` will guarantee that.
+ *
+ * Default value: 1_0000_0000_000 msat (1 Bitcoin)
+ *
+ * [`liquidity_penalty_multiplier_msat`]: Self::liquidity_penalty_multiplier_msat
+ * [`liquidity_penalty_amount_multiplier_msat`]: Self::liquidity_penalty_amount_multiplier_msat
+ * [`base_penalty_msat`]: Self::base_penalty_msat
+ * [`anti_probing_penalty_msat`]: Self::anti_probing_penalty_msat
+ */
+void ProbabilisticScoringParameters_set_considered_impossible_penalty_msat(struct LDKProbabilisticScoringParameters *NONNULL_PTR this_ptr, uint64_t val);
 
 /**
  * Creates a copy of the ProbabilisticScoringParameters
@@ -27470,9 +28013,19 @@ void ProbabilisticScorer_add_banned(struct LDKProbabilisticScorer *NONNULL_PTR t
 void ProbabilisticScorer_remove_banned(struct LDKProbabilisticScorer *NONNULL_PTR this_arg, const struct LDKNodeId *NONNULL_PTR node_id);
 
 /**
- * Clears the list of nodes that are avoided during path finding.
+ * Sets a manual penalty for the given node.
  */
-void ProbabilisticScorer_clear_banned(struct LDKProbabilisticScorer *NONNULL_PTR this_arg);
+void ProbabilisticScorer_set_manual_penalty(struct LDKProbabilisticScorer *NONNULL_PTR this_arg, const struct LDKNodeId *NONNULL_PTR node_id, uint64_t penalty);
+
+/**
+ * Removes the node with the given `node_id` from the list of manual penalties.
+ */
+void ProbabilisticScorer_remove_manual_penalty(struct LDKProbabilisticScorer *NONNULL_PTR this_arg, const struct LDKNodeId *NONNULL_PTR node_id);
+
+/**
+ * Clears the list of manual penalties that are applied during path finding.
+ */
+void ProbabilisticScorer_clear_manual_penalties(struct LDKProbabilisticScorer *NONNULL_PTR this_arg);
 
 /**
  * Marks all nodes in the given list as banned, i.e.,

@@ -1819,6 +1819,18 @@ pub extern "C" fn ChannelManager_send_spontaneous_payment(this_arg: &crate::ligh
 	local_ret
 }
 
+/// Send a payment that is probing the given route for liquidity. We calculate the
+/// [`PaymentHash`] of probes based on a static secret and a random [`PaymentId`], which allows
+/// us to easily discern them from real payments.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_send_probe(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut hops: crate::c_types::derived::CVec_RouteHopZ) -> crate::c_types::derived::CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ {
+	let mut local_hops = Vec::new(); for mut item in hops.into_rust().drain(..) { local_hops.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.send_probe(local_hops);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.0 }, crate::c_types::ThirtyTwoBytes { data: orig_ret_0_1.0 }).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::channelmanager::PaymentSendFailure::native_into(e) }).into() };
+	local_ret
+}
+
 /// Call this upon creation of a funding transaction for the given channel.
 ///
 /// Returns an [`APIError::APIMisuseError`] if the funding_transaction spent non-SegWit outputs
@@ -1872,7 +1884,7 @@ pub extern "C" fn ChannelManager_funding_transaction_generated(this_arg: &crate:
 /// tying these addresses together and to this node. If you wish to preserve user privacy,
 /// addresses should likely contain only Tor Onion addresses.
 ///
-/// Panics if `addresses` is absurdly large (more than 500).
+/// Panics if `addresses` is absurdly large (more than 100).
 ///
 /// [`get_and_clear_pending_msg_events`]: MessageSendEventsProvider::get_and_clear_pending_msg_events
 #[no_mangle]

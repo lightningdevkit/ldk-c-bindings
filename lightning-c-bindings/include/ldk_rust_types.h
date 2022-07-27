@@ -137,6 +137,8 @@ struct nativeUserConfigOpaque;
 typedef struct nativeUserConfigOpaque LDKnativeUserConfig;
 struct nativeBigSizeOpaque;
 typedef struct nativeBigSizeOpaque LDKnativeBigSize;
+struct nativeHostnameOpaque;
+typedef struct nativeHostnameOpaque LDKnativeHostname;
 struct nativeOutPointOpaque;
 typedef struct nativeOutPointOpaque LDKnativeOutPoint;
 struct nativeInvoicePayerOpaque;

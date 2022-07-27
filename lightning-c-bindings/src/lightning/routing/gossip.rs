@@ -736,16 +736,14 @@ pub extern "C" fn ChannelUpdateInfo_set_htlc_minimum_msat(this_ptr: &mut Channel
 }
 /// The maximum value which may be relayed to the next hop via the channel.
 #[no_mangle]
-pub extern "C" fn ChannelUpdateInfo_get_htlc_maximum_msat(this_ptr: &ChannelUpdateInfo) -> crate::c_types::derived::COption_u64Z {
+pub extern "C" fn ChannelUpdateInfo_get_htlc_maximum_msat(this_ptr: &ChannelUpdateInfo) -> u64 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().htlc_maximum_msat;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { inner_val.unwrap() }) };
-	local_inner_val
+	*inner_val
 }
 /// The maximum value which may be relayed to the next hop via the channel.
 #[no_mangle]
-pub extern "C" fn ChannelUpdateInfo_set_htlc_maximum_msat(this_ptr: &mut ChannelUpdateInfo, mut val: crate::c_types::derived::COption_u64Z) {
-	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc_maximum_msat = local_val;
+pub extern "C" fn ChannelUpdateInfo_set_htlc_maximum_msat(this_ptr: &mut ChannelUpdateInfo, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc_maximum_msat = val;
 }
 /// Fees charged when the channel is used for routing
 #[no_mangle]
@@ -784,15 +782,14 @@ pub extern "C" fn ChannelUpdateInfo_set_last_update_message(this_ptr: &mut Chann
 /// Constructs a new ChannelUpdateInfo given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelUpdateInfo_new(mut last_update_arg: u32, mut enabled_arg: bool, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: u64, mut htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z, mut fees_arg: crate::lightning::routing::gossip::RoutingFees, mut last_update_message_arg: crate::lightning::ln::msgs::ChannelUpdate) -> ChannelUpdateInfo {
-	let mut local_htlc_maximum_msat_arg = if htlc_maximum_msat_arg.is_some() { Some( { htlc_maximum_msat_arg.take() }) } else { None };
+pub extern "C" fn ChannelUpdateInfo_new(mut last_update_arg: u32, mut enabled_arg: bool, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: u64, mut htlc_maximum_msat_arg: u64, mut fees_arg: crate::lightning::routing::gossip::RoutingFees, mut last_update_message_arg: crate::lightning::ln::msgs::ChannelUpdate) -> ChannelUpdateInfo {
 	let mut local_last_update_message_arg = if last_update_message_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(last_update_message_arg.take_inner()) } }) };
 	ChannelUpdateInfo { inner: ObjOps::heap_alloc(nativeChannelUpdateInfo {
 		last_update: last_update_arg,
 		enabled: enabled_arg,
 		cltv_expiry_delta: cltv_expiry_delta_arg,
 		htlc_minimum_msat: htlc_minimum_msat_arg,
-		htlc_maximum_msat: local_htlc_maximum_msat_arg,
+		htlc_maximum_msat: htlc_maximum_msat_arg,
 		fees: *unsafe { Box::from_raw(fees_arg.take_inner()) },
 		last_update_message: local_last_update_message_arg,
 	}), is_owned: true }
@@ -2106,6 +2103,28 @@ pub extern "C" fn NetworkGraph_update_channel(this_arg: &crate::lightning::routi
 pub extern "C" fn NetworkGraph_update_channel_unsigned(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelUpdate) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_unsigned(msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_ret
+}
+
+/// Returns information on a channel with the given id.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ReadOnlyNetworkGraph_channel(this_arg: &crate::lightning::routing::gossip::ReadOnlyNetworkGraph, mut short_channel_id: u64) -> crate::lightning::routing::gossip::ChannelInfo {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel(short_channel_id);
+	let mut local_ret = crate::lightning::routing::gossip::ChannelInfo { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::routing::gossip::ChannelInfo<>) as *mut _ }, is_owned: false };
+	local_ret
+}
+
+/// Returns information on a node with the given id.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ReadOnlyNetworkGraph_node(this_arg: &crate::lightning::routing::gossip::ReadOnlyNetworkGraph, node_id: &crate::lightning::routing::gossip::NodeId) -> crate::lightning::routing::gossip::NodeInfo {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.node(node_id.get_native_ref());
+	let mut local_ret = crate::lightning::routing::gossip::NodeInfo { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::routing::gossip::NodeInfo<>) as *mut _ }, is_owned: false };
 	local_ret
 }
 

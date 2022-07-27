@@ -2349,6 +2349,52 @@ pub extern "C" fn COption_u64Z_free(_res: COption_u64Z) { }
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn COption_u64Z_clone(orig: &COption_u64Z) -> COption_u64Z { Clone::clone(&orig) }
 #[repr(C)]
+/// A dynamically-allocated array of u64s of arbitrary size.
+/// This corresponds to std::vector in C++
+pub struct CVec_u64Z {
+	/// The elements in the array.
+	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
+	pub data: *mut u64,
+	/// The number of elements pointed to by `data`.
+	pub datalen: usize
+}
+impl CVec_u64Z {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<u64> {
+		if self.datalen == 0 { return Vec::new(); }
+		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
+		self.data = core::ptr::null_mut();
+		self.datalen = 0;
+		ret
+	}
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[u64] {
+		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
+	}
+}
+impl From<Vec<u64>> for CVec_u64Z {
+	fn from(v: Vec<u64>) -> Self {
+		let datalen = v.len();
+		let data = Box::into_raw(v.into_boxed_slice());
+		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
+	}
+}
+#[no_mangle]
+/// Frees the buffer pointed to by `data` if `datalen` is non-0.
+pub extern "C" fn CVec_u64Z_free(_res: CVec_u64Z) { }
+impl Drop for CVec_u64Z {
+	fn drop(&mut self) {
+		if self.datalen == 0 { return; }
+		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
+	}
+}
+impl Clone for CVec_u64Z {
+	fn clone(&self) -> Self {
+		let mut res = Vec::new();
+		if self.datalen == 0 { return Self::from(res); }
+		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
+		Self::from(res)
+	}
+}
+#[repr(C)]
 /// The contents of CResult_PaymentParametersDecodeErrorZ
 pub union CResult_PaymentParametersDecodeErrorZPtr {
 	/// A pointer to the contents in the success state.
@@ -3101,6 +3147,139 @@ impl Clone for CResult_COption_ClosureReasonZDecodeErrorZ {
 pub extern "C" fn CResult_COption_ClosureReasonZDecodeErrorZ_clone(orig: &CResult_COption_ClosureReasonZDecodeErrorZ) -> CResult_COption_ClosureReasonZDecodeErrorZ { Clone::clone(&orig) }
 #[repr(C)]
 #[derive(Clone)]
+/// An enum which can either contain a crate::lightning::util::events::HTLCDestination or not
+pub enum COption_HTLCDestinationZ {
+	/// When we're in this state, this COption_HTLCDestinationZ contains a crate::lightning::util::events::HTLCDestination
+	Some(crate::lightning::util::events::HTLCDestination),
+	/// When we're in this state, this COption_HTLCDestinationZ contains nothing
+	None
+}
+impl COption_HTLCDestinationZ {
+	#[allow(unused)] pub(crate) fn is_some(&self) -> bool {
+		if let Self::None = self { false } else { true }
+	}
+	#[allow(unused)] pub(crate) fn is_none(&self) -> bool {
+		!self.is_some()
+	}
+	#[allow(unused)] pub(crate) fn take(mut self) -> crate::lightning::util::events::HTLCDestination {
+		if let Self::Some(v) = self { v } else { unreachable!() }
+	}
+}
+#[no_mangle]
+/// Constructs a new COption_HTLCDestinationZ containing a crate::lightning::util::events::HTLCDestination
+pub extern "C" fn COption_HTLCDestinationZ_some(o: crate::lightning::util::events::HTLCDestination) -> COption_HTLCDestinationZ {
+	COption_HTLCDestinationZ::Some(o)
+}
+#[no_mangle]
+/// Constructs a new COption_HTLCDestinationZ containing nothing
+pub extern "C" fn COption_HTLCDestinationZ_none() -> COption_HTLCDestinationZ {
+	COption_HTLCDestinationZ::None
+}
+#[no_mangle]
+/// Frees any resources associated with the crate::lightning::util::events::HTLCDestination, if we are in the Some state
+pub extern "C" fn COption_HTLCDestinationZ_free(_res: COption_HTLCDestinationZ) { }
+#[no_mangle]
+/// Creates a new COption_HTLCDestinationZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn COption_HTLCDestinationZ_clone(orig: &COption_HTLCDestinationZ) -> COption_HTLCDestinationZ { Clone::clone(&orig) }
+#[repr(C)]
+/// The contents of CResult_COption_HTLCDestinationZDecodeErrorZ
+pub union CResult_COption_HTLCDestinationZDecodeErrorZPtr {
+	/// A pointer to the contents in the success state.
+	/// Reading from this pointer when `result_ok` is not set is undefined.
+	pub result: *mut crate::c_types::derived::COption_HTLCDestinationZ,
+	/// A pointer to the contents in the error state.
+	/// Reading from this pointer when `result_ok` is set is undefined.
+	pub err: *mut crate::lightning::ln::msgs::DecodeError,
+}
+#[repr(C)]
+/// A CResult_COption_HTLCDestinationZDecodeErrorZ represents the result of a fallible operation,
+/// containing a crate::c_types::derived::COption_HTLCDestinationZ on success and a crate::lightning::ln::msgs::DecodeError on failure.
+/// `result_ok` indicates the overall state, and the contents are provided via `contents`.
+pub struct CResult_COption_HTLCDestinationZDecodeErrorZ {
+	/// The contents of this CResult_COption_HTLCDestinationZDecodeErrorZ, accessible via either
+	/// `err` or `result` depending on the state of `result_ok`.
+	pub contents: CResult_COption_HTLCDestinationZDecodeErrorZPtr,
+	/// Whether this CResult_COption_HTLCDestinationZDecodeErrorZ represents a success state.
+	pub result_ok: bool,
+}
+#[no_mangle]
+/// Creates a new CResult_COption_HTLCDestinationZDecodeErrorZ in the success state.
+pub extern "C" fn CResult_COption_HTLCDestinationZDecodeErrorZ_ok(o: crate::c_types::derived::COption_HTLCDestinationZ) -> CResult_COption_HTLCDestinationZDecodeErrorZ {
+	CResult_COption_HTLCDestinationZDecodeErrorZ {
+		contents: CResult_COption_HTLCDestinationZDecodeErrorZPtr {
+			result: Box::into_raw(Box::new(o)),
+		},
+		result_ok: true,
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_COption_HTLCDestinationZDecodeErrorZ in the error state.
+pub extern "C" fn CResult_COption_HTLCDestinationZDecodeErrorZ_err(e: crate::lightning::ln::msgs::DecodeError) -> CResult_COption_HTLCDestinationZDecodeErrorZ {
+	CResult_COption_HTLCDestinationZDecodeErrorZ {
+		contents: CResult_COption_HTLCDestinationZDecodeErrorZPtr {
+			err: Box::into_raw(Box::new(e)),
+		},
+		result_ok: false,
+	}
+}
+/// Checks if the given object is currently in the success state
+#[no_mangle]
+pub extern "C" fn CResult_COption_HTLCDestinationZDecodeErrorZ_is_ok(o: &CResult_COption_HTLCDestinationZDecodeErrorZ) -> bool {
+	o.result_ok
+}
+#[no_mangle]
+/// Frees any resources used by the CResult_COption_HTLCDestinationZDecodeErrorZ.
+pub extern "C" fn CResult_COption_HTLCDestinationZDecodeErrorZ_free(_res: CResult_COption_HTLCDestinationZDecodeErrorZ) { }
+impl Drop for CResult_COption_HTLCDestinationZDecodeErrorZ {
+	fn drop(&mut self) {
+		if self.result_ok {
+			if unsafe { !(self.contents.result as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.result) };
+			}
+		} else {
+			if unsafe { !(self.contents.err as *mut ()).is_null() } {
+				let _ = unsafe { Box::from_raw(self.contents.err) };
+			}
+		}
+	}
+}
+impl From<crate::c_types::CResultTempl<crate::c_types::derived::COption_HTLCDestinationZ, crate::lightning::ln::msgs::DecodeError>> for CResult_COption_HTLCDestinationZDecodeErrorZ {
+	fn from(mut o: crate::c_types::CResultTempl<crate::c_types::derived::COption_HTLCDestinationZ, crate::lightning::ln::msgs::DecodeError>) -> Self {
+		let contents = if o.result_ok {
+			let result = unsafe { o.contents.result };
+			unsafe { o.contents.result = core::ptr::null_mut() };
+			CResult_COption_HTLCDestinationZDecodeErrorZPtr { result }
+		} else {
+			let err = unsafe { o.contents.err };
+			unsafe { o.contents.err = core::ptr::null_mut(); }
+			CResult_COption_HTLCDestinationZDecodeErrorZPtr { err }
+		};
+		Self {
+			contents,
+			result_ok: o.result_ok,
+		}
+	}
+}
+impl Clone for CResult_COption_HTLCDestinationZDecodeErrorZ {
+	fn clone(&self) -> Self {
+		if self.result_ok {
+			Self { result_ok: true, contents: CResult_COption_HTLCDestinationZDecodeErrorZPtr {
+				result: Box::into_raw(Box::new(<crate::c_types::derived::COption_HTLCDestinationZ>::clone(unsafe { &*self.contents.result })))
+			} }
+		} else {
+			Self { result_ok: false, contents: CResult_COption_HTLCDestinationZDecodeErrorZPtr {
+				err: Box::into_raw(Box::new(<crate::lightning::ln::msgs::DecodeError>::clone(unsafe { &*self.contents.err })))
+			} }
+		}
+	}
+}
+#[no_mangle]
+/// Creates a new CResult_COption_HTLCDestinationZDecodeErrorZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn CResult_COption_HTLCDestinationZDecodeErrorZ_clone(orig: &CResult_COption_HTLCDestinationZDecodeErrorZ) -> CResult_COption_HTLCDestinationZDecodeErrorZ { Clone::clone(&orig) }
+#[repr(C)]
+#[derive(Clone)]
 /// An enum which can either contain a crate::lightning::routing::gossip::NetworkUpdate or not
 pub enum COption_NetworkUpdateZ {
 	/// When we're in this state, this COption_NetworkUpdateZ contains a crate::lightning::routing::gossip::NetworkUpdate
@@ -3730,71 +3909,75 @@ impl Clone for CVec_MonitorEventZ {
 	}
 }
 #[repr(C)]
-/// A tuple of 2 elements. See the individual fields for the types contained.
-pub struct C2Tuple_OutPointCVec_MonitorEventZZ {
+/// A tuple of 3 elements. See the individual fields for the types contained.
+pub struct C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ {
 	/// The element at position 0
 	pub a: crate::lightning::chain::transaction::OutPoint,
 	/// The element at position 1
 	pub b: crate::c_types::derived::CVec_MonitorEventZ,
+	/// The element at position 2
+	pub c: crate::c_types::PublicKey,
 }
-impl From<(crate::lightning::chain::transaction::OutPoint, crate::c_types::derived::CVec_MonitorEventZ)> for C2Tuple_OutPointCVec_MonitorEventZZ {
-	fn from (tup: (crate::lightning::chain::transaction::OutPoint, crate::c_types::derived::CVec_MonitorEventZ)) -> Self {
+impl From<(crate::lightning::chain::transaction::OutPoint, crate::c_types::derived::CVec_MonitorEventZ, crate::c_types::PublicKey)> for C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ {
+	fn from (tup: (crate::lightning::chain::transaction::OutPoint, crate::c_types::derived::CVec_MonitorEventZ, crate::c_types::PublicKey)) -> Self {
 		Self {
 			a: tup.0,
 			b: tup.1,
+			c: tup.2,
 		}
 	}
 }
-impl C2Tuple_OutPointCVec_MonitorEventZZ {
-	#[allow(unused)] pub(crate) fn to_rust(mut self) -> (crate::lightning::chain::transaction::OutPoint, crate::c_types::derived::CVec_MonitorEventZ) {
-		(self.a, self.b)
+impl C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ {
+	#[allow(unused)] pub(crate) fn to_rust(mut self) -> (crate::lightning::chain::transaction::OutPoint, crate::c_types::derived::CVec_MonitorEventZ, crate::c_types::PublicKey) {
+		(self.a, self.b, self.c)
 	}
 }
-impl Clone for C2Tuple_OutPointCVec_MonitorEventZZ {
+impl Clone for C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ {
 	fn clone(&self) -> Self {
 		Self {
 			a: Clone::clone(&self.a),
 			b: Clone::clone(&self.b),
+			c: Clone::clone(&self.c),
 		}
 	}
 }
 #[no_mangle]
 /// Creates a new tuple which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
-pub extern "C" fn C2Tuple_OutPointCVec_MonitorEventZZ_clone(orig: &C2Tuple_OutPointCVec_MonitorEventZZ) -> C2Tuple_OutPointCVec_MonitorEventZZ { Clone::clone(&orig) }
-/// Creates a new C2Tuple_OutPointCVec_MonitorEventZZ from the contained elements.
+pub extern "C" fn C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ_clone(orig: &C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ) -> C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ { Clone::clone(&orig) }
+/// Creates a new C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ from the contained elements.
 #[no_mangle]
-pub extern "C" fn C2Tuple_OutPointCVec_MonitorEventZZ_new(a: crate::lightning::chain::transaction::OutPoint, b: crate::c_types::derived::CVec_MonitorEventZ) -> C2Tuple_OutPointCVec_MonitorEventZZ {
-	C2Tuple_OutPointCVec_MonitorEventZZ { a, b, }
+pub extern "C" fn C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ_new(a: crate::lightning::chain::transaction::OutPoint, b: crate::c_types::derived::CVec_MonitorEventZ, c: crate::c_types::PublicKey) -> C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ {
+	C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ { a, b, c, }
 }
 
 #[no_mangle]
-/// Frees any resources used by the C2Tuple_OutPointCVec_MonitorEventZZ.
-pub extern "C" fn C2Tuple_OutPointCVec_MonitorEventZZ_free(_res: C2Tuple_OutPointCVec_MonitorEventZZ) { }
+/// Frees any resources used by the C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ.
+pub extern "C" fn C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ_free(_res: C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ) { }
 #[repr(C)]
-/// A dynamically-allocated array of crate::c_types::derived::C2Tuple_OutPointCVec_MonitorEventZZs of arbitrary size.
+/// A dynamically-allocated array of crate::c_types::derived::C3Tuple_OutPointCVec_MonitorEventZPublicKeyZs of arbitrary size.
 /// This corresponds to std::vector in C++
-pub struct CVec_C2Tuple_OutPointCVec_MonitorEventZZZ {
+pub struct CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ {
 	/// The elements in the array.
 	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
-	pub data: *mut crate::c_types::derived::C2Tuple_OutPointCVec_MonitorEventZZ,
+	pub data: *mut crate::c_types::derived::C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ,
 	/// The number of elements pointed to by `data`.
 	pub datalen: usize
 }
-impl CVec_C2Tuple_OutPointCVec_MonitorEventZZZ {
-	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C2Tuple_OutPointCVec_MonitorEventZZ> {
+impl CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ {
+	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<crate::c_types::derived::C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ> {
 		if self.datalen == 0 { return Vec::new(); }
 		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
 		self.data = core::ptr::null_mut();
 		self.datalen = 0;
 		ret
 	}
-	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C2Tuple_OutPointCVec_MonitorEventZZ] {
+	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[crate::c_types::derived::C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ] {
 		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
 	}
 }
-impl From<Vec<crate::c_types::derived::C2Tuple_OutPointCVec_MonitorEventZZ>> for CVec_C2Tuple_OutPointCVec_MonitorEventZZZ {
-	fn from(v: Vec<crate::c_types::derived::C2Tuple_OutPointCVec_MonitorEventZZ>) -> Self {
+impl From<Vec<crate::c_types::derived::C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ>> for CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ {
+	fn from(v: Vec<crate::c_types::derived::C3Tuple_OutPointCVec_MonitorEventZPublicKeyZ>) -> Self {
 		let datalen = v.len();
 		let data = Box::into_raw(v.into_boxed_slice());
 		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
@@ -3802,14 +3985,14 @@ impl From<Vec<crate::c_types::derived::C2Tuple_OutPointCVec_MonitorEventZZ>> for
 }
 #[no_mangle]
 /// Frees the buffer pointed to by `data` if `datalen` is non-0.
-pub extern "C" fn CVec_C2Tuple_OutPointCVec_MonitorEventZZZ_free(_res: CVec_C2Tuple_OutPointCVec_MonitorEventZZZ) { }
-impl Drop for CVec_C2Tuple_OutPointCVec_MonitorEventZZZ {
+pub extern "C" fn CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ_free(_res: CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ) { }
+impl Drop for CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ {
 	fn drop(&mut self) {
 		if self.datalen == 0 { return; }
 		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
 	}
 }
-impl Clone for CVec_C2Tuple_OutPointCVec_MonitorEventZZZ {
+impl Clone for CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ {
 	fn clone(&self) -> Self {
 		let mut res = Vec::new();
 		if self.datalen == 0 { return Self::from(res); }
@@ -5710,52 +5893,6 @@ impl Clone for CResult_NodeAliasDecodeErrorZ {
 /// Creates a new CResult_NodeAliasDecodeErrorZ which has the same data as `orig`
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_NodeAliasDecodeErrorZ_clone(orig: &CResult_NodeAliasDecodeErrorZ) -> CResult_NodeAliasDecodeErrorZ { Clone::clone(&orig) }
-#[repr(C)]
-/// A dynamically-allocated array of u64s of arbitrary size.
-/// This corresponds to std::vector in C++
-pub struct CVec_u64Z {
-	/// The elements in the array.
-	/// If datalen is non-0 this must be a valid, non-NULL pointer allocated by malloc().
-	pub data: *mut u64,
-	/// The number of elements pointed to by `data`.
-	pub datalen: usize
-}
-impl CVec_u64Z {
-	#[allow(unused)] pub(crate) fn into_rust(&mut self) -> Vec<u64> {
-		if self.datalen == 0 { return Vec::new(); }
-		let ret = unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }.into();
-		self.data = core::ptr::null_mut();
-		self.datalen = 0;
-		ret
-	}
-	#[allow(unused)] pub(crate) fn as_slice(&self) -> &[u64] {
-		unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) }
-	}
-}
-impl From<Vec<u64>> for CVec_u64Z {
-	fn from(v: Vec<u64>) -> Self {
-		let datalen = v.len();
-		let data = Box::into_raw(v.into_boxed_slice());
-		Self { datalen, data: unsafe { (*data).as_mut_ptr() } }
-	}
-}
-#[no_mangle]
-/// Frees the buffer pointed to by `data` if `datalen` is non-0.
-pub extern "C" fn CVec_u64Z_free(_res: CVec_u64Z) { }
-impl Drop for CVec_u64Z {
-	fn drop(&mut self) {
-		if self.datalen == 0 { return; }
-		unsafe { Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) };
-	}
-}
-impl Clone for CVec_u64Z {
-	fn clone(&self) -> Self {
-		let mut res = Vec::new();
-		if self.datalen == 0 { return Self::from(res); }
-		res.extend_from_slice(unsafe { core::slice::from_raw_parts_mut(self.data, self.datalen) });
-		Self::from(res)
-	}
-}
 #[repr(C)]
 /// The contents of CResult_NodeInfoDecodeErrorZ
 pub union CResult_NodeInfoDecodeErrorZPtr {

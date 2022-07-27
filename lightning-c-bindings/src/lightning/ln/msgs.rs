@@ -2983,6 +2983,13 @@ pub enum NetAddress {
 		/// The port on which the node is listening
 		port: u16,
 	},
+	/// A hostname/port on which the peer is listening.
+	Hostname {
+		/// The hostname on which the node is listening.
+		hostname: crate::lightning::util::ser::Hostname,
+		/// The port on which the node is listening.
+		port: u16,
+	},
 }
 use lightning::ln::msgs::NetAddress as NetAddressImport;
 pub(crate) type nativeNetAddress = NetAddressImport;
@@ -3025,6 +3032,14 @@ impl NetAddress {
 					port: port_nonref,
 				}
 			},
+			NetAddress::Hostname {ref hostname, ref port, } => {
+				let mut hostname_nonref = (*hostname).clone();
+				let mut port_nonref = (*port).clone();
+				nativeNetAddress::Hostname {
+					hostname: *unsafe { Box::from_raw(hostname_nonref.take_inner()) },
+					port: port_nonref,
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -3052,6 +3067,12 @@ impl NetAddress {
 					ed25519_pubkey: ed25519_pubkey.data,
 					checksum: checksum,
 					version: version,
+					port: port,
+				}
+			},
+			NetAddress::Hostname {mut hostname, mut port, } => {
+				nativeNetAddress::Hostname {
+					hostname: *unsafe { Box::from_raw(hostname.take_inner()) },
 					port: port,
 				}
 			},
@@ -3094,6 +3115,14 @@ impl NetAddress {
 					port: port_nonref,
 				}
 			},
+			nativeNetAddress::Hostname {ref hostname, ref port, } => {
+				let mut hostname_nonref = (*hostname).clone();
+				let mut port_nonref = (*port).clone();
+				NetAddress::Hostname {
+					hostname: crate::lightning::util::ser::Hostname { inner: ObjOps::heap_alloc(hostname_nonref), is_owned: true },
+					port: port_nonref,
+				}
+			},
 		}
 	}
 	#[allow(unused)]
@@ -3121,6 +3150,12 @@ impl NetAddress {
 					ed25519_pubkey: crate::c_types::ThirtyTwoBytes { data: ed25519_pubkey },
 					checksum: checksum,
 					version: version,
+					port: port,
+				}
+			},
+			nativeNetAddress::Hostname {mut hostname, mut port, } => {
+				NetAddress::Hostname {
+					hostname: crate::lightning::util::ser::Hostname { inner: ObjOps::heap_alloc(hostname), is_owned: true },
 					port: port,
 				}
 			},
@@ -3163,6 +3198,14 @@ pub extern "C" fn NetAddress_onion_v3(ed25519_pubkey: crate::c_types::ThirtyTwoB
 		ed25519_pubkey,
 		checksum,
 		version,
+		port,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new Hostname-variant NetAddress
+pub extern "C" fn NetAddress_hostname(hostname: crate::lightning::util::ser::Hostname, port: u16) -> NetAddress {
+	NetAddress::Hostname {
+		hostname,
 		port,
 	}
 }
@@ -3829,6 +3872,17 @@ pub extern "C" fn UnsignedChannelUpdate_get_htlc_minimum_msat(this_ptr: &Unsigne
 pub extern "C" fn UnsignedChannelUpdate_set_htlc_minimum_msat(this_ptr: &mut UnsignedChannelUpdate, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc_minimum_msat = val;
 }
+/// The maximum HTLC value incoming to sender, in milli-satoshi. Used to be optional.
+#[no_mangle]
+pub extern "C" fn UnsignedChannelUpdate_get_htlc_maximum_msat(this_ptr: &UnsignedChannelUpdate) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().htlc_maximum_msat;
+	*inner_val
+}
+/// The maximum HTLC value incoming to sender, in milli-satoshi. Used to be optional.
+#[no_mangle]
+pub extern "C" fn UnsignedChannelUpdate_set_htlc_maximum_msat(this_ptr: &mut UnsignedChannelUpdate, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc_maximum_msat = val;
+}
 /// The base HTLC fee charged by sender, in milli-satoshi
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_fee_base_msat(this_ptr: &UnsignedChannelUpdate) -> u32 {
@@ -3858,6 +3912,24 @@ pub extern "C" fn UnsignedChannelUpdate_set_fee_proportional_millionths(this_ptr
 pub extern "C" fn UnsignedChannelUpdate_set_excess_data(this_ptr: &mut UnsignedChannelUpdate, mut val: crate::c_types::derived::CVec_u8Z) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.excess_data = local_val;
+}
+/// Constructs a new UnsignedChannelUpdate given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedChannelUpdate_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut short_channel_id_arg: u64, mut timestamp_arg: u32, mut flags_arg: u8, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: u64, mut htlc_maximum_msat_arg: u64, mut fee_base_msat_arg: u32, mut fee_proportional_millionths_arg: u32, mut excess_data_arg: crate::c_types::derived::CVec_u8Z) -> UnsignedChannelUpdate {
+	let mut local_excess_data_arg = Vec::new(); for mut item in excess_data_arg.into_rust().drain(..) { local_excess_data_arg.push( { item }); };
+	UnsignedChannelUpdate { inner: ObjOps::heap_alloc(nativeUnsignedChannelUpdate {
+		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
+		short_channel_id: short_channel_id_arg,
+		timestamp: timestamp_arg,
+		flags: flags_arg,
+		cltv_expiry_delta: cltv_expiry_delta_arg,
+		htlc_minimum_msat: htlc_minimum_msat_arg,
+		htlc_maximum_msat: htlc_maximum_msat_arg,
+		fee_base_msat: fee_base_msat_arg,
+		fee_proportional_millionths: fee_proportional_millionths_arg,
+		excess_data: local_excess_data_arg,
+	}), is_owned: true }
 }
 impl Clone for UnsignedChannelUpdate {
 	fn clone(&self) -> Self {

@@ -95,3 +95,85 @@ pub extern "C" fn BigSize_new(mut a_arg: u64) -> BigSize {
 		a_arg,
 	)), is_owned: true }
 }
+
+use lightning::util::ser::Hostname as nativeHostnameImport;
+pub(crate) type nativeHostname = nativeHostnameImport;
+
+/// Represents a hostname for serialization purposes.
+/// Only the character set and length will be validated.
+/// The character set consists of ASCII alphanumeric characters, hyphens, and periods.
+/// Its length is guaranteed to be representable by a single byte.
+/// This serialization is used by BOLT 7 hostnames.
+#[must_use]
+#[repr(C)]
+pub struct Hostname {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeHostname,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for Hostname {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeHostname>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the Hostname, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn Hostname_free(this_obj: Hostname) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Hostname_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeHostname); }
+}
+#[allow(unused)]
+impl Hostname {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeHostname {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeHostname {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeHostname {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+impl Clone for Hostname {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeHostname>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Hostname_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeHostname)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the Hostname
+pub extern "C" fn Hostname_clone(orig: &Hostname) -> Hostname {
+	orig.clone()
+}
+/// Returns the length of the hostname.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Hostname_len(this_arg: &crate::lightning::util::ser::Hostname) -> u8 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.len();
+	ret
+}
+

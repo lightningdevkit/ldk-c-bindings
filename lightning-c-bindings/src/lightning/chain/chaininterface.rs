@@ -153,12 +153,12 @@ pub struct FeeEstimator {
 	pub this_arg: *mut c_void,
 	/// Gets estimated satoshis of fee required per 1000 Weight-Units.
 	///
-	/// Must return a value no smaller than 253 (ie 1 satoshi-per-byte rounded up to ensure later
-	/// round-downs don't put us below 1 satoshi-per-byte).
+	/// LDK will wrap this method and ensure that the value returned is no smaller than 253
+	/// (ie 1 satoshi-per-byte rounded up to ensure later round-downs don't put us below 1 satoshi-per-byte).
 	///
-	/// This method can be implemented with the following unit conversions:
-	///  * max(satoshis-per-byte * 250, 253)
-	///  * max(satoshis-per-kbyte / 4, 253)
+	/// The following unit conversions can be used to convert to sats/KW:
+	///  * satoshis-per-byte * 250
+	///  * satoshis-per-kbyte / 4
 	#[must_use]
 	pub get_est_sat_per_1000_weight: extern "C" fn (this_arg: *const c_void, confirmation_target: crate::lightning::chain::chaininterface::ConfirmationTarget) -> u32,
 	/// Frees any resources associated with this object given its this_arg pointer.
@@ -206,3 +206,9 @@ impl Drop for FeeEstimator {
 
 #[no_mangle]
 pub static MIN_RELAY_FEE_SAT_PER_1000_WEIGHT: u64 = lightning::chain::chaininterface::MIN_RELAY_FEE_SAT_PER_1000_WEIGHT;
+/// Minimum feerate that takes a sane approach to bitcoind weight-to-vbytes rounding.
+/// See the following Core Lightning commit for an explanation:
+/// <https://github.com/ElementsProject/lightning/commit/2e687b9b352c9092b5e8bd4a688916ac50b44af0>
+
+#[no_mangle]
+pub static FEERATE_FLOOR_SATS_PER_KW: u32 = lightning::chain::chaininterface::FEERATE_FLOOR_SATS_PER_KW;

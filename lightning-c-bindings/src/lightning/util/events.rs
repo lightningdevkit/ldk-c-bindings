@@ -363,6 +363,183 @@ pub extern "C" fn ClosureReason_read(ser: crate::c_types::u8slice) -> crate::c_t
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_ClosureReasonZ::None } else { crate::c_types::derived::COption_ClosureReasonZ::Some( { crate::lightning::util::events::ClosureReason::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
 }
+/// Intended destination of a failed HTLC as indicated in [`Event::HTLCHandlingFailed`].
+#[derive(Clone)]
+#[must_use]
+#[repr(C)]
+pub enum HTLCDestination {
+	/// We tried forwarding to a channel but failed to do so. An example of such an instance is when
+	/// there is insufficient capacity in our outbound channel.
+	NextHopChannel {
+		/// The `node_id` of the next node. For backwards compatibility, this field is
+		/// marked as optional, versions prior to 0.0.110 may not always be able to provide
+		/// counterparty node information.
+		///
+		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+		node_id: crate::c_types::PublicKey,
+		/// The outgoing `channel_id` between us and the next node.
+		channel_id: crate::c_types::ThirtyTwoBytes,
+	},
+	/// Scenario where we are unsure of the next node to forward the HTLC to.
+	UnknownNextHop {
+		/// Short channel id we are requesting to forward an HTLC to.
+		requested_forward_scid: u64,
+	},
+	/// Failure scenario where an HTLC may have been forwarded to be intended for us,
+	/// but is invalid for some reason, so we reject it.
+	///
+	/// Some of the reasons may include:
+	/// * HTLC Timeouts
+	/// * Expected MPP amount to claim does not equal HTLC total
+	/// * Claimable amount does not match expected amount
+	FailedPayment {
+		/// The payment hash of the payment we attempted to process.
+		payment_hash: crate::c_types::ThirtyTwoBytes,
+	},
+}
+use lightning::util::events::HTLCDestination as HTLCDestinationImport;
+pub(crate) type nativeHTLCDestination = HTLCDestinationImport;
+
+impl HTLCDestination {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeHTLCDestination {
+		match self {
+			HTLCDestination::NextHopChannel {ref node_id, ref channel_id, } => {
+				let mut node_id_nonref = (*node_id).clone();
+				let mut local_node_id_nonref = if node_id_nonref.is_null() { None } else { Some( { node_id_nonref.into_rust() }) };
+				let mut channel_id_nonref = (*channel_id).clone();
+				nativeHTLCDestination::NextHopChannel {
+					node_id: local_node_id_nonref,
+					channel_id: channel_id_nonref.data,
+				}
+			},
+			HTLCDestination::UnknownNextHop {ref requested_forward_scid, } => {
+				let mut requested_forward_scid_nonref = (*requested_forward_scid).clone();
+				nativeHTLCDestination::UnknownNextHop {
+					requested_forward_scid: requested_forward_scid_nonref,
+				}
+			},
+			HTLCDestination::FailedPayment {ref payment_hash, } => {
+				let mut payment_hash_nonref = (*payment_hash).clone();
+				nativeHTLCDestination::FailedPayment {
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
+				}
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeHTLCDestination {
+		match self {
+			HTLCDestination::NextHopChannel {mut node_id, mut channel_id, } => {
+				let mut local_node_id = if node_id.is_null() { None } else { Some( { node_id.into_rust() }) };
+				nativeHTLCDestination::NextHopChannel {
+					node_id: local_node_id,
+					channel_id: channel_id.data,
+				}
+			},
+			HTLCDestination::UnknownNextHop {mut requested_forward_scid, } => {
+				nativeHTLCDestination::UnknownNextHop {
+					requested_forward_scid: requested_forward_scid,
+				}
+			},
+			HTLCDestination::FailedPayment {mut payment_hash, } => {
+				nativeHTLCDestination::FailedPayment {
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
+				}
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeHTLCDestination) -> Self {
+		match native {
+			nativeHTLCDestination::NextHopChannel {ref node_id, ref channel_id, } => {
+				let mut node_id_nonref = (*node_id).clone();
+				let mut local_node_id_nonref = if node_id_nonref.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(node_id_nonref.unwrap())) } };
+				let mut channel_id_nonref = (*channel_id).clone();
+				HTLCDestination::NextHopChannel {
+					node_id: local_node_id_nonref,
+					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id_nonref },
+				}
+			},
+			nativeHTLCDestination::UnknownNextHop {ref requested_forward_scid, } => {
+				let mut requested_forward_scid_nonref = (*requested_forward_scid).clone();
+				HTLCDestination::UnknownNextHop {
+					requested_forward_scid: requested_forward_scid_nonref,
+				}
+			},
+			nativeHTLCDestination::FailedPayment {ref payment_hash, } => {
+				let mut payment_hash_nonref = (*payment_hash).clone();
+				HTLCDestination::FailedPayment {
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
+				}
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeHTLCDestination) -> Self {
+		match native {
+			nativeHTLCDestination::NextHopChannel {mut node_id, mut channel_id, } => {
+				let mut local_node_id = if node_id.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(node_id.unwrap())) } };
+				HTLCDestination::NextHopChannel {
+					node_id: local_node_id,
+					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id },
+				}
+			},
+			nativeHTLCDestination::UnknownNextHop {mut requested_forward_scid, } => {
+				HTLCDestination::UnknownNextHop {
+					requested_forward_scid: requested_forward_scid,
+				}
+			},
+			nativeHTLCDestination::FailedPayment {mut payment_hash, } => {
+				HTLCDestination::FailedPayment {
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
+				}
+			},
+		}
+	}
+}
+/// Frees any resources used by the HTLCDestination
+#[no_mangle]
+pub extern "C" fn HTLCDestination_free(this_ptr: HTLCDestination) { }
+/// Creates a copy of the HTLCDestination
+#[no_mangle]
+pub extern "C" fn HTLCDestination_clone(orig: &HTLCDestination) -> HTLCDestination {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new NextHopChannel-variant HTLCDestination
+pub extern "C" fn HTLCDestination_next_hop_channel(node_id: crate::c_types::PublicKey, channel_id: crate::c_types::ThirtyTwoBytes) -> HTLCDestination {
+	HTLCDestination::NextHopChannel {
+		node_id,
+		channel_id,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new UnknownNextHop-variant HTLCDestination
+pub extern "C" fn HTLCDestination_unknown_next_hop(requested_forward_scid: u64) -> HTLCDestination {
+	HTLCDestination::UnknownNextHop {
+		requested_forward_scid,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new FailedPayment-variant HTLCDestination
+pub extern "C" fn HTLCDestination_failed_payment(payment_hash: crate::c_types::ThirtyTwoBytes) -> HTLCDestination {
+	HTLCDestination::FailedPayment {
+		payment_hash,
+	}
+}
+#[no_mangle]
+/// Serialize the HTLCDestination object into a byte array which can be read by HTLCDestination_read
+pub extern "C" fn HTLCDestination_write(obj: &crate::lightning::util::events::HTLCDestination) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[no_mangle]
+/// Read a HTLCDestination from a byte array, created by HTLCDestination_write
+pub extern "C" fn HTLCDestination_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_HTLCDestinationZDecodeErrorZ {
+	let res: Result<Option<lightning::util::events::HTLCDestination>, lightning::ln::msgs::DecodeError> = crate::c_types::maybe_deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_HTLCDestinationZ::None } else { crate::c_types::derived::COption_HTLCDestinationZ::Some( { crate::lightning::util::events::HTLCDestination::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
 /// An Event which you should probably take some action in response to.
 ///
 /// Note that while Writeable and Readable are implemented for Event, you probably shouldn't use
@@ -599,6 +776,38 @@ pub enum Event {
 		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
 		retry: crate::lightning::routing::router::RouteParameters,
 	},
+	/// Indicates that a probe payment we sent returned successful, i.e., only failed at the destination.
+	ProbeSuccessful {
+		/// The id returned by [`ChannelManager::send_probe`].
+		///
+		/// [`ChannelManager::send_probe`]: crate::ln::channelmanager::ChannelManager::send_probe
+		payment_id: crate::c_types::ThirtyTwoBytes,
+		/// The hash generated by [`ChannelManager::send_probe`].
+		///
+		/// [`ChannelManager::send_probe`]: crate::ln::channelmanager::ChannelManager::send_probe
+		payment_hash: crate::c_types::ThirtyTwoBytes,
+		/// The payment path that was successful.
+		path: crate::c_types::derived::CVec_RouteHopZ,
+	},
+	/// Indicates that a probe payment we sent failed at an intermediary node on the path.
+	ProbeFailed {
+		/// The id returned by [`ChannelManager::send_probe`].
+		///
+		/// [`ChannelManager::send_probe`]: crate::ln::channelmanager::ChannelManager::send_probe
+		payment_id: crate::c_types::ThirtyTwoBytes,
+		/// The hash generated by [`ChannelManager::send_probe`].
+		///
+		/// [`ChannelManager::send_probe`]: crate::ln::channelmanager::ChannelManager::send_probe
+		payment_hash: crate::c_types::ThirtyTwoBytes,
+		/// The payment path that failed.
+		path: crate::c_types::derived::CVec_RouteHopZ,
+		/// The channel responsible for the failed probe.
+		///
+		/// Note that for route hints or for the first hop in a path this may be an SCID alias and
+		/// may not refer to a channel in the public network graph. These aliases may also collide
+		/// with channels in the public network graph.
+		short_channel_id: crate::c_types::derived::COption_u64Z,
+	},
 	/// Used to indicate that [`ChannelManager::process_pending_htlc_forwards`] should be called at
 	/// a time in the future.
 	///
@@ -729,6 +938,24 @@ pub enum Event {
 		/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
 		channel_type: crate::lightning::ln::features::ChannelTypeFeatures,
 	},
+	/// Indicates that the HTLC was accepted, but could not be processed when or after attempting to
+	/// forward it.
+	///
+	/// Some scenarios where this event may be sent include:
+	/// * Insufficient capacity in the outbound channel
+	/// * While waiting to forward the HTLC, the channel it is meant to be forwarded through closes
+	/// * When an unknown SCID is requested for forwarding a payment.
+	/// * Claiming an amount for an MPP payment that exceeds the HTLC total
+	/// * The HTLC has timed out
+	///
+	/// This event, however, does not get generated if an HTLC fails to meet the forwarding
+	/// requirements (i.e. insufficient fees paid, or a CLTV that is too soon).
+	HTLCHandlingFailed {
+		/// The channel over which the HTLC was received.
+		prev_channel_id: crate::c_types::ThirtyTwoBytes,
+		/// Destination of the HTLC that failed to be processed.
+		failed_next_destination: crate::lightning::util::events::HTLCDestination,
+	},
 }
 use lightning::util::events::Event as EventImport;
 pub(crate) type nativeEvent = EventImport;
@@ -830,6 +1057,31 @@ impl Event {
 					retry: local_retry_nonref,
 				}
 			},
+			Event::ProbeSuccessful {ref payment_id, ref payment_hash, ref path, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut path_nonref = (*path).clone();
+				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.into_rust().drain(..) { local_path_nonref.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+				nativeEvent::ProbeSuccessful {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
+					path: local_path_nonref,
+				}
+			},
+			Event::ProbeFailed {ref payment_id, ref payment_hash, ref path, ref short_channel_id, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut path_nonref = (*path).clone();
+				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.into_rust().drain(..) { local_path_nonref.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+				let mut short_channel_id_nonref = (*short_channel_id).clone();
+				let mut local_short_channel_id_nonref = if short_channel_id_nonref.is_some() { Some( { short_channel_id_nonref.take() }) } else { None };
+				nativeEvent::ProbeFailed {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
+					path: local_path_nonref,
+					short_channel_id: local_short_channel_id_nonref,
+				}
+			},
 			Event::PendingHTLCsForwardable {ref time_forwardable, } => {
 				let mut time_forwardable_nonref = (*time_forwardable).clone();
 				nativeEvent::PendingHTLCsForwardable {
@@ -888,6 +1140,14 @@ impl Event {
 					funding_satoshis: funding_satoshis_nonref,
 					push_msat: push_msat_nonref,
 					channel_type: *unsafe { Box::from_raw(channel_type_nonref.take_inner()) },
+				}
+			},
+			Event::HTLCHandlingFailed {ref prev_channel_id, ref failed_next_destination, } => {
+				let mut prev_channel_id_nonref = (*prev_channel_id).clone();
+				let mut failed_next_destination_nonref = (*failed_next_destination).clone();
+				nativeEvent::HTLCHandlingFailed {
+					prev_channel_id: prev_channel_id_nonref.data,
+					failed_next_destination: failed_next_destination_nonref.into_native(),
 				}
 			},
 		}
@@ -960,6 +1220,24 @@ impl Event {
 					retry: local_retry,
 				}
 			},
+			Event::ProbeSuccessful {mut payment_id, mut payment_hash, mut path, } => {
+				let mut local_path = Vec::new(); for mut item in path.into_rust().drain(..) { local_path.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+				nativeEvent::ProbeSuccessful {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id.data),
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
+					path: local_path,
+				}
+			},
+			Event::ProbeFailed {mut payment_id, mut payment_hash, mut path, mut short_channel_id, } => {
+				let mut local_path = Vec::new(); for mut item in path.into_rust().drain(..) { local_path.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+				let mut local_short_channel_id = if short_channel_id.is_some() { Some( { short_channel_id.take() }) } else { None };
+				nativeEvent::ProbeFailed {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id.data),
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
+					path: local_path,
+					short_channel_id: local_short_channel_id,
+				}
+			},
 			Event::PendingHTLCsForwardable {mut time_forwardable, } => {
 				nativeEvent::PendingHTLCsForwardable {
 					time_forwardable: core::time::Duration::from_secs(time_forwardable),
@@ -1002,6 +1280,12 @@ impl Event {
 					funding_satoshis: funding_satoshis,
 					push_msat: push_msat,
 					channel_type: *unsafe { Box::from_raw(channel_type.take_inner()) },
+				}
+			},
+			Event::HTLCHandlingFailed {mut prev_channel_id, mut failed_next_destination, } => {
+				nativeEvent::HTLCHandlingFailed {
+					prev_channel_id: prev_channel_id.data,
+					failed_next_destination: failed_next_destination.into_native(),
 				}
 			},
 		}
@@ -1102,6 +1386,31 @@ impl Event {
 					retry: local_retry_nonref,
 				}
 			},
+			nativeEvent::ProbeSuccessful {ref payment_id, ref payment_hash, ref path, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut path_nonref = (*path).clone();
+				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.drain(..) { local_path_nonref.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+				Event::ProbeSuccessful {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
+					path: local_path_nonref.into(),
+				}
+			},
+			nativeEvent::ProbeFailed {ref payment_id, ref payment_hash, ref path, ref short_channel_id, } => {
+				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut path_nonref = (*path).clone();
+				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.drain(..) { local_path_nonref.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+				let mut short_channel_id_nonref = (*short_channel_id).clone();
+				let mut local_short_channel_id_nonref = if short_channel_id_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { short_channel_id_nonref.unwrap() }) };
+				Event::ProbeFailed {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
+					path: local_path_nonref.into(),
+					short_channel_id: local_short_channel_id_nonref,
+				}
+			},
 			nativeEvent::PendingHTLCsForwardable {ref time_forwardable, } => {
 				let mut time_forwardable_nonref = (*time_forwardable).clone();
 				Event::PendingHTLCsForwardable {
@@ -1160,6 +1469,14 @@ impl Event {
 					funding_satoshis: funding_satoshis_nonref,
 					push_msat: push_msat_nonref,
 					channel_type: crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(channel_type_nonref), is_owned: true },
+				}
+			},
+			nativeEvent::HTLCHandlingFailed {ref prev_channel_id, ref failed_next_destination, } => {
+				let mut prev_channel_id_nonref = (*prev_channel_id).clone();
+				let mut failed_next_destination_nonref = (*failed_next_destination).clone();
+				Event::HTLCHandlingFailed {
+					prev_channel_id: crate::c_types::ThirtyTwoBytes { data: prev_channel_id_nonref },
+					failed_next_destination: crate::lightning::util::events::HTLCDestination::native_into(failed_next_destination_nonref),
 				}
 			},
 		}
@@ -1232,6 +1549,24 @@ impl Event {
 					retry: local_retry,
 				}
 			},
+			nativeEvent::ProbeSuccessful {mut payment_id, mut payment_hash, mut path, } => {
+				let mut local_path = Vec::new(); for mut item in path.drain(..) { local_path.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+				Event::ProbeSuccessful {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id.0 },
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
+					path: local_path.into(),
+				}
+			},
+			nativeEvent::ProbeFailed {mut payment_id, mut payment_hash, mut path, mut short_channel_id, } => {
+				let mut local_path = Vec::new(); for mut item in path.drain(..) { local_path.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+				let mut local_short_channel_id = if short_channel_id.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { short_channel_id.unwrap() }) };
+				Event::ProbeFailed {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id.0 },
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
+					path: local_path.into(),
+					short_channel_id: local_short_channel_id,
+				}
+			},
 			nativeEvent::PendingHTLCsForwardable {mut time_forwardable, } => {
 				Event::PendingHTLCsForwardable {
 					time_forwardable: time_forwardable.as_secs(),
@@ -1274,6 +1609,12 @@ impl Event {
 					funding_satoshis: funding_satoshis,
 					push_msat: push_msat,
 					channel_type: crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(channel_type), is_owned: true },
+				}
+			},
+			nativeEvent::HTLCHandlingFailed {mut prev_channel_id, mut failed_next_destination, } => {
+				Event::HTLCHandlingFailed {
+					prev_channel_id: crate::c_types::ThirtyTwoBytes { data: prev_channel_id },
+					failed_next_destination: crate::lightning::util::events::HTLCDestination::native_into(failed_next_destination),
 				}
 			},
 		}
@@ -1358,6 +1699,25 @@ pub extern "C" fn Event_payment_path_failed(payment_id: crate::c_types::ThirtyTw
 	}
 }
 #[no_mangle]
+/// Utility method to constructs a new ProbeSuccessful-variant Event
+pub extern "C" fn Event_probe_successful(payment_id: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::ThirtyTwoBytes, path: crate::c_types::derived::CVec_RouteHopZ) -> Event {
+	Event::ProbeSuccessful {
+		payment_id,
+		payment_hash,
+		path,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new ProbeFailed-variant Event
+pub extern "C" fn Event_probe_failed(payment_id: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::ThirtyTwoBytes, path: crate::c_types::derived::CVec_RouteHopZ, short_channel_id: crate::c_types::derived::COption_u64Z) -> Event {
+	Event::ProbeFailed {
+		payment_id,
+		payment_hash,
+		path,
+		short_channel_id,
+	}
+}
+#[no_mangle]
 /// Utility method to constructs a new PendingHTLCsForwardable-variant Event
 pub extern "C" fn Event_pending_htlcs_forwardable(time_forwardable: u64) -> Event {
 	Event::PendingHTLCsForwardable {
@@ -1407,6 +1767,14 @@ pub extern "C" fn Event_open_channel_request(temporary_channel_id: crate::c_type
 		funding_satoshis,
 		push_msat,
 		channel_type,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new HTLCHandlingFailed-variant Event
+pub extern "C" fn Event_htlchandling_failed(prev_channel_id: crate::c_types::ThirtyTwoBytes, failed_next_destination: crate::lightning::util::events::HTLCDestination) -> Event {
+	Event::HTLCHandlingFailed {
+		prev_channel_id,
+		failed_next_destination,
 	}
 }
 #[no_mangle]

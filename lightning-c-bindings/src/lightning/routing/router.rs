@@ -533,10 +533,10 @@ pub extern "C" fn RouteParameters_read(ser: crate::c_types::u8slice) -> crate::c
 
 #[no_mangle]
 pub static DEFAULT_MAX_TOTAL_CLTV_EXPIRY_DELTA: u32 = lightning::routing::router::DEFAULT_MAX_TOTAL_CLTV_EXPIRY_DELTA;
-/// Maximum number of paths we allow an MPP payment to have.
+/// Maximum number of paths we allow an (MPP) payment to have.
 
 #[no_mangle]
-pub static DEFAULT_MAX_MPP_PATH_COUNT: u8 = lightning::routing::router::DEFAULT_MAX_MPP_PATH_COUNT;
+pub static DEFAULT_MAX_PATH_COUNT: u8 = lightning::routing::router::DEFAULT_MAX_PATH_COUNT;
 
 use lightning::routing::router::PaymentParameters as nativePaymentParametersImport;
 pub(crate) type nativePaymentParameters = nativePaymentParametersImport;
@@ -665,33 +665,79 @@ pub extern "C" fn PaymentParameters_get_max_total_cltv_expiry_delta(this_ptr: &P
 pub extern "C" fn PaymentParameters_set_max_total_cltv_expiry_delta(this_ptr: &mut PaymentParameters, mut val: u32) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.max_total_cltv_expiry_delta = val;
 }
-/// The maximum number of paths that may be used by MPP payments.
-/// Defaults to [`DEFAULT_MAX_MPP_PATH_COUNT`].
+/// The maximum number of paths that may be used by (MPP) payments.
+/// Defaults to [`DEFAULT_MAX_PATH_COUNT`].
 #[no_mangle]
-pub extern "C" fn PaymentParameters_get_max_mpp_path_count(this_ptr: &PaymentParameters) -> u8 {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().max_mpp_path_count;
+pub extern "C" fn PaymentParameters_get_max_path_count(this_ptr: &PaymentParameters) -> u8 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().max_path_count;
 	*inner_val
 }
-/// The maximum number of paths that may be used by MPP payments.
-/// Defaults to [`DEFAULT_MAX_MPP_PATH_COUNT`].
+/// The maximum number of paths that may be used by (MPP) payments.
+/// Defaults to [`DEFAULT_MAX_PATH_COUNT`].
 #[no_mangle]
-pub extern "C" fn PaymentParameters_set_max_mpp_path_count(this_ptr: &mut PaymentParameters, mut val: u8) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.max_mpp_path_count = val;
+pub extern "C" fn PaymentParameters_set_max_path_count(this_ptr: &mut PaymentParameters, mut val: u8) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.max_path_count = val;
+}
+/// Selects the maximum share of a channel's total capacity which will be sent over a channel,
+/// as a power of 1/2. A higher value prefers to send the payment using more MPP parts whereas
+/// a lower value prefers to send larger MPP parts, potentially saturating channels and
+/// increasing failure probability for those paths.
+///
+/// Note that this restriction will be relaxed during pathfinding after paths which meet this
+/// restriction have been found. While paths which meet this criteria will be searched for, it
+/// is ultimately up to the scorer to select them over other paths.
+///
+/// A value of 0 will allow payments up to and including a channel's total announced usable
+/// capacity, a value of one will only use up to half its capacity, two 1/4, etc.
+///
+/// Default value: 2
+#[no_mangle]
+pub extern "C" fn PaymentParameters_get_max_channel_saturation_power_of_half(this_ptr: &PaymentParameters) -> u8 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().max_channel_saturation_power_of_half;
+	*inner_val
+}
+/// Selects the maximum share of a channel's total capacity which will be sent over a channel,
+/// as a power of 1/2. A higher value prefers to send the payment using more MPP parts whereas
+/// a lower value prefers to send larger MPP parts, potentially saturating channels and
+/// increasing failure probability for those paths.
+///
+/// Note that this restriction will be relaxed during pathfinding after paths which meet this
+/// restriction have been found. While paths which meet this criteria will be searched for, it
+/// is ultimately up to the scorer to select them over other paths.
+///
+/// A value of 0 will allow payments up to and including a channel's total announced usable
+/// capacity, a value of one will only use up to half its capacity, two 1/4, etc.
+///
+/// Default value: 2
+#[no_mangle]
+pub extern "C" fn PaymentParameters_set_max_channel_saturation_power_of_half(this_ptr: &mut PaymentParameters, mut val: u8) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.max_channel_saturation_power_of_half = val;
+}
+/// A list of SCIDs which this payment was previously attempted over and which caused the
+/// payment to fail. Future attempts for the same payment shouldn't be relayed through any of
+/// these SCIDs.
+#[no_mangle]
+pub extern "C" fn PaymentParameters_set_previously_failed_channels(this_ptr: &mut PaymentParameters, mut val: crate::c_types::derived::CVec_u64Z) {
+	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.previously_failed_channels = local_val;
 }
 /// Constructs a new PaymentParameters given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PaymentParameters_new(mut payee_pubkey_arg: crate::c_types::PublicKey, mut features_arg: crate::lightning::ln::features::InvoiceFeatures, mut route_hints_arg: crate::c_types::derived::CVec_RouteHintZ, mut expiry_time_arg: crate::c_types::derived::COption_u64Z, mut max_total_cltv_expiry_delta_arg: u32, mut max_mpp_path_count_arg: u8) -> PaymentParameters {
+pub extern "C" fn PaymentParameters_new(mut payee_pubkey_arg: crate::c_types::PublicKey, mut features_arg: crate::lightning::ln::features::InvoiceFeatures, mut route_hints_arg: crate::c_types::derived::CVec_RouteHintZ, mut expiry_time_arg: crate::c_types::derived::COption_u64Z, mut max_total_cltv_expiry_delta_arg: u32, mut max_path_count_arg: u8, mut max_channel_saturation_power_of_half_arg: u8, mut previously_failed_channels_arg: crate::c_types::derived::CVec_u64Z) -> PaymentParameters {
 	let mut local_features_arg = if features_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(features_arg.take_inner()) } }) };
 	let mut local_route_hints_arg = Vec::new(); for mut item in route_hints_arg.into_rust().drain(..) { local_route_hints_arg.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 	let mut local_expiry_time_arg = if expiry_time_arg.is_some() { Some( { expiry_time_arg.take() }) } else { None };
+	let mut local_previously_failed_channels_arg = Vec::new(); for mut item in previously_failed_channels_arg.into_rust().drain(..) { local_previously_failed_channels_arg.push( { item }); };
 	PaymentParameters { inner: ObjOps::heap_alloc(nativePaymentParameters {
 		payee_pubkey: payee_pubkey_arg.into_rust(),
 		features: local_features_arg,
 		route_hints: local_route_hints_arg,
 		expiry_time: local_expiry_time_arg,
 		max_total_cltv_expiry_delta: max_total_cltv_expiry_delta_arg,
-		max_mpp_path_count: max_mpp_path_count_arg,
+		max_path_count: max_path_count_arg,
+		max_channel_saturation_power_of_half: max_channel_saturation_power_of_half_arg,
+		previously_failed_channels: local_previously_failed_channels_arg,
 	}), is_owned: true }
 }
 impl Clone for PaymentParameters {

@@ -716,6 +716,17 @@ pub extern "C" fn PaymentParameters_set_max_channel_saturation_power_of_half(thi
 /// A list of SCIDs which this payment was previously attempted over and which caused the
 /// payment to fail. Future attempts for the same payment shouldn't be relayed through any of
 /// these SCIDs.
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn PaymentParameters_get_previously_failed_channels(this_ptr: &PaymentParameters) -> crate::c_types::derived::CVec_u64Z {
+	let mut inner_val = this_ptr.get_native_mut_ref().previously_failed_channels.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { item }); };
+	local_inner_val.into()
+}
+/// A list of SCIDs which this payment was previously attempted over and which caused the
+/// payment to fail. Future attempts for the same payment shouldn't be relayed through any of
+/// these SCIDs.
 #[no_mangle]
 pub extern "C" fn PaymentParameters_set_previously_failed_channels(this_ptr: &mut PaymentParameters, mut val: crate::c_types::derived::CVec_u64Z) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };

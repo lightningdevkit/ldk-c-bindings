@@ -1574,6 +1574,15 @@ pub extern "C" fn NodeAnnouncementInfo_set_alias(this_ptr: &mut NodeAnnouncement
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.alias = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Internet-level addresses via which one can connect to the node
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn NodeAnnouncementInfo_get_addresses(this_ptr: &NodeAnnouncementInfo) -> crate::c_types::derived::CVec_NetAddressZ {
+	let mut inner_val = this_ptr.get_native_mut_ref().addresses.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::lightning::ln::msgs::NetAddress::native_into(item) }); };
+	local_inner_val.into()
+}
+/// Internet-level addresses via which one can connect to the node
 #[no_mangle]
 pub extern "C" fn NodeAnnouncementInfo_set_addresses(this_ptr: &mut NodeAnnouncementInfo, mut val: crate::c_types::derived::CVec_NetAddressZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item.into_native() }); };
@@ -1808,6 +1817,15 @@ impl NodeInfo {
 		self.inner = core::ptr::null_mut();
 		ret
 	}
+}
+/// All valid channels a node has announced
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn NodeInfo_get_channels(this_ptr: &NodeInfo) -> crate::c_types::derived::CVec_u64Z {
+	let mut inner_val = this_ptr.get_native_mut_ref().channels.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { item }); };
+	local_inner_val.into()
 }
 /// All valid channels a node has announced
 #[no_mangle]

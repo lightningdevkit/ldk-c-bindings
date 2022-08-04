@@ -1322,6 +1322,15 @@ pub extern "C" fn HolderCommitmentTransaction_set_counterparty_sig(this_ptr: &mu
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.counterparty_sig = val.into_rust();
 }
 /// All non-dust counterparty HTLC signatures, in the order they appear in the transaction
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn HolderCommitmentTransaction_get_counterparty_htlc_sigs(this_ptr: &HolderCommitmentTransaction) -> crate::c_types::derived::CVec_SignatureZ {
+	let mut inner_val = this_ptr.get_native_mut_ref().counterparty_htlc_sigs.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::c_types::Signature::from_rust(&item) }); };
+	local_inner_val.into()
+}
+/// All non-dust counterparty HTLC signatures, in the order they appear in the transaction
 #[no_mangle]
 pub extern "C" fn HolderCommitmentTransaction_set_counterparty_htlc_sigs(this_ptr: &mut HolderCommitmentTransaction, mut val: crate::c_types::derived::CVec_SignatureZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item.into_rust() }); };

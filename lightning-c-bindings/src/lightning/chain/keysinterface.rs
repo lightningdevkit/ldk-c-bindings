@@ -106,6 +106,14 @@ pub extern "C" fn DelayedPaymentOutputDescriptor_set_to_self_delay(this_ptr: &mu
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.to_self_delay = val;
 }
 /// The output which is referenced by the given outpoint
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn DelayedPaymentOutputDescriptor_get_output(this_ptr: &DelayedPaymentOutputDescriptor) -> crate::c_types::TxOut {
+	let mut inner_val = this_ptr.get_native_mut_ref().output.clone();
+	crate::c_types::TxOut::from_rust(inner_val)
+}
+/// The output which is referenced by the given outpoint
 #[no_mangle]
 pub extern "C" fn DelayedPaymentOutputDescriptor_set_output(this_ptr: &mut DelayedPaymentOutputDescriptor, mut val: crate::c_types::TxOut) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.output = val.into_rust();
@@ -260,6 +268,14 @@ pub extern "C" fn StaticPaymentOutputDescriptor_get_outpoint(this_ptr: &StaticPa
 #[no_mangle]
 pub extern "C" fn StaticPaymentOutputDescriptor_set_outpoint(this_ptr: &mut StaticPaymentOutputDescriptor, mut val: crate::lightning::chain::transaction::OutPoint) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.outpoint = *unsafe { Box::from_raw(val.take_inner()) };
+}
+/// The output which is referenced by the given outpoint
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn StaticPaymentOutputDescriptor_get_output(this_ptr: &StaticPaymentOutputDescriptor) -> crate::c_types::TxOut {
+	let mut inner_val = this_ptr.get_native_mut_ref().output.clone();
+	crate::c_types::TxOut::from_rust(inner_val)
 }
 /// The output which is referenced by the given outpoint
 #[no_mangle]

@@ -2362,6 +2362,15 @@ pub extern "C" fn CommitmentSigned_set_signature(this_ptr: &mut CommitmentSigned
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.signature = val.into_rust();
 }
 /// Signatures on the HTLC transactions
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn CommitmentSigned_get_htlc_signatures(this_ptr: &CommitmentSigned) -> crate::c_types::derived::CVec_SignatureZ {
+	let mut inner_val = this_ptr.get_native_mut_ref().htlc_signatures.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::c_types::Signature::from_rust(&item) }); };
+	local_inner_val.into()
+}
+/// Signatures on the HTLC transactions
 #[no_mangle]
 pub extern "C" fn CommitmentSigned_set_htlc_signatures(this_ptr: &mut CommitmentSigned, mut val: crate::c_types::derived::CVec_SignatureZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item.into_rust() }); };
@@ -3332,6 +3341,15 @@ pub extern "C" fn UnsignedNodeAnnouncement_set_alias(this_ptr: &mut UnsignedNode
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.alias = val.data;
 }
 /// List of addresses on which this node is reachable
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn UnsignedNodeAnnouncement_get_addresses(this_ptr: &UnsignedNodeAnnouncement) -> crate::c_types::derived::CVec_NetAddressZ {
+	let mut inner_val = this_ptr.get_native_mut_ref().addresses.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::lightning::ln::msgs::NetAddress::native_into(item) }); };
+	local_inner_val.into()
+}
+/// List of addresses on which this node is reachable
 #[no_mangle]
 pub extern "C" fn UnsignedNodeAnnouncement_set_addresses(this_ptr: &mut UnsignedNodeAnnouncement, mut val: crate::c_types::derived::CVec_NetAddressZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item.into_native() }); };
@@ -3908,6 +3926,17 @@ pub extern "C" fn UnsignedChannelUpdate_set_fee_proportional_millionths(this_ptr
 /// Excess data which was signed as a part of the message which we do not (yet) understand how
 /// to decode. This is stored to ensure forward-compatibility as new fields are added to the
 /// lightning gossip
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn UnsignedChannelUpdate_get_excess_data(this_ptr: &UnsignedChannelUpdate) -> crate::c_types::derived::CVec_u8Z {
+	let mut inner_val = this_ptr.get_native_mut_ref().excess_data.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { item }); };
+	local_inner_val.into()
+}
+/// Excess data which was signed as a part of the message which we do not (yet) understand how
+/// to decode. This is stored to ensure forward-compatibility as new fields are added to the
+/// lightning gossip
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_set_excess_data(this_ptr: &mut UnsignedChannelUpdate, mut val: crate::c_types::derived::CVec_u8Z) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
@@ -4269,6 +4298,15 @@ pub extern "C" fn ReplyChannelRange_set_sync_complete(this_ptr: &mut ReplyChanne
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.sync_complete = val;
 }
 /// The short_channel_ids in the channel range
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn ReplyChannelRange_get_short_channel_ids(this_ptr: &ReplyChannelRange) -> crate::c_types::derived::CVec_u64Z {
+	let mut inner_val = this_ptr.get_native_mut_ref().short_channel_ids.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { item }); };
+	local_inner_val.into()
+}
+/// The short_channel_ids in the channel range
 #[no_mangle]
 pub extern "C" fn ReplyChannelRange_set_short_channel_ids(this_ptr: &mut ReplyChannelRange, mut val: crate::c_types::derived::CVec_u64Z) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
@@ -4374,6 +4412,15 @@ pub extern "C" fn QueryShortChannelIds_get_chain_hash(this_ptr: &QueryShortChann
 #[no_mangle]
 pub extern "C" fn QueryShortChannelIds_set_chain_hash(this_ptr: &mut QueryShortChannelIds, mut val: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
+}
+/// The short_channel_ids that are being queried
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn QueryShortChannelIds_get_short_channel_ids(this_ptr: &QueryShortChannelIds) -> crate::c_types::derived::CVec_u64Z {
+	let mut inner_val = this_ptr.get_native_mut_ref().short_channel_ids.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { item }); };
+	local_inner_val.into()
 }
 /// The short_channel_ids that are being queried
 #[no_mangle]

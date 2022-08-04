@@ -735,6 +735,25 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 						write!(w, "inner_val").unwrap();
 						types.write_to_c_conversion_inline_suffix(w, &ref_type, Some(&gen_types), true);
 						writeln!(w, "\n}}").unwrap();
+					} else {
+						// If the type isn't reference-able, but is clonable, export a getter that just clones
+						if types.understood_c_type(&$field.ty, Some(&gen_types)) {
+							let mut v = Vec::new();
+							types.write_c_type(&mut v, &$field.ty, Some(&gen_types), true);
+							let s = String::from_utf8(v).unwrap();
+							if types.is_clonable(&s) {
+								writeln_arg_docs(w, &$field.attrs, "", types, Some(&gen_types), vec![].drain(..), Some(&$field.ty));
+								writeln!(w, "///\n/// Returns a copy of the field.").unwrap();
+								write!(w, "#[no_mangle]\npub extern \"C\" fn {}_get_{}(this_ptr: &{}) -> {}", struct_name, $new_name, struct_name, s).unwrap();
+								write!(w, " {{\n\tlet mut inner_val = this_ptr.get_native_mut_ref().{}.clone();\n\t", $real_name).unwrap();
+								let local_var = types.write_to_c_conversion_new_var(w, &format_ident!("inner_val"), &$field.ty, Some(&gen_types), true);
+								if local_var { write!(w, "\n\t").unwrap(); }
+								types.write_to_c_conversion_inline_prefix(w, &$field.ty, Some(&gen_types), true);
+								write!(w, "inner_val").unwrap();
+								types.write_to_c_conversion_inline_suffix(w, &$field.ty, Some(&gen_types), true);
+								writeln!(w, "\n}}").unwrap();
+							}
+						}
 					}
 				}
 

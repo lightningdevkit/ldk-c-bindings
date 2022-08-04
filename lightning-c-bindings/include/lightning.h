@@ -19565,6 +19565,13 @@ void DelayedPaymentOutputDescriptor_set_to_self_delay(struct LDKDelayedPaymentOu
 
 /**
  * The output which is referenced by the given outpoint
+ *
+ * Returns a copy of the field.
+ */
+struct LDKTxOut DelayedPaymentOutputDescriptor_get_output(const struct LDKDelayedPaymentOutputDescriptor *NONNULL_PTR this_ptr);
+
+/**
+ * The output which is referenced by the given outpoint
  */
 void DelayedPaymentOutputDescriptor_set_output(struct LDKDelayedPaymentOutputDescriptor *NONNULL_PTR this_ptr, struct LDKTxOut val);
 
@@ -19638,6 +19645,13 @@ struct LDKOutPoint StaticPaymentOutputDescriptor_get_outpoint(const struct LDKSt
  * The outpoint which is spendable
  */
 void StaticPaymentOutputDescriptor_set_outpoint(struct LDKStaticPaymentOutputDescriptor *NONNULL_PTR this_ptr, struct LDKOutPoint val);
+
+/**
+ * The output which is referenced by the given outpoint
+ *
+ * Returns a copy of the field.
+ */
+struct LDKTxOut StaticPaymentOutputDescriptor_get_output(const struct LDKStaticPaymentOutputDescriptor *NONNULL_PTR this_ptr);
 
 /**
  * The output which is referenced by the given outpoint
@@ -22641,6 +22655,13 @@ void CommitmentSigned_set_signature(struct LDKCommitmentSigned *NONNULL_PTR this
 
 /**
  * Signatures on the HTLC transactions
+ *
+ * Returns a copy of the field.
+ */
+struct LDKCVec_SignatureZ CommitmentSigned_get_htlc_signatures(const struct LDKCommitmentSigned *NONNULL_PTR this_ptr);
+
+/**
+ * Signatures on the HTLC transactions
  */
 void CommitmentSigned_set_htlc_signatures(struct LDKCommitmentSigned *NONNULL_PTR this_ptr, struct LDKCVec_SignatureZ val);
 
@@ -22972,6 +22993,13 @@ void UnsignedNodeAnnouncement_set_alias(struct LDKUnsignedNodeAnnouncement *NONN
 
 /**
  * List of addresses on which this node is reachable
+ *
+ * Returns a copy of the field.
+ */
+struct LDKCVec_NetAddressZ UnsignedNodeAnnouncement_get_addresses(const struct LDKUnsignedNodeAnnouncement *NONNULL_PTR this_ptr);
+
+/**
+ * List of addresses on which this node is reachable
  */
 void UnsignedNodeAnnouncement_set_addresses(struct LDKUnsignedNodeAnnouncement *NONNULL_PTR this_ptr, struct LDKCVec_NetAddressZ val);
 
@@ -23273,6 +23301,15 @@ void UnsignedChannelUpdate_set_fee_proportional_millionths(struct LDKUnsignedCha
  * Excess data which was signed as a part of the message which we do not (yet) understand how
  * to decode. This is stored to ensure forward-compatibility as new fields are added to the
  * lightning gossip
+ *
+ * Returns a copy of the field.
+ */
+struct LDKCVec_u8Z UnsignedChannelUpdate_get_excess_data(const struct LDKUnsignedChannelUpdate *NONNULL_PTR this_ptr);
+
+/**
+ * Excess data which was signed as a part of the message which we do not (yet) understand how
+ * to decode. This is stored to ensure forward-compatibility as new fields are added to the
+ * lightning gossip
  */
 void UnsignedChannelUpdate_set_excess_data(struct LDKUnsignedChannelUpdate *NONNULL_PTR this_ptr, struct LDKCVec_u8Z val);
 
@@ -23413,6 +23450,13 @@ void ReplyChannelRange_set_sync_complete(struct LDKReplyChannelRange *NONNULL_PT
 
 /**
  * The short_channel_ids in the channel range
+ *
+ * Returns a copy of the field.
+ */
+struct LDKCVec_u64Z ReplyChannelRange_get_short_channel_ids(const struct LDKReplyChannelRange *NONNULL_PTR this_ptr);
+
+/**
+ * The short_channel_ids in the channel range
  */
 void ReplyChannelRange_set_short_channel_ids(struct LDKReplyChannelRange *NONNULL_PTR this_ptr, struct LDKCVec_u64Z val);
 
@@ -23440,6 +23484,13 @@ const uint8_t (*QueryShortChannelIds_get_chain_hash(const struct LDKQueryShortCh
  * The genesis hash of the blockchain being queried
  */
 void QueryShortChannelIds_set_chain_hash(struct LDKQueryShortChannelIds *NONNULL_PTR this_ptr, struct LDKThirtyTwoBytes val);
+
+/**
+ * The short_channel_ids that are being queried
+ *
+ * Returns a copy of the field.
+ */
+struct LDKCVec_u64Z QueryShortChannelIds_get_short_channel_ids(const struct LDKQueryShortChannelIds *NONNULL_PTR this_ptr);
 
 /**
  * The short_channel_ids that are being queried
@@ -24980,6 +25031,13 @@ struct LDKSignature HolderCommitmentTransaction_get_counterparty_sig(const struc
  * Our counterparty's signature for the transaction
  */
 void HolderCommitmentTransaction_set_counterparty_sig(struct LDKHolderCommitmentTransaction *NONNULL_PTR this_ptr, struct LDKSignature val);
+
+/**
+ * All non-dust counterparty HTLC signatures, in the order they appear in the transaction
+ *
+ * Returns a copy of the field.
+ */
+struct LDKCVec_SignatureZ HolderCommitmentTransaction_get_counterparty_htlc_sigs(const struct LDKHolderCommitmentTransaction *NONNULL_PTR this_ptr);
 
 /**
  * All non-dust counterparty HTLC signatures, in the order they appear in the transaction
@@ -26738,6 +26796,13 @@ void NodeAnnouncementInfo_set_alias(struct LDKNodeAnnouncementInfo *NONNULL_PTR 
 
 /**
  * Internet-level addresses via which one can connect to the node
+ *
+ * Returns a copy of the field.
+ */
+struct LDKCVec_NetAddressZ NodeAnnouncementInfo_get_addresses(const struct LDKNodeAnnouncementInfo *NONNULL_PTR this_ptr);
+
+/**
+ * Internet-level addresses via which one can connect to the node
  */
 void NodeAnnouncementInfo_set_addresses(struct LDKNodeAnnouncementInfo *NONNULL_PTR this_ptr, struct LDKCVec_NetAddressZ val);
 
@@ -26814,6 +26879,13 @@ struct LDKCResult_NodeAliasDecodeErrorZ NodeAlias_read(struct LDKu8slice ser);
  * Frees any resources used by the NodeInfo, if is_owned is set and inner is non-NULL.
  */
 void NodeInfo_free(struct LDKNodeInfo this_obj);
+
+/**
+ * All valid channels a node has announced
+ *
+ * Returns a copy of the field.
+ */
+struct LDKCVec_u64Z NodeInfo_get_channels(const struct LDKNodeInfo *NONNULL_PTR this_ptr);
 
 /**
  * All valid channels a node has announced
@@ -27414,6 +27486,15 @@ uint8_t PaymentParameters_get_max_channel_saturation_power_of_half(const struct 
  * Default value: 2
  */
 void PaymentParameters_set_max_channel_saturation_power_of_half(struct LDKPaymentParameters *NONNULL_PTR this_ptr, uint8_t val);
+
+/**
+ * A list of SCIDs which this payment was previously attempted over and which caused the
+ * payment to fail. Future attempts for the same payment shouldn't be relayed through any of
+ * these SCIDs.
+ *
+ * Returns a copy of the field.
+ */
+struct LDKCVec_u64Z PaymentParameters_get_previously_failed_channels(const struct LDKPaymentParameters *NONNULL_PTR this_ptr);
 
 /**
  * A list of SCIDs which this payment was previously attempted over and which caused the

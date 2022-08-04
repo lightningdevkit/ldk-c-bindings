@@ -68,16 +68,19 @@ rm genbindings_path_map_test_file.c
 case "$ENV_TARGET" in
 	"x86_64"*)
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge"
-		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS"
 		;;
 	"aarch64_apple_darwin")
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14"
-		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -mcpu=apple-a14"
+		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -mcpu=apple-a14"
+		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS"
 		;;
 	*)
 		# Assume this isn't targeted at another host and build for the host's CPU.
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=native"
-		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -mcpu=native"
+		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -mcpu=native"
+		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS"
 		;;
 esac
 
@@ -497,7 +500,7 @@ if [ "$CLANGPP" != "" ]; then
 	# The cc-rs crate tries to force -fdata-sections and -ffunction-sections on, which
 	# breaks -fembed-bitcode, so we turn off cc-rs' default flags and specify exactly
 	# what we want here.
-	export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -fPIC -fembed-bitcode -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+	export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -fPIC -fembed-bitcode"
 	export CRATE_CC_NO_DEFAULTS=true
 fi
 
@@ -550,7 +553,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 	fi
 	# If we're on an M1 don't bother building X86 binaries
 	if [ "$HOST_PLATFORM" != "aarch64-apple-darwin" ]; then
-		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -O3 -fPIC -fembed-bitcode -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -O3 -fPIC -fembed-bitcode"
 		# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 		cargo clean --release
 		CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge" cargo build $CARGO_BUILD_ARGS -v --release

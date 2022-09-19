@@ -147,7 +147,7 @@ pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
 }
 
 pub fn assert_simple_bound(bound: &syn::TraitBound) {
-	if bound.paren_token.is_some() || bound.lifetimes.is_some() { unimplemented!(); }
+	if bound.paren_token.is_some() { unimplemented!(); }
 	if let syn::TraitBoundModifier::Maybe(_) = bound.modifier { unimplemented!(); }
 }
 

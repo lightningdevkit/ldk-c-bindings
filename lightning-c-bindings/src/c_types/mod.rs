@@ -24,6 +24,8 @@ pub(crate) use core2::io::{self, Cursor, Read};
 #[cfg(feature = "no-std")]
 use alloc::{boxed::Box, vec::Vec, string::String};
 
+use core::convert::TryFrom;
+
 #[repr(C)]
 /// A dummy struct of which an instance must never exist.
 /// This corresponds to the Rust type `Infallible`, or, in unstable rust, `!`
@@ -53,10 +55,12 @@ impl Into<bech32::u5> for u5 {
 pub struct WitnessVersion(u8);
 
 impl From<address::WitnessVersion> for WitnessVersion {
-	fn from(o: address::WitnessVersion) -> Self { Self(o.into_num()) }
+	fn from(o: address::WitnessVersion) -> Self { Self(o.to_num()) }
 }
 impl Into<address::WitnessVersion> for WitnessVersion {
-	fn into(self) -> address::WitnessVersion { address::WitnessVersion::from_num(self.0).expect("WitnessVersion objects must be in the range 0..=16") }
+	fn into(self) -> address::WitnessVersion {
+		address::WitnessVersion::try_from(self.0).expect("WitnessVersion objects must be in the range 0..=16")
+	}
 }
 
 #[derive(Clone)]

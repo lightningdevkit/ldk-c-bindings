@@ -436,16 +436,23 @@ uint64_t get_chan_score(const void *this_arg, uint64_t scid, const LDKNodeId *sr
 	return 42;
 }
 
-struct CustomRouteFinderParams {
-	LDKLogger *logger;
-	LDKNetworkGraph *graph_ref;
-	LDKThirtyTwoBytes random_seed_bytes;
-};
-struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, struct LDKPublicKey payer, const struct LDKRouteParameters *NONNULL_PTR route_params, const uint8_t (*payment_hash)[32], struct LDKCVec_ChannelDetailsZ *first_hops, const struct LDKScore *NONNULL_PTR scorer) {
-	const struct CustomRouteFinderParams *params = (struct CustomRouteFinderParams *)this_arg;
+struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, struct LDKPublicKey payer, const struct LDKRouteParameters *NONNULL_PTR route_params, const uint8_t (*payment_hash)[32], struct LDKCVec_ChannelDetailsZ *first_hops, const struct LDKInFlightHtlcs in_flights) {
+	const LDK::DefaultRouter *router = (LDK::DefaultRouter *)this_arg;
 	assert(first_hops->datalen == 1);
 	assert(ChannelDetails_get_is_usable(&first_hops->data[0]));
-	return find_route(payer, route_params, params->graph_ref, first_hops, *params->logger, scorer, &params->random_seed_bytes.data);
+	const LDK::Router router_impl = DefaultRouter_as_Router(&*router);
+	return router_impl->find_route(router_impl->this_arg, payer, route_params, payment_hash, first_hops, in_flights);
+}
+
+void custom_notify_payment_path_failed(const void *this_arg, struct LDKCVec_RouteHopZ path, uint64_t short_channel_id) {
+	const LDK::DefaultRouter *router = (LDK::DefaultRouter *)this_arg;
+	const LDK::Router router_impl = DefaultRouter_as_Router(&*router);
+	return router_impl->notify_payment_path_failed(router_impl->this_arg, path, short_channel_id);
+}
+void custom_notify_payment_path_successful(const void *this_arg, struct LDKCVec_RouteHopZ path) {
+	const LDK::DefaultRouter *router = (LDK::DefaultRouter *)this_arg;
+	const LDK::Router router_impl = DefaultRouter_as_Router(&*router);
+	return router_impl->notify_payment_path_successful(router_impl->this_arg, path);
 }
 
 int main() {
@@ -527,17 +534,18 @@ int main() {
 		node_secret1 = *node_secret1_res->contents.result;
 
 		LDK::ChannelManager cm1 = ChannelManager_new(fee_est, mon1, broadcast, logger1, KeysManager_as_KeysInterface(&keys1), UserConfig_default(), ChainParameters_new(network, BestBlock_new(chain_tip, 0)));
+		LDK::OnionMessenger om1 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys1), logger1);
 
 		LDK::CVec_ChannelDetailsZ channels = ChannelManager_list_channels(&cm1);
 		assert(channels->datalen == 0);
 
-		LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), P2PGossipSync_as_RoutingMessageHandler(&graph_msg_handler1));
+		LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), P2PGossipSync_as_RoutingMessageHandler(&graph_msg_handler1), OnionMessenger_as_OnionMessageHandler(&om1));
 
 		LDK::IgnoringMessageHandler ignoring_handler1 = IgnoringMessageHandler_new();
 		LDK::CustomMessageHandler custom_msg_handler1 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler1);
 
 		random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
-		LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, &random_bytes.data, logger1, std::move(custom_msg_handler1));
+		LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, 0xdeadbeef, &random_bytes.data, logger1, std::move(custom_msg_handler1));
 
 		// Demo getting a channel key and check that its returning real pubkeys:
 		LDK::Sign chan_signer1 = keys_source1->get_channel_signer(keys_source1->this_arg, false, 42);
@@ -559,6 +567,7 @@ int main() {
 		UserConfig_set_channel_handshake_config(&config2, std::move(handshake_config2));
 
 		LDK::ChannelManager cm2 = ChannelManager_new(fee_est, mon2, broadcast, logger2, KeysManager_as_KeysInterface(&keys2), std::move(config2), ChainParameters_new(network, BestBlock_new(chain_tip, 0)));
+		LDK::OnionMessenger om2 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys2), logger2);
 
 		LDK::CVec_ChannelDetailsZ channels2 = ChannelManager_list_channels(&cm2);
 		assert(channels2->datalen == 0);
@@ -569,13 +578,13 @@ int main() {
 		LDK::CResult_boolLightningErrorZ ann_res = net_msgs2->handle_channel_announcement(net_msgs2->this_arg, chan_ann->contents.result);
 		assert(ann_res->result_ok);
 
-		LDK::MessageHandler msg_handler2 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm2), std::move(net_msgs2));
+		LDK::MessageHandler msg_handler2 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm2), std::move(net_msgs2), OnionMessenger_as_OnionMessageHandler(&om1));
 
 		LDK::IgnoringMessageHandler ignoring_handler2 = IgnoringMessageHandler_new();
 		LDK::CustomMessageHandler custom_msg_handler2 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler2);
 
 		random_bytes = keys_source2->get_secure_random_bytes(keys_source2->this_arg);
-		LDK::PeerManager net2 = PeerManager_new(std::move(msg_handler2), node_secret2, &random_bytes.data, logger2, std::move(custom_msg_handler2));
+		LDK::PeerManager net2 = PeerManager_new(std::move(msg_handler2), node_secret2, 0xdeadbeef, &random_bytes.data, logger2, std::move(custom_msg_handler2));
 
 		// Open a connection!
 		PeersConnection conn(cm1, cm2, net1, net2);
@@ -814,6 +823,8 @@ int main() {
 	assert(cm1_read->result_ok);
 	LDK::ChannelManager cm1(std::move(cm1_read->contents.result->b));
 
+	LDK::OnionMessenger om1 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys1), logger1);
+
 	LDK::CVec_ChannelMonitorZ mons_list2 = LDKCVec_ChannelMonitorZ { .data = (LDKChannelMonitor*)malloc(sizeof(LDKChannelMonitor)), .datalen = 1 };
 	assert(mons2.mons.size() == 1);
 	mons_list2->data[0] = *& std::get<1>(mons2.mons[0]); // Note that we need a reference, thus need a raw clone here, which *& does.
@@ -827,6 +838,8 @@ int main() {
 	assert(cm2_read->result_ok);
 	LDK::ChannelManager cm2(std::move(cm2_read->contents.result->b));
 
+	LDK::OnionMessenger om2 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys2), logger2);
+
 	// Attempt to close the channel...
 	uint8_t chan_id[32];
 	for (int i = 0; i < 32; i++) { chan_id[i] = channel_open_txid[31-i]; }
@@ -834,7 +847,7 @@ int main() {
 	assert(!close_res->result_ok); // Note that we can't close while disconnected!
 
 	// Open a connection!
-	LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), P2PGossipSync_as_RoutingMessageHandler(&graph_msg_handler1));
+	LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), P2PGossipSync_as_RoutingMessageHandler(&graph_msg_handler1), OnionMessenger_as_OnionMessageHandler(&om1));
 	random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
 
 	LDKPublicKey chan_2_node_id = ChannelManager_get_our_node_id(&cm2);
@@ -849,9 +862,9 @@ int main() {
 		},
 		.free = NULL,
 	};
-	LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, &random_bytes.data, logger1, std::move(custom_msg_handler1));
+	LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, 0xdeadbeef, &random_bytes.data, logger1, std::move(custom_msg_handler1));
 
-	LDK::MessageHandler msg_handler2 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm2), P2PGossipSync_as_RoutingMessageHandler(&graph_msg_handler2));
+	LDK::MessageHandler msg_handler2 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm2), P2PGossipSync_as_RoutingMessageHandler(&graph_msg_handler2), OnionMessenger_as_OnionMessageHandler(&om2));
 	CustomMsgQueue peer_2_custom_messages;
 	LDKCustomMessageHandler custom_msg_handler2 = {
 		.this_arg = &peer_2_custom_messages,
@@ -865,7 +878,7 @@ int main() {
 		.free = NULL,
 	};
 	random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
-	LDK::PeerManager net2 = PeerManager_new(std::move(msg_handler2), node_secret2, &random_bytes.data, logger2, std::move(custom_msg_handler2));
+	LDK::PeerManager net2 = PeerManager_new(std::move(msg_handler2), node_secret2, 0xdeadbeef, &random_bytes.data, logger2, std::move(custom_msg_handler2));
 
 	PeersConnection conn(cm1, cm2, net1, net2);
 
@@ -878,21 +891,24 @@ int main() {
 	}
 
 	// Send another payment, this time via the InvoicePayer
-	struct CustomRouteFinderParams router_params = {
-		.logger = &logger1,
-		.graph_ref = &net_graph1,
-		.random_seed_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg),
-	};
+	LDK::ProbabilisticScorer scorer = ProbabilisticScorer_new(ProbabilisticScoringParameters_default(), &net_graph1, logger1);
+	LDK::Score scorer_trait = ProbabilisticScorer_as_Score(&scorer);
+	LDK::MultiThreadedLockableScore scorer_mtx = MultiThreadedLockableScore_new(std::move(scorer_trait));
+	LDK::LockableScore scorer_mtx_trait = MultiThreadedLockableScore_as_LockableScore(&scorer_mtx);
+	const LDK::DefaultRouter router = DefaultRouter_new(&net_graph1, logger1, keys_source1->get_secure_random_bytes(keys_source1->this_arg), std::move(scorer_mtx_trait));
 	LDKRouter sending_router = {
-		.this_arg = &router_params,
+		.this_arg = (void*)&router,
 		.find_route = custom_find_route,
+		.notify_payment_path_failed = custom_notify_payment_path_failed,
+		.notify_payment_path_successful = custom_notify_payment_path_successful,
+		// We don't probe, so we opt to crash if the probe functions are called.
+		.notify_payment_probe_successful = NULL,
+		.notify_payment_probe_failed = NULL,
 		.free = NULL,
 	};
-	LDK::ProbabilisticScorer scorer = ProbabilisticScorer_new(ProbabilisticScoringParameters_default(), &net_graph1, logger1);
-	LDK::MultiThreadedLockableScore scorer_mtx = MultiThreadedLockableScore_new(ProbabilisticScorer_as_Score(&scorer));
 	EventQueue queue1;
 	LDKEventHandler handler1 = { .this_arg = &queue1, .handle_event = handle_event, .free = NULL };
-	LDK::InvoicePayer payer = InvoicePayer_new(ChannelManager_as_Payer(&cm1), sending_router, &scorer_mtx, logger1, handler1, Retry_attempts(0));
+	LDK::InvoicePayer payer = InvoicePayer_new(ChannelManager_as_Payer(&cm1), sending_router, logger1, handler1, Retry_attempts(0));
 
 	LDK::CResult_InvoiceSignOrCreationErrorZ invoice_res2 = create_invoice_from_channelmanager(&cm2,
 		KeysManager_as_KeysInterface(&keys2),

@@ -102,7 +102,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 			},
 			"lightning::util::ser::Readable"|"lightning::util::ser::ReadableArgs"|"lightning::util::ser::MaybeReadable" => {
 				// Create the Result<Object, DecodeError> syn::Type
-				let mut res_ty: syn::Type = parse_quote!(Result<#for_ty, ::ln::msgs::DecodeError>);
+				let mut res_ty: syn::Type = parse_quote!(Result<#for_ty, lightning::ln::msgs::DecodeError>);
 
 				writeln!(w, "#[no_mangle]").unwrap();
 				writeln!(w, "/// Read a {} from a byte array, created by {}_write", for_obj, for_obj).unwrap();
@@ -151,7 +151,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 						} else { unreachable!(); }
 					} else { unreachable!(); }
 				} else if t == "lightning::util::ser::MaybeReadable" {
-					res_ty = parse_quote!(Result<Option<#for_ty>, ::ln::msgs::DecodeError>);
+					res_ty = parse_quote!(Result<Option<#for_ty>, lightning::ln::msgs::DecodeError>);
 				}
 				write!(w, ") -> ").unwrap();
 				types.write_c_type(w, &res_ty, Some(generics), false);

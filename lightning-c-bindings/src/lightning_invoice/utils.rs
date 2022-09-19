@@ -157,7 +157,7 @@ pub extern "C" fn create_invoice_from_channelmanager_and_duration_since_epoch(ch
 
 
 use lightning_invoice::utils::DefaultRouter as nativeDefaultRouterImport;
-pub(crate) type nativeDefaultRouter = nativeDefaultRouterImport<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::util::logger::Logger>;
+pub(crate) type nativeDefaultRouter = nativeDefaultRouterImport<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::util::logger::Logger, crate::lightning::routing::scoring::LockableScore>;
 
 /// A [`Router`] implemented using [`find_route`].
 #[must_use]
@@ -210,8 +210,8 @@ impl DefaultRouter {
 /// `random_seed_bytes`.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn DefaultRouter_new(network_graph: &crate::lightning::routing::gossip::NetworkGraph, mut logger: crate::lightning::util::logger::Logger, mut random_seed_bytes: crate::c_types::ThirtyTwoBytes) -> crate::lightning_invoice::utils::DefaultRouter {
-	let mut ret = lightning_invoice::utils::DefaultRouter::new(network_graph.get_native_ref(), logger, random_seed_bytes.data);
+pub extern "C" fn DefaultRouter_new(network_graph: &crate::lightning::routing::gossip::NetworkGraph, mut logger: crate::lightning::util::logger::Logger, mut random_seed_bytes: crate::c_types::ThirtyTwoBytes, mut scorer: crate::lightning::routing::scoring::LockableScore) -> crate::lightning_invoice::utils::DefaultRouter {
+	let mut ret = lightning_invoice::utils::DefaultRouter::new(network_graph.get_native_ref(), logger, random_seed_bytes.data, scorer);
 	crate::lightning_invoice::utils::DefaultRouter { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
@@ -233,15 +233,35 @@ pub extern "C" fn DefaultRouter_as_Router(this_arg: &DefaultRouter) -> crate::li
 		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		find_route: DefaultRouter_Router_find_route,
+		notify_payment_path_failed: DefaultRouter_Router_notify_payment_path_failed,
+		notify_payment_path_successful: DefaultRouter_Router_notify_payment_path_successful,
+		notify_payment_probe_successful: DefaultRouter_Router_notify_payment_probe_successful,
+		notify_payment_probe_failed: DefaultRouter_Router_notify_payment_probe_failed,
 	}
 }
 
 #[must_use]
-extern "C" fn DefaultRouter_Router_find_route(this_arg: *const c_void, mut payer: crate::c_types::PublicKey, params: &crate::lightning::routing::router::RouteParameters, _payment_hash: *const [u8; 32], first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, scorer: &crate::lightning::routing::scoring::Score) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+extern "C" fn DefaultRouter_Router_find_route(this_arg: *const c_void, mut payer: crate::c_types::PublicKey, route_params: &crate::lightning::routing::router::RouteParameters, payment_hash: *const [u8; 32], first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut inflight_htlcs: crate::lightning_invoice::payment::InFlightHtlcs) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
 	let mut local_first_hops_base = if first_hops == core::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { item.get_native_ref() }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
-	let mut ret = <nativeDefaultRouter as lightning_invoice::payment::Router<_>>::find_route(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &payer.into_rust(), params.get_native_ref(), &::lightning::ln::PaymentHash(unsafe { *_payment_hash }), local_first_hops, scorer);
+	let mut ret = <nativeDefaultRouter as lightning_invoice::payment::Router<>>::find_route(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &payer.into_rust(), route_params.get_native_ref(), &::lightning::ln::PaymentHash(unsafe { *payment_hash }), local_first_hops, *unsafe { Box::from_raw(inflight_htlcs.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
+}
+extern "C" fn DefaultRouter_Router_notify_payment_path_failed(this_arg: *const c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeDefaultRouter as lightning_invoice::payment::Router<>>::notify_payment_path_failed(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &local_path[..], short_channel_id)
+}
+extern "C" fn DefaultRouter_Router_notify_payment_path_successful(this_arg: *const c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeDefaultRouter as lightning_invoice::payment::Router<>>::notify_payment_path_successful(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &local_path[..])
+}
+extern "C" fn DefaultRouter_Router_notify_payment_probe_successful(this_arg: *const c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeDefaultRouter as lightning_invoice::payment::Router<>>::notify_payment_probe_successful(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &local_path[..])
+}
+extern "C" fn DefaultRouter_Router_notify_payment_probe_failed(this_arg: *const c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeDefaultRouter as lightning_invoice::payment::Router<>>::notify_payment_probe_failed(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &local_path[..], short_channel_id)
 }
 
 use crate::lightning::ln::channelmanager::nativeChannelManager as nativeChannelManager;

@@ -204,13 +204,15 @@ pub extern "C" fn IgnoringMessageHandler_as_RoutingMessageHandler(this_arg: &Ign
 		handle_node_announcement: IgnoringMessageHandler_RoutingMessageHandler_handle_node_announcement,
 		handle_channel_announcement: IgnoringMessageHandler_RoutingMessageHandler_handle_channel_announcement,
 		handle_channel_update: IgnoringMessageHandler_RoutingMessageHandler_handle_channel_update,
-		get_next_channel_announcements: IgnoringMessageHandler_RoutingMessageHandler_get_next_channel_announcements,
-		get_next_node_announcements: IgnoringMessageHandler_RoutingMessageHandler_get_next_node_announcements,
+		get_next_channel_announcement: IgnoringMessageHandler_RoutingMessageHandler_get_next_channel_announcement,
+		get_next_node_announcement: IgnoringMessageHandler_RoutingMessageHandler_get_next_node_announcement,
 		peer_connected: IgnoringMessageHandler_RoutingMessageHandler_peer_connected,
 		handle_reply_channel_range: IgnoringMessageHandler_RoutingMessageHandler_handle_reply_channel_range,
 		handle_reply_short_channel_ids_end: IgnoringMessageHandler_RoutingMessageHandler_handle_reply_short_channel_ids_end,
 		handle_query_channel_range: IgnoringMessageHandler_RoutingMessageHandler_handle_query_channel_range,
 		handle_query_short_channel_ids: IgnoringMessageHandler_RoutingMessageHandler_handle_query_short_channel_ids,
+		provided_node_features: IgnoringMessageHandler_RoutingMessageHandler_provided_node_features,
+		provided_init_features: IgnoringMessageHandler_RoutingMessageHandler_provided_init_features,
 		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider {
 			this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 			free: None,
@@ -220,62 +222,150 @@ pub extern "C" fn IgnoringMessageHandler_as_RoutingMessageHandler(this_arg: &Ign
 }
 
 #[must_use]
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_node_announcement(this_arg: *const c_void, _msg: &crate::lightning::ln::msgs::NodeAnnouncement) -> crate::c_types::derived::CResult_boolLightningErrorZ {
-	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_node_announcement(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, _msg.get_native_ref());
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_node_announcement(this_arg: *const c_void, msg: &crate::lightning::ln::msgs::NodeAnnouncement) -> crate::c_types::derived::CResult_boolLightningErrorZ {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_node_announcement(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_channel_announcement(this_arg: *const c_void, _msg: &crate::lightning::ln::msgs::ChannelAnnouncement) -> crate::c_types::derived::CResult_boolLightningErrorZ {
-	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_channel_announcement(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, _msg.get_native_ref());
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_channel_announcement(this_arg: *const c_void, msg: &crate::lightning::ln::msgs::ChannelAnnouncement) -> crate::c_types::derived::CResult_boolLightningErrorZ {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_channel_announcement(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_channel_update(this_arg: *const c_void, _msg: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CResult_boolLightningErrorZ {
-	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_channel_update(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, _msg.get_native_ref());
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_channel_update(this_arg: *const c_void, msg: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CResult_boolLightningErrorZ {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_channel_update(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_get_next_channel_announcements(this_arg: *const c_void, mut _starting_point: u64, mut _batch_amount: u8) -> crate::c_types::derived::CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
-	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::get_next_channel_announcements(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, _starting_point, _batch_amount);
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item; let mut local_orig_ret_0_1 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_1.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_1.unwrap())) } }, is_owned: true }; let mut local_orig_ret_0_2 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_2.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_2.unwrap())) } }, is_owned: true }; let mut local_ret_0 = (crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, local_orig_ret_0_1, local_orig_ret_0_2).into(); local_ret_0 }); };
-	local_ret.into()
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_get_next_channel_announcement(this_arg: *const c_void, mut starting_point: u64) -> crate::c_types::derived::COption_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::get_next_channel_announcement(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, starting_point);
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ::None } else { crate::c_types::derived::COption_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ::Some( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = (ret.unwrap()); let mut local_orig_ret_0_1 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_1.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_1.unwrap())) } }, is_owned: true }; let mut local_orig_ret_0_2 = crate::lightning::ln::msgs::ChannelUpdate { inner: if orig_ret_0_2.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_2.unwrap())) } }, is_owned: true }; let mut local_ret_0 = (crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, local_orig_ret_0_1, local_orig_ret_0_2).into(); local_ret_0 }) };
+	local_ret
 }
 #[must_use]
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_get_next_node_announcements(this_arg: *const c_void, mut _starting_point: crate::c_types::PublicKey, mut _batch_amount: u8) -> crate::c_types::derived::CVec_NodeAnnouncementZ {
-	let mut local__starting_point_base = if _starting_point.is_null() { None } else { Some( { _starting_point.into_rust() }) }; let mut local__starting_point = local__starting_point_base.as_ref();
-	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::get_next_node_announcements(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, local__starting_point, _batch_amount);
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::ln::msgs::NodeAnnouncement { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
-	local_ret.into()
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_get_next_node_announcement(this_arg: *const c_void, mut starting_point: crate::c_types::PublicKey) -> crate::lightning::ln::msgs::NodeAnnouncement {
+	let mut local_starting_point_base = if starting_point.is_null() { None } else { Some( { starting_point.into_rust() }) }; let mut local_starting_point = local_starting_point_base.as_ref();
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::get_next_node_announcement(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, local_starting_point);
+	let mut local_ret = crate::lightning::ln::msgs::NodeAnnouncement { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
+	local_ret
 }
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_peer_connected(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _init: &crate::lightning::ln::msgs::Init) {
-	<nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &_their_node_id.into_rust(), _init.get_native_ref())
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init) {
+	<nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &their_node_id.into_rust(), init.get_native_ref())
 }
 #[must_use]
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_reply_channel_range(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _msg: crate::lightning::ln::msgs::ReplyChannelRange) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_reply_channel_range(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &_their_node_id.into_rust(), *unsafe { Box::from_raw(_msg.take_inner()) });
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_reply_channel_range(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut msg: crate::lightning::ln::msgs::ReplyChannelRange) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_reply_channel_range(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &their_node_id.into_rust(), *unsafe { Box::from_raw(msg.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_reply_short_channel_ids_end(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _msg: crate::lightning::ln::msgs::ReplyShortChannelIdsEnd) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_reply_short_channel_ids_end(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &_their_node_id.into_rust(), *unsafe { Box::from_raw(_msg.take_inner()) });
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_reply_short_channel_ids_end(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut msg: crate::lightning::ln::msgs::ReplyShortChannelIdsEnd) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_reply_short_channel_ids_end(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &their_node_id.into_rust(), *unsafe { Box::from_raw(msg.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_query_channel_range(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _msg: crate::lightning::ln::msgs::QueryChannelRange) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_query_channel_range(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &_their_node_id.into_rust(), *unsafe { Box::from_raw(_msg.take_inner()) });
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_query_channel_range(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut msg: crate::lightning::ln::msgs::QueryChannelRange) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_query_channel_range(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &their_node_id.into_rust(), *unsafe { Box::from_raw(msg.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_query_short_channel_ids(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _msg: crate::lightning::ln::msgs::QueryShortChannelIds) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_query_short_channel_ids(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &_their_node_id.into_rust(), *unsafe { Box::from_raw(_msg.take_inner()) });
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_handle_query_short_channel_ids(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut msg: crate::lightning::ln::msgs::QueryShortChannelIds) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::handle_query_short_channel_ids(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &their_node_id.into_rust(), *unsafe { Box::from_raw(msg.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
+}
+#[must_use]
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_provided_node_features(this_arg: *const c_void) -> crate::lightning::ln::features::NodeFeatures {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::provided_node_features(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, );
+	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+#[must_use]
+extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_provided_init_features(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::features::InitFeatures {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::RoutingMessageHandler<>>::provided_init_features(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &their_node_id.into_rust());
+	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+impl From<nativeIgnoringMessageHandler> for crate::lightning::util::events::OnionMessageProvider {
+	fn from(obj: nativeIgnoringMessageHandler) -> Self {
+		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let mut ret = IgnoringMessageHandler_as_OnionMessageProvider(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
+		rust_obj.inner = core::ptr::null_mut();
+		ret.free = Some(IgnoringMessageHandler_free_void);
+		ret
+	}
+}
+/// Constructs a new OnionMessageProvider which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned OnionMessageProvider must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn IgnoringMessageHandler_as_OnionMessageProvider(this_arg: &IgnoringMessageHandler) -> crate::lightning::util::events::OnionMessageProvider {
+	crate::lightning::util::events::OnionMessageProvider {
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
+		free: None,
+		next_onion_message_for_peer: IgnoringMessageHandler_OnionMessageProvider_next_onion_message_for_peer,
+	}
+}
+
+#[must_use]
+extern "C" fn IgnoringMessageHandler_OnionMessageProvider_next_onion_message_for_peer(this_arg: *const c_void, mut peer_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::msgs::OnionMessage {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::util::events::OnionMessageProvider<>>::next_onion_message_for_peer(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, peer_node_id.into_rust());
+	let mut local_ret = crate::lightning::ln::msgs::OnionMessage { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
+	local_ret
+}
+
+impl From<nativeIgnoringMessageHandler> for crate::lightning::ln::msgs::OnionMessageHandler {
+	fn from(obj: nativeIgnoringMessageHandler) -> Self {
+		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let mut ret = IgnoringMessageHandler_as_OnionMessageHandler(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
+		rust_obj.inner = core::ptr::null_mut();
+		ret.free = Some(IgnoringMessageHandler_free_void);
+		ret
+	}
+}
+/// Constructs a new OnionMessageHandler which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned OnionMessageHandler must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn IgnoringMessageHandler_as_OnionMessageHandler(this_arg: &IgnoringMessageHandler) -> crate::lightning::ln::msgs::OnionMessageHandler {
+	crate::lightning::ln::msgs::OnionMessageHandler {
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
+		free: None,
+		handle_onion_message: IgnoringMessageHandler_OnionMessageHandler_handle_onion_message,
+		peer_connected: IgnoringMessageHandler_OnionMessageHandler_peer_connected,
+		peer_disconnected: IgnoringMessageHandler_OnionMessageHandler_peer_disconnected,
+		provided_node_features: IgnoringMessageHandler_OnionMessageHandler_provided_node_features,
+		provided_init_features: IgnoringMessageHandler_OnionMessageHandler_provided_init_features,
+		OnionMessageProvider: crate::lightning::util::events::OnionMessageProvider {
+			this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
+			free: None,
+			next_onion_message_for_peer: IgnoringMessageHandler_OnionMessageProvider_next_onion_message_for_peer,
+		},
+	}
+}
+
+extern "C" fn IgnoringMessageHandler_OnionMessageHandler_handle_onion_message(this_arg: *const c_void, mut peer_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::OnionMessage) {
+	<nativeIgnoringMessageHandler as lightning::ln::msgs::OnionMessageHandler<>>::handle_onion_message(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &peer_node_id.into_rust(), msg.get_native_ref())
+}
+extern "C" fn IgnoringMessageHandler_OnionMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init) {
+	<nativeIgnoringMessageHandler as lightning::ln::msgs::OnionMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &their_node_id.into_rust(), init.get_native_ref())
+}
+extern "C" fn IgnoringMessageHandler_OnionMessageHandler_peer_disconnected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut no_connection_possible: bool) {
+	<nativeIgnoringMessageHandler as lightning::ln::msgs::OnionMessageHandler<>>::peer_disconnected(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &their_node_id.into_rust(), no_connection_possible)
+}
+#[must_use]
+extern "C" fn IgnoringMessageHandler_OnionMessageHandler_provided_node_features(this_arg: *const c_void) -> crate::lightning::ln::features::NodeFeatures {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::OnionMessageHandler<>>::provided_node_features(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, );
+	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+#[must_use]
+extern "C" fn IgnoringMessageHandler_OnionMessageHandler_provided_init_features(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::features::InitFeatures {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::OnionMessageHandler<>>::provided_init_features(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &their_node_id.into_rust());
+	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 use core::convert::Infallible as nativeInfallible;
@@ -306,8 +396,8 @@ pub extern "C" fn IgnoringMessageHandler_as_CustomMessageReader(this_arg: &Ignor
 }
 
 #[must_use]
-extern "C" fn IgnoringMessageHandler_CustomMessageReader_read(this_arg: *const c_void, mut _message_type: u16, mut _buffer: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_TypeZDecodeErrorZ {
-	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::wire::CustomMessageReader<>>::read(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, _message_type, &mut _buffer.to_reader());
+extern "C" fn IgnoringMessageHandler_CustomMessageReader_read(this_arg: *const c_void, mut message_type: u16, mut buffer: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_TypeZDecodeErrorZ {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::wire::CustomMessageReader<>>::read(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, message_type, &mut buffer.to_reader());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = if o.is_none() { crate::c_types::derived::COption_TypeZ::None } else { crate::c_types::derived::COption_TypeZ::Some( { Into::into(o.unwrap()) }) }; local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
@@ -475,6 +565,8 @@ pub extern "C" fn ErroringMessageHandler_as_ChannelMessageHandler(this_arg: &Err
 		handle_channel_reestablish: ErroringMessageHandler_ChannelMessageHandler_handle_channel_reestablish,
 		handle_channel_update: ErroringMessageHandler_ChannelMessageHandler_handle_channel_update,
 		handle_error: ErroringMessageHandler_ChannelMessageHandler_handle_error,
+		provided_node_features: ErroringMessageHandler_ChannelMessageHandler_provided_node_features,
+		provided_init_features: ErroringMessageHandler_ChannelMessageHandler_provided_init_features,
 		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider {
 			this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 			free: None,
@@ -483,11 +575,11 @@ pub extern "C" fn ErroringMessageHandler_as_ChannelMessageHandler(this_arg: &Err
 	}
 }
 
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_open_channel(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut _their_features: crate::lightning::ln::features::InitFeatures, msg: &crate::lightning::ln::msgs::OpenChannel) {
-	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_open_channel(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), *unsafe { Box::from_raw(_their_features.take_inner()) }, msg.get_native_ref())
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_open_channel(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut their_features: crate::lightning::ln::features::InitFeatures, msg: &crate::lightning::ln::msgs::OpenChannel) {
+	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_open_channel(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), *unsafe { Box::from_raw(their_features.take_inner()) }, msg.get_native_ref())
 }
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_accept_channel(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut _their_features: crate::lightning::ln::features::InitFeatures, msg: &crate::lightning::ln::msgs::AcceptChannel) {
-	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_accept_channel(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), *unsafe { Box::from_raw(_their_features.take_inner()) }, msg.get_native_ref())
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_accept_channel(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut their_features: crate::lightning::ln::features::InitFeatures, msg: &crate::lightning::ln::msgs::AcceptChannel) {
+	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_accept_channel(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), *unsafe { Box::from_raw(their_features.take_inner()) }, msg.get_native_ref())
 }
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_funding_created(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::FundingCreated) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_funding_created(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
@@ -498,8 +590,8 @@ extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_funding_signed
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_channel_ready(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelReady) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_ready(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
 }
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_shutdown(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, _their_features: &crate::lightning::ln::features::InitFeatures, msg: &crate::lightning::ln::msgs::Shutdown) {
-	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_shutdown(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), _their_features.get_native_ref(), msg.get_native_ref())
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_shutdown(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, their_features: &crate::lightning::ln::features::InitFeatures, msg: &crate::lightning::ln::msgs::Shutdown) {
+	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_shutdown(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), their_features.get_native_ref(), msg.get_native_ref())
 }
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_closing_signed(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ClosingSigned) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_closing_signed(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
@@ -528,25 +620,35 @@ extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_update_fee(thi
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_announcement_signatures(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::AnnouncementSignatures) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_announcement_signatures(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
 }
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_peer_disconnected(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, mut _no_connection_possible: bool) {
-	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::peer_disconnected(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), _no_connection_possible)
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_peer_disconnected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut no_connection_possible: bool) {
+	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::peer_disconnected(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), no_connection_possible)
 }
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_peer_connected(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _msg: &crate::lightning::ln::msgs::Init) {
-	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), _msg.get_native_ref())
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::Init) {
+	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
 }
 extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_channel_reestablish(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelReestablish) {
 	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_reestablish(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
 }
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_channel_update(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _msg: &crate::lightning::ln::msgs::ChannelUpdate) {
-	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_update(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), _msg.get_native_ref())
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_channel_update(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelUpdate) {
+	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_update(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
 }
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_error(this_arg: *const c_void, mut _their_node_id: crate::c_types::PublicKey, _msg: &crate::lightning::ln::msgs::ErrorMessage) {
-	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_error(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &_their_node_id.into_rust(), _msg.get_native_ref())
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_handle_error(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ErrorMessage) {
+	<nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::handle_error(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust(), msg.get_native_ref())
+}
+#[must_use]
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_provided_node_features(this_arg: *const c_void) -> crate::lightning::ln::features::NodeFeatures {
+	let mut ret = <nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::provided_node_features(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, );
+	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+#[must_use]
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_provided_init_features(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::features::InitFeatures {
+	let mut ret = <nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::provided_init_features(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, &their_node_id.into_rust());
+	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 
 use lightning::ln::peer_handler::MessageHandler as nativeMessageHandlerImport;
-pub(crate) type nativeMessageHandler = nativeMessageHandlerImport<crate::lightning::ln::msgs::ChannelMessageHandler, crate::lightning::ln::msgs::RoutingMessageHandler>;
+pub(crate) type nativeMessageHandler = nativeMessageHandlerImport<crate::lightning::ln::msgs::ChannelMessageHandler, crate::lightning::ln::msgs::RoutingMessageHandler, crate::lightning::ln::msgs::OnionMessageHandler>;
 
 /// Provides references to trait impls which handle different types of messages.
 #[must_use]
@@ -629,13 +731,27 @@ pub extern "C" fn MessageHandler_get_route_handler(this_ptr: &MessageHandler) ->
 pub extern "C" fn MessageHandler_set_route_handler(this_ptr: &mut MessageHandler, mut val: crate::lightning::ln::msgs::RoutingMessageHandler) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.route_handler = val;
 }
+/// A message handler which handles onion messages. For now, this can only be an
+/// [`IgnoringMessageHandler`].
+#[no_mangle]
+pub extern "C" fn MessageHandler_get_onion_message_handler(this_ptr: &MessageHandler) -> *const crate::lightning::ln::msgs::OnionMessageHandler {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().onion_message_handler;
+	inner_val
+}
+/// A message handler which handles onion messages. For now, this can only be an
+/// [`IgnoringMessageHandler`].
+#[no_mangle]
+pub extern "C" fn MessageHandler_set_onion_message_handler(this_ptr: &mut MessageHandler, mut val: crate::lightning::ln::msgs::OnionMessageHandler) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.onion_message_handler = val;
+}
 /// Constructs a new MessageHandler given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn MessageHandler_new(mut chan_handler_arg: crate::lightning::ln::msgs::ChannelMessageHandler, mut route_handler_arg: crate::lightning::ln::msgs::RoutingMessageHandler) -> MessageHandler {
+pub extern "C" fn MessageHandler_new(mut chan_handler_arg: crate::lightning::ln::msgs::ChannelMessageHandler, mut route_handler_arg: crate::lightning::ln::msgs::RoutingMessageHandler, mut onion_message_handler_arg: crate::lightning::ln::msgs::OnionMessageHandler) -> MessageHandler {
 	MessageHandler { inner: ObjOps::heap_alloc(nativeMessageHandler {
 		chan_handler: chan_handler_arg,
 		route_handler: route_handler_arg,
+		onion_message_handler: onion_message_handler_arg,
 	}), is_owned: true }
 }
 /// Provides an object which can be used to send data to and which uniquely identifies a connection
@@ -861,7 +977,7 @@ pub extern "C" fn PeerHandleError_clone(orig: &PeerHandleError) -> PeerHandleErr
 }
 
 use lightning::ln::peer_handler::PeerManager as nativePeerManagerImport;
-pub(crate) type nativePeerManager = nativePeerManagerImport<crate::lightning::ln::peer_handler::SocketDescriptor, crate::lightning::ln::msgs::ChannelMessageHandler, crate::lightning::ln::msgs::RoutingMessageHandler, crate::lightning::util::logger::Logger, crate::lightning::ln::peer_handler::CustomMessageHandler>;
+pub(crate) type nativePeerManager = nativePeerManagerImport<crate::lightning::ln::peer_handler::SocketDescriptor, crate::lightning::ln::msgs::ChannelMessageHandler, crate::lightning::ln::msgs::RoutingMessageHandler, crate::lightning::ln::msgs::OnionMessageHandler, crate::lightning::util::logger::Logger, crate::lightning::ln::peer_handler::CustomMessageHandler>;
 
 /// A PeerManager manages a set of peers, described by their [`SocketDescriptor`] and marshalls
 /// socket events into messages which it passes on to its [`MessageHandler`].
@@ -931,10 +1047,15 @@ impl PeerManager {
 /// Constructs a new PeerManager with the given message handlers and node_id secret key
 /// ephemeral_random_data is used to derive per-connection ephemeral keys and must be
 /// cryptographically secure random bytes.
+///
+/// `current_time` is used as an always-increasing counter that survives across restarts and is
+/// incremented irregularly internally. In general it is best to simply use the current UNIX
+/// timestamp, however if it is not available a persistent counter that increases once per
+/// minute should suffice.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PeerManager_new(mut message_handler: crate::lightning::ln::peer_handler::MessageHandler, mut our_node_secret: crate::c_types::SecretKey, ephemeral_random_data: *const [u8; 32], mut logger: crate::lightning::util::logger::Logger, mut custom_message_handler: crate::lightning::ln::peer_handler::CustomMessageHandler) -> crate::lightning::ln::peer_handler::PeerManager {
-	let mut ret = lightning::ln::peer_handler::PeerManager::new(*unsafe { Box::from_raw(message_handler.take_inner()) }, our_node_secret.into_rust(), unsafe { &*ephemeral_random_data}, logger, custom_message_handler);
+pub extern "C" fn PeerManager_new(mut message_handler: crate::lightning::ln::peer_handler::MessageHandler, mut our_node_secret: crate::c_types::SecretKey, mut current_time: u64, ephemeral_random_data: *const [u8; 32], mut logger: crate::lightning::util::logger::Logger, mut custom_message_handler: crate::lightning::ln::peer_handler::CustomMessageHandler) -> crate::lightning::ln::peer_handler::PeerManager {
+	let mut ret = lightning::ln::peer_handler::PeerManager::new(*unsafe { Box::from_raw(message_handler.take_inner()) }, our_node_secret.into_rust(), current_time, unsafe { &*ephemeral_random_data}, logger, custom_message_handler);
 	crate::lightning::ln::peer_handler::PeerManager { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
@@ -1105,5 +1226,26 @@ pub extern "C" fn PeerManager_disconnect_all_peers(this_arg: &crate::lightning::
 #[no_mangle]
 pub extern "C" fn PeerManager_timer_tick_occurred(this_arg: &crate::lightning::ln::peer_handler::PeerManager) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.timer_tick_occurred()
+}
+
+/// Generates a signed node_announcement from the given arguments, sending it to all connected
+/// peers. Note that peers will likely ignore this message unless we have at least one public
+/// channel which has at least six confirmations on-chain.
+///
+/// `rgb` is a node \"color\" and `alias` is a printable human-readable string to describe this
+/// node to humans. They carry no in-protocol meaning.
+///
+/// `addresses` represent the set (possibly empty) of socket addresses on which this node
+/// accepts incoming connections. These will be included in the node_announcement, publicly
+/// tying these addresses together and to this node. If you wish to preserve user privacy,
+/// addresses should likely contain only Tor Onion addresses.
+///
+/// Panics if `addresses` is absurdly large (more than 100).
+///
+/// [`get_and_clear_pending_msg_events`]: MessageSendEventsProvider::get_and_clear_pending_msg_events
+#[no_mangle]
+pub extern "C" fn PeerManager_broadcast_node_announcement(this_arg: &crate::lightning::ln::peer_handler::PeerManager, mut rgb: crate::c_types::ThreeBytes, mut alias: crate::c_types::ThirtyTwoBytes, mut addresses: crate::c_types::derived::CVec_NetAddressZ) {
+	let mut local_addresses = Vec::new(); for mut item in addresses.into_rust().drain(..) { local_addresses.push( { item.into_native() }); };
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.broadcast_node_announcement(rgb.data, alias.data, local_addresses)
 }
 

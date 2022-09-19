@@ -335,10 +335,63 @@ pub extern "C" fn ChannelHandshakeConfig_get_commit_upfront_shutdown_pubkey(this
 pub extern "C" fn ChannelHandshakeConfig_set_commit_upfront_shutdown_pubkey(this_ptr: &mut ChannelHandshakeConfig, mut val: bool) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.commit_upfront_shutdown_pubkey = val;
 }
+/// The Proportion of the channel value to configure as counterparty's channel reserve,
+/// i.e., `their_channel_reserve_satoshis` for both outbound and inbound channels.
+///
+/// `their_channel_reserve_satoshis` is the minimum balance that the other node has to maintain
+/// on their side, at all times.
+/// This ensures that if our counterparty broadcasts a revoked state, we can punish them by
+/// claiming at least this value on chain.
+///
+/// Channel reserve values greater than 30% could be considered highly unreasonable, since that
+/// amount can never be used for payments.
+/// Also, if our selected channel reserve for counterparty and counterparty's selected
+/// channel reserve for us sum up to equal or greater than channel value, channel negotiations
+/// will fail.
+///
+/// Note: Versions of LDK earlier than v0.0.104 will fail to read channels with any channel reserve
+/// other than the default value.
+///
+/// Default value: 1% of channel value, i.e., configured as 10,000 millionths.
+/// Minimum value: If the calculated proportional value is less than 1000 sats, it will be treated
+///                as 1000 sats instead, which is a safe implementation-specific lower bound.
+/// Maximum value: 1,000,000, any values larger than 1 Million will be treated as 1 Million (or 100%)
+///                instead, although channel negotiations will fail in that case.
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_get_their_channel_reserve_proportional_millionths(this_ptr: &ChannelHandshakeConfig) -> u32 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().their_channel_reserve_proportional_millionths;
+	*inner_val
+}
+/// The Proportion of the channel value to configure as counterparty's channel reserve,
+/// i.e., `their_channel_reserve_satoshis` for both outbound and inbound channels.
+///
+/// `their_channel_reserve_satoshis` is the minimum balance that the other node has to maintain
+/// on their side, at all times.
+/// This ensures that if our counterparty broadcasts a revoked state, we can punish them by
+/// claiming at least this value on chain.
+///
+/// Channel reserve values greater than 30% could be considered highly unreasonable, since that
+/// amount can never be used for payments.
+/// Also, if our selected channel reserve for counterparty and counterparty's selected
+/// channel reserve for us sum up to equal or greater than channel value, channel negotiations
+/// will fail.
+///
+/// Note: Versions of LDK earlier than v0.0.104 will fail to read channels with any channel reserve
+/// other than the default value.
+///
+/// Default value: 1% of channel value, i.e., configured as 10,000 millionths.
+/// Minimum value: If the calculated proportional value is less than 1000 sats, it will be treated
+///                as 1000 sats instead, which is a safe implementation-specific lower bound.
+/// Maximum value: 1,000,000, any values larger than 1 Million will be treated as 1 Million (or 100%)
+///                instead, although channel negotiations will fail in that case.
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_set_their_channel_reserve_proportional_millionths(this_ptr: &mut ChannelHandshakeConfig, mut val: u32) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.their_channel_reserve_proportional_millionths = val;
+}
 /// Constructs a new ChannelHandshakeConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our_to_self_delay_arg: u16, mut our_htlc_minimum_msat_arg: u64, mut max_inbound_htlc_value_in_flight_percent_of_channel_arg: u8, mut negotiate_scid_privacy_arg: bool, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool) -> ChannelHandshakeConfig {
+pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our_to_self_delay_arg: u16, mut our_htlc_minimum_msat_arg: u64, mut max_inbound_htlc_value_in_flight_percent_of_channel_arg: u8, mut negotiate_scid_privacy_arg: bool, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool, mut their_channel_reserve_proportional_millionths_arg: u32) -> ChannelHandshakeConfig {
 	ChannelHandshakeConfig { inner: ObjOps::heap_alloc(nativeChannelHandshakeConfig {
 		minimum_depth: minimum_depth_arg,
 		our_to_self_delay: our_to_self_delay_arg,
@@ -347,6 +400,7 @@ pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our
 		negotiate_scid_privacy: negotiate_scid_privacy_arg,
 		announced_channel: announced_channel_arg,
 		commit_upfront_shutdown_pubkey: commit_upfront_shutdown_pubkey_arg,
+		their_channel_reserve_proportional_millionths: their_channel_reserve_proportional_millionths_arg,
 	}), is_owned: true }
 }
 impl Clone for ChannelHandshakeConfig {

@@ -692,6 +692,16 @@ pub(crate) extern "C" fn Invoice_clone_void(this_ptr: *const c_void) -> *mut c_v
 pub extern "C" fn Invoice_clone(orig: &Invoice) -> Invoice {
 	orig.clone()
 }
+/// Checks if two Invoices contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn Invoice_hash(o: &Invoice) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 
 use lightning_invoice::SignedRawInvoice as nativeSignedRawInvoiceImport;
 pub(crate) type nativeSignedRawInvoice = nativeSignedRawInvoiceImport;
@@ -774,6 +784,16 @@ pub(crate) extern "C" fn SignedRawInvoice_clone_void(this_ptr: *const c_void) ->
 /// Creates a copy of the SignedRawInvoice
 pub extern "C" fn SignedRawInvoice_clone(orig: &SignedRawInvoice) -> SignedRawInvoice {
 	orig.clone()
+}
+/// Checks if two SignedRawInvoices contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn SignedRawInvoice_hash(o: &SignedRawInvoice) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 
 use lightning_invoice::RawInvoice as nativeRawInvoiceImport;
@@ -869,6 +889,16 @@ pub(crate) extern "C" fn RawInvoice_clone_void(this_ptr: *const c_void) -> *mut 
 pub extern "C" fn RawInvoice_clone(orig: &RawInvoice) -> RawInvoice {
 	orig.clone()
 }
+/// Checks if two RawInvoices contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn RawInvoice_hash(o: &RawInvoice) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 
 use lightning_invoice::RawDataPart as nativeRawDataPartImport;
 pub(crate) type nativeRawDataPart = nativeRawDataPartImport;
@@ -959,6 +989,16 @@ pub(crate) extern "C" fn RawDataPart_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn RawDataPart_clone(orig: &RawDataPart) -> RawDataPart {
 	orig.clone()
 }
+/// Checks if two RawDataParts contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn RawDataPart_hash(o: &RawDataPart) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 
 use lightning_invoice::PositiveTimestamp as nativePositiveTimestampImport;
 pub(crate) type nativePositiveTimestamp = nativePositiveTimestampImport;
@@ -1043,6 +1083,16 @@ pub(crate) extern "C" fn PositiveTimestamp_clone_void(this_ptr: *const c_void) -
 pub extern "C" fn PositiveTimestamp_clone(orig: &PositiveTimestamp) -> PositiveTimestamp {
 	orig.clone()
 }
+/// Checks if two PositiveTimestamps contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn PositiveTimestamp_hash(o: &PositiveTimestamp) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// SI prefixes for the human readable part
 #[derive(Clone)]
 #[must_use]
@@ -1124,6 +1174,15 @@ pub extern "C" fn SiPrefix_pico() -> SiPrefix {
 #[no_mangle]
 pub extern "C" fn SiPrefix_eq(a: &SiPrefix, b: &SiPrefix) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
+}
+/// Checks if two SiPrefixs contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn SiPrefix_hash(o: &SiPrefix) -> u64 {
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(&o.to_native(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Returns the multiplier to go from a BTC value to picoBTC implied by this SiPrefix.
 /// This is effectively 10^12 * the prefix multiplier
@@ -1945,6 +2004,16 @@ pub extern "C" fn InvoiceSignature_clone(orig: &InvoiceSignature) -> InvoiceSign
 	orig.clone()
 }
 /// Checks if two InvoiceSignatures contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn InvoiceSignature_hash(o: &InvoiceSignature) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Checks if two InvoiceSignatures contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
 #[no_mangle]
@@ -2069,8 +2138,8 @@ pub extern "C" fn SignedRawInvoice_raw_invoice(this_arg: &crate::lightning_invoi
 /// The hash of the `RawInvoice` that was signed.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn SignedRawInvoice_hash(this_arg: &crate::lightning_invoice::SignedRawInvoice) -> *const [u8; 32] {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.hash();
+pub extern "C" fn SignedRawInvoice_signable_hash(this_arg: &crate::lightning_invoice::SignedRawInvoice) -> *const [u8; 32] {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signable_hash();
 	ret
 }
 
@@ -2100,11 +2169,11 @@ pub extern "C" fn SignedRawInvoice_check_signature(this_arg: &crate::lightning_i
 	ret
 }
 
-/// Calculate the hash of the encoded `RawInvoice`
+/// Calculate the hash of the encoded `RawInvoice` which should be signed.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_hash(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::c_types::ThirtyTwoBytes {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.hash();
+pub extern "C" fn RawInvoice_signable_hash(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signable_hash();
 	crate::c_types::ThirtyTwoBytes { data: ret }
 }
 

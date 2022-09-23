@@ -1381,7 +1381,19 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					if let Some(resolved) = self.maybe_resolve_path(&p.path, generics) {
 						if self.c_type_has_inner_from_path(&resolved) { return true; }
 						if self.is_primitive(&resolved) { return false; }
-						if self.c_type_from_path(&resolved, false, false).is_some() { true } else { false }
+						// We want to move to using `Option_` mappings where possible rather than
+						// manual mappings, as it makes downstream bindings simpler and is more
+						// clear for users. Thus, we default to false but override for a few
+						// types which had mappings defined when we were avoiding the `Option_`s.
+						match &resolved as &str {
+							"lightning::ln::PaymentSecret" => true,
+							"lightning::ln::PaymentHash" => true,
+							"lightning::ln::PaymentPreimage" => true,
+							"lightning::ln::channelmanager::PaymentId" => true,
+							"bitcoin::hash_types::BlockHash" => true,
+							"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => true,
+							_ => false,
+						}
 					} else { unimplemented!(); }
 				},
 				syn::Type::Tuple(_) => false,
@@ -1456,7 +1468,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 								(".is_none() { core::ptr::null_mut() } else { ".to_owned(), format!("({}.unwrap())", var_access))
 								], " }", ContainerPrefixLocation::OutsideConv));
 						}
-					} else if self.is_primitive(&inner_path) || self.c_type_from_path(&inner_path, false, false).is_none() {
+					} else if !self.is_transparent_container("Option", is_ref, [single_contained.unwrap()].iter().map(|a| *a), generics) {
 						if self.is_primitive(&inner_path) || (!is_contained_ref && !is_ref) || only_contained_has_inner {
 							let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
 							return Some(("if ", vec![

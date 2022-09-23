@@ -1125,6 +1125,14 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										if idx != 0 { t_gen_args += ", " };
 										t_gen_args += "_"
 									}
+									// rustc doesn't like <_> if the _ is actually a lifetime, so
+									// if all the parameters are lifetimes just skip it.
+									let mut nonlifetime_param = false;
+									for param in $trait.generics.params.iter() {
+										if let syn::GenericParam::Lifetime(_) = param {}
+										else { nonlifetime_param = true; }
+									}
+									if !nonlifetime_param { t_gen_args = String::new(); }
 									if takes_self {
 										write!(w, "<native{} as {}<{}>>::{}(unsafe {{ &mut *(this_arg as *mut native{}) }}, ", ident, $trait_path, t_gen_args, $m.sig.ident, ident).unwrap();
 									} else {

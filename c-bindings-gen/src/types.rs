@@ -936,6 +936,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature"),
 			"bitcoin::secp256k1::SecretKey" if is_ref  => Some("*const [u8; 32]"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey"),
+			"bitcoin::secp256k1::Scalar" if is_ref  => Some("*const crate::c_types::BigEndianScalar"),
+			"bitcoin::secp256k1::Scalar" if !is_ref => Some("crate::c_types::BigEndianScalar"),
+			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
@@ -1021,6 +1025,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(""),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some("&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(""),
+			"bitcoin::secp256k1::Scalar" if !is_ref => Some(""),
+			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("::bitcoin::secp256k1::ecdh::SharedSecret::from_bytes("),
+
 			"bitcoin::blockdata::script::Script" if is_ref => Some("&::bitcoin::blockdata::script::Script::from(Vec::from("),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("::bitcoin::blockdata::script::Script::from("),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("&"),
@@ -1104,6 +1111,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(".into_rust()"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(".into_rust()"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some("}[..]).unwrap()"),
+			"bitcoin::secp256k1::Scalar" if !is_ref => Some(".into_rust()"),
+			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some(".data)"),
+
 			"bitcoin::blockdata::script::Script" if is_ref => Some(".to_slice()))"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_rust())"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(".into_bitcoin()"),
@@ -1196,6 +1206,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature::from_rust(&"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some(""),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
+			"bitcoin::secp256k1::Scalar" if !is_ref => Some("crate::c_types::BigEndianScalar::from_rust("),
+			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
+
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
@@ -1273,6 +1286,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(")"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(")"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some(".as_ref()"),
+			"bitcoin::secp256k1::Scalar" if !is_ref => Some(")"),
+			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some(".secret_bytes() }"),
+
 			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(")"),

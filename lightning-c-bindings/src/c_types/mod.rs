@@ -11,6 +11,7 @@ use bitcoin::secp256k1::ecdsa::Signature as SecpSignature;
 use bitcoin::secp256k1::Error as SecpError;
 use bitcoin::secp256k1::ecdsa::RecoveryId;
 use bitcoin::secp256k1::ecdsa::RecoverableSignature as SecpRecoverableSignature;
+use bitcoin::secp256k1::Scalar as SecpScalar;
 use bitcoin::bech32;
 use bitcoin::util::address;
 
@@ -146,6 +147,22 @@ impl RecoverableSignature {
 		SecpRecoverableSignature::from_compact(&self.serialized_form[0..64],
 				RecoveryId::from_i32(i32::from_le_bytes(id)).expect("Invalid Recovery ID"))
 			.unwrap()
+	}
+}
+
+#[repr(C)]
+#[derive(Clone)]
+/// Represents a scalar value between zero and the secp256k1 curve order, in big endian.
+pub struct BigEndianScalar {
+	/// The bytes of the scalar value.
+	pub big_endian_bytes: [u8; 32],
+}
+impl BigEndianScalar {
+	pub(crate) fn from_rust(scalar: &SecpScalar) -> Self {
+		Self { big_endian_bytes: scalar.to_be_bytes() }
+	}
+	pub(crate) fn into_rust(&self) -> SecpScalar {
+		SecpScalar::from_be_bytes(self.big_endian_bytes).expect("Scalar greater than the curve order")
 	}
 }
 

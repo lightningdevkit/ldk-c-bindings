@@ -38,8 +38,13 @@
 //!     (see [BOLT-4](https://github.com/lightning/bolts/blob/master/04-onion-routing.md) for more information).
 //! - `BasicMPP` - requires/supports that a node can receive basic multi-part payments
 //!     (see [BOLT-4](https://github.com/lightning/bolts/blob/master/04-onion-routing.md#basic-multi-part-payments) for more information).
+//! - `Wumbo` - requires/supports that a node create large channels. Called `option_support_large_channel` in the spec.
+//!     (see [BOLT-2](https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#the-open_channel-message) for more information).
 //! - `ShutdownAnySegwit` - requires/supports that future segwit versions are allowed in `shutdown`
 //!     (see [BOLT-2](https://github.com/lightning/bolts/blob/master/02-peer-protocol.md) for more information).
+//! - `OnionMessages` - requires/supports forwarding onion messages
+//!     (see [BOLT-7](https://github.com/lightning/bolts/pull/759/files) for more information).
+//!     TODO: update link
 //! - `ChannelType` - node supports the channel_type field in open/accept
 //!     (see [BOLT-2](https://github.com/lightning/bolts/blob/master/02-peer-protocol.md) for more information).
 //! - `SCIDPrivacy` - supply channel aliases for routing
@@ -706,6 +711,62 @@ pub extern "C" fn NodeFeatures_requires_shutdown_anysegwit(this_arg: &crate::lig
 
 /// Set this feature as optional.
 #[no_mangle]
+pub extern "C" fn InitFeatures_set_onion_messages_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_onion_messages_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_onion_messages_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_onion_messages_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_onion_messages(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_onion_messages();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_onion_messages_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_onion_messages_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_onion_messages_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_onion_messages_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_onion_messages(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_onion_messages();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_onion_messages(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_onion_messages();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_onion_messages(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_onion_messages();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
 pub extern "C" fn InitFeatures_set_channel_type_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
 	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_channel_type_optional()
 }
@@ -1361,6 +1422,23 @@ impl ChannelTypeFeatures {
 		ret
 	}
 }
+/// Returns the set of known init features that are related to channels. At least some of
+/// these features are likely required for peers to talk to us.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_known_channel_features() -> crate::lightning::ln::features::InitFeatures {
+	let mut ret = lightning::ln::features::InitFeatures::known_channel_features();
+	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns the set of known node features that are related to channels.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_known_channel_features() -> crate::lightning::ln::features::NodeFeatures {
+	let mut ret = lightning::ln::features::NodeFeatures::known_channel_features();
+	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]

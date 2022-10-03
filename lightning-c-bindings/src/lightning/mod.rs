@@ -15,7 +15,7 @@
 //! figure out how best to make networking happen/timers fire/things get written to disk/keys get
 //! generated/etc. This makes it a good candidate for tight integration into an existing wallet
 //! instead of having a rather-separate lightning appendage to a wallet.
-//! 
+//!
 //! `default` features are:
 //!
 //! * `std` - enables functionalities which require `std`, including `std::io` trait implementations and things which utilize time
@@ -47,6 +47,7 @@ pub mod util;
 pub mod chain;
 pub mod ln;
 pub mod routing;
+pub mod onion_message;
 mod io_extras {
 
 use alloc::str::FromStr;

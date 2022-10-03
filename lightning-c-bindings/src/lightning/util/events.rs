@@ -728,7 +728,7 @@ pub enum Event {
 		/// Indicates the payment was rejected for some reason by the recipient. This implies that
 		/// the payment has failed, not just the route in question. If this is not set, you may
 		/// retry the payment via a different route.
-		rejected_by_dest: bool,
+		payment_failed_permanently: bool,
 		/// Any failure information conveyed via the Onion return packet by a node along the failed
 		/// payment route.
 		///
@@ -1032,11 +1032,11 @@ impl Event {
 					path: local_path_nonref,
 				}
 			},
-			Event::PaymentPathFailed {ref payment_id, ref payment_hash, ref rejected_by_dest, ref network_update, ref all_paths_failed, ref path, ref short_channel_id, ref retry, } => {
+			Event::PaymentPathFailed {ref payment_id, ref payment_hash, ref payment_failed_permanently, ref network_update, ref all_paths_failed, ref path, ref short_channel_id, ref retry, } => {
 				let mut payment_id_nonref = (*payment_id).clone();
 				let mut local_payment_id_nonref = if payment_id_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data) }) };
 				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut rejected_by_dest_nonref = (*rejected_by_dest).clone();
+				let mut payment_failed_permanently_nonref = (*payment_failed_permanently).clone();
 				let mut network_update_nonref = (*network_update).clone();
 				let mut local_network_update_nonref = { /* network_update_nonref*/ let network_update_nonref_opt = network_update_nonref; { } if network_update_nonref_opt.is_none() { None } else { Some({ network_update_nonref_opt.take().into_native() }) } };
 				let mut all_paths_failed_nonref = (*all_paths_failed).clone();
@@ -1049,7 +1049,7 @@ impl Event {
 				nativeEvent::PaymentPathFailed {
 					payment_id: local_payment_id_nonref,
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
-					rejected_by_dest: rejected_by_dest_nonref,
+					payment_failed_permanently: payment_failed_permanently_nonref,
 					network_update: local_network_update_nonref,
 					all_paths_failed: all_paths_failed_nonref,
 					path: local_path_nonref,
@@ -1203,7 +1203,7 @@ impl Event {
 					path: local_path,
 				}
 			},
-			Event::PaymentPathFailed {mut payment_id, mut payment_hash, mut rejected_by_dest, mut network_update, mut all_paths_failed, mut path, mut short_channel_id, mut retry, } => {
+			Event::PaymentPathFailed {mut payment_id, mut payment_hash, mut payment_failed_permanently, mut network_update, mut all_paths_failed, mut path, mut short_channel_id, mut retry, } => {
 				let mut local_payment_id = if payment_id.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentId(payment_id.data) }) };
 				let mut local_network_update = { /* network_update*/ let network_update_opt = network_update; { } if network_update_opt.is_none() { None } else { Some({ network_update_opt.take().into_native() }) } };
 				let mut local_path = Vec::new(); for mut item in path.into_rust().drain(..) { local_path.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
@@ -1212,7 +1212,7 @@ impl Event {
 				nativeEvent::PaymentPathFailed {
 					payment_id: local_payment_id,
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
-					rejected_by_dest: rejected_by_dest,
+					payment_failed_permanently: payment_failed_permanently,
 					network_update: local_network_update,
 					all_paths_failed: all_paths_failed,
 					path: local_path,
@@ -1361,11 +1361,11 @@ impl Event {
 					path: local_path_nonref.into(),
 				}
 			},
-			nativeEvent::PaymentPathFailed {ref payment_id, ref payment_hash, ref rejected_by_dest, ref network_update, ref all_paths_failed, ref path, ref short_channel_id, ref retry, } => {
+			nativeEvent::PaymentPathFailed {ref payment_id, ref payment_hash, ref payment_failed_permanently, ref network_update, ref all_paths_failed, ref path, ref short_channel_id, ref retry, } => {
 				let mut payment_id_nonref = (*payment_id).clone();
 				let mut local_payment_id_nonref = if payment_id_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_id_nonref.unwrap()).0 } } };
 				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut rejected_by_dest_nonref = (*rejected_by_dest).clone();
+				let mut payment_failed_permanently_nonref = (*payment_failed_permanently).clone();
 				let mut network_update_nonref = (*network_update).clone();
 				let mut local_network_update_nonref = if network_update_nonref.is_none() { crate::c_types::derived::COption_NetworkUpdateZ::None } else { crate::c_types::derived::COption_NetworkUpdateZ::Some( { crate::lightning::routing::gossip::NetworkUpdate::native_into(network_update_nonref.unwrap()) }) };
 				let mut all_paths_failed_nonref = (*all_paths_failed).clone();
@@ -1378,7 +1378,7 @@ impl Event {
 				Event::PaymentPathFailed {
 					payment_id: local_payment_id_nonref,
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
-					rejected_by_dest: rejected_by_dest_nonref,
+					payment_failed_permanently: payment_failed_permanently_nonref,
 					network_update: local_network_update_nonref,
 					all_paths_failed: all_paths_failed_nonref,
 					path: local_path_nonref.into(),
@@ -1532,7 +1532,7 @@ impl Event {
 					path: local_path.into(),
 				}
 			},
-			nativeEvent::PaymentPathFailed {mut payment_id, mut payment_hash, mut rejected_by_dest, mut network_update, mut all_paths_failed, mut path, mut short_channel_id, mut retry, } => {
+			nativeEvent::PaymentPathFailed {mut payment_id, mut payment_hash, mut payment_failed_permanently, mut network_update, mut all_paths_failed, mut path, mut short_channel_id, mut retry, } => {
 				let mut local_payment_id = if payment_id.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_id.unwrap()).0 } } };
 				let mut local_network_update = if network_update.is_none() { crate::c_types::derived::COption_NetworkUpdateZ::None } else { crate::c_types::derived::COption_NetworkUpdateZ::Some( { crate::lightning::routing::gossip::NetworkUpdate::native_into(network_update.unwrap()) }) };
 				let mut local_path = Vec::new(); for mut item in path.drain(..) { local_path.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
@@ -1541,7 +1541,7 @@ impl Event {
 				Event::PaymentPathFailed {
 					payment_id: local_payment_id,
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
-					rejected_by_dest: rejected_by_dest,
+					payment_failed_permanently: payment_failed_permanently,
 					network_update: local_network_update,
 					all_paths_failed: all_paths_failed,
 					path: local_path.into(),
@@ -1686,11 +1686,11 @@ pub extern "C" fn Event_payment_path_successful(payment_id: crate::c_types::Thir
 }
 #[no_mangle]
 /// Utility method to constructs a new PaymentPathFailed-variant Event
-pub extern "C" fn Event_payment_path_failed(payment_id: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::ThirtyTwoBytes, rejected_by_dest: bool, network_update: crate::c_types::derived::COption_NetworkUpdateZ, all_paths_failed: bool, path: crate::c_types::derived::CVec_RouteHopZ, short_channel_id: crate::c_types::derived::COption_u64Z, retry: crate::lightning::routing::router::RouteParameters) -> Event {
+pub extern "C" fn Event_payment_path_failed(payment_id: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::ThirtyTwoBytes, payment_failed_permanently: bool, network_update: crate::c_types::derived::COption_NetworkUpdateZ, all_paths_failed: bool, path: crate::c_types::derived::CVec_RouteHopZ, short_channel_id: crate::c_types::derived::COption_u64Z, retry: crate::lightning::routing::router::RouteParameters) -> Event {
 	Event::PaymentPathFailed {
 		payment_id,
 		payment_hash,
-		rejected_by_dest,
+		payment_failed_permanently,
 		network_update,
 		all_paths_failed,
 		path,
@@ -1876,24 +1876,31 @@ pub enum MessageSendEvent {
 		/// The message which should be sent.
 		msg: crate::lightning::ln::msgs::ChannelReestablish,
 	},
-	/// Used to indicate that a channel_announcement and channel_update should be broadcast to all
-	/// peers (except the peer with node_id either msg.contents.node_id_1 or msg.contents.node_id_2).
-	///
-	/// Note that after doing so, you very likely (unless you did so very recently) want to call
-	/// ChannelManager::broadcast_node_announcement to trigger a BroadcastNodeAnnouncement event.
-	/// This ensures that any nodes which see our channel_announcement also have a relevant
-	/// node_announcement, including relevant feature flags which may be important for routing
-	/// through or to us.
-	BroadcastChannelAnnouncement {
+	/// Used to send a channel_announcement and channel_update to a specific peer, likely on
+	/// initial connection to ensure our peers know about our channels.
+	SendChannelAnnouncement {
+		/// The node_id of the node which should receive this message
+		node_id: crate::c_types::PublicKey,
 		/// The channel_announcement which should be sent.
 		msg: crate::lightning::ln::msgs::ChannelAnnouncement,
 		/// The followup channel_update which should be sent.
 		update_msg: crate::lightning::ln::msgs::ChannelUpdate,
 	},
-	/// Used to indicate that a node_announcement should be broadcast to all peers.
-	BroadcastNodeAnnouncement {
-		/// The node_announcement which should be sent.
-		msg: crate::lightning::ln::msgs::NodeAnnouncement,
+	/// Used to indicate that a channel_announcement and channel_update should be broadcast to all
+	/// peers (except the peer with node_id either msg.contents.node_id_1 or msg.contents.node_id_2).
+	///
+	/// Note that after doing so, you very likely (unless you did so very recently) want to
+	/// broadcast a node_announcement (e.g. via [`PeerManager::broadcast_node_announcement`]). This
+	/// ensures that any nodes which see our channel_announcement also have a relevant
+	/// node_announcement, including relevant feature flags which may be important for routing
+	/// through or to us.
+	///
+	/// [`PeerManager::broadcast_node_announcement`]: crate::ln::peer_handler::PeerManager::broadcast_node_announcement
+	BroadcastChannelAnnouncement {
+		/// The channel_announcement which should be sent.
+		msg: crate::lightning::ln::msgs::ChannelAnnouncement,
+		/// The followup channel_update which should be sent.
+		update_msg: crate::lightning::ln::msgs::ChannelUpdate,
 	},
 	/// Used to indicate that a channel_update should be broadcast to all peers.
 	BroadcastChannelUpdate {
@@ -2043,18 +2050,22 @@ impl MessageSendEvent {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
+			MessageSendEvent::SendChannelAnnouncement {ref node_id, ref msg, ref update_msg, } => {
+				let mut node_id_nonref = (*node_id).clone();
+				let mut msg_nonref = (*msg).clone();
+				let mut update_msg_nonref = (*update_msg).clone();
+				nativeMessageSendEvent::SendChannelAnnouncement {
+					node_id: node_id_nonref.into_rust(),
+					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
+					update_msg: *unsafe { Box::from_raw(update_msg_nonref.take_inner()) },
+				}
+			},
 			MessageSendEvent::BroadcastChannelAnnouncement {ref msg, ref update_msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				let mut update_msg_nonref = (*update_msg).clone();
 				nativeMessageSendEvent::BroadcastChannelAnnouncement {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 					update_msg: *unsafe { Box::from_raw(update_msg_nonref.take_inner()) },
-				}
-			},
-			MessageSendEvent::BroadcastNodeAnnouncement {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
-				nativeMessageSendEvent::BroadcastNodeAnnouncement {
-					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::BroadcastChannelUpdate {ref msg, } => {
@@ -2182,15 +2193,17 @@ impl MessageSendEvent {
 					msg: *unsafe { Box::from_raw(msg.take_inner()) },
 				}
 			},
-			MessageSendEvent::BroadcastChannelAnnouncement {mut msg, mut update_msg, } => {
-				nativeMessageSendEvent::BroadcastChannelAnnouncement {
+			MessageSendEvent::SendChannelAnnouncement {mut node_id, mut msg, mut update_msg, } => {
+				nativeMessageSendEvent::SendChannelAnnouncement {
+					node_id: node_id.into_rust(),
 					msg: *unsafe { Box::from_raw(msg.take_inner()) },
 					update_msg: *unsafe { Box::from_raw(update_msg.take_inner()) },
 				}
 			},
-			MessageSendEvent::BroadcastNodeAnnouncement {mut msg, } => {
-				nativeMessageSendEvent::BroadcastNodeAnnouncement {
+			MessageSendEvent::BroadcastChannelAnnouncement {mut msg, mut update_msg, } => {
+				nativeMessageSendEvent::BroadcastChannelAnnouncement {
 					msg: *unsafe { Box::from_raw(msg.take_inner()) },
+					update_msg: *unsafe { Box::from_raw(update_msg.take_inner()) },
 				}
 			},
 			MessageSendEvent::BroadcastChannelUpdate {mut msg, } => {
@@ -2327,18 +2340,22 @@ impl MessageSendEvent {
 					msg: crate::lightning::ln::msgs::ChannelReestablish { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
+			nativeMessageSendEvent::SendChannelAnnouncement {ref node_id, ref msg, ref update_msg, } => {
+				let mut node_id_nonref = (*node_id).clone();
+				let mut msg_nonref = (*msg).clone();
+				let mut update_msg_nonref = (*update_msg).clone();
+				MessageSendEvent::SendChannelAnnouncement {
+					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
+					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
+					update_msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(update_msg_nonref), is_owned: true },
+				}
+			},
 			nativeMessageSendEvent::BroadcastChannelAnnouncement {ref msg, ref update_msg, } => {
 				let mut msg_nonref = (*msg).clone();
 				let mut update_msg_nonref = (*update_msg).clone();
 				MessageSendEvent::BroadcastChannelAnnouncement {
 					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 					update_msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(update_msg_nonref), is_owned: true },
-				}
-			},
-			nativeMessageSendEvent::BroadcastNodeAnnouncement {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
-				MessageSendEvent::BroadcastNodeAnnouncement {
-					msg: crate::lightning::ln::msgs::NodeAnnouncement { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelUpdate {ref msg, } => {
@@ -2466,15 +2483,17 @@ impl MessageSendEvent {
 					msg: crate::lightning::ln::msgs::ChannelReestablish { inner: ObjOps::heap_alloc(msg), is_owned: true },
 				}
 			},
-			nativeMessageSendEvent::BroadcastChannelAnnouncement {mut msg, mut update_msg, } => {
-				MessageSendEvent::BroadcastChannelAnnouncement {
+			nativeMessageSendEvent::SendChannelAnnouncement {mut node_id, mut msg, mut update_msg, } => {
+				MessageSendEvent::SendChannelAnnouncement {
+					node_id: crate::c_types::PublicKey::from_rust(&node_id),
 					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(msg), is_owned: true },
 					update_msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(update_msg), is_owned: true },
 				}
 			},
-			nativeMessageSendEvent::BroadcastNodeAnnouncement {mut msg, } => {
-				MessageSendEvent::BroadcastNodeAnnouncement {
-					msg: crate::lightning::ln::msgs::NodeAnnouncement { inner: ObjOps::heap_alloc(msg), is_owned: true },
+			nativeMessageSendEvent::BroadcastChannelAnnouncement {mut msg, mut update_msg, } => {
+				MessageSendEvent::BroadcastChannelAnnouncement {
+					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(msg), is_owned: true },
+					update_msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(update_msg), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelUpdate {mut msg, } => {
@@ -2618,18 +2637,20 @@ pub extern "C" fn MessageSendEvent_send_channel_reestablish(node_id: crate::c_ty
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new BroadcastChannelAnnouncement-variant MessageSendEvent
-pub extern "C" fn MessageSendEvent_broadcast_channel_announcement(msg: crate::lightning::ln::msgs::ChannelAnnouncement, update_msg: crate::lightning::ln::msgs::ChannelUpdate) -> MessageSendEvent {
-	MessageSendEvent::BroadcastChannelAnnouncement {
+/// Utility method to constructs a new SendChannelAnnouncement-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_send_channel_announcement(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::ChannelAnnouncement, update_msg: crate::lightning::ln::msgs::ChannelUpdate) -> MessageSendEvent {
+	MessageSendEvent::SendChannelAnnouncement {
+		node_id,
 		msg,
 		update_msg,
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new BroadcastNodeAnnouncement-variant MessageSendEvent
-pub extern "C" fn MessageSendEvent_broadcast_node_announcement(msg: crate::lightning::ln::msgs::NodeAnnouncement) -> MessageSendEvent {
-	MessageSendEvent::BroadcastNodeAnnouncement {
+/// Utility method to constructs a new BroadcastChannelAnnouncement-variant MessageSendEvent
+pub extern "C" fn MessageSendEvent_broadcast_channel_announcement(msg: crate::lightning::ln::msgs::ChannelAnnouncement, update_msg: crate::lightning::ln::msgs::ChannelUpdate) -> MessageSendEvent {
+	MessageSendEvent::BroadcastChannelAnnouncement {
 		msg,
+		update_msg,
 	}
 }
 #[no_mangle]
@@ -2739,17 +2760,76 @@ impl Drop for MessageSendEventsProvider {
 		}
 	}
 }
+/// A trait indicating an object may generate onion messages to send
+#[repr(C)]
+pub struct OnionMessageProvider {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
+	pub this_arg: *mut c_void,
+	/// Gets the next pending onion message for the peer with the given node id.
+	///
+	/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+	#[must_use]
+	pub next_onion_message_for_peer: extern "C" fn (this_arg: *const c_void, peer_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::msgs::OnionMessage,
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
+}
+unsafe impl Send for OnionMessageProvider {}
+unsafe impl Sync for OnionMessageProvider {}
+#[no_mangle]
+pub(crate) extern "C" fn OnionMessageProvider_clone_fields(orig: &OnionMessageProvider) -> OnionMessageProvider {
+	OnionMessageProvider {
+		this_arg: orig.this_arg,
+		next_onion_message_for_peer: Clone::clone(&orig.next_onion_message_for_peer),
+		free: Clone::clone(&orig.free),
+	}
+}
+
+use lightning::util::events::OnionMessageProvider as rustOnionMessageProvider;
+impl rustOnionMessageProvider for OnionMessageProvider {
+	fn next_onion_message_for_peer(&self, mut peer_node_id: bitcoin::secp256k1::PublicKey) -> Option<lightning::ln::msgs::OnionMessage> {
+		let mut ret = (self.next_onion_message_for_peer)(self.this_arg, crate::c_types::PublicKey::from_rust(&peer_node_id));
+		let mut local_ret = if ret.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(ret.take_inner()) } }) };
+		local_ret
+	}
+}
+
+// We're essentially a pointer already, or at least a set of pointers, so allow us to be used
+// directly as a Deref trait in higher-level structs:
+impl core::ops::Deref for OnionMessageProvider {
+	type Target = Self;
+	fn deref(&self) -> &Self {
+		self
+	}
+}
+/// Calls the free function if one is set
+#[no_mangle]
+pub extern "C" fn OnionMessageProvider_free(this_ptr: OnionMessageProvider) { }
+impl Drop for OnionMessageProvider {
+	fn drop(&mut self) {
+		if let Some(f) = self.free {
+			f(self.this_arg);
+		}
+	}
+}
 /// A trait indicating an object may generate events.
 ///
 /// Events are processed by passing an [`EventHandler`] to [`process_pending_events`].
 ///
 /// # Requirements
 ///
-/// See [`process_pending_events`] for requirements around event processing.
-///
 /// When using this trait, [`process_pending_events`] will call [`handle_event`] for each pending
-/// event since the last invocation. The handler must either act upon the event immediately
-/// or preserve it for later handling.
+/// event since the last invocation.
+///
+/// In order to ensure no [`Event`]s are lost, implementors of this trait will persist [`Event`]s
+/// and replay any unhandled events on startup. An [`Event`] is considered handled when
+/// [`process_pending_events`] returns, thus handlers MUST fully handle [`Event`]s and persist any
+/// relevant changes to disk *before* returning.
+///
+/// Further, because an application may crash between an [`Event`] being handled and the
+/// implementor of this trait being re-serialized, [`Event`] handling must be idempotent - in
+/// effect, [`Event`]s may be replayed.
 ///
 /// Note, handlers may call back into the provider and thus deadlocking must be avoided. Be sure to
 /// consult the provider's documentation on the implication of processing events and how a handler
@@ -2770,9 +2850,7 @@ pub struct EventsProvider {
 	pub this_arg: *mut c_void,
 	/// Processes any events generated since the last call using the given event handler.
 	///
-	/// Subsequent calls must only process new events. However, handlers must be capable of handling
-	/// duplicate events across process restarts. This may occur if the provider was recovered from
-	/// an old state (i.e., it hadn't been successfully persisted after processing pending events).
+	/// See the trait-level documentation for requirements.
 	pub process_pending_events: extern "C" fn (this_arg: *const c_void, handler: crate::lightning::util::events::EventHandler),
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.

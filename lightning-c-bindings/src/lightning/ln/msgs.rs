@@ -1981,6 +1981,87 @@ pub extern "C" fn UpdateAddHTLC_clone(orig: &UpdateAddHTLC) -> UpdateAddHTLC {
 	orig.clone()
 }
 
+use lightning::ln::msgs::OnionMessage as nativeOnionMessageImport;
+pub(crate) type nativeOnionMessage = nativeOnionMessageImport;
+
+/// An onion message to be sent or received from a peer
+#[must_use]
+#[repr(C)]
+pub struct OnionMessage {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeOnionMessage,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for OnionMessage {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeOnionMessage>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the OnionMessage, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn OnionMessage_free(this_obj: OnionMessage) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn OnionMessage_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeOnionMessage); }
+}
+#[allow(unused)]
+impl OnionMessage {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeOnionMessage {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeOnionMessage {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeOnionMessage {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// Used in decrypting the onion packet's payload.
+#[no_mangle]
+pub extern "C" fn OnionMessage_get_blinding_point(this_ptr: &OnionMessage) -> crate::c_types::PublicKey {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().blinding_point;
+	crate::c_types::PublicKey::from_rust(&inner_val)
+}
+/// Used in decrypting the onion packet's payload.
+#[no_mangle]
+pub extern "C" fn OnionMessage_set_blinding_point(this_ptr: &mut OnionMessage, mut val: crate::c_types::PublicKey) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.blinding_point = val.into_rust();
+}
+impl Clone for OnionMessage {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeOnionMessage>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn OnionMessage_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeOnionMessage)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the OnionMessage
+pub extern "C" fn OnionMessage_clone(orig: &OnionMessage) -> OnionMessage {
+	orig.clone()
+}
+
 use lightning::ln::msgs::UpdateFulfillHTLC as nativeUpdateFulfillHTLCImport;
 pub(crate) type nativeUpdateFulfillHTLC = nativeUpdateFulfillHTLCImport;
 
@@ -5211,6 +5292,18 @@ pub struct ChannelMessageHandler {
 	pub handle_channel_update: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelUpdate),
 	/// Handle an incoming error message from the given peer.
 	pub handle_error: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ErrorMessage),
+	/// Gets the node feature flags which this handler itself supports. All available handlers are
+	/// queried similarly and their feature flags are OR'd together to form the [`NodeFeatures`]
+	/// which are broadcasted in our [`NodeAnnouncement`] message.
+	#[must_use]
+	pub provided_node_features: extern "C" fn (this_arg: *const c_void) -> crate::lightning::ln::features::NodeFeatures,
+	/// Gets the init feature flags which should be sent to the given peer. All available handlers
+	/// are queried similarly and their feature flags are OR'd together to form the [`InitFeatures`]
+	/// which are sent in our [`Init`] message.
+	///
+	/// Note that this method is called before [`Self::peer_connected`].
+	#[must_use]
+	pub provided_init_features: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::features::InitFeatures,
 	/// Implementation of MessageSendEventsProvider for this object.
 	pub MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider,
 	/// Frees any resources associated with this object given its this_arg pointer.
@@ -5243,6 +5336,8 @@ pub(crate) extern "C" fn ChannelMessageHandler_clone_fields(orig: &ChannelMessag
 		handle_channel_reestablish: Clone::clone(&orig.handle_channel_reestablish),
 		handle_channel_update: Clone::clone(&orig.handle_channel_update),
 		handle_error: Clone::clone(&orig.handle_error),
+		provided_node_features: Clone::clone(&orig.provided_node_features),
+		provided_init_features: Clone::clone(&orig.provided_init_features),
 		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider_clone_fields(&orig.MessageSendEventsProvider),
 		free: Clone::clone(&orig.free),
 	}
@@ -5317,6 +5412,14 @@ impl rustChannelMessageHandler for ChannelMessageHandler {
 	fn handle_error(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::ErrorMessage) {
 		(self.handle_error)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ErrorMessage { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ErrorMessage<>) as *mut _) }, is_owned: false })
 	}
+	fn provided_node_features(&self) -> lightning::ln::features::NodeFeatures {
+		let mut ret = (self.provided_node_features)(self.this_arg);
+		*unsafe { Box::from_raw(ret.take_inner()) }
+	}
+	fn provided_init_features(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey) -> lightning::ln::features::InitFeatures {
+		let mut ret = (self.provided_init_features)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id));
+		*unsafe { Box::from_raw(ret.take_inner()) }
+	}
 }
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
@@ -5361,19 +5464,20 @@ pub struct RoutingMessageHandler {
 	/// false or returning an Err otherwise.
 	#[must_use]
 	pub handle_channel_update: extern "C" fn (this_arg: *const c_void, msg: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CResult_boolLightningErrorZ,
-	/// Gets a subset of the channel announcements and updates required to dump our routing table
-	/// to a remote node, starting at the short_channel_id indicated by starting_point and
-	/// including the batch_amount entries immediately higher in numerical value than starting_point.
+	/// Gets channel announcements and updates required to dump our routing table to a remote node,
+	/// starting at the short_channel_id indicated by starting_point and including announcements
+	/// for a single channel.
 	#[must_use]
-	pub get_next_channel_announcements: extern "C" fn (this_arg: *const c_void, starting_point: u64, batch_amount: u8) -> crate::c_types::derived::CVec_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ,
-	/// Gets a subset of the node announcements required to dump our routing table to a remote node,
-	/// starting at the node *after* the provided publickey and including batch_amount entries
-	/// immediately higher (as defined by <PublicKey as Ord>::cmp) than starting_point.
+	pub get_next_channel_announcement: extern "C" fn (this_arg: *const c_void, starting_point: u64) -> crate::c_types::derived::COption_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ,
+	/// Gets a node announcement required to dump our routing table to a remote node, starting at
+	/// the node *after* the provided pubkey and including up to one announcement immediately
+	/// higher (as defined by <PublicKey as Ord>::cmp) than starting_point.
 	/// If None is provided for starting_point, we start at the first node.
 	///
 	/// Note that starting_point (or a relevant inner pointer) may be NULL or all-0s to represent None
+	/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 	#[must_use]
-	pub get_next_node_announcements: extern "C" fn (this_arg: *const c_void, starting_point: crate::c_types::PublicKey, batch_amount: u8) -> crate::c_types::derived::CVec_NodeAnnouncementZ,
+	pub get_next_node_announcement: extern "C" fn (this_arg: *const c_void, starting_point: crate::c_types::PublicKey) -> crate::lightning::ln::msgs::NodeAnnouncement,
 	/// Called when a connection is established with a peer. This can be used to
 	/// perform routing table synchronization using a strategy defined by the
 	/// implementor.
@@ -5397,6 +5501,18 @@ pub struct RoutingMessageHandler {
 	/// list of short_channel_ids.
 	#[must_use]
 	pub handle_query_short_channel_ids: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::QueryShortChannelIds) -> crate::c_types::derived::CResult_NoneLightningErrorZ,
+	/// Gets the node feature flags which this handler itself supports. All available handlers are
+	/// queried similarly and their feature flags are OR'd together to form the [`NodeFeatures`]
+	/// which are broadcasted in our [`NodeAnnouncement`] message.
+	#[must_use]
+	pub provided_node_features: extern "C" fn (this_arg: *const c_void) -> crate::lightning::ln::features::NodeFeatures,
+	/// Gets the init feature flags which should be sent to the given peer. All available handlers
+	/// are queried similarly and their feature flags are OR'd together to form the [`InitFeatures`]
+	/// which are sent in our [`Init`] message.
+	///
+	/// Note that this method is called before [`Self::peer_connected`].
+	#[must_use]
+	pub provided_init_features: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::features::InitFeatures,
 	/// Implementation of MessageSendEventsProvider for this object.
 	pub MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider,
 	/// Frees any resources associated with this object given its this_arg pointer.
@@ -5412,13 +5528,15 @@ pub(crate) extern "C" fn RoutingMessageHandler_clone_fields(orig: &RoutingMessag
 		handle_node_announcement: Clone::clone(&orig.handle_node_announcement),
 		handle_channel_announcement: Clone::clone(&orig.handle_channel_announcement),
 		handle_channel_update: Clone::clone(&orig.handle_channel_update),
-		get_next_channel_announcements: Clone::clone(&orig.get_next_channel_announcements),
-		get_next_node_announcements: Clone::clone(&orig.get_next_node_announcements),
+		get_next_channel_announcement: Clone::clone(&orig.get_next_channel_announcement),
+		get_next_node_announcement: Clone::clone(&orig.get_next_node_announcement),
 		peer_connected: Clone::clone(&orig.peer_connected),
 		handle_reply_channel_range: Clone::clone(&orig.handle_reply_channel_range),
 		handle_reply_short_channel_ids_end: Clone::clone(&orig.handle_reply_short_channel_ids_end),
 		handle_query_channel_range: Clone::clone(&orig.handle_query_channel_range),
 		handle_query_short_channel_ids: Clone::clone(&orig.handle_query_short_channel_ids),
+		provided_node_features: Clone::clone(&orig.provided_node_features),
+		provided_init_features: Clone::clone(&orig.provided_init_features),
 		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider_clone_fields(&orig.MessageSendEventsProvider),
 		free: Clone::clone(&orig.free),
 	}
@@ -5448,15 +5566,15 @@ impl rustRoutingMessageHandler for RoutingMessageHandler {
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }) }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn get_next_channel_announcements(&self, mut starting_point: u64, mut batch_amount: u8) -> Vec<(lightning::ln::msgs::ChannelAnnouncement, Option<lightning::ln::msgs::ChannelUpdate>, Option<lightning::ln::msgs::ChannelUpdate>)> {
-		let mut ret = (self.get_next_channel_announcements)(self.this_arg, starting_point, batch_amount);
-		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item.to_rust(); let mut local_orig_ret_0_1 = if orig_ret_0_1.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(orig_ret_0_1.take_inner()) } }) }; let mut local_orig_ret_0_2 = if orig_ret_0_2.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(orig_ret_0_2.take_inner()) } }) }; let mut local_ret_0 = (*unsafe { Box::from_raw(orig_ret_0_0.take_inner()) }, local_orig_ret_0_1, local_orig_ret_0_2); local_ret_0 }); };
+	fn get_next_channel_announcement(&self, mut starting_point: u64) -> Option<(lightning::ln::msgs::ChannelAnnouncement, Option<lightning::ln::msgs::ChannelUpdate>, Option<lightning::ln::msgs::ChannelUpdate>)> {
+		let mut ret = (self.get_next_channel_announcement)(self.this_arg, starting_point);
+		let mut local_ret = if ret.is_some() { Some( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = ret.take().to_rust(); let mut local_orig_ret_0_1 = if orig_ret_0_1.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(orig_ret_0_1.take_inner()) } }) }; let mut local_orig_ret_0_2 = if orig_ret_0_2.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(orig_ret_0_2.take_inner()) } }) }; let mut local_ret_0 = (*unsafe { Box::from_raw(orig_ret_0_0.take_inner()) }, local_orig_ret_0_1, local_orig_ret_0_2); local_ret_0 }) } else { None };
 		local_ret
 	}
-	fn get_next_node_announcements(&self, mut starting_point: Option<&bitcoin::secp256k1::PublicKey>, mut batch_amount: u8) -> Vec<lightning::ln::msgs::NodeAnnouncement> {
+	fn get_next_node_announcement(&self, mut starting_point: Option<&bitcoin::secp256k1::PublicKey>) -> Option<lightning::ln::msgs::NodeAnnouncement> {
 		let mut local_starting_point = if starting_point.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(starting_point.unwrap())) } };
-		let mut ret = (self.get_next_node_announcements)(self.this_arg, local_starting_point, batch_amount);
-		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+		let mut ret = (self.get_next_node_announcement)(self.this_arg, local_starting_point);
+		let mut local_ret = if ret.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(ret.take_inner()) } }) };
 		local_ret
 	}
 	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init) {
@@ -5482,6 +5600,14 @@ impl rustRoutingMessageHandler for RoutingMessageHandler {
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
+	fn provided_node_features(&self) -> lightning::ln::features::NodeFeatures {
+		let mut ret = (self.provided_node_features)(self.this_arg);
+		*unsafe { Box::from_raw(ret.take_inner()) }
+	}
+	fn provided_init_features(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey) -> lightning::ln::features::InitFeatures {
+		let mut ret = (self.provided_init_features)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id));
+		*unsafe { Box::from_raw(ret.take_inner()) }
+	}
 }
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
@@ -5496,6 +5622,100 @@ impl core::ops::Deref for RoutingMessageHandler {
 #[no_mangle]
 pub extern "C" fn RoutingMessageHandler_free(this_ptr: RoutingMessageHandler) { }
 impl Drop for RoutingMessageHandler {
+	fn drop(&mut self) {
+		if let Some(f) = self.free {
+			f(self.this_arg);
+		}
+	}
+}
+/// A trait to describe an object that can receive onion messages.
+#[repr(C)]
+pub struct OnionMessageHandler {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
+	pub this_arg: *mut c_void,
+	/// Handle an incoming onion_message message from the given peer.
+	pub handle_onion_message: extern "C" fn (this_arg: *const c_void, peer_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::OnionMessage),
+	/// Called when a connection is established with a peer. Can be used to track which peers
+	/// advertise onion message support and are online.
+	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init),
+	/// Indicates a connection to the peer failed/an existing connection was lost. Allows handlers to
+	/// drop and refuse to forward onion messages to this peer.
+	pub peer_disconnected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, no_connection_possible: bool),
+	/// Gets the node feature flags which this handler itself supports. All available handlers are
+	/// queried similarly and their feature flags are OR'd together to form the [`NodeFeatures`]
+	/// which are broadcasted in our [`NodeAnnouncement`] message.
+	#[must_use]
+	pub provided_node_features: extern "C" fn (this_arg: *const c_void) -> crate::lightning::ln::features::NodeFeatures,
+	/// Gets the init feature flags which should be sent to the given peer. All available handlers
+	/// are queried similarly and their feature flags are OR'd together to form the [`InitFeatures`]
+	/// which are sent in our [`Init`] message.
+	///
+	/// Note that this method is called before [`Self::peer_connected`].
+	#[must_use]
+	pub provided_init_features: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::features::InitFeatures,
+	/// Implementation of OnionMessageProvider for this object.
+	pub OnionMessageProvider: crate::lightning::util::events::OnionMessageProvider,
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
+}
+unsafe impl Send for OnionMessageHandler {}
+unsafe impl Sync for OnionMessageHandler {}
+#[no_mangle]
+pub(crate) extern "C" fn OnionMessageHandler_clone_fields(orig: &OnionMessageHandler) -> OnionMessageHandler {
+	OnionMessageHandler {
+		this_arg: orig.this_arg,
+		handle_onion_message: Clone::clone(&orig.handle_onion_message),
+		peer_connected: Clone::clone(&orig.peer_connected),
+		peer_disconnected: Clone::clone(&orig.peer_disconnected),
+		provided_node_features: Clone::clone(&orig.provided_node_features),
+		provided_init_features: Clone::clone(&orig.provided_init_features),
+		OnionMessageProvider: crate::lightning::util::events::OnionMessageProvider_clone_fields(&orig.OnionMessageProvider),
+		free: Clone::clone(&orig.free),
+	}
+}
+impl lightning::util::events::OnionMessageProvider for OnionMessageHandler {
+	fn next_onion_message_for_peer(&self, mut peer_node_id: bitcoin::secp256k1::PublicKey) -> Option<lightning::ln::msgs::OnionMessage> {
+		let mut ret = (self.OnionMessageProvider.next_onion_message_for_peer)(self.OnionMessageProvider.this_arg, crate::c_types::PublicKey::from_rust(&peer_node_id));
+		let mut local_ret = if ret.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(ret.take_inner()) } }) };
+		local_ret
+	}
+}
+
+use lightning::ln::msgs::OnionMessageHandler as rustOnionMessageHandler;
+impl rustOnionMessageHandler for OnionMessageHandler {
+	fn handle_onion_message(&self, mut peer_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::OnionMessage) {
+		(self.handle_onion_message)(self.this_arg, crate::c_types::PublicKey::from_rust(&peer_node_id), &crate::lightning::ln::msgs::OnionMessage { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::OnionMessage<>) as *mut _) }, is_owned: false })
+	}
+	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init) {
+		(self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false })
+	}
+	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut no_connection_possible: bool) {
+		(self.peer_disconnected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), no_connection_possible)
+	}
+	fn provided_node_features(&self) -> lightning::ln::features::NodeFeatures {
+		let mut ret = (self.provided_node_features)(self.this_arg);
+		*unsafe { Box::from_raw(ret.take_inner()) }
+	}
+	fn provided_init_features(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey) -> lightning::ln::features::InitFeatures {
+		let mut ret = (self.provided_init_features)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id));
+		*unsafe { Box::from_raw(ret.take_inner()) }
+	}
+}
+
+// We're essentially a pointer already, or at least a set of pointers, so allow us to be used
+// directly as a Deref trait in higher-level structs:
+impl core::ops::Deref for OnionMessageHandler {
+	type Target = Self;
+	fn deref(&self) -> &Self {
+		self
+	}
+}
+/// Calls the free function if one is set
+#[no_mangle]
+pub extern "C" fn OnionMessageHandler_free(this_ptr: OnionMessageHandler) { }
+impl Drop for OnionMessageHandler {
 	fn drop(&mut self) {
 		if let Some(f) = self.free {
 			f(self.this_arg);
@@ -5800,6 +6020,22 @@ pub extern "C" fn UpdateAddHTLC_read(ser: crate::c_types::u8slice) -> crate::c_t
 	let res: Result<lightning::ln::msgs::UpdateAddHTLC, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UpdateAddHTLC { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_res
+}
+#[no_mangle]
+/// Read a OnionMessage from a byte array, created by OnionMessage_write
+pub extern "C" fn OnionMessage_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_OnionMessageDecodeErrorZ {
+	let res: Result<lightning::ln::msgs::OnionMessage, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::OnionMessage { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the OnionMessage object into a byte array which can be read by OnionMessage_read
+pub extern "C" fn OnionMessage_write(obj: &crate::lightning::ln::msgs::OnionMessage) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn OnionMessage_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOnionMessage) })
 }
 #[no_mangle]
 /// Serialize the Ping object into a byte array which can be read by Ping_read

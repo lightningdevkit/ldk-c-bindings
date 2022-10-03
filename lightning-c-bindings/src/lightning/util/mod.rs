@@ -22,6 +22,7 @@ pub mod ser;
 pub mod message_signing;
 pub mod invoice;
 pub mod persist;
+pub mod wakers;
 pub mod logger;
 pub mod config;
 mod fuzz_wrappers {

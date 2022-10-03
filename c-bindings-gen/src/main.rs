@@ -102,7 +102,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 			},
 			"lightning::util::ser::Readable"|"lightning::util::ser::ReadableArgs"|"lightning::util::ser::MaybeReadable" => {
 				// Create the Result<Object, DecodeError> syn::Type
-				let mut res_ty: syn::Type = parse_quote!(Result<#for_ty, ::ln::msgs::DecodeError>);
+				let mut res_ty: syn::Type = parse_quote!(Result<#for_ty, lightning::ln::msgs::DecodeError>);
 
 				writeln!(w, "#[no_mangle]").unwrap();
 				writeln!(w, "/// Read a {} from a byte array, created by {}_write", for_obj, for_obj).unwrap();
@@ -151,7 +151,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 						} else { unreachable!(); }
 					} else { unreachable!(); }
 				} else if t == "lightning::util::ser::MaybeReadable" {
-					res_ty = parse_quote!(Result<Option<#for_ty>, ::ln::msgs::DecodeError>);
+					res_ty = parse_quote!(Result<Option<#for_ty>, lightning::ln::msgs::DecodeError>);
 				}
 				write!(w, ") -> ").unwrap();
 				types.write_c_type(w, &res_ty, Some(generics), false);
@@ -947,7 +947,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						// mappings from a trai defined in a different file, we may mis-resolve or
 						// fail to resolve the mapped types. Thus, we have to construct a new
 						// resolver for the module that the trait was defined in here first.
-						let trait_resolver = get_module_type_resolver!(full_trait_path, types.crate_libs, types.crate_types);
+						let mut trait_resolver = get_module_type_resolver!(full_trait_path, types.crate_libs, types.crate_types);
 						gen_types.learn_associated_types(trait_obj, &trait_resolver);
 						let mut impl_associated_types = HashMap::new();
 						for item in i.items.iter() {
@@ -1107,17 +1107,12 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										_ => {}
 									}
 								}
-								if uncallable_function {
-									let mut trait_resolver = get_module_type_resolver!(full_trait_path, $types.crate_libs, $types.crate_types);
-									write_method_params(w, &$trait_meth.sig, "c_void", &mut trait_resolver, Some(&meth_gen_types), true, true);
-								} else {
-									write_method_params(w, &$m.sig, "c_void", $types, Some(&meth_gen_types), true, true);
-								}
+								write_method_params(w, &$trait_meth.sig, "c_void", &mut trait_resolver, Some(&meth_gen_types), true, true);
 								write!(w, " {{\n\t").unwrap();
 								if uncallable_function {
 									write!(w, "unreachable!();").unwrap();
 								} else {
-									write_method_var_decl_body(w, &$m.sig, "", $types, Some(&meth_gen_types), false);
+									write_method_var_decl_body(w, &$trait_meth.sig, "", &mut trait_resolver, Some(&meth_gen_types), false);
 									let mut takes_self = false;
 									for inp in $m.sig.inputs.iter() {
 										if let syn::FnArg::Receiver(_) = inp {
@@ -1130,6 +1125,14 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										if idx != 0 { t_gen_args += ", " };
 										t_gen_args += "_"
 									}
+									// rustc doesn't like <_> if the _ is actually a lifetime, so
+									// if all the parameters are lifetimes just skip it.
+									let mut nonlifetime_param = false;
+									for param in $trait.generics.params.iter() {
+										if let syn::GenericParam::Lifetime(_) = param {}
+										else { nonlifetime_param = true; }
+									}
+									if !nonlifetime_param { t_gen_args = String::new(); }
 									if takes_self {
 										write!(w, "<native{} as {}<{}>>::{}(unsafe {{ &mut *(this_arg as *mut native{}) }}, ", ident, $trait_path, t_gen_args, $m.sig.ident, ident).unwrap();
 									} else {
@@ -1147,7 +1150,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 										},
 										_ => {},
 									}
-									write_method_call_params(w, &$m.sig, "", $types, Some(&meth_gen_types), &real_type, false);
+									write_method_call_params(w, &$trait_meth.sig, "", &mut trait_resolver, Some(&meth_gen_types), &real_type, false);
 								}
 								write!(w, "\n}}\n").unwrap();
 								if let syn::ReturnType::Type(_, rtype) = &$m.sig.output {
@@ -1185,7 +1188,6 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 									assert!(meth.default.is_some());
 									let old_gen_types = gen_types;
 									gen_types = GenericTypes::new(Some(resolved_path.clone()));
-									let mut trait_resolver = get_module_type_resolver!(full_trait_path, types.crate_libs, types.crate_types);
 									impl_meth!(meth, meth, full_trait_path, trait_obj, "", &mut trait_resolver);
 									gen_types = old_gen_types;
 								},

@@ -206,12 +206,10 @@ pub extern "C" fn GossipSync_none() -> GossipSync {
 /// [`Persister::persist_graph`]: lightning::util::persist::Persister::persist_graph
 /// [`NetworkGraph`]: lightning::routing::gossip::NetworkGraph
 /// [`NetworkGraph::write`]: lightning::routing::gossip::NetworkGraph#impl-Writeable
-///
-/// Note that scorer (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning::util::persist::Persister, mut event_handler: crate::lightning::util::events::EventHandler, chain_monitor: &crate::lightning::chain::chainmonitor::ChainMonitor, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager, mut gossip_sync: crate::lightning_background_processor::GossipSync, peer_manager: &crate::lightning::ln::peer_handler::PeerManager, mut logger: crate::lightning::util::logger::Logger, mut scorer: crate::lightning::routing::scoring::MultiThreadedLockableScore) -> crate::lightning_background_processor::BackgroundProcessor {
-	let mut local_scorer = if scorer.inner.is_null() { None } else { Some( { scorer.get_native_ref() }) };
+pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning::util::persist::Persister, mut event_handler: crate::lightning::util::events::EventHandler, chain_monitor: &crate::lightning::chain::chainmonitor::ChainMonitor, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager, mut gossip_sync: crate::lightning_background_processor::GossipSync, peer_manager: &crate::lightning::ln::peer_handler::PeerManager, mut logger: crate::lightning::util::logger::Logger, mut scorer: crate::c_types::derived::COption_WriteableScoreZ) -> crate::lightning_background_processor::BackgroundProcessor {
+	let mut local_scorer = { /* scorer*/ let scorer_opt = scorer; { } if scorer_opt.is_none() { None } else { Some({ scorer_opt.take() }) } };
 	let mut ret = lightning_background_processor::BackgroundProcessor::start(persister, event_handler, chain_monitor.get_native_ref(), channel_manager.get_native_ref(), gossip_sync.into_native(), peer_manager.get_native_ref(), logger, local_scorer);
 	crate::lightning_background_processor::BackgroundProcessor { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }

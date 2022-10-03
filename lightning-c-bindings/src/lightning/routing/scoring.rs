@@ -215,6 +215,70 @@ impl Drop for LockableScore {
 		}
 	}
 }
+/// Refers to a scorer that is accessible under lock and also writeable to disk
+///
+/// We need this trait to be able to pass in a scorer to `lightning-background-processor` that will enable us to
+/// use the Persister to persist it.
+#[repr(C)]
+pub struct WriteableScore {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
+	pub this_arg: *mut c_void,
+	/// Implementation of LockableScore for this object.
+	pub LockableScore: crate::lightning::routing::scoring::LockableScore,
+	/// Serialize the object into a byte array
+	pub write: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_u8Z,
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
+}
+unsafe impl Send for WriteableScore {}
+unsafe impl Sync for WriteableScore {}
+#[no_mangle]
+pub(crate) extern "C" fn WriteableScore_clone_fields(orig: &WriteableScore) -> WriteableScore {
+	WriteableScore {
+		this_arg: orig.this_arg,
+		LockableScore: crate::lightning::routing::scoring::LockableScore_clone_fields(&orig.LockableScore),
+		write: Clone::clone(&orig.write),
+		free: Clone::clone(&orig.free),
+	}
+}
+impl<'a> lightning::routing::scoring::LockableScore<'a> for WriteableScore {
+	type Locked = crate::lightning::routing::scoring::Score;
+	fn lock(&'a self) -> crate::lightning::routing::scoring::Score {
+		let mut ret = (self.LockableScore.lock)(self.LockableScore.this_arg);
+		ret
+	}
+}
+impl lightning::util::ser::Writeable for WriteableScore {
+	fn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), crate::c_types::io::Error> {
+		let vec = (self.write)(self.this_arg);
+		w.write_all(vec.as_slice())
+	}
+}
+
+use lightning::routing::scoring::WriteableScore as rustWriteableScore;
+impl<'a> rustWriteableScore<'a> for WriteableScore {
+}
+
+// We're essentially a pointer already, or at least a set of pointers, so allow us to be used
+// directly as a Deref trait in higher-level structs:
+impl core::ops::Deref for WriteableScore {
+	type Target = Self;
+	fn deref(&self) -> &Self {
+		self
+	}
+}
+/// Calls the free function if one is set
+#[no_mangle]
+pub extern "C" fn WriteableScore_free(this_ptr: WriteableScore) { }
+impl Drop for WriteableScore {
+	fn drop(&mut self) {
+		if let Some(f) = self.free {
+			f(self.this_arg);
+		}
+	}
+}
 
 use lightning::routing::scoring::MultiThreadedLockableScore as nativeMultiThreadedLockableScoreImport;
 pub(crate) type nativeMultiThreadedLockableScore = nativeMultiThreadedLockableScoreImport<crate::lightning::routing::scoring::Score>;
@@ -266,15 +330,141 @@ impl MultiThreadedLockableScore {
 		ret
 	}
 }
+
+use lightning::routing::scoring::MultiThreadedScoreLock as nativeMultiThreadedScoreLockImport;
+pub(crate) type nativeMultiThreadedScoreLock = nativeMultiThreadedScoreLockImport<'static, crate::lightning::routing::scoring::Score>;
+
+/// A locked `MultiThreadedLockableScore`.
+#[must_use]
+#[repr(C)]
+pub struct MultiThreadedScoreLock {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeMultiThreadedScoreLock,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for MultiThreadedScoreLock {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeMultiThreadedScoreLock>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the MultiThreadedScoreLock, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-/// Serialize the MultiThreadedLockableScore object into a byte array which can be read by MultiThreadedLockableScore_read
-pub extern "C" fn MultiThreadedLockableScore_write(obj: &crate::lightning::routing::scoring::MultiThreadedLockableScore) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn MultiThreadedScoreLock_free(this_obj: MultiThreadedScoreLock) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn MultiThreadedScoreLock_free_void(this_ptr: *mut c_void) {
+	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeMultiThreadedScoreLock); }
+}
+#[allow(unused)]
+impl MultiThreadedScoreLock {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeMultiThreadedScoreLock {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeMultiThreadedScoreLock {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeMultiThreadedScoreLock {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+impl From<nativeMultiThreadedScoreLock> for crate::lightning::routing::scoring::Score {
+	fn from(obj: nativeMultiThreadedScoreLock) -> Self {
+		let mut rust_obj = MultiThreadedScoreLock { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let mut ret = MultiThreadedScoreLock_as_Score(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
+		rust_obj.inner = core::ptr::null_mut();
+		ret.free = Some(MultiThreadedScoreLock_free_void);
+		ret
+	}
+}
+/// Constructs a new Score which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned Score must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn MultiThreadedScoreLock_as_Score(this_arg: &MultiThreadedScoreLock) -> crate::lightning::routing::scoring::Score {
+	crate::lightning::routing::scoring::Score {
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
+		free: None,
+		channel_penalty_msat: MultiThreadedScoreLock_Score_channel_penalty_msat,
+		payment_path_failed: MultiThreadedScoreLock_Score_payment_path_failed,
+		payment_path_successful: MultiThreadedScoreLock_Score_payment_path_successful,
+		probe_failed: MultiThreadedScoreLock_Score_probe_failed,
+		probe_successful: MultiThreadedScoreLock_Score_probe_successful,
+		write: MultiThreadedScoreLock_write_void,
+	}
+}
+
+#[must_use]
+extern "C" fn MultiThreadedScoreLock_Score_channel_penalty_msat(this_arg: *const c_void, mut short_channel_id: u64, source: &crate::lightning::routing::gossip::NodeId, target: &crate::lightning::routing::gossip::NodeId, mut usage: crate::lightning::routing::scoring::ChannelUsage) -> u64 {
+	let mut ret = <nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::channel_penalty_msat(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, short_channel_id, source.get_native_ref(), target.get_native_ref(), *unsafe { Box::from_raw(usage.take_inner()) });
+	ret
+}
+extern "C" fn MultiThreadedScoreLock_Score_payment_path_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::payment_path_failed(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, &local_path[..], short_channel_id)
+}
+extern "C" fn MultiThreadedScoreLock_Score_payment_path_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, &local_path[..])
+}
+extern "C" fn MultiThreadedScoreLock_Score_probe_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::probe_failed(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, &local_path[..], short_channel_id)
+}
+extern "C" fn MultiThreadedScoreLock_Score_probe_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::probe_successful(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, &local_path[..])
+}
+
+#[no_mangle]
+/// Serialize the MultiThreadedScoreLock object into a byte array which can be read by MultiThreadedScoreLock_read
+pub extern "C" fn MultiThreadedScoreLock_write(obj: &crate::lightning::routing::scoring::MultiThreadedScoreLock) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
-pub(crate) extern "C" fn MultiThreadedLockableScore_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeMultiThreadedLockableScore) })
+pub(crate) extern "C" fn MultiThreadedScoreLock_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeMultiThreadedScoreLock) })
 }
+impl From<nativeMultiThreadedLockableScore> for crate::lightning::routing::scoring::LockableScore {
+	fn from(obj: nativeMultiThreadedLockableScore) -> Self {
+		let mut rust_obj = MultiThreadedLockableScore { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let mut ret = MultiThreadedLockableScore_as_LockableScore(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
+		rust_obj.inner = core::ptr::null_mut();
+		ret.free = Some(MultiThreadedLockableScore_free_void);
+		ret
+	}
+}
+/// Constructs a new LockableScore which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned LockableScore must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn MultiThreadedLockableScore_as_LockableScore(this_arg: &MultiThreadedLockableScore) -> crate::lightning::routing::scoring::LockableScore {
+	crate::lightning::routing::scoring::LockableScore {
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
+		free: None,
+		lock: MultiThreadedLockableScore_LockableScore_lock,
+	}
+}
+
+#[must_use]
+extern "C" fn MultiThreadedLockableScore_LockableScore_lock(this_arg: *const c_void) -> crate::lightning::routing::scoring::Score {
+	let mut ret = <nativeMultiThreadedLockableScore as lightning::routing::scoring::LockableScore<>>::lock(unsafe { &mut *(this_arg as *mut nativeMultiThreadedLockableScore) }, );
+	Into::into(ret)
+}
+
 /// Creates a new [`MultiThreadedLockableScore`] given an underlying [`Score`].
 #[must_use]
 #[no_mangle]
@@ -503,25 +693,25 @@ pub extern "C" fn FixedPenaltyScorer_as_Score(this_arg: &FixedPenaltyScorer) -> 
 }
 
 #[must_use]
-extern "C" fn FixedPenaltyScorer_Score_channel_penalty_msat(this_arg: *const c_void, unused_0: u64, unused_1: &crate::lightning::routing::gossip::NodeId, unused_2: &crate::lightning::routing::gossip::NodeId, unused_3: crate::lightning::routing::scoring::ChannelUsage) -> u64 {
-	let mut ret = <nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::channel_penalty_msat(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, unused_0, unused_1.get_native_ref(), unused_2.get_native_ref(), *unsafe { Box::from_raw(unused_3.take_inner()) });
+extern "C" fn FixedPenaltyScorer_Score_channel_penalty_msat(this_arg: *const c_void, mut short_channel_id: u64, source: &crate::lightning::routing::gossip::NodeId, target: &crate::lightning::routing::gossip::NodeId, mut usage: crate::lightning::routing::scoring::ChannelUsage) -> u64 {
+	let mut ret = <nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::channel_penalty_msat(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, short_channel_id, source.get_native_ref(), target.get_native_ref(), *unsafe { Box::from_raw(usage.take_inner()) });
 	ret
 }
-extern "C" fn FixedPenaltyScorer_Score_payment_path_failed(this_arg: *mut c_void, mut _path: crate::c_types::derived::CVec_RouteHopZ, mut _short_channel_id: u64) {
-	let mut local__path = Vec::new(); for mut item in _path.as_slice().iter() { local__path.push( { item.get_native_ref() }); };
-	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::payment_path_failed(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local__path[..], _short_channel_id)
+extern "C" fn FixedPenaltyScorer_Score_payment_path_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::payment_path_failed(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local_path[..], short_channel_id)
 }
-extern "C" fn FixedPenaltyScorer_Score_payment_path_successful(this_arg: *mut c_void, mut _path: crate::c_types::derived::CVec_RouteHopZ) {
-	let mut local__path = Vec::new(); for mut item in _path.as_slice().iter() { local__path.push( { item.get_native_ref() }); };
-	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local__path[..])
+extern "C" fn FixedPenaltyScorer_Score_payment_path_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local_path[..])
 }
-extern "C" fn FixedPenaltyScorer_Score_probe_failed(this_arg: *mut c_void, mut _path: crate::c_types::derived::CVec_RouteHopZ, mut _short_channel_id: u64) {
-	let mut local__path = Vec::new(); for mut item in _path.as_slice().iter() { local__path.push( { item.get_native_ref() }); };
-	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::probe_failed(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local__path[..], _short_channel_id)
+extern "C" fn FixedPenaltyScorer_Score_probe_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::probe_failed(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local_path[..], short_channel_id)
 }
-extern "C" fn FixedPenaltyScorer_Score_probe_successful(this_arg: *mut c_void, mut _path: crate::c_types::derived::CVec_RouteHopZ) {
-	let mut local__path = Vec::new(); for mut item in _path.as_slice().iter() { local__path.push( { item.get_native_ref() }); };
-	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::probe_successful(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local__path[..])
+extern "C" fn FixedPenaltyScorer_Score_probe_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
+	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
+	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::probe_successful(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local_path[..])
 }
 
 #[no_mangle]

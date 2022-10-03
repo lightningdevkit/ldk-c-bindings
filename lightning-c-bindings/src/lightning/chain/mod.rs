@@ -381,14 +381,14 @@ pub struct Confirm {
 	/// in the event of a chain reorganization, it must not be called with a `header` that is no
 	/// longer in the chain as of the last call to [`best_block_updated`].
 	///
-	/// [chain order]: Confirm#Order
+	/// [chain order]: Confirm#order
 	/// [`best_block_updated`]: Self::best_block_updated
 	pub transactions_confirmed: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, height: u32),
 	/// Processes a transaction that is no longer confirmed as result of a chain reorganization.
 	///
 	/// Should be called for any transaction returned by [`get_relevant_txids`] if it has been
-	/// reorganized out of the best chain. Once called, the given transaction should not be returned
-	/// by [`get_relevant_txids`] unless it has been reconfirmed via [`transactions_confirmed`].
+	/// reorganized out of the best chain. Once called, the given transaction will not be returned
+	/// by [`get_relevant_txids`], unless it has been reconfirmed via [`transactions_confirmed`].
 	///
 	/// [`get_relevant_txids`]: Self::get_relevant_txids
 	/// [`transactions_confirmed`]: Self::transactions_confirmed
@@ -400,9 +400,9 @@ pub struct Confirm {
 	pub best_block_updated: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], height: u32),
 	/// Returns transactions that should be monitored for reorganization out of the chain.
 	///
-	/// Should include any transactions passed to [`transactions_confirmed`] that have insufficient
-	/// confirmations to be safe from a chain reorganization. Should not include any transactions
-	/// passed to [`transaction_unconfirmed`] unless later reconfirmed.
+	/// Will include any transactions passed to [`transactions_confirmed`] that have insufficient
+	/// confirmations to be safe from a chain reorganization. Will not include any transactions
+	/// passed to [`transaction_unconfirmed`], unless later reconfirmed.
 	///
 	/// May be called to determine the subset of transactions that must still be monitored for
 	/// reorganization. Will be idempotent between calls but may change as a result of calls to the
@@ -723,15 +723,11 @@ pub struct Filter {
 	pub register_tx: extern "C" fn (this_arg: *const c_void, txid: *const [u8; 32], script_pubkey: crate::c_types::u8slice),
 	/// Registers interest in spends of a transaction output.
 	///
-	/// Optionally, when `output.block_hash` is set, should return any transaction spending the
-	/// output that is found in the corresponding block along with its index.
-	///
-	/// This return value is useful for Electrum clients in order to supply in-block descendant
-	/// transactions which otherwise were not included. This is not necessary for other clients if
-	/// such descendant transactions were already included (e.g., when a BIP 157 client provides the
-	/// full block).
-	#[must_use]
-	pub register_output: extern "C" fn (this_arg: *const c_void, output: crate::lightning::chain::WatchedOutput) -> crate::c_types::derived::COption_C2Tuple_usizeTransactionZZ,
+	/// Note that this method might be called during processing of a new block. You therefore need
+	/// to ensure that also dependent output spents within an already connected block are correctly
+	/// handled, e.g., by re-scanning the block in question whenever new outputs have been
+	/// registered mid-processing.
+	pub register_output: extern "C" fn (this_arg: *const c_void, output: crate::lightning::chain::WatchedOutput),
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -753,10 +749,8 @@ impl rustFilter for Filter {
 	fn register_tx(&self, mut txid: &bitcoin::hash_types::Txid, mut script_pubkey: &bitcoin::blockdata::script::Script) {
 		(self.register_tx)(self.this_arg, txid.as_inner(), crate::c_types::u8slice::from_slice(&script_pubkey[..]))
 	}
-	fn register_output(&self, mut output: lightning::chain::WatchedOutput) -> Option<(usize, bitcoin::blockdata::transaction::Transaction)> {
-		let mut ret = (self.register_output)(self.this_arg, crate::lightning::chain::WatchedOutput { inner: ObjOps::heap_alloc(output), is_owned: true });
-		let mut local_ret = if ret.is_some() { Some( { let (mut orig_ret_0_0, mut orig_ret_0_1) = ret.take().to_rust(); let mut local_ret_0 = (orig_ret_0_0, orig_ret_0_1.into_bitcoin()); local_ret_0 }) } else { None };
-		local_ret
+	fn register_output(&self, mut output: lightning::chain::WatchedOutput) {
+		(self.register_output)(self.this_arg, crate::lightning::chain::WatchedOutput { inner: ObjOps::heap_alloc(output), is_owned: true })
 	}
 }
 
@@ -786,7 +780,7 @@ pub(crate) type nativeWatchedOutput = nativeWatchedOutputImport;
 ///
 /// Used to convey to a [`Filter`] such an output with a given spending condition. Any transaction
 /// spending the output must be given to [`ChannelMonitor::block_connected`] either directly or via
-/// the return value of [`Filter::register_output`].
+/// [`Confirm::transactions_confirmed`].
 ///
 /// If `block_hash` is `Some`, this indicates the output was created in the corresponding block and
 /// may have been spent there. See [`Filter::register_output`] for details.

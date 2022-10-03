@@ -147,7 +147,7 @@ pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
 }
 
 pub fn assert_simple_bound(bound: &syn::TraitBound) {
-	if bound.paren_token.is_some() || bound.lifetimes.is_some() { unimplemented!(); }
+	if bound.paren_token.is_some() { unimplemented!(); }
 	if let syn::TraitBoundModifier::Maybe(_) = bound.modifier { unimplemented!(); }
 }
 
@@ -936,6 +936,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature"),
 			"bitcoin::secp256k1::SecretKey" if is_ref  => Some("*const [u8; 32]"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey"),
+			"bitcoin::secp256k1::Scalar" if is_ref  => Some("*const crate::c_types::BigEndianScalar"),
+			"bitcoin::secp256k1::Scalar" if !is_ref => Some("crate::c_types::BigEndianScalar"),
+			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
+
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
@@ -1021,6 +1025,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(""),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some("&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(""),
+			"bitcoin::secp256k1::Scalar" if !is_ref => Some(""),
+			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("::bitcoin::secp256k1::ecdh::SharedSecret::from_bytes("),
+
 			"bitcoin::blockdata::script::Script" if is_ref => Some("&::bitcoin::blockdata::script::Script::from(Vec::from("),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("::bitcoin::blockdata::script::Script::from("),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("&"),
@@ -1104,6 +1111,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(".into_rust()"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(".into_rust()"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some("}[..]).unwrap()"),
+			"bitcoin::secp256k1::Scalar" if !is_ref => Some(".into_rust()"),
+			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some(".data)"),
+
 			"bitcoin::blockdata::script::Script" if is_ref => Some(".to_slice()))"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_rust())"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(".into_bitcoin()"),
@@ -1196,6 +1206,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature::from_rust(&"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some(""),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
+			"bitcoin::secp256k1::Scalar" if !is_ref => Some("crate::c_types::BigEndianScalar::from_rust("),
+			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
+
 			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
@@ -1273,6 +1286,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(")"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(")"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some(".as_ref()"),
+			"bitcoin::secp256k1::Scalar" if !is_ref => Some(")"),
+			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some(".secret_bytes() }"),
+
 			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(")"),
@@ -1381,7 +1397,19 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					if let Some(resolved) = self.maybe_resolve_path(&p.path, generics) {
 						if self.c_type_has_inner_from_path(&resolved) { return true; }
 						if self.is_primitive(&resolved) { return false; }
-						if self.c_type_from_path(&resolved, false, false).is_some() { true } else { false }
+						// We want to move to using `Option_` mappings where possible rather than
+						// manual mappings, as it makes downstream bindings simpler and is more
+						// clear for users. Thus, we default to false but override for a few
+						// types which had mappings defined when we were avoiding the `Option_`s.
+						match &resolved as &str {
+							"lightning::ln::PaymentSecret" => true,
+							"lightning::ln::PaymentHash" => true,
+							"lightning::ln::PaymentPreimage" => true,
+							"lightning::ln::channelmanager::PaymentId" => true,
+							"bitcoin::hash_types::BlockHash" => true,
+							"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => true,
+							_ => false,
+						}
 					} else { unimplemented!(); }
 				},
 				syn::Type::Tuple(_) => false,
@@ -1456,7 +1484,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 								(".is_none() { core::ptr::null_mut() } else { ".to_owned(), format!("({}.unwrap())", var_access))
 								], " }", ContainerPrefixLocation::OutsideConv));
 						}
-					} else if self.is_primitive(&inner_path) || self.c_type_from_path(&inner_path, false, false).is_none() {
+					} else if !self.is_transparent_container("Option", is_ref, [single_contained.unwrap()].iter().map(|a| *a), generics) {
 						if self.is_primitive(&inner_path) || (!is_contained_ref && !is_ref) || only_contained_has_inner {
 							let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
 							return Some(("if ", vec![

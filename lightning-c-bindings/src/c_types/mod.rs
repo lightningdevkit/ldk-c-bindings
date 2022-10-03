@@ -166,6 +166,12 @@ impl BigEndianScalar {
 	}
 }
 
+#[no_mangle]
+/// Convenience function for constructing a new BigEndianScalar
+pub extern "C" fn BigEndianScalar_new(big_endian_bytes: ThirtyTwoBytes) -> BigEndianScalar {
+	BigEndianScalar { big_endian_bytes: big_endian_bytes.data }
+}
+
 #[repr(C)]
 #[derive(Copy, Clone)]
 /// Represents an error returned from libsecp256k1 during validation of some secp256k1 data

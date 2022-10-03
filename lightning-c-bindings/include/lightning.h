@@ -468,6 +468,27 @@ typedef struct LDKStr {
 } LDKStr;
 
 /**
+ * Represents a scalar value between zero and the secp256k1 curve order, in big endian.
+ */
+typedef struct LDKBigEndianScalar {
+   /**
+    * The bytes of the scalar value.
+    */
+   uint8_t big_endian_bytes[32];
+} LDKBigEndianScalar;
+
+/**
+ * Arbitrary 32 bytes, which could represent one of a few different things. You probably want to
+ * look up the corresponding function in rust-lightning's docs.
+ */
+typedef struct LDKThirtyTwoBytes {
+   /**
+    * The thirty-two bytes
+    */
+   uint8_t data[32];
+} LDKThirtyTwoBytes;
+
+/**
  * Represents an error returned from the bech32 library during validation of some bech32 data
  */
 typedef enum LDKBech32Error_Tag {
@@ -2436,17 +2457,6 @@ typedef struct LDKCResult_RouteLightningErrorZ {
     */
    bool result_ok;
 } LDKCResult_RouteLightningErrorZ;
-
-/**
- * Arbitrary 32 bytes, which could represent one of a few different things. You probably want to
- * look up the corresponding function in rust-lightning's docs.
- */
-typedef struct LDKThirtyTwoBytes {
-   /**
-    * The thirty-two bytes
-    */
-   uint8_t data[32];
-} LDKThirtyTwoBytes;
 
 /**
  * Some information provided on receipt of payment depends on whether the payment received is a
@@ -6406,16 +6416,6 @@ typedef struct LDKCResult_SecretKeyNoneZ {
     */
    bool result_ok;
 } LDKCResult_SecretKeyNoneZ;
-
-/**
- * Represents a scalar value between zero and the secp256k1 curve order, in big endian.
- */
-typedef struct LDKBigEndianScalar {
-   /**
-    * The bytes of the scalar value.
-    */
-   uint8_t big_endian_bytes[32];
-} LDKBigEndianScalar;
 
 /**
  * An enum which can either contain a crate::c_types::BigEndianScalar or not
@@ -13895,6 +13895,11 @@ extern const uint8_t TAG_FEATURES;
 struct LDKStr _ldk_get_compiled_version(void);
 
 struct LDKStr _ldk_c_bindings_get_compiled_version(void);
+
+/**
+ * Convenience function for constructing a new BigEndianScalar
+ */
+struct LDKBigEndianScalar BigEndianScalar_new(struct LDKThirtyTwoBytes big_endian_bytes);
 
 /**
  * Creates a new Bech32Error which has the same data as `orig`

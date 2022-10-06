@@ -13501,7 +13501,8 @@ typedef struct MUST_USE_STRUCT LDKBackgroundProcessor {
 
 
 /**
- * Rapid Gossip Sync struct
+ * The main Rapid Gossip Sync object.
+ *
  * See [crate-level documentation] for usage.
  *
  * [crate-level documentation]: crate
@@ -30843,23 +30844,22 @@ struct LDKStr SiPrefix_to_str(const enum LDKSiPrefix *NONNULL_PTR o);
 void RapidGossipSync_free(struct LDKRapidGossipSync this_obj);
 
 /**
- * Instantiate a new [`RapidGossipSync`] instance
+ * Instantiate a new [`RapidGossipSync`] instance.
  */
 MUST_USE_RES struct LDKRapidGossipSync RapidGossipSync_new(const struct LDKNetworkGraph *NONNULL_PTR network_graph);
 
 /**
- * Sync gossip data from a file
+ * Update network graph from binary data.
  * Returns the last sync timestamp to be used the next time rapid sync data is queried.
  *
- * `network_graph`: The network graph to apply the updates to
+ * `network_graph`: network graph to be updated
  *
- * `sync_path`: Path to the file where the gossip update data is located
- *
+ * `update_data`: `&[u8]` binary stream that comprises the update data
  */
-MUST_USE_RES struct LDKCResult_u32GraphSyncErrorZ RapidGossipSync_sync_network_graph_with_file_path(const struct LDKRapidGossipSync *NONNULL_PTR this_arg, struct LDKStr sync_path);
+MUST_USE_RES struct LDKCResult_u32GraphSyncErrorZ RapidGossipSync_update_network_graph(const struct LDKRapidGossipSync *NONNULL_PTR this_arg, struct LDKu8slice update_data);
 
 /**
- * Returns whether a rapid gossip sync has completed at least once
+ * Returns whether a rapid gossip sync has completed at least once.
  */
 MUST_USE_RES bool RapidGossipSync_is_initial_sync_complete(const struct LDKRapidGossipSync *NONNULL_PTR this_arg);
 
@@ -30882,16 +30882,6 @@ struct LDKGraphSyncError GraphSyncError_decode_error(struct LDKDecodeError a);
  * Utility method to constructs a new LightningError-variant GraphSyncError
  */
 struct LDKGraphSyncError GraphSyncError_lightning_error(struct LDKLightningError a);
-
-/**
- * Update network graph from binary data.
- * Returns the last sync timestamp to be used the next time rapid sync data is queried.
- *
- * `network_graph`: network graph to be updated
- *
- * `update_data`: `&[u8]` binary stream that comprises the update data
- */
-MUST_USE_RES struct LDKCResult_u32GraphSyncErrorZ RapidGossipSync_update_network_graph(const struct LDKRapidGossipSync *NONNULL_PTR this_arg, struct LDKu8slice update_data);
 
 #endif /* LDK_C_BINDINGS_H */
 

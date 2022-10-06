@@ -191,7 +191,7 @@ else
 	add_crate lightning lightning --features=no-std
 	drop_crate "lightning-persister"
 	drop_crate "lightning-background-processor"
-	drop_crate "lightning-rapid-gossip-sync"
+	add_crate "lightning-rapid-gossip-sync" "lightning_rapid_gossip_sync" --features=no-std
 	add_crate "lightning-invoice" "lightning_invoice" --features=no-std
 	CARGO_BUILD_ARGS="--features=no-std"
 fi

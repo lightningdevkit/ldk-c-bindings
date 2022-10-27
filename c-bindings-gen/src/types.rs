@@ -650,6 +650,8 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				Some(format!("{}::{}{}", self.module_path, first_seg.ident, remaining))
 			} else if first_seg_is_stdlib(&first_seg_str) || self.dependencies.contains(&first_seg.ident) {
 				Some(first_seg_str + &remaining)
+			} else if first_seg_str == "crate" {
+				Some(self.crate_name.to_owned() + &remaining)
 			} else { None }
 		}
 	}

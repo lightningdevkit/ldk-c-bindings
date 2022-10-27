@@ -932,7 +932,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration"|"core::time::Duration" => Some("u64"),
 			"std::time::SystemTime" => Some("u64"),
-			"std::io::Error"|"lightning::io::Error" => Some("crate::c_types::IOError"),
+			"std::io::Error"|"lightning::io::Error"|"lightning::io::ErrorKind" => Some("crate::c_types::IOError"),
 			"core::fmt::Arguments" if is_ref => Some("crate::c_types::Str"),
 
 			"core::convert::Infallible" => Some("crate::c_types::NotConstructable"),
@@ -1017,7 +1017,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"str" if is_ref => Some(""),
 			"alloc::string::String"|"String" => Some(""),
-			"std::io::Error"|"lightning::io::Error" => Some(""),
+			"std::io::Error"|"lightning::io::Error"|"lightning::io::ErrorKind" => Some(""),
 			// Note that we'll panic for String if is_ref, as we only have non-owned memory, we
 			// cannot create a &String.
 
@@ -1108,6 +1108,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"str" if is_ref => Some(".into_str()"),
 			"alloc::string::String"|"String" => Some(".into_string()"),
 			"std::io::Error"|"lightning::io::Error" => Some(".to_rust()"),
+			"lightning::io::ErrorKind" => Some(".to_rust_kind()"),
 
 			"core::convert::Infallible" => Some("\")"),
 
@@ -1204,6 +1205,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::Duration"|"core::time::Duration" => Some(""),
 			"std::time::SystemTime" => Some(""),
 			"std::io::Error"|"lightning::io::Error" => Some("crate::c_types::IOError::from_rust("),
+			"lightning::io::ErrorKind" => Some("crate::c_types::IOError::from_rust_kind("),
 			"core::fmt::Arguments" => Some("alloc::format!(\"{}\", "),
 
 			"core::convert::Infallible" => Some("panic!(\"Cannot construct an Infallible: "),
@@ -1283,7 +1285,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"std::time::Duration"|"core::time::Duration" => Some(".as_secs()"),
 			"std::time::SystemTime" => Some(".duration_since(::std::time::SystemTime::UNIX_EPOCH).expect(\"Times must be post-1970\").as_secs()"),
-			"std::io::Error"|"lightning::io::Error" => Some(")"),
+			"std::io::Error"|"lightning::io::Error"|"lightning::io::ErrorKind" => Some(")"),
 			"core::fmt::Arguments" => Some(").into()"),
 
 			"core::convert::Infallible" => Some("\")"),

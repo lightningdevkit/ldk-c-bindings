@@ -316,8 +316,8 @@ pub enum IOError {
 	UnexpectedEof,
 }
 impl IOError {
-	pub(crate) fn from_rust(err: io::Error) -> Self {
-		match err.kind() {
+	pub(crate) fn from_rust_kind(err: io::ErrorKind) -> Self {
+		match err {
 			io::ErrorKind::NotFound => IOError::NotFound,
 			io::ErrorKind::PermissionDenied => IOError::PermissionDenied,
 			io::ErrorKind::ConnectionRefused => IOError::ConnectionRefused,
@@ -339,8 +339,11 @@ impl IOError {
 			_ => IOError::Other,
 		}
 	}
-	pub(crate) fn to_rust(&self) -> io::Error {
-		io::Error::new(match self {
+	pub(crate) fn from_rust(err: io::Error) -> Self {
+		Self::from_rust_kind(err.kind())
+	}
+	pub(crate) fn to_rust_kind(&self) -> io::ErrorKind {
+		match self {
 			IOError::NotFound => io::ErrorKind::NotFound,
 			IOError::PermissionDenied => io::ErrorKind::PermissionDenied,
 			IOError::ConnectionRefused => io::ErrorKind::ConnectionRefused,
@@ -359,7 +362,10 @@ impl IOError {
 			IOError::Interrupted => io::ErrorKind::Interrupted,
 			IOError::Other => io::ErrorKind::Other,
 			IOError::UnexpectedEof => io::ErrorKind::UnexpectedEof,
-		}, "")
+		}
+	}
+	pub(crate) fn to_rust(&self) -> io::Error {
+		io::Error::new(self.to_rust_kind(), "")
 	}
 }
 

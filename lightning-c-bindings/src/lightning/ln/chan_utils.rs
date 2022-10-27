@@ -171,7 +171,7 @@ pub(crate) extern "C" fn CounterpartyCommitmentSecrets_write_void(obj: *const c_
 /// Read a CounterpartyCommitmentSecrets from a byte array, created by CounterpartyCommitmentSecrets_write
 pub extern "C" fn CounterpartyCommitmentSecrets_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CounterpartyCommitmentSecretsDecodeErrorZ {
 	let res: Result<lightning::ln::chan_utils::CounterpartyCommitmentSecrets, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::CounterpartyCommitmentSecrets { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::CounterpartyCommitmentSecrets { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Derives a per-commitment-transaction private key (eg an htlc key or delayed_payment key)
@@ -201,7 +201,7 @@ pub extern "C" fn derive_public_key(mut per_commitment_point: crate::c_types::Pu
 
 /// Derives a per-commitment-transaction revocation key from its constituent parts.
 ///
-/// Only the cheating participant owns a valid witness to propagate a revoked 
+/// Only the cheating participant owns a valid witness to propagate a revoked
 /// commitment transaction, thus per_commitment_secret always come from cheater
 /// and revocation_base_secret always come from punisher, which is the broadcaster
 /// of the transaction spending with this key knowledge.
@@ -219,7 +219,7 @@ pub extern "C" fn derive_private_revocation_key(per_commitment_secret: *const [u
 /// the public equivalend of derive_private_revocation_key - using only public keys to derive a
 /// public key instead of private keys.
 ///
-/// Only the cheating participant owns a valid witness to propagate a revoked 
+/// Only the cheating participant owns a valid witness to propagate a revoked
 /// commitment transaction, thus per_commitment_point always come from cheater
 /// and revocation_base_point always come from punisher, which is the broadcaster
 /// of the transaction spending with this key knowledge.
@@ -365,6 +365,15 @@ pub extern "C" fn TxCreationKeys_new(mut per_commitment_point_arg: crate::c_type
 		broadcaster_delayed_payment_key: broadcaster_delayed_payment_key_arg.into_rust(),
 	}), is_owned: true }
 }
+/// Checks if two TxCreationKeyss contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn TxCreationKeys_eq(a: &TxCreationKeys, b: &TxCreationKeys) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 impl Clone for TxCreationKeys {
 	fn clone(&self) -> Self {
 		Self {
@@ -397,7 +406,7 @@ pub(crate) extern "C" fn TxCreationKeys_write_void(obj: *const c_void) -> crate:
 /// Read a TxCreationKeys from a byte array, created by TxCreationKeys_write
 pub extern "C" fn TxCreationKeys_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_TxCreationKeysDecodeErrorZ {
 	let res: Result<lightning::ln::chan_utils::TxCreationKeys, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::TxCreationKeys { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::TxCreationKeys { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -555,6 +564,15 @@ pub(crate) extern "C" fn ChannelPublicKeys_clone_void(this_ptr: *const c_void) -
 pub extern "C" fn ChannelPublicKeys_clone(orig: &ChannelPublicKeys) -> ChannelPublicKeys {
 	orig.clone()
 }
+/// Checks if two ChannelPublicKeyss contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ChannelPublicKeys_eq(a: &ChannelPublicKeys, b: &ChannelPublicKeys) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the ChannelPublicKeys object into a byte array which can be read by ChannelPublicKeys_read
 pub extern "C" fn ChannelPublicKeys_write(obj: &crate::lightning::ln::chan_utils::ChannelPublicKeys) -> crate::c_types::derived::CVec_u8Z {
@@ -568,7 +586,7 @@ pub(crate) extern "C" fn ChannelPublicKeys_write_void(obj: *const c_void) -> cra
 /// Read a ChannelPublicKeys from a byte array, created by ChannelPublicKeys_write
 pub extern "C" fn ChannelPublicKeys_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelPublicKeysDecodeErrorZ {
 	let res: Result<lightning::ln::chan_utils::ChannelPublicKeys, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Create per-state keys from channel base points and the per-commitment point.
@@ -756,6 +774,15 @@ pub(crate) extern "C" fn HTLCOutputInCommitment_clone_void(this_ptr: *const c_vo
 pub extern "C" fn HTLCOutputInCommitment_clone(orig: &HTLCOutputInCommitment) -> HTLCOutputInCommitment {
 	orig.clone()
 }
+/// Checks if two HTLCOutputInCommitments contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn HTLCOutputInCommitment_eq(a: &HTLCOutputInCommitment, b: &HTLCOutputInCommitment) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the HTLCOutputInCommitment object into a byte array which can be read by HTLCOutputInCommitment_read
 pub extern "C" fn HTLCOutputInCommitment_write(obj: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment) -> crate::c_types::derived::CVec_u8Z {
@@ -769,7 +796,7 @@ pub(crate) extern "C" fn HTLCOutputInCommitment_write_void(obj: *const c_void) -
 /// Read a HTLCOutputInCommitment from a byte array, created by HTLCOutputInCommitment_write
 pub extern "C" fn HTLCOutputInCommitment_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_HTLCOutputInCommitmentDecodeErrorZ {
 	let res: Result<lightning::ln::chan_utils::HTLCOutputInCommitment, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Gets the witness redeemscript for an HTLC output in a commitment transaction. Note that htlc
@@ -939,14 +966,16 @@ pub extern "C" fn ChannelTransactionParameters_set_funding_outpoint(this_ptr: &m
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.funding_outpoint = local_val;
 }
-/// Are anchors used for this channel.  Boolean is serialization backwards-compatible
+/// Are anchors (zero fee HTLC transaction variant) used for this channel. Boolean is
+/// serialization backwards-compatible.
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_get_opt_anchors(this_ptr: &ChannelTransactionParameters) -> crate::c_types::derived::COption_NoneZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().opt_anchors;
 	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NoneZ::None } else { crate::c_types::derived::COption_NoneZ::Some /*  { () /**/ } */ };
 	local_inner_val
 }
-/// Are anchors used for this channel.  Boolean is serialization backwards-compatible
+/// Are anchors (zero fee HTLC transaction variant) used for this channel. Boolean is
+/// serialization backwards-compatible.
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_set_opt_anchors(this_ptr: &mut ChannelTransactionParameters, mut val: crate::c_types::derived::COption_NoneZ) {
 	let mut local_val = if val.is_some() { Some( { () /*val.take()*/ }) } else { None };
@@ -1131,7 +1160,7 @@ pub(crate) extern "C" fn CounterpartyChannelTransactionParameters_write_void(obj
 /// Read a CounterpartyChannelTransactionParameters from a byte array, created by CounterpartyChannelTransactionParameters_write
 pub extern "C" fn CounterpartyChannelTransactionParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CounterpartyChannelTransactionParametersDecodeErrorZ {
 	let res: Result<lightning::ln::chan_utils::CounterpartyChannelTransactionParameters, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -1147,7 +1176,7 @@ pub(crate) extern "C" fn ChannelTransactionParameters_write_void(obj: *const c_v
 /// Read a ChannelTransactionParameters from a byte array, created by ChannelTransactionParameters_write
 pub extern "C" fn ChannelTransactionParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelTransactionParametersDecodeErrorZ {
 	let res: Result<lightning::ln::chan_utils::ChannelTransactionParameters, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::ChannelTransactionParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::ChannelTransactionParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -1368,7 +1397,7 @@ pub(crate) extern "C" fn HolderCommitmentTransaction_write_void(obj: *const c_vo
 /// Read a HolderCommitmentTransaction from a byte array, created by HolderCommitmentTransaction_write
 pub extern "C" fn HolderCommitmentTransaction_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_HolderCommitmentTransactionDecodeErrorZ {
 	let res: Result<lightning::ln::chan_utils::HolderCommitmentTransaction, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::HolderCommitmentTransaction { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::HolderCommitmentTransaction { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Create a new holder transaction with the given counterparty signatures.
@@ -1501,7 +1530,7 @@ pub(crate) extern "C" fn BuiltCommitmentTransaction_write_void(obj: *const c_voi
 /// Read a BuiltCommitmentTransaction from a byte array, created by BuiltCommitmentTransaction_write
 pub extern "C" fn BuiltCommitmentTransaction_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_BuiltCommitmentTransactionDecodeErrorZ {
 	let res: Result<lightning::ln::chan_utils::BuiltCommitmentTransaction, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::BuiltCommitmentTransaction { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::BuiltCommitmentTransaction { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Get the SIGHASH_ALL sighash value of the transaction.
@@ -1606,6 +1635,15 @@ pub extern "C" fn ClosingTransaction_hash(o: &ClosingTransaction) -> u64 {
 	let mut hasher = core::hash::SipHasher::new();
 	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
 	core::hash::Hasher::finish(&hasher)
+}
+/// Checks if two ClosingTransactions contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ClosingTransaction_eq(a: &ClosingTransaction, b: &ClosingTransaction) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 /// Construct an object of the class
 #[must_use]
@@ -1845,7 +1883,7 @@ pub(crate) extern "C" fn CommitmentTransaction_write_void(obj: *const c_void) ->
 /// Read a CommitmentTransaction from a byte array, created by CommitmentTransaction_write
 pub extern "C" fn CommitmentTransaction_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CommitmentTransactionDecodeErrorZ {
 	let res: Result<lightning::ln::chan_utils::CommitmentTransaction, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::CommitmentTransaction { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::CommitmentTransaction { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// The backwards-counting commitment number

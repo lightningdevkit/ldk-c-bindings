@@ -210,7 +210,7 @@ pub(crate) extern "C" fn RouteHop_write_void(obj: *const c_void) -> crate::c_typ
 /// Read a RouteHop from a byte array, created by RouteHop_write
 pub extern "C" fn RouteHop_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteHopDecodeErrorZ {
 	let res: Result<lightning::routing::router::RouteHop, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -392,7 +392,7 @@ pub(crate) extern "C" fn Route_write_void(obj: *const c_void) -> crate::c_types:
 /// Read a Route from a byte array, created by Route_write
 pub extern "C" fn Route_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteDecodeErrorZ {
 	let res: Result<lightning::routing::router::Route, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -526,7 +526,7 @@ pub(crate) extern "C" fn RouteParameters_write_void(obj: *const c_void) -> crate
 /// Read a RouteParameters from a byte array, created by RouteParameters_write
 pub extern "C" fn RouteParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteParametersDecodeErrorZ {
 	let res: Result<lightning::routing::router::RouteParameters, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Maximum total CTLV difference we allow for a full payment path.
@@ -802,7 +802,7 @@ pub(crate) extern "C" fn PaymentParameters_write_void(obj: *const c_void) -> cra
 /// Read a PaymentParameters from a byte array, created by PaymentParameters_write
 pub extern "C" fn PaymentParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_PaymentParametersDecodeErrorZ {
 	let res: Result<lightning::routing::router::PaymentParameters, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::PaymentParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::PaymentParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Creates a payee with the node id of the given `pubkey`.
@@ -943,7 +943,7 @@ pub(crate) extern "C" fn RouteHint_write_void(obj: *const c_void) -> crate::c_ty
 /// Read a RouteHint from a byte array, created by RouteHint_write
 pub extern "C" fn RouteHint_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteHintDecodeErrorZ {
 	let res: Result<lightning::routing::router::RouteHint, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteHint { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteHint { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -1133,7 +1133,7 @@ pub(crate) extern "C" fn RouteHintHop_write_void(obj: *const c_void) -> crate::c
 /// Read a RouteHintHop from a byte array, created by RouteHintHop_write
 pub extern "C" fn RouteHintHop_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RouteHintHopDecodeErrorZ {
 	let res: Result<lightning::routing::router::RouteHintHop, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteHintHop { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::RouteHintHop { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Finds a route from us (payer) to the given target node (payee).

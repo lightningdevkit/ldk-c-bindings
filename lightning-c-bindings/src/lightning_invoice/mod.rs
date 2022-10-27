@@ -485,6 +485,12 @@ pub extern "C" fn ParseError_invalid_slice_length(a: crate::c_types::Str) -> Par
 /// Utility method to constructs a new Skip-variant ParseError
 pub extern "C" fn ParseError_skip() -> ParseError {
 	ParseError::Skip}
+/// Checks if two ParseErrors contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn ParseError_eq(a: &ParseError, b: &ParseError) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 /// Indicates that something went wrong while parsing or validating the invoice. Parsing errors
 /// should be mostly seen as opaque and are only there for debugging reasons. Semantic errors
 /// like wrong signatures, missing fields etc. could mean that someone tampered with the invoice.
@@ -585,6 +591,12 @@ pub extern "C" fn ParseOrSemanticError_parse_error(a: crate::lightning_invoice::
 /// Utility method to constructs a new SemanticError-variant ParseOrSemanticError
 pub extern "C" fn ParseOrSemanticError_semantic_error(a: crate::lightning_invoice::SemanticError) -> ParseOrSemanticError {
 	ParseOrSemanticError::SemanticError(a, )
+}
+/// Checks if two ParseOrSemanticErrors contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn ParseOrSemanticError_eq(a: &ParseOrSemanticError, b: &ParseOrSemanticError) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
 }
 /// The maximum timestamp as [`Duration::as_secs`] since the Unix epoch allowed by [`BOLT 11`].
 ///
@@ -2294,6 +2306,8 @@ pub extern "C" fn PositiveTimestamp_from_unix_timestamp(mut unix_seconds: u64) -
 /// Creates a `PositiveTimestamp` from a [`SystemTime`] with a corresponding Unix timestamp in
 /// the range `0..=MAX_TIMESTAMP`.
 ///
+/// Note that the subsecond part is dropped as it is not representable in BOLT 11 invoices.
+///
 /// Otherwise, returns a [`CreationError::TimestampOutOfBounds`].
 #[must_use]
 #[no_mangle]
@@ -2305,6 +2319,8 @@ pub extern "C" fn PositiveTimestamp_from_system_time(mut time: u64) -> crate::c_
 
 /// Creates a `PositiveTimestamp` from a [`Duration`] since the Unix epoch in the range
 /// `0..=MAX_TIMESTAMP`.
+///
+/// Note that the subsecond part is dropped as it is not representable in BOLT 11 invoices.
 ///
 /// Otherwise, returns a [`CreationError::TimestampOutOfBounds`].
 #[must_use]
@@ -2543,7 +2559,7 @@ pub extern "C" fn ExpiryTime_from_seconds(mut seconds: u64) -> crate::lightning_
 	crate::lightning_invoice::ExpiryTime { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Construct an `ExpiryTime` from a `Duration`.
+/// Construct an `ExpiryTime` from a `Duration`, dropping the sub-second part.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ExpiryTime_from_duration(mut duration: u64) -> crate::lightning_invoice::ExpiryTime {

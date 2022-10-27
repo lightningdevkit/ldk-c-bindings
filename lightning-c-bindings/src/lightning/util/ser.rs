@@ -169,6 +169,15 @@ pub(crate) extern "C" fn Hostname_clone_void(this_ptr: *const c_void) -> *mut c_
 pub extern "C" fn Hostname_clone(orig: &Hostname) -> Hostname {
 	orig.clone()
 }
+/// Checks if two Hostnames contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Hostname_eq(a: &Hostname, b: &Hostname) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 /// Returns the length of the hostname.
 #[must_use]
 #[no_mangle]

@@ -88,6 +88,15 @@ pub(crate) extern "C" fn ShutdownScript_clone_void(this_ptr: *const c_void) -> *
 pub extern "C" fn ShutdownScript_clone(orig: &ShutdownScript) -> ShutdownScript {
 	orig.clone()
 }
+/// Checks if two ShutdownScripts contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ShutdownScript_eq(a: &ShutdownScript, b: &ShutdownScript) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::script::InvalidShutdownScript as nativeInvalidShutdownScriptImport;
 pub(crate) type nativeInvalidShutdownScript = nativeInvalidShutdownScriptImport;
@@ -194,7 +203,7 @@ pub(crate) extern "C" fn ShutdownScript_write_void(obj: *const c_void) -> crate:
 /// Read a ShutdownScript from a byte array, created by ShutdownScript_write
 pub extern "C" fn ShutdownScript_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ShutdownScriptDecodeErrorZ {
 	let res: Result<lightning::ln::script::ShutdownScript, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Generates a P2WPKH script pubkey from the given [`WPubkeyHash`].

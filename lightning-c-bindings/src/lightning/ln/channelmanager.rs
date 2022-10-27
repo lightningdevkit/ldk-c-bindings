@@ -1214,13 +1214,13 @@ pub enum PaymentSendFailure {
 	/// in over-/re-payment.
 	///
 	/// The results here are ordered the same as the paths in the route object which was passed to
-	/// send_payment, and any Errs which are not APIError::MonitorUpdateFailed can be safely
-	/// retried (though there is currently no API with which to do so).
+	/// send_payment, and any `Err`s which are not [`APIError::MonitorUpdateInProgress`] can be
+	/// safely retried via [`ChannelManager::retry_payment`].
 	///
-	/// Any entries which contain Err(APIError::MonitorUpdateFailed) or Ok(()) MUST NOT be retried
-	/// as they will result in over-/re-payment. These HTLCs all either successfully sent (in the
-	/// case of Ok(())) or will send once channel_monitor_updated is called on the next-hop channel
-	/// with the latest update_id.
+	/// Any entries which contain `Err(APIError::MonitorUpdateInprogress)` or `Ok(())` MUST NOT be
+	/// retried as they will result in over-/re-payment. These HTLCs all either successfully sent
+	/// (in the case of `Ok(())`) or will send once a [`MonitorEvent::Completed`] is provided for
+	/// the next-hop channel with the latest update_id.
 	PartialFailure {
 		/// The errors themselves, in the same order as the route hops.
 		results: crate::c_types::derived::CVec_CResult_NoneAPIErrorZZ,
@@ -1726,12 +1726,12 @@ pub extern "C" fn ChannelManager_force_close_all_channels_without_broadcasting_t
 /// PaymentSendFailure for more info.
 ///
 /// In general, a path may raise:
-///  * APIError::RouteError when an invalid route or forwarding parameter (cltv_delta, fee,
+///  * [`APIError::RouteError`] when an invalid route or forwarding parameter (cltv_delta, fee,
 ///    node public key) is specified.
-///  * APIError::ChannelUnavailable if the next-hop channel is not available for updates
+///  * [`APIError::ChannelUnavailable`] if the next-hop channel is not available for updates
 ///    (including due to previous monitor update failure or new permanent monitor update
 ///    failure).
-///  * APIError::MonitorUpdateFailed if a new monitor update failure prevented sending the
+///  * [`APIError::MonitorUpdateInProgress`] if a new monitor update failure prevented sending the
 ///    relevant updates.
 ///
 /// Note that depending on the type of the PaymentSendFailure the HTLC may have been
@@ -2444,8 +2444,11 @@ extern "C" fn ChannelManager_ChannelMessageHandler_handle_announcement_signature
 extern "C" fn ChannelManager_ChannelMessageHandler_peer_disconnected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut no_connection_possible: bool) {
 	<nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::peer_disconnected(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &their_node_id.into_rust(), no_connection_possible)
 }
-extern "C" fn ChannelManager_ChannelMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::Init) {
-	<nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &their_node_id.into_rust(), msg.get_native_ref())
+#[must_use]
+extern "C" fn ChannelManager_ChannelMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::Init) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = <nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &their_node_id.into_rust(), msg.get_native_ref());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
 }
 extern "C" fn ChannelManager_ChannelMessageHandler_handle_channel_reestablish(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelReestablish) {
 	<nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::handle_channel_reestablish(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &their_node_id.into_rust(), msg.get_native_ref())
@@ -2467,6 +2470,30 @@ extern "C" fn ChannelManager_ChannelMessageHandler_provided_init_features(this_a
 	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
+/// Fetches the set of [`NodeFeatures`] flags which are provided by or required by
+/// [`ChannelManager`].
+#[no_mangle]
+pub extern "C" fn provided_node_features() -> crate::lightning::ln::features::NodeFeatures {
+	let mut ret = lightning::ln::channelmanager::provided_node_features();
+	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Fetches the set of [`ChannelFeatures`] flags which are provided by or required by
+/// [`ChannelManager`].
+#[no_mangle]
+pub extern "C" fn provided_channel_features() -> crate::lightning::ln::features::ChannelFeatures {
+	let mut ret = lightning::ln::channelmanager::provided_channel_features();
+	crate::lightning::ln::features::ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Fetches the set of [`InitFeatures`] flags which are provided by or required by
+/// [`ChannelManager`].
+#[no_mangle]
+pub extern "C" fn provided_init_features() -> crate::lightning::ln::features::InitFeatures {
+	let mut ret = lightning::ln::channelmanager::provided_init_features();
+	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
 #[no_mangle]
 /// Serialize the CounterpartyForwardingInfo object into a byte array which can be read by CounterpartyForwardingInfo_read
 pub extern "C" fn CounterpartyForwardingInfo_write(obj: &crate::lightning::ln::channelmanager::CounterpartyForwardingInfo) -> crate::c_types::derived::CVec_u8Z {
@@ -2480,7 +2507,7 @@ pub(crate) extern "C" fn CounterpartyForwardingInfo_write_void(obj: *const c_voi
 /// Read a CounterpartyForwardingInfo from a byte array, created by CounterpartyForwardingInfo_write
 pub extern "C" fn CounterpartyForwardingInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CounterpartyForwardingInfoDecodeErrorZ {
 	let res: Result<lightning::ln::channelmanager::CounterpartyForwardingInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::CounterpartyForwardingInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::CounterpartyForwardingInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -2496,7 +2523,7 @@ pub(crate) extern "C" fn ChannelCounterparty_write_void(obj: *const c_void) -> c
 /// Read a ChannelCounterparty from a byte array, created by ChannelCounterparty_write
 pub extern "C" fn ChannelCounterparty_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelCounterpartyDecodeErrorZ {
 	let res: Result<lightning::ln::channelmanager::ChannelCounterparty, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::ChannelCounterparty { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::ChannelCounterparty { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -2512,7 +2539,7 @@ pub(crate) extern "C" fn ChannelDetails_write_void(obj: *const c_void) -> crate:
 /// Read a ChannelDetails from a byte array, created by ChannelDetails_write
 pub extern "C" fn ChannelDetails_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelDetailsDecodeErrorZ {
 	let res: Result<lightning::ln::channelmanager::ChannelDetails, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::ChannelDetails { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::ChannelDetails { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -2528,7 +2555,7 @@ pub(crate) extern "C" fn PhantomRouteHints_write_void(obj: *const c_void) -> cra
 /// Read a PhantomRouteHints from a byte array, created by PhantomRouteHints_write
 pub extern "C" fn PhantomRouteHints_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_PhantomRouteHintsDecodeErrorZ {
 	let res: Result<lightning::ln::channelmanager::PhantomRouteHints, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::PhantomRouteHints { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::channelmanager::PhantomRouteHints { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -2728,6 +2755,6 @@ pub extern "C" fn ChannelManagerReadArgs_new(mut keys_manager: crate::lightning:
 pub extern "C" fn C2Tuple_BlockHashChannelManagerZ_read(ser: crate::c_types::u8slice, arg: crate::lightning::ln::channelmanager::ChannelManagerReadArgs) -> crate::c_types::derived::CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ {
 	let arg_conv = *unsafe { Box::from_raw(arg.take_inner()) };
 	let res: Result<(bitcoin::hash_types::BlockHash, lightning::ln::channelmanager::ChannelManager<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>), lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_res_0_0, mut orig_res_0_1) = o; let mut local_res_0 = (crate::c_types::ThirtyTwoBytes { data: orig_res_0_0.into_inner() }, crate::lightning::ln::channelmanager::ChannelManager { inner: ObjOps::heap_alloc(orig_res_0_1), is_owned: true }).into(); local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_res_0_0, mut orig_res_0_1) = o; let mut local_res_0 = (crate::c_types::ThirtyTwoBytes { data: orig_res_0_0.into_inner() }, crate::lightning::ln::channelmanager::ChannelManager { inner: ObjOps::heap_alloc(orig_res_0_1), is_owned: true }).into(); local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }

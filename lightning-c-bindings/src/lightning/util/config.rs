@@ -909,6 +909,12 @@ pub extern "C" fn ChannelConfig_set_cltv_expiry_delta(this_ptr: &mut ChannelConf
 /// to such payments may be sustantial if there are many dust HTLCs present when the
 /// channel is force-closed.
 ///
+/// The dust threshold for each HTLC is based on the `dust_limit_satoshis` for each party in a
+/// channel negotiated throughout the channel open process, along with the fees required to have
+/// a broadcastable HTLC spending transaction. When a channel supports anchor outputs
+/// (specifically the zero fee HTLC transaction variant), this threshold no longer takes into
+/// account the HTLC transaction fee as it is zero.
+///
 /// This limit is applied for sent, forwarded, and received HTLCs and limits the total
 /// exposure across all three types per-channel. Setting this too low may prevent the
 /// sending or receipt of low-value HTLCs on high-traffic nodes, and this limit is very
@@ -928,6 +934,12 @@ pub extern "C" fn ChannelConfig_get_max_dust_htlc_exposure_msat(this_ptr: &Chann
 /// party force-closes the channel. Because the threshold is per-HTLC, our total exposure
 /// to such payments may be sustantial if there are many dust HTLCs present when the
 /// channel is force-closed.
+///
+/// The dust threshold for each HTLC is based on the `dust_limit_satoshis` for each party in a
+/// channel negotiated throughout the channel open process, along with the fees required to have
+/// a broadcastable HTLC spending transaction. When a channel supports anchor outputs
+/// (specifically the zero fee HTLC transaction variant), this threshold no longer takes into
+/// account the HTLC transaction fee as it is zero.
 ///
 /// This limit is applied for sent, forwarded, and received HTLCs and limits the total
 /// exposure across all three types per-channel. Setting this too low may prevent the
@@ -1023,6 +1035,15 @@ pub(crate) extern "C" fn ChannelConfig_clone_void(this_ptr: *const c_void) -> *m
 pub extern "C" fn ChannelConfig_clone(orig: &ChannelConfig) -> ChannelConfig {
 	orig.clone()
 }
+/// Checks if two ChannelConfigs contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ChannelConfig_eq(a: &ChannelConfig, b: &ChannelConfig) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 /// Creates a "default" ChannelConfig. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
@@ -1042,7 +1063,7 @@ pub(crate) extern "C" fn ChannelConfig_write_void(obj: *const c_void) -> crate::
 /// Read a ChannelConfig from a byte array, created by ChannelConfig_write
 pub extern "C" fn ChannelConfig_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelConfigDecodeErrorZ {
 	let res: Result<lightning::util::config::ChannelConfig, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::util::config::ChannelConfig { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::util::config::ChannelConfig { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 

@@ -126,7 +126,7 @@ pub(crate) extern "C" fn NodeId_write_void(obj: *const c_void) -> crate::c_types
 /// Read a NodeId from a byte array, created by NodeId_write
 pub extern "C" fn NodeId_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeIdDecodeErrorZ {
 	let res: Result<lightning::routing::gossip::NodeId, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeId { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeId { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -255,7 +255,7 @@ pub enum NetworkUpdate {
 		is_permanent: bool,
 	},
 	/// An error indicating that a node failed to route a payment, which should be applied via
-	/// [`NetworkGraph::node_failed`].
+	/// [`NetworkGraph::node_failed_permanent`] if permanent.
 	NodeFailure {
 		/// The node id of the failed node.
 		node_id: crate::c_types::PublicKey,
@@ -398,6 +398,12 @@ pub extern "C" fn NetworkUpdate_node_failure(node_id: crate::c_types::PublicKey,
 		is_permanent,
 	}
 }
+/// Checks if two NetworkUpdates contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn NetworkUpdate_eq(a: &NetworkUpdate, b: &NetworkUpdate) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the NetworkUpdate object into a byte array which can be read by NetworkUpdate_read
 pub extern "C" fn NetworkUpdate_write(obj: &crate::lightning::routing::gossip::NetworkUpdate) -> crate::c_types::derived::CVec_u8Z {
@@ -407,7 +413,7 @@ pub extern "C" fn NetworkUpdate_write(obj: &crate::lightning::routing::gossip::N
 /// Read a NetworkUpdate from a byte array, created by NetworkUpdate_write
 pub extern "C" fn NetworkUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_NetworkUpdateZDecodeErrorZ {
 	let res: Result<Option<lightning::routing::gossip::NetworkUpdate>, lightning::ln::msgs::DecodeError> = crate::c_types::maybe_deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_NetworkUpdateZ::None } else { crate::c_types::derived::COption_NetworkUpdateZ::Some( { crate::lightning::routing::gossip::NetworkUpdate::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_NetworkUpdateZ::None } else { crate::c_types::derived::COption_NetworkUpdateZ::Some( { crate::lightning::routing::gossip::NetworkUpdate::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -583,8 +589,11 @@ extern "C" fn P2PGossipSync_RoutingMessageHandler_get_next_node_announcement(thi
 	let mut local_ret = crate::lightning::ln::msgs::NodeAnnouncement { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
 	local_ret
 }
-extern "C" fn P2PGossipSync_RoutingMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init) {
-	<nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, &their_node_id.into_rust(), init.get_native_ref())
+#[must_use]
+extern "C" fn P2PGossipSync_RoutingMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, &their_node_id.into_rust(), init.get_native_ref());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
 }
 #[must_use]
 extern "C" fn P2PGossipSync_RoutingMessageHandler_handle_reply_channel_range(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, mut msg: crate::lightning::ln::msgs::ReplyChannelRange) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
@@ -825,6 +834,15 @@ pub(crate) extern "C" fn ChannelUpdateInfo_clone_void(this_ptr: *const c_void) -
 pub extern "C" fn ChannelUpdateInfo_clone(orig: &ChannelUpdateInfo) -> ChannelUpdateInfo {
 	orig.clone()
 }
+/// Checks if two ChannelUpdateInfos contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ChannelUpdateInfo_eq(a: &ChannelUpdateInfo, b: &ChannelUpdateInfo) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the ChannelUpdateInfo object into a byte array which can be read by ChannelUpdateInfo_read
 pub extern "C" fn ChannelUpdateInfo_write(obj: &crate::lightning::routing::gossip::ChannelUpdateInfo) -> crate::c_types::derived::CVec_u8Z {
@@ -838,7 +856,7 @@ pub(crate) extern "C" fn ChannelUpdateInfo_write_void(obj: *const c_void) -> cra
 /// Read a ChannelUpdateInfo from a byte array, created by ChannelUpdateInfo_write
 pub extern "C" fn ChannelUpdateInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelUpdateInfoDecodeErrorZ {
 	let res: Result<lightning::routing::gossip::ChannelUpdateInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::ChannelUpdateInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::ChannelUpdateInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -1015,6 +1033,15 @@ pub(crate) extern "C" fn ChannelInfo_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn ChannelInfo_clone(orig: &ChannelInfo) -> ChannelInfo {
 	orig.clone()
 }
+/// Checks if two ChannelInfos contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ChannelInfo_eq(a: &ChannelInfo, b: &ChannelInfo) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 /// Returns a [`ChannelUpdateInfo`] based on the direction implied by the channel_flag.
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
@@ -1039,7 +1066,7 @@ pub(crate) extern "C" fn ChannelInfo_write_void(obj: *const c_void) -> crate::c_
 /// Read a ChannelInfo from a byte array, created by ChannelInfo_write
 pub extern "C" fn ChannelInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelInfoDecodeErrorZ {
 	let res: Result<lightning::routing::gossip::ChannelInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::ChannelInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::ChannelInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -1481,7 +1508,7 @@ pub(crate) extern "C" fn RoutingFees_write_void(obj: *const c_void) -> crate::c_
 /// Read a RoutingFees from a byte array, created by RoutingFees_write
 pub extern "C" fn RoutingFees_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RoutingFeesDecodeErrorZ {
 	let res: Result<lightning::routing::gossip::RoutingFees, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::RoutingFees { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::RoutingFees { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -1657,6 +1684,15 @@ pub(crate) extern "C" fn NodeAnnouncementInfo_clone_void(this_ptr: *const c_void
 pub extern "C" fn NodeAnnouncementInfo_clone(orig: &NodeAnnouncementInfo) -> NodeAnnouncementInfo {
 	orig.clone()
 }
+/// Checks if two NodeAnnouncementInfos contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn NodeAnnouncementInfo_eq(a: &NodeAnnouncementInfo, b: &NodeAnnouncementInfo) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the NodeAnnouncementInfo object into a byte array which can be read by NodeAnnouncementInfo_read
 pub extern "C" fn NodeAnnouncementInfo_write(obj: &crate::lightning::routing::gossip::NodeAnnouncementInfo) -> crate::c_types::derived::CVec_u8Z {
@@ -1670,7 +1706,7 @@ pub(crate) extern "C" fn NodeAnnouncementInfo_write_void(obj: *const c_void) -> 
 /// Read a NodeAnnouncementInfo from a byte array, created by NodeAnnouncementInfo_write
 pub extern "C" fn NodeAnnouncementInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeAnnouncementInfoDecodeErrorZ {
 	let res: Result<lightning::routing::gossip::NodeAnnouncementInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeAnnouncementInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeAnnouncementInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -1763,6 +1799,15 @@ pub(crate) extern "C" fn NodeAlias_clone_void(this_ptr: *const c_void) -> *mut c
 pub extern "C" fn NodeAlias_clone(orig: &NodeAlias) -> NodeAlias {
 	orig.clone()
 }
+/// Checks if two NodeAliass contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn NodeAlias_eq(a: &NodeAlias, b: &NodeAlias) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the NodeAlias object into a byte array which can be read by NodeAlias_read
 pub extern "C" fn NodeAlias_write(obj: &crate::lightning::routing::gossip::NodeAlias) -> crate::c_types::derived::CVec_u8Z {
@@ -1776,7 +1821,7 @@ pub(crate) extern "C" fn NodeAlias_write_void(obj: *const c_void) -> crate::c_ty
 /// Read a NodeAlias from a byte array, created by NodeAlias_write
 pub extern "C" fn NodeAlias_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeAliasDecodeErrorZ {
 	let res: Result<lightning::routing::gossip::NodeAlias, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeAlias { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeAlias { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -1919,6 +1964,15 @@ pub(crate) extern "C" fn NodeInfo_clone_void(this_ptr: *const c_void) -> *mut c_
 pub extern "C" fn NodeInfo_clone(orig: &NodeInfo) -> NodeInfo {
 	orig.clone()
 }
+/// Checks if two NodeInfos contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn NodeInfo_eq(a: &NodeInfo, b: &NodeInfo) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the NodeInfo object into a byte array which can be read by NodeInfo_read
 pub extern "C" fn NodeInfo_write(obj: &crate::lightning::routing::gossip::NodeInfo) -> crate::c_types::derived::CVec_u8Z {
@@ -1932,7 +1986,7 @@ pub(crate) extern "C" fn NodeInfo_write_void(obj: *const c_void) -> crate::c_typ
 /// Read a NodeInfo from a byte array, created by NodeInfo_write
 pub extern "C" fn NodeInfo_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeInfoDecodeErrorZ {
 	let res: Result<lightning::routing::gossip::NodeInfo, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NodeInfo { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -1949,7 +2003,7 @@ pub(crate) extern "C" fn NetworkGraph_write_void(obj: *const c_void) -> crate::c
 pub extern "C" fn NetworkGraph_read(ser: crate::c_types::u8slice, arg: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CResult_NetworkGraphDecodeErrorZ {
 	let arg_conv = arg;
 	let res: Result<lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NetworkGraph { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::gossip::NetworkGraph { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Creates a new, empty, network graph.
@@ -2066,10 +2120,11 @@ pub extern "C" fn NetworkGraph_channel_failed(this_arg: &crate::lightning::routi
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel_failed(short_channel_id, is_permanent)
 }
 
-/// Marks a node in the graph as failed.
+/// Marks a node in the graph as permanently failed, effectively removing it and its channels
+/// from local storage.
 #[no_mangle]
-pub extern "C" fn NetworkGraph_node_failed(this_arg: &crate::lightning::routing::gossip::NetworkGraph, mut _node_id: crate::c_types::PublicKey, mut is_permanent: bool) {
-	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.node_failed(&_node_id.into_rust(), is_permanent)
+pub extern "C" fn NetworkGraph_node_failed_permanent(this_arg: &crate::lightning::routing::gossip::NetworkGraph, mut node_id: crate::c_types::PublicKey) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.node_failed_permanent(&node_id.into_rust())
 }
 
 /// Removes information about channels that we haven't heard any updates about in some time.
@@ -2083,11 +2138,14 @@ pub extern "C" fn NetworkGraph_node_failed(this_arg: &crate::lightning::routing:
 /// Note that for users of the `lightning-background-processor` crate this method may be
 /// automatically called regularly for you.
 ///
+/// This method will also cause us to stop tracking removed nodes and channels if they have been
+/// in the map for a while so that these can be resynced from gossip in the future.
+///
 /// This method is only available with the `std` feature. See
-/// [`NetworkGraph::remove_stale_channels_with_time`] for `no-std` use.
+/// [`NetworkGraph::remove_stale_channels_and_tracking_with_time`] for `no-std` use.
 #[no_mangle]
-pub extern "C" fn NetworkGraph_remove_stale_channels(this_arg: &crate::lightning::routing::gossip::NetworkGraph) {
-	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.remove_stale_channels()
+pub extern "C" fn NetworkGraph_remove_stale_channels_and_tracking(this_arg: &crate::lightning::routing::gossip::NetworkGraph) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.remove_stale_channels_and_tracking()
 }
 
 /// Removes information about channels that we haven't heard any updates about in some time.
@@ -2098,11 +2156,14 @@ pub extern "C" fn NetworkGraph_remove_stale_channels(this_arg: &crate::lightning
 /// updates every two weeks, the non-normative section of BOLT 7 currently suggests that
 /// pruning occur for updates which are at least two weeks old, which we implement here.
 ///
+/// This method will also cause us to stop tracking removed nodes and channels if they have been
+/// in the map for a while so that these can be resynced from gossip in the future.
+///
 /// This function takes the current unix time as an argument. For users with the `std` feature
-/// enabled, [`NetworkGraph::remove_stale_channels`] may be preferable.
+/// enabled, [`NetworkGraph::remove_stale_channels_and_tracking`] may be preferable.
 #[no_mangle]
-pub extern "C" fn NetworkGraph_remove_stale_channels_with_time(this_arg: &crate::lightning::routing::gossip::NetworkGraph, mut current_time_unix: u64) {
-	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.remove_stale_channels_with_time(current_time_unix)
+pub extern "C" fn NetworkGraph_remove_stale_channels_and_tracking_with_time(this_arg: &crate::lightning::routing::gossip::NetworkGraph, mut current_time_unix: u64) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.remove_stale_channels_and_tracking_with_time(current_time_unix)
 }
 
 /// For an already known (from announcement) channel, update info about one of the directions

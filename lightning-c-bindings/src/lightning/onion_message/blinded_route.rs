@@ -146,7 +146,7 @@ pub(crate) extern "C" fn BlindedRoute_write_void(obj: *const c_void) -> crate::c
 /// Read a BlindedRoute from a byte array, created by BlindedRoute_write
 pub extern "C" fn BlindedRoute_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_BlindedRouteDecodeErrorZ {
 	let res: Result<lightning::onion_message::blinded_route::BlindedRoute, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::onion_message::blinded_route::BlindedRoute { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::onion_message::blinded_route::BlindedRoute { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -162,6 +162,6 @@ pub(crate) extern "C" fn BlindedHop_write_void(obj: *const c_void) -> crate::c_t
 /// Read a BlindedHop from a byte array, created by BlindedHop_write
 pub extern "C" fn BlindedHop_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_BlindedHopDecodeErrorZ {
 	let res: Result<lightning::onion_message::blinded_route::BlindedHop, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::onion_message::blinded_route::BlindedHop { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::onion_message::blinded_route::BlindedHop { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }

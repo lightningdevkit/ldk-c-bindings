@@ -18,7 +18,7 @@
 //! It also generates relevant memory-management functions and free-standing functions with
 //! parameters mapped.
 
-use std::collections::{HashMap, hash_map};
+use std::collections::{HashMap, hash_map, HashSet};
 use std::env;
 use std::fs::File;
 use std::io::{Read, Write};
@@ -875,7 +875,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 /// Trait struct containing a pointer to the passed struct's inner field and the wrapper functions.
 ///
 /// A few non-crate Traits are hard-coded including Default.
-fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut TypeResolver) {
+fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRandomHash>, i: &syn::ItemImpl, types: &mut TypeResolver) {
 	match export_status(&i.attrs) {
 		ExportStatus::Export => {},
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
@@ -979,11 +979,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						// type-conversion logic without actually knowing the concrete native type.
 						if !resolved_path.starts_with(types.module_path) {
 							if !first_seg_is_stdlib(resolved_path.split("::").next().unwrap()) {
-								writeln!(w, "use crate::{}::native{} as native{};", resolved_path.rsplitn(2, "::").skip(1).next().unwrap(), ident, ident).unwrap();
-								writeln!(w, "use crate::{};", resolved_path).unwrap();
-								writeln!(w, "use crate::{}_free_void;", resolved_path).unwrap();
+								w_uses.insert(format!("use crate::{}::native{} as native{};", resolved_path.rsplitn(2, "::").skip(1).next().unwrap(), ident, ident));
+								w_uses.insert(format!("use crate::{};", resolved_path));
+								w_uses.insert(format!("use crate::{}_free_void;", resolved_path));
 							} else {
-								writeln!(w, "use {} as native{};", resolved_path, ident).unwrap();
+								w_uses.insert(format!("use {} as native{};", resolved_path, ident));
 							}
 						}
 						writeln!(w, "impl From<native{}> for crate::{} {{", ident, full_trait_path).unwrap();
@@ -1407,7 +1407,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 					}
 				}
 			} else if let Some(resolved_path) = types.maybe_resolve_ident(&ident) {
-				create_alias_for_impl(resolved_path, i, types, move |aliased_impl, types| writeln_impl(w, &aliased_impl, types));
+				create_alias_for_impl(resolved_path, i, types, move |aliased_impl, types| writeln_impl(w, w_uses, &aliased_impl, types));
 			} else {
 				eprintln!("Not implementing anything for {} due to no-resolve (probably the type isn't pub)", ident);
 			}
@@ -1915,7 +1915,7 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 // *** File/Crate Walking Logic ***
 // ********************************
 
-fn convert_priv_mod<'a, 'b: 'a, W: std::io::Write>(w: &mut W, libast: &'b FullLibraryAST, crate_types: &CrateTypes<'b>, out_dir: &str, mod_path: &str, module: &'b syn::ItemMod) {
+fn convert_priv_mod<'a, 'b: 'a, W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRandomHash>, libast: &'b FullLibraryAST, crate_types: &CrateTypes<'b>, out_dir: &str, mod_path: &str, module: &'b syn::ItemMod) {
 	// We want to ignore all items declared in this module (as they are not pub), but we still need
 	// to give the ImportResolver any use statements, so we copy them here.
 	let mut use_items = Vec::new();
@@ -1930,9 +1930,9 @@ fn convert_priv_mod<'a, 'b: 'a, W: std::io::Write>(w: &mut W, libast: &'b FullLi
 	writeln!(w, "mod {} {{\n{}", module.ident, DEFAULT_IMPORTS).unwrap();
 	for item in module.content.as_ref().unwrap().1.iter() {
 		match item {
-			syn::Item::Mod(m) => convert_priv_mod(w, libast, crate_types, out_dir, &format!("{}::{}", mod_path, module.ident), m),
+			syn::Item::Mod(m) => convert_priv_mod(w, w_uses, libast, crate_types, out_dir, &format!("{}::{}", mod_path, module.ident), m),
 			syn::Item::Impl(i) => {
-				writeln_impl(w, i, &mut types);
+				writeln_impl(w, w_uses, i, &mut types);
 			},
 			_ => {},
 		}
@@ -1959,6 +1959,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 		let _ = std::fs::create_dir((&new_file_path.as_ref() as &std::path::Path).parent().unwrap());
 		let mut out = std::fs::OpenOptions::new().write(true).create(true).truncate(true)
 			.open(new_file_path).expect("Unable to open new src file");
+		let mut out_uses = HashSet::default();
 
 		writeln!(out, "// This file is Copyright its original authors, visible in version control").unwrap();
 		writeln!(out, "// history and in the source files from which this was generated.").unwrap();
@@ -2018,7 +2019,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 					}
 				},
 				syn::Item::Impl(i) => {
-					writeln_impl(&mut out, &i, &mut type_resolver);
+					writeln_impl(&mut out, &mut out_uses, &i, &mut type_resolver);
 				},
 				syn::Item::Struct(s) => {
 					if let syn::Visibility::Public(_) = s.vis {
@@ -2031,7 +2032,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 					}
 				},
 				syn::Item::Mod(m) => {
-					convert_priv_mod(&mut out, libast, crate_types, out_dir, &format!("{}::{}", module, m.ident), m);
+					convert_priv_mod(&mut out, &mut out_uses, libast, crate_types, out_dir, &format!("{}::{}", module, m.ident), m);
 				},
 				syn::Item::Const(c) => {
 					// Re-export any primitive-type constants.
@@ -2099,6 +2100,10 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 				syn::Item::ExternCrate(_) => {},
 				_ => unimplemented!(),
 			}
+		}
+
+		for use_stmt in out_uses {
+			writeln!(out, "{}", use_stmt).unwrap();
 		}
 
 		out.flush().unwrap();

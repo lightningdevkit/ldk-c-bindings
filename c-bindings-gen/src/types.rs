@@ -205,10 +205,10 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 	}
 
 	/// Learn the generics in generics in the current context, given a TypeResolver.
-	pub fn learn_generics<'b, 'c>(&mut self, generics: &'a syn::Generics, types: &'b TypeResolver<'a, 'c>) -> bool {
+	pub fn learn_generics_with_impls<'b, 'c>(&mut self, generics: &'a syn::Generics, impld_generics: &'a syn::PathArguments, types: &'b TypeResolver<'a, 'c>) -> bool {
 		let mut new_typed_generics = HashMap::new();
 		// First learn simple generics...
-		for generic in generics.params.iter() {
+		for (idx, generic) in generics.params.iter().enumerate() {
 			match generic {
 				syn::GenericParam::Type(type_param) => {
 					let mut non_lifetimes_processed = false;
@@ -260,6 +260,15 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 					if let Some(default) = type_param.default.as_ref() {
 						assert!(type_param.bounds.is_empty());
 						self.default_generics.insert(&type_param.ident, (default.clone(), parse_quote!(&#default), parse_quote!(&mut #default)));
+					} else if type_param.bounds.is_empty() {
+						if let syn::PathArguments::AngleBracketed(args) = impld_generics {
+							match &args.args[idx] {
+								syn::GenericArgument::Type(ty) => {
+									self.default_generics.insert(&type_param.ident, (ty.clone(), parse_quote!(&#ty), parse_quote!(&mut #ty)));
+								}
+								_ => unimplemented!(),
+							}
+						}
 					}
 				},
 				_ => {},
@@ -270,6 +279,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 			for pred in wh.predicates.iter() {
 				if let syn::WherePredicate::Type(t) = pred {
 					if let syn::Type::Path(p) = &t.bounded_ty {
+						if first_seg_self(&t.bounded_ty).is_some() && p.path.segments.len() == 1 { continue; }
 						if p.qself.is_some() { return false; }
 						if p.path.leading_colon.is_some() { return false; }
 						let mut p_iter = p.path.segments.iter();
@@ -313,6 +323,11 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 			} else { return false; }
 		}
 		true
+	}
+
+	/// Learn the generics in generics in the current context, given a TypeResolver.
+	pub fn learn_generics<'b, 'c>(&mut self, generics: &'a syn::Generics, types: &'b TypeResolver<'a, 'c>) -> bool {
+		self.learn_generics_with_impls(generics, &syn::PathArguments::None, types)
 	}
 
 	/// Learn the associated types from the trait in the current context.

@@ -747,7 +747,7 @@ pub fn write_method_call_params<W: std::io::Write>(w: &mut W, sig: &syn::Signatu
 
 /// Prints concrete generic parameters for a struct/trait/function, including the less-than and
 /// greater-than symbols, if any generic parameters are defined.
-pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generics, types: &TypeResolver, concrete_lifetimes: bool) {
+pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generics, generics_impld: &syn::PathArguments, types: &TypeResolver, concrete_lifetimes: bool) {
 	let mut gen_types = GenericTypes::new(None);
 	assert!(gen_types.learn_generics(generics, types));
 	if generics.params.is_empty() { return; }
@@ -778,7 +778,15 @@ pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generi
 			syn::GenericParam::Type(type_param) => {
 				write!(w, "{}", if idx != 0 { ", " } else { "" }).unwrap();
 				let type_ident = &type_param.ident;
-				types.write_c_type_in_generic_param(w, &syn::parse_quote!(#type_ident), Some(&gen_types), false);
+				if types.understood_c_type(&syn::parse_quote!(#type_ident), Some(&gen_types)) {
+					types.write_c_type_in_generic_param(w, &syn::parse_quote!(#type_ident), Some(&gen_types), false);
+				} else {
+					if let syn::PathArguments::AngleBracketed(args) = generics_impld {
+						if let syn::GenericArgument::Type(ty) = &args.args[idx] {
+							types.write_c_type_in_generic_param(w, &ty, Some(&gen_types), false);
+						}
+					}
+				}
 			},
 			syn::GenericParam::Lifetime(lt) => {
 				if concrete_lifetimes {

@@ -34,7 +34,7 @@
 //!
 //! After the gossip data snapshot has been downloaded, one of the client's graph processing
 //! functions needs to be called. In this example, we process the update by reading its contents
-//! from disk, which we do by calling [sync_network_graph_with_file_path]:
+//! from disk, which we do by calling [`RapidGossipSync::update_network_graph`]:
 //!
 //! ```
 //! use bitcoin::blockdata::constants::genesis_block;
@@ -52,9 +52,9 @@
 //! let block_hash = genesis_block(Network::Bitcoin).header.block_hash();
 //! let network_graph = NetworkGraph::new(block_hash, &logger);
 //! let rapid_sync = RapidGossipSync::new(&network_graph);
-//! let new_last_sync_timestamp_result = rapid_sync.sync_network_graph_with_file_path(\"./rapid_sync.lngossip\");
+//! let snapshot_contents: &[u8] = &[0; 0];
+//! let new_last_sync_timestamp_result = rapid_sync.update_network_graph(snapshot_contents);
 //! ```
-//! [sync_network_graph_with_file_path]: RapidGossipSync::sync_network_graph_with_file_path
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -65,7 +65,17 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 pub mod error;
-pub mod processing;
+mod processing {
+
+use alloc::str::FromStr;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
 
 use lightning_rapid_gossip_sync::RapidGossipSync as nativeRapidGossipSyncImport;
 pub(crate) type nativeRapidGossipSync = nativeRapidGossipSyncImport<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::util::logger::Logger>;

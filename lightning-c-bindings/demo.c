@@ -25,11 +25,11 @@ void broadcast_tx(const void *this_arg, LDKTransaction tx) {
 	Transaction_free(tx);
 }
 
-LDKCResult_NoneChannelMonitorUpdateErrZ add_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, LDKChannelMonitor monitor) {
-	return CResult_NoneChannelMonitorUpdateErrZ_ok();
+LDKChannelMonitorUpdateStatus add_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, LDKChannelMonitor monitor) {
+	return ChannelMonitorUpdateStatus_completed();
 }
-LDKCResult_NoneChannelMonitorUpdateErrZ update_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, LDKChannelMonitorUpdate monitor) {
-	return CResult_NoneChannelMonitorUpdateErrZ_ok();
+LDKChannelMonitorUpdateStatus update_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, LDKChannelMonitorUpdate monitor) {
+	return ChannelMonitorUpdateStatus_completed();
 }
 LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ monitors_pending_monitor_events(const void *this_arg) {
 	LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ empty_htlc_vec = {

@@ -40,7 +40,7 @@ impl GraphSyncError {
 			GraphSyncError::DecodeError (ref a, ) => {
 				let mut a_nonref = (*a).clone();
 				nativeGraphSyncError::DecodeError (
-					*unsafe { Box::from_raw(a_nonref.take_inner()) },
+					a_nonref.into_native(),
 				)
 			},
 			GraphSyncError::LightningError (ref a, ) => {
@@ -56,7 +56,7 @@ impl GraphSyncError {
 		match self {
 			GraphSyncError::DecodeError (mut a, ) => {
 				nativeGraphSyncError::DecodeError (
-					*unsafe { Box::from_raw(a.take_inner()) },
+					a.into_native(),
 				)
 			},
 			GraphSyncError::LightningError (mut a, ) => {
@@ -72,7 +72,7 @@ impl GraphSyncError {
 			nativeGraphSyncError::DecodeError (ref a, ) => {
 				let mut a_nonref = (*a).clone();
 				GraphSyncError::DecodeError (
-					crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
+					crate::lightning::ln::msgs::DecodeError::native_into(a_nonref),
 				)
 			},
 			nativeGraphSyncError::LightningError (ref a, ) => {
@@ -88,7 +88,7 @@ impl GraphSyncError {
 		match native {
 			nativeGraphSyncError::DecodeError (mut a, ) => {
 				GraphSyncError::DecodeError (
-					crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(a), is_owned: true },
+					crate::lightning::ln::msgs::DecodeError::native_into(a),
 				)
 			},
 			nativeGraphSyncError::LightningError (mut a, ) => {

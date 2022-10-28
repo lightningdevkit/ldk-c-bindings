@@ -50,9 +50,15 @@ pub enum APIError {
 		/// A human-readable error message
 		err: crate::c_types::Str,
 	},
-	/// An attempt to call watch/update_channel returned an Err (ie you did this!), causing the
-	/// attempted action to fail.
-	MonitorUpdateFailed,
+	/// An attempt to call [`chain::Watch::watch_channel`]/[`chain::Watch::update_channel`]
+	/// returned a [`ChannelMonitorUpdateStatus::InProgress`] indicating the persistence of a
+	/// monitor update is awaiting async resolution. Once it resolves the attempted action should
+	/// complete automatically.
+	///
+	/// [`chain::Watch::watch_channel`]: crate::chain::Watch::watch_channel
+	/// [`chain::Watch::update_channel`]: crate::chain::Watch::update_channel
+	/// [`ChannelMonitorUpdateStatus::InProgress`]: crate::chain::ChannelMonitorUpdateStatus::InProgress
+	MonitorUpdateInProgress,
 	/// [`KeysInterface::get_shutdown_scriptpubkey`] returned a shutdown scriptpubkey incompatible
 	/// with the channel counterparty as negotiated in [`InitFeatures`].
 	///
@@ -99,7 +105,7 @@ impl APIError {
 					err: err_nonref.into_string(),
 				}
 			},
-			APIError::MonitorUpdateFailed => nativeAPIError::MonitorUpdateFailed,
+			APIError::MonitorUpdateInProgress => nativeAPIError::MonitorUpdateInProgress,
 			APIError::IncompatibleShutdownScript {ref script, } => {
 				let mut script_nonref = (*script).clone();
 				nativeAPIError::IncompatibleShutdownScript {
@@ -132,7 +138,7 @@ impl APIError {
 					err: err.into_string(),
 				}
 			},
-			APIError::MonitorUpdateFailed => nativeAPIError::MonitorUpdateFailed,
+			APIError::MonitorUpdateInProgress => nativeAPIError::MonitorUpdateInProgress,
 			APIError::IncompatibleShutdownScript {mut script, } => {
 				nativeAPIError::IncompatibleShutdownScript {
 					script: *unsafe { Box::from_raw(script.take_inner()) },
@@ -169,7 +175,7 @@ impl APIError {
 					err: err_nonref.into(),
 				}
 			},
-			nativeAPIError::MonitorUpdateFailed => APIError::MonitorUpdateFailed,
+			nativeAPIError::MonitorUpdateInProgress => APIError::MonitorUpdateInProgress,
 			nativeAPIError::IncompatibleShutdownScript {ref script, } => {
 				let mut script_nonref = (*script).clone();
 				APIError::IncompatibleShutdownScript {
@@ -202,7 +208,7 @@ impl APIError {
 					err: err.into(),
 				}
 			},
-			nativeAPIError::MonitorUpdateFailed => APIError::MonitorUpdateFailed,
+			nativeAPIError::MonitorUpdateInProgress => APIError::MonitorUpdateInProgress,
 			nativeAPIError::IncompatibleShutdownScript {mut script, } => {
 				APIError::IncompatibleShutdownScript {
 					script: crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(script), is_owned: true },
@@ -249,13 +255,19 @@ pub extern "C" fn APIError_channel_unavailable(err: crate::c_types::Str) -> APIE
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new MonitorUpdateFailed-variant APIError
-pub extern "C" fn APIError_monitor_update_failed() -> APIError {
-	APIError::MonitorUpdateFailed}
+/// Utility method to constructs a new MonitorUpdateInProgress-variant APIError
+pub extern "C" fn APIError_monitor_update_in_progress() -> APIError {
+	APIError::MonitorUpdateInProgress}
 #[no_mangle]
 /// Utility method to constructs a new IncompatibleShutdownScript-variant APIError
 pub extern "C" fn APIError_incompatible_shutdown_script(script: crate::lightning::ln::script::ShutdownScript) -> APIError {
 	APIError::IncompatibleShutdownScript {
 		script,
 	}
+}
+/// Checks if two APIErrors contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn APIError_eq(a: &APIError, b: &APIError) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
 }

@@ -18,7 +18,7 @@
 //! It also generates relevant memory-management functions and free-standing functions with
 //! parameters mapped.
 
-use std::collections::{HashMap, hash_map};
+use std::collections::{HashMap, hash_map, HashSet};
 use std::env;
 use std::fs::File;
 use std::io::{Read, Write};
@@ -244,14 +244,15 @@ macro_rules! walk_supertraits { ($t: expr, $types: expr, ($( $($pat: pat)|* => $
 					let types_opt: Option<&TypeResolver> = $types;
 					if let Some(types) = types_opt {
 						if let Some(path) = types.maybe_resolve_path(&supertrait.path, None) {
-							match (&path as &str, &supertrait.path.segments.iter().last().unwrap().ident) {
+							let last_seg = supertrait.path.segments.iter().last().unwrap();
+							match (&path as &str, &last_seg.ident, &last_seg.arguments) {
 								$( $($pat)|* => $e, )*
 							}
 							continue;
 						}
 					}
 					if let Some(ident) = supertrait.path.get_ident() {
-						match (&format!("{}", ident) as &str, &ident) {
+						match (&format!("{}", ident) as &str, &ident, &syn::PathArguments::None) {
 							$( $($pat)|* => $e, )*
 						}
 					} else if types_opt.is_some() {
@@ -292,14 +293,14 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	}
 	writeln_docs(w, &t.attrs, "");
 
-	let mut gen_types = GenericTypes::new(None);
+	let mut gen_types = GenericTypes::new(Some(format!("{}::{}", types.module_path, trait_name)));
 
 	// Add functions which may be required for supertrait implementations.
 	// Due to borrow checker limitations, we only support one in-crate supertrait here.
 	let supertrait_name;
 	let supertrait_resolver;
 	walk_supertraits!(t, Some(&types), (
-		(s, _i) => {
+		(s, _i, _) => {
 			if let Some(supertrait) = types.crate_types.traits.get(s) {
 				supertrait_name = s.to_string();
 				supertrait_resolver = get_module_type_resolver!(supertrait_name, types.crate_libs, types.crate_types);
@@ -385,20 +386,20 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	}
 	// Add functions which may be required for supertrait implementations.
 	walk_supertraits!(t, Some(&types), (
-		("Clone", _) => {
+		("Clone", _, _) => {
 			writeln!(w, "\t/// Called, if set, after this {} has been cloned into a duplicate object.", trait_name).unwrap();
 			writeln!(w, "\t/// The new {} is provided, and should be mutated as needed to perform a", trait_name).unwrap();
 			writeln!(w, "\t/// deep copy of the object pointed to by this_arg or avoid any double-freeing.").unwrap();
 			writeln!(w, "\tpub cloned: Option<extern \"C\" fn (new_{}: &mut {})>,", trait_name, trait_name).unwrap();
 			generated_fields.push(("cloned".to_owned(), None, None));
 		},
-		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
+		("std::cmp::Eq", _, _)|("core::cmp::Eq", _, _) => {
 			let eq_docs = "Checks if two objects are equal given this object's this_arg pointer and another object.";
 			writeln!(w, "\t/// {}", eq_docs).unwrap();
 			writeln!(w, "\tpub eq: extern \"C\" fn (this_arg: *const c_void, other_arg: &{}) -> bool,", trait_name).unwrap();
 			generated_fields.push(("eq".to_owned(), None, Some(format!("\t/** {} */\n", eq_docs))));
 		},
-		("std::hash::Hash", _)|("core::hash::Hash", _) => {
+		("std::hash::Hash", _, _)|("core::hash::Hash", _, _) => {
 			let hash_docs_a = "Calculate a succinct non-cryptographic hash for an object given its this_arg pointer.";
 			let hash_docs_b = "This is used, for example, for inclusion of this object in a hash map.";
 			writeln!(w, "\t/// {}", hash_docs_a).unwrap();
@@ -407,15 +408,15 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 			generated_fields.push(("hash".to_owned(), None,
 				Some(format!("\t/**\n\t * {}\n\t * {}\n\t */\n", hash_docs_a, hash_docs_b))));
 		},
-		("Send", _) => {}, ("Sync", _) => {},
-		("std::fmt::Debug", _)|("core::fmt::Debug", _) => {
+		("Send", _, _) => {}, ("Sync", _, _) => {},
+		("std::fmt::Debug", _, _)|("core::fmt::Debug", _, _) => {
 			let debug_docs = "Return a human-readable \"debug\" string describing this object";
 			writeln!(w, "\t/// {}", debug_docs).unwrap();
 			writeln!(w, "\tpub debug_str: extern \"C\" fn (this_arg: *const c_void) -> crate::c_types::Str,").unwrap();
 			generated_fields.push(("debug_str".to_owned(), None,
 				Some(format!("\t/**\n\t * {}\n\t */\n", debug_docs))));
 		},
-		(s, i) => {
+		(s, i, _) => {
 			// TODO: Both of the below should expose supertrait methods in C++, but doing so is
 			// nontrivial.
 			generated_fields.push(if types.crate_types.traits.get(s).is_none() {
@@ -441,7 +442,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "}}").unwrap();
 
 	macro_rules! impl_trait_for_c {
-		($t: expr, $impl_accessor: expr, $type_resolver: expr) => {
+		($t: expr, $impl_accessor: expr, $type_resolver: expr, $generic_impls: expr) => {
+			let mut trait_gen_types = gen_types.push_ctx();
+			assert!(trait_gen_types.learn_generics_with_impls(&$t.generics, $generic_impls, $type_resolver));
 			for item in $t.items.iter() {
 				match item {
 					syn::TraitItem::Method(m) => {
@@ -450,7 +453,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 								m.sig.abi.is_some() || m.sig.variadic.is_some() {
 							panic!("1");
 						}
-						let mut meth_gen_types = gen_types.push_ctx();
+						let mut meth_gen_types = trait_gen_types.push_ctx();
 						assert!(meth_gen_types.learn_generics(&m.sig.generics, $type_resolver));
 						// Note that we do *not* use the method generics when printing "native"
 						// rust parts - if the method is generic, we need to print a generic
@@ -565,17 +568,17 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 
 	// Implement supertraits for the C-mapped struct.
 	walk_supertraits!(t, Some(&types), (
-		("std::cmp::Eq", _)|("core::cmp::Eq", _) => {
+		("std::cmp::Eq", _, _)|("core::cmp::Eq", _, _) => {
 			writeln!(w, "impl core::cmp::Eq for {} {{}}", trait_name).unwrap();
 			writeln!(w, "impl core::cmp::PartialEq for {} {{", trait_name).unwrap();
 			writeln!(w, "\tfn eq(&self, o: &Self) -> bool {{ (self.eq)(self.this_arg, o) }}\n}}").unwrap();
 		},
-		("std::hash::Hash", _)|("core::hash::Hash", _) => {
+		("std::hash::Hash", _, _)|("core::hash::Hash", _, _) => {
 			writeln!(w, "impl core::hash::Hash for {} {{", trait_name).unwrap();
 			writeln!(w, "\tfn hash<H: core::hash::Hasher>(&self, hasher: &mut H) {{ hasher.write_u64((self.hash)(self.this_arg)) }}\n}}").unwrap();
 		},
-		("Send", _) => {}, ("Sync", _) => {},
-		("Clone", _) => {
+		("Send", _, _) => {}, ("Sync", _, _) => {},
+		("Clone", _, _) => {
 			writeln!(w, "#[no_mangle]").unwrap();
 			writeln!(w, "/// Creates a copy of a {}", trait_name).unwrap();
 			writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", trait_name, trait_name, trait_name).unwrap();
@@ -587,14 +590,14 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 			writeln!(w, "\t\t{}_clone(self)", trait_name).unwrap();
 			writeln!(w, "\t}}\n}}").unwrap();
 		},
-		("std::fmt::Debug", _)|("core::fmt::Debug", _) => {
+		("std::fmt::Debug", _, _)|("core::fmt::Debug", _, _) => {
 			writeln!(w, "impl core::fmt::Debug for {} {{", trait_name).unwrap();
 			writeln!(w, "\tfn fmt(&self, f: &mut core::fmt::Formatter) -> Result<(), core::fmt::Error> {{").unwrap();
 			writeln!(w, "\t\tf.write_str((self.debug_str)(self.this_arg).into_str())").unwrap();
 			writeln!(w, "\t}}").unwrap();
 			writeln!(w, "}}").unwrap();
 		},
-		(s, i) => {
+		(s, i, generic_args) => {
 			if let Some(supertrait) = types.crate_types.traits.get(s) {
 				let resolver = get_module_type_resolver!(s, types.crate_libs, types.crate_types);
 
@@ -604,10 +607,10 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				write!(w, "impl").unwrap();
 				maybe_write_lifetime_generics(w, &supertrait.generics, types);
 				write!(w, " {}", s).unwrap();
-				maybe_write_generics(w, &supertrait.generics, types, false);
+				maybe_write_generics(w, &supertrait.generics, generic_args, types, false);
 				writeln!(w, " for {} {{", trait_name).unwrap();
 
-				impl_trait_for_c!(supertrait, format!(".{}", i), &resolver);
+				impl_trait_for_c!(supertrait, format!(".{}", i), &resolver, generic_args);
 				writeln!(w, "}}").unwrap();
 			} else {
 				do_write_impl_trait(w, s, i, &trait_name);
@@ -621,9 +624,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		write!(w, "impl").unwrap();
 		maybe_write_lifetime_generics(w, &t.generics, types);
 		write!(w, " rust{}", t.ident).unwrap();
-		maybe_write_generics(w, &t.generics, types, false);
+		maybe_write_generics(w, &t.generics, &syn::PathArguments::None, types, false);
 		writeln!(w, " for {} {{", trait_name).unwrap();
-		impl_trait_for_c!(t, "", types);
+		impl_trait_for_c!(t, "", types, &syn::PathArguments::None);
 		writeln!(w, "}}\n").unwrap();
 		writeln!(w, "// We're essentially a pointer already, or at least a set of pointers, so allow us to be used").unwrap();
 		writeln!(w, "// directly as a Deref trait in higher-level structs:").unwrap();
@@ -652,7 +655,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	// https://github.com/eqrion/cbindgen/issues/286 Thus, instead, we import it as a temporary
 	// name and then reference it by that name, which works around the issue.
 	write!(w, "\nuse {}::{} as native{}Import;\npub(crate) type native{} = native{}Import", types.module_path, ident, ident, ident, ident).unwrap();
-	maybe_write_generics(w, &generics, &types, true);
+	maybe_write_generics(w, &generics, &syn::PathArguments::None, &types, true);
 	writeln!(w, ";\n").unwrap();
 	writeln!(extra_headers, "struct native{}Opaque;\ntypedef struct native{}Opaque LDKnative{};", ident, ident, ident).unwrap();
 	writeln_docs(w, &attrs, "");
@@ -872,7 +875,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 /// Trait struct containing a pointer to the passed struct's inner field and the wrapper functions.
 ///
 /// A few non-crate Traits are hard-coded including Default.
-fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut TypeResolver) {
+fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRandomHash>, i: &syn::ItemImpl, types: &mut TypeResolver) {
 	match export_status(&i.attrs) {
 		ExportStatus::Export => {},
 		ExportStatus::NoExport|ExportStatus::TestOnly => return,
@@ -933,7 +936,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						let supertrait_name;
 						let supertrait_resolver;
 						walk_supertraits!(trait_obj, Some(&types), (
-							(s, _i) => {
+							(s, _i, _) => {
 								if let Some(supertrait) = types.crate_types.traits.get(s) {
 									supertrait_name = s.to_string();
 									supertrait_resolver = get_module_type_resolver!(supertrait_name, types.crate_libs, types.crate_types);
@@ -976,11 +979,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						// type-conversion logic without actually knowing the concrete native type.
 						if !resolved_path.starts_with(types.module_path) {
 							if !first_seg_is_stdlib(resolved_path.split("::").next().unwrap()) {
-								writeln!(w, "use crate::{}::native{} as native{};", resolved_path.rsplitn(2, "::").skip(1).next().unwrap(), ident, ident).unwrap();
-								writeln!(w, "use crate::{};", resolved_path).unwrap();
-								writeln!(w, "use crate::{}_free_void;", resolved_path).unwrap();
+								w_uses.insert(format!("use crate::{}::native{} as native{};", resolved_path.rsplitn(2, "::").skip(1).next().unwrap(), ident, ident));
+								w_uses.insert(format!("use crate::{};", resolved_path));
+								w_uses.insert(format!("use crate::{}_free_void;", resolved_path));
 							} else {
-								writeln!(w, "use {} as native{};", resolved_path, ident).unwrap();
+								w_uses.insert(format!("use {} as native{};", resolved_path, ident));
 							}
 						}
 						writeln!(w, "impl From<native{}> for crate::{} {{", ident, full_trait_path).unwrap();
@@ -1048,14 +1051,14 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 						}
 						let mut requires_clone = false;
 						walk_supertraits!(trait_obj, Some(&types), (
-							("Clone", _) => {
+							("Clone", _, _) => {
 								requires_clone = true;
 								writeln!(w, "\t\tcloned: Some({}_{}_cloned),", trait_obj.ident, ident).unwrap();
 							},
-							("Sync", _) => {}, ("Send", _) => {},
-							("std::marker::Sync", _) => {}, ("std::marker::Send", _) => {},
-							("core::fmt::Debug", _) => {},
-							(s, t) => {
+							("Sync", _, _) => {}, ("Send", _, _) => {},
+							("std::marker::Sync", _, _) => {}, ("std::marker::Send", _, _) => {},
+							("core::fmt::Debug", _, _) => {},
+							(s, t, _) => {
 								if let Some(supertrait_obj) = types.crate_types.traits.get(s) {
 									writeln!(w, "\t\t{}: crate::{} {{", t, s).unwrap();
 									writeln!(w, "\t\t\tthis_arg: unsafe {{ ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void }},").unwrap();
@@ -1199,7 +1202,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 							writeln!(w, "\tnew_obj.this_arg = {}_clone_void(new_obj.this_arg);", ident).unwrap();
 							writeln!(w, "\tnew_obj.free = Some({}_free_void);", ident).unwrap();
 							walk_supertraits!(trait_obj, Some(&types), (
-								(s, t) => {
+								(s, t, _) => {
 									if types.crate_types.traits.get(s).is_some() {
 										assert!(!types.is_clonable(s)); // We don't currently support cloning with a clonable supertrait
 										writeln!(w, "\tnew_obj.{}.this_arg = new_obj.this_arg;", t).unwrap();
@@ -1404,7 +1407,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, i: &syn::ItemImpl, types: &mut Typ
 					}
 				}
 			} else if let Some(resolved_path) = types.maybe_resolve_ident(&ident) {
-				create_alias_for_impl(resolved_path, i, types, move |aliased_impl, types| writeln_impl(w, &aliased_impl, types));
+				create_alias_for_impl(resolved_path, i, types, move |aliased_impl, types| writeln_impl(w, w_uses, &aliased_impl, types));
 			} else {
 				eprintln!("Not implementing anything for {} due to no-resolve (probably the type isn't pub)", ident);
 			}
@@ -1729,7 +1732,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	}
 	writeln!(w, "}}\nuse {}::{} as {}Import;", types.module_path, e.ident, e.ident).unwrap();
 	write!(w, "pub(crate) type native{} = {}Import", e.ident, e.ident).unwrap();
-	maybe_write_generics(w, &e.generics, &types, true);
+	maybe_write_generics(w, &e.generics, &syn::PathArguments::None, &types, true);
 	writeln!(w, ";\n\nimpl {} {{", e.ident).unwrap();
 
 	macro_rules! write_conv {
@@ -1898,7 +1901,7 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 	write!(w, "{}::{}", types.module_path, f.sig.ident).unwrap();
 
 	let mut function_generic_args = Vec::new();
-	maybe_write_generics(&mut function_generic_args, &f.sig.generics, types, true);
+	maybe_write_generics(&mut function_generic_args, &f.sig.generics, &syn::PathArguments::None, types, true);
 	if !function_generic_args.is_empty() {
 		write!(w, "::{}", String::from_utf8(function_generic_args).unwrap()).unwrap();
 	}
@@ -1912,7 +1915,7 @@ fn writeln_fn<'a, 'b, W: std::io::Write>(w: &mut W, f: &'a syn::ItemFn, types: &
 // *** File/Crate Walking Logic ***
 // ********************************
 
-fn convert_priv_mod<'a, 'b: 'a, W: std::io::Write>(w: &mut W, libast: &'b FullLibraryAST, crate_types: &CrateTypes<'b>, out_dir: &str, mod_path: &str, module: &'b syn::ItemMod) {
+fn convert_priv_mod<'a, 'b: 'a, W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRandomHash>, libast: &'b FullLibraryAST, crate_types: &CrateTypes<'b>, out_dir: &str, mod_path: &str, module: &'b syn::ItemMod) {
 	// We want to ignore all items declared in this module (as they are not pub), but we still need
 	// to give the ImportResolver any use statements, so we copy them here.
 	let mut use_items = Vec::new();
@@ -1927,9 +1930,9 @@ fn convert_priv_mod<'a, 'b: 'a, W: std::io::Write>(w: &mut W, libast: &'b FullLi
 	writeln!(w, "mod {} {{\n{}", module.ident, DEFAULT_IMPORTS).unwrap();
 	for item in module.content.as_ref().unwrap().1.iter() {
 		match item {
-			syn::Item::Mod(m) => convert_priv_mod(w, libast, crate_types, out_dir, &format!("{}::{}", mod_path, module.ident), m),
+			syn::Item::Mod(m) => convert_priv_mod(w, w_uses, libast, crate_types, out_dir, &format!("{}::{}", mod_path, module.ident), m),
 			syn::Item::Impl(i) => {
-				writeln_impl(w, i, &mut types);
+				writeln_impl(w, w_uses, i, &mut types);
 			},
 			_ => {},
 		}
@@ -1956,6 +1959,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 		let _ = std::fs::create_dir((&new_file_path.as_ref() as &std::path::Path).parent().unwrap());
 		let mut out = std::fs::OpenOptions::new().write(true).create(true).truncate(true)
 			.open(new_file_path).expect("Unable to open new src file");
+		let mut out_uses = HashSet::default();
 
 		writeln!(out, "// This file is Copyright its original authors, visible in version control").unwrap();
 		writeln!(out, "// history and in the source files from which this was generated.").unwrap();
@@ -2015,7 +2019,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 					}
 				},
 				syn::Item::Impl(i) => {
-					writeln_impl(&mut out, &i, &mut type_resolver);
+					writeln_impl(&mut out, &mut out_uses, &i, &mut type_resolver);
 				},
 				syn::Item::Struct(s) => {
 					if let syn::Visibility::Public(_) = s.vis {
@@ -2028,7 +2032,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 					}
 				},
 				syn::Item::Mod(m) => {
-					convert_priv_mod(&mut out, libast, crate_types, out_dir, &format!("{}::{}", module, m.ident), m);
+					convert_priv_mod(&mut out, &mut out_uses, libast, crate_types, out_dir, &format!("{}::{}", module, m.ident), m);
 				},
 				syn::Item::Const(c) => {
 					// Re-export any primitive-type constants.
@@ -2096,6 +2100,10 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 				syn::Item::ExternCrate(_) => {},
 				_ => unimplemented!(),
 			}
+		}
+
+		for use_stmt in out_uses {
+			writeln!(out, "{}", use_stmt).unwrap();
 		}
 
 		out.flush().unwrap();
@@ -2201,10 +2209,10 @@ fn walk_ast_first_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut Cr
 						}
 						let trait_path = format!("{}::{}", module, t.ident);
 						walk_supertraits!(t, None, (
-							("Clone", _) => {
+							("Clone", _, _) => {
 								crate_types.set_clonable("crate::".to_owned() + &trait_path);
 							},
-							(_, _) => {}
+							(_, _, _) => {}
 						) );
 						crate_types.traits.insert(trait_path, &t);
 					}

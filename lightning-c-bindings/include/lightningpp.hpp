@@ -44,7 +44,7 @@ class AccessError;
 class Access;
 class Listen;
 class Confirm;
-class ChannelMonitorUpdateErr;
+class ChannelMonitorUpdateStatus;
 class Watch;
 class Filter;
 class WatchedOutput;
@@ -62,6 +62,7 @@ class NodeFeatures;
 class ChannelFeatures;
 class InvoiceFeatures;
 class ChannelTypeFeatures;
+class CustomOnionMessageContents;
 class NodeId;
 class NetworkGraph;
 class ReadOnlyNetworkGraph;
@@ -146,6 +147,7 @@ class PeerManager;
 class OnionMessenger;
 class Destination;
 class SendError;
+class CustomOnionMessageHandler;
 class RapidGossipSync;
 class Persister;
 class DecodeError;
@@ -236,21 +238,21 @@ class CResult_CommitmentSignedDecodeErrorZ;
 class COption_u32Z;
 class CResult_InitFeaturesDecodeErrorZ;
 class CResult_StaticPaymentOutputDescriptorDecodeErrorZ;
+class CResult_PublicKeyNoneZ;
 class CResult_PaymentIdPaymentSendFailureZ;
-class CResult_OnionMessageDecodeErrorZ;
 class CResult_CommitmentTransactionDecodeErrorZ;
 class CResult_TransactionNoneZ;
 class CResult_ClosingSignedFeeRangeDecodeErrorZ;
+class CResult_OnionMessageDecodeErrorZ;
 class CResult_PingDecodeErrorZ;
 class CResult_UnsignedNodeAnnouncementDecodeErrorZ;
 class CResult_ReplyChannelRangeDecodeErrorZ;
 class CResult_GossipTimestampFilterDecodeErrorZ;
-class CResult_InvoiceSignOrCreationErrorZ;
 class CVec_TransactionOutputsZ;
 class CResult_ErrorMessageDecodeErrorZ;
 class CResult_OpenChannelDecodeErrorZ;
 class CVec_CVec_u8ZZ;
-class COption_FilterZ;
+class CResult_COption_CustomOnionMessageContentsZDecodeErrorZ;
 class CResult_SecretKeyErrorZ;
 class CResult_ShutdownScriptDecodeErrorZ;
 class CResult_ProbabilisticScorerDecodeErrorZ;
@@ -279,7 +281,10 @@ class C3Tuple_RawInvoice_u832InvoiceSignatureZ;
 class CVec_UpdateFailMalformedHTLCZ;
 class CResult_FundingSignedDecodeErrorZ;
 class CResult_NetworkGraphDecodeErrorZ;
+class CResult_InvoiceSignOrCreationErrorZ;
 class CVec_RouteHopZ;
+class COption_FilterZ;
+class COption_CustomOnionMessageContentsZ;
 class CResult_NodeInfoDecodeErrorZ;
 class CVec_NodeIdZ;
 class CResult_RouteLightningErrorZ;
@@ -388,7 +393,6 @@ class CResult_NoneSemanticErrorZ;
 class CVec_MonitorEventZ;
 class CVec_PaymentPreimageZ;
 class CVec_C2Tuple_u32ScriptZZ;
-class CResult_NoneChannelMonitorUpdateErrZ;
 class CResult_COption_ClosureReasonZDecodeErrorZ;
 class CResult_PublicKeyErrorZ;
 class CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ;
@@ -1174,19 +1178,19 @@ public:
 	 */
 	inline LDK::CVec_TxidZ get_relevant_txids();
 };
-class ChannelMonitorUpdateErr {
+class ChannelMonitorUpdateStatus {
 private:
-	LDKChannelMonitorUpdateErr self;
+	LDKChannelMonitorUpdateStatus self;
 public:
-	ChannelMonitorUpdateErr(const ChannelMonitorUpdateErr&) = delete;
-	ChannelMonitorUpdateErr(ChannelMonitorUpdateErr&& o) : self(o.self) { memset(&o, 0, sizeof(ChannelMonitorUpdateErr)); }
-	ChannelMonitorUpdateErr(LDKChannelMonitorUpdateErr&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKChannelMonitorUpdateErr)); }
-	operator LDKChannelMonitorUpdateErr() && { LDKChannelMonitorUpdateErr res = self; memset(&self, 0, sizeof(LDKChannelMonitorUpdateErr)); return res; }
-	ChannelMonitorUpdateErr& operator=(ChannelMonitorUpdateErr&& o) { self = o.self; memset(&o, 0, sizeof(ChannelMonitorUpdateErr)); return *this; }
-	LDKChannelMonitorUpdateErr* operator &() { return &self; }
-	LDKChannelMonitorUpdateErr* operator ->() { return &self; }
-	const LDKChannelMonitorUpdateErr* operator &() const { return &self; }
-	const LDKChannelMonitorUpdateErr* operator ->() const { return &self; }
+	ChannelMonitorUpdateStatus(const ChannelMonitorUpdateStatus&) = delete;
+	ChannelMonitorUpdateStatus(ChannelMonitorUpdateStatus&& o) : self(o.self) { memset(&o, 0, sizeof(ChannelMonitorUpdateStatus)); }
+	ChannelMonitorUpdateStatus(LDKChannelMonitorUpdateStatus&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKChannelMonitorUpdateStatus)); }
+	operator LDKChannelMonitorUpdateStatus() && { LDKChannelMonitorUpdateStatus res = self; memset(&self, 0, sizeof(LDKChannelMonitorUpdateStatus)); return res; }
+	ChannelMonitorUpdateStatus& operator=(ChannelMonitorUpdateStatus&& o) { self = o.self; memset(&o, 0, sizeof(ChannelMonitorUpdateStatus)); return *this; }
+	LDKChannelMonitorUpdateStatus* operator &() { return &self; }
+	LDKChannelMonitorUpdateStatus* operator ->() { return &self; }
+	const LDKChannelMonitorUpdateStatus* operator &() const { return &self; }
+	const LDKChannelMonitorUpdateStatus* operator ->() const { return &self; }
 };
 class Watch {
 private:
@@ -1209,23 +1213,23 @@ public:
 	 *  with any spends of outputs returned by [`get_outputs_to_watch`]. In practice, this means
 	 *  calling [`block_connected`] and [`block_disconnected`] on the monitor.
 	 * 
-	 *  Note: this interface MUST error with `ChannelMonitorUpdateErr::PermanentFailure` if
+	 *  Note: this interface MUST error with [`ChannelMonitorUpdateStatus::PermanentFailure`] if
 	 *  the given `funding_txo` has previously been registered via `watch_channel`.
 	 * 
 	 *  [`get_outputs_to_watch`]: channelmonitor::ChannelMonitor::get_outputs_to_watch
 	 *  [`block_connected`]: channelmonitor::ChannelMonitor::block_connected
 	 *  [`block_disconnected`]: channelmonitor::ChannelMonitor::block_disconnected
 	 */
-	inline LDK::CResult_NoneChannelMonitorUpdateErrZ watch_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitor monitor);
+	inline LDK::ChannelMonitorUpdateStatus watch_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitor monitor);
 	/**
 	 *  Updates a channel identified by `funding_txo` by applying `update` to its monitor.
 	 * 
 	 *  Implementations must call [`update_monitor`] with the given update. See
-	 *  [`ChannelMonitorUpdateErr`] for invariants around returning an error.
+	 *  [`ChannelMonitorUpdateStatus`] for invariants around returning an error.
 	 * 
 	 *  [`update_monitor`]: channelmonitor::ChannelMonitor::update_monitor
 	 */
-	inline LDK::CResult_NoneChannelMonitorUpdateErrZ update_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitorUpdate update);
+	inline LDK::ChannelMonitorUpdateStatus update_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitorUpdate update);
 	/**
 	 *  Returns any monitor events since the last call. Subsequent calls must only return new
 	 *  events.
@@ -1235,7 +1239,7 @@ public:
 	 *  to disk.
 	 * 
 	 *  For details on asynchronous [`ChannelMonitor`] updating and returning
-	 *  [`MonitorEvent::UpdateCompleted`] here, see [`ChannelMonitorUpdateErr::TemporaryFailure`].
+	 *  [`MonitorEvent::Completed`] here, see [`ChannelMonitorUpdateStatus::InProgress`].
 	 */
 	inline LDK::CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ release_pending_monitor_events();
 };
@@ -1523,6 +1527,25 @@ public:
 	LDKChannelTypeFeatures* operator ->() { return &self; }
 	const LDKChannelTypeFeatures* operator &() const { return &self; }
 	const LDKChannelTypeFeatures* operator ->() const { return &self; }
+};
+class CustomOnionMessageContents {
+private:
+	LDKCustomOnionMessageContents self;
+public:
+	CustomOnionMessageContents(const CustomOnionMessageContents&) = delete;
+	CustomOnionMessageContents(CustomOnionMessageContents&& o) : self(o.self) { memset(&o, 0, sizeof(CustomOnionMessageContents)); }
+	CustomOnionMessageContents(LDKCustomOnionMessageContents&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCustomOnionMessageContents)); }
+	operator LDKCustomOnionMessageContents() && { LDKCustomOnionMessageContents res = self; memset(&self, 0, sizeof(LDKCustomOnionMessageContents)); return res; }
+	~CustomOnionMessageContents() { CustomOnionMessageContents_free(self); }
+	CustomOnionMessageContents& operator=(CustomOnionMessageContents&& o) { CustomOnionMessageContents_free(self); self = o.self; memset(&o, 0, sizeof(CustomOnionMessageContents)); return *this; }
+	LDKCustomOnionMessageContents* operator &() { return &self; }
+	LDKCustomOnionMessageContents* operator ->() { return &self; }
+	const LDKCustomOnionMessageContents* operator &() const { return &self; }
+	const LDKCustomOnionMessageContents* operator ->() const { return &self; }
+	/**
+	 *  Returns the TLV type identifying the message contents. MUST be >= 64.
+	 */
+	inline uint64_t tlv_type();
 };
 class NodeId {
 private:
@@ -1919,6 +1942,11 @@ public:
 	 */
 	inline LDK::CResult_SignatureNoneZ sign_closing_transaction(const struct LDKClosingTransaction *NONNULL_PTR closing_tx);
 	/**
+	 *  Computes the signature for a commitment transaction's anchor output used as an
+	 *  input within `anchor_tx`, which spends the commitment transaction, at index `input`.
+	 */
+	inline LDK::CResult_SignatureNoneZ sign_holder_anchor_input(struct LDKTransaction anchor_tx, uintptr_t input);
+	/**
 	 *  Signs a channel announcement message with our funding key and our node secret key (aka
 	 *  node_id or network_key), proving it comes from one of the channel participants.
 	 * 
@@ -1994,12 +2022,28 @@ public:
 	 * 
 	 *  This method must return the same value each time it is called with a given `Recipient`
 	 *  parameter.
+	 * 
+	 *  Errors if the `Recipient` variant is not supported by the implementation.
 	 */
 	inline LDK::CResult_SecretKeyNoneZ get_node_secret(enum LDKRecipient recipient);
+	/**
+	 *  Get node id based on the provided [`Recipient`]. This public key corresponds to the secret in
+	 *  [`get_node_secret`].
+	 * 
+	 *  This method must return the same value each time it is called with a given `Recipient`
+	 *  parameter.
+	 * 
+	 *  Errors if the `Recipient` variant is not supported by the implementation.
+	 * 
+	 *  [`get_node_secret`]: KeysInterface::get_node_secret
+	 */
+	inline LDK::CResult_PublicKeyNoneZ get_node_id(enum LDKRecipient recipient);
 	/**
 	 *  Gets the ECDH shared secret of our [`node secret`] and `other_key`, multiplying by `tweak` if
 	 *  one is provided. Note that this tweak can be applied to `other_key` instead of our node
 	 *  secret, though this is less efficient.
+	 * 
+	 *  Errors if the `Recipient` variant is not supported by the implementation.
 	 * 
 	 *  [`node secret`]: Self::get_node_secret
 	 */
@@ -2050,6 +2094,8 @@ public:
 	 *  The hrp is ascii bytes, while the invoice data is base32.
 	 * 
 	 *  The secret key used to sign the invoice is dependent on the [`Recipient`].
+	 * 
+	 *  Errors if the `Recipient` variant is not supported by the implementation.
 	 */
 	inline LDK::CResult_RecoverableSignatureNoneZ sign_invoice(struct LDKu8slice hrp_bytes, struct LDKCVec_u5Z invoice_data, enum LDKRecipient receipient);
 	/**
@@ -3130,6 +3176,30 @@ public:
 	const LDKSendError* operator &() const { return &self; }
 	const LDKSendError* operator ->() const { return &self; }
 };
+class CustomOnionMessageHandler {
+private:
+	LDKCustomOnionMessageHandler self;
+public:
+	CustomOnionMessageHandler(const CustomOnionMessageHandler&) = delete;
+	CustomOnionMessageHandler(CustomOnionMessageHandler&& o) : self(o.self) { memset(&o, 0, sizeof(CustomOnionMessageHandler)); }
+	CustomOnionMessageHandler(LDKCustomOnionMessageHandler&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCustomOnionMessageHandler)); }
+	operator LDKCustomOnionMessageHandler() && { LDKCustomOnionMessageHandler res = self; memset(&self, 0, sizeof(LDKCustomOnionMessageHandler)); return res; }
+	~CustomOnionMessageHandler() { CustomOnionMessageHandler_free(self); }
+	CustomOnionMessageHandler& operator=(CustomOnionMessageHandler&& o) { CustomOnionMessageHandler_free(self); self = o.self; memset(&o, 0, sizeof(CustomOnionMessageHandler)); return *this; }
+	LDKCustomOnionMessageHandler* operator &() { return &self; }
+	LDKCustomOnionMessageHandler* operator ->() { return &self; }
+	const LDKCustomOnionMessageHandler* operator &() const { return &self; }
+	const LDKCustomOnionMessageHandler* operator ->() const { return &self; }
+	/**
+	 *  Called with the custom message that was received.
+	 */
+	inline void handle_custom_message(struct LDKCustomOnionMessageContents msg);
+	/**
+	 *  Read a custom message of type `message_type` from `buffer`, returning `Ok(None)` if the
+	 *  message type is unknown.
+	 */
+	inline LDK::CResult_COption_CustomOnionMessageContentsZDecodeErrorZ read_custom_message(uint64_t message_type, struct LDKu8slice buffer);
+};
 class RapidGossipSync {
 private:
 	LDKRapidGossipSync self;
@@ -3851,12 +3921,19 @@ public:
 	 *  is believed to be possible in the future (eg they're sending us messages we don't
 	 *  understand or indicate they require unknown feature bits), no_connection_possible is set
 	 *  and any outstanding channels should be failed.
+	 * 
+	 *  Note that in some rare cases this may be called without a corresponding
+	 *  [`Self::peer_connected`].
 	 */
 	inline void peer_disconnected(struct LDKPublicKey their_node_id, bool no_connection_possible);
 	/**
 	 *  Handle a peer reconnecting, possibly generating channel_reestablish message(s).
+	 * 
+	 *  May return an `Err(())` if the features the peer supports are not sufficient to communicate
+	 *  with us. Implementors should be somewhat conservative about doing so, however, as other
+	 *  message handlers may still wish to communicate with this peer.
 	 */
-	inline void peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR msg);
+	inline LDK::CResult_NoneNoneZ peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR msg);
 	/**
 	 *  Handle an incoming channel_reestablish message from the given peer.
 	 */
@@ -3933,8 +4010,12 @@ public:
 	 *  Called when a connection is established with a peer. This can be used to
 	 *  perform routing table synchronization using a strategy defined by the
 	 *  implementor.
+	 * 
+	 *  May return an `Err(())` if the features the peer supports are not sufficient to communicate
+	 *  with us. Implementors should be somewhat conservative about doing so, however, as other
+	 *  message handlers may still wish to communicate with this peer.
 	 */
-	inline void peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init);
+	inline LDK::CResult_NoneNoneZ peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init);
 	/**
 	 *  Handles the reply of a query we initiated to learn about channels
 	 *  for a given range of blocks. We can expect to receive one or more
@@ -3994,11 +4075,18 @@ public:
 	/**
 	 *  Called when a connection is established with a peer. Can be used to track which peers
 	 *  advertise onion message support and are online.
+	 * 
+	 *  May return an `Err(())` if the features the peer supports are not sufficient to communicate
+	 *  with us. Implementors should be somewhat conservative about doing so, however, as other
+	 *  message handlers may still wish to communicate with this peer.
 	 */
-	inline void peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init);
+	inline LDK::CResult_NoneNoneZ peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init);
 	/**
 	 *  Indicates a connection to the peer failed/an existing connection was lost. Allows handlers to
 	 *  drop and refuse to forward onion messages to this peer.
+	 * 
+	 *  Note that in some rare cases this may be called without a corresponding
+	 *  [`Self::peer_connected`].
 	 */
 	inline void peer_disconnected(struct LDKPublicKey their_node_id, bool no_connection_possible);
 	/**
@@ -4166,15 +4254,15 @@ public:
 	 *  and the stored channel data). Note that you **must** persist every new monitor to disk.
 	 * 
 	 *  The `update_id` is used to identify this call to [`ChainMonitor::channel_monitor_updated`],
-	 *  if you return [`ChannelMonitorUpdateErr::TemporaryFailure`].
+	 *  if you return [`ChannelMonitorUpdateStatus::InProgress`].
 	 * 
 	 *  See [`Writeable::write`] on [`ChannelMonitor`] for writing out a `ChannelMonitor`
-	 *  and [`ChannelMonitorUpdateErr`] for requirements when returning errors.
+	 *  and [`ChannelMonitorUpdateStatus`] for requirements when returning errors.
 	 * 
 	 *  [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
 	 *  [`Writeable::write`]: crate::util::ser::Writeable::write
 	 */
-	inline LDK::CResult_NoneChannelMonitorUpdateErrZ persist_new_channel(struct LDKOutPoint channel_id, const struct LDKChannelMonitor *NONNULL_PTR data, struct LDKMonitorUpdateId update_id);
+	inline LDK::ChannelMonitorUpdateStatus persist_new_channel(struct LDKOutPoint channel_id, const struct LDKChannelMonitor *NONNULL_PTR data, struct LDKMonitorUpdateId update_id);
 	/**
 	 *  Update one channel's data. The provided [`ChannelMonitor`] has already applied the given
 	 *  update.
@@ -4202,17 +4290,17 @@ public:
 	 *  whereas updates are small and `O(1)`.
 	 * 
 	 *  The `update_id` is used to identify this call to [`ChainMonitor::channel_monitor_updated`],
-	 *  if you return [`ChannelMonitorUpdateErr::TemporaryFailure`].
+	 *  if you return [`ChannelMonitorUpdateStatus::InProgress`].
 	 * 
 	 *  See [`Writeable::write`] on [`ChannelMonitor`] for writing out a `ChannelMonitor`,
 	 *  [`Writeable::write`] on [`ChannelMonitorUpdate`] for writing out an update, and
-	 *  [`ChannelMonitorUpdateErr`] for requirements when returning errors.
+	 *  [`ChannelMonitorUpdateStatus`] for requirements when returning errors.
 	 * 
 	 *  [`Writeable::write`]: crate::util::ser::Writeable::write
 	 * 
 	 *  Note that update (or a relevant inner pointer) may be NULL or all-0s to represent None
 	 */
-	inline LDK::CResult_NoneChannelMonitorUpdateErrZ update_persisted_channel(struct LDKOutPoint channel_id, const struct LDKChannelMonitorUpdate *NONNULL_PTR update, const struct LDKChannelMonitor *NONNULL_PTR data, struct LDKMonitorUpdateId update_id);
+	inline LDK::ChannelMonitorUpdateStatus update_persisted_channel(struct LDKOutPoint channel_id, const struct LDKChannelMonitorUpdate *NONNULL_PTR update, const struct LDKChannelMonitor *NONNULL_PTR data, struct LDKMonitorUpdateId update_id);
 };
 class LockedChannelMonitor {
 private:
@@ -4754,6 +4842,21 @@ public:
 	const LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZ* operator &() const { return &self; }
 	const LDKCResult_StaticPaymentOutputDescriptorDecodeErrorZ* operator ->() const { return &self; }
 };
+class CResult_PublicKeyNoneZ {
+private:
+	LDKCResult_PublicKeyNoneZ self;
+public:
+	CResult_PublicKeyNoneZ(const CResult_PublicKeyNoneZ&) = delete;
+	CResult_PublicKeyNoneZ(CResult_PublicKeyNoneZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_PublicKeyNoneZ)); }
+	CResult_PublicKeyNoneZ(LDKCResult_PublicKeyNoneZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_PublicKeyNoneZ)); }
+	operator LDKCResult_PublicKeyNoneZ() && { LDKCResult_PublicKeyNoneZ res = self; memset(&self, 0, sizeof(LDKCResult_PublicKeyNoneZ)); return res; }
+	~CResult_PublicKeyNoneZ() { CResult_PublicKeyNoneZ_free(self); }
+	CResult_PublicKeyNoneZ& operator=(CResult_PublicKeyNoneZ&& o) { CResult_PublicKeyNoneZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_PublicKeyNoneZ)); return *this; }
+	LDKCResult_PublicKeyNoneZ* operator &() { return &self; }
+	LDKCResult_PublicKeyNoneZ* operator ->() { return &self; }
+	const LDKCResult_PublicKeyNoneZ* operator &() const { return &self; }
+	const LDKCResult_PublicKeyNoneZ* operator ->() const { return &self; }
+};
 class CResult_PaymentIdPaymentSendFailureZ {
 private:
 	LDKCResult_PaymentIdPaymentSendFailureZ self;
@@ -4768,21 +4871,6 @@ public:
 	LDKCResult_PaymentIdPaymentSendFailureZ* operator ->() { return &self; }
 	const LDKCResult_PaymentIdPaymentSendFailureZ* operator &() const { return &self; }
 	const LDKCResult_PaymentIdPaymentSendFailureZ* operator ->() const { return &self; }
-};
-class CResult_OnionMessageDecodeErrorZ {
-private:
-	LDKCResult_OnionMessageDecodeErrorZ self;
-public:
-	CResult_OnionMessageDecodeErrorZ(const CResult_OnionMessageDecodeErrorZ&) = delete;
-	CResult_OnionMessageDecodeErrorZ(CResult_OnionMessageDecodeErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_OnionMessageDecodeErrorZ)); }
-	CResult_OnionMessageDecodeErrorZ(LDKCResult_OnionMessageDecodeErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_OnionMessageDecodeErrorZ)); }
-	operator LDKCResult_OnionMessageDecodeErrorZ() && { LDKCResult_OnionMessageDecodeErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_OnionMessageDecodeErrorZ)); return res; }
-	~CResult_OnionMessageDecodeErrorZ() { CResult_OnionMessageDecodeErrorZ_free(self); }
-	CResult_OnionMessageDecodeErrorZ& operator=(CResult_OnionMessageDecodeErrorZ&& o) { CResult_OnionMessageDecodeErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_OnionMessageDecodeErrorZ)); return *this; }
-	LDKCResult_OnionMessageDecodeErrorZ* operator &() { return &self; }
-	LDKCResult_OnionMessageDecodeErrorZ* operator ->() { return &self; }
-	const LDKCResult_OnionMessageDecodeErrorZ* operator &() const { return &self; }
-	const LDKCResult_OnionMessageDecodeErrorZ* operator ->() const { return &self; }
 };
 class CResult_CommitmentTransactionDecodeErrorZ {
 private:
@@ -4828,6 +4916,21 @@ public:
 	LDKCResult_ClosingSignedFeeRangeDecodeErrorZ* operator ->() { return &self; }
 	const LDKCResult_ClosingSignedFeeRangeDecodeErrorZ* operator &() const { return &self; }
 	const LDKCResult_ClosingSignedFeeRangeDecodeErrorZ* operator ->() const { return &self; }
+};
+class CResult_OnionMessageDecodeErrorZ {
+private:
+	LDKCResult_OnionMessageDecodeErrorZ self;
+public:
+	CResult_OnionMessageDecodeErrorZ(const CResult_OnionMessageDecodeErrorZ&) = delete;
+	CResult_OnionMessageDecodeErrorZ(CResult_OnionMessageDecodeErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_OnionMessageDecodeErrorZ)); }
+	CResult_OnionMessageDecodeErrorZ(LDKCResult_OnionMessageDecodeErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_OnionMessageDecodeErrorZ)); }
+	operator LDKCResult_OnionMessageDecodeErrorZ() && { LDKCResult_OnionMessageDecodeErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_OnionMessageDecodeErrorZ)); return res; }
+	~CResult_OnionMessageDecodeErrorZ() { CResult_OnionMessageDecodeErrorZ_free(self); }
+	CResult_OnionMessageDecodeErrorZ& operator=(CResult_OnionMessageDecodeErrorZ&& o) { CResult_OnionMessageDecodeErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_OnionMessageDecodeErrorZ)); return *this; }
+	LDKCResult_OnionMessageDecodeErrorZ* operator &() { return &self; }
+	LDKCResult_OnionMessageDecodeErrorZ* operator ->() { return &self; }
+	const LDKCResult_OnionMessageDecodeErrorZ* operator &() const { return &self; }
+	const LDKCResult_OnionMessageDecodeErrorZ* operator ->() const { return &self; }
 };
 class CResult_PingDecodeErrorZ {
 private:
@@ -4889,21 +4992,6 @@ public:
 	const LDKCResult_GossipTimestampFilterDecodeErrorZ* operator &() const { return &self; }
 	const LDKCResult_GossipTimestampFilterDecodeErrorZ* operator ->() const { return &self; }
 };
-class CResult_InvoiceSignOrCreationErrorZ {
-private:
-	LDKCResult_InvoiceSignOrCreationErrorZ self;
-public:
-	CResult_InvoiceSignOrCreationErrorZ(const CResult_InvoiceSignOrCreationErrorZ&) = delete;
-	CResult_InvoiceSignOrCreationErrorZ(CResult_InvoiceSignOrCreationErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_InvoiceSignOrCreationErrorZ)); }
-	CResult_InvoiceSignOrCreationErrorZ(LDKCResult_InvoiceSignOrCreationErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_InvoiceSignOrCreationErrorZ)); }
-	operator LDKCResult_InvoiceSignOrCreationErrorZ() && { LDKCResult_InvoiceSignOrCreationErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_InvoiceSignOrCreationErrorZ)); return res; }
-	~CResult_InvoiceSignOrCreationErrorZ() { CResult_InvoiceSignOrCreationErrorZ_free(self); }
-	CResult_InvoiceSignOrCreationErrorZ& operator=(CResult_InvoiceSignOrCreationErrorZ&& o) { CResult_InvoiceSignOrCreationErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_InvoiceSignOrCreationErrorZ)); return *this; }
-	LDKCResult_InvoiceSignOrCreationErrorZ* operator &() { return &self; }
-	LDKCResult_InvoiceSignOrCreationErrorZ* operator ->() { return &self; }
-	const LDKCResult_InvoiceSignOrCreationErrorZ* operator &() const { return &self; }
-	const LDKCResult_InvoiceSignOrCreationErrorZ* operator ->() const { return &self; }
-};
 class CVec_TransactionOutputsZ {
 private:
 	LDKCVec_TransactionOutputsZ self;
@@ -4964,20 +5052,20 @@ public:
 	const LDKCVec_CVec_u8ZZ* operator &() const { return &self; }
 	const LDKCVec_CVec_u8ZZ* operator ->() const { return &self; }
 };
-class COption_FilterZ {
+class CResult_COption_CustomOnionMessageContentsZDecodeErrorZ {
 private:
-	LDKCOption_FilterZ self;
+	LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ self;
 public:
-	COption_FilterZ(const COption_FilterZ&) = delete;
-	COption_FilterZ(COption_FilterZ&& o) : self(o.self) { memset(&o, 0, sizeof(COption_FilterZ)); }
-	COption_FilterZ(LDKCOption_FilterZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCOption_FilterZ)); }
-	operator LDKCOption_FilterZ() && { LDKCOption_FilterZ res = self; memset(&self, 0, sizeof(LDKCOption_FilterZ)); return res; }
-	~COption_FilterZ() { COption_FilterZ_free(self); }
-	COption_FilterZ& operator=(COption_FilterZ&& o) { COption_FilterZ_free(self); self = o.self; memset(&o, 0, sizeof(COption_FilterZ)); return *this; }
-	LDKCOption_FilterZ* operator &() { return &self; }
-	LDKCOption_FilterZ* operator ->() { return &self; }
-	const LDKCOption_FilterZ* operator &() const { return &self; }
-	const LDKCOption_FilterZ* operator ->() const { return &self; }
+	CResult_COption_CustomOnionMessageContentsZDecodeErrorZ(const CResult_COption_CustomOnionMessageContentsZDecodeErrorZ&) = delete;
+	CResult_COption_CustomOnionMessageContentsZDecodeErrorZ(CResult_COption_CustomOnionMessageContentsZDecodeErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_COption_CustomOnionMessageContentsZDecodeErrorZ)); }
+	CResult_COption_CustomOnionMessageContentsZDecodeErrorZ(LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ)); }
+	operator LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ() && { LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ)); return res; }
+	~CResult_COption_CustomOnionMessageContentsZDecodeErrorZ() { CResult_COption_CustomOnionMessageContentsZDecodeErrorZ_free(self); }
+	CResult_COption_CustomOnionMessageContentsZDecodeErrorZ& operator=(CResult_COption_CustomOnionMessageContentsZDecodeErrorZ&& o) { CResult_COption_CustomOnionMessageContentsZDecodeErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_COption_CustomOnionMessageContentsZDecodeErrorZ)); return *this; }
+	LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ* operator &() { return &self; }
+	LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ* operator ->() { return &self; }
+	const LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ* operator &() const { return &self; }
+	const LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ* operator ->() const { return &self; }
 };
 class CResult_SecretKeyErrorZ {
 private:
@@ -5399,6 +5487,21 @@ public:
 	const LDKCResult_NetworkGraphDecodeErrorZ* operator &() const { return &self; }
 	const LDKCResult_NetworkGraphDecodeErrorZ* operator ->() const { return &self; }
 };
+class CResult_InvoiceSignOrCreationErrorZ {
+private:
+	LDKCResult_InvoiceSignOrCreationErrorZ self;
+public:
+	CResult_InvoiceSignOrCreationErrorZ(const CResult_InvoiceSignOrCreationErrorZ&) = delete;
+	CResult_InvoiceSignOrCreationErrorZ(CResult_InvoiceSignOrCreationErrorZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_InvoiceSignOrCreationErrorZ)); }
+	CResult_InvoiceSignOrCreationErrorZ(LDKCResult_InvoiceSignOrCreationErrorZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_InvoiceSignOrCreationErrorZ)); }
+	operator LDKCResult_InvoiceSignOrCreationErrorZ() && { LDKCResult_InvoiceSignOrCreationErrorZ res = self; memset(&self, 0, sizeof(LDKCResult_InvoiceSignOrCreationErrorZ)); return res; }
+	~CResult_InvoiceSignOrCreationErrorZ() { CResult_InvoiceSignOrCreationErrorZ_free(self); }
+	CResult_InvoiceSignOrCreationErrorZ& operator=(CResult_InvoiceSignOrCreationErrorZ&& o) { CResult_InvoiceSignOrCreationErrorZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_InvoiceSignOrCreationErrorZ)); return *this; }
+	LDKCResult_InvoiceSignOrCreationErrorZ* operator &() { return &self; }
+	LDKCResult_InvoiceSignOrCreationErrorZ* operator ->() { return &self; }
+	const LDKCResult_InvoiceSignOrCreationErrorZ* operator &() const { return &self; }
+	const LDKCResult_InvoiceSignOrCreationErrorZ* operator ->() const { return &self; }
+};
 class CVec_RouteHopZ {
 private:
 	LDKCVec_RouteHopZ self;
@@ -5413,6 +5516,36 @@ public:
 	LDKCVec_RouteHopZ* operator ->() { return &self; }
 	const LDKCVec_RouteHopZ* operator &() const { return &self; }
 	const LDKCVec_RouteHopZ* operator ->() const { return &self; }
+};
+class COption_FilterZ {
+private:
+	LDKCOption_FilterZ self;
+public:
+	COption_FilterZ(const COption_FilterZ&) = delete;
+	COption_FilterZ(COption_FilterZ&& o) : self(o.self) { memset(&o, 0, sizeof(COption_FilterZ)); }
+	COption_FilterZ(LDKCOption_FilterZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCOption_FilterZ)); }
+	operator LDKCOption_FilterZ() && { LDKCOption_FilterZ res = self; memset(&self, 0, sizeof(LDKCOption_FilterZ)); return res; }
+	~COption_FilterZ() { COption_FilterZ_free(self); }
+	COption_FilterZ& operator=(COption_FilterZ&& o) { COption_FilterZ_free(self); self = o.self; memset(&o, 0, sizeof(COption_FilterZ)); return *this; }
+	LDKCOption_FilterZ* operator &() { return &self; }
+	LDKCOption_FilterZ* operator ->() { return &self; }
+	const LDKCOption_FilterZ* operator &() const { return &self; }
+	const LDKCOption_FilterZ* operator ->() const { return &self; }
+};
+class COption_CustomOnionMessageContentsZ {
+private:
+	LDKCOption_CustomOnionMessageContentsZ self;
+public:
+	COption_CustomOnionMessageContentsZ(const COption_CustomOnionMessageContentsZ&) = delete;
+	COption_CustomOnionMessageContentsZ(COption_CustomOnionMessageContentsZ&& o) : self(o.self) { memset(&o, 0, sizeof(COption_CustomOnionMessageContentsZ)); }
+	COption_CustomOnionMessageContentsZ(LDKCOption_CustomOnionMessageContentsZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCOption_CustomOnionMessageContentsZ)); }
+	operator LDKCOption_CustomOnionMessageContentsZ() && { LDKCOption_CustomOnionMessageContentsZ res = self; memset(&self, 0, sizeof(LDKCOption_CustomOnionMessageContentsZ)); return res; }
+	~COption_CustomOnionMessageContentsZ() { COption_CustomOnionMessageContentsZ_free(self); }
+	COption_CustomOnionMessageContentsZ& operator=(COption_CustomOnionMessageContentsZ&& o) { COption_CustomOnionMessageContentsZ_free(self); self = o.self; memset(&o, 0, sizeof(COption_CustomOnionMessageContentsZ)); return *this; }
+	LDKCOption_CustomOnionMessageContentsZ* operator &() { return &self; }
+	LDKCOption_CustomOnionMessageContentsZ* operator ->() { return &self; }
+	const LDKCOption_CustomOnionMessageContentsZ* operator &() const { return &self; }
+	const LDKCOption_CustomOnionMessageContentsZ* operator ->() const { return &self; }
 };
 class CResult_NodeInfoDecodeErrorZ {
 private:
@@ -7034,21 +7167,6 @@ public:
 	const LDKCVec_C2Tuple_u32ScriptZZ* operator &() const { return &self; }
 	const LDKCVec_C2Tuple_u32ScriptZZ* operator ->() const { return &self; }
 };
-class CResult_NoneChannelMonitorUpdateErrZ {
-private:
-	LDKCResult_NoneChannelMonitorUpdateErrZ self;
-public:
-	CResult_NoneChannelMonitorUpdateErrZ(const CResult_NoneChannelMonitorUpdateErrZ&) = delete;
-	CResult_NoneChannelMonitorUpdateErrZ(CResult_NoneChannelMonitorUpdateErrZ&& o) : self(o.self) { memset(&o, 0, sizeof(CResult_NoneChannelMonitorUpdateErrZ)); }
-	CResult_NoneChannelMonitorUpdateErrZ(LDKCResult_NoneChannelMonitorUpdateErrZ&& m_self) : self(m_self) { memset(&m_self, 0, sizeof(LDKCResult_NoneChannelMonitorUpdateErrZ)); }
-	operator LDKCResult_NoneChannelMonitorUpdateErrZ() && { LDKCResult_NoneChannelMonitorUpdateErrZ res = self; memset(&self, 0, sizeof(LDKCResult_NoneChannelMonitorUpdateErrZ)); return res; }
-	~CResult_NoneChannelMonitorUpdateErrZ() { CResult_NoneChannelMonitorUpdateErrZ_free(self); }
-	CResult_NoneChannelMonitorUpdateErrZ& operator=(CResult_NoneChannelMonitorUpdateErrZ&& o) { CResult_NoneChannelMonitorUpdateErrZ_free(self); self = o.self; memset(&o, 0, sizeof(CResult_NoneChannelMonitorUpdateErrZ)); return *this; }
-	LDKCResult_NoneChannelMonitorUpdateErrZ* operator &() { return &self; }
-	LDKCResult_NoneChannelMonitorUpdateErrZ* operator ->() { return &self; }
-	const LDKCResult_NoneChannelMonitorUpdateErrZ* operator &() const { return &self; }
-	const LDKCResult_NoneChannelMonitorUpdateErrZ* operator ->() const { return &self; }
-};
 class CResult_COption_ClosureReasonZDecodeErrorZ {
 private:
 	LDKCResult_COption_ClosureReasonZDecodeErrorZ self;
@@ -7577,12 +7695,12 @@ inline LDK::CVec_TxidZ Confirm::get_relevant_txids() {
 	LDK::CVec_TxidZ ret = (self.get_relevant_txids)(self.this_arg);
 	return ret;
 }
-inline LDK::CResult_NoneChannelMonitorUpdateErrZ Watch::watch_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitor monitor) {
-	LDK::CResult_NoneChannelMonitorUpdateErrZ ret = (self.watch_channel)(self.this_arg, funding_txo, monitor);
+inline LDK::ChannelMonitorUpdateStatus Watch::watch_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitor monitor) {
+	LDK::ChannelMonitorUpdateStatus ret = (self.watch_channel)(self.this_arg, funding_txo, monitor);
 	return ret;
 }
-inline LDK::CResult_NoneChannelMonitorUpdateErrZ Watch::update_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitorUpdate update) {
-	LDK::CResult_NoneChannelMonitorUpdateErrZ ret = (self.update_channel)(self.this_arg, funding_txo, update);
+inline LDK::ChannelMonitorUpdateStatus Watch::update_channel(struct LDKOutPoint funding_txo, struct LDKChannelMonitorUpdate update) {
+	LDK::ChannelMonitorUpdateStatus ret = (self.update_channel)(self.this_arg, funding_txo, update);
 	return ret;
 }
 inline LDK::CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ Watch::release_pending_monitor_events() {
@@ -7613,6 +7731,10 @@ inline void Score::probe_successful(struct LDKCVec_RouteHopZ path) {
 }
 inline LDK::Score LockableScore::lock() {
 	LDK::Score ret = (self.lock)(self.this_arg);
+	return ret;
+}
+inline uint64_t CustomOnionMessageContents::tlv_type() {
+	uint64_t ret = (self.tlv_type)(self.this_arg);
 	return ret;
 }
 inline LDKPublicKey BaseSign::get_per_commitment_point(uint64_t idx) {
@@ -7659,6 +7781,10 @@ inline LDK::CResult_SignatureNoneZ BaseSign::sign_closing_transaction(const stru
 	LDK::CResult_SignatureNoneZ ret = (self.sign_closing_transaction)(self.this_arg, closing_tx);
 	return ret;
 }
+inline LDK::CResult_SignatureNoneZ BaseSign::sign_holder_anchor_input(struct LDKTransaction anchor_tx, uintptr_t input) {
+	LDK::CResult_SignatureNoneZ ret = (self.sign_holder_anchor_input)(self.this_arg, anchor_tx, input);
+	return ret;
+}
 inline LDK::CResult_C2Tuple_SignatureSignatureZNoneZ BaseSign::sign_channel_announcement(const struct LDKUnsignedChannelAnnouncement *NONNULL_PTR msg) {
 	LDK::CResult_C2Tuple_SignatureSignatureZNoneZ ret = (self.sign_channel_announcement)(self.this_arg, msg);
 	return ret;
@@ -7668,6 +7794,10 @@ inline void BaseSign::ready_channel(const struct LDKChannelTransactionParameters
 }
 inline LDK::CResult_SecretKeyNoneZ KeysInterface::get_node_secret(enum LDKRecipient recipient) {
 	LDK::CResult_SecretKeyNoneZ ret = (self.get_node_secret)(self.this_arg, recipient);
+	return ret;
+}
+inline LDK::CResult_PublicKeyNoneZ KeysInterface::get_node_id(enum LDKRecipient recipient) {
+	LDK::CResult_PublicKeyNoneZ ret = (self.get_node_id)(self.this_arg, recipient);
 	return ret;
 }
 inline LDK::CResult_SharedSecretNoneZ KeysInterface::ecdh(enum LDKRecipient recipient, struct LDKPublicKey other_key, struct LDKCOption_ScalarZ tweak) {
@@ -7776,6 +7906,13 @@ inline uint64_t SocketDescriptor::hash() {
 	uint64_t ret = (self.hash)(self.this_arg);
 	return ret;
 }
+inline void CustomOnionMessageHandler::handle_custom_message(struct LDKCustomOnionMessageContents msg) {
+	(self.handle_custom_message)(self.this_arg, msg);
+}
+inline LDK::CResult_COption_CustomOnionMessageContentsZDecodeErrorZ CustomOnionMessageHandler::read_custom_message(uint64_t message_type, struct LDKu8slice buffer) {
+	LDK::CResult_COption_CustomOnionMessageContentsZDecodeErrorZ ret = (self.read_custom_message)(self.this_arg, message_type, buffer);
+	return ret;
+}
 inline LDK::CResult_NoneErrorZ Persister::persist_manager(const struct LDKChannelManager *NONNULL_PTR channel_manager) {
 	LDK::CResult_NoneErrorZ ret = (self.persist_manager)(self.this_arg, channel_manager);
 	return ret;
@@ -7836,8 +7973,9 @@ inline void ChannelMessageHandler::handle_announcement_signatures(struct LDKPubl
 inline void ChannelMessageHandler::peer_disconnected(struct LDKPublicKey their_node_id, bool no_connection_possible) {
 	(self.peer_disconnected)(self.this_arg, their_node_id, no_connection_possible);
 }
-inline void ChannelMessageHandler::peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR msg) {
-	(self.peer_connected)(self.this_arg, their_node_id, msg);
+inline LDK::CResult_NoneNoneZ ChannelMessageHandler::peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR msg) {
+	LDK::CResult_NoneNoneZ ret = (self.peer_connected)(self.this_arg, their_node_id, msg);
+	return ret;
 }
 inline void ChannelMessageHandler::handle_channel_reestablish(struct LDKPublicKey their_node_id, const struct LDKChannelReestablish *NONNULL_PTR msg) {
 	(self.handle_channel_reestablish)(self.this_arg, their_node_id, msg);
@@ -7876,8 +8014,9 @@ inline LDK::NodeAnnouncement RoutingMessageHandler::get_next_node_announcement(s
 	LDK::NodeAnnouncement ret = (self.get_next_node_announcement)(self.this_arg, starting_point);
 	return ret;
 }
-inline void RoutingMessageHandler::peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init) {
-	(self.peer_connected)(self.this_arg, their_node_id, init);
+inline LDK::CResult_NoneNoneZ RoutingMessageHandler::peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init) {
+	LDK::CResult_NoneNoneZ ret = (self.peer_connected)(self.this_arg, their_node_id, init);
+	return ret;
 }
 inline LDK::CResult_NoneLightningErrorZ RoutingMessageHandler::handle_reply_channel_range(struct LDKPublicKey their_node_id, struct LDKReplyChannelRange msg) {
 	LDK::CResult_NoneLightningErrorZ ret = (self.handle_reply_channel_range)(self.this_arg, their_node_id, msg);
@@ -7906,8 +8045,9 @@ inline LDK::InitFeatures RoutingMessageHandler::provided_init_features(struct LD
 inline void OnionMessageHandler::handle_onion_message(struct LDKPublicKey peer_node_id, const struct LDKOnionMessage *NONNULL_PTR msg) {
 	(self.handle_onion_message)(self.this_arg, peer_node_id, msg);
 }
-inline void OnionMessageHandler::peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init) {
-	(self.peer_connected)(self.this_arg, their_node_id, init);
+inline LDK::CResult_NoneNoneZ OnionMessageHandler::peer_connected(struct LDKPublicKey their_node_id, const struct LDKInit *NONNULL_PTR init) {
+	LDK::CResult_NoneNoneZ ret = (self.peer_connected)(self.this_arg, their_node_id, init);
+	return ret;
 }
 inline void OnionMessageHandler::peer_disconnected(struct LDKPublicKey their_node_id, bool no_connection_possible) {
 	(self.peer_disconnected)(self.this_arg, their_node_id, no_connection_possible);
@@ -7926,12 +8066,12 @@ inline void Logger::log(const struct LDKRecord *NONNULL_PTR record) {
 inline void FutureCallback::call() {
 	(self.call)(self.this_arg);
 }
-inline LDK::CResult_NoneChannelMonitorUpdateErrZ Persist::persist_new_channel(struct LDKOutPoint channel_id, const struct LDKChannelMonitor *NONNULL_PTR data, struct LDKMonitorUpdateId update_id) {
-	LDK::CResult_NoneChannelMonitorUpdateErrZ ret = (self.persist_new_channel)(self.this_arg, channel_id, data, update_id);
+inline LDK::ChannelMonitorUpdateStatus Persist::persist_new_channel(struct LDKOutPoint channel_id, const struct LDKChannelMonitor *NONNULL_PTR data, struct LDKMonitorUpdateId update_id) {
+	LDK::ChannelMonitorUpdateStatus ret = (self.persist_new_channel)(self.this_arg, channel_id, data, update_id);
 	return ret;
 }
-inline LDK::CResult_NoneChannelMonitorUpdateErrZ Persist::update_persisted_channel(struct LDKOutPoint channel_id, const struct LDKChannelMonitorUpdate *NONNULL_PTR update, const struct LDKChannelMonitor *NONNULL_PTR data, struct LDKMonitorUpdateId update_id) {
-	LDK::CResult_NoneChannelMonitorUpdateErrZ ret = (self.update_persisted_channel)(self.this_arg, channel_id, update, data, update_id);
+inline LDK::ChannelMonitorUpdateStatus Persist::update_persisted_channel(struct LDKOutPoint channel_id, const struct LDKChannelMonitorUpdate *NONNULL_PTR update, const struct LDKChannelMonitor *NONNULL_PTR data, struct LDKMonitorUpdateId update_id) {
+	LDK::ChannelMonitorUpdateStatus ret = (self.update_persisted_channel)(self.this_arg, channel_id, update, data, update_id);
 	return ret;
 }
 }

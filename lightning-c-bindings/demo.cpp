@@ -139,7 +139,7 @@ struct NodeMonitors {
 	}
 };
 
-LDKCResult_NoneChannelMonitorUpdateErrZ add_channel_monitor(const void *this_arg, LDKOutPoint funding_txo_arg, LDKChannelMonitor monitor_arg) {
+LDKChannelMonitorUpdateStatus add_channel_monitor(const void *this_arg, LDKOutPoint funding_txo_arg, LDKChannelMonitor monitor_arg) {
 	// First bind the args to C++ objects so they auto-free
 	LDK::ChannelMonitor mon(std::move(monitor_arg));
 	LDK::OutPoint funding_txo(std::move(funding_txo_arg));
@@ -148,10 +148,10 @@ LDKCResult_NoneChannelMonitorUpdateErrZ add_channel_monitor(const void *this_arg
 	std::unique_lock<std::mutex> l(arg->mut);
 
 	arg->mons.push_back(std::make_pair(std::move(funding_txo), std::move(mon)));
-	return CResult_NoneChannelMonitorUpdateErrZ_ok();
+	return ChannelMonitorUpdateStatus_completed();
 }
 static std::atomic_int mons_updated(0);
-LDKCResult_NoneChannelMonitorUpdateErrZ update_channel_monitor(const void *this_arg, LDKOutPoint funding_txo_arg, LDKChannelMonitorUpdate monitor_arg) {
+LDKChannelMonitorUpdateStatus update_channel_monitor(const void *this_arg, LDKOutPoint funding_txo_arg, LDKChannelMonitorUpdate monitor_arg) {
 	// First bind the args to C++ objects so they auto-free
 	LDK::ChannelMonitorUpdate update(std::move(monitor_arg));
 	LDK::OutPoint funding_txo(std::move(funding_txo_arg));
@@ -174,7 +174,7 @@ LDKCResult_NoneChannelMonitorUpdateErrZ update_channel_monitor(const void *this_
 	assert(updated);
 
 	mons_updated += 1;
-	return CResult_NoneChannelMonitorUpdateErrZ_ok();
+	return ChannelMonitorUpdateStatus_completed();
 }
 LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ monitors_pending_monitor_events(const void *this_arg) {
 	NodeMonitors* arg = (NodeMonitors*) this_arg;
@@ -369,6 +369,47 @@ public:
 };
 #endif // !REAL_NET
 
+struct CustomOnionMsgQueue {
+	std::mutex mtx;
+	std::vector<LDK::CustomOnionMessageContents> msgs;
+};
+
+uint64_t custom_onion_msg_type_id(const void *this_arg) {
+	return 8888;
+}
+LDKCVec_u8Z custom_onion_msg_bytes(const void *this_arg) {
+	uint8_t *bytes = (uint8_t *) malloc(1024);
+	memset(bytes, 43, 1024);
+	return LDKCVec_u8Z {
+		.data = bytes, .datalen = 1024
+	};
+}
+
+void handle_custom_onion_message(const void* this_arg, struct LDKCustomOnionMessageContents msg) {
+	CustomOnionMsgQueue* arg = (CustomOnionMsgQueue*) this_arg;
+	std::unique_lock<std::mutex> lck(arg->mtx);
+	arg->msgs.push_back(std::move(msg));
+}
+
+LDKCustomOnionMessageContents build_custom_onion_message() {
+	return LDKCustomOnionMessageContents {
+		.this_arg = NULL,
+		.tlv_type = custom_onion_msg_type_id,
+		.write = custom_onion_msg_bytes,
+		.free = NULL,
+	};
+}
+
+LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ read_custom_onion_message(const void* this_arg, uint64_t type, LDKu8slice buf) {
+	assert(type == 8888);
+	assert(buf.datalen == 1024);
+	uint8_t cmp[1024];
+	memset(cmp, 43, 1024);
+	assert(!memcmp(cmp, buf.data, 1024));
+	return CResult_COption_CustomOnionMessageContentsZDecodeErrorZ_ok(COption_CustomOnionMessageContentsZ_some(build_custom_onion_message()));
+}
+
+
 struct CustomMsgQueue {
 	std::vector<LDK::Type> msgs;
 };
@@ -534,15 +575,17 @@ int main() {
 		node_secret1 = *node_secret1_res->contents.result;
 
 		LDK::ChannelManager cm1 = ChannelManager_new(fee_est, mon1, broadcast, logger1, KeysManager_as_KeysInterface(&keys1), UserConfig_default(), ChainParameters_new(network, BestBlock_new(chain_tip, 0)));
-		LDK::OnionMessenger om1 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys1), logger1);
+
+		LDK::IgnoringMessageHandler ignoring_handler1 = IgnoringMessageHandler_new();
+		LDK::CustomMessageHandler custom_msg_handler1 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler1);
+		LDK::CustomOnionMessageHandler custom_onion_msg_handler1 = IgnoringMessageHandler_as_CustomOnionMessageHandler(&ignoring_handler1);
+
+		LDK::OnionMessenger om1 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys1), logger1, std::move(custom_onion_msg_handler1));
 
 		LDK::CVec_ChannelDetailsZ channels = ChannelManager_list_channels(&cm1);
 		assert(channels->datalen == 0);
 
 		LDK::MessageHandler msg_handler1 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm1), P2PGossipSync_as_RoutingMessageHandler(&graph_msg_handler1), OnionMessenger_as_OnionMessageHandler(&om1));
-
-		LDK::IgnoringMessageHandler ignoring_handler1 = IgnoringMessageHandler_new();
-		LDK::CustomMessageHandler custom_msg_handler1 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler1);
 
 		random_bytes = keys_source1->get_secure_random_bytes(keys_source1->this_arg);
 		LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, 0xdeadbeef, &random_bytes.data, logger1, std::move(custom_msg_handler1));
@@ -567,7 +610,12 @@ int main() {
 		UserConfig_set_channel_handshake_config(&config2, std::move(handshake_config2));
 
 		LDK::ChannelManager cm2 = ChannelManager_new(fee_est, mon2, broadcast, logger2, KeysManager_as_KeysInterface(&keys2), std::move(config2), ChainParameters_new(network, BestBlock_new(chain_tip, 0)));
-		LDK::OnionMessenger om2 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys2), logger2);
+
+		LDK::IgnoringMessageHandler ignoring_handler2 = IgnoringMessageHandler_new();
+		LDK::CustomMessageHandler custom_msg_handler2 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler2);
+		LDK::CustomOnionMessageHandler custom_onion_msg_handler2 = IgnoringMessageHandler_as_CustomOnionMessageHandler(&ignoring_handler2);
+
+		LDK::OnionMessenger om2 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys2), logger2, std::move(custom_onion_msg_handler2));
 
 		LDK::CVec_ChannelDetailsZ channels2 = ChannelManager_list_channels(&cm2);
 		assert(channels2->datalen == 0);
@@ -579,9 +627,6 @@ int main() {
 		assert(ann_res->result_ok);
 
 		LDK::MessageHandler msg_handler2 = MessageHandler_new(ChannelManager_as_ChannelMessageHandler(&cm2), std::move(net_msgs2), OnionMessenger_as_OnionMessageHandler(&om1));
-
-		LDK::IgnoringMessageHandler ignoring_handler2 = IgnoringMessageHandler_new();
-		LDK::CustomMessageHandler custom_msg_handler2 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler2);
 
 		random_bytes = keys_source2->get_secure_random_bytes(keys_source2->this_arg);
 		LDK::PeerManager net2 = PeerManager_new(std::move(msg_handler2), node_secret2, 0xdeadbeef, &random_bytes.data, logger2, std::move(custom_msg_handler2));
@@ -702,7 +747,7 @@ int main() {
 			.some = 5000,
 		};
 		LDK::CResult_InvoiceSignOrCreationErrorZ invoice = create_invoice_from_channelmanager(&cm2,
-			KeysManager_as_KeysInterface(&keys2),
+			KeysManager_as_KeysInterface(&keys2), logger2,
 			LDKCurrency_Bitcoin, min_value,
 			LDKStr {
 				.chars = (const uint8_t *)"Invoice Description",
@@ -823,7 +868,13 @@ int main() {
 	assert(cm1_read->result_ok);
 	LDK::ChannelManager cm1(std::move(cm1_read->contents.result->b));
 
-	LDK::OnionMessenger om1 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys1), logger1);
+	LDKCustomOnionMessageHandler custom_onion_msg_handler1 = {
+		.this_arg = NULL,
+		.handle_custom_message = NULL, // We only create custom messages, not handle them
+		.read_custom_message = NULL, // We only create custom messages, not handle them
+		.free = NULL,
+	};
+	LDK::OnionMessenger om1 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys1), logger1, custom_onion_msg_handler1);
 
 	LDK::CVec_ChannelMonitorZ mons_list2 = LDKCVec_ChannelMonitorZ { .data = (LDKChannelMonitor*)malloc(sizeof(LDKChannelMonitor)), .datalen = 1 };
 	assert(mons2.mons.size() == 1);
@@ -838,7 +889,14 @@ int main() {
 	assert(cm2_read->result_ok);
 	LDK::ChannelManager cm2(std::move(cm2_read->contents.result->b));
 
-	LDK::OnionMessenger om2 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys2), logger2);
+	CustomOnionMsgQueue peer_2_custom_onion_messages;
+	LDKCustomOnionMessageHandler custom_onion_msg_handler2 = {
+		.this_arg = &peer_2_custom_onion_messages,
+		.handle_custom_message = handle_custom_onion_message,
+		.read_custom_message = read_custom_onion_message,
+		.free = NULL,
+	};
+	LDK::OnionMessenger om2 = OnionMessenger_new(KeysManager_as_KeysInterface(&keys2), logger2, custom_onion_msg_handler2);
 
 	// Attempt to close the channel...
 	uint8_t chan_id[32];
@@ -911,7 +969,7 @@ int main() {
 	LDK::InvoicePayer payer = InvoicePayer_new(ChannelManager_as_Payer(&cm1), sending_router, logger1, handler1, Retry_attempts(0));
 
 	LDK::CResult_InvoiceSignOrCreationErrorZ invoice_res2 = create_invoice_from_channelmanager(&cm2,
-		KeysManager_as_KeysInterface(&keys2),
+		KeysManager_as_KeysInterface(&keys2), logger1,
 		LDKCurrency_Bitcoin, COption_u64Z_some(10000),
 		LDKStr {
 			.chars = (const uint8_t *)"Invoice 2 Description",
@@ -991,8 +1049,23 @@ int main() {
 	LDK::CVec_ChannelDetailsZ chans_after_close2 = ChannelManager_list_channels(&cm2);
 	assert(chans_after_close2->datalen == 0);
 
+	assert(OnionMessenger_send_custom_onion_message(&om1,
+			LDKCVec_PublicKeyZ { .data = NULL, .datalen = 0, },
+			Destination_node(ChannelManager_get_our_node_id(&cm2)),
+			build_custom_onion_message(), LDKBlindedRoute { .inner = NULL, .is_owned = true })
+		.result_ok);
+	PeerManager_process_events(&net1);
+	while (true) {
+		std::this_thread::yield();
+		std::unique_lock<std::mutex> lck(peer_2_custom_onion_messages.mtx);
+		if (peer_2_custom_onion_messages.msgs.size() != 0) break;
+	}
+
 	conn.stop();
 
+	std::unique_lock<std::mutex> lck(peer_2_custom_onion_messages.mtx);
+	assert(peer_2_custom_onion_messages.msgs.size() == 1);
+	assert(peer_2_custom_onion_messages.msgs[0].tlv_type() == 8888);
 	assert(peer_2_custom_messages.msgs.size() != 0);
 
 	// Few extra random tests:

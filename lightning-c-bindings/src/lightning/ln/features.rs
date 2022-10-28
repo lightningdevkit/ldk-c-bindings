@@ -1422,36 +1422,11 @@ impl ChannelTypeFeatures {
 		ret
 	}
 }
-/// Returns the set of known init features that are related to channels. At least some of
-/// these features are likely required for peers to talk to us.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn InitFeatures_known_channel_features() -> crate::lightning::ln::features::InitFeatures {
-	let mut ret = lightning::ln::features::InitFeatures::known_channel_features();
-	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
-}
-
-/// Returns the set of known node features that are related to channels.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn NodeFeatures_known_channel_features() -> crate::lightning::ln::features::NodeFeatures {
-	let mut ret = lightning::ln::features::NodeFeatures::known_channel_features();
-	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
-}
-
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InitFeatures_empty() -> crate::lightning::ln::features::InitFeatures {
 	let mut ret = lightning::ln::features::InitFeatures::empty();
-	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
-}
-
-/// Creates a Features with the bits set which are known by the implementation
-#[must_use]
-#[no_mangle]
-pub extern "C" fn InitFeatures_known() -> crate::lightning::ln::features::InitFeatures {
-	let mut ret = lightning::ln::features::InitFeatures::known();
 	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
@@ -1472,14 +1447,6 @@ pub extern "C" fn NodeFeatures_empty() -> crate::lightning::ln::features::NodeFe
 	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Creates a Features with the bits set which are known by the implementation
-#[must_use]
-#[no_mangle]
-pub extern "C" fn NodeFeatures_known() -> crate::lightning::ln::features::NodeFeatures {
-	let mut ret = lightning::ln::features::NodeFeatures::known();
-	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
-}
-
 /// Returns true if this `Features` object contains unknown feature flags which are set as
 /// \"required\".
 #[must_use]
@@ -1494,14 +1461,6 @@ pub extern "C" fn NodeFeatures_requires_unknown_bits(this_arg: &crate::lightning
 #[no_mangle]
 pub extern "C" fn ChannelFeatures_empty() -> crate::lightning::ln::features::ChannelFeatures {
 	let mut ret = lightning::ln::features::ChannelFeatures::empty();
-	crate::lightning::ln::features::ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
-}
-
-/// Creates a Features with the bits set which are known by the implementation
-#[must_use]
-#[no_mangle]
-pub extern "C" fn ChannelFeatures_known() -> crate::lightning::ln::features::ChannelFeatures {
-	let mut ret = lightning::ln::features::ChannelFeatures::known();
 	crate::lightning::ln::features::ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
@@ -1522,14 +1481,6 @@ pub extern "C" fn InvoiceFeatures_empty() -> crate::lightning::ln::features::Inv
 	crate::lightning::ln::features::InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Creates a Features with the bits set which are known by the implementation
-#[must_use]
-#[no_mangle]
-pub extern "C" fn InvoiceFeatures_known() -> crate::lightning::ln::features::InvoiceFeatures {
-	let mut ret = lightning::ln::features::InvoiceFeatures::known();
-	crate::lightning::ln::features::InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
-}
-
 /// Returns true if this `Features` object contains unknown feature flags which are set as
 /// \"required\".
 #[must_use]
@@ -1544,14 +1495,6 @@ pub extern "C" fn InvoiceFeatures_requires_unknown_bits(this_arg: &crate::lightn
 #[no_mangle]
 pub extern "C" fn ChannelTypeFeatures_empty() -> crate::lightning::ln::features::ChannelTypeFeatures {
 	let mut ret = lightning::ln::features::ChannelTypeFeatures::empty();
-	crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
-}
-
-/// Creates a Features with the bits set which are known by the implementation
-#[must_use]
-#[no_mangle]
-pub extern "C" fn ChannelTypeFeatures_known() -> crate::lightning::ln::features::ChannelTypeFeatures {
-	let mut ret = lightning::ln::features::ChannelTypeFeatures::known();
 	crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
@@ -1577,7 +1520,7 @@ pub(crate) extern "C" fn InitFeatures_write_void(obj: *const c_void) -> crate::c
 /// Read a InitFeatures from a byte array, created by InitFeatures_write
 pub extern "C" fn InitFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_InitFeaturesDecodeErrorZ {
 	let res: Result<lightning::ln::features::InitFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -1593,7 +1536,7 @@ pub(crate) extern "C" fn ChannelFeatures_write_void(obj: *const c_void) -> crate
 /// Read a ChannelFeatures from a byte array, created by ChannelFeatures_write
 pub extern "C" fn ChannelFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelFeaturesDecodeErrorZ {
 	let res: Result<lightning::ln::features::ChannelFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::ChannelFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::ChannelFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -1609,7 +1552,7 @@ pub(crate) extern "C" fn NodeFeatures_write_void(obj: *const c_void) -> crate::c
 /// Read a NodeFeatures from a byte array, created by NodeFeatures_write
 pub extern "C" fn NodeFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeFeaturesDecodeErrorZ {
 	let res: Result<lightning::ln::features::NodeFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -1625,7 +1568,7 @@ pub(crate) extern "C" fn InvoiceFeatures_write_void(obj: *const c_void) -> crate
 /// Read a InvoiceFeatures from a byte array, created by InvoiceFeatures_write
 pub extern "C" fn InvoiceFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_InvoiceFeaturesDecodeErrorZ {
 	let res: Result<lightning::ln::features::InvoiceFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::InvoiceFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::InvoiceFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -1641,6 +1584,6 @@ pub(crate) extern "C" fn ChannelTypeFeatures_write_void(obj: *const c_void) -> c
 /// Read a ChannelTypeFeatures from a byte array, created by ChannelTypeFeatures_write
 pub extern "C" fn ChannelTypeFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelTypeFeaturesDecodeErrorZ {
 	let res: Result<lightning::ln::features::ChannelTypeFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }

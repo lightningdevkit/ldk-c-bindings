@@ -272,7 +272,7 @@ while read LINE; do
 				echo "Unable to find method declaration for $LINE"
 				exit 1
 			fi
-			RETVAL="$(echo "$METHOD" | sed 's/[ ]*\([A-Za-z0-9 _]*\)(\*\(.*\)).*/\1/' | sed 's/^struct LDK/LDK::/g' | tr -d ' ')"
+			RETVAL="$(echo "$METHOD" | sed 's/[ ]*\([A-Za-z0-9 _]*\)(\*\(.*\)).*/\1/' | sed -E 's/^(struct|enum) LDK/LDK::/g' | tr -d ' ')"
 			[ "$RETVAL" = "LDK::SecretKey" ] && RETVAL="LDKSecretKey"
 			[ "$RETVAL" = "LDK::PublicKey" ] && RETVAL="LDKPublicKey"
 			[ "$RETVAL" = "LDK::ThirtyTwoBytes" ] && RETVAL="LDKThirtyTwoBytes"

@@ -89,12 +89,14 @@ impl ChannelMonitorUpdate {
 /// increasing and increase by one for each new update, with one exception specified below.
 ///
 /// This sequence number is also used to track up to which points updates which returned
-/// ChannelMonitorUpdateErr::TemporaryFailure have been applied to all copies of a given
+/// [`ChannelMonitorUpdateStatus::InProgress`] have been applied to all copies of a given
 /// ChannelMonitor when ChannelManager::channel_monitor_updated is called.
 ///
 /// The only instance where update_id values are not strictly increasing is the case where we
 /// allow post-force-close updates with a special update ID of [`CLOSED_CHANNEL_UPDATE_ID`]. See
 /// its docs for more details.
+///
+/// [`ChannelMonitorUpdateStatus::InProgress`]: super::ChannelMonitorUpdateStatus::InProgress
 #[no_mangle]
 pub extern "C" fn ChannelMonitorUpdate_get_update_id(this_ptr: &ChannelMonitorUpdate) -> u64 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_id;
@@ -105,12 +107,14 @@ pub extern "C" fn ChannelMonitorUpdate_get_update_id(this_ptr: &ChannelMonitorUp
 /// increasing and increase by one for each new update, with one exception specified below.
 ///
 /// This sequence number is also used to track up to which points updates which returned
-/// ChannelMonitorUpdateErr::TemporaryFailure have been applied to all copies of a given
+/// [`ChannelMonitorUpdateStatus::InProgress`] have been applied to all copies of a given
 /// ChannelMonitor when ChannelManager::channel_monitor_updated is called.
 ///
 /// The only instance where update_id values are not strictly increasing is the case where we
 /// allow post-force-close updates with a special update ID of [`CLOSED_CHANNEL_UPDATE_ID`]. See
 /// its docs for more details.
+///
+/// [`ChannelMonitorUpdateStatus::InProgress`]: super::ChannelMonitorUpdateStatus::InProgress
 #[no_mangle]
 pub extern "C" fn ChannelMonitorUpdate_set_update_id(this_ptr: &mut ChannelMonitorUpdate, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.update_id = val;
@@ -157,7 +161,7 @@ pub(crate) extern "C" fn ChannelMonitorUpdate_write_void(obj: *const c_void) -> 
 /// Read a ChannelMonitorUpdate from a byte array, created by ChannelMonitorUpdate_write
 pub extern "C" fn ChannelMonitorUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelMonitorUpdateDecodeErrorZ {
 	let res: Result<lightning::chain::channelmonitor::ChannelMonitorUpdate, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// An event to be processed by the ChannelManager.
@@ -172,10 +176,10 @@ pub enum MonitorEvent {
 	CommitmentTxConfirmed(
 		crate::lightning::chain::transaction::OutPoint),
 	/// Indicates a [`ChannelMonitor`] update has completed. See
-	/// [`ChannelMonitorUpdateErr::TemporaryFailure`] for more information on how this is used.
+	/// [`ChannelMonitorUpdateStatus::InProgress`] for more information on how this is used.
 	///
-	/// [`ChannelMonitorUpdateErr::TemporaryFailure`]: super::ChannelMonitorUpdateErr::TemporaryFailure
-	UpdateCompleted {
+	/// [`ChannelMonitorUpdateStatus::InProgress`]: super::ChannelMonitorUpdateStatus::InProgress
+	Completed {
 		/// The funding outpoint of the [`ChannelMonitor`] that was updated
 		funding_txo: crate::lightning::chain::transaction::OutPoint,
 		/// The Update ID from [`ChannelMonitorUpdate::update_id`] which was applied or
@@ -186,9 +190,9 @@ pub enum MonitorEvent {
 		monitor_update_id: u64,
 	},
 	/// Indicates a [`ChannelMonitor`] update has failed. See
-	/// [`ChannelMonitorUpdateErr::PermanentFailure`] for more information on how this is used.
+	/// [`ChannelMonitorUpdateStatus::PermanentFailure`] for more information on how this is used.
 	///
-	/// [`ChannelMonitorUpdateErr::PermanentFailure`]: super::ChannelMonitorUpdateErr::PermanentFailure
+	/// [`ChannelMonitorUpdateStatus::PermanentFailure`]: super::ChannelMonitorUpdateStatus::PermanentFailure
 	UpdateFailed(
 		crate::lightning::chain::transaction::OutPoint),
 }
@@ -211,10 +215,10 @@ impl MonitorEvent {
 					*unsafe { Box::from_raw(a_nonref.take_inner()) },
 				)
 			},
-			MonitorEvent::UpdateCompleted {ref funding_txo, ref monitor_update_id, } => {
+			MonitorEvent::Completed {ref funding_txo, ref monitor_update_id, } => {
 				let mut funding_txo_nonref = (*funding_txo).clone();
 				let mut monitor_update_id_nonref = (*monitor_update_id).clone();
-				nativeMonitorEvent::UpdateCompleted {
+				nativeMonitorEvent::Completed {
 					funding_txo: *unsafe { Box::from_raw(funding_txo_nonref.take_inner()) },
 					monitor_update_id: monitor_update_id_nonref,
 				}
@@ -240,8 +244,8 @@ impl MonitorEvent {
 					*unsafe { Box::from_raw(a.take_inner()) },
 				)
 			},
-			MonitorEvent::UpdateCompleted {mut funding_txo, mut monitor_update_id, } => {
-				nativeMonitorEvent::UpdateCompleted {
+			MonitorEvent::Completed {mut funding_txo, mut monitor_update_id, } => {
+				nativeMonitorEvent::Completed {
 					funding_txo: *unsafe { Box::from_raw(funding_txo.take_inner()) },
 					monitor_update_id: monitor_update_id,
 				}
@@ -268,10 +272,10 @@ impl MonitorEvent {
 					crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
 				)
 			},
-			nativeMonitorEvent::UpdateCompleted {ref funding_txo, ref monitor_update_id, } => {
+			nativeMonitorEvent::Completed {ref funding_txo, ref monitor_update_id, } => {
 				let mut funding_txo_nonref = (*funding_txo).clone();
 				let mut monitor_update_id_nonref = (*monitor_update_id).clone();
-				MonitorEvent::UpdateCompleted {
+				MonitorEvent::Completed {
 					funding_txo: crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo_nonref), is_owned: true },
 					monitor_update_id: monitor_update_id_nonref,
 				}
@@ -297,8 +301,8 @@ impl MonitorEvent {
 					crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(a), is_owned: true },
 				)
 			},
-			nativeMonitorEvent::UpdateCompleted {mut funding_txo, mut monitor_update_id, } => {
-				MonitorEvent::UpdateCompleted {
+			nativeMonitorEvent::Completed {mut funding_txo, mut monitor_update_id, } => {
+				MonitorEvent::Completed {
 					funding_txo: crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo), is_owned: true },
 					monitor_update_id: monitor_update_id,
 				}
@@ -330,9 +334,9 @@ pub extern "C" fn MonitorEvent_commitment_tx_confirmed(a: crate::lightning::chai
 	MonitorEvent::CommitmentTxConfirmed(a, )
 }
 #[no_mangle]
-/// Utility method to constructs a new UpdateCompleted-variant MonitorEvent
-pub extern "C" fn MonitorEvent_update_completed(funding_txo: crate::lightning::chain::transaction::OutPoint, monitor_update_id: u64) -> MonitorEvent {
-	MonitorEvent::UpdateCompleted {
+/// Utility method to constructs a new Completed-variant MonitorEvent
+pub extern "C" fn MonitorEvent_completed(funding_txo: crate::lightning::chain::transaction::OutPoint, monitor_update_id: u64) -> MonitorEvent {
+	MonitorEvent::Completed {
 		funding_txo,
 		monitor_update_id,
 	}
@@ -341,6 +345,12 @@ pub extern "C" fn MonitorEvent_update_completed(funding_txo: crate::lightning::c
 /// Utility method to constructs a new UpdateFailed-variant MonitorEvent
 pub extern "C" fn MonitorEvent_update_failed(a: crate::lightning::chain::transaction::OutPoint) -> MonitorEvent {
 	MonitorEvent::UpdateFailed(a, )
+}
+/// Checks if two MonitorEvents contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn MonitorEvent_eq(a: &MonitorEvent, b: &MonitorEvent) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
 }
 #[no_mangle]
 /// Serialize the MonitorEvent object into a byte array which can be read by MonitorEvent_read
@@ -351,7 +361,7 @@ pub extern "C" fn MonitorEvent_write(obj: &crate::lightning::chain::channelmonit
 /// Read a MonitorEvent from a byte array, created by MonitorEvent_write
 pub extern "C" fn MonitorEvent_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_MonitorEventZDecodeErrorZ {
 	let res: Result<Option<lightning::chain::channelmonitor::MonitorEvent>, lightning::ln::msgs::DecodeError> = crate::c_types::maybe_deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_MonitorEventZ::None } else { crate::c_types::derived::COption_MonitorEventZ::Some( { crate::lightning::chain::channelmonitor::MonitorEvent::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_MonitorEventZ::None } else { crate::c_types::derived::COption_MonitorEventZ::Some( { crate::lightning::chain::channelmonitor::MonitorEvent::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -426,6 +436,15 @@ pub(crate) extern "C" fn HTLCUpdate_clone_void(this_ptr: *const c_void) -> *mut 
 pub extern "C" fn HTLCUpdate_clone(orig: &HTLCUpdate) -> HTLCUpdate {
 	orig.clone()
 }
+/// Checks if two HTLCUpdates contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn HTLCUpdate_eq(a: &HTLCUpdate, b: &HTLCUpdate) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the HTLCUpdate object into a byte array which can be read by HTLCUpdate_read
 pub extern "C" fn HTLCUpdate_write(obj: &crate::lightning::chain::channelmonitor::HTLCUpdate) -> crate::c_types::derived::CVec_u8Z {
@@ -439,7 +458,7 @@ pub(crate) extern "C" fn HTLCUpdate_write_void(obj: *const c_void) -> crate::c_t
 /// Read a HTLCUpdate from a byte array, created by HTLCUpdate_write
 pub extern "C" fn HTLCUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_HTLCUpdateDecodeErrorZ {
 	let res: Result<lightning::chain::channelmonitor::HTLCUpdate, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::HTLCUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::channelmonitor::HTLCUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Number of blocks we wait on seeing a HTLC output being solved before we fail corresponding
@@ -931,14 +950,20 @@ pub extern "C" fn ChannelMonitor_get_counterparty_node_id(this_arg: &crate::ligh
 }
 
 /// Used by ChannelManager deserialization to broadcast the latest holder state if its copy of
-/// the Channel was out-of-date. You may use it to get a broadcastable holder toxic tx in case of
-/// fallen-behind, i.e when receiving a channel_reestablish with a proof that our counterparty side knows
-/// a higher revocation secret than the holder commitment number we are aware of. Broadcasting these
-/// transactions are UNSAFE, as they allow counterparty side to punish you. Nevertheless you may want to
-/// broadcast them if counterparty don't close channel with his higher commitment transaction after a
-/// substantial amount of time (a month or even a year) to get back funds. Best may be to contact
-/// out-of-band the other node operator to coordinate with him if option is available to you.
-/// In any-case, choice is up to the user.
+/// the Channel was out-of-date.
+///
+/// You may also use this to broadcast the latest local commitment transaction, either because
+/// a monitor update failed with [`ChannelMonitorUpdateStatus::PermanentFailure`] or because we've
+/// fallen behind (i.e. we've received proof that our counterparty side knows a revocation
+/// secret we gave them that they shouldn't know).
+///
+/// Broadcasting these transactions in the second case is UNSAFE, as they allow counterparty
+/// side to punish you. Nevertheless you may want to broadcast them if counterparty doesn't
+/// close channel with their commitment transaction after a substantial amount of time. Best
+/// may be to contact the other node operator out-of-band to coordinate other options available
+/// to you. In any-case, the choice is up to you.
+///
+/// [`ChannelMonitorUpdateStatus::PermanentFailure`]: super::ChannelMonitorUpdateStatus::PermanentFailure
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_latest_holder_commitment_txn(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, logger: &crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionZ {
@@ -1062,6 +1087,6 @@ pub extern "C" fn ChannelMonitor_get_claimable_balances(this_arg: &crate::lightn
 pub extern "C" fn C2Tuple_BlockHashChannelMonitorZ_read(ser: crate::c_types::u8slice, arg: &crate::lightning::chain::keysinterface::KeysInterface) -> crate::c_types::derived::CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
 	let arg_conv = arg;
 	let res: Result<(bitcoin::hash_types::BlockHash, lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>), lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_res_0_0, mut orig_res_0_1) = o; let mut local_res_0 = (crate::c_types::ThirtyTwoBytes { data: orig_res_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_res_0_1), is_owned: true }).into(); local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_res_0_0, mut orig_res_0_1) = o; let mut local_res_0 = (crate::c_types::ThirtyTwoBytes { data: orig_res_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_res_0_1), is_owned: true }).into(); local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }

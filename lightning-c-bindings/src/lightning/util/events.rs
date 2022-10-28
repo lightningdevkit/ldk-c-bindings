@@ -164,7 +164,7 @@ pub extern "C" fn PaymentPurpose_write(obj: &crate::lightning::util::events::Pay
 /// Read a PaymentPurpose from a byte array, created by PaymentPurpose_write
 pub extern "C" fn PaymentPurpose_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_PaymentPurposeDecodeErrorZ {
 	let res: Result<lightning::util::events::PaymentPurpose, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::util::events::PaymentPurpose::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::util::events::PaymentPurpose::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// The reason the channel was closed. See individual variants more details.
@@ -205,11 +205,19 @@ pub enum ClosureReason {
 	/// The peer disconnected prior to funding completing. In this case the spec mandates that we
 	/// forget the channel entirely - we can attempt again if the peer reconnects.
 	///
+	/// This includes cases where we restarted prior to funding completion, including prior to the
+	/// initial [`ChannelMonitor`] persistence completing.
+	///
 	/// In LDK versions prior to 0.0.107 this could also occur if we were unable to connect to the
 	/// peer because of mutual incompatibility between us and our channel counterparty.
+	///
+	/// [`ChannelMonitor`]: crate::chain::channelmonitor::ChannelMonitor
 	DisconnectedPeer,
-	/// Closure generated from `ChannelManager::read` if the ChannelMonitor is newer than
-	/// the ChannelManager deserialized.
+	/// Closure generated from `ChannelManager::read` if the [`ChannelMonitor`] is newer than
+	/// the [`ChannelManager`] deserialized.
+	///
+	/// [`ChannelMonitor`]: crate::chain::channelmonitor::ChannelMonitor
+	/// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
 	OutdatedChannelManager,
 }
 use lightning::util::events::ClosureReason as ClosureReasonImport;
@@ -351,6 +359,12 @@ pub extern "C" fn ClosureReason_disconnected_peer() -> ClosureReason {
 /// Utility method to constructs a new OutdatedChannelManager-variant ClosureReason
 pub extern "C" fn ClosureReason_outdated_channel_manager() -> ClosureReason {
 	ClosureReason::OutdatedChannelManager}
+/// Checks if two ClosureReasons contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn ClosureReason_eq(a: &ClosureReason, b: &ClosureReason) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the ClosureReason object into a byte array which can be read by ClosureReason_read
 pub extern "C" fn ClosureReason_write(obj: &crate::lightning::util::events::ClosureReason) -> crate::c_types::derived::CVec_u8Z {
@@ -360,7 +374,7 @@ pub extern "C" fn ClosureReason_write(obj: &crate::lightning::util::events::Clos
 /// Read a ClosureReason from a byte array, created by ClosureReason_write
 pub extern "C" fn ClosureReason_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_ClosureReasonZDecodeErrorZ {
 	let res: Result<Option<lightning::util::events::ClosureReason>, lightning::ln::msgs::DecodeError> = crate::c_types::maybe_deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_ClosureReasonZ::None } else { crate::c_types::derived::COption_ClosureReasonZ::Some( { crate::lightning::util::events::ClosureReason::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_ClosureReasonZ::None } else { crate::c_types::derived::COption_ClosureReasonZ::Some( { crate::lightning::util::events::ClosureReason::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Intended destination of a failed HTLC as indicated in [`Event::HTLCHandlingFailed`].
@@ -528,6 +542,12 @@ pub extern "C" fn HTLCDestination_failed_payment(payment_hash: crate::c_types::T
 		payment_hash,
 	}
 }
+/// Checks if two HTLCDestinations contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn HTLCDestination_eq(a: &HTLCDestination, b: &HTLCDestination) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the HTLCDestination object into a byte array which can be read by HTLCDestination_read
 pub extern "C" fn HTLCDestination_write(obj: &crate::lightning::util::events::HTLCDestination) -> crate::c_types::derived::CVec_u8Z {
@@ -537,7 +557,7 @@ pub extern "C" fn HTLCDestination_write(obj: &crate::lightning::util::events::HT
 /// Read a HTLCDestination from a byte array, created by HTLCDestination_write
 pub extern "C" fn HTLCDestination_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_HTLCDestinationZDecodeErrorZ {
 	let res: Result<Option<lightning::util::events::HTLCDestination>, lightning::ln::msgs::DecodeError> = crate::c_types::maybe_deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_HTLCDestinationZ::None } else { crate::c_types::derived::COption_HTLCDestinationZ::Some( { crate::lightning::util::events::HTLCDestination::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_HTLCDestinationZ::None } else { crate::c_types::derived::COption_HTLCDestinationZ::Some( { crate::lightning::util::events::HTLCDestination::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// An Event which you should probably take some action in response to.
@@ -1786,7 +1806,7 @@ pub extern "C" fn Event_write(obj: &crate::lightning::util::events::Event) -> cr
 /// Read a Event from a byte array, created by Event_write
 pub extern "C" fn Event_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_EventZDecodeErrorZ {
 	let res: Result<Option<lightning::util::events::Event>, lightning::ln::msgs::DecodeError> = crate::c_types::maybe_deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_EventZ::None } else { crate::c_types::derived::COption_EventZ::Some( { crate::lightning::util::events::Event::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_EventZ::None } else { crate::c_types::derived::COption_EventZ::Some( { crate::lightning::util::events::Event::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// An event generated by ChannelManager which indicates a message should be sent to a peer (or

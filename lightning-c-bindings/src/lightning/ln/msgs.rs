@@ -31,75 +31,143 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
-
-use lightning::ln::msgs::DecodeError as nativeDecodeErrorImport;
-pub(crate) type nativeDecodeError = nativeDecodeErrorImport;
-
 /// An error in decoding a message or struct.
+#[derive(Clone)]
 #[must_use]
 #[repr(C)]
-pub struct DecodeError {
-	/// A pointer to the opaque Rust object.
-
-	/// Nearly everywhere, inner must be non-null, however in places where
-	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeDecodeError,
-	/// Indicates that this is the only struct which contains the same pointer.
-
-	/// Rust functions which take ownership of an object provided via an argument require
-	/// this to be true and invalidate the object pointed to by inner.
-	pub is_owned: bool,
+pub enum DecodeError {
+	/// A version byte specified something we don't know how to handle.
+	/// Includes unknown realm byte in an OnionHopData packet
+	UnknownVersion,
+	/// Unknown feature mandating we fail to parse message (eg TLV with an even, unknown type)
+	UnknownRequiredFeature,
+	/// Value was invalid, eg a byte which was supposed to be a bool was something other than a 0
+	/// or 1, a public key/private key/signature was invalid, text wasn't UTF-8, TLV was
+	/// syntactically incorrect, etc
+	InvalidValue,
+	/// Buffer too short
+	ShortRead,
+	/// A length descriptor in the packet didn't describe the later data correctly
+	BadLengthDescriptor,
+	/// Error from std::io
+	Io(
+		crate::c_types::IOError),
+	/// The message included zlib-compressed values, which we don't support.
+	UnsupportedCompression,
 }
+use lightning::ln::msgs::DecodeError as DecodeErrorImport;
+pub(crate) type nativeDecodeError = DecodeErrorImport;
 
-impl Drop for DecodeError {
-	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeDecodeError>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
-		}
-	}
-}
-/// Frees any resources used by the DecodeError, if is_owned is set and inner is non-NULL.
-#[no_mangle]
-pub extern "C" fn DecodeError_free(this_obj: DecodeError) { }
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn DecodeError_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDecodeError); }
-}
-#[allow(unused)]
 impl DecodeError {
-	pub(crate) fn get_native_ref(&self) -> &'static nativeDecodeError {
-		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeDecodeError {
+		match self {
+			DecodeError::UnknownVersion => nativeDecodeError::UnknownVersion,
+			DecodeError::UnknownRequiredFeature => nativeDecodeError::UnknownRequiredFeature,
+			DecodeError::InvalidValue => nativeDecodeError::InvalidValue,
+			DecodeError::ShortRead => nativeDecodeError::ShortRead,
+			DecodeError::BadLengthDescriptor => nativeDecodeError::BadLengthDescriptor,
+			DecodeError::Io (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				nativeDecodeError::Io (
+					a_nonref.to_rust_kind(),
+				)
+			},
+			DecodeError::UnsupportedCompression => nativeDecodeError::UnsupportedCompression,
+		}
 	}
-	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeDecodeError {
-		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeDecodeError {
+		match self {
+			DecodeError::UnknownVersion => nativeDecodeError::UnknownVersion,
+			DecodeError::UnknownRequiredFeature => nativeDecodeError::UnknownRequiredFeature,
+			DecodeError::InvalidValue => nativeDecodeError::InvalidValue,
+			DecodeError::ShortRead => nativeDecodeError::ShortRead,
+			DecodeError::BadLengthDescriptor => nativeDecodeError::BadLengthDescriptor,
+			DecodeError::Io (mut a, ) => {
+				nativeDecodeError::Io (
+					a.to_rust_kind(),
+				)
+			},
+			DecodeError::UnsupportedCompression => nativeDecodeError::UnsupportedCompression,
+		}
 	}
-	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-	pub(crate) fn take_inner(mut self) -> *mut nativeDecodeError {
-		assert!(self.is_owned);
-		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = core::ptr::null_mut();
-		ret
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeDecodeError) -> Self {
+		match native {
+			nativeDecodeError::UnknownVersion => DecodeError::UnknownVersion,
+			nativeDecodeError::UnknownRequiredFeature => DecodeError::UnknownRequiredFeature,
+			nativeDecodeError::InvalidValue => DecodeError::InvalidValue,
+			nativeDecodeError::ShortRead => DecodeError::ShortRead,
+			nativeDecodeError::BadLengthDescriptor => DecodeError::BadLengthDescriptor,
+			nativeDecodeError::Io (ref a, ) => {
+				let mut a_nonref = (*a).clone();
+				DecodeError::Io (
+					crate::c_types::IOError::from_rust_kind(a_nonref),
+				)
+			},
+			nativeDecodeError::UnsupportedCompression => DecodeError::UnsupportedCompression,
+		}
 	}
-}
-impl Clone for DecodeError {
-	fn clone(&self) -> Self {
-		Self {
-			inner: if <*mut nativeDecodeError>::is_null(self.inner) { core::ptr::null_mut() } else {
-				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
-			is_owned: true,
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeDecodeError) -> Self {
+		match native {
+			nativeDecodeError::UnknownVersion => DecodeError::UnknownVersion,
+			nativeDecodeError::UnknownRequiredFeature => DecodeError::UnknownRequiredFeature,
+			nativeDecodeError::InvalidValue => DecodeError::InvalidValue,
+			nativeDecodeError::ShortRead => DecodeError::ShortRead,
+			nativeDecodeError::BadLengthDescriptor => DecodeError::BadLengthDescriptor,
+			nativeDecodeError::Io (mut a, ) => {
+				DecodeError::Io (
+					crate::c_types::IOError::from_rust_kind(a),
+				)
+			},
+			nativeDecodeError::UnsupportedCompression => DecodeError::UnsupportedCompression,
 		}
 	}
 }
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn DecodeError_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeDecodeError)).clone() })) as *mut c_void
-}
+/// Frees any resources used by the DecodeError
 #[no_mangle]
+pub extern "C" fn DecodeError_free(this_ptr: DecodeError) { }
 /// Creates a copy of the DecodeError
+#[no_mangle]
 pub extern "C" fn DecodeError_clone(orig: &DecodeError) -> DecodeError {
 	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new UnknownVersion-variant DecodeError
+pub extern "C" fn DecodeError_unknown_version() -> DecodeError {
+	DecodeError::UnknownVersion}
+#[no_mangle]
+/// Utility method to constructs a new UnknownRequiredFeature-variant DecodeError
+pub extern "C" fn DecodeError_unknown_required_feature() -> DecodeError {
+	DecodeError::UnknownRequiredFeature}
+#[no_mangle]
+/// Utility method to constructs a new InvalidValue-variant DecodeError
+pub extern "C" fn DecodeError_invalid_value() -> DecodeError {
+	DecodeError::InvalidValue}
+#[no_mangle]
+/// Utility method to constructs a new ShortRead-variant DecodeError
+pub extern "C" fn DecodeError_short_read() -> DecodeError {
+	DecodeError::ShortRead}
+#[no_mangle]
+/// Utility method to constructs a new BadLengthDescriptor-variant DecodeError
+pub extern "C" fn DecodeError_bad_length_descriptor() -> DecodeError {
+	DecodeError::BadLengthDescriptor}
+#[no_mangle]
+/// Utility method to constructs a new Io-variant DecodeError
+pub extern "C" fn DecodeError_io(a: crate::c_types::IOError) -> DecodeError {
+	DecodeError::Io(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new UnsupportedCompression-variant DecodeError
+pub extern "C" fn DecodeError_unsupported_compression() -> DecodeError {
+	DecodeError::UnsupportedCompression}
+/// Checks if two DecodeErrors contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn DecodeError_eq(a: &DecodeError, b: &DecodeError) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
 }
 
 use lightning::ln::msgs::Init as nativeInitImport;
@@ -210,6 +278,15 @@ pub(crate) extern "C" fn Init_clone_void(this_ptr: *const c_void) -> *mut c_void
 /// Creates a copy of the Init
 pub extern "C" fn Init_clone(orig: &Init) -> Init {
 	orig.clone()
+}
+/// Checks if two Inits contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Init_eq(a: &Init, b: &Init) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::ErrorMessage as nativeErrorMessageImport;
@@ -324,6 +401,15 @@ pub(crate) extern "C" fn ErrorMessage_clone_void(this_ptr: *const c_void) -> *mu
 pub extern "C" fn ErrorMessage_clone(orig: &ErrorMessage) -> ErrorMessage {
 	orig.clone()
 }
+/// Checks if two ErrorMessages contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ErrorMessage_eq(a: &ErrorMessage, b: &ErrorMessage) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::WarningMessage as nativeWarningMessageImport;
 pub(crate) type nativeWarningMessage = nativeWarningMessageImport;
@@ -435,6 +521,15 @@ pub(crate) extern "C" fn WarningMessage_clone_void(this_ptr: *const c_void) -> *
 pub extern "C" fn WarningMessage_clone(orig: &WarningMessage) -> WarningMessage {
 	orig.clone()
 }
+/// Checks if two WarningMessages contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn WarningMessage_eq(a: &WarningMessage, b: &WarningMessage) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::Ping as nativePingImport;
 pub(crate) type nativePing = nativePingImport;
@@ -538,6 +633,15 @@ pub(crate) extern "C" fn Ping_clone_void(this_ptr: *const c_void) -> *mut c_void
 pub extern "C" fn Ping_clone(orig: &Ping) -> Ping {
 	orig.clone()
 }
+/// Checks if two Pings contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Ping_eq(a: &Ping, b: &Ping) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::Pong as nativePongImport;
 pub(crate) type nativePong = nativePongImport;
@@ -628,6 +732,15 @@ pub(crate) extern "C" fn Pong_clone_void(this_ptr: *const c_void) -> *mut c_void
 /// Creates a copy of the Pong
 pub extern "C" fn Pong_clone(orig: &Pong) -> Pong {
 	orig.clone()
+}
+/// Checks if two Pongs contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Pong_eq(a: &Pong, b: &Pong) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::OpenChannel as nativeOpenChannelImport;
@@ -918,6 +1031,15 @@ pub(crate) extern "C" fn OpenChannel_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn OpenChannel_clone(orig: &OpenChannel) -> OpenChannel {
 	orig.clone()
 }
+/// Checks if two OpenChannels contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn OpenChannel_eq(a: &OpenChannel, b: &OpenChannel) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::AcceptChannel as nativeAcceptChannelImport;
 pub(crate) type nativeAcceptChannel = nativeAcceptChannelImport;
@@ -1167,6 +1289,15 @@ pub(crate) extern "C" fn AcceptChannel_clone_void(this_ptr: *const c_void) -> *m
 pub extern "C" fn AcceptChannel_clone(orig: &AcceptChannel) -> AcceptChannel {
 	orig.clone()
 }
+/// Checks if two AcceptChannels contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn AcceptChannel_eq(a: &AcceptChannel, b: &AcceptChannel) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::FundingCreated as nativeFundingCreatedImport;
 pub(crate) type nativeFundingCreated = nativeFundingCreatedImport;
@@ -1292,6 +1423,15 @@ pub(crate) extern "C" fn FundingCreated_clone_void(this_ptr: *const c_void) -> *
 pub extern "C" fn FundingCreated_clone(orig: &FundingCreated) -> FundingCreated {
 	orig.clone()
 }
+/// Checks if two FundingCreateds contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn FundingCreated_eq(a: &FundingCreated, b: &FundingCreated) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::FundingSigned as nativeFundingSignedImport;
 pub(crate) type nativeFundingSigned = nativeFundingSignedImport;
@@ -1392,6 +1532,15 @@ pub(crate) extern "C" fn FundingSigned_clone_void(this_ptr: *const c_void) -> *m
 /// Creates a copy of the FundingSigned
 pub extern "C" fn FundingSigned_clone(orig: &FundingSigned) -> FundingSigned {
 	orig.clone()
+}
+/// Checks if two FundingSigneds contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn FundingSigned_eq(a: &FundingSigned, b: &FundingSigned) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::ChannelReady as nativeChannelReadyImport;
@@ -1511,6 +1660,15 @@ pub(crate) extern "C" fn ChannelReady_clone_void(this_ptr: *const c_void) -> *mu
 pub extern "C" fn ChannelReady_clone(orig: &ChannelReady) -> ChannelReady {
 	orig.clone()
 }
+/// Checks if two ChannelReadys contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ChannelReady_eq(a: &ChannelReady, b: &ChannelReady) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::Shutdown as nativeShutdownImport;
 pub(crate) type nativeShutdown = nativeShutdownImport;
@@ -1613,6 +1771,15 @@ pub(crate) extern "C" fn Shutdown_clone_void(this_ptr: *const c_void) -> *mut c_
 /// Creates a copy of the Shutdown
 pub extern "C" fn Shutdown_clone(orig: &Shutdown) -> Shutdown {
 	orig.clone()
+}
+/// Checks if two Shutdowns contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Shutdown_eq(a: &Shutdown, b: &Shutdown) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::ClosingSignedFeeRange as nativeClosingSignedFeeRangeImport;
@@ -1720,6 +1887,15 @@ pub(crate) extern "C" fn ClosingSignedFeeRange_clone_void(this_ptr: *const c_voi
 /// Creates a copy of the ClosingSignedFeeRange
 pub extern "C" fn ClosingSignedFeeRange_clone(orig: &ClosingSignedFeeRange) -> ClosingSignedFeeRange {
 	orig.clone()
+}
+/// Checks if two ClosingSignedFeeRanges contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ClosingSignedFeeRange_eq(a: &ClosingSignedFeeRange, b: &ClosingSignedFeeRange) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::ClosingSigned as nativeClosingSignedImport;
@@ -1855,6 +2031,15 @@ pub(crate) extern "C" fn ClosingSigned_clone_void(this_ptr: *const c_void) -> *m
 pub extern "C" fn ClosingSigned_clone(orig: &ClosingSigned) -> ClosingSigned {
 	orig.clone()
 }
+/// Checks if two ClosingSigneds contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ClosingSigned_eq(a: &ClosingSigned, b: &ClosingSigned) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::UpdateAddHTLC as nativeUpdateAddHTLCImport;
 pub(crate) type nativeUpdateAddHTLC = nativeUpdateAddHTLCImport;
@@ -1980,6 +2165,15 @@ pub(crate) extern "C" fn UpdateAddHTLC_clone_void(this_ptr: *const c_void) -> *m
 pub extern "C" fn UpdateAddHTLC_clone(orig: &UpdateAddHTLC) -> UpdateAddHTLC {
 	orig.clone()
 }
+/// Checks if two UpdateAddHTLCs contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn UpdateAddHTLC_eq(a: &UpdateAddHTLC, b: &UpdateAddHTLC) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::OnionMessage as nativeOnionMessageImport;
 pub(crate) type nativeOnionMessage = nativeOnionMessageImport;
@@ -2060,6 +2254,15 @@ pub(crate) extern "C" fn OnionMessage_clone_void(this_ptr: *const c_void) -> *mu
 /// Creates a copy of the OnionMessage
 pub extern "C" fn OnionMessage_clone(orig: &OnionMessage) -> OnionMessage {
 	orig.clone()
+}
+/// Checks if two OnionMessages contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn OnionMessage_eq(a: &OnionMessage, b: &OnionMessage) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::UpdateFulfillHTLC as nativeUpdateFulfillHTLCImport;
@@ -2174,6 +2377,15 @@ pub(crate) extern "C" fn UpdateFulfillHTLC_clone_void(this_ptr: *const c_void) -
 pub extern "C" fn UpdateFulfillHTLC_clone(orig: &UpdateFulfillHTLC) -> UpdateFulfillHTLC {
 	orig.clone()
 }
+/// Checks if two UpdateFulfillHTLCs contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn UpdateFulfillHTLC_eq(a: &UpdateFulfillHTLC, b: &UpdateFulfillHTLC) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::UpdateFailHTLC as nativeUpdateFailHTLCImport;
 pub(crate) type nativeUpdateFailHTLC = nativeUpdateFailHTLCImport;
@@ -2265,6 +2477,15 @@ pub(crate) extern "C" fn UpdateFailHTLC_clone_void(this_ptr: *const c_void) -> *
 /// Creates a copy of the UpdateFailHTLC
 pub extern "C" fn UpdateFailHTLC_clone(orig: &UpdateFailHTLC) -> UpdateFailHTLC {
 	orig.clone()
+}
+/// Checks if two UpdateFailHTLCs contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn UpdateFailHTLC_eq(a: &UpdateFailHTLC, b: &UpdateFailHTLC) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::UpdateFailMalformedHTLC as nativeUpdateFailMalformedHTLCImport;
@@ -2368,6 +2589,15 @@ pub(crate) extern "C" fn UpdateFailMalformedHTLC_clone_void(this_ptr: *const c_v
 /// Creates a copy of the UpdateFailMalformedHTLC
 pub extern "C" fn UpdateFailMalformedHTLC_clone(orig: &UpdateFailMalformedHTLC) -> UpdateFailMalformedHTLC {
 	orig.clone()
+}
+/// Checks if two UpdateFailMalformedHTLCs contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn UpdateFailMalformedHTLC_eq(a: &UpdateFailMalformedHTLC, b: &UpdateFailMalformedHTLC) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::CommitmentSigned as nativeCommitmentSignedImport;
@@ -2487,6 +2717,15 @@ pub(crate) extern "C" fn CommitmentSigned_clone_void(this_ptr: *const c_void) ->
 pub extern "C" fn CommitmentSigned_clone(orig: &CommitmentSigned) -> CommitmentSigned {
 	orig.clone()
 }
+/// Checks if two CommitmentSigneds contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn CommitmentSigned_eq(a: &CommitmentSigned, b: &CommitmentSigned) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::RevokeAndACK as nativeRevokeAndACKImport;
 pub(crate) type nativeRevokeAndACK = nativeRevokeAndACKImport;
@@ -2600,6 +2839,15 @@ pub(crate) extern "C" fn RevokeAndACK_clone_void(this_ptr: *const c_void) -> *mu
 pub extern "C" fn RevokeAndACK_clone(orig: &RevokeAndACK) -> RevokeAndACK {
 	orig.clone()
 }
+/// Checks if two RevokeAndACKs contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RevokeAndACK_eq(a: &RevokeAndACK, b: &RevokeAndACK) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::UpdateFee as nativeUpdateFeeImport;
 pub(crate) type nativeUpdateFee = nativeUpdateFeeImport;
@@ -2700,6 +2948,15 @@ pub(crate) extern "C" fn UpdateFee_clone_void(this_ptr: *const c_void) -> *mut c
 /// Creates a copy of the UpdateFee
 pub extern "C" fn UpdateFee_clone(orig: &UpdateFee) -> UpdateFee {
 	orig.clone()
+}
+/// Checks if two UpdateFees contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn UpdateFee_eq(a: &UpdateFee, b: &UpdateFee) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::DataLossProtect as nativeDataLossProtectImport;
@@ -2807,6 +3064,15 @@ pub(crate) extern "C" fn DataLossProtect_clone_void(this_ptr: *const c_void) -> 
 pub extern "C" fn DataLossProtect_clone(orig: &DataLossProtect) -> DataLossProtect {
 	orig.clone()
 }
+/// Checks if two DataLossProtects contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn DataLossProtect_eq(a: &DataLossProtect, b: &DataLossProtect) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::ChannelReestablish as nativeChannelReestablishImport;
 pub(crate) type nativeChannelReestablish = nativeChannelReestablishImport;
@@ -2909,6 +3175,15 @@ pub(crate) extern "C" fn ChannelReestablish_clone_void(this_ptr: *const c_void) 
 /// Creates a copy of the ChannelReestablish
 pub extern "C" fn ChannelReestablish_clone(orig: &ChannelReestablish) -> ChannelReestablish {
 	orig.clone()
+}
+/// Checks if two ChannelReestablishs contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ChannelReestablish_eq(a: &ChannelReestablish, b: &ChannelReestablish) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::AnnouncementSignatures as nativeAnnouncementSignaturesImport;
@@ -3034,6 +3309,15 @@ pub(crate) extern "C" fn AnnouncementSignatures_clone_void(this_ptr: *const c_vo
 /// Creates a copy of the AnnouncementSignatures
 pub extern "C" fn AnnouncementSignatures_clone(orig: &AnnouncementSignatures) -> AnnouncementSignatures {
 	orig.clone()
+}
+/// Checks if two AnnouncementSignaturess contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn AnnouncementSignatures_eq(a: &AnnouncementSignatures, b: &AnnouncementSignatures) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 /// An address which can be used to connect to a remote peer
 #[derive(Clone)]
@@ -3299,6 +3583,12 @@ pub extern "C" fn NetAddress_hostname(hostname: crate::lightning::util::ser::Hos
 		port,
 	}
 }
+/// Checks if two NetAddresss contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn NetAddress_eq(a: &NetAddress, b: &NetAddress) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 #[no_mangle]
 /// Serialize the NetAddress object into a byte array which can be read by NetAddress_read
 pub extern "C" fn NetAddress_write(obj: &crate::lightning::ln::msgs::NetAddress) -> crate::c_types::derived::CVec_u8Z {
@@ -3308,7 +3598,7 @@ pub extern "C" fn NetAddress_write(obj: &crate::lightning::ln::msgs::NetAddress)
 /// Read a NetAddress from a byte array, created by NetAddress_write
 pub extern "C" fn NetAddress_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NetAddressDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::NetAddress, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::NetAddress::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::NetAddress::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -3455,6 +3745,15 @@ pub(crate) extern "C" fn UnsignedNodeAnnouncement_clone_void(this_ptr: *const c_
 pub extern "C" fn UnsignedNodeAnnouncement_clone(orig: &UnsignedNodeAnnouncement) -> UnsignedNodeAnnouncement {
 	orig.clone()
 }
+/// Checks if two UnsignedNodeAnnouncements contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn UnsignedNodeAnnouncement_eq(a: &UnsignedNodeAnnouncement, b: &UnsignedNodeAnnouncement) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::NodeAnnouncement as nativeNodeAnnouncementImport;
 pub(crate) type nativeNodeAnnouncement = nativeNodeAnnouncementImport;
@@ -3555,6 +3854,15 @@ pub(crate) extern "C" fn NodeAnnouncement_clone_void(this_ptr: *const c_void) ->
 /// Creates a copy of the NodeAnnouncement
 pub extern "C" fn NodeAnnouncement_clone(orig: &NodeAnnouncement) -> NodeAnnouncement {
 	orig.clone()
+}
+/// Checks if two NodeAnnouncements contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn NodeAnnouncement_eq(a: &NodeAnnouncement, b: &NodeAnnouncement) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::UnsignedChannelAnnouncement as nativeUnsignedChannelAnnouncementImport;
@@ -3703,6 +4011,15 @@ pub(crate) extern "C" fn UnsignedChannelAnnouncement_clone_void(this_ptr: *const
 pub extern "C" fn UnsignedChannelAnnouncement_clone(orig: &UnsignedChannelAnnouncement) -> UnsignedChannelAnnouncement {
 	orig.clone()
 }
+/// Checks if two UnsignedChannelAnnouncements contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn UnsignedChannelAnnouncement_eq(a: &UnsignedChannelAnnouncement, b: &UnsignedChannelAnnouncement) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::ChannelAnnouncement as nativeChannelAnnouncementImport;
 pub(crate) type nativeChannelAnnouncement = nativeChannelAnnouncementImport;
@@ -3839,6 +4156,15 @@ pub(crate) extern "C" fn ChannelAnnouncement_clone_void(this_ptr: *const c_void)
 /// Creates a copy of the ChannelAnnouncement
 pub extern "C" fn ChannelAnnouncement_clone(orig: &ChannelAnnouncement) -> ChannelAnnouncement {
 	orig.clone()
+}
+/// Checks if two ChannelAnnouncements contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ChannelAnnouncement_eq(a: &ChannelAnnouncement, b: &ChannelAnnouncement) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::UnsignedChannelUpdate as nativeUnsignedChannelUpdateImport;
@@ -4060,6 +4386,15 @@ pub(crate) extern "C" fn UnsignedChannelUpdate_clone_void(this_ptr: *const c_voi
 pub extern "C" fn UnsignedChannelUpdate_clone(orig: &UnsignedChannelUpdate) -> UnsignedChannelUpdate {
 	orig.clone()
 }
+/// Checks if two UnsignedChannelUpdates contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn UnsignedChannelUpdate_eq(a: &UnsignedChannelUpdate, b: &UnsignedChannelUpdate) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::ChannelUpdate as nativeChannelUpdateImport;
 pub(crate) type nativeChannelUpdate = nativeChannelUpdateImport;
@@ -4160,6 +4495,15 @@ pub(crate) extern "C" fn ChannelUpdate_clone_void(this_ptr: *const c_void) -> *m
 /// Creates a copy of the ChannelUpdate
 pub extern "C" fn ChannelUpdate_clone(orig: &ChannelUpdate) -> ChannelUpdate {
 	orig.clone()
+}
+/// Checks if two ChannelUpdates contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ChannelUpdate_eq(a: &ChannelUpdate, b: &ChannelUpdate) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::QueryChannelRange as nativeQueryChannelRangeImport;
@@ -4276,6 +4620,15 @@ pub(crate) extern "C" fn QueryChannelRange_clone_void(this_ptr: *const c_void) -
 /// Creates a copy of the QueryChannelRange
 pub extern "C" fn QueryChannelRange_clone(orig: &QueryChannelRange) -> QueryChannelRange {
 	orig.clone()
+}
+/// Checks if two QueryChannelRanges contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn QueryChannelRange_eq(a: &QueryChannelRange, b: &QueryChannelRange) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::ReplyChannelRange as nativeReplyChannelRangeImport;
@@ -4425,6 +4778,15 @@ pub(crate) extern "C" fn ReplyChannelRange_clone_void(this_ptr: *const c_void) -
 pub extern "C" fn ReplyChannelRange_clone(orig: &ReplyChannelRange) -> ReplyChannelRange {
 	orig.clone()
 }
+/// Checks if two ReplyChannelRanges contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ReplyChannelRange_eq(a: &ReplyChannelRange, b: &ReplyChannelRange) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::QueryShortChannelIds as nativeQueryShortChannelIdsImport;
 pub(crate) type nativeQueryShortChannelIds = nativeQueryShortChannelIdsImport;
@@ -4538,6 +4900,15 @@ pub(crate) extern "C" fn QueryShortChannelIds_clone_void(this_ptr: *const c_void
 pub extern "C" fn QueryShortChannelIds_clone(orig: &QueryShortChannelIds) -> QueryShortChannelIds {
 	orig.clone()
 }
+/// Checks if two QueryShortChannelIdss contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn QueryShortChannelIds_eq(a: &QueryShortChannelIds, b: &QueryShortChannelIds) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::msgs::ReplyShortChannelIdsEnd as nativeReplyShortChannelIdsEndImport;
 pub(crate) type nativeReplyShortChannelIdsEnd = nativeReplyShortChannelIdsEndImport;
@@ -4643,6 +5014,15 @@ pub(crate) extern "C" fn ReplyShortChannelIdsEnd_clone_void(this_ptr: *const c_v
 /// Creates a copy of the ReplyShortChannelIdsEnd
 pub extern "C" fn ReplyShortChannelIdsEnd_clone(orig: &ReplyShortChannelIdsEnd) -> ReplyShortChannelIdsEnd {
 	orig.clone()
+}
+/// Checks if two ReplyShortChannelIdsEnds contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ReplyShortChannelIdsEnd_eq(a: &ReplyShortChannelIdsEnd, b: &ReplyShortChannelIdsEnd) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
 use lightning::ln::msgs::GossipTimestampFilter as nativeGossipTimestampFilterImport;
@@ -4758,6 +5138,15 @@ pub(crate) extern "C" fn GossipTimestampFilter_clone_void(this_ptr: *const c_voi
 /// Creates a copy of the GossipTimestampFilter
 pub extern "C" fn GossipTimestampFilter_clone(orig: &GossipTimestampFilter) -> GossipTimestampFilter {
 	orig.clone()
+}
+/// Checks if two GossipTimestampFilters contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn GossipTimestampFilter_eq(a: &GossipTimestampFilter, b: &GossipTimestampFilter) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 /// Used to put an error message in a LightningError
 #[derive(Clone)]
@@ -5240,6 +5629,15 @@ pub(crate) extern "C" fn CommitmentUpdate_clone_void(this_ptr: *const c_void) ->
 pub extern "C" fn CommitmentUpdate_clone(orig: &CommitmentUpdate) -> CommitmentUpdate {
 	orig.clone()
 }
+/// Checks if two CommitmentUpdates contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn CommitmentUpdate_eq(a: &CommitmentUpdate, b: &CommitmentUpdate) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 /// A trait to describe an object which can receive channel messages.
 ///
 /// Messages MAY be called in parallel when they originate from different their_node_ids, however
@@ -5283,9 +5681,17 @@ pub struct ChannelMessageHandler {
 	/// is believed to be possible in the future (eg they're sending us messages we don't
 	/// understand or indicate they require unknown feature bits), no_connection_possible is set
 	/// and any outstanding channels should be failed.
+	///
+	/// Note that in some rare cases this may be called without a corresponding
+	/// [`Self::peer_connected`].
 	pub peer_disconnected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, no_connection_possible: bool),
 	/// Handle a peer reconnecting, possibly generating channel_reestablish message(s).
-	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::Init),
+	///
+	/// May return an `Err(())` if the features the peer supports are not sufficient to communicate
+	/// with us. Implementors should be somewhat conservative about doing so, however, as other
+	/// message handlers may still wish to communicate with this peer.
+	#[must_use]
+	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::Init) -> crate::c_types::derived::CResult_NoneNoneZ,
 	/// Handle an incoming channel_reestablish message from the given peer.
 	pub handle_channel_reestablish: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelReestablish),
 	/// Handle an incoming channel update from the given peer.
@@ -5400,8 +5806,10 @@ impl rustChannelMessageHandler for ChannelMessageHandler {
 	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut no_connection_possible: bool) {
 		(self.peer_disconnected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), no_connection_possible)
 	}
-	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::Init) {
-		(self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false })
+	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::Init) -> Result<(), ()> {
+		let mut ret = (self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false });
+		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
+		local_ret
 	}
 	fn handle_channel_reestablish(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::ChannelReestablish) {
 		(self.handle_channel_reestablish)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ChannelReestablish { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ChannelReestablish<>) as *mut _) }, is_owned: false })
@@ -5481,7 +5889,12 @@ pub struct RoutingMessageHandler {
 	/// Called when a connection is established with a peer. This can be used to
 	/// perform routing table synchronization using a strategy defined by the
 	/// implementor.
-	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init),
+	///
+	/// May return an `Err(())` if the features the peer supports are not sufficient to communicate
+	/// with us. Implementors should be somewhat conservative about doing so, however, as other
+	/// message handlers may still wish to communicate with this peer.
+	#[must_use]
+	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init) -> crate::c_types::derived::CResult_NoneNoneZ,
 	/// Handles the reply of a query we initiated to learn about channels
 	/// for a given range of blocks. We can expect to receive one or more
 	/// replies to a single query.
@@ -5577,8 +5990,10 @@ impl rustRoutingMessageHandler for RoutingMessageHandler {
 		let mut local_ret = if ret.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(ret.take_inner()) } }) };
 		local_ret
 	}
-	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init) {
-		(self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false })
+	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init) -> Result<(), ()> {
+		let mut ret = (self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false });
+		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
+		local_ret
 	}
 	fn handle_reply_channel_range(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: lightning::ln::msgs::ReplyChannelRange) -> Result<(), lightning::ln::msgs::LightningError> {
 		let mut ret = (self.handle_reply_channel_range)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::ReplyChannelRange { inner: ObjOps::heap_alloc(msg), is_owned: true });
@@ -5638,9 +6053,17 @@ pub struct OnionMessageHandler {
 	pub handle_onion_message: extern "C" fn (this_arg: *const c_void, peer_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::OnionMessage),
 	/// Called when a connection is established with a peer. Can be used to track which peers
 	/// advertise onion message support and are online.
-	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init),
+	///
+	/// May return an `Err(())` if the features the peer supports are not sufficient to communicate
+	/// with us. Implementors should be somewhat conservative about doing so, however, as other
+	/// message handlers may still wish to communicate with this peer.
+	#[must_use]
+	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init) -> crate::c_types::derived::CResult_NoneNoneZ,
 	/// Indicates a connection to the peer failed/an existing connection was lost. Allows handlers to
 	/// drop and refuse to forward onion messages to this peer.
+	///
+	/// Note that in some rare cases this may be called without a corresponding
+	/// [`Self::peer_connected`].
 	pub peer_disconnected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, no_connection_possible: bool),
 	/// Gets the node feature flags which this handler itself supports. All available handlers are
 	/// queried similarly and their feature flags are OR'd together to form the [`NodeFeatures`]
@@ -5688,8 +6111,10 @@ impl rustOnionMessageHandler for OnionMessageHandler {
 	fn handle_onion_message(&self, mut peer_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::OnionMessage) {
 		(self.handle_onion_message)(self.this_arg, crate::c_types::PublicKey::from_rust(&peer_node_id), &crate::lightning::ln::msgs::OnionMessage { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::OnionMessage<>) as *mut _) }, is_owned: false })
 	}
-	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init) {
-		(self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false })
+	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init) -> Result<(), ()> {
+		let mut ret = (self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false });
+		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
+		local_ret
 	}
 	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut no_connection_possible: bool) {
 		(self.peer_disconnected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), no_connection_possible)
@@ -5746,7 +6171,7 @@ pub(crate) extern "C" fn AcceptChannel_write_void(obj: *const c_void) -> crate::
 /// Read a AcceptChannel from a byte array, created by AcceptChannel_write
 pub extern "C" fn AcceptChannel_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_AcceptChannelDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::AcceptChannel, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::AcceptChannel { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::AcceptChannel { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5762,7 +6187,7 @@ pub(crate) extern "C" fn AnnouncementSignatures_write_void(obj: *const c_void) -
 /// Read a AnnouncementSignatures from a byte array, created by AnnouncementSignatures_write
 pub extern "C" fn AnnouncementSignatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_AnnouncementSignaturesDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::AnnouncementSignatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::AnnouncementSignatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::AnnouncementSignatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5778,7 +6203,7 @@ pub(crate) extern "C" fn ChannelReestablish_write_void(obj: *const c_void) -> cr
 /// Read a ChannelReestablish from a byte array, created by ChannelReestablish_write
 pub extern "C" fn ChannelReestablish_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelReestablishDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::ChannelReestablish, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ChannelReestablish { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ChannelReestablish { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5794,7 +6219,7 @@ pub(crate) extern "C" fn ClosingSigned_write_void(obj: *const c_void) -> crate::
 /// Read a ClosingSigned from a byte array, created by ClosingSigned_write
 pub extern "C" fn ClosingSigned_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ClosingSignedDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::ClosingSigned, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ClosingSigned { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ClosingSigned { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5810,7 +6235,7 @@ pub(crate) extern "C" fn ClosingSignedFeeRange_write_void(obj: *const c_void) ->
 /// Read a ClosingSignedFeeRange from a byte array, created by ClosingSignedFeeRange_write
 pub extern "C" fn ClosingSignedFeeRange_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ClosingSignedFeeRangeDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::ClosingSignedFeeRange, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ClosingSignedFeeRange { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ClosingSignedFeeRange { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5826,7 +6251,7 @@ pub(crate) extern "C" fn CommitmentSigned_write_void(obj: *const c_void) -> crat
 /// Read a CommitmentSigned from a byte array, created by CommitmentSigned_write
 pub extern "C" fn CommitmentSigned_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_CommitmentSignedDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::CommitmentSigned, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::CommitmentSigned { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::CommitmentSigned { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5842,7 +6267,7 @@ pub(crate) extern "C" fn FundingCreated_write_void(obj: *const c_void) -> crate:
 /// Read a FundingCreated from a byte array, created by FundingCreated_write
 pub extern "C" fn FundingCreated_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_FundingCreatedDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::FundingCreated, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::FundingCreated { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::FundingCreated { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5858,7 +6283,7 @@ pub(crate) extern "C" fn FundingSigned_write_void(obj: *const c_void) -> crate::
 /// Read a FundingSigned from a byte array, created by FundingSigned_write
 pub extern "C" fn FundingSigned_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_FundingSignedDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::FundingSigned, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::FundingSigned { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::FundingSigned { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5874,7 +6299,7 @@ pub(crate) extern "C" fn ChannelReady_write_void(obj: *const c_void) -> crate::c
 /// Read a ChannelReady from a byte array, created by ChannelReady_write
 pub extern "C" fn ChannelReady_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelReadyDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::ChannelReady, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ChannelReady { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ChannelReady { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5890,7 +6315,7 @@ pub(crate) extern "C" fn Init_write_void(obj: *const c_void) -> crate::c_types::
 /// Read a Init from a byte array, created by Init_write
 pub extern "C" fn Init_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_InitDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::Init, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::Init { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::Init { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5906,7 +6331,7 @@ pub(crate) extern "C" fn OpenChannel_write_void(obj: *const c_void) -> crate::c_
 /// Read a OpenChannel from a byte array, created by OpenChannel_write
 pub extern "C" fn OpenChannel_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_OpenChannelDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::OpenChannel, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::OpenChannel { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::OpenChannel { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5922,7 +6347,7 @@ pub(crate) extern "C" fn RevokeAndACK_write_void(obj: *const c_void) -> crate::c
 /// Read a RevokeAndACK from a byte array, created by RevokeAndACK_write
 pub extern "C" fn RevokeAndACK_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RevokeAndACKDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::RevokeAndACK, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::RevokeAndACK { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::RevokeAndACK { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5938,7 +6363,7 @@ pub(crate) extern "C" fn Shutdown_write_void(obj: *const c_void) -> crate::c_typ
 /// Read a Shutdown from a byte array, created by Shutdown_write
 pub extern "C" fn Shutdown_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ShutdownDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::Shutdown, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::Shutdown { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::Shutdown { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5954,7 +6379,7 @@ pub(crate) extern "C" fn UpdateFailHTLC_write_void(obj: *const c_void) -> crate:
 /// Read a UpdateFailHTLC from a byte array, created by UpdateFailHTLC_write
 pub extern "C" fn UpdateFailHTLC_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UpdateFailHTLCDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::UpdateFailHTLC, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UpdateFailHTLC { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UpdateFailHTLC { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5970,7 +6395,7 @@ pub(crate) extern "C" fn UpdateFailMalformedHTLC_write_void(obj: *const c_void) 
 /// Read a UpdateFailMalformedHTLC from a byte array, created by UpdateFailMalformedHTLC_write
 pub extern "C" fn UpdateFailMalformedHTLC_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UpdateFailMalformedHTLCDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::UpdateFailMalformedHTLC, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UpdateFailMalformedHTLC { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UpdateFailMalformedHTLC { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -5986,7 +6411,7 @@ pub(crate) extern "C" fn UpdateFee_write_void(obj: *const c_void) -> crate::c_ty
 /// Read a UpdateFee from a byte array, created by UpdateFee_write
 pub extern "C" fn UpdateFee_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UpdateFeeDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::UpdateFee, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UpdateFee { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UpdateFee { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6002,7 +6427,7 @@ pub(crate) extern "C" fn UpdateFulfillHTLC_write_void(obj: *const c_void) -> cra
 /// Read a UpdateFulfillHTLC from a byte array, created by UpdateFulfillHTLC_write
 pub extern "C" fn UpdateFulfillHTLC_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UpdateFulfillHTLCDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::UpdateFulfillHTLC, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UpdateFulfillHTLC { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UpdateFulfillHTLC { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6018,14 +6443,14 @@ pub(crate) extern "C" fn UpdateAddHTLC_write_void(obj: *const c_void) -> crate::
 /// Read a UpdateAddHTLC from a byte array, created by UpdateAddHTLC_write
 pub extern "C" fn UpdateAddHTLC_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UpdateAddHTLCDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::UpdateAddHTLC, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UpdateAddHTLC { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UpdateAddHTLC { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
 /// Read a OnionMessage from a byte array, created by OnionMessage_write
 pub extern "C" fn OnionMessage_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_OnionMessageDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::OnionMessage, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::OnionMessage { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::OnionMessage { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6050,7 +6475,7 @@ pub(crate) extern "C" fn Ping_write_void(obj: *const c_void) -> crate::c_types::
 /// Read a Ping from a byte array, created by Ping_write
 pub extern "C" fn Ping_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_PingDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::Ping, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::Ping { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::Ping { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6066,7 +6491,7 @@ pub(crate) extern "C" fn Pong_write_void(obj: *const c_void) -> crate::c_types::
 /// Read a Pong from a byte array, created by Pong_write
 pub extern "C" fn Pong_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_PongDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::Pong, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::Pong { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::Pong { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6082,7 +6507,7 @@ pub(crate) extern "C" fn UnsignedChannelAnnouncement_write_void(obj: *const c_vo
 /// Read a UnsignedChannelAnnouncement from a byte array, created by UnsignedChannelAnnouncement_write
 pub extern "C" fn UnsignedChannelAnnouncement_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UnsignedChannelAnnouncementDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::UnsignedChannelAnnouncement, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6098,7 +6523,7 @@ pub(crate) extern "C" fn ChannelAnnouncement_write_void(obj: *const c_void) -> c
 /// Read a ChannelAnnouncement from a byte array, created by ChannelAnnouncement_write
 pub extern "C" fn ChannelAnnouncement_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelAnnouncementDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::ChannelAnnouncement, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6114,7 +6539,7 @@ pub(crate) extern "C" fn UnsignedChannelUpdate_write_void(obj: *const c_void) ->
 /// Read a UnsignedChannelUpdate from a byte array, created by UnsignedChannelUpdate_write
 pub extern "C" fn UnsignedChannelUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UnsignedChannelUpdateDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::UnsignedChannelUpdate, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UnsignedChannelUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UnsignedChannelUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6130,7 +6555,7 @@ pub(crate) extern "C" fn ChannelUpdate_write_void(obj: *const c_void) -> crate::
 /// Read a ChannelUpdate from a byte array, created by ChannelUpdate_write
 pub extern "C" fn ChannelUpdate_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelUpdateDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::ChannelUpdate, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6146,7 +6571,7 @@ pub(crate) extern "C" fn ErrorMessage_write_void(obj: *const c_void) -> crate::c
 /// Read a ErrorMessage from a byte array, created by ErrorMessage_write
 pub extern "C" fn ErrorMessage_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ErrorMessageDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::ErrorMessage, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ErrorMessage { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ErrorMessage { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6162,7 +6587,7 @@ pub(crate) extern "C" fn WarningMessage_write_void(obj: *const c_void) -> crate:
 /// Read a WarningMessage from a byte array, created by WarningMessage_write
 pub extern "C" fn WarningMessage_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_WarningMessageDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::WarningMessage, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::WarningMessage { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::WarningMessage { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6178,7 +6603,7 @@ pub(crate) extern "C" fn UnsignedNodeAnnouncement_write_void(obj: *const c_void)
 /// Read a UnsignedNodeAnnouncement from a byte array, created by UnsignedNodeAnnouncement_write
 pub extern "C" fn UnsignedNodeAnnouncement_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_UnsignedNodeAnnouncementDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::UnsignedNodeAnnouncement, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UnsignedNodeAnnouncement { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::UnsignedNodeAnnouncement { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6194,14 +6619,14 @@ pub(crate) extern "C" fn NodeAnnouncement_write_void(obj: *const c_void) -> crat
 /// Read a NodeAnnouncement from a byte array, created by NodeAnnouncement_write
 pub extern "C" fn NodeAnnouncement_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NodeAnnouncementDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::NodeAnnouncement, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::NodeAnnouncement { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::NodeAnnouncement { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
 /// Read a QueryShortChannelIds from a byte array, created by QueryShortChannelIds_write
 pub extern "C" fn QueryShortChannelIds_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_QueryShortChannelIdsDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::QueryShortChannelIds, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::QueryShortChannelIds { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::QueryShortChannelIds { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6226,7 +6651,7 @@ pub(crate) extern "C" fn ReplyShortChannelIdsEnd_write_void(obj: *const c_void) 
 /// Read a ReplyShortChannelIdsEnd from a byte array, created by ReplyShortChannelIdsEnd_write
 pub extern "C" fn ReplyShortChannelIdsEnd_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ReplyShortChannelIdsEndDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::ReplyShortChannelIdsEnd, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ReplyShortChannelIdsEnd { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ReplyShortChannelIdsEnd { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 ///\n\t * Calculates the overflow safe ending block height for the query.\n\t * Overflow returns `0xffffffff`, otherwise returns `first_blocknum + number_of_blocks`\n\t 
@@ -6250,14 +6675,14 @@ pub(crate) extern "C" fn QueryChannelRange_write_void(obj: *const c_void) -> cra
 /// Read a QueryChannelRange from a byte array, created by QueryChannelRange_write
 pub extern "C" fn QueryChannelRange_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_QueryChannelRangeDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::QueryChannelRange, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::QueryChannelRange { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::QueryChannelRange { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
 /// Read a ReplyChannelRange from a byte array, created by ReplyChannelRange_write
 pub extern "C" fn ReplyChannelRange_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ReplyChannelRangeDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::ReplyChannelRange, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ReplyChannelRange { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ReplyChannelRange { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -6282,6 +6707,6 @@ pub(crate) extern "C" fn GossipTimestampFilter_write_void(obj: *const c_void) ->
 /// Read a GossipTimestampFilter from a byte array, created by GossipTimestampFilter_write
 pub extern "C" fn GossipTimestampFilter_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_GossipTimestampFilterDecodeErrorZ {
 	let res: Result<lightning::ln::msgs::GossipTimestampFilter, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::GossipTimestampFilter { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::GossipTimestampFilter { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }

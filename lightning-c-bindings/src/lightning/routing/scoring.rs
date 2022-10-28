@@ -465,6 +465,42 @@ extern "C" fn MultiThreadedLockableScore_LockableScore_lock(this_arg: *const c_v
 	Into::into(ret)
 }
 
+#[no_mangle]
+/// Serialize the MultiThreadedLockableScore object into a byte array which can be read by MultiThreadedLockableScore_read
+pub extern "C" fn MultiThreadedLockableScore_write(obj: &crate::lightning::routing::scoring::MultiThreadedLockableScore) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn MultiThreadedLockableScore_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeMultiThreadedLockableScore) })
+}
+impl From<nativeMultiThreadedLockableScore> for crate::lightning::routing::scoring::WriteableScore {
+	fn from(obj: nativeMultiThreadedLockableScore) -> Self {
+		let mut rust_obj = MultiThreadedLockableScore { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let mut ret = MultiThreadedLockableScore_as_WriteableScore(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
+		rust_obj.inner = core::ptr::null_mut();
+		ret.free = Some(MultiThreadedLockableScore_free_void);
+		ret
+	}
+}
+/// Constructs a new WriteableScore which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned WriteableScore must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn MultiThreadedLockableScore_as_WriteableScore(this_arg: &MultiThreadedLockableScore) -> crate::lightning::routing::scoring::WriteableScore {
+	crate::lightning::routing::scoring::WriteableScore {
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
+		free: None,
+		LockableScore: crate::lightning::routing::scoring::LockableScore {
+			this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
+			free: None,
+			lock: MultiThreadedLockableScore_LockableScore_lock,
+		},
+		write: MultiThreadedLockableScore_write_void,
+	}
+}
+
+
 /// Creates a new [`MultiThreadedLockableScore`] given an underlying [`Score`].
 #[must_use]
 #[no_mangle]
@@ -728,7 +764,7 @@ pub(crate) extern "C" fn FixedPenaltyScorer_write_void(obj: *const c_void) -> cr
 pub extern "C" fn FixedPenaltyScorer_read(ser: crate::c_types::u8slice, arg: u64) -> crate::c_types::derived::CResult_FixedPenaltyScorerDecodeErrorZ {
 	let arg_conv = arg;
 	let res: Result<lightning::routing::scoring::FixedPenaltyScorer, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scoring::FixedPenaltyScorer { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scoring::FixedPenaltyScorer { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 
@@ -737,19 +773,28 @@ pub(crate) type nativeProbabilisticScorer = nativeProbabilisticScorerImport<&'st
 
 /// [`Score`] implementation using channel success probability distributions.
 ///
-/// Based on *Optimally Reliable & Cheap Payment Flows on the Lightning Network* by Rene Pickhardt
-/// and Stefan Richter [[1]]. Given the uncertainty of channel liquidity balances, probability
-/// distributions are defined based on knowledge learned from successful and unsuccessful attempts.
-/// Then the negative `log10` of the success probability is used to determine the cost of routing a
-/// specific HTLC amount through a channel.
+/// Channels are tracked with upper and lower liquidity bounds - when an HTLC fails at a channel,
+/// we learn that the upper-bound on the available liquidity is lower than the amount of the HTLC.
+/// When a payment is forwarded through a channel (but fails later in the route), we learn the
+/// lower-bound on the channel's available liquidity must be at least the value of the HTLC.
 ///
-/// Knowledge about channel liquidity balances takes the form of upper and lower bounds on the
-/// possible liquidity. Certainty of the bounds is decreased over time using a decay function. See
-/// [`ProbabilisticScoringParameters`] for details.
+/// These bounds are then used to determine a success probability using the formula from
+/// *Optimally Reliable & Cheap Payment Flows on the Lightning Network* by Rene Pickhardt
+/// and Stefan Richter [[1]] (i.e. `(upper_bound - payment_amount) / (upper_bound - lower_bound)`).
 ///
-/// Since the scorer aims to learn the current channel liquidity balances, it works best for nodes
-/// with high payment volume or that actively probe the [`NetworkGraph`]. Nodes with low payment
-/// volume are more likely to experience failed payment paths, which would need to be retried.
+/// This probability is combined with the [`liquidity_penalty_multiplier_msat`] and
+/// [`liquidity_penalty_amount_multiplier_msat`] parameters to calculate a concrete penalty in
+/// milli-satoshis. The penalties, when added across all hops, have the property of being linear in
+/// terms of the entire path's success probability. This allows the router to directly compare
+/// penalties for different paths. See the documentation of those parameters for the exact formulas.
+///
+/// The liquidity bounds are decayed by halving them every [`liquidity_offset_half_life`].
+///
+/// Further, we track the history of our upper and lower liquidity bounds for each channel,
+/// allowing us to assign a second penalty (using [`historical_liquidity_penalty_multiplier_msat`]
+/// and [`historical_liquidity_penalty_amount_multiplier_msat`]) based on the same probability
+/// formula, but using the history of a channel rather than our latest estimates for the liquidity
+/// bounds.
 ///
 /// # Note
 ///
@@ -757,6 +802,11 @@ pub(crate) type nativeProbabilisticScorer = nativeProbabilisticScorerImport<&'st
 /// behavior.
 ///
 /// [1]: https://arxiv.org/abs/2107.05322
+/// [`liquidity_penalty_multiplier_msat`]: ProbabilisticScoringParameters::liquidity_penalty_multiplier_msat
+/// [`liquidity_penalty_amount_multiplier_msat`]: ProbabilisticScoringParameters::liquidity_penalty_amount_multiplier_msat
+/// [`liquidity_offset_half_life`]: ProbabilisticScoringParameters::liquidity_offset_half_life
+/// [`historical_liquidity_penalty_multiplier_msat`]: ProbabilisticScoringParameters::historical_liquidity_penalty_multiplier_msat
+/// [`historical_liquidity_penalty_amount_multiplier_msat`]: ProbabilisticScoringParameters::historical_liquidity_penalty_amount_multiplier_msat
 #[must_use]
 #[repr(C)]
 pub struct ProbabilisticScorer {
@@ -909,7 +959,8 @@ pub extern "C" fn ProbabilisticScoringParameters_set_base_penalty_amount_multipl
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.base_penalty_amount_multiplier_msat = val;
 }
 /// A multiplier used in conjunction with the negative `log10` of the channel's success
-/// probability for a payment to determine the liquidity penalty.
+/// probability for a payment, as determined by our latest estimates of the channel's
+/// liquidity, to determine the liquidity penalty.
 ///
 /// The penalty is based in part on the knowledge learned from prior successful and unsuccessful
 /// payments. This knowledge is decayed over time based on [`liquidity_offset_half_life`]. The
@@ -918,7 +969,9 @@ pub extern "C" fn ProbabilisticScoringParameters_set_base_penalty_amount_multipl
 /// uncertainty bounds of the channel liquidity balance. Amounts above the upper bound will
 /// result in a `u64::max_value` penalty, however.
 ///
-/// Default value: 40,000 msat
+/// `-log10(success_probability) * liquidity_penalty_multiplier_msat`
+///
+/// Default value: 30,000 msat
 ///
 /// [`liquidity_offset_half_life`]: Self::liquidity_offset_half_life
 #[no_mangle]
@@ -927,7 +980,8 @@ pub extern "C" fn ProbabilisticScoringParameters_get_liquidity_penalty_multiplie
 	*inner_val
 }
 /// A multiplier used in conjunction with the negative `log10` of the channel's success
-/// probability for a payment to determine the liquidity penalty.
+/// probability for a payment, as determined by our latest estimates of the channel's
+/// liquidity, to determine the liquidity penalty.
 ///
 /// The penalty is based in part on the knowledge learned from prior successful and unsuccessful
 /// payments. This knowledge is decayed over time based on [`liquidity_offset_half_life`]. The
@@ -936,21 +990,29 @@ pub extern "C" fn ProbabilisticScoringParameters_get_liquidity_penalty_multiplie
 /// uncertainty bounds of the channel liquidity balance. Amounts above the upper bound will
 /// result in a `u64::max_value` penalty, however.
 ///
-/// Default value: 40,000 msat
+/// `-log10(success_probability) * liquidity_penalty_multiplier_msat`
+///
+/// Default value: 30,000 msat
 ///
 /// [`liquidity_offset_half_life`]: Self::liquidity_offset_half_life
 #[no_mangle]
 pub extern "C" fn ProbabilisticScoringParameters_set_liquidity_penalty_multiplier_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.liquidity_penalty_multiplier_msat = val;
 }
-/// The time required to elapse before any knowledge learned about channel liquidity balances is
-/// cut in half.
+/// Whenever this amount of time elapses since the last update to a channel's liquidity bounds,
+/// the distance from the bounds to \"zero\" is cut in half. In other words, the lower-bound on
+/// the available liquidity is halved and the upper-bound moves half-way to the channel's total
+/// capacity.
 ///
-/// The bounds are defined in terms of offsets and are initially zero. Increasing the offsets
-/// gives tighter bounds on the channel liquidity balance. Thus, halving the offsets decreases
-/// the certainty of the channel liquidity balance.
+/// Because halving the liquidity bounds grows the uncertainty on the channel's liquidity,
+/// the penalty for an amount within the new bounds may change. See the [`ProbabilisticScorer`]
+/// struct documentation for more info on the way the liquidity bounds are used.
 ///
-/// Default value: 1 hour
+/// For example, if the channel's capacity is 1 million sats, and the current upper and lower
+/// liquidity bounds are 200,000 sats and 600,000 sats, after this amount of time the upper
+/// and lower liquidity bounds will be decayed to 100,000 and 800,000 sats.
+///
+/// Default value: 6 hours
 ///
 /// # Note
 ///
@@ -961,14 +1023,20 @@ pub extern "C" fn ProbabilisticScoringParameters_get_liquidity_offset_half_life(
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().liquidity_offset_half_life;
 	inner_val.as_secs()
 }
-/// The time required to elapse before any knowledge learned about channel liquidity balances is
-/// cut in half.
+/// Whenever this amount of time elapses since the last update to a channel's liquidity bounds,
+/// the distance from the bounds to \"zero\" is cut in half. In other words, the lower-bound on
+/// the available liquidity is halved and the upper-bound moves half-way to the channel's total
+/// capacity.
 ///
-/// The bounds are defined in terms of offsets and are initially zero. Increasing the offsets
-/// gives tighter bounds on the channel liquidity balance. Thus, halving the offsets decreases
-/// the certainty of the channel liquidity balance.
+/// Because halving the liquidity bounds grows the uncertainty on the channel's liquidity,
+/// the penalty for an amount within the new bounds may change. See the [`ProbabilisticScorer`]
+/// struct documentation for more info on the way the liquidity bounds are used.
 ///
-/// Default value: 1 hour
+/// For example, if the channel's capacity is 1 million sats, and the current upper and lower
+/// liquidity bounds are 200,000 sats and 600,000 sats, after this amount of time the upper
+/// and lower liquidity bounds will be decayed to 100,000 and 800,000 sats.
+///
+/// Default value: 6 hours
 ///
 /// # Note
 ///
@@ -979,7 +1047,8 @@ pub extern "C" fn ProbabilisticScoringParameters_set_liquidity_offset_half_life(
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.liquidity_offset_half_life = core::time::Duration::from_secs(val);
 }
 /// A multiplier used in conjunction with a payment amount and the negative `log10` of the
-/// channel's success probability for the payment to determine the amount penalty.
+/// channel's success probability for the payment, as determined by our latest estimates of the
+/// channel's liquidity, to determine the amount penalty.
 ///
 /// The purpose of the amount penalty is to avoid having fees dominate the channel cost (i.e.,
 /// fees plus penalty) for large payments. The penalty is computed as the product of this
@@ -994,14 +1063,15 @@ pub extern "C" fn ProbabilisticScoringParameters_set_liquidity_offset_half_life(
 /// probabilities, the multiplier will have a decreasing effect as the negative `log10` will
 /// fall below `1`.
 ///
-/// Default value: 256 msat
+/// Default value: 192 msat
 #[no_mangle]
 pub extern "C" fn ProbabilisticScoringParameters_get_liquidity_penalty_amount_multiplier_msat(this_ptr: &ProbabilisticScoringParameters) -> u64 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().liquidity_penalty_amount_multiplier_msat;
 	*inner_val
 }
 /// A multiplier used in conjunction with a payment amount and the negative `log10` of the
-/// channel's success probability for the payment to determine the amount penalty.
+/// channel's success probability for the payment, as determined by our latest estimates of the
+/// channel's liquidity, to determine the amount penalty.
 ///
 /// The purpose of the amount penalty is to avoid having fees dominate the channel cost (i.e.,
 /// fees plus penalty) for large payments. The penalty is computed as the product of this
@@ -1016,10 +1086,117 @@ pub extern "C" fn ProbabilisticScoringParameters_get_liquidity_penalty_amount_mu
 /// probabilities, the multiplier will have a decreasing effect as the negative `log10` will
 /// fall below `1`.
 ///
-/// Default value: 256 msat
+/// Default value: 192 msat
 #[no_mangle]
 pub extern "C" fn ProbabilisticScoringParameters_set_liquidity_penalty_amount_multiplier_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.liquidity_penalty_amount_multiplier_msat = val;
+}
+/// A multiplier used in conjunction with the negative `log10` of the channel's success
+/// probability for the payment, as determined based on the history of our estimates of the
+/// channel's available liquidity, to determine a penalty.
+///
+/// This penalty is similar to [`liquidity_penalty_multiplier_msat`], however, instead of using
+/// only our latest estimate for the current liquidity available in the channel, it estimates
+/// success probability based on the estimated liquidity available in the channel through
+/// history. Specifically, every time we update our liquidity bounds on a given channel, we
+/// track which of several buckets those bounds fall into, exponentially decaying the
+/// probability of each bucket as new samples are added.
+///
+/// Default value: 10,000 msat
+///
+/// [`liquidity_penalty_multiplier_msat`]: Self::liquidity_penalty_multiplier_msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_get_historical_liquidity_penalty_multiplier_msat(this_ptr: &ProbabilisticScoringParameters) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().historical_liquidity_penalty_multiplier_msat;
+	*inner_val
+}
+/// A multiplier used in conjunction with the negative `log10` of the channel's success
+/// probability for the payment, as determined based on the history of our estimates of the
+/// channel's available liquidity, to determine a penalty.
+///
+/// This penalty is similar to [`liquidity_penalty_multiplier_msat`], however, instead of using
+/// only our latest estimate for the current liquidity available in the channel, it estimates
+/// success probability based on the estimated liquidity available in the channel through
+/// history. Specifically, every time we update our liquidity bounds on a given channel, we
+/// track which of several buckets those bounds fall into, exponentially decaying the
+/// probability of each bucket as new samples are added.
+///
+/// Default value: 10,000 msat
+///
+/// [`liquidity_penalty_multiplier_msat`]: Self::liquidity_penalty_multiplier_msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_set_historical_liquidity_penalty_multiplier_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.historical_liquidity_penalty_multiplier_msat = val;
+}
+/// A multiplier used in conjunction with the payment amount and the negative `log10` of the
+/// channel's success probability for the payment, as determined based on the history of our
+/// estimates of the channel's available liquidity, to determine a penalty.
+///
+/// The purpose of the amount penalty is to avoid having fees dominate the channel cost for
+/// large payments. The penalty is computed as the product of this multiplier and the `2^20`ths
+/// of the payment amount, weighted by the negative `log10` of the success probability.
+///
+/// This penalty is similar to [`liquidity_penalty_amount_multiplier_msat`], however, instead
+/// of using only our latest estimate for the current liquidity available in the channel, it
+/// estimates success probability based on the estimated liquidity available in the channel
+/// through history. Specifically, every time we update our liquidity bounds on a given
+/// channel, we track which of several buckets those bounds fall into, exponentially decaying
+/// the probability of each bucket as new samples are added.
+///
+/// Default value: 64 msat
+///
+/// [`liquidity_penalty_amount_multiplier_msat`]: Self::liquidity_penalty_amount_multiplier_msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_get_historical_liquidity_penalty_amount_multiplier_msat(this_ptr: &ProbabilisticScoringParameters) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().historical_liquidity_penalty_amount_multiplier_msat;
+	*inner_val
+}
+/// A multiplier used in conjunction with the payment amount and the negative `log10` of the
+/// channel's success probability for the payment, as determined based on the history of our
+/// estimates of the channel's available liquidity, to determine a penalty.
+///
+/// The purpose of the amount penalty is to avoid having fees dominate the channel cost for
+/// large payments. The penalty is computed as the product of this multiplier and the `2^20`ths
+/// of the payment amount, weighted by the negative `log10` of the success probability.
+///
+/// This penalty is similar to [`liquidity_penalty_amount_multiplier_msat`], however, instead
+/// of using only our latest estimate for the current liquidity available in the channel, it
+/// estimates success probability based on the estimated liquidity available in the channel
+/// through history. Specifically, every time we update our liquidity bounds on a given
+/// channel, we track which of several buckets those bounds fall into, exponentially decaying
+/// the probability of each bucket as new samples are added.
+///
+/// Default value: 64 msat
+///
+/// [`liquidity_penalty_amount_multiplier_msat`]: Self::liquidity_penalty_amount_multiplier_msat
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_set_historical_liquidity_penalty_amount_multiplier_msat(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.historical_liquidity_penalty_amount_multiplier_msat = val;
+}
+/// If we aren't learning any new datapoints for a channel, the historical liquidity bounds
+/// tracking can simply live on with increasingly stale data. Instead, when a channel has not
+/// seen a liquidity estimate update for this amount of time, the historical datapoints are
+/// decayed by half.
+///
+/// Note that after 16 or more half lives all historical data will be completely gone.
+///
+/// Default value: 14 days
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_get_historical_no_updates_half_life(this_ptr: &ProbabilisticScoringParameters) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().historical_no_updates_half_life;
+	inner_val.as_secs()
+}
+/// If we aren't learning any new datapoints for a channel, the historical liquidity bounds
+/// tracking can simply live on with increasingly stale data. Instead, when a channel has not
+/// seen a liquidity estimate update for this amount of time, the historical datapoints are
+/// decayed by half.
+///
+/// Note that after 16 or more half lives all historical data will be completely gone.
+///
+/// Default value: 14 days
+#[no_mangle]
+pub extern "C" fn ProbabilisticScoringParameters_set_historical_no_updates_half_life(this_ptr: &mut ProbabilisticScoringParameters, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.historical_no_updates_half_life = core::time::Duration::from_secs(val);
 }
 /// This penalty is applied when `htlc_maximum_msat` is equal to or larger than half of the
 /// channel's capacity, which makes us prefer nodes with a smaller `htlc_maximum_msat`. We
@@ -1253,6 +1430,6 @@ pub extern "C" fn ProbabilisticScorer_read(ser: crate::c_types::u8slice, arg_a: 
 	let arg_c_conv = arg_c;
 	let arg_conv = (arg_a_conv, arg_b_conv, arg_c_conv);
 	let res: Result<lightning::routing::scoring::ProbabilisticScorer<&lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::util::logger::Logger>, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scoring::ProbabilisticScorer { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::scoring::ProbabilisticScorer { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }

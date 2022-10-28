@@ -676,10 +676,10 @@ impl<O, E> Drop for CResultTempl<O, E> {
 	fn drop(&mut self) {
 		if self.result_ok {
 			if unsafe { !self.contents.result.is_null() } {
-				unsafe { Box::from_raw(self.contents.result) };
+				let _ = unsafe { Box::from_raw(self.contents.result) };
 			}
 		} else if unsafe { !self.contents.err.is_null() } {
-			unsafe { Box::from_raw(self.contents.err) };
+			let _ = unsafe { Box::from_raw(self.contents.err) };
 		}
 	}
 }
@@ -780,7 +780,7 @@ impl<T> SmartPtr<T> {
 impl<T> Drop for SmartPtr<T> {
 	fn drop(&mut self) {
 		if self.ptr != core::ptr::null_mut() {
-			unsafe { Box::from_raw(self.ptr); }
+			let _ = unsafe { Box::from_raw(self.ptr) };
 		}
 	}
 }

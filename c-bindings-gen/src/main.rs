@@ -677,7 +677,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	writeln!(w, "#[allow(unused)]").unwrap();
 	writeln!(w, "/// Used only if an object of this type is returned as a trait impl by a method").unwrap();
 	writeln!(w, "pub(crate) extern \"C\" fn {}_free_void(this_ptr: *mut c_void) {{", struct_name).unwrap();
-	writeln!(w, "\tunsafe {{ let _ = Box::from_raw(this_ptr as *mut native{}); }}\n}}", struct_name).unwrap();
+	writeln!(w, "\tlet _ = unsafe {{ Box::from_raw(this_ptr as *mut native{}) }};\n}}", struct_name).unwrap();
 	writeln!(w, "#[allow(unused)]").unwrap();
 	writeln!(w, "impl {} {{", struct_name).unwrap();
 	writeln!(w, "\tpub(crate) fn get_native_ref(&self) -> &'static native{} {{", struct_name).unwrap();

@@ -1026,10 +1026,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
-			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
+			|"lightning::chain::keysinterface::KeyMaterial"
 				if is_ref => Some("*const [u8; 32]"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
-			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
+			|"lightning::chain::keysinterface::KeyMaterial"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice"),
@@ -1126,6 +1128,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentSecret" if !is_ref => Some("::lightning::ln::PaymentSecret("),
 			"lightning::ln::channelmanager::PaymentId" if !is_ref => Some("::lightning::ln::channelmanager::PaymentId("),
 			"lightning::ln::channelmanager::PaymentId" if is_ref=> Some("&::lightning::ln::channelmanager::PaymentId( unsafe { *"),
+			"lightning::ln::channelmanager::InterceptId" if !is_ref => Some("::lightning::ln::channelmanager::InterceptId("),
+			"lightning::ln::channelmanager::InterceptId" if is_ref=> Some("&::lightning::ln::channelmanager::InterceptId( unsafe { *"),
 			"lightning::chain::keysinterface::KeyMaterial" if !is_ref => Some("::lightning::chain::keysinterface::KeyMaterial("),
 			"lightning::chain::keysinterface::KeyMaterial" if is_ref=> Some("&::lightning::chain::keysinterface::KeyMaterial( unsafe { *"),
 
@@ -1203,10 +1207,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" => Some(".data[..]).unwrap()"),
 			"bitcoin::hash_types::BlockHash" if !is_ref => Some(".data[..]).unwrap()"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
-			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
+			|"lightning::chain::keysinterface::KeyMaterial"
 				if !is_ref => Some(".data)"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
-			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
+			|"lightning::chain::keysinterface::KeyMaterial"
 				if is_ref => Some(" })"),
 
 			// List of traits we map (possibly during processing of other files):
@@ -1303,10 +1309,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
-			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
+			|"lightning::chain::keysinterface::KeyMaterial"
 				if is_ref => Some("&"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
-			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
+			|"lightning::chain::keysinterface::KeyMaterial"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec("),
@@ -1384,10 +1392,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if !is_ref => Some(".into_inner() }"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
-			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
+			|"lightning::chain::keysinterface::KeyMaterial"
 				if is_ref => Some(".0"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
-			|"lightning::ln::channelmanager::PaymentId"|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
+			|"lightning::chain::keysinterface::KeyMaterial"
 				if !is_ref => Some(".0 }"),
 
 			"lightning::io::Read" => Some("))"),

@@ -54,6 +54,8 @@ const uint8_t valid_node_announcement[] = {
 // A simple block containing only one transaction (which is the channel-open transaction for the
 // channel we'll create). This was originally created by printing additional data in a simple
 // rust-lightning unit test.
+//
+// Note that the merkle root is incorrect, but it isn't ever checked by LDK, so should be fine.
 const uint8_t channel_open_block[] = {
 	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -64,16 +66,16 @@ const uint8_t channel_open_block[] = {
 	0x02, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x01, 0x40, 0x9c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x22, 0x00, 0x20, 0xd1, 0xd9, 0x13, 0xa9,
-	0x76, 0x09, 0x05, 0xa3, 0x4d, 0x13, 0x5b, 0x69, 0xaa, 0xe7, 0x79, 0x71, 0xb9, 0x75, 0xa1, 0xd0,
-	0x77, 0xcb, 0xa2, 0xf6, 0x6a, 0x25, 0x37, 0x3a, 0xaf, 0xdc, 0x11, 0x09, 0x01, 0x00, 0x00, 0x00,
+	0x01, 0x40, 0x9c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x22, 0x00, 0x20, 0xba, 0x1e, 0x83, 0xac,
+	0xc0, 0xee, 0xc5, 0xeb, 0xd0, 0x97, 0xc8, 0x1d, 0x54, 0xbe, 0x54, 0x34, 0x53, 0x2d, 0x1b, 0x90,
+	0x50, 0x4d, 0xc9, 0x7b, 0x88, 0x5b, 0x7b, 0xee, 0x08, 0x98, 0x7b, 0x3b, 0x01, 0x00, 0x00, 0x00,
 	0x00, 0x00
 };
 
 // The first transaction in the block is header (80 bytes) + transaction count (1 byte) into the block data.
 const uint8_t channel_open_txid[] = {
-	0x02, 0xe0, 0x50, 0x05, 0x33, 0xd3, 0x29, 0x66, 0x0c, 0xb2, 0xcb, 0x1e, 0x7a, 0x4a, 0xc7, 0xc7,
-	0x8b, 0x02, 0x46, 0x7e, 0x30, 0x2c, 0xe6, 0x19, 0xce, 0x43, 0x3e, 0xdf, 0x43, 0x65, 0xae, 0xf9,
+	0xe3, 0x76, 0xb9, 0xc7, 0x9e, 0xac, 0x0f, 0x28, 0xa2, 0x7f, 0xa6, 0x63, 0xa8, 0x46, 0xf3, 0xcf,
+	0xb1, 0x6a, 0x8d, 0x9a, 0x41, 0x4a, 0x8c, 0x07, 0x2d, 0xfa, 0x94, 0x72, 0x0e, 0x44, 0x3c, 0x7f
 };
 
 // Two blocks built on top of channel_open_block:
@@ -206,9 +208,9 @@ LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ monitors_pending_monitor_e
 struct EventQueue {
 	std::vector<LDK::Event> events;
 };
-void handle_event(const void *this_arg, const LDKEvent *event) {
+void handle_event(const void *this_arg, LDKEvent event) {
 	EventQueue* arg = (EventQueue*) this_arg;
-	arg->events.push_back(Event_clone(event));
+	arg->events.push_back(std::move(event));
 }
 
 #ifdef REAL_NET
@@ -477,12 +479,12 @@ uint64_t get_chan_score(const void *this_arg, uint64_t scid, const LDKNodeId *sr
 	return 42;
 }
 
-struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, struct LDKPublicKey payer, const struct LDKRouteParameters *NONNULL_PTR route_params, const uint8_t (*payment_hash)[32], struct LDKCVec_ChannelDetailsZ *first_hops, const struct LDKInFlightHtlcs in_flights) {
+struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, struct LDKPublicKey payer, const struct LDKRouteParameters *NONNULL_PTR route_params, struct LDKCVec_ChannelDetailsZ *first_hops, const struct LDKInFlightHtlcs in_flights) {
 	const LDK::DefaultRouter *router = (LDK::DefaultRouter *)this_arg;
 	assert(first_hops->datalen == 1);
 	assert(ChannelDetails_get_is_usable(&first_hops->data[0]));
 	const LDK::Router router_impl = DefaultRouter_as_Router(&*router);
-	return router_impl->find_route(router_impl->this_arg, payer, route_params, payment_hash, first_hops, in_flights);
+	return router_impl->find_route(router_impl->this_arg, payer, route_params, first_hops, in_flights);
 }
 
 void custom_notify_payment_path_failed(const void *this_arg, struct LDKCVec_RouteHopZ path, uint64_t short_channel_id) {
@@ -591,7 +593,9 @@ int main() {
 		LDK::PeerManager net1 = PeerManager_new(std::move(msg_handler1), node_secret1, 0xdeadbeef, &random_bytes.data, logger1, std::move(custom_msg_handler1));
 
 		// Demo getting a channel key and check that its returning real pubkeys:
-		LDK::Sign chan_signer1 = keys_source1->get_channel_signer(keys_source1->this_arg, false, 42);
+		LDKSixteenBytes user_id_1 { .data = {45, 0, 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0} };
+		LDKThirtyTwoBytes chan_signer_id1 = keys_source1->generate_channel_keys_id(keys_source1->this_arg, false, 42, U128_new(user_id_1));
+		LDK::Sign chan_signer1 = keys_source1->derive_channel_signer(keys_source1->this_arg, 42, chan_signer_id1);
 		chan_signer1->BaseSign.set_pubkeys(&chan_signer1->BaseSign); // Make sure pubkeys is defined
 		LDKPublicKey payment_point = ChannelPublicKeys_get_payment_point(&chan_signer1->BaseSign.pubkeys);
 		assert(memcmp(&payment_point, &null_pk, sizeof(null_pk)));
@@ -635,7 +639,7 @@ int main() {
 		PeersConnection conn(cm1, cm2, net1, net2);
 
 		// Note that we have to bind the result to a C++ class to make sure it gets free'd
-		LDK::CResult__u832APIErrorZ res = ChannelManager_create_channel(&cm1, ChannelManager_get_our_node_id(&cm2), 40000, 1000, 42, UserConfig_default());
+		LDK::CResult__u832APIErrorZ res = ChannelManager_create_channel(&cm1, ChannelManager_get_our_node_id(&cm2), 40000, 1000, U128_new(user_id_1), UserConfig_default());
 		assert(res->result_ok);
 		PeerManager_process_events(&net1);
 
@@ -657,16 +661,18 @@ int main() {
 			std::this_thread::yield();
 		}
 
-		LDKEventsProvider ev1 = ChannelManager_as_EventsProvider(&cm1);
+		LDK::EventsProvider ev1 = ChannelManager_as_EventsProvider(&cm1);
 		while (true) {
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
-			ev1.process_pending_events(ev1.this_arg, handler);
+			ev1.process_pending_events(handler);
 			if (queue.events.size() == 1) {
 				assert(queue.events[0]->tag == LDKEvent_FundingGenerationReady);
-				assert(queue.events[0]->funding_generation_ready.user_channel_id == 42);
+				LDKSixteenBytes event_id = U128_le_bytes(queue.events[0]->funding_generation_ready.user_channel_id);
+				assert(!memcmp(&event_id, &user_id_1, 16));
 				assert(queue.events[0]->funding_generation_ready.channel_value_satoshis == 40000);
 				assert(queue.events[0]->funding_generation_ready.output_script.datalen == 34);
+
 				assert(!memcmp(queue.events[0]->funding_generation_ready.output_script.data, channel_open_block + 58 + 81, 34));
 				LDKTransaction funding_transaction { .data = const_cast<uint8_t*>(channel_open_block + 81), .datalen = sizeof(channel_open_block) - 81, .data_is_owned = false };
 
@@ -712,6 +718,35 @@ int main() {
 		PeerManager_process_events(&net1);
 		PeerManager_process_events(&net2);
 
+		// Note that the channel ID is the same as the channel txid reversed as the output index is 0
+		uint8_t expected_chan_id[32];
+		for (int i = 0; i < 32; i++) { expected_chan_id[i] = channel_open_txid[31-i]; }
+
+		LDK::EventsProvider ev2 = ChannelManager_as_EventsProvider(&cm2);
+		while (true) {
+			EventQueue queue;
+			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
+			ev2.process_pending_events(handler);
+			if (queue.events.size() == 1) {
+				assert(queue.events[0]->tag == LDKEvent_ChannelReady);
+				assert(!memcmp(queue.events[0]->channel_ready.channel_id.data, expected_chan_id, 32));
+				break;
+			}
+			std::this_thread::yield();
+		}
+
+		while (true) {
+			EventQueue queue;
+			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
+			ev1.process_pending_events(handler);
+			if (queue.events.size() == 1) {
+				assert(queue.events[0]->tag == LDKEvent_ChannelReady);
+				assert(!memcmp(queue.events[0]->channel_ready.channel_id.data, expected_chan_id, 32));
+				break;
+			}
+			std::this_thread::yield();
+		}
+
 		// Now send funds from 1 to 2!
 		uint64_t channel_scid;
 		while (true) {
@@ -719,9 +754,7 @@ int main() {
 			if (outbound_channels->datalen == 1) {
 				const LDKChannelDetails *channel = &outbound_channels->data[0];
 				LDK::ChannelCounterparty counterparty = ChannelDetails_get_counterparty(channel);
-				// Note that the channel ID is the same as the channel txid reversed as the output index is 0
-				uint8_t expected_chan_id[32];
-				for (int i = 0; i < 32; i++) { expected_chan_id[i] = channel_open_txid[31-i]; }
+
 				assert(!memcmp(ChannelDetails_get_channel_id(channel), expected_chan_id, 32));
 				assert(!memcmp(
 					ChannelCounterparty_get_node_id(&counterparty).compressed_form,
@@ -782,7 +815,7 @@ int main() {
 			assert(RouteHop_get_short_channel_id(&paths->data[0].data[0]) == channel_scid);
 			LDKThirtyTwoBytes payment_secret;
 			memcpy(payment_secret.data, Invoice_payment_secret(invoice->contents.result), 32);
-			LDK::CResult_PaymentIdPaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash, payment_secret);
+			LDK::CResult_NonePaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash, payment_secret, payment_hash);
 			assert(send_res->result_ok);
 		}
 
@@ -793,7 +826,6 @@ int main() {
 		}
 
 		// Check that we received the payment!
-		LDK::EventsProvider ev2 = ChannelManager_as_EventsProvider(&cm2);
 		while (true) {
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
@@ -814,13 +846,13 @@ int main() {
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
 			ev2.process_pending_events(handler);
 			assert(queue.events.size() == 1);
-			assert(queue.events[0]->tag == LDKEvent_PaymentReceived);
-			assert(!memcmp(queue.events[0]->payment_received.payment_hash.data, payment_hash.data, 32));
-			assert(queue.events[0]->payment_received.purpose.tag == LDKPaymentPurpose_InvoicePayment);
-			assert(!memcmp(queue.events[0]->payment_received.purpose.invoice_payment.payment_secret.data,
+			assert(queue.events[0]->tag == LDKEvent_PaymentClaimable);
+			assert(!memcmp(queue.events[0]->payment_claimable.payment_hash.data, payment_hash.data, 32));
+			assert(queue.events[0]->payment_claimable.purpose.tag == LDKPaymentPurpose_InvoicePayment);
+			assert(!memcmp(queue.events[0]->payment_claimable.purpose.invoice_payment.payment_secret.data,
 					Invoice_payment_secret(invoice->contents.result), 32));
-			assert(queue.events[0]->payment_received.amount_msat == 5000);
-			memcpy(payment_preimage.data, queue.events[0]->payment_received.purpose.invoice_payment.payment_preimage.data, 32);
+			assert(queue.events[0]->payment_claimable.amount_msat == 5000);
+			memcpy(payment_preimage.data, queue.events[0]->payment_claimable.purpose.invoice_payment.payment_preimage.data, 32);
 			ChannelManager_claim_funds(&cm2, payment_preimage);
 
 			queue.events.clear();
@@ -839,7 +871,7 @@ int main() {
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
 			while (queue.events.size() < 2)
-				ev1.process_pending_events(ev1.this_arg, handler);
+				ev1.process_pending_events(handler);
 			assert(queue.events.size() == 2);
 			assert(queue.events[0]->tag == LDKEvent_PaymentSent);
 			assert(!memcmp(queue.events[0]->payment_sent.payment_preimage.data, payment_preimage.data, 32));
@@ -1003,8 +1035,8 @@ int main() {
 		LDK::EventsProvider ev2 = ChannelManager_as_EventsProvider(&cm2);
 		ev2.process_pending_events(handler2);
 		if (queue2.events.size() == 1) {
-			assert(queue2.events[0]->tag == LDKEvent_PaymentReceived);
-			const struct LDKEvent_LDKPaymentReceived_Body *event_data = &queue2.events[0]->payment_received;
+			assert(queue2.events[0]->tag == LDKEvent_PaymentClaimable);
+			const struct LDKEvent_LDKPaymentClaimable_Body *event_data = &queue2.events[0]->payment_claimable;
 			assert(!memcmp(event_data->payment_hash.data, Invoice_payment_hash(invoice2), 32));
 			assert(event_data->purpose.tag == LDKPaymentPurpose_InvoicePayment);
 			assert(!memcmp(event_data->purpose.invoice_payment.payment_secret.data,
@@ -1049,10 +1081,13 @@ int main() {
 	LDK::CVec_ChannelDetailsZ chans_after_close2 = ChannelManager_list_channels(&cm2);
 	assert(chans_after_close2->datalen == 0);
 
-	assert(OnionMessenger_send_custom_onion_message(&om1,
+	assert(OnionMessenger_send_onion_message(&om1,
 			LDKCVec_PublicKeyZ { .data = NULL, .datalen = 0, },
 			Destination_node(ChannelManager_get_our_node_id(&cm2)),
-			build_custom_onion_message(), LDKBlindedRoute { .inner = NULL, .is_owned = true })
+			LDKOnionMessageContents {
+				.tag = LDKOnionMessageContents_Custom,
+				.custom = build_custom_onion_message()
+			}, LDKBlindedPath { .inner = NULL, .is_owned = true })
 		.result_ok);
 	PeerManager_process_events(&net1);
 	while (true) {

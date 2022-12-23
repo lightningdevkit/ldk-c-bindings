@@ -39,7 +39,7 @@ LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ monitors_pending_monitor_e
 	return empty_htlc_vec;
 }
 
-void never_handle_event(const void *this_arg, const struct LDKEvent* event) {
+void never_handle_event(const void *this_arg, const struct LDKEvent event) {
 	// Note that we never actually generate any events to handle in the code below.
 	assert(false);
 }

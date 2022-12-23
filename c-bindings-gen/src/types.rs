@@ -539,6 +539,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		let mut imports = HashMap::new();
 		// Add primitives to the "imports" list:
 		Self::insert_primitive(&mut imports, "bool");
+		Self::insert_primitive(&mut imports, "u128");
 		Self::insert_primitive(&mut imports, "u64");
 		Self::insert_primitive(&mut imports, "u32");
 		Self::insert_primitive(&mut imports, "u16");
@@ -797,7 +798,8 @@ impl FullLibraryAST {
 /// List of manually-generated types which are clonable
 fn initial_clonable_types() -> HashSet<String> {
 	let mut res = HashSet::new();
-	res.insert("crate::c_types::u5".to_owned());
+	res.insert("crate::c_types::U5".to_owned());
+	res.insert("crate::c_types::U128".to_owned());
 	res.insert("crate::c_types::FourBytes".to_owned());
 	res.insert("crate::c_types::TwelveBytes".to_owned());
 	res.insert("crate::c_types::SixteenBytes".to_owned());
@@ -987,7 +989,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"core::num::ParseIntError" => Some("crate::c_types::Error"),
 			"core::str::Utf8Error" => Some("crate::c_types::Error"),
 
-			"bitcoin::bech32::u5"|"bech32::u5" => Some("crate::c_types::u5"),
+			"bitcoin::bech32::u5"|"bech32::u5" => Some("crate::c_types::U5"),
+			"u128" => Some("crate::c_types::U128"),
 			"core::num::NonZeroU8" => Some("u8"),
 
 			"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => Some("crate::c_types::PublicKey"),
@@ -1075,6 +1078,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::SystemTime" => Some("(::std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs("),
 
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(""),
+			"u128" => Some(""),
 			"core::num::NonZeroU8" => Some("core::num::NonZeroU8::new("),
 
 			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" if is_ref => Some("&"),
@@ -1164,6 +1168,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"std::time::SystemTime" => Some("))"),
 
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(".into()"),
+			"u128" => Some(".into()"),
 			"core::num::NonZeroU8" => Some(").expect(\"Value must be non-zero\")"),
 
 			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some(".into_rust()"),
@@ -1261,6 +1266,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"core::str::Utf8Error" => Some("crate::c_types::Error { _dummy: 0 } /*"),
 
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(""),
+			"u128" => Some(""),
 
 			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some("crate::c_types::PublicKey::from_rust(&"),
 			"bitcoin::secp256k1::ecdsa::Signature" => Some("crate::c_types::Signature::from_rust(&"),
@@ -1341,6 +1347,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"core::str::Utf8Error" => Some("*/"),
 
 			"bitcoin::bech32::u5"|"bech32::u5" => Some(".into()"),
+			"u128" => Some(".into()"),
 
 			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some(")"),
 			"bitcoin::secp256k1::ecdsa::Signature" => Some(")"),

@@ -41,13 +41,42 @@ impl From<core::convert::Infallible> for NotConstructable {
 #[derive(PartialEq, Eq, Copy, Clone)]
 #[allow(non_camel_case_types)]
 #[repr(C)]
-pub struct u5(u8);
+pub struct U5(u8);
 
-impl From<bech32::u5> for u5 {
+impl From<bech32::u5> for U5 {
 	fn from(o: bech32::u5) -> Self { Self(o.to_u8()) }
 }
-impl Into<bech32::u5> for u5 {
+impl Into<bech32::u5> for U5 {
 	fn into(self) -> bech32::u5 { bech32::u5::try_from_u8(self.0).expect("u5 objects must be in the range 0..32") }
+}
+
+/// Unsigned, 128-bit integer.
+///
+/// Because LLVM implements an incorrect ABI for 128-bit integers, a wrapper type is defined here.
+/// See https://github.com/rust-lang/rust/issues/54341 for more details.
+#[derive(PartialEq, Eq, Copy, Clone)]
+#[allow(non_camel_case_types)]
+#[repr(C)]
+pub struct U128 {
+	/// The 128-bit integer, as 16 little-endian bytes
+	pub le_bytes: [u8; 16],
+}
+
+#[no_mangle]
+/// Gets the 128-bit integer, as 16 little-endian bytes
+pub extern "C" fn U128_le_bytes(val: U128) -> SixteenBytes { SixteenBytes { data: val.le_bytes } }
+#[no_mangle]
+/// Constructs a new U128 from 16 little-endian bytes
+pub extern "C" fn U128_new(le_bytes: SixteenBytes) -> U128 { U128 { le_bytes: le_bytes.data } }
+
+impl From<u128> for U128 {
+	fn from(o: u128) -> Self { Self { le_bytes: o.to_le_bytes() } }
+}
+impl From<&mut u128> for U128 {
+	fn from(o: &mut u128) -> U128 { Self::from(*o) }
+}
+impl Into<u128> for U128 {
+	fn into(self) -> u128 { u128::from_le_bytes(self.le_bytes) }
 }
 
 /// Integer in the range `0..=16`

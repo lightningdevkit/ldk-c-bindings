@@ -440,16 +440,18 @@ pub enum DeclType<'a> {
 
 pub struct ImportResolver<'mod_lifetime, 'crate_lft: 'mod_lifetime> {
 	pub crate_name: &'mod_lifetime str,
-	dependencies: &'mod_lifetime HashSet<syn::Ident>,
+	library: &'crate_lft FullLibraryAST,
 	module_path: &'mod_lifetime str,
 	imports: HashMap<syn::Ident, (String, syn::Path)>,
 	declared: HashMap<syn::Ident, DeclType<'crate_lft>>,
 	priv_modules: HashSet<syn::Ident>,
 }
 impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'crate_lft> {
-	fn process_use_intern(crate_name: &str, module_path: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>,
-			u: &syn::UseTree, partial_path: &str, mut path: syn::punctuated::Punctuated<syn::PathSegment, syn::token::Colon2>) {
-
+	fn walk_use_intern<F: FnMut(syn::Ident, (String, syn::Path))>(
+		crate_name: &str, module_path: &str, dependencies: &HashSet<syn::Ident>, u: &syn::UseTree,
+		partial_path: &str,
+		mut path: syn::punctuated::Punctuated<syn::PathSegment, syn::token::Colon2>, handle_use: &mut F
+	) {
 		let new_path;
 		macro_rules! push_path {
 			($ident: expr, $path_suffix: expr) => {
@@ -489,21 +491,21 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		match u {
 			syn::UseTree::Path(p) => {
 				push_path!(p.ident, "::");
-				Self::process_use_intern(crate_name, module_path, dependencies, imports, &p.tree, &new_path, path);
+				Self::walk_use_intern(crate_name, module_path, dependencies, &p.tree, &new_path, path, handle_use);
 			},
 			syn::UseTree::Name(n) => {
 				push_path!(n.ident, "");
 				let imported_ident = syn::Ident::new(new_path.rsplitn(2, "::").next().unwrap(), Span::call_site());
-				imports.insert(imported_ident, (new_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
+				handle_use(imported_ident, (new_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
 			},
 			syn::UseTree::Group(g) => {
 				for i in g.items.iter() {
-					Self::process_use_intern(crate_name, module_path, dependencies, imports, i, partial_path, path.clone());
+					Self::walk_use_intern(crate_name, module_path, dependencies, i, partial_path, path.clone(), handle_use);
 				}
 			},
 			syn::UseTree::Rename(r) => {
 				push_path!(r.ident, "");
-				imports.insert(r.rename.clone(), (new_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
+				handle_use(r.rename.clone(), (new_path, syn::Path { leading_colon: Some(syn::Token![::](Span::call_site())), segments: path }));
 			},
 			syn::UseTree::Glob(_) => {
 				eprintln!("Ignoring * use for {} - this may result in resolution failures", partial_path);
@@ -511,12 +513,15 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		}
 	}
 
+	fn process_use_intern(crate_name: &str, module_path: &str, dependencies: &HashSet<syn::Ident>,
+		imports: &mut HashMap<syn::Ident, (String, syn::Path)>, u: &syn::UseTree, partial_path: &str,
+		path: syn::punctuated::Punctuated<syn::PathSegment, syn::token::Colon2>
+	) {
+		Self::walk_use_intern(crate_name, module_path, dependencies, u, partial_path, path,
+			&mut |k, v| { imports.insert(k, v); });
+	}
+
 	fn process_use(crate_name: &str, module_path: &str, dependencies: &HashSet<syn::Ident>, imports: &mut HashMap<syn::Ident, (String, syn::Path)>, u: &syn::ItemUse) {
-		if let syn::Visibility::Public(_) = u.vis {
-			// We actually only use these for #[cfg(fuzztarget)]
-			eprintln!("Ignoring pub(use) tree!");
-			return;
-		}
 		if u.leading_colon.is_some() { eprintln!("Ignoring leading-colon use!"); return; }
 		Self::process_use_intern(crate_name, module_path, dependencies, imports, &u.tree, "", syn::punctuated::Punctuated::new());
 	}
@@ -527,10 +532,10 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		imports.insert(ident, (id.to_owned(), path));
 	}
 
-	pub fn new(crate_name: &'mod_lifetime str, dependencies: &'mod_lifetime HashSet<syn::Ident>, module_path: &'mod_lifetime str, contents: &'crate_lft [syn::Item]) -> Self {
-		Self::from_borrowed_items(crate_name, dependencies, module_path, &contents.iter().map(|a| a).collect::<Vec<_>>())
+	pub fn new(crate_name: &'mod_lifetime str, library: &'crate_lft FullLibraryAST, module_path: &'mod_lifetime str, contents: &'crate_lft [syn::Item]) -> Self {
+		Self::from_borrowed_items(crate_name, library, module_path, &contents.iter().map(|a| a).collect::<Vec<_>>())
 	}
-	pub fn from_borrowed_items(crate_name: &'mod_lifetime str, dependencies: &'mod_lifetime HashSet<syn::Ident>, module_path: &'mod_lifetime str, contents: &[&'crate_lft syn::Item]) -> Self {
+	pub fn from_borrowed_items(crate_name: &'mod_lifetime str, library: &'crate_lft FullLibraryAST, module_path: &'mod_lifetime str, contents: &[&'crate_lft syn::Item]) -> Self {
 		let mut imports = HashMap::new();
 		// Add primitives to the "imports" list:
 		Self::insert_primitive(&mut imports, "bool");
@@ -553,7 +558,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 
 		for item in contents.iter() {
 			match item {
-				syn::Item::Use(u) => Self::process_use(crate_name, module_path, dependencies, &mut imports, &u),
+				syn::Item::Use(u) => Self::process_use(crate_name, module_path, &library.dependencies, &mut imports, &u),
 				syn::Item::Struct(s) => {
 					if let syn::Visibility::Public(_) = s.vis {
 						match export_status(&s.attrs) {
@@ -596,7 +601,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 			}
 		}
 
-		Self { crate_name, dependencies, module_path, imports, declared, priv_modules }
+		Self { crate_name, library, module_path, imports, declared, priv_modules }
 	}
 
 	pub fn maybe_resolve_declared(&self, id: &syn::Ident) -> Option<&DeclType<'crate_lft>> {
@@ -611,7 +616,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		} else { None }
 	}
 
-	pub fn maybe_resolve_path(&self, p: &syn::Path, generics: Option<&GenericTypes>) -> Option<String> {
+	fn maybe_resolve_imported_path(&self, p: &syn::Path, generics: Option<&GenericTypes>) -> Option<String> {
 		if let Some(gen_types) = generics {
 			if let Some(resp) = gen_types.maybe_resolve_path(p) {
 				return Some(resp.clone());
@@ -623,7 +628,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				format!("{}{}", if idx == 0 { "" } else { "::" }, seg.ident)
 			}).collect();
 			let firstseg = p.segments.iter().next().unwrap();
-			if !self.dependencies.contains(&firstseg.ident) {
+			if !self.library.dependencies.contains(&firstseg.ident) {
 				res = self.crate_name.to_owned() + "::" + &res;
 			}
 			Some(res)
@@ -648,12 +653,49 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				}
 			} else if let Some(_) = self.priv_modules.get(&first_seg.ident) {
 				Some(format!("{}::{}{}", self.module_path, first_seg.ident, remaining))
-			} else if first_seg_is_stdlib(&first_seg_str) || self.dependencies.contains(&first_seg.ident) {
+			} else if first_seg_is_stdlib(&first_seg_str) || self.library.dependencies.contains(&first_seg.ident) {
 				Some(first_seg_str + &remaining)
 			} else if first_seg_str == "crate" {
 				Some(self.crate_name.to_owned() + &remaining)
 			} else { None }
 		}
+	}
+
+	pub fn maybe_resolve_path(&self, p: &syn::Path, generics: Option<&GenericTypes>) -> Option<String> {
+		self.maybe_resolve_imported_path(p, generics).map(|mut path| {
+			loop {
+				// Now that we've resolved the path to the path as-imported, check whether the path
+				// is actually a pub(.*) use statement and map it to the real path.
+				let path_tmp = path.clone();
+				let crate_name = path_tmp.splitn(1, "::").next().unwrap();
+				let mut module_riter = path_tmp.rsplitn(2, "::");
+				let obj = module_riter.next().unwrap();
+				if let Some(module_path) = module_riter.next() {
+					if let Some(m) = self.library.modules.get(module_path) {
+						for item in m.items.iter() {
+							if let syn::Item::Use(syn::ItemUse { vis, tree, .. }) = item {
+								match vis {
+									syn::Visibility::Public(_)|
+									syn::Visibility::Crate(_)|
+									syn::Visibility::Restricted(_) => {
+										Self::walk_use_intern(crate_name, module_path,
+											&self.library.dependencies, tree, "",
+											syn::punctuated::Punctuated::new(), &mut |ident, (use_path, _)| {
+												if format!("{}", ident) == obj {
+													path = use_path;
+												}
+										});
+									},
+									syn::Visibility::Inherited => {},
+								}
+							}
+						}
+					}
+				}
+				break;
+			}
+			path
+		})
 	}
 
 	/// Map all the Paths in a Type into absolute paths given a set of imports (generated via process_use_intern)

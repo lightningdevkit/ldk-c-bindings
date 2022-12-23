@@ -271,7 +271,7 @@ macro_rules! get_module_type_resolver {
 		let mut module_iter = module.rsplitn(2, "::");
 		module_iter.next().unwrap();
 		let module = module_iter.next().unwrap();
-		let imports = ImportResolver::new(module.splitn(2, "::").next().unwrap(), &$crate_types.lib_ast.dependencies,
+		let imports = ImportResolver::new(module.splitn(2, "::").next().unwrap(), &$crate_types.lib_ast,
 				module, &$crate_types.lib_ast.modules.get(module).unwrap().items);
 		TypeResolver::new(module, imports, $crate_types)
 	} }
@@ -1430,7 +1430,7 @@ fn create_alias_for_impl<F: FnMut(syn::ItemImpl, &mut TypeResolver)>(resolved_pa
 
 			let alias_resolver_override;
 			let alias_resolver = if alias_module != types.module_path {
-				alias_resolver_override = ImportResolver::new(types.types.crate_name, &types.crate_types.lib_ast.dependencies,
+				alias_resolver_override = ImportResolver::new(types.types.crate_name, &types.crate_types.lib_ast,
 					alias_module, &types.crate_types.lib_ast.modules.get(alias_module).unwrap().items);
 				&alias_resolver_override
 			} else { &types.types };
@@ -1924,7 +1924,7 @@ fn convert_priv_mod<'a, 'b: 'a, W: std::io::Write>(w: &mut W, w_uses: &mut HashS
 			use_items.push(item);
 		}
 	}
-	let import_resolver = ImportResolver::from_borrowed_items(mod_path.splitn(2, "::").next().unwrap(), &libast.dependencies, mod_path, &use_items);
+	let import_resolver = ImportResolver::from_borrowed_items(mod_path.splitn(2, "::").next().unwrap(), libast, mod_path, &use_items);
 	let mut types = TypeResolver::new(mod_path, import_resolver, crate_types);
 
 	writeln!(w, "mod {} {{\n{}", module.ident, DEFAULT_IMPORTS).unwrap();
@@ -2006,7 +2006,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 
 		eprintln!("Converting {} entries...", module);
 
-		let import_resolver = ImportResolver::new(orig_crate, &libast.dependencies, module, items);
+		let import_resolver = ImportResolver::new(orig_crate, libast, module, items);
 		let mut type_resolver = TypeResolver::new(module, import_resolver, crate_types);
 
 		for item in items.iter() {
@@ -2118,7 +2118,7 @@ fn walk_ast_second_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &Crate
 		let ASTModule { ref attrs, ref items, .. } = astmod;
 		assert_eq!(export_status(&attrs), ExportStatus::Export);
 
-		let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, module, items);
+		let import_resolver = ImportResolver::new(orig_crate, ast_storage, module, items);
 		let mut types = TypeResolver::new(module, import_resolver, crate_types);
 
 		for item in items.iter() {
@@ -2154,7 +2154,7 @@ fn walk_ast_second_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &Crate
 }
 
 fn walk_private_mod<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, module: String, items: &'a syn::ItemMod, crate_types: &mut CrateTypes<'a>) {
-	let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, &module, &items.content.as_ref().unwrap().1);
+	let import_resolver = ImportResolver::new(orig_crate, ast_storage, &module, &items.content.as_ref().unwrap().1);
 	for item in items.content.as_ref().unwrap().1.iter() {
 		match item {
 			syn::Item::Mod(m) => walk_private_mod(ast_storage, orig_crate, format!("{}::{}", module, m.ident), m, crate_types),
@@ -2183,7 +2183,7 @@ fn walk_ast_first_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut Cr
 		let ASTModule { ref attrs, ref items, submods: _ } = astmod;
 		assert_eq!(export_status(&attrs), ExportStatus::Export);
 		let orig_crate = module.splitn(2, "::").next().unwrap();
-		let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, module, items);
+		let import_resolver = ImportResolver::new(orig_crate, ast_storage, module, items);
 
 		for item in items.iter() {
 			match item {

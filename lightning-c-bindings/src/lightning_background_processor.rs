@@ -75,7 +75,7 @@ pub extern "C" fn BackgroundProcessor_free(this_obj: BackgroundProcessor) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BackgroundProcessor_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBackgroundProcessor); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeBackgroundProcessor) };
 }
 #[allow(unused)]
 impl BackgroundProcessor {

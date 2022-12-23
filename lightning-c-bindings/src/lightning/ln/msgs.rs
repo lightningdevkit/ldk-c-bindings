@@ -68,7 +68,7 @@ impl DecodeError {
 			DecodeError::ShortRead => nativeDecodeError::ShortRead,
 			DecodeError::BadLengthDescriptor => nativeDecodeError::BadLengthDescriptor,
 			DecodeError::Io (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeDecodeError::Io (
 					a_nonref.to_rust_kind(),
 				)
@@ -101,7 +101,7 @@ impl DecodeError {
 			nativeDecodeError::ShortRead => DecodeError::ShortRead,
 			nativeDecodeError::BadLengthDescriptor => DecodeError::BadLengthDescriptor,
 			nativeDecodeError::Io (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				DecodeError::Io (
 					crate::c_types::IOError::from_rust_kind(a_nonref),
 				)
@@ -202,7 +202,7 @@ pub extern "C" fn Init_free(this_obj: Init) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Init_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInit); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeInit) };
 }
 #[allow(unused)]
 impl Init {
@@ -321,7 +321,7 @@ pub extern "C" fn ErrorMessage_free(this_obj: ErrorMessage) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ErrorMessage_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeErrorMessage); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeErrorMessage) };
 }
 #[allow(unused)]
 impl ErrorMessage {
@@ -443,7 +443,7 @@ pub extern "C" fn WarningMessage_free(this_obj: WarningMessage) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn WarningMessage_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeWarningMessage); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeWarningMessage) };
 }
 #[allow(unused)]
 impl WarningMessage {
@@ -563,7 +563,7 @@ pub extern "C" fn Ping_free(this_obj: Ping) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Ping_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePing); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativePing) };
 }
 #[allow(unused)]
 impl Ping {
@@ -675,7 +675,7 @@ pub extern "C" fn Pong_free(this_obj: Pong) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Pong_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePong); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativePong) };
 }
 #[allow(unused)]
 impl Pong {
@@ -775,7 +775,7 @@ pub extern "C" fn OpenChannel_free(this_obj: OpenChannel) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn OpenChannel_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeOpenChannel); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeOpenChannel) };
 }
 #[allow(unused)]
 impl OpenChannel {
@@ -1073,7 +1073,7 @@ pub extern "C" fn AcceptChannel_free(this_obj: AcceptChannel) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn AcceptChannel_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeAcceptChannel); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeAcceptChannel) };
 }
 #[allow(unused)]
 impl AcceptChannel {
@@ -1331,7 +1331,7 @@ pub extern "C" fn FundingCreated_free(this_obj: FundingCreated) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn FundingCreated_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeFundingCreated); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeFundingCreated) };
 }
 #[allow(unused)]
 impl FundingCreated {
@@ -1465,7 +1465,7 @@ pub extern "C" fn FundingSigned_free(this_obj: FundingSigned) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn FundingSigned_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeFundingSigned); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeFundingSigned) };
 }
 #[allow(unused)]
 impl FundingSigned {
@@ -1575,7 +1575,7 @@ pub extern "C" fn ChannelReady_free(this_obj: ChannelReady) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelReady_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelReady); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelReady) };
 }
 #[allow(unused)]
 impl ChannelReady {
@@ -1702,7 +1702,7 @@ pub extern "C" fn Shutdown_free(this_obj: Shutdown) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Shutdown_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeShutdown); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeShutdown) };
 }
 #[allow(unused)]
 impl Shutdown {
@@ -1816,7 +1816,7 @@ pub extern "C" fn ClosingSignedFeeRange_free(this_obj: ClosingSignedFeeRange) { 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ClosingSignedFeeRange_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeClosingSignedFeeRange); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeClosingSignedFeeRange) };
 }
 #[allow(unused)]
 impl ClosingSignedFeeRange {
@@ -1930,7 +1930,7 @@ pub extern "C" fn ClosingSigned_free(this_obj: ClosingSigned) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ClosingSigned_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeClosingSigned); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeClosingSigned) };
 }
 #[allow(unused)]
 impl ClosingSigned {
@@ -2073,7 +2073,7 @@ pub extern "C" fn UpdateAddHTLC_free(this_obj: UpdateAddHTLC) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UpdateAddHTLC_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUpdateAddHTLC); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeUpdateAddHTLC) };
 }
 #[allow(unused)]
 impl UpdateAddHTLC {
@@ -2207,7 +2207,7 @@ pub extern "C" fn OnionMessage_free(this_obj: OnionMessage) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn OnionMessage_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeOnionMessage); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeOnionMessage) };
 }
 #[allow(unused)]
 impl OnionMessage {
@@ -2297,7 +2297,7 @@ pub extern "C" fn UpdateFulfillHTLC_free(this_obj: UpdateFulfillHTLC) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UpdateFulfillHTLC_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUpdateFulfillHTLC); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeUpdateFulfillHTLC) };
 }
 #[allow(unused)]
 impl UpdateFulfillHTLC {
@@ -2419,7 +2419,7 @@ pub extern "C" fn UpdateFailHTLC_free(this_obj: UpdateFailHTLC) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UpdateFailHTLC_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUpdateFailHTLC); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeUpdateFailHTLC) };
 }
 #[allow(unused)]
 impl UpdateFailHTLC {
@@ -2520,7 +2520,7 @@ pub extern "C" fn UpdateFailMalformedHTLC_free(this_obj: UpdateFailMalformedHTLC
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UpdateFailMalformedHTLC_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUpdateFailMalformedHTLC); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeUpdateFailMalformedHTLC) };
 }
 #[allow(unused)]
 impl UpdateFailMalformedHTLC {
@@ -2632,7 +2632,7 @@ pub extern "C" fn CommitmentSigned_free(this_obj: CommitmentSigned) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CommitmentSigned_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeCommitmentSigned); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeCommitmentSigned) };
 }
 #[allow(unused)]
 impl CommitmentSigned {
@@ -2759,7 +2759,7 @@ pub extern "C" fn RevokeAndACK_free(this_obj: RevokeAndACK) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RevokeAndACK_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRevokeAndACK); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeRevokeAndACK) };
 }
 #[allow(unused)]
 impl RevokeAndACK {
@@ -2881,7 +2881,7 @@ pub extern "C" fn UpdateFee_free(this_obj: UpdateFee) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UpdateFee_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUpdateFee); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeUpdateFee) };
 }
 #[allow(unused)]
 impl UpdateFee {
@@ -2994,7 +2994,7 @@ pub extern "C" fn DataLossProtect_free(this_obj: DataLossProtect) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn DataLossProtect_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDataLossProtect); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeDataLossProtect) };
 }
 #[allow(unused)]
 impl DataLossProtect {
@@ -3106,7 +3106,7 @@ pub extern "C" fn ChannelReestablish_free(this_obj: ChannelReestablish) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelReestablish_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelReestablish); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelReestablish) };
 }
 #[allow(unused)]
 impl ChannelReestablish {
@@ -3218,7 +3218,7 @@ pub extern "C" fn AnnouncementSignatures_free(this_obj: AnnouncementSignatures) 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn AnnouncementSignatures_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeAnnouncementSignatures); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeAnnouncementSignatures) };
 }
 #[allow(unused)]
 impl AnnouncementSignatures {
@@ -3373,32 +3373,32 @@ impl NetAddress {
 	pub(crate) fn to_native(&self) -> nativeNetAddress {
 		match self {
 			NetAddress::IPv4 {ref addr, ref port, } => {
-				let mut addr_nonref = (*addr).clone();
-				let mut port_nonref = (*port).clone();
+				let mut addr_nonref = Clone::clone(addr);
+				let mut port_nonref = Clone::clone(port);
 				nativeNetAddress::IPv4 {
 					addr: addr_nonref.data,
 					port: port_nonref,
 				}
 			},
 			NetAddress::IPv6 {ref addr, ref port, } => {
-				let mut addr_nonref = (*addr).clone();
-				let mut port_nonref = (*port).clone();
+				let mut addr_nonref = Clone::clone(addr);
+				let mut port_nonref = Clone::clone(port);
 				nativeNetAddress::IPv6 {
 					addr: addr_nonref.data,
 					port: port_nonref,
 				}
 			},
 			NetAddress::OnionV2 (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeNetAddress::OnionV2 (
 					a_nonref.data,
 				)
 			},
 			NetAddress::OnionV3 {ref ed25519_pubkey, ref checksum, ref version, ref port, } => {
-				let mut ed25519_pubkey_nonref = (*ed25519_pubkey).clone();
-				let mut checksum_nonref = (*checksum).clone();
-				let mut version_nonref = (*version).clone();
-				let mut port_nonref = (*port).clone();
+				let mut ed25519_pubkey_nonref = Clone::clone(ed25519_pubkey);
+				let mut checksum_nonref = Clone::clone(checksum);
+				let mut version_nonref = Clone::clone(version);
+				let mut port_nonref = Clone::clone(port);
 				nativeNetAddress::OnionV3 {
 					ed25519_pubkey: ed25519_pubkey_nonref.data,
 					checksum: checksum_nonref,
@@ -3407,8 +3407,8 @@ impl NetAddress {
 				}
 			},
 			NetAddress::Hostname {ref hostname, ref port, } => {
-				let mut hostname_nonref = (*hostname).clone();
-				let mut port_nonref = (*port).clone();
+				let mut hostname_nonref = Clone::clone(hostname);
+				let mut port_nonref = Clone::clone(port);
 				nativeNetAddress::Hostname {
 					hostname: *unsafe { Box::from_raw(hostname_nonref.take_inner()) },
 					port: port_nonref,
@@ -3456,32 +3456,32 @@ impl NetAddress {
 	pub(crate) fn from_native(native: &nativeNetAddress) -> Self {
 		match native {
 			nativeNetAddress::IPv4 {ref addr, ref port, } => {
-				let mut addr_nonref = (*addr).clone();
-				let mut port_nonref = (*port).clone();
+				let mut addr_nonref = Clone::clone(addr);
+				let mut port_nonref = Clone::clone(port);
 				NetAddress::IPv4 {
 					addr: crate::c_types::FourBytes { data: addr_nonref },
 					port: port_nonref,
 				}
 			},
 			nativeNetAddress::IPv6 {ref addr, ref port, } => {
-				let mut addr_nonref = (*addr).clone();
-				let mut port_nonref = (*port).clone();
+				let mut addr_nonref = Clone::clone(addr);
+				let mut port_nonref = Clone::clone(port);
 				NetAddress::IPv6 {
 					addr: crate::c_types::SixteenBytes { data: addr_nonref },
 					port: port_nonref,
 				}
 			},
 			nativeNetAddress::OnionV2 (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				NetAddress::OnionV2 (
 					crate::c_types::TwelveBytes { data: a_nonref },
 				)
 			},
 			nativeNetAddress::OnionV3 {ref ed25519_pubkey, ref checksum, ref version, ref port, } => {
-				let mut ed25519_pubkey_nonref = (*ed25519_pubkey).clone();
-				let mut checksum_nonref = (*checksum).clone();
-				let mut version_nonref = (*version).clone();
-				let mut port_nonref = (*port).clone();
+				let mut ed25519_pubkey_nonref = Clone::clone(ed25519_pubkey);
+				let mut checksum_nonref = Clone::clone(checksum);
+				let mut version_nonref = Clone::clone(version);
+				let mut port_nonref = Clone::clone(port);
 				NetAddress::OnionV3 {
 					ed25519_pubkey: crate::c_types::ThirtyTwoBytes { data: ed25519_pubkey_nonref },
 					checksum: checksum_nonref,
@@ -3490,8 +3490,8 @@ impl NetAddress {
 				}
 			},
 			nativeNetAddress::Hostname {ref hostname, ref port, } => {
-				let mut hostname_nonref = (*hostname).clone();
-				let mut port_nonref = (*port).clone();
+				let mut hostname_nonref = Clone::clone(hostname);
+				let mut port_nonref = Clone::clone(port);
 				NetAddress::Hostname {
 					hostname: crate::lightning::util::ser::Hostname { inner: ObjOps::heap_alloc(hostname_nonref), is_owned: true },
 					port: port_nonref,
@@ -3634,7 +3634,7 @@ pub extern "C" fn UnsignedNodeAnnouncement_free(this_obj: UnsignedNodeAnnounceme
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UnsignedNodeAnnouncement_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUnsignedNodeAnnouncement); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeUnsignedNodeAnnouncement) };
 }
 #[allow(unused)]
 impl UnsignedNodeAnnouncement {
@@ -3787,7 +3787,7 @@ pub extern "C" fn NodeAnnouncement_free(this_obj: NodeAnnouncement) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeAnnouncement_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeAnnouncement); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeNodeAnnouncement) };
 }
 #[allow(unused)]
 impl NodeAnnouncement {
@@ -3897,7 +3897,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_free(this_obj: UnsignedChannelAnno
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UnsignedChannelAnnouncement_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUnsignedChannelAnnouncement); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeUnsignedChannelAnnouncement) };
 }
 #[allow(unused)]
 impl UnsignedChannelAnnouncement {
@@ -4053,7 +4053,7 @@ pub extern "C" fn ChannelAnnouncement_free(this_obj: ChannelAnnouncement) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelAnnouncement_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelAnnouncement); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelAnnouncement) };
 }
 #[allow(unused)]
 impl ChannelAnnouncement {
@@ -4199,7 +4199,7 @@ pub extern "C" fn UnsignedChannelUpdate_free(this_obj: UnsignedChannelUpdate) { 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UnsignedChannelUpdate_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUnsignedChannelUpdate); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeUnsignedChannelUpdate) };
 }
 #[allow(unused)]
 impl UnsignedChannelUpdate {
@@ -4428,7 +4428,7 @@ pub extern "C" fn ChannelUpdate_free(this_obj: ChannelUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelUpdate_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelUpdate); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelUpdate) };
 }
 #[allow(unused)]
 impl ChannelUpdate {
@@ -4541,7 +4541,7 @@ pub extern "C" fn QueryChannelRange_free(this_obj: QueryChannelRange) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn QueryChannelRange_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeQueryChannelRange); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeQueryChannelRange) };
 }
 #[allow(unused)]
 impl QueryChannelRange {
@@ -4669,7 +4669,7 @@ pub extern "C" fn ReplyChannelRange_free(this_obj: ReplyChannelRange) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ReplyChannelRange_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeReplyChannelRange); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeReplyChannelRange) };
 }
 #[allow(unused)]
 impl ReplyChannelRange {
@@ -4827,7 +4827,7 @@ pub extern "C" fn QueryShortChannelIds_free(this_obj: QueryShortChannelIds) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn QueryShortChannelIds_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeQueryShortChannelIds); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeQueryShortChannelIds) };
 }
 #[allow(unused)]
 impl QueryShortChannelIds {
@@ -4945,7 +4945,7 @@ pub extern "C" fn ReplyShortChannelIdsEnd_free(this_obj: ReplyShortChannelIdsEnd
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ReplyShortChannelIdsEnd_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeReplyShortChannelIdsEnd); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeReplyShortChannelIdsEnd) };
 }
 #[allow(unused)]
 impl ReplyShortChannelIdsEnd {
@@ -5059,7 +5059,7 @@ pub extern "C" fn GossipTimestampFilter_free(this_obj: GossipTimestampFilter) { 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn GossipTimestampFilter_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeGossipTimestampFilter); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeGossipTimestampFilter) };
 }
 #[allow(unused)]
 impl GossipTimestampFilter {
@@ -5193,7 +5193,7 @@ impl ErrorAction {
 	pub(crate) fn to_native(&self) -> nativeErrorAction {
 		match self {
 			ErrorAction::DisconnectPeer {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
+				let mut msg_nonref = Clone::clone(msg);
 				let mut local_msg_nonref = if msg_nonref.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(msg_nonref.take_inner()) } }) };
 				nativeErrorAction::DisconnectPeer {
 					msg: local_msg_nonref,
@@ -5201,21 +5201,21 @@ impl ErrorAction {
 			},
 			ErrorAction::IgnoreError => nativeErrorAction::IgnoreError,
 			ErrorAction::IgnoreAndLog (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeErrorAction::IgnoreAndLog (
 					a_nonref.into_native(),
 				)
 			},
 			ErrorAction::IgnoreDuplicateGossip => nativeErrorAction::IgnoreDuplicateGossip,
 			ErrorAction::SendErrorMessage {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
+				let mut msg_nonref = Clone::clone(msg);
 				nativeErrorAction::SendErrorMessage {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			ErrorAction::SendWarningMessage {ref msg, ref log_level, } => {
-				let mut msg_nonref = (*msg).clone();
-				let mut log_level_nonref = (*log_level).clone();
+				let mut msg_nonref = Clone::clone(msg);
+				let mut log_level_nonref = Clone::clone(log_level);
 				nativeErrorAction::SendWarningMessage {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 					log_level: log_level_nonref.into_native(),
@@ -5256,7 +5256,7 @@ impl ErrorAction {
 	pub(crate) fn from_native(native: &nativeErrorAction) -> Self {
 		match native {
 			nativeErrorAction::DisconnectPeer {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
+				let mut msg_nonref = Clone::clone(msg);
 				let mut local_msg_nonref = crate::lightning::ln::msgs::ErrorMessage { inner: if msg_nonref.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((msg_nonref.unwrap())) } }, is_owned: true };
 				ErrorAction::DisconnectPeer {
 					msg: local_msg_nonref,
@@ -5264,21 +5264,21 @@ impl ErrorAction {
 			},
 			nativeErrorAction::IgnoreError => ErrorAction::IgnoreError,
 			nativeErrorAction::IgnoreAndLog (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				ErrorAction::IgnoreAndLog (
 					crate::lightning::util::logger::Level::native_into(a_nonref),
 				)
 			},
 			nativeErrorAction::IgnoreDuplicateGossip => ErrorAction::IgnoreDuplicateGossip,
 			nativeErrorAction::SendErrorMessage {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
+				let mut msg_nonref = Clone::clone(msg);
 				ErrorAction::SendErrorMessage {
 					msg: crate::lightning::ln::msgs::ErrorMessage { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeErrorAction::SendWarningMessage {ref msg, ref log_level, } => {
-				let mut msg_nonref = (*msg).clone();
-				let mut log_level_nonref = (*log_level).clone();
+				let mut msg_nonref = Clone::clone(msg);
+				let mut log_level_nonref = Clone::clone(log_level);
 				ErrorAction::SendWarningMessage {
 					msg: crate::lightning::ln::msgs::WarningMessage { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 					log_level: crate::lightning::util::logger::Level::native_into(log_level_nonref),
@@ -5392,7 +5392,7 @@ pub extern "C" fn LightningError_free(this_obj: LightningError) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn LightningError_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeLightningError); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeLightningError) };
 }
 #[allow(unused)]
 impl LightningError {
@@ -5494,7 +5494,7 @@ pub extern "C" fn CommitmentUpdate_free(this_obj: CommitmentUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CommitmentUpdate_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeCommitmentUpdate); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeCommitmentUpdate) };
 }
 #[allow(unused)]
 impl CommitmentUpdate {

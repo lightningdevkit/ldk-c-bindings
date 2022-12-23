@@ -108,7 +108,7 @@ pub extern "C" fn Future_free(this_obj: Future) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Future_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeFuture); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeFuture) };
 }
 #[allow(unused)]
 impl Future {
@@ -133,14 +133,3 @@ pub extern "C" fn Future_register_callback_fn(this_arg: &crate::lightning::util:
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.register_callback_fn(callback)
 }
 
-mod std_future {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}

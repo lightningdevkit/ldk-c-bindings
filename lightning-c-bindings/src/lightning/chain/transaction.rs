@@ -52,7 +52,7 @@ pub extern "C" fn OutPoint_free(this_obj: OutPoint) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn OutPoint_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeOutPoint); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeOutPoint) };
 }
 #[allow(unused)]
 impl OutPoint {

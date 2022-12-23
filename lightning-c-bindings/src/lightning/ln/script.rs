@@ -51,7 +51,7 @@ pub extern "C" fn ShutdownScript_free(this_obj: ShutdownScript) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ShutdownScript_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeShutdownScript); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeShutdownScript) };
 }
 #[allow(unused)]
 impl ShutdownScript {
@@ -130,7 +130,7 @@ pub extern "C" fn InvalidShutdownScript_free(this_obj: InvalidShutdownScript) { 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn InvalidShutdownScript_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInvalidShutdownScript); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeInvalidShutdownScript) };
 }
 #[allow(unused)]
 impl InvalidShutdownScript {

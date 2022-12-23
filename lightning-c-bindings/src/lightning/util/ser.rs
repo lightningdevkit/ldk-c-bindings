@@ -60,7 +60,7 @@ pub extern "C" fn BigSize_free(this_obj: BigSize) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BigSize_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBigSize); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeBigSize) };
 }
 #[allow(unused)]
 impl BigSize {
@@ -132,7 +132,7 @@ pub extern "C" fn Hostname_free(this_obj: Hostname) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Hostname_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeHostname); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeHostname) };
 }
 #[allow(unused)]
 impl Hostname {

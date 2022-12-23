@@ -63,7 +63,7 @@ pub extern "C" fn MonitorUpdateId_free(this_obj: MonitorUpdateId) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn MonitorUpdateId_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeMonitorUpdateId); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeMonitorUpdateId) };
 }
 #[allow(unused)]
 impl MonitorUpdateId {
@@ -281,7 +281,7 @@ pub extern "C" fn LockedChannelMonitor_free(this_obj: LockedChannelMonitor) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn LockedChannelMonitor_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeLockedChannelMonitor); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeLockedChannelMonitor) };
 }
 #[allow(unused)]
 impl LockedChannelMonitor {
@@ -340,7 +340,7 @@ pub extern "C" fn ChainMonitor_free(this_obj: ChainMonitor) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChainMonitor_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChainMonitor); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChainMonitor) };
 }
 #[allow(unused)]
 impl ChainMonitor {
@@ -413,6 +413,15 @@ pub extern "C" fn ChainMonitor_get_monitor(this_arg: &crate::lightning::chain::c
 pub extern "C" fn ChainMonitor_list_monitors(this_arg: &crate::lightning::chain::chainmonitor::ChainMonitor) -> crate::c_types::derived::CVec_OutPointZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.list_monitors();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+	local_ret.into()
+}
+
+/// Lists the pending updates for each [`ChannelMonitor`] (by `OutPoint` being monitored).
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChainMonitor_list_pending_monitor_updates(this_arg: &crate::lightning::chain::chainmonitor::ChainMonitor) -> crate::c_types::derived::CVec_C2Tuple_OutPointCVec_MonitorUpdateIdZZZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.list_pending_monitor_updates();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { crate::lightning::chain::chainmonitor::MonitorUpdateId { inner: ObjOps::heap_alloc(item), is_owned: true } }); }; let mut local_ret_0 = (crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
 }
 
@@ -506,9 +515,9 @@ extern "C" fn ChainMonitor_Confirm_best_block_updated(this_arg: *const c_void, h
 	<nativeChainMonitor as lightning::chain::Confirm<>>::best_block_updated(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height)
 }
 #[must_use]
-extern "C" fn ChainMonitor_Confirm_get_relevant_txids(this_arg: *const c_void) -> crate::c_types::derived::CVec_TxidZ {
+extern "C" fn ChainMonitor_Confirm_get_relevant_txids(this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_TxidBlockHashZZ {
 	let mut ret = <nativeChainMonitor as lightning::chain::Confirm<>>::get_relevant_txids(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.into_inner() } }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = if orig_ret_0_1.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (orig_ret_0_1.unwrap()).into_inner() } } }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1).into(); local_ret_0 }); };
 	local_ret.into()
 }
 

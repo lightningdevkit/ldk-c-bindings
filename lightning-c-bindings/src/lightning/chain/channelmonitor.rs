@@ -66,7 +66,7 @@ pub extern "C" fn ChannelMonitorUpdate_free(this_obj: ChannelMonitorUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelMonitorUpdate_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelMonitorUpdate); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelMonitorUpdate) };
 }
 #[allow(unused)]
 impl ChannelMonitorUpdate {
@@ -204,27 +204,27 @@ impl MonitorEvent {
 	pub(crate) fn to_native(&self) -> nativeMonitorEvent {
 		match self {
 			MonitorEvent::HTLCEvent (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeMonitorEvent::HTLCEvent (
 					*unsafe { Box::from_raw(a_nonref.take_inner()) },
 				)
 			},
 			MonitorEvent::CommitmentTxConfirmed (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeMonitorEvent::CommitmentTxConfirmed (
 					*unsafe { Box::from_raw(a_nonref.take_inner()) },
 				)
 			},
 			MonitorEvent::Completed {ref funding_txo, ref monitor_update_id, } => {
-				let mut funding_txo_nonref = (*funding_txo).clone();
-				let mut monitor_update_id_nonref = (*monitor_update_id).clone();
+				let mut funding_txo_nonref = Clone::clone(funding_txo);
+				let mut monitor_update_id_nonref = Clone::clone(monitor_update_id);
 				nativeMonitorEvent::Completed {
 					funding_txo: *unsafe { Box::from_raw(funding_txo_nonref.take_inner()) },
 					monitor_update_id: monitor_update_id_nonref,
 				}
 			},
 			MonitorEvent::UpdateFailed (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeMonitorEvent::UpdateFailed (
 					*unsafe { Box::from_raw(a_nonref.take_inner()) },
 				)
@@ -261,27 +261,27 @@ impl MonitorEvent {
 	pub(crate) fn from_native(native: &nativeMonitorEvent) -> Self {
 		match native {
 			nativeMonitorEvent::HTLCEvent (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				MonitorEvent::HTLCEvent (
 					crate::lightning::chain::channelmonitor::HTLCUpdate { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
 				)
 			},
 			nativeMonitorEvent::CommitmentTxConfirmed (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				MonitorEvent::CommitmentTxConfirmed (
 					crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
 				)
 			},
 			nativeMonitorEvent::Completed {ref funding_txo, ref monitor_update_id, } => {
-				let mut funding_txo_nonref = (*funding_txo).clone();
-				let mut monitor_update_id_nonref = (*monitor_update_id).clone();
+				let mut funding_txo_nonref = Clone::clone(funding_txo);
+				let mut monitor_update_id_nonref = Clone::clone(monitor_update_id);
 				MonitorEvent::Completed {
 					funding_txo: crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo_nonref), is_owned: true },
 					monitor_update_id: monitor_update_id_nonref,
 				}
 			},
 			nativeMonitorEvent::UpdateFailed (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				MonitorEvent::UpdateFailed (
 					crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
 				)
@@ -399,7 +399,7 @@ pub extern "C" fn HTLCUpdate_free(this_obj: HTLCUpdate) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn HTLCUpdate_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeHTLCUpdate); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeHTLCUpdate) };
 }
 #[allow(unused)]
 impl HTLCUpdate {
@@ -555,45 +555,45 @@ impl Balance {
 	pub(crate) fn to_native(&self) -> nativeBalance {
 		match self {
 			Balance::ClaimableOnChannelClose {ref claimable_amount_satoshis, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
 				nativeBalance::ClaimableOnChannelClose {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 				}
 			},
 			Balance::ClaimableAwaitingConfirmations {ref claimable_amount_satoshis, ref confirmation_height, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
-				let mut confirmation_height_nonref = (*confirmation_height).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
+				let mut confirmation_height_nonref = Clone::clone(confirmation_height);
 				nativeBalance::ClaimableAwaitingConfirmations {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					confirmation_height: confirmation_height_nonref,
 				}
 			},
 			Balance::ContentiousClaimable {ref claimable_amount_satoshis, ref timeout_height, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
-				let mut timeout_height_nonref = (*timeout_height).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
+				let mut timeout_height_nonref = Clone::clone(timeout_height);
 				nativeBalance::ContentiousClaimable {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					timeout_height: timeout_height_nonref,
 				}
 			},
 			Balance::MaybeTimeoutClaimableHTLC {ref claimable_amount_satoshis, ref claimable_height, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
-				let mut claimable_height_nonref = (*claimable_height).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
+				let mut claimable_height_nonref = Clone::clone(claimable_height);
 				nativeBalance::MaybeTimeoutClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					claimable_height: claimable_height_nonref,
 				}
 			},
 			Balance::MaybePreimageClaimableHTLC {ref claimable_amount_satoshis, ref expiry_height, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
-				let mut expiry_height_nonref = (*expiry_height).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
+				let mut expiry_height_nonref = Clone::clone(expiry_height);
 				nativeBalance::MaybePreimageClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					expiry_height: expiry_height_nonref,
 				}
 			},
 			Balance::CounterpartyRevokedOutputClaimable {ref claimable_amount_satoshis, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
 				nativeBalance::CounterpartyRevokedOutputClaimable {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 				}
@@ -643,45 +643,45 @@ impl Balance {
 	pub(crate) fn from_native(native: &nativeBalance) -> Self {
 		match native {
 			nativeBalance::ClaimableOnChannelClose {ref claimable_amount_satoshis, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
 				Balance::ClaimableOnChannelClose {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 				}
 			},
 			nativeBalance::ClaimableAwaitingConfirmations {ref claimable_amount_satoshis, ref confirmation_height, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
-				let mut confirmation_height_nonref = (*confirmation_height).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
+				let mut confirmation_height_nonref = Clone::clone(confirmation_height);
 				Balance::ClaimableAwaitingConfirmations {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					confirmation_height: confirmation_height_nonref,
 				}
 			},
 			nativeBalance::ContentiousClaimable {ref claimable_amount_satoshis, ref timeout_height, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
-				let mut timeout_height_nonref = (*timeout_height).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
+				let mut timeout_height_nonref = Clone::clone(timeout_height);
 				Balance::ContentiousClaimable {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					timeout_height: timeout_height_nonref,
 				}
 			},
 			nativeBalance::MaybeTimeoutClaimableHTLC {ref claimable_amount_satoshis, ref claimable_height, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
-				let mut claimable_height_nonref = (*claimable_height).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
+				let mut claimable_height_nonref = Clone::clone(claimable_height);
 				Balance::MaybeTimeoutClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					claimable_height: claimable_height_nonref,
 				}
 			},
 			nativeBalance::MaybePreimageClaimableHTLC {ref claimable_amount_satoshis, ref expiry_height, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
-				let mut expiry_height_nonref = (*expiry_height).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
+				let mut expiry_height_nonref = Clone::clone(expiry_height);
 				Balance::MaybePreimageClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					expiry_height: expiry_height_nonref,
 				}
 			},
 			nativeBalance::CounterpartyRevokedOutputClaimable {ref claimable_amount_satoshis, } => {
-				let mut claimable_amount_satoshis_nonref = (*claimable_amount_satoshis).clone();
+				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
 				Balance::CounterpartyRevokedOutputClaimable {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 				}
@@ -836,7 +836,7 @@ pub extern "C" fn ChannelMonitor_free(this_obj: ChannelMonitor) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelMonitor_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelMonitor); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelMonitor) };
 }
 #[allow(unused)]
 impl ChannelMonitor {
@@ -924,9 +924,11 @@ pub extern "C" fn ChannelMonitor_get_and_clear_pending_monitor_events(this_arg: 
 /// Gets the list of pending events which were generated by previous actions, clearing the list
 /// in the process.
 ///
-/// This is called by ChainMonitor::get_and_clear_pending_events() and is equivalent to
-/// EventsProvider::get_and_clear_pending_events() except that it requires &mut self as we do
-/// no internal locking in ChannelMonitors.
+/// This is called by the [`EventsProvider::process_pending_events`] implementation for
+/// [`ChainMonitor`].
+///
+/// [`EventsProvider::process_pending_events`]: crate::util::events::EventsProvider::process_pending_events
+/// [`ChainMonitor`]: crate::chain::chainmonitor::ChainMonitor
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_and_clear_pending_events(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_EventZ {
@@ -1044,9 +1046,9 @@ pub extern "C" fn ChannelMonitor_best_block_updated(this_arg: &crate::lightning:
 /// Returns the set of txids that should be monitored for re-organization out of the chain.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_TxidZ {
+pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_C2Tuple_TxidBlockHashZZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_relevant_txids();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.into_inner() } }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = if orig_ret_0_1.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (orig_ret_0_1.unwrap()).into_inner() } } }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1).into(); local_ret_0 }); };
 	local_ret.into()
 }
 

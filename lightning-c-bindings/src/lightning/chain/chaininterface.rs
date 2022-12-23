@@ -136,6 +136,15 @@ pub extern "C" fn ConfirmationTarget_normal() -> ConfirmationTarget {
 pub extern "C" fn ConfirmationTarget_high_priority() -> ConfirmationTarget {
 	ConfirmationTarget::HighPriority}
 /// Checks if two ConfirmationTargets contain equal inner contents.
+#[no_mangle]
+pub extern "C" fn ConfirmationTarget_hash(o: &ConfirmationTarget) -> u64 {
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(&o.to_native(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Checks if two ConfirmationTargets contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
 pub extern "C" fn ConfirmationTarget_eq(a: &ConfirmationTarget, b: &ConfirmationTarget) -> bool {

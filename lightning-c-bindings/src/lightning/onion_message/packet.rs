@@ -16,6 +16,48 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
+/// The contents of an onion message. In the context of offers, this would be the invoice, invoice
+/// request, or invoice error.
+#[must_use]
+#[repr(C)]
+pub enum OnionMessageContents {
+	/// A custom onion message specified by the user.
+	Custom(
+		crate::lightning::onion_message::packet::CustomOnionMessageContents),
+}
+use lightning::onion_message::packet::OnionMessageContents as OnionMessageContentsImport;
+pub(crate) type nativeOnionMessageContents = OnionMessageContentsImport<crate::lightning::onion_message::packet::CustomOnionMessageContents>;
+
+impl OnionMessageContents {
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeOnionMessageContents {
+		match self {
+			OnionMessageContents::Custom (mut a, ) => {
+				nativeOnionMessageContents::Custom (
+					a,
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeOnionMessageContents) -> Self {
+		match native {
+			nativeOnionMessageContents::Custom (mut a, ) => {
+				OnionMessageContents::Custom (
+					Into::into(a),
+				)
+			},
+		}
+	}
+}
+/// Frees any resources used by the OnionMessageContents
+#[no_mangle]
+pub extern "C" fn OnionMessageContents_free(this_ptr: OnionMessageContents) { }
+#[no_mangle]
+/// Utility method to constructs a new Custom-variant OnionMessageContents
+pub extern "C" fn OnionMessageContents_custom(a: crate::lightning::onion_message::packet::CustomOnionMessageContents) -> OnionMessageContents {
+	OnionMessageContents::Custom(a, )
+}
 /// The contents of a custom onion message.
 #[repr(C)]
 pub struct CustomOnionMessageContents {

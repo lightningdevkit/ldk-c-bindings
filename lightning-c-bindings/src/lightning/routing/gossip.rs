@@ -49,7 +49,7 @@ pub extern "C" fn NodeId_free(this_obj: NodeId) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeId_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeId); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeNodeId) };
 }
 #[allow(unused)]
 impl NodeId {
@@ -162,7 +162,7 @@ pub extern "C" fn NetworkGraph_free(this_obj: NetworkGraph) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NetworkGraph_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNetworkGraph); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeNetworkGraph) };
 }
 #[allow(unused)]
 impl NetworkGraph {
@@ -213,7 +213,7 @@ pub extern "C" fn ReadOnlyNetworkGraph_free(this_obj: ReadOnlyNetworkGraph) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ReadOnlyNetworkGraph_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeReadOnlyNetworkGraph); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeReadOnlyNetworkGraph) };
 }
 #[allow(unused)]
 impl ReadOnlyNetworkGraph {
@@ -272,22 +272,22 @@ impl NetworkUpdate {
 	pub(crate) fn to_native(&self) -> nativeNetworkUpdate {
 		match self {
 			NetworkUpdate::ChannelUpdateMessage {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
+				let mut msg_nonref = Clone::clone(msg);
 				nativeNetworkUpdate::ChannelUpdateMessage {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			NetworkUpdate::ChannelFailure {ref short_channel_id, ref is_permanent, } => {
-				let mut short_channel_id_nonref = (*short_channel_id).clone();
-				let mut is_permanent_nonref = (*is_permanent).clone();
+				let mut short_channel_id_nonref = Clone::clone(short_channel_id);
+				let mut is_permanent_nonref = Clone::clone(is_permanent);
 				nativeNetworkUpdate::ChannelFailure {
 					short_channel_id: short_channel_id_nonref,
 					is_permanent: is_permanent_nonref,
 				}
 			},
 			NetworkUpdate::NodeFailure {ref node_id, ref is_permanent, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut is_permanent_nonref = (*is_permanent).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut is_permanent_nonref = Clone::clone(is_permanent);
 				nativeNetworkUpdate::NodeFailure {
 					node_id: node_id_nonref.into_rust(),
 					is_permanent: is_permanent_nonref,
@@ -321,22 +321,22 @@ impl NetworkUpdate {
 	pub(crate) fn from_native(native: &nativeNetworkUpdate) -> Self {
 		match native {
 			nativeNetworkUpdate::ChannelUpdateMessage {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
+				let mut msg_nonref = Clone::clone(msg);
 				NetworkUpdate::ChannelUpdateMessage {
 					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeNetworkUpdate::ChannelFailure {ref short_channel_id, ref is_permanent, } => {
-				let mut short_channel_id_nonref = (*short_channel_id).clone();
-				let mut is_permanent_nonref = (*is_permanent).clone();
+				let mut short_channel_id_nonref = Clone::clone(short_channel_id);
+				let mut is_permanent_nonref = Clone::clone(is_permanent);
 				NetworkUpdate::ChannelFailure {
 					short_channel_id: short_channel_id_nonref,
 					is_permanent: is_permanent_nonref,
 				}
 			},
 			nativeNetworkUpdate::NodeFailure {ref node_id, ref is_permanent, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut is_permanent_nonref = (*is_permanent).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut is_permanent_nonref = Clone::clone(is_permanent);
 				NetworkUpdate::NodeFailure {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					is_permanent: is_permanent_nonref,
@@ -425,9 +425,6 @@ pub(crate) type nativeP2PGossipSync = nativeP2PGossipSyncImport<&'static lightni
 /// This network graph is then used for routing payments.
 /// Provides interface to help with initial routing sync by
 /// serving historical announcements.
-///
-/// Serves as an [`EventHandler`] for applying updates from [`Event::PaymentPathFailed`] to the
-/// [`NetworkGraph`].
 #[must_use]
 #[repr(C)]
 pub struct P2PGossipSync {
@@ -456,7 +453,7 @@ pub extern "C" fn P2PGossipSync_free(this_obj: P2PGossipSync) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn P2PGossipSync_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeP2PGossipSync); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeP2PGossipSync) };
 }
 #[allow(unused)]
 impl P2PGossipSync {
@@ -496,29 +493,12 @@ pub extern "C" fn P2PGossipSync_add_chain_access(this_arg: &mut crate::lightning
 	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::gossip::nativeP2PGossipSync)) }.add_chain_access(local_chain_access)
 }
 
-impl From<nativeNetworkGraph> for crate::lightning::util::events::EventHandler {
-	fn from(obj: nativeNetworkGraph) -> Self {
-		let mut rust_obj = NetworkGraph { inner: ObjOps::heap_alloc(obj), is_owned: true };
-		let mut ret = NetworkGraph_as_EventHandler(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
-		ret.free = Some(NetworkGraph_free_void);
-		ret
-	}
-}
-/// Constructs a new EventHandler which calls the relevant methods on this_arg.
-/// This copies the `inner` pointer in this_arg and thus the returned EventHandler must be freed before this_arg is
+/// Handles any network updates originating from [`Event`]s.
+///
+/// [`Event`]: crate::util::events::Event
 #[no_mangle]
-pub extern "C" fn NetworkGraph_as_EventHandler(this_arg: &NetworkGraph) -> crate::lightning::util::events::EventHandler {
-	crate::lightning::util::events::EventHandler {
-		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
-		free: None,
-		handle_event: NetworkGraph_EventHandler_handle_event,
-	}
-}
-
-extern "C" fn NetworkGraph_EventHandler_handle_event(this_arg: *const c_void, event: &crate::lightning::util::events::Event) {
-	<nativeNetworkGraph as lightning::util::events::EventHandler<>>::handle_event(unsafe { &mut *(this_arg as *mut nativeNetworkGraph) }, &event.to_native())
+pub extern "C" fn NetworkGraph_handle_network_update(this_arg: &crate::lightning::routing::gossip::NetworkGraph, network_update: &crate::lightning::routing::gossip::NetworkUpdate) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.handle_network_update(&network_update.to_native())
 }
 
 impl From<nativeP2PGossipSync> for crate::lightning::ln::msgs::RoutingMessageHandler {
@@ -691,7 +671,7 @@ pub extern "C" fn ChannelUpdateInfo_free(this_obj: ChannelUpdateInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelUpdateInfo_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelUpdateInfo); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelUpdateInfo) };
 }
 #[allow(unused)]
 impl ChannelUpdateInfo {
@@ -893,7 +873,7 @@ pub extern "C" fn ChannelInfo_free(this_obj: ChannelInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelInfo_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelInfo); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelInfo) };
 }
 #[allow(unused)]
 impl ChannelInfo {
@@ -1103,7 +1083,7 @@ pub extern "C" fn DirectedChannelInfo_free(this_obj: DirectedChannelInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn DirectedChannelInfo_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDirectedChannelInfo); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeDirectedChannelInfo) };
 }
 #[allow(unused)]
 impl DirectedChannelInfo {
@@ -1146,17 +1126,6 @@ pub extern "C" fn DirectedChannelInfo_clone(orig: &DirectedChannelInfo) -> Direc
 pub extern "C" fn DirectedChannelInfo_channel(this_arg: &crate::lightning::routing::gossip::DirectedChannelInfo) -> crate::lightning::routing::gossip::ChannelInfo {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel();
 	crate::lightning::routing::gossip::ChannelInfo { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::routing::gossip::ChannelInfo<>) as *mut _) }, is_owned: false }
-}
-
-/// Returns information for the direction.
-///
-/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
-#[must_use]
-#[no_mangle]
-pub extern "C" fn DirectedChannelInfo_direction(this_arg: &crate::lightning::routing::gossip::DirectedChannelInfo) -> crate::lightning::routing::gossip::ChannelUpdateInfo {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.direction();
-	let mut local_ret = crate::lightning::routing::gossip::ChannelUpdateInfo { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::routing::gossip::ChannelUpdateInfo<>) as *mut _ }, is_owned: false };
-	local_ret
 }
 
 /// Returns the maximum HTLC amount allowed over the channel in the direction.
@@ -1204,7 +1173,7 @@ pub enum EffectiveCapacity {
 		/// The funding amount denominated in millisatoshi.
 		capacity_msat: u64,
 		/// The maximum HTLC amount denominated in millisatoshi.
-		htlc_maximum_msat: crate::c_types::derived::COption_u64Z,
+		htlc_maximum_msat: u64,
 	},
 	/// A capacity sufficient to route any payment, typically used for private channels provided by
 	/// an invoice.
@@ -1221,24 +1190,23 @@ impl EffectiveCapacity {
 	pub(crate) fn to_native(&self) -> nativeEffectiveCapacity {
 		match self {
 			EffectiveCapacity::ExactLiquidity {ref liquidity_msat, } => {
-				let mut liquidity_msat_nonref = (*liquidity_msat).clone();
+				let mut liquidity_msat_nonref = Clone::clone(liquidity_msat);
 				nativeEffectiveCapacity::ExactLiquidity {
 					liquidity_msat: liquidity_msat_nonref,
 				}
 			},
 			EffectiveCapacity::MaximumHTLC {ref amount_msat, } => {
-				let mut amount_msat_nonref = (*amount_msat).clone();
+				let mut amount_msat_nonref = Clone::clone(amount_msat);
 				nativeEffectiveCapacity::MaximumHTLC {
 					amount_msat: amount_msat_nonref,
 				}
 			},
 			EffectiveCapacity::Total {ref capacity_msat, ref htlc_maximum_msat, } => {
-				let mut capacity_msat_nonref = (*capacity_msat).clone();
-				let mut htlc_maximum_msat_nonref = (*htlc_maximum_msat).clone();
-				let mut local_htlc_maximum_msat_nonref = if htlc_maximum_msat_nonref.is_some() { Some( { htlc_maximum_msat_nonref.take() }) } else { None };
+				let mut capacity_msat_nonref = Clone::clone(capacity_msat);
+				let mut htlc_maximum_msat_nonref = Clone::clone(htlc_maximum_msat);
 				nativeEffectiveCapacity::Total {
 					capacity_msat: capacity_msat_nonref,
-					htlc_maximum_msat: local_htlc_maximum_msat_nonref,
+					htlc_maximum_msat: htlc_maximum_msat_nonref,
 				}
 			},
 			EffectiveCapacity::Infinite => nativeEffectiveCapacity::Infinite,
@@ -1259,10 +1227,9 @@ impl EffectiveCapacity {
 				}
 			},
 			EffectiveCapacity::Total {mut capacity_msat, mut htlc_maximum_msat, } => {
-				let mut local_htlc_maximum_msat = if htlc_maximum_msat.is_some() { Some( { htlc_maximum_msat.take() }) } else { None };
 				nativeEffectiveCapacity::Total {
 					capacity_msat: capacity_msat,
-					htlc_maximum_msat: local_htlc_maximum_msat,
+					htlc_maximum_msat: htlc_maximum_msat,
 				}
 			},
 			EffectiveCapacity::Infinite => nativeEffectiveCapacity::Infinite,
@@ -1273,24 +1240,23 @@ impl EffectiveCapacity {
 	pub(crate) fn from_native(native: &nativeEffectiveCapacity) -> Self {
 		match native {
 			nativeEffectiveCapacity::ExactLiquidity {ref liquidity_msat, } => {
-				let mut liquidity_msat_nonref = (*liquidity_msat).clone();
+				let mut liquidity_msat_nonref = Clone::clone(liquidity_msat);
 				EffectiveCapacity::ExactLiquidity {
 					liquidity_msat: liquidity_msat_nonref,
 				}
 			},
 			nativeEffectiveCapacity::MaximumHTLC {ref amount_msat, } => {
-				let mut amount_msat_nonref = (*amount_msat).clone();
+				let mut amount_msat_nonref = Clone::clone(amount_msat);
 				EffectiveCapacity::MaximumHTLC {
 					amount_msat: amount_msat_nonref,
 				}
 			},
 			nativeEffectiveCapacity::Total {ref capacity_msat, ref htlc_maximum_msat, } => {
-				let mut capacity_msat_nonref = (*capacity_msat).clone();
-				let mut htlc_maximum_msat_nonref = (*htlc_maximum_msat).clone();
-				let mut local_htlc_maximum_msat_nonref = if htlc_maximum_msat_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { htlc_maximum_msat_nonref.unwrap() }) };
+				let mut capacity_msat_nonref = Clone::clone(capacity_msat);
+				let mut htlc_maximum_msat_nonref = Clone::clone(htlc_maximum_msat);
 				EffectiveCapacity::Total {
 					capacity_msat: capacity_msat_nonref,
-					htlc_maximum_msat: local_htlc_maximum_msat_nonref,
+					htlc_maximum_msat: htlc_maximum_msat_nonref,
 				}
 			},
 			nativeEffectiveCapacity::Infinite => EffectiveCapacity::Infinite,
@@ -1311,10 +1277,9 @@ impl EffectiveCapacity {
 				}
 			},
 			nativeEffectiveCapacity::Total {mut capacity_msat, mut htlc_maximum_msat, } => {
-				let mut local_htlc_maximum_msat = if htlc_maximum_msat.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { htlc_maximum_msat.unwrap() }) };
 				EffectiveCapacity::Total {
 					capacity_msat: capacity_msat,
-					htlc_maximum_msat: local_htlc_maximum_msat,
+					htlc_maximum_msat: htlc_maximum_msat,
 				}
 			},
 			nativeEffectiveCapacity::Infinite => EffectiveCapacity::Infinite,
@@ -1346,7 +1311,7 @@ pub extern "C" fn EffectiveCapacity_maximum_htlc(amount_msat: u64) -> EffectiveC
 }
 #[no_mangle]
 /// Utility method to constructs a new Total-variant EffectiveCapacity
-pub extern "C" fn EffectiveCapacity_total(capacity_msat: u64, htlc_maximum_msat: crate::c_types::derived::COption_u64Z) -> EffectiveCapacity {
+pub extern "C" fn EffectiveCapacity_total(capacity_msat: u64, htlc_maximum_msat: u64) -> EffectiveCapacity {
 	EffectiveCapacity::Total {
 		capacity_msat,
 		htlc_maximum_msat,
@@ -1406,7 +1371,7 @@ pub extern "C" fn RoutingFees_free(this_obj: RoutingFees) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RoutingFees_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRoutingFees); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeRoutingFees) };
 }
 #[allow(unused)]
 impl RoutingFees {
@@ -1544,7 +1509,7 @@ pub extern "C" fn NodeAnnouncementInfo_free(this_obj: NodeAnnouncementInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeAnnouncementInfo_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeAnnouncementInfo); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeNodeAnnouncementInfo) };
 }
 #[allow(unused)]
 impl NodeAnnouncementInfo {
@@ -1745,7 +1710,7 @@ pub extern "C" fn NodeAlias_free(this_obj: NodeAlias) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeAlias_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeAlias); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeNodeAlias) };
 }
 #[allow(unused)]
 impl NodeAlias {
@@ -1857,7 +1822,7 @@ pub extern "C" fn NodeInfo_free(this_obj: NodeInfo) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeInfo_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeInfo); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeNodeInfo) };
 }
 #[allow(unused)]
 impl NodeInfo {

@@ -39,7 +39,7 @@ pub enum APIError {
 	},
 	/// A malformed Route was provided (eg overflowed value, node id mismatch, overly-looped route,
 	/// too-many-hops, etc).
-	RouteError {
+	InvalidRoute {
 		/// A human-readable error message
 		err: crate::c_types::Str,
 	},
@@ -80,34 +80,34 @@ impl APIError {
 	pub(crate) fn to_native(&self) -> nativeAPIError {
 		match self {
 			APIError::APIMisuseError {ref err, } => {
-				let mut err_nonref = (*err).clone();
+				let mut err_nonref = Clone::clone(err);
 				nativeAPIError::APIMisuseError {
 					err: err_nonref.into_string(),
 				}
 			},
 			APIError::FeeRateTooHigh {ref err, ref feerate, } => {
-				let mut err_nonref = (*err).clone();
-				let mut feerate_nonref = (*feerate).clone();
+				let mut err_nonref = Clone::clone(err);
+				let mut feerate_nonref = Clone::clone(feerate);
 				nativeAPIError::FeeRateTooHigh {
 					err: err_nonref.into_string(),
 					feerate: feerate_nonref,
 				}
 			},
-			APIError::RouteError {ref err, } => {
-				let mut err_nonref = (*err).clone();
-				nativeAPIError::RouteError {
+			APIError::InvalidRoute {ref err, } => {
+				let mut err_nonref = Clone::clone(err);
+				nativeAPIError::InvalidRoute {
 					err: err_nonref.into_str(),
 				}
 			},
 			APIError::ChannelUnavailable {ref err, } => {
-				let mut err_nonref = (*err).clone();
+				let mut err_nonref = Clone::clone(err);
 				nativeAPIError::ChannelUnavailable {
 					err: err_nonref.into_string(),
 				}
 			},
 			APIError::MonitorUpdateInProgress => nativeAPIError::MonitorUpdateInProgress,
 			APIError::IncompatibleShutdownScript {ref script, } => {
-				let mut script_nonref = (*script).clone();
+				let mut script_nonref = Clone::clone(script);
 				nativeAPIError::IncompatibleShutdownScript {
 					script: *unsafe { Box::from_raw(script_nonref.take_inner()) },
 				}
@@ -128,8 +128,8 @@ impl APIError {
 					feerate: feerate,
 				}
 			},
-			APIError::RouteError {mut err, } => {
-				nativeAPIError::RouteError {
+			APIError::InvalidRoute {mut err, } => {
+				nativeAPIError::InvalidRoute {
 					err: err.into_str(),
 				}
 			},
@@ -150,34 +150,34 @@ impl APIError {
 	pub(crate) fn from_native(native: &nativeAPIError) -> Self {
 		match native {
 			nativeAPIError::APIMisuseError {ref err, } => {
-				let mut err_nonref = (*err).clone();
+				let mut err_nonref = Clone::clone(err);
 				APIError::APIMisuseError {
 					err: err_nonref.into(),
 				}
 			},
 			nativeAPIError::FeeRateTooHigh {ref err, ref feerate, } => {
-				let mut err_nonref = (*err).clone();
-				let mut feerate_nonref = (*feerate).clone();
+				let mut err_nonref = Clone::clone(err);
+				let mut feerate_nonref = Clone::clone(feerate);
 				APIError::FeeRateTooHigh {
 					err: err_nonref.into(),
 					feerate: feerate_nonref,
 				}
 			},
-			nativeAPIError::RouteError {ref err, } => {
-				let mut err_nonref = (*err).clone();
-				APIError::RouteError {
+			nativeAPIError::InvalidRoute {ref err, } => {
+				let mut err_nonref = Clone::clone(err);
+				APIError::InvalidRoute {
 					err: err_nonref.into(),
 				}
 			},
 			nativeAPIError::ChannelUnavailable {ref err, } => {
-				let mut err_nonref = (*err).clone();
+				let mut err_nonref = Clone::clone(err);
 				APIError::ChannelUnavailable {
 					err: err_nonref.into(),
 				}
 			},
 			nativeAPIError::MonitorUpdateInProgress => APIError::MonitorUpdateInProgress,
 			nativeAPIError::IncompatibleShutdownScript {ref script, } => {
-				let mut script_nonref = (*script).clone();
+				let mut script_nonref = Clone::clone(script);
 				APIError::IncompatibleShutdownScript {
 					script: crate::lightning::ln::script::ShutdownScript { inner: ObjOps::heap_alloc(script_nonref), is_owned: true },
 				}
@@ -198,8 +198,8 @@ impl APIError {
 					feerate: feerate,
 				}
 			},
-			nativeAPIError::RouteError {mut err, } => {
-				APIError::RouteError {
+			nativeAPIError::InvalidRoute {mut err, } => {
+				APIError::InvalidRoute {
 					err: err.into(),
 				}
 			},
@@ -241,9 +241,9 @@ pub extern "C" fn APIError_fee_rate_too_high(err: crate::c_types::Str, feerate: 
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new RouteError-variant APIError
-pub extern "C" fn APIError_route_error(err: crate::c_types::Str) -> APIError {
-	APIError::RouteError {
+/// Utility method to constructs a new InvalidRoute-variant APIError
+pub extern "C" fn APIError_invalid_route(err: crate::c_types::Str) -> APIError {
+	APIError::InvalidRoute {
 		err,
 	}
 }

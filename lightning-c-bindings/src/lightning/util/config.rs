@@ -52,7 +52,7 @@ pub extern "C" fn ChannelHandshakeConfig_free(this_obj: ChannelHandshakeConfig) 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelHandshakeConfig_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelHandshakeConfig); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelHandshakeConfig) };
 }
 #[allow(unused)]
 impl ChannelHandshakeConfig {
@@ -471,7 +471,7 @@ pub extern "C" fn ChannelHandshakeLimits_free(this_obj: ChannelHandshakeLimits) 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelHandshakeLimits_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelHandshakeLimits); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelHandshakeLimits) };
 }
 #[allow(unused)]
 impl ChannelHandshakeLimits {
@@ -781,7 +781,7 @@ pub extern "C" fn ChannelConfig_free(this_obj: ChannelConfig) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelConfig_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelConfig); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelConfig) };
 }
 #[allow(unused)]
 impl ChannelConfig {
@@ -1102,7 +1102,7 @@ pub extern "C" fn UserConfig_free(this_obj: UserConfig) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UserConfig_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeUserConfig); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeUserConfig) };
 }
 #[allow(unused)]
 impl UserConfig {
@@ -1242,10 +1242,39 @@ pub extern "C" fn UserConfig_get_manually_accept_inbound_channels(this_ptr: &Use
 pub extern "C" fn UserConfig_set_manually_accept_inbound_channels(this_ptr: &mut UserConfig, mut val: bool) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.manually_accept_inbound_channels = val;
 }
+///  If this is set to true, LDK will intercept HTLCs that are attempting to be forwarded over
+///  fake short channel ids generated via [`ChannelManager::get_intercept_scid`]. Upon HTLC
+///  intercept, LDK will generate an [`Event::HTLCIntercepted`] which MUST be handled by the user.
+///
+///  Setting this to true may break backwards compatibility with LDK versions < 0.0.113.
+///
+///  Default value: false.
+///
+/// [`ChannelManager::get_intercept_scid`]: crate::ln::channelmanager::ChannelManager::get_intercept_scid
+/// [`Event::HTLCIntercepted`]: crate::util::events::Event::HTLCIntercepted
+#[no_mangle]
+pub extern "C" fn UserConfig_get_accept_intercept_htlcs(this_ptr: &UserConfig) -> bool {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().accept_intercept_htlcs;
+	*inner_val
+}
+///  If this is set to true, LDK will intercept HTLCs that are attempting to be forwarded over
+///  fake short channel ids generated via [`ChannelManager::get_intercept_scid`]. Upon HTLC
+///  intercept, LDK will generate an [`Event::HTLCIntercepted`] which MUST be handled by the user.
+///
+///  Setting this to true may break backwards compatibility with LDK versions < 0.0.113.
+///
+///  Default value: false.
+///
+/// [`ChannelManager::get_intercept_scid`]: crate::ln::channelmanager::ChannelManager::get_intercept_scid
+/// [`Event::HTLCIntercepted`]: crate::util::events::Event::HTLCIntercepted
+#[no_mangle]
+pub extern "C" fn UserConfig_set_accept_intercept_htlcs(this_ptr: &mut UserConfig, mut val: bool) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.accept_intercept_htlcs = val;
+}
 /// Constructs a new UserConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn UserConfig_new(mut channel_handshake_config_arg: crate::lightning::util::config::ChannelHandshakeConfig, mut channel_handshake_limits_arg: crate::lightning::util::config::ChannelHandshakeLimits, mut channel_config_arg: crate::lightning::util::config::ChannelConfig, mut accept_forwards_to_priv_channels_arg: bool, mut accept_inbound_channels_arg: bool, mut manually_accept_inbound_channels_arg: bool) -> UserConfig {
+pub extern "C" fn UserConfig_new(mut channel_handshake_config_arg: crate::lightning::util::config::ChannelHandshakeConfig, mut channel_handshake_limits_arg: crate::lightning::util::config::ChannelHandshakeLimits, mut channel_config_arg: crate::lightning::util::config::ChannelConfig, mut accept_forwards_to_priv_channels_arg: bool, mut accept_inbound_channels_arg: bool, mut manually_accept_inbound_channels_arg: bool, mut accept_intercept_htlcs_arg: bool) -> UserConfig {
 	UserConfig { inner: ObjOps::heap_alloc(nativeUserConfig {
 		channel_handshake_config: *unsafe { Box::from_raw(channel_handshake_config_arg.take_inner()) },
 		channel_handshake_limits: *unsafe { Box::from_raw(channel_handshake_limits_arg.take_inner()) },
@@ -1253,6 +1282,7 @@ pub extern "C" fn UserConfig_new(mut channel_handshake_config_arg: crate::lightn
 		accept_forwards_to_priv_channels: accept_forwards_to_priv_channels_arg,
 		accept_inbound_channels: accept_inbound_channels_arg,
 		manually_accept_inbound_channels: manually_accept_inbound_channels_arg,
+		accept_intercept_htlcs: accept_intercept_htlcs_arg,
 	}), is_owned: true }
 }
 impl Clone for UserConfig {

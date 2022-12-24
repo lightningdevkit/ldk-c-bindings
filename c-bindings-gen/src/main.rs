@@ -1360,6 +1360,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 										ExportStatus::NoExport|ExportStatus::TestOnly => continue,
 										ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 									}
+									if m.sig.asyncness.is_some() { continue; }
 									let mut meth_gen_types = gen_types.push_ctx();
 									assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
 									if m.defaultness.is_some() { unimplemented!(); }

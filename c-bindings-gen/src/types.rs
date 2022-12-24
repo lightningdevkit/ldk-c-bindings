@@ -808,6 +808,7 @@ fn initial_clonable_types() -> HashSet<String> {
 	res.insert("crate::c_types::SecretKey".to_owned());
 	res.insert("crate::c_types::PublicKey".to_owned());
 	res.insert("crate::c_types::Transaction".to_owned());
+	res.insert("crate::c_types::Witness".to_owned());
 	res.insert("crate::c_types::TxOut".to_owned());
 	res.insert("crate::c_types::Signature".to_owned());
 	res.insert("crate::c_types::RecoverableSignature".to_owned());
@@ -1006,6 +1007,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction"),
+			"bitcoin::Witness" => Some("crate::c_types::Witness"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut"),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network"),
 			"bitcoin::util::address::WitnessVersion" => Some("crate::c_types::WitnessVersion"),
@@ -1095,6 +1097,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::script::Script" if !is_ref => Some("::bitcoin::blockdata::script::Script::from("),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("&"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(""),
+			"bitcoin::Witness" if is_ref => Some("&"),
+			"bitcoin::Witness" => Some(""),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::C_to_bitcoin_outpoint("),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(""),
 			"bitcoin::network::constants::Network" => Some(""),
@@ -1182,6 +1186,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::script::Script" if is_ref => Some(".to_slice()))"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_rust())"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(".into_bitcoin()"),
+			"bitcoin::Witness" => Some(".into_bitcoin()"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(".into_rust()"),
 			"bitcoin::network::constants::Network" => Some(".into_bitcoin()"),
@@ -1280,6 +1285,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction::from_bitcoin(&"),
+			"bitcoin::Witness" if is_ref => Some("crate::c_types::Witness::from_bitcoin("),
+			"bitcoin::Witness" if !is_ref => Some("crate::c_types::Witness::from_bitcoin(&"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::bitcoin_to_C_outpoint("),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network::from_bitcoin("),
@@ -1360,6 +1367,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
 			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(")"),
+			"bitcoin::Witness" => Some(")"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
 			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(")"),
 			"bitcoin::network::constants::Network" => Some(")"),

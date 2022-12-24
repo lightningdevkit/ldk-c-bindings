@@ -4,6 +4,7 @@
 pub mod derived;
 
 use bitcoin::Transaction as BitcoinTransaction;
+use bitcoin::Witness as BitcoinWitness;
 use bitcoin::hashes::Hash;
 use bitcoin::secp256k1::PublicKey as SecpPublicKey;
 use bitcoin::secp256k1::SecretKey as SecpSecretKey;
@@ -459,6 +460,57 @@ impl Clone for Transaction {
 #[no_mangle]
 /// Frees the data buffer, if data_is_owned is set and datalen > 0.
 pub extern "C" fn Transaction_free(_res: Transaction) { }
+
+#[repr(C)]
+/// A serialized witness.
+pub struct Witness {
+	/// The serialized transaction data.
+	///
+	/// This is non-const for your convenience, an object passed to Rust is never written to.
+	pub data: *mut u8,
+	/// The length of the serialized transaction
+	pub datalen: usize,
+	/// Whether the data pointed to by `data` should be freed or not.
+	pub data_is_owned: bool,
+}
+impl Witness {
+	fn from_vec(vec: Vec<u8>) -> Self {
+		let datalen = vec.len();
+		let data = Box::into_raw(vec.into_boxed_slice());
+		Self {
+			data: unsafe { (*data).as_mut_ptr() },
+			datalen,
+			data_is_owned: true,
+		}
+	}
+	pub(crate) fn into_bitcoin(&self) -> BitcoinWitness {
+		::bitcoin::consensus::encode::deserialize(unsafe { core::slice::from_raw_parts(self.data, self.datalen) }).unwrap()
+	}
+	pub(crate) fn from_bitcoin(btc: &BitcoinWitness) -> Self {
+		let vec = ::bitcoin::consensus::encode::serialize(btc);
+		Self::from_vec(vec)
+	}
+}
+
+impl Drop for Witness {
+	fn drop(&mut self) {
+		if self.data_is_owned && self.datalen != 0 {
+			let _ = derived::CVec_u8Z { data: self.data as *mut u8, datalen: self.datalen };
+		}
+	}
+}
+impl Clone for Witness {
+	fn clone(&self) -> Self {
+		let sl = unsafe { core::slice::from_raw_parts(self.data, self.datalen) };
+		let mut v = Vec::new();
+		v.extend_from_slice(&sl);
+		Self::from_vec(v)
+	}
+}
+
+#[no_mangle]
+/// Frees the data pointed to by data
+pub extern "C" fn Witness_free(_res: Witness) { }
 
 pub(crate) fn bitcoin_to_C_outpoint(outpoint: ::bitcoin::blockdata::transaction::OutPoint) -> crate::lightning::chain::transaction::OutPoint {
 	crate::lightning::chain::transaction::OutPoint_new(ThirtyTwoBytes { data: outpoint.txid.into_inner() }, outpoint.vout.try_into().unwrap())

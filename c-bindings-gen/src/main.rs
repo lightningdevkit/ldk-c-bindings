@@ -849,7 +849,8 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 				write!(w, "\t}}").unwrap();
 			},
 			syn::Fields::Unnamed(fields) => {
-				assert!(s.generics.lt_token.is_none());
+				assert!(!s.generics.params.iter()
+					.any(|gen| if let syn::GenericParam::Lifetime(_) = gen { false } else { true }));
 				writeln!(w, "{} (", types.maybe_resolve_ident(&s.ident).unwrap()).unwrap();
 				for (idx, field) in fields.unnamed.iter().enumerate() {
 					write!(w, "\t\t").unwrap();

@@ -1779,7 +1779,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 						};
 						if $ref || new_var {
 							if $ref {
-								write!(w, "let mut {}_nonref = (*{}).clone();\n\t\t\t\t", $field_ident, $field_ident).unwrap();
+								write!(w, "let mut {}_nonref = Clone::clone({});\n\t\t\t\t", $field_ident, $field_ident).unwrap();
 								if new_var {
 									let nonref_ident = format_ident!("{}_nonref", $field_ident);
 									if $to_c {

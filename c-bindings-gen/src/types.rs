@@ -2962,12 +2962,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					} else {
 						let mut inner_c_ty = Vec::new();
 						assert!(self.write_c_path_intern(&mut inner_c_ty, &p.path, generics, true, false, ptr_for_ref, with_ref_lifetime, c_ty));
-						if self.is_clonable(&String::from_utf8(inner_c_ty).unwrap()) {
-							if let Some(id) = p.path.get_ident() {
-								let mangled_container = format!("CVec_{}Z", id);
-								write!(w, "{}::{}", Self::generated_container_path(), mangled_container).unwrap();
-								self.check_create_container(mangled_container, "Vec", vec![&*s.elem], generics, false)
-							} else { false }
+						let inner_ty_str = String::from_utf8(inner_c_ty).unwrap();
+						if self.is_clonable(&inner_ty_str) {
+							let inner_ty_ident = inner_ty_str.rsplitn(2, "::").next().unwrap();
+							let mangled_container = format!("CVec_{}Z", inner_ty_ident);
+							write!(w, "{}::{}", Self::generated_container_path(), mangled_container).unwrap();
+							self.check_create_container(mangled_container, "Vec", vec![&*s.elem], generics, false)
 						} else { false }
 					}
 				} else if let syn::Type::Reference(r) = &*s.elem {

@@ -131,7 +131,7 @@ pub extern "C" fn IgnoringMessageHandler_free(this_obj: IgnoringMessageHandler) 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn IgnoringMessageHandler_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeIgnoringMessageHandler); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeIgnoringMessageHandler) };
 }
 #[allow(unused)]
 impl IgnoringMessageHandler {
@@ -516,7 +516,7 @@ pub extern "C" fn ErroringMessageHandler_free(this_obj: ErroringMessageHandler) 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ErroringMessageHandler_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeErroringMessageHandler); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeErroringMessageHandler) };
 }
 #[allow(unused)]
 impl ErroringMessageHandler {
@@ -724,7 +724,7 @@ pub extern "C" fn MessageHandler_free(this_obj: MessageHandler) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn MessageHandler_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeMessageHandler); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeMessageHandler) };
 }
 #[allow(unused)]
 impl MessageHandler {
@@ -952,7 +952,7 @@ pub extern "C" fn PeerHandleError_free(this_obj: PeerHandleError) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PeerHandleError_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePeerHandleError); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativePeerHandleError) };
 }
 #[allow(unused)]
 impl PeerHandleError {
@@ -1071,7 +1071,7 @@ pub extern "C" fn PeerManager_free(this_obj: PeerManager) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PeerManager_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePeerManager); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativePeerManager) };
 }
 #[allow(unused)]
 impl PeerManager {

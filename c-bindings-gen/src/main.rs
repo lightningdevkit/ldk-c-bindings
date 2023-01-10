@@ -271,7 +271,7 @@ macro_rules! get_module_type_resolver {
 		let mut module_iter = module.rsplitn(2, "::");
 		module_iter.next().unwrap();
 		let module = module_iter.next().unwrap();
-		let imports = ImportResolver::new(module.splitn(2, "::").next().unwrap(), &$crate_types.lib_ast.dependencies,
+		let imports = ImportResolver::new(module.splitn(2, "::").next().unwrap(), &$crate_types.lib_ast,
 				module, &$crate_types.lib_ast.modules.get(module).unwrap().items);
 		TypeResolver::new(module, imports, $crate_types)
 	} }
@@ -677,7 +677,7 @@ fn writeln_opaque<W: std::io::Write>(w: &mut W, ident: &syn::Ident, struct_name:
 	writeln!(w, "#[allow(unused)]").unwrap();
 	writeln!(w, "/// Used only if an object of this type is returned as a trait impl by a method").unwrap();
 	writeln!(w, "pub(crate) extern \"C\" fn {}_free_void(this_ptr: *mut c_void) {{", struct_name).unwrap();
-	writeln!(w, "\tunsafe {{ let _ = Box::from_raw(this_ptr as *mut native{}); }}\n}}", struct_name).unwrap();
+	writeln!(w, "\tlet _ = unsafe {{ Box::from_raw(this_ptr as *mut native{}) }};\n}}", struct_name).unwrap();
 	writeln!(w, "#[allow(unused)]").unwrap();
 	writeln!(w, "impl {} {{", struct_name).unwrap();
 	writeln!(w, "\tpub(crate) fn get_native_ref(&self) -> &'static native{} {{", struct_name).unwrap();
@@ -849,7 +849,8 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 				write!(w, "\t}}").unwrap();
 			},
 			syn::Fields::Unnamed(fields) => {
-				assert!(s.generics.lt_token.is_none());
+				assert!(!s.generics.params.iter()
+					.any(|gen| if let syn::GenericParam::Lifetime(_) = gen { false } else { true }));
 				writeln!(w, "{} (", types.maybe_resolve_ident(&s.ident).unwrap()).unwrap();
 				for (idx, field) in fields.unnamed.iter().enumerate() {
 					write!(w, "\t\t").unwrap();
@@ -1359,6 +1360,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 										ExportStatus::NoExport|ExportStatus::TestOnly => continue,
 										ExportStatus::NotImplementable => panic!("(C-not implementable) must only appear on traits"),
 									}
+									if m.sig.asyncness.is_some() { continue; }
 									let mut meth_gen_types = gen_types.push_ctx();
 									assert!(meth_gen_types.learn_generics(&m.sig.generics, types));
 									if m.defaultness.is_some() { unimplemented!(); }
@@ -1430,7 +1432,7 @@ fn create_alias_for_impl<F: FnMut(syn::ItemImpl, &mut TypeResolver)>(resolved_pa
 
 			let alias_resolver_override;
 			let alias_resolver = if alias_module != types.module_path {
-				alias_resolver_override = ImportResolver::new(types.types.crate_name, &types.crate_types.lib_ast.dependencies,
+				alias_resolver_override = ImportResolver::new(types.types.crate_name, &types.crate_types.lib_ast,
 					alias_module, &types.crate_types.lib_ast.modules.get(alias_module).unwrap().items);
 				&alias_resolver_override
 			} else { &types.types };
@@ -1779,7 +1781,7 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 						};
 						if $ref || new_var {
 							if $ref {
-								write!(w, "let mut {}_nonref = (*{}).clone();\n\t\t\t\t", $field_ident, $field_ident).unwrap();
+								write!(w, "let mut {}_nonref = Clone::clone({});\n\t\t\t\t", $field_ident, $field_ident).unwrap();
 								if new_var {
 									let nonref_ident = format_ident!("{}_nonref", $field_ident);
 									if $to_c {
@@ -1924,7 +1926,7 @@ fn convert_priv_mod<'a, 'b: 'a, W: std::io::Write>(w: &mut W, w_uses: &mut HashS
 			use_items.push(item);
 		}
 	}
-	let import_resolver = ImportResolver::from_borrowed_items(mod_path.splitn(2, "::").next().unwrap(), &libast.dependencies, mod_path, &use_items);
+	let import_resolver = ImportResolver::from_borrowed_items(mod_path.splitn(2, "::").next().unwrap(), libast, mod_path, &use_items);
 	let mut types = TypeResolver::new(mod_path, import_resolver, crate_types);
 
 	writeln!(w, "mod {} {{\n{}", module.ident, DEFAULT_IMPORTS).unwrap();
@@ -2006,7 +2008,7 @@ fn convert_file<'a, 'b>(libast: &'a FullLibraryAST, crate_types: &CrateTypes<'a>
 
 		eprintln!("Converting {} entries...", module);
 
-		let import_resolver = ImportResolver::new(orig_crate, &libast.dependencies, module, items);
+		let import_resolver = ImportResolver::new(orig_crate, libast, module, items);
 		let mut type_resolver = TypeResolver::new(module, import_resolver, crate_types);
 
 		for item in items.iter() {
@@ -2118,7 +2120,7 @@ fn walk_ast_second_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &Crate
 		let ASTModule { ref attrs, ref items, .. } = astmod;
 		assert_eq!(export_status(&attrs), ExportStatus::Export);
 
-		let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, module, items);
+		let import_resolver = ImportResolver::new(orig_crate, ast_storage, module, items);
 		let mut types = TypeResolver::new(module, import_resolver, crate_types);
 
 		for item in items.iter() {
@@ -2154,7 +2156,7 @@ fn walk_ast_second_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &Crate
 }
 
 fn walk_private_mod<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, module: String, items: &'a syn::ItemMod, crate_types: &mut CrateTypes<'a>) {
-	let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, &module, &items.content.as_ref().unwrap().1);
+	let import_resolver = ImportResolver::new(orig_crate, ast_storage, &module, &items.content.as_ref().unwrap().1);
 	for item in items.content.as_ref().unwrap().1.iter() {
 		match item {
 			syn::Item::Mod(m) => walk_private_mod(ast_storage, orig_crate, format!("{}::{}", module, m.ident), m, crate_types),
@@ -2183,7 +2185,7 @@ fn walk_ast_first_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut Cr
 		let ASTModule { ref attrs, ref items, submods: _ } = astmod;
 		assert_eq!(export_status(&attrs), ExportStatus::Export);
 		let orig_crate = module.splitn(2, "::").next().unwrap();
-		let import_resolver = ImportResolver::new(orig_crate, &ast_storage.dependencies, module, items);
+		let import_resolver = ImportResolver::new(orig_crate, ast_storage, module, items);
 
 		for item in items.iter() {
 			match item {

@@ -63,16 +63,16 @@ impl PaymentPurpose {
 	pub(crate) fn to_native(&self) -> nativePaymentPurpose {
 		match self {
 			PaymentPurpose::InvoicePayment {ref payment_preimage, ref payment_secret, } => {
-				let mut payment_preimage_nonref = (*payment_preimage).clone();
+				let mut payment_preimage_nonref = Clone::clone(payment_preimage);
 				let mut local_payment_preimage_nonref = if payment_preimage_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(payment_preimage_nonref.data) }) };
-				let mut payment_secret_nonref = (*payment_secret).clone();
+				let mut payment_secret_nonref = Clone::clone(payment_secret);
 				nativePaymentPurpose::InvoicePayment {
 					payment_preimage: local_payment_preimage_nonref,
 					payment_secret: ::lightning::ln::PaymentSecret(payment_secret_nonref.data),
 				}
 			},
 			PaymentPurpose::SpontaneousPayment (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativePaymentPurpose::SpontaneousPayment (
 					::lightning::ln::PaymentPreimage(a_nonref.data),
 				)
@@ -100,16 +100,16 @@ impl PaymentPurpose {
 	pub(crate) fn from_native(native: &nativePaymentPurpose) -> Self {
 		match native {
 			nativePaymentPurpose::InvoicePayment {ref payment_preimage, ref payment_secret, } => {
-				let mut payment_preimage_nonref = (*payment_preimage).clone();
+				let mut payment_preimage_nonref = Clone::clone(payment_preimage);
 				let mut local_payment_preimage_nonref = if payment_preimage_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_preimage_nonref.unwrap()).0 } } };
-				let mut payment_secret_nonref = (*payment_secret).clone();
+				let mut payment_secret_nonref = Clone::clone(payment_secret);
 				PaymentPurpose::InvoicePayment {
 					payment_preimage: local_payment_preimage_nonref,
 					payment_secret: crate::c_types::ThirtyTwoBytes { data: payment_secret_nonref.0 },
 				}
 			},
 			nativePaymentPurpose::SpontaneousPayment (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				PaymentPurpose::SpontaneousPayment (
 					crate::c_types::ThirtyTwoBytes { data: a_nonref.0 },
 				)
@@ -228,7 +228,7 @@ impl ClosureReason {
 	pub(crate) fn to_native(&self) -> nativeClosureReason {
 		match self {
 			ClosureReason::CounterpartyForceClosed {ref peer_msg, } => {
-				let mut peer_msg_nonref = (*peer_msg).clone();
+				let mut peer_msg_nonref = Clone::clone(peer_msg);
 				nativeClosureReason::CounterpartyForceClosed {
 					peer_msg: peer_msg_nonref.into_string(),
 				}
@@ -238,7 +238,7 @@ impl ClosureReason {
 			ClosureReason::CommitmentTxConfirmed => nativeClosureReason::CommitmentTxConfirmed,
 			ClosureReason::FundingTimedOut => nativeClosureReason::FundingTimedOut,
 			ClosureReason::ProcessingError {ref err, } => {
-				let mut err_nonref = (*err).clone();
+				let mut err_nonref = Clone::clone(err);
 				nativeClosureReason::ProcessingError {
 					err: err_nonref.into_string(),
 				}
@@ -272,7 +272,7 @@ impl ClosureReason {
 	pub(crate) fn from_native(native: &nativeClosureReason) -> Self {
 		match native {
 			nativeClosureReason::CounterpartyForceClosed {ref peer_msg, } => {
-				let mut peer_msg_nonref = (*peer_msg).clone();
+				let mut peer_msg_nonref = Clone::clone(peer_msg);
 				ClosureReason::CounterpartyForceClosed {
 					peer_msg: peer_msg_nonref.into(),
 				}
@@ -282,7 +282,7 @@ impl ClosureReason {
 			nativeClosureReason::CommitmentTxConfirmed => ClosureReason::CommitmentTxConfirmed,
 			nativeClosureReason::FundingTimedOut => ClosureReason::FundingTimedOut,
 			nativeClosureReason::ProcessingError {ref err, } => {
-				let mut err_nonref = (*err).clone();
+				let mut err_nonref = Clone::clone(err);
 				ClosureReason::ProcessingError {
 					err: err_nonref.into(),
 				}
@@ -399,6 +399,12 @@ pub enum HTLCDestination {
 		/// Short channel id we are requesting to forward an HTLC to.
 		requested_forward_scid: u64,
 	},
+	/// We couldn't forward to the outgoing scid. An example would be attempting to send a duplicate
+	/// intercept HTLC.
+	InvalidForward {
+		/// Short channel id we are requesting to forward an HTLC to.
+		requested_forward_scid: u64,
+	},
 	/// Failure scenario where an HTLC may have been forwarded to be intended for us,
 	/// but is invalid for some reason, so we reject it.
 	///
@@ -419,22 +425,28 @@ impl HTLCDestination {
 	pub(crate) fn to_native(&self) -> nativeHTLCDestination {
 		match self {
 			HTLCDestination::NextHopChannel {ref node_id, ref channel_id, } => {
-				let mut node_id_nonref = (*node_id).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
 				let mut local_node_id_nonref = if node_id_nonref.is_null() { None } else { Some( { node_id_nonref.into_rust() }) };
-				let mut channel_id_nonref = (*channel_id).clone();
+				let mut channel_id_nonref = Clone::clone(channel_id);
 				nativeHTLCDestination::NextHopChannel {
 					node_id: local_node_id_nonref,
 					channel_id: channel_id_nonref.data,
 				}
 			},
 			HTLCDestination::UnknownNextHop {ref requested_forward_scid, } => {
-				let mut requested_forward_scid_nonref = (*requested_forward_scid).clone();
+				let mut requested_forward_scid_nonref = Clone::clone(requested_forward_scid);
 				nativeHTLCDestination::UnknownNextHop {
 					requested_forward_scid: requested_forward_scid_nonref,
 				}
 			},
+			HTLCDestination::InvalidForward {ref requested_forward_scid, } => {
+				let mut requested_forward_scid_nonref = Clone::clone(requested_forward_scid);
+				nativeHTLCDestination::InvalidForward {
+					requested_forward_scid: requested_forward_scid_nonref,
+				}
+			},
 			HTLCDestination::FailedPayment {ref payment_hash, } => {
-				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				nativeHTLCDestination::FailedPayment {
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 				}
@@ -456,6 +468,11 @@ impl HTLCDestination {
 					requested_forward_scid: requested_forward_scid,
 				}
 			},
+			HTLCDestination::InvalidForward {mut requested_forward_scid, } => {
+				nativeHTLCDestination::InvalidForward {
+					requested_forward_scid: requested_forward_scid,
+				}
+			},
 			HTLCDestination::FailedPayment {mut payment_hash, } => {
 				nativeHTLCDestination::FailedPayment {
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
@@ -467,22 +484,28 @@ impl HTLCDestination {
 	pub(crate) fn from_native(native: &nativeHTLCDestination) -> Self {
 		match native {
 			nativeHTLCDestination::NextHopChannel {ref node_id, ref channel_id, } => {
-				let mut node_id_nonref = (*node_id).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
 				let mut local_node_id_nonref = if node_id_nonref.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(node_id_nonref.unwrap())) } };
-				let mut channel_id_nonref = (*channel_id).clone();
+				let mut channel_id_nonref = Clone::clone(channel_id);
 				HTLCDestination::NextHopChannel {
 					node_id: local_node_id_nonref,
 					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id_nonref },
 				}
 			},
 			nativeHTLCDestination::UnknownNextHop {ref requested_forward_scid, } => {
-				let mut requested_forward_scid_nonref = (*requested_forward_scid).clone();
+				let mut requested_forward_scid_nonref = Clone::clone(requested_forward_scid);
 				HTLCDestination::UnknownNextHop {
 					requested_forward_scid: requested_forward_scid_nonref,
 				}
 			},
+			nativeHTLCDestination::InvalidForward {ref requested_forward_scid, } => {
+				let mut requested_forward_scid_nonref = Clone::clone(requested_forward_scid);
+				HTLCDestination::InvalidForward {
+					requested_forward_scid: requested_forward_scid_nonref,
+				}
+			},
 			nativeHTLCDestination::FailedPayment {ref payment_hash, } => {
-				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				HTLCDestination::FailedPayment {
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
 				}
@@ -501,6 +524,11 @@ impl HTLCDestination {
 			},
 			nativeHTLCDestination::UnknownNextHop {mut requested_forward_scid, } => {
 				HTLCDestination::UnknownNextHop {
+					requested_forward_scid: requested_forward_scid,
+				}
+			},
+			nativeHTLCDestination::InvalidForward {mut requested_forward_scid, } => {
+				HTLCDestination::InvalidForward {
 					requested_forward_scid: requested_forward_scid,
 				}
 			},
@@ -532,6 +560,13 @@ pub extern "C" fn HTLCDestination_next_hop_channel(node_id: crate::c_types::Publ
 /// Utility method to constructs a new UnknownNextHop-variant HTLCDestination
 pub extern "C" fn HTLCDestination_unknown_next_hop(requested_forward_scid: u64) -> HTLCDestination {
 	HTLCDestination::UnknownNextHop {
+		requested_forward_scid,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new InvalidForward-variant HTLCDestination
+pub extern "C" fn HTLCDestination_invalid_forward(requested_forward_scid: u64) -> HTLCDestination {
+	HTLCDestination::InvalidForward {
 		requested_forward_scid,
 	}
 }
@@ -592,14 +627,15 @@ pub enum Event {
 		channel_value_satoshis: u64,
 		/// The script which should be used in the transaction output.
 		output_script: crate::c_types::derived::CVec_u8Z,
-		/// The `user_channel_id` value passed in to [`ChannelManager::create_channel`], or 0 for
-		/// an inbound channel.
+		/// The `user_channel_id` value passed in to [`ChannelManager::create_channel`], or a
+		/// random value for an inbound channel. This may be zero for objects serialized with LDK
+		/// versions prior to 0.0.113.
 		///
 		/// [`ChannelManager::create_channel`]: crate::ln::channelmanager::ChannelManager::create_channel
-		user_channel_id: u64,
+		user_channel_id: crate::c_types::U128,
 	},
-	/// Indicates we've received (an offer of) money! Just gotta dig out that payment preimage and
-	/// feed it to [`ChannelManager::claim_funds`] to get it....
+	/// Indicates that we've been offered a payment and it needs to be claimed via calling
+	/// [`ChannelManager::claim_funds`] with the preimage given in [`PaymentPurpose`].
 	///
 	/// Note that if the preimage is not known, you should call
 	/// [`ChannelManager::fail_htlc_backwards`] to free up resources for this HTLC and avoid
@@ -610,11 +646,23 @@ pub enum Event {
 	///
 	/// # Note
 	/// LDK will not stop an inbound payment from being paid multiple times, so multiple
-	/// `PaymentReceived` events may be generated for the same payment.
+	/// `PaymentClaimable` events may be generated for the same payment.
+	///
+	/// # Note
+	/// This event used to be called `PaymentReceived` in LDK versions 0.0.112 and earlier.
 	///
 	/// [`ChannelManager::claim_funds`]: crate::ln::channelmanager::ChannelManager::claim_funds
 	/// [`ChannelManager::fail_htlc_backwards`]: crate::ln::channelmanager::ChannelManager::fail_htlc_backwards
-	PaymentReceived {
+	PaymentClaimable {
+		/// The node that will receive the payment after it has been claimed.
+		/// This is useful to identify payments received via [phantom nodes].
+		/// This field will always be filled in when the event was generated by LDK versions
+		/// 0.0.113 and above.
+		///
+		/// [phantom nodes]: crate::chain::keysinterface::PhantomKeysManager
+		///
+		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+		receiver_node_id: crate::c_types::PublicKey,
 		/// The hash for which the preimage should be handed to the ChannelManager. Note that LDK will
 		/// not stop you from registering duplicate payment hashes for inbound payments.
 		payment_hash: crate::c_types::ThirtyTwoBytes,
@@ -623,28 +671,43 @@ pub enum Event {
 		/// Information for claiming this received payment, based on whether the purpose of the
 		/// payment is to pay an invoice or to send a spontaneous payment.
 		purpose: crate::lightning::util::events::PaymentPurpose,
+		/// The `channel_id` indicating over which channel we received the payment.
+		///
+		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+		via_channel_id: crate::c_types::ThirtyTwoBytes,
+		/// The `user_channel_id` indicating over which channel we received the payment.
+		via_user_channel_id: crate::c_types::derived::COption_u128Z,
 	},
 	/// Indicates a payment has been claimed and we've received money!
 	///
 	/// This most likely occurs when [`ChannelManager::claim_funds`] has been called in response
-	/// to an [`Event::PaymentReceived`]. However, if we previously crashed during a
+	/// to an [`Event::PaymentClaimable`]. However, if we previously crashed during a
 	/// [`ChannelManager::claim_funds`] call you may see this event without a corresponding
-	/// [`Event::PaymentReceived`] event.
+	/// [`Event::PaymentClaimable`] event.
 	///
 	/// # Note
 	/// LDK will not stop an inbound payment from being paid multiple times, so multiple
-	/// `PaymentReceived` events may be generated for the same payment. If you then call
-	/// [`ChannelManager::claim_funds`] twice for the same [`Event::PaymentReceived`] you may get
+	/// `PaymentClaimable` events may be generated for the same payment. If you then call
+	/// [`ChannelManager::claim_funds`] twice for the same [`Event::PaymentClaimable`] you may get
 	/// multiple `PaymentClaimed` events.
 	///
 	/// [`ChannelManager::claim_funds`]: crate::ln::channelmanager::ChannelManager::claim_funds
 	PaymentClaimed {
+		/// The node that received the payment.
+		/// This is useful to identify payments which were received via [phantom nodes].
+		/// This field will always be filled in when the event was generated by LDK versions
+		/// 0.0.113 and above.
+		///
+		/// [phantom nodes]: crate::chain::keysinterface::PhantomKeysManager
+		///
+		/// Note that this (or a relevant inner pointer) may be NULL or all-0s to represent None
+		receiver_node_id: crate::c_types::PublicKey,
 		/// The payment hash of the claimed payment. Note that LDK will not stop you from
 		/// registering duplicate payment hashes for inbound payments.
 		payment_hash: crate::c_types::ThirtyTwoBytes,
 		/// The value, in thousandths of a satoshi, that this payment is for.
 		amount_msat: u64,
-		/// The purpose of this claimed payment, i.e. whether the payment was for an invoice or a
+		/// The purpose of the claimed payment, i.e. whether the payment was for an invoice or a
 		/// spontaneous payment.
 		purpose: crate::lightning::util::events::PaymentPurpose,
 	},
@@ -685,8 +748,8 @@ pub enum Event {
 	/// provide failure information for each MPP part in the payment.
 	///
 	/// This event is provided once there are no further pending HTLCs for the payment and the
-	/// payment is no longer retryable, either due to a several-block timeout or because
-	/// [`ChannelManager::abandon_payment`] was previously called for the corresponding payment.
+	/// payment is no longer retryable due to [`ChannelManager::abandon_payment`] having been
+	/// called for the corresponding payment.
 	///
 	/// [`ChannelManager::abandon_payment`]: crate::ln::channelmanager::ChannelManager::abandon_payment
 	PaymentFailed {
@@ -727,9 +790,14 @@ pub enum Event {
 	/// Indicates an outbound HTLC we sent failed. Probably some intermediary node dropped
 	/// something. You may wish to retry with a different route.
 	///
+	/// If you have given up retrying this payment and wish to fail it, you MUST call
+	/// [`ChannelManager::abandon_payment`] at least once for a given [`PaymentId`] or memory
+	/// related to payment tracking will leak.
+	///
 	/// Note that this does *not* indicate that all paths for an MPP payment have failed, see
 	/// [`Event::PaymentFailed`] and [`all_paths_failed`].
 	///
+	/// [`ChannelManager::abandon_payment`]: crate::ln::channelmanager::ChannelManager::abandon_payment
 	/// [`all_paths_failed`]: Self::PaymentPathFailed::all_paths_failed
 	PaymentPathFailed {
 		/// The id returned by [`ChannelManager::send_payment`] and used with
@@ -839,6 +907,38 @@ pub enum Event {
 		/// now + 5*time_forwardable).
 		time_forwardable: u64,
 	},
+	/// Used to indicate that we've intercepted an HTLC forward. This event will only be generated if
+	/// you've encoded an intercept scid in the receiver's invoice route hints using
+	/// [`ChannelManager::get_intercept_scid`] and have set [`UserConfig::accept_intercept_htlcs`].
+	///
+	/// [`ChannelManager::forward_intercepted_htlc`] or
+	/// [`ChannelManager::fail_intercepted_htlc`] MUST be called in response to this event. See
+	/// their docs for more information.
+	///
+	/// [`ChannelManager::get_intercept_scid`]: crate::ln::channelmanager::ChannelManager::get_intercept_scid
+	/// [`UserConfig::accept_intercept_htlcs`]: crate::util::config::UserConfig::accept_intercept_htlcs
+	/// [`ChannelManager::forward_intercepted_htlc`]: crate::ln::channelmanager::ChannelManager::forward_intercepted_htlc
+	/// [`ChannelManager::fail_intercepted_htlc`]: crate::ln::channelmanager::ChannelManager::fail_intercepted_htlc
+	HTLCIntercepted {
+		/// An id to help LDK identify which HTLC is being forwarded or failed.
+		intercept_id: crate::c_types::ThirtyTwoBytes,
+		/// The fake scid that was programmed as the next hop's scid, generated using
+		/// [`ChannelManager::get_intercept_scid`].
+		///
+		/// [`ChannelManager::get_intercept_scid`]: crate::ln::channelmanager::ChannelManager::get_intercept_scid
+		requested_next_hop_scid: u64,
+		/// The payment hash used for this HTLC.
+		payment_hash: crate::c_types::ThirtyTwoBytes,
+		/// How many msats were received on the inbound edge of this HTLC.
+		inbound_amount_msat: u64,
+		/// How many msats the payer intended to route to the next node. Depending on the reason you are
+		/// intercepting this payment, you might take a fee by forwarding less than this amount.
+		///
+		/// Note that LDK will NOT check that expected fees were factored into this value. You MUST
+		/// check that whatever fee you want has been included here or subtract it as required. Further,
+		/// LDK will not stop you from forwarding more than you received.
+		expected_outbound_amount_msat: u64,
+	},
 	/// Used to indicate that an output which you should know how to spend was confirmed on chain
 	/// and is now spendable.
 	/// Such an output will *not* ever be spent by rust-lightning, and are not at risk of your
@@ -879,6 +979,27 @@ pub enum Event {
 		/// transaction.
 		claim_from_onchain_tx: bool,
 	},
+	/// Used to indicate that a channel with the given `channel_id` is ready to
+	/// be used. This event is emitted either when the funding transaction has been confirmed
+	/// on-chain, or, in case of a 0conf channel, when both parties have confirmed the channel
+	/// establishment.
+	ChannelReady {
+		/// The channel_id of the channel that is ready.
+		channel_id: crate::c_types::ThirtyTwoBytes,
+		/// The `user_channel_id` value passed in to [`ChannelManager::create_channel`] for outbound
+		/// channels, or to [`ChannelManager::accept_inbound_channel`] for inbound channels if
+		/// [`UserConfig::manually_accept_inbound_channels`] config flag is set to true. Otherwise
+		/// `user_channel_id` will be randomized for an inbound channel.
+		///
+		/// [`ChannelManager::create_channel`]: crate::ln::channelmanager::ChannelManager::create_channel
+		/// [`ChannelManager::accept_inbound_channel`]: crate::ln::channelmanager::ChannelManager::accept_inbound_channel
+		/// [`UserConfig::manually_accept_inbound_channels`]: crate::util::config::UserConfig::manually_accept_inbound_channels
+		user_channel_id: crate::c_types::U128,
+		/// The node_id of the channel counterparty.
+		counterparty_node_id: crate::c_types::PublicKey,
+		/// The features that this channel will operate with.
+		channel_type: crate::lightning::ln::features::ChannelTypeFeatures,
+	},
 	/// Used to indicate that a previously opened channel with the given `channel_id` is in the
 	/// process of closure.
 	ChannelClosed {
@@ -888,13 +1009,14 @@ pub enum Event {
 		/// The `user_channel_id` value passed in to [`ChannelManager::create_channel`] for outbound
 		/// channels, or to [`ChannelManager::accept_inbound_channel`] for inbound channels if
 		/// [`UserConfig::manually_accept_inbound_channels`] config flag is set to true. Otherwise
-		/// `user_channel_id` will be 0 for an inbound channel.
-		/// This will always be zero for objects serialized with LDK versions prior to 0.0.102.
+		/// `user_channel_id` will be randomized for inbound channels.
+		/// This may be zero for inbound channels serialized prior to 0.0.113 and will always be
+		/// zero for objects serialized with LDK versions prior to 0.0.102.
 		///
 		/// [`ChannelManager::create_channel`]: crate::ln::channelmanager::ChannelManager::create_channel
 		/// [`ChannelManager::accept_inbound_channel`]: crate::ln::channelmanager::ChannelManager::accept_inbound_channel
 		/// [`UserConfig::manually_accept_inbound_channels`]: crate::util::config::UserConfig::manually_accept_inbound_channels
-		user_channel_id: u64,
+		user_channel_id: crate::c_types::U128,
 		/// The reason the channel was closed.
 		reason: crate::lightning::util::events::ClosureReason,
 	},
@@ -985,45 +1107,57 @@ impl Event {
 	pub(crate) fn to_native(&self) -> nativeEvent {
 		match self {
 			Event::FundingGenerationReady {ref temporary_channel_id, ref counterparty_node_id, ref channel_value_satoshis, ref output_script, ref user_channel_id, } => {
-				let mut temporary_channel_id_nonref = (*temporary_channel_id).clone();
-				let mut counterparty_node_id_nonref = (*counterparty_node_id).clone();
-				let mut channel_value_satoshis_nonref = (*channel_value_satoshis).clone();
-				let mut output_script_nonref = (*output_script).clone();
-				let mut user_channel_id_nonref = (*user_channel_id).clone();
+				let mut temporary_channel_id_nonref = Clone::clone(temporary_channel_id);
+				let mut counterparty_node_id_nonref = Clone::clone(counterparty_node_id);
+				let mut channel_value_satoshis_nonref = Clone::clone(channel_value_satoshis);
+				let mut output_script_nonref = Clone::clone(output_script);
+				let mut user_channel_id_nonref = Clone::clone(user_channel_id);
 				nativeEvent::FundingGenerationReady {
 					temporary_channel_id: temporary_channel_id_nonref.data,
 					counterparty_node_id: counterparty_node_id_nonref.into_rust(),
 					channel_value_satoshis: channel_value_satoshis_nonref,
 					output_script: ::bitcoin::blockdata::script::Script::from(output_script_nonref.into_rust()),
-					user_channel_id: user_channel_id_nonref,
+					user_channel_id: user_channel_id_nonref.into(),
 				}
 			},
-			Event::PaymentReceived {ref payment_hash, ref amount_msat, ref purpose, } => {
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut amount_msat_nonref = (*amount_msat).clone();
-				let mut purpose_nonref = (*purpose).clone();
-				nativeEvent::PaymentReceived {
+			Event::PaymentClaimable {ref receiver_node_id, ref payment_hash, ref amount_msat, ref purpose, ref via_channel_id, ref via_user_channel_id, } => {
+				let mut receiver_node_id_nonref = Clone::clone(receiver_node_id);
+				let mut local_receiver_node_id_nonref = if receiver_node_id_nonref.is_null() { None } else { Some( { receiver_node_id_nonref.into_rust() }) };
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut amount_msat_nonref = Clone::clone(amount_msat);
+				let mut purpose_nonref = Clone::clone(purpose);
+				let mut via_channel_id_nonref = Clone::clone(via_channel_id);
+				let mut local_via_channel_id_nonref = if via_channel_id_nonref.data == [0; 32] { None } else { Some( { via_channel_id_nonref.data }) };
+				let mut via_user_channel_id_nonref = Clone::clone(via_user_channel_id);
+				let mut local_via_user_channel_id_nonref = { /* via_user_channel_id_nonref*/ let via_user_channel_id_nonref_opt = via_user_channel_id_nonref; { } if via_user_channel_id_nonref_opt.is_none() { None } else { Some({ via_user_channel_id_nonref_opt.take().into() }) } };
+				nativeEvent::PaymentClaimable {
+					receiver_node_id: local_receiver_node_id_nonref,
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 					amount_msat: amount_msat_nonref,
 					purpose: purpose_nonref.into_native(),
+					via_channel_id: local_via_channel_id_nonref,
+					via_user_channel_id: local_via_user_channel_id_nonref,
 				}
 			},
-			Event::PaymentClaimed {ref payment_hash, ref amount_msat, ref purpose, } => {
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut amount_msat_nonref = (*amount_msat).clone();
-				let mut purpose_nonref = (*purpose).clone();
+			Event::PaymentClaimed {ref receiver_node_id, ref payment_hash, ref amount_msat, ref purpose, } => {
+				let mut receiver_node_id_nonref = Clone::clone(receiver_node_id);
+				let mut local_receiver_node_id_nonref = if receiver_node_id_nonref.is_null() { None } else { Some( { receiver_node_id_nonref.into_rust() }) };
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut amount_msat_nonref = Clone::clone(amount_msat);
+				let mut purpose_nonref = Clone::clone(purpose);
 				nativeEvent::PaymentClaimed {
+					receiver_node_id: local_receiver_node_id_nonref,
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 					amount_msat: amount_msat_nonref,
 					purpose: purpose_nonref.into_native(),
 				}
 			},
 			Event::PaymentSent {ref payment_id, ref payment_preimage, ref payment_hash, ref fee_paid_msat, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
 				let mut local_payment_id_nonref = if payment_id_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data) }) };
-				let mut payment_preimage_nonref = (*payment_preimage).clone();
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut fee_paid_msat_nonref = (*fee_paid_msat).clone();
+				let mut payment_preimage_nonref = Clone::clone(payment_preimage);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut fee_paid_msat_nonref = Clone::clone(fee_paid_msat);
 				let mut local_fee_paid_msat_nonref = if fee_paid_msat_nonref.is_some() { Some( { fee_paid_msat_nonref.take() }) } else { None };
 				nativeEvent::PaymentSent {
 					payment_id: local_payment_id_nonref,
@@ -1033,18 +1167,18 @@ impl Event {
 				}
 			},
 			Event::PaymentFailed {ref payment_id, ref payment_hash, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
-				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				nativeEvent::PaymentFailed {
 					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 				}
 			},
 			Event::PaymentPathSuccessful {ref payment_id, ref payment_hash, ref path, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
-				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				let mut local_payment_hash_nonref = if payment_hash_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentHash(payment_hash_nonref.data) }) };
-				let mut path_nonref = (*path).clone();
+				let mut path_nonref = Clone::clone(path);
 				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.into_rust().drain(..) { local_path_nonref.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 				nativeEvent::PaymentPathSuccessful {
 					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
@@ -1053,18 +1187,18 @@ impl Event {
 				}
 			},
 			Event::PaymentPathFailed {ref payment_id, ref payment_hash, ref payment_failed_permanently, ref network_update, ref all_paths_failed, ref path, ref short_channel_id, ref retry, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
 				let mut local_payment_id_nonref = if payment_id_nonref.data == [0; 32] { None } else { Some( { ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data) }) };
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut payment_failed_permanently_nonref = (*payment_failed_permanently).clone();
-				let mut network_update_nonref = (*network_update).clone();
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut payment_failed_permanently_nonref = Clone::clone(payment_failed_permanently);
+				let mut network_update_nonref = Clone::clone(network_update);
 				let mut local_network_update_nonref = { /* network_update_nonref*/ let network_update_nonref_opt = network_update_nonref; { } if network_update_nonref_opt.is_none() { None } else { Some({ network_update_nonref_opt.take().into_native() }) } };
-				let mut all_paths_failed_nonref = (*all_paths_failed).clone();
-				let mut path_nonref = (*path).clone();
+				let mut all_paths_failed_nonref = Clone::clone(all_paths_failed);
+				let mut path_nonref = Clone::clone(path);
 				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.into_rust().drain(..) { local_path_nonref.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
-				let mut short_channel_id_nonref = (*short_channel_id).clone();
+				let mut short_channel_id_nonref = Clone::clone(short_channel_id);
 				let mut local_short_channel_id_nonref = if short_channel_id_nonref.is_some() { Some( { short_channel_id_nonref.take() }) } else { None };
-				let mut retry_nonref = (*retry).clone();
+				let mut retry_nonref = Clone::clone(retry);
 				let mut local_retry_nonref = if retry_nonref.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(retry_nonref.take_inner()) } }) };
 				nativeEvent::PaymentPathFailed {
 					payment_id: local_payment_id_nonref,
@@ -1078,9 +1212,9 @@ impl Event {
 				}
 			},
 			Event::ProbeSuccessful {ref payment_id, ref payment_hash, ref path, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut path_nonref = (*path).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut path_nonref = Clone::clone(path);
 				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.into_rust().drain(..) { local_path_nonref.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 				nativeEvent::ProbeSuccessful {
 					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
@@ -1089,11 +1223,11 @@ impl Event {
 				}
 			},
 			Event::ProbeFailed {ref payment_id, ref payment_hash, ref path, ref short_channel_id, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut path_nonref = (*path).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut path_nonref = Clone::clone(path);
 				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.into_rust().drain(..) { local_path_nonref.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
-				let mut short_channel_id_nonref = (*short_channel_id).clone();
+				let mut short_channel_id_nonref = Clone::clone(short_channel_id);
 				let mut local_short_channel_id_nonref = if short_channel_id_nonref.is_some() { Some( { short_channel_id_nonref.take() }) } else { None };
 				nativeEvent::ProbeFailed {
 					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
@@ -1103,26 +1237,40 @@ impl Event {
 				}
 			},
 			Event::PendingHTLCsForwardable {ref time_forwardable, } => {
-				let mut time_forwardable_nonref = (*time_forwardable).clone();
+				let mut time_forwardable_nonref = Clone::clone(time_forwardable);
 				nativeEvent::PendingHTLCsForwardable {
 					time_forwardable: core::time::Duration::from_secs(time_forwardable_nonref),
 				}
 			},
+			Event::HTLCIntercepted {ref intercept_id, ref requested_next_hop_scid, ref payment_hash, ref inbound_amount_msat, ref expected_outbound_amount_msat, } => {
+				let mut intercept_id_nonref = Clone::clone(intercept_id);
+				let mut requested_next_hop_scid_nonref = Clone::clone(requested_next_hop_scid);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut inbound_amount_msat_nonref = Clone::clone(inbound_amount_msat);
+				let mut expected_outbound_amount_msat_nonref = Clone::clone(expected_outbound_amount_msat);
+				nativeEvent::HTLCIntercepted {
+					intercept_id: ::lightning::ln::channelmanager::InterceptId(intercept_id_nonref.data),
+					requested_next_hop_scid: requested_next_hop_scid_nonref,
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
+					inbound_amount_msat: inbound_amount_msat_nonref,
+					expected_outbound_amount_msat: expected_outbound_amount_msat_nonref,
+				}
+			},
 			Event::SpendableOutputs {ref outputs, } => {
-				let mut outputs_nonref = (*outputs).clone();
+				let mut outputs_nonref = Clone::clone(outputs);
 				let mut local_outputs_nonref = Vec::new(); for mut item in outputs_nonref.into_rust().drain(..) { local_outputs_nonref.push( { item.into_native() }); };
 				nativeEvent::SpendableOutputs {
 					outputs: local_outputs_nonref,
 				}
 			},
 			Event::PaymentForwarded {ref prev_channel_id, ref next_channel_id, ref fee_earned_msat, ref claim_from_onchain_tx, } => {
-				let mut prev_channel_id_nonref = (*prev_channel_id).clone();
+				let mut prev_channel_id_nonref = Clone::clone(prev_channel_id);
 				let mut local_prev_channel_id_nonref = if prev_channel_id_nonref.data == [0; 32] { None } else { Some( { prev_channel_id_nonref.data }) };
-				let mut next_channel_id_nonref = (*next_channel_id).clone();
+				let mut next_channel_id_nonref = Clone::clone(next_channel_id);
 				let mut local_next_channel_id_nonref = if next_channel_id_nonref.data == [0; 32] { None } else { Some( { next_channel_id_nonref.data }) };
-				let mut fee_earned_msat_nonref = (*fee_earned_msat).clone();
+				let mut fee_earned_msat_nonref = Clone::clone(fee_earned_msat);
 				let mut local_fee_earned_msat_nonref = if fee_earned_msat_nonref.is_some() { Some( { fee_earned_msat_nonref.take() }) } else { None };
-				let mut claim_from_onchain_tx_nonref = (*claim_from_onchain_tx).clone();
+				let mut claim_from_onchain_tx_nonref = Clone::clone(claim_from_onchain_tx);
 				nativeEvent::PaymentForwarded {
 					prev_channel_id: local_prev_channel_id_nonref,
 					next_channel_id: local_next_channel_id_nonref,
@@ -1130,30 +1278,42 @@ impl Event {
 					claim_from_onchain_tx: claim_from_onchain_tx_nonref,
 				}
 			},
+			Event::ChannelReady {ref channel_id, ref user_channel_id, ref counterparty_node_id, ref channel_type, } => {
+				let mut channel_id_nonref = Clone::clone(channel_id);
+				let mut user_channel_id_nonref = Clone::clone(user_channel_id);
+				let mut counterparty_node_id_nonref = Clone::clone(counterparty_node_id);
+				let mut channel_type_nonref = Clone::clone(channel_type);
+				nativeEvent::ChannelReady {
+					channel_id: channel_id_nonref.data,
+					user_channel_id: user_channel_id_nonref.into(),
+					counterparty_node_id: counterparty_node_id_nonref.into_rust(),
+					channel_type: *unsafe { Box::from_raw(channel_type_nonref.take_inner()) },
+				}
+			},
 			Event::ChannelClosed {ref channel_id, ref user_channel_id, ref reason, } => {
-				let mut channel_id_nonref = (*channel_id).clone();
-				let mut user_channel_id_nonref = (*user_channel_id).clone();
-				let mut reason_nonref = (*reason).clone();
+				let mut channel_id_nonref = Clone::clone(channel_id);
+				let mut user_channel_id_nonref = Clone::clone(user_channel_id);
+				let mut reason_nonref = Clone::clone(reason);
 				nativeEvent::ChannelClosed {
 					channel_id: channel_id_nonref.data,
-					user_channel_id: user_channel_id_nonref,
+					user_channel_id: user_channel_id_nonref.into(),
 					reason: reason_nonref.into_native(),
 				}
 			},
 			Event::DiscardFunding {ref channel_id, ref transaction, } => {
-				let mut channel_id_nonref = (*channel_id).clone();
-				let mut transaction_nonref = (*transaction).clone();
+				let mut channel_id_nonref = Clone::clone(channel_id);
+				let mut transaction_nonref = Clone::clone(transaction);
 				nativeEvent::DiscardFunding {
 					channel_id: channel_id_nonref.data,
 					transaction: transaction_nonref.into_bitcoin(),
 				}
 			},
 			Event::OpenChannelRequest {ref temporary_channel_id, ref counterparty_node_id, ref funding_satoshis, ref push_msat, ref channel_type, } => {
-				let mut temporary_channel_id_nonref = (*temporary_channel_id).clone();
-				let mut counterparty_node_id_nonref = (*counterparty_node_id).clone();
-				let mut funding_satoshis_nonref = (*funding_satoshis).clone();
-				let mut push_msat_nonref = (*push_msat).clone();
-				let mut channel_type_nonref = (*channel_type).clone();
+				let mut temporary_channel_id_nonref = Clone::clone(temporary_channel_id);
+				let mut counterparty_node_id_nonref = Clone::clone(counterparty_node_id);
+				let mut funding_satoshis_nonref = Clone::clone(funding_satoshis);
+				let mut push_msat_nonref = Clone::clone(push_msat);
+				let mut channel_type_nonref = Clone::clone(channel_type);
 				nativeEvent::OpenChannelRequest {
 					temporary_channel_id: temporary_channel_id_nonref.data,
 					counterparty_node_id: counterparty_node_id_nonref.into_rust(),
@@ -1163,8 +1323,8 @@ impl Event {
 				}
 			},
 			Event::HTLCHandlingFailed {ref prev_channel_id, ref failed_next_destination, } => {
-				let mut prev_channel_id_nonref = (*prev_channel_id).clone();
-				let mut failed_next_destination_nonref = (*failed_next_destination).clone();
+				let mut prev_channel_id_nonref = Clone::clone(prev_channel_id);
+				let mut failed_next_destination_nonref = Clone::clone(failed_next_destination);
 				nativeEvent::HTLCHandlingFailed {
 					prev_channel_id: prev_channel_id_nonref.data,
 					failed_next_destination: failed_next_destination_nonref.into_native(),
@@ -1181,18 +1341,26 @@ impl Event {
 					counterparty_node_id: counterparty_node_id.into_rust(),
 					channel_value_satoshis: channel_value_satoshis,
 					output_script: ::bitcoin::blockdata::script::Script::from(output_script.into_rust()),
-					user_channel_id: user_channel_id,
+					user_channel_id: user_channel_id.into(),
 				}
 			},
-			Event::PaymentReceived {mut payment_hash, mut amount_msat, mut purpose, } => {
-				nativeEvent::PaymentReceived {
+			Event::PaymentClaimable {mut receiver_node_id, mut payment_hash, mut amount_msat, mut purpose, mut via_channel_id, mut via_user_channel_id, } => {
+				let mut local_receiver_node_id = if receiver_node_id.is_null() { None } else { Some( { receiver_node_id.into_rust() }) };
+				let mut local_via_channel_id = if via_channel_id.data == [0; 32] { None } else { Some( { via_channel_id.data }) };
+				let mut local_via_user_channel_id = { /* via_user_channel_id*/ let via_user_channel_id_opt = via_user_channel_id; { } if via_user_channel_id_opt.is_none() { None } else { Some({ via_user_channel_id_opt.take().into() }) } };
+				nativeEvent::PaymentClaimable {
+					receiver_node_id: local_receiver_node_id,
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
 					amount_msat: amount_msat,
 					purpose: purpose.into_native(),
+					via_channel_id: local_via_channel_id,
+					via_user_channel_id: local_via_user_channel_id,
 				}
 			},
-			Event::PaymentClaimed {mut payment_hash, mut amount_msat, mut purpose, } => {
+			Event::PaymentClaimed {mut receiver_node_id, mut payment_hash, mut amount_msat, mut purpose, } => {
+				let mut local_receiver_node_id = if receiver_node_id.is_null() { None } else { Some( { receiver_node_id.into_rust() }) };
 				nativeEvent::PaymentClaimed {
+					receiver_node_id: local_receiver_node_id,
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
 					amount_msat: amount_msat,
 					purpose: purpose.into_native(),
@@ -1263,6 +1431,15 @@ impl Event {
 					time_forwardable: core::time::Duration::from_secs(time_forwardable),
 				}
 			},
+			Event::HTLCIntercepted {mut intercept_id, mut requested_next_hop_scid, mut payment_hash, mut inbound_amount_msat, mut expected_outbound_amount_msat, } => {
+				nativeEvent::HTLCIntercepted {
+					intercept_id: ::lightning::ln::channelmanager::InterceptId(intercept_id.data),
+					requested_next_hop_scid: requested_next_hop_scid,
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
+					inbound_amount_msat: inbound_amount_msat,
+					expected_outbound_amount_msat: expected_outbound_amount_msat,
+				}
+			},
 			Event::SpendableOutputs {mut outputs, } => {
 				let mut local_outputs = Vec::new(); for mut item in outputs.into_rust().drain(..) { local_outputs.push( { item.into_native() }); };
 				nativeEvent::SpendableOutputs {
@@ -1280,10 +1457,18 @@ impl Event {
 					claim_from_onchain_tx: claim_from_onchain_tx,
 				}
 			},
+			Event::ChannelReady {mut channel_id, mut user_channel_id, mut counterparty_node_id, mut channel_type, } => {
+				nativeEvent::ChannelReady {
+					channel_id: channel_id.data,
+					user_channel_id: user_channel_id.into(),
+					counterparty_node_id: counterparty_node_id.into_rust(),
+					channel_type: *unsafe { Box::from_raw(channel_type.take_inner()) },
+				}
+			},
 			Event::ChannelClosed {mut channel_id, mut user_channel_id, mut reason, } => {
 				nativeEvent::ChannelClosed {
 					channel_id: channel_id.data,
-					user_channel_id: user_channel_id,
+					user_channel_id: user_channel_id.into(),
 					reason: reason.into_native(),
 				}
 			},
@@ -1314,45 +1499,57 @@ impl Event {
 	pub(crate) fn from_native(native: &nativeEvent) -> Self {
 		match native {
 			nativeEvent::FundingGenerationReady {ref temporary_channel_id, ref counterparty_node_id, ref channel_value_satoshis, ref output_script, ref user_channel_id, } => {
-				let mut temporary_channel_id_nonref = (*temporary_channel_id).clone();
-				let mut counterparty_node_id_nonref = (*counterparty_node_id).clone();
-				let mut channel_value_satoshis_nonref = (*channel_value_satoshis).clone();
-				let mut output_script_nonref = (*output_script).clone();
-				let mut user_channel_id_nonref = (*user_channel_id).clone();
+				let mut temporary_channel_id_nonref = Clone::clone(temporary_channel_id);
+				let mut counterparty_node_id_nonref = Clone::clone(counterparty_node_id);
+				let mut channel_value_satoshis_nonref = Clone::clone(channel_value_satoshis);
+				let mut output_script_nonref = Clone::clone(output_script);
+				let mut user_channel_id_nonref = Clone::clone(user_channel_id);
 				Event::FundingGenerationReady {
 					temporary_channel_id: crate::c_types::ThirtyTwoBytes { data: temporary_channel_id_nonref },
 					counterparty_node_id: crate::c_types::PublicKey::from_rust(&counterparty_node_id_nonref),
 					channel_value_satoshis: channel_value_satoshis_nonref,
 					output_script: output_script_nonref.into_bytes().into(),
-					user_channel_id: user_channel_id_nonref,
+					user_channel_id: user_channel_id_nonref.into(),
 				}
 			},
-			nativeEvent::PaymentReceived {ref payment_hash, ref amount_msat, ref purpose, } => {
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut amount_msat_nonref = (*amount_msat).clone();
-				let mut purpose_nonref = (*purpose).clone();
-				Event::PaymentReceived {
+			nativeEvent::PaymentClaimable {ref receiver_node_id, ref payment_hash, ref amount_msat, ref purpose, ref via_channel_id, ref via_user_channel_id, } => {
+				let mut receiver_node_id_nonref = Clone::clone(receiver_node_id);
+				let mut local_receiver_node_id_nonref = if receiver_node_id_nonref.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(receiver_node_id_nonref.unwrap())) } };
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut amount_msat_nonref = Clone::clone(amount_msat);
+				let mut purpose_nonref = Clone::clone(purpose);
+				let mut via_channel_id_nonref = Clone::clone(via_channel_id);
+				let mut local_via_channel_id_nonref = if via_channel_id_nonref.is_none() { crate::c_types::ThirtyTwoBytes { data: [0; 32] } } else {  { crate::c_types::ThirtyTwoBytes { data: (via_channel_id_nonref.unwrap()) } } };
+				let mut via_user_channel_id_nonref = Clone::clone(via_user_channel_id);
+				let mut local_via_user_channel_id_nonref = if via_user_channel_id_nonref.is_none() { crate::c_types::derived::COption_u128Z::None } else { crate::c_types::derived::COption_u128Z::Some( { via_user_channel_id_nonref.unwrap().into() }) };
+				Event::PaymentClaimable {
+					receiver_node_id: local_receiver_node_id_nonref,
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
 					amount_msat: amount_msat_nonref,
 					purpose: crate::lightning::util::events::PaymentPurpose::native_into(purpose_nonref),
+					via_channel_id: local_via_channel_id_nonref,
+					via_user_channel_id: local_via_user_channel_id_nonref,
 				}
 			},
-			nativeEvent::PaymentClaimed {ref payment_hash, ref amount_msat, ref purpose, } => {
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut amount_msat_nonref = (*amount_msat).clone();
-				let mut purpose_nonref = (*purpose).clone();
+			nativeEvent::PaymentClaimed {ref receiver_node_id, ref payment_hash, ref amount_msat, ref purpose, } => {
+				let mut receiver_node_id_nonref = Clone::clone(receiver_node_id);
+				let mut local_receiver_node_id_nonref = if receiver_node_id_nonref.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(receiver_node_id_nonref.unwrap())) } };
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut amount_msat_nonref = Clone::clone(amount_msat);
+				let mut purpose_nonref = Clone::clone(purpose);
 				Event::PaymentClaimed {
+					receiver_node_id: local_receiver_node_id_nonref,
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
 					amount_msat: amount_msat_nonref,
 					purpose: crate::lightning::util::events::PaymentPurpose::native_into(purpose_nonref),
 				}
 			},
 			nativeEvent::PaymentSent {ref payment_id, ref payment_preimage, ref payment_hash, ref fee_paid_msat, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
 				let mut local_payment_id_nonref = if payment_id_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_id_nonref.unwrap()).0 } } };
-				let mut payment_preimage_nonref = (*payment_preimage).clone();
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut fee_paid_msat_nonref = (*fee_paid_msat).clone();
+				let mut payment_preimage_nonref = Clone::clone(payment_preimage);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut fee_paid_msat_nonref = Clone::clone(fee_paid_msat);
 				let mut local_fee_paid_msat_nonref = if fee_paid_msat_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { fee_paid_msat_nonref.unwrap() }) };
 				Event::PaymentSent {
 					payment_id: local_payment_id_nonref,
@@ -1362,18 +1559,18 @@ impl Event {
 				}
 			},
 			nativeEvent::PaymentFailed {ref payment_id, ref payment_hash, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
-				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				Event::PaymentFailed {
 					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
 				}
 			},
 			nativeEvent::PaymentPathSuccessful {ref payment_id, ref payment_hash, ref path, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
-				let mut payment_hash_nonref = (*payment_hash).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				let mut local_payment_hash_nonref = if payment_hash_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_hash_nonref.unwrap()).0 } } };
-				let mut path_nonref = (*path).clone();
+				let mut path_nonref = Clone::clone(path);
 				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.drain(..) { local_path_nonref.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
 				Event::PaymentPathSuccessful {
 					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
@@ -1382,18 +1579,18 @@ impl Event {
 				}
 			},
 			nativeEvent::PaymentPathFailed {ref payment_id, ref payment_hash, ref payment_failed_permanently, ref network_update, ref all_paths_failed, ref path, ref short_channel_id, ref retry, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
 				let mut local_payment_id_nonref = if payment_id_nonref.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (payment_id_nonref.unwrap()).0 } } };
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut payment_failed_permanently_nonref = (*payment_failed_permanently).clone();
-				let mut network_update_nonref = (*network_update).clone();
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut payment_failed_permanently_nonref = Clone::clone(payment_failed_permanently);
+				let mut network_update_nonref = Clone::clone(network_update);
 				let mut local_network_update_nonref = if network_update_nonref.is_none() { crate::c_types::derived::COption_NetworkUpdateZ::None } else { crate::c_types::derived::COption_NetworkUpdateZ::Some( { crate::lightning::routing::gossip::NetworkUpdate::native_into(network_update_nonref.unwrap()) }) };
-				let mut all_paths_failed_nonref = (*all_paths_failed).clone();
-				let mut path_nonref = (*path).clone();
+				let mut all_paths_failed_nonref = Clone::clone(all_paths_failed);
+				let mut path_nonref = Clone::clone(path);
 				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.drain(..) { local_path_nonref.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
-				let mut short_channel_id_nonref = (*short_channel_id).clone();
+				let mut short_channel_id_nonref = Clone::clone(short_channel_id);
 				let mut local_short_channel_id_nonref = if short_channel_id_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { short_channel_id_nonref.unwrap() }) };
-				let mut retry_nonref = (*retry).clone();
+				let mut retry_nonref = Clone::clone(retry);
 				let mut local_retry_nonref = crate::lightning::routing::router::RouteParameters { inner: if retry_nonref.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((retry_nonref.unwrap())) } }, is_owned: true };
 				Event::PaymentPathFailed {
 					payment_id: local_payment_id_nonref,
@@ -1407,9 +1604,9 @@ impl Event {
 				}
 			},
 			nativeEvent::ProbeSuccessful {ref payment_id, ref payment_hash, ref path, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut path_nonref = (*path).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut path_nonref = Clone::clone(path);
 				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.drain(..) { local_path_nonref.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
 				Event::ProbeSuccessful {
 					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
@@ -1418,11 +1615,11 @@ impl Event {
 				}
 			},
 			nativeEvent::ProbeFailed {ref payment_id, ref payment_hash, ref path, ref short_channel_id, } => {
-				let mut payment_id_nonref = (*payment_id).clone();
-				let mut payment_hash_nonref = (*payment_hash).clone();
-				let mut path_nonref = (*path).clone();
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut path_nonref = Clone::clone(path);
 				let mut local_path_nonref = Vec::new(); for mut item in path_nonref.drain(..) { local_path_nonref.push( { crate::lightning::routing::router::RouteHop { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
-				let mut short_channel_id_nonref = (*short_channel_id).clone();
+				let mut short_channel_id_nonref = Clone::clone(short_channel_id);
 				let mut local_short_channel_id_nonref = if short_channel_id_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { short_channel_id_nonref.unwrap() }) };
 				Event::ProbeFailed {
 					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
@@ -1432,26 +1629,40 @@ impl Event {
 				}
 			},
 			nativeEvent::PendingHTLCsForwardable {ref time_forwardable, } => {
-				let mut time_forwardable_nonref = (*time_forwardable).clone();
+				let mut time_forwardable_nonref = Clone::clone(time_forwardable);
 				Event::PendingHTLCsForwardable {
 					time_forwardable: time_forwardable_nonref.as_secs(),
 				}
 			},
+			nativeEvent::HTLCIntercepted {ref intercept_id, ref requested_next_hop_scid, ref payment_hash, ref inbound_amount_msat, ref expected_outbound_amount_msat, } => {
+				let mut intercept_id_nonref = Clone::clone(intercept_id);
+				let mut requested_next_hop_scid_nonref = Clone::clone(requested_next_hop_scid);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut inbound_amount_msat_nonref = Clone::clone(inbound_amount_msat);
+				let mut expected_outbound_amount_msat_nonref = Clone::clone(expected_outbound_amount_msat);
+				Event::HTLCIntercepted {
+					intercept_id: crate::c_types::ThirtyTwoBytes { data: intercept_id_nonref.0 },
+					requested_next_hop_scid: requested_next_hop_scid_nonref,
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
+					inbound_amount_msat: inbound_amount_msat_nonref,
+					expected_outbound_amount_msat: expected_outbound_amount_msat_nonref,
+				}
+			},
 			nativeEvent::SpendableOutputs {ref outputs, } => {
-				let mut outputs_nonref = (*outputs).clone();
+				let mut outputs_nonref = Clone::clone(outputs);
 				let mut local_outputs_nonref = Vec::new(); for mut item in outputs_nonref.drain(..) { local_outputs_nonref.push( { crate::lightning::chain::keysinterface::SpendableOutputDescriptor::native_into(item) }); };
 				Event::SpendableOutputs {
 					outputs: local_outputs_nonref.into(),
 				}
 			},
 			nativeEvent::PaymentForwarded {ref prev_channel_id, ref next_channel_id, ref fee_earned_msat, ref claim_from_onchain_tx, } => {
-				let mut prev_channel_id_nonref = (*prev_channel_id).clone();
+				let mut prev_channel_id_nonref = Clone::clone(prev_channel_id);
 				let mut local_prev_channel_id_nonref = if prev_channel_id_nonref.is_none() { crate::c_types::ThirtyTwoBytes { data: [0; 32] } } else {  { crate::c_types::ThirtyTwoBytes { data: (prev_channel_id_nonref.unwrap()) } } };
-				let mut next_channel_id_nonref = (*next_channel_id).clone();
+				let mut next_channel_id_nonref = Clone::clone(next_channel_id);
 				let mut local_next_channel_id_nonref = if next_channel_id_nonref.is_none() { crate::c_types::ThirtyTwoBytes { data: [0; 32] } } else {  { crate::c_types::ThirtyTwoBytes { data: (next_channel_id_nonref.unwrap()) } } };
-				let mut fee_earned_msat_nonref = (*fee_earned_msat).clone();
+				let mut fee_earned_msat_nonref = Clone::clone(fee_earned_msat);
 				let mut local_fee_earned_msat_nonref = if fee_earned_msat_nonref.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { fee_earned_msat_nonref.unwrap() }) };
-				let mut claim_from_onchain_tx_nonref = (*claim_from_onchain_tx).clone();
+				let mut claim_from_onchain_tx_nonref = Clone::clone(claim_from_onchain_tx);
 				Event::PaymentForwarded {
 					prev_channel_id: local_prev_channel_id_nonref,
 					next_channel_id: local_next_channel_id_nonref,
@@ -1459,30 +1670,42 @@ impl Event {
 					claim_from_onchain_tx: claim_from_onchain_tx_nonref,
 				}
 			},
+			nativeEvent::ChannelReady {ref channel_id, ref user_channel_id, ref counterparty_node_id, ref channel_type, } => {
+				let mut channel_id_nonref = Clone::clone(channel_id);
+				let mut user_channel_id_nonref = Clone::clone(user_channel_id);
+				let mut counterparty_node_id_nonref = Clone::clone(counterparty_node_id);
+				let mut channel_type_nonref = Clone::clone(channel_type);
+				Event::ChannelReady {
+					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id_nonref },
+					user_channel_id: user_channel_id_nonref.into(),
+					counterparty_node_id: crate::c_types::PublicKey::from_rust(&counterparty_node_id_nonref),
+					channel_type: crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(channel_type_nonref), is_owned: true },
+				}
+			},
 			nativeEvent::ChannelClosed {ref channel_id, ref user_channel_id, ref reason, } => {
-				let mut channel_id_nonref = (*channel_id).clone();
-				let mut user_channel_id_nonref = (*user_channel_id).clone();
-				let mut reason_nonref = (*reason).clone();
+				let mut channel_id_nonref = Clone::clone(channel_id);
+				let mut user_channel_id_nonref = Clone::clone(user_channel_id);
+				let mut reason_nonref = Clone::clone(reason);
 				Event::ChannelClosed {
 					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id_nonref },
-					user_channel_id: user_channel_id_nonref,
+					user_channel_id: user_channel_id_nonref.into(),
 					reason: crate::lightning::util::events::ClosureReason::native_into(reason_nonref),
 				}
 			},
 			nativeEvent::DiscardFunding {ref channel_id, ref transaction, } => {
-				let mut channel_id_nonref = (*channel_id).clone();
-				let mut transaction_nonref = (*transaction).clone();
+				let mut channel_id_nonref = Clone::clone(channel_id);
+				let mut transaction_nonref = Clone::clone(transaction);
 				Event::DiscardFunding {
 					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id_nonref },
 					transaction: crate::c_types::Transaction::from_bitcoin(&transaction_nonref),
 				}
 			},
 			nativeEvent::OpenChannelRequest {ref temporary_channel_id, ref counterparty_node_id, ref funding_satoshis, ref push_msat, ref channel_type, } => {
-				let mut temporary_channel_id_nonref = (*temporary_channel_id).clone();
-				let mut counterparty_node_id_nonref = (*counterparty_node_id).clone();
-				let mut funding_satoshis_nonref = (*funding_satoshis).clone();
-				let mut push_msat_nonref = (*push_msat).clone();
-				let mut channel_type_nonref = (*channel_type).clone();
+				let mut temporary_channel_id_nonref = Clone::clone(temporary_channel_id);
+				let mut counterparty_node_id_nonref = Clone::clone(counterparty_node_id);
+				let mut funding_satoshis_nonref = Clone::clone(funding_satoshis);
+				let mut push_msat_nonref = Clone::clone(push_msat);
+				let mut channel_type_nonref = Clone::clone(channel_type);
 				Event::OpenChannelRequest {
 					temporary_channel_id: crate::c_types::ThirtyTwoBytes { data: temporary_channel_id_nonref },
 					counterparty_node_id: crate::c_types::PublicKey::from_rust(&counterparty_node_id_nonref),
@@ -1492,8 +1715,8 @@ impl Event {
 				}
 			},
 			nativeEvent::HTLCHandlingFailed {ref prev_channel_id, ref failed_next_destination, } => {
-				let mut prev_channel_id_nonref = (*prev_channel_id).clone();
-				let mut failed_next_destination_nonref = (*failed_next_destination).clone();
+				let mut prev_channel_id_nonref = Clone::clone(prev_channel_id);
+				let mut failed_next_destination_nonref = Clone::clone(failed_next_destination);
 				Event::HTLCHandlingFailed {
 					prev_channel_id: crate::c_types::ThirtyTwoBytes { data: prev_channel_id_nonref },
 					failed_next_destination: crate::lightning::util::events::HTLCDestination::native_into(failed_next_destination_nonref),
@@ -1510,18 +1733,26 @@ impl Event {
 					counterparty_node_id: crate::c_types::PublicKey::from_rust(&counterparty_node_id),
 					channel_value_satoshis: channel_value_satoshis,
 					output_script: output_script.into_bytes().into(),
-					user_channel_id: user_channel_id,
+					user_channel_id: user_channel_id.into(),
 				}
 			},
-			nativeEvent::PaymentReceived {mut payment_hash, mut amount_msat, mut purpose, } => {
-				Event::PaymentReceived {
+			nativeEvent::PaymentClaimable {mut receiver_node_id, mut payment_hash, mut amount_msat, mut purpose, mut via_channel_id, mut via_user_channel_id, } => {
+				let mut local_receiver_node_id = if receiver_node_id.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(receiver_node_id.unwrap())) } };
+				let mut local_via_channel_id = if via_channel_id.is_none() { crate::c_types::ThirtyTwoBytes { data: [0; 32] } } else {  { crate::c_types::ThirtyTwoBytes { data: (via_channel_id.unwrap()) } } };
+				let mut local_via_user_channel_id = if via_user_channel_id.is_none() { crate::c_types::derived::COption_u128Z::None } else { crate::c_types::derived::COption_u128Z::Some( { via_user_channel_id.unwrap().into() }) };
+				Event::PaymentClaimable {
+					receiver_node_id: local_receiver_node_id,
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
 					amount_msat: amount_msat,
 					purpose: crate::lightning::util::events::PaymentPurpose::native_into(purpose),
+					via_channel_id: local_via_channel_id,
+					via_user_channel_id: local_via_user_channel_id,
 				}
 			},
-			nativeEvent::PaymentClaimed {mut payment_hash, mut amount_msat, mut purpose, } => {
+			nativeEvent::PaymentClaimed {mut receiver_node_id, mut payment_hash, mut amount_msat, mut purpose, } => {
+				let mut local_receiver_node_id = if receiver_node_id.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(receiver_node_id.unwrap())) } };
 				Event::PaymentClaimed {
+					receiver_node_id: local_receiver_node_id,
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
 					amount_msat: amount_msat,
 					purpose: crate::lightning::util::events::PaymentPurpose::native_into(purpose),
@@ -1592,6 +1823,15 @@ impl Event {
 					time_forwardable: time_forwardable.as_secs(),
 				}
 			},
+			nativeEvent::HTLCIntercepted {mut intercept_id, mut requested_next_hop_scid, mut payment_hash, mut inbound_amount_msat, mut expected_outbound_amount_msat, } => {
+				Event::HTLCIntercepted {
+					intercept_id: crate::c_types::ThirtyTwoBytes { data: intercept_id.0 },
+					requested_next_hop_scid: requested_next_hop_scid,
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
+					inbound_amount_msat: inbound_amount_msat,
+					expected_outbound_amount_msat: expected_outbound_amount_msat,
+				}
+			},
 			nativeEvent::SpendableOutputs {mut outputs, } => {
 				let mut local_outputs = Vec::new(); for mut item in outputs.drain(..) { local_outputs.push( { crate::lightning::chain::keysinterface::SpendableOutputDescriptor::native_into(item) }); };
 				Event::SpendableOutputs {
@@ -1609,10 +1849,18 @@ impl Event {
 					claim_from_onchain_tx: claim_from_onchain_tx,
 				}
 			},
+			nativeEvent::ChannelReady {mut channel_id, mut user_channel_id, mut counterparty_node_id, mut channel_type, } => {
+				Event::ChannelReady {
+					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id },
+					user_channel_id: user_channel_id.into(),
+					counterparty_node_id: crate::c_types::PublicKey::from_rust(&counterparty_node_id),
+					channel_type: crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(channel_type), is_owned: true },
+				}
+			},
 			nativeEvent::ChannelClosed {mut channel_id, mut user_channel_id, mut reason, } => {
 				Event::ChannelClosed {
 					channel_id: crate::c_types::ThirtyTwoBytes { data: channel_id },
-					user_channel_id: user_channel_id,
+					user_channel_id: user_channel_id.into(),
 					reason: crate::lightning::util::events::ClosureReason::native_into(reason),
 				}
 			},
@@ -1650,7 +1898,7 @@ pub extern "C" fn Event_clone(orig: &Event) -> Event {
 }
 #[no_mangle]
 /// Utility method to constructs a new FundingGenerationReady-variant Event
-pub extern "C" fn Event_funding_generation_ready(temporary_channel_id: crate::c_types::ThirtyTwoBytes, counterparty_node_id: crate::c_types::PublicKey, channel_value_satoshis: u64, output_script: crate::c_types::derived::CVec_u8Z, user_channel_id: u64) -> Event {
+pub extern "C" fn Event_funding_generation_ready(temporary_channel_id: crate::c_types::ThirtyTwoBytes, counterparty_node_id: crate::c_types::PublicKey, channel_value_satoshis: u64, output_script: crate::c_types::derived::CVec_u8Z, user_channel_id: crate::c_types::U128) -> Event {
 	Event::FundingGenerationReady {
 		temporary_channel_id,
 		counterparty_node_id,
@@ -1660,18 +1908,22 @@ pub extern "C" fn Event_funding_generation_ready(temporary_channel_id: crate::c_
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new PaymentReceived-variant Event
-pub extern "C" fn Event_payment_received(payment_hash: crate::c_types::ThirtyTwoBytes, amount_msat: u64, purpose: crate::lightning::util::events::PaymentPurpose) -> Event {
-	Event::PaymentReceived {
+/// Utility method to constructs a new PaymentClaimable-variant Event
+pub extern "C" fn Event_payment_claimable(receiver_node_id: crate::c_types::PublicKey, payment_hash: crate::c_types::ThirtyTwoBytes, amount_msat: u64, purpose: crate::lightning::util::events::PaymentPurpose, via_channel_id: crate::c_types::ThirtyTwoBytes, via_user_channel_id: crate::c_types::derived::COption_u128Z) -> Event {
+	Event::PaymentClaimable {
+		receiver_node_id,
 		payment_hash,
 		amount_msat,
 		purpose,
+		via_channel_id,
+		via_user_channel_id,
 	}
 }
 #[no_mangle]
 /// Utility method to constructs a new PaymentClaimed-variant Event
-pub extern "C" fn Event_payment_claimed(payment_hash: crate::c_types::ThirtyTwoBytes, amount_msat: u64, purpose: crate::lightning::util::events::PaymentPurpose) -> Event {
+pub extern "C" fn Event_payment_claimed(receiver_node_id: crate::c_types::PublicKey, payment_hash: crate::c_types::ThirtyTwoBytes, amount_msat: u64, purpose: crate::lightning::util::events::PaymentPurpose) -> Event {
 	Event::PaymentClaimed {
+		receiver_node_id,
 		payment_hash,
 		amount_msat,
 		purpose,
@@ -1745,6 +1997,17 @@ pub extern "C" fn Event_pending_htlcs_forwardable(time_forwardable: u64) -> Even
 	}
 }
 #[no_mangle]
+/// Utility method to constructs a new HTLCIntercepted-variant Event
+pub extern "C" fn Event_htlcintercepted(intercept_id: crate::c_types::ThirtyTwoBytes, requested_next_hop_scid: u64, payment_hash: crate::c_types::ThirtyTwoBytes, inbound_amount_msat: u64, expected_outbound_amount_msat: u64) -> Event {
+	Event::HTLCIntercepted {
+		intercept_id,
+		requested_next_hop_scid,
+		payment_hash,
+		inbound_amount_msat,
+		expected_outbound_amount_msat,
+	}
+}
+#[no_mangle]
 /// Utility method to constructs a new SpendableOutputs-variant Event
 pub extern "C" fn Event_spendable_outputs(outputs: crate::c_types::derived::CVec_SpendableOutputDescriptorZ) -> Event {
 	Event::SpendableOutputs {
@@ -1762,8 +2025,18 @@ pub extern "C" fn Event_payment_forwarded(prev_channel_id: crate::c_types::Thirt
 	}
 }
 #[no_mangle]
+/// Utility method to constructs a new ChannelReady-variant Event
+pub extern "C" fn Event_channel_ready(channel_id: crate::c_types::ThirtyTwoBytes, user_channel_id: crate::c_types::U128, counterparty_node_id: crate::c_types::PublicKey, channel_type: crate::lightning::ln::features::ChannelTypeFeatures) -> Event {
+	Event::ChannelReady {
+		channel_id,
+		user_channel_id,
+		counterparty_node_id,
+		channel_type,
+	}
+}
+#[no_mangle]
 /// Utility method to constructs a new ChannelClosed-variant Event
-pub extern "C" fn Event_channel_closed(channel_id: crate::c_types::ThirtyTwoBytes, user_channel_id: u64, reason: crate::lightning::util::events::ClosureReason) -> Event {
+pub extern "C" fn Event_channel_closed(channel_id: crate::c_types::ThirtyTwoBytes, user_channel_id: crate::c_types::U128, reason: crate::lightning::util::events::ClosureReason) -> Event {
 	Event::ChannelClosed {
 		channel_id,
 		user_channel_id,
@@ -1983,97 +2256,97 @@ impl MessageSendEvent {
 	pub(crate) fn to_native(&self) -> nativeMessageSendEvent {
 		match self {
 			MessageSendEvent::SendAcceptChannel {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendAcceptChannel {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendOpenChannel {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendOpenChannel {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendFundingCreated {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendFundingCreated {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendFundingSigned {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendFundingSigned {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendChannelReady {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendChannelReady {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendAnnouncementSignatures {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendAnnouncementSignatures {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::UpdateHTLCs {ref node_id, ref updates, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut updates_nonref = (*updates).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut updates_nonref = Clone::clone(updates);
 				nativeMessageSendEvent::UpdateHTLCs {
 					node_id: node_id_nonref.into_rust(),
 					updates: *unsafe { Box::from_raw(updates_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendRevokeAndACK {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendRevokeAndACK {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendClosingSigned {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendClosingSigned {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendShutdown {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendShutdown {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendChannelReestablish {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendChannelReestablish {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendChannelAnnouncement {ref node_id, ref msg, ref update_msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
-				let mut update_msg_nonref = (*update_msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
+				let mut update_msg_nonref = Clone::clone(update_msg);
 				nativeMessageSendEvent::SendChannelAnnouncement {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
@@ -2081,62 +2354,62 @@ impl MessageSendEvent {
 				}
 			},
 			MessageSendEvent::BroadcastChannelAnnouncement {ref msg, ref update_msg, } => {
-				let mut msg_nonref = (*msg).clone();
-				let mut update_msg_nonref = (*update_msg).clone();
+				let mut msg_nonref = Clone::clone(msg);
+				let mut update_msg_nonref = Clone::clone(update_msg);
 				nativeMessageSendEvent::BroadcastChannelAnnouncement {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 					update_msg: *unsafe { Box::from_raw(update_msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::BroadcastChannelUpdate {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::BroadcastChannelUpdate {
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendChannelUpdate {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendChannelUpdate {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::HandleError {ref node_id, ref action, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut action_nonref = (*action).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut action_nonref = Clone::clone(action);
 				nativeMessageSendEvent::HandleError {
 					node_id: node_id_nonref.into_rust(),
 					action: action_nonref.into_native(),
 				}
 			},
 			MessageSendEvent::SendChannelRangeQuery {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendChannelRangeQuery {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendShortIdsQuery {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendShortIdsQuery {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendReplyChannelRange {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendReplyChannelRange {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
 				}
 			},
 			MessageSendEvent::SendGossipTimestampFilter {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				nativeMessageSendEvent::SendGossipTimestampFilter {
 					node_id: node_id_nonref.into_rust(),
 					msg: *unsafe { Box::from_raw(msg_nonref.take_inner()) },
@@ -2273,97 +2546,97 @@ impl MessageSendEvent {
 	pub(crate) fn from_native(native: &nativeMessageSendEvent) -> Self {
 		match native {
 			nativeMessageSendEvent::SendAcceptChannel {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendAcceptChannel {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::AcceptChannel { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendOpenChannel {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendOpenChannel {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::OpenChannel { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingCreated {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendFundingCreated {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::FundingCreated { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendFundingSigned {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendFundingSigned {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::FundingSigned { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendChannelReady {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendChannelReady {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::ChannelReady { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendAnnouncementSignatures {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendAnnouncementSignatures {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::AnnouncementSignatures { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::UpdateHTLCs {ref node_id, ref updates, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut updates_nonref = (*updates).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut updates_nonref = Clone::clone(updates);
 				MessageSendEvent::UpdateHTLCs {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					updates: crate::lightning::ln::msgs::CommitmentUpdate { inner: ObjOps::heap_alloc(updates_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendRevokeAndACK {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendRevokeAndACK {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::RevokeAndACK { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendClosingSigned {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendClosingSigned {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::ClosingSigned { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendShutdown {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendShutdown {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::Shutdown { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendChannelReestablish {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendChannelReestablish {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::ChannelReestablish { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendChannelAnnouncement {ref node_id, ref msg, ref update_msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
-				let mut update_msg_nonref = (*update_msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
+				let mut update_msg_nonref = Clone::clone(update_msg);
 				MessageSendEvent::SendChannelAnnouncement {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
@@ -2371,62 +2644,62 @@ impl MessageSendEvent {
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelAnnouncement {ref msg, ref update_msg, } => {
-				let mut msg_nonref = (*msg).clone();
-				let mut update_msg_nonref = (*update_msg).clone();
+				let mut msg_nonref = Clone::clone(msg);
+				let mut update_msg_nonref = Clone::clone(update_msg);
 				MessageSendEvent::BroadcastChannelAnnouncement {
 					msg: crate::lightning::ln::msgs::ChannelAnnouncement { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 					update_msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(update_msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::BroadcastChannelUpdate {ref msg, } => {
-				let mut msg_nonref = (*msg).clone();
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::BroadcastChannelUpdate {
 					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendChannelUpdate {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendChannelUpdate {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::ChannelUpdate { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::HandleError {ref node_id, ref action, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut action_nonref = (*action).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut action_nonref = Clone::clone(action);
 				MessageSendEvent::HandleError {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					action: crate::lightning::ln::msgs::ErrorAction::native_into(action_nonref),
 				}
 			},
 			nativeMessageSendEvent::SendChannelRangeQuery {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendChannelRangeQuery {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::QueryChannelRange { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendShortIdsQuery {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendShortIdsQuery {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::QueryShortChannelIds { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendReplyChannelRange {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendReplyChannelRange {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::ReplyChannelRange { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
 				}
 			},
 			nativeMessageSendEvent::SendGossipTimestampFilter {ref node_id, ref msg, } => {
-				let mut node_id_nonref = (*node_id).clone();
-				let mut msg_nonref = (*msg).clone();
+				let mut node_id_nonref = Clone::clone(node_id);
+				let mut msg_nonref = Clone::clone(msg);
 				MessageSendEvent::SendGossipTimestampFilter {
 					node_id: crate::c_types::PublicKey::from_rust(&node_id_nonref),
 					msg: crate::lightning::ln::msgs::GossipTimestampFilter { inner: ObjOps::heap_alloc(msg_nonref), is_owned: true },
@@ -2837,6 +3110,10 @@ impl Drop for OnionMessageProvider {
 ///
 /// Events are processed by passing an [`EventHandler`] to [`process_pending_events`].
 ///
+/// Implementations of this trait may also feature an async version of event handling, as shown with
+/// [`ChannelManager::process_pending_events_async`] and
+/// [`ChainMonitor::process_pending_events_async`].
+///
 /// # Requirements
 ///
 /// When using this trait, [`process_pending_events`] will call [`handle_event`] for each pending
@@ -2863,6 +3140,8 @@ impl Drop for OnionMessageProvider {
 /// [`handle_event`]: EventHandler::handle_event
 /// [`ChannelManager::process_pending_events`]: crate::ln::channelmanager::ChannelManager#method.process_pending_events
 /// [`ChainMonitor::process_pending_events`]: crate::chain::chainmonitor::ChainMonitor#method.process_pending_events
+/// [`ChannelManager::process_pending_events_async`]: crate::ln::channelmanager::ChannelManager::process_pending_events_async
+/// [`ChainMonitor::process_pending_events_async`]: crate::chain::chainmonitor::ChainMonitor::process_pending_events_async
 #[repr(C)]
 pub struct EventsProvider {
 	/// An opaque pointer which is passed to your function implementations as an argument.
@@ -2899,6 +3178,10 @@ impl Drop for EventsProvider {
 	}
 }
 /// A trait implemented for objects handling events from [`EventsProvider`].
+///
+/// An async variation also exists for implementations of [`EventsProvider`] that support async
+/// event handling. The async event handler should satisfy the generic bounds: `F:
+/// core::future::Future, H: Fn(Event) -> F`.
 #[repr(C)]
 pub struct EventHandler {
 	/// An opaque pointer which is passed to your function implementations as an argument.
@@ -2907,7 +3190,7 @@ pub struct EventHandler {
 	/// Handles the given [`Event`].
 	///
 	/// See [`EventsProvider`] for details that must be considered when implementing this method.
-	pub handle_event: extern "C" fn (this_arg: *const c_void, event: &crate::lightning::util::events::Event),
+	pub handle_event: extern "C" fn (this_arg: *const c_void, event: crate::lightning::util::events::Event),
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -2925,8 +3208,8 @@ pub(crate) extern "C" fn EventHandler_clone_fields(orig: &EventHandler) -> Event
 
 use lightning::util::events::EventHandler as rustEventHandler;
 impl rustEventHandler for EventHandler {
-	fn handle_event(&self, mut event: &lightning::util::events::Event) {
-		(self.handle_event)(self.this_arg, &crate::lightning::util::events::Event::from_native(event))
+	fn handle_event(&self, mut event: lightning::util::events::Event) {
+		(self.handle_event)(self.this_arg, crate::lightning::util::events::Event::native_into(event))
 	}
 }
 

@@ -1054,6 +1054,24 @@ pub extern "C" fn InvoiceFeatures_eq(a: &InvoiceFeatures, b: &InvoiceFeatures) -
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
+/// Checks if two OfferFeaturess contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn OfferFeatures_eq(a: &OfferFeatures, b: &OfferFeatures) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+/// Checks if two InvoiceRequestFeaturess contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn InvoiceRequestFeatures_eq(a: &InvoiceRequestFeatures, b: &InvoiceRequestFeatures) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 /// Checks if two ChannelTypeFeaturess contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -1139,6 +1157,44 @@ pub(crate) extern "C" fn InvoiceFeatures_clone_void(this_ptr: *const c_void) -> 
 pub extern "C" fn InvoiceFeatures_clone(orig: &InvoiceFeatures) -> InvoiceFeatures {
 	orig.clone()
 }
+impl Clone for OfferFeatures {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeOfferFeatures>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn OfferFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeOfferFeatures)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the OfferFeatures
+pub extern "C" fn OfferFeatures_clone(orig: &OfferFeatures) -> OfferFeatures {
+	orig.clone()
+}
+impl Clone for InvoiceRequestFeatures {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeInvoiceRequestFeatures>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn InvoiceRequestFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInvoiceRequestFeatures)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the InvoiceRequestFeatures
+pub extern "C" fn InvoiceRequestFeatures_clone(orig: &InvoiceRequestFeatures) -> InvoiceRequestFeatures {
+	orig.clone()
+}
 impl Clone for ChannelTypeFeatures {
 	fn clone(&self) -> Self {
 		Self {
@@ -1191,7 +1247,7 @@ pub extern "C" fn InitFeatures_free(this_obj: InitFeatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn InitFeatures_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInitFeatures); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeInitFeatures) };
 }
 #[allow(unused)]
 impl InitFeatures {
@@ -1242,7 +1298,7 @@ pub extern "C" fn NodeFeatures_free(this_obj: NodeFeatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeFeatures_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeNodeFeatures); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeNodeFeatures) };
 }
 #[allow(unused)]
 impl NodeFeatures {
@@ -1293,7 +1349,7 @@ pub extern "C" fn ChannelFeatures_free(this_obj: ChannelFeatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelFeatures_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelFeatures); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelFeatures) };
 }
 #[allow(unused)]
 impl ChannelFeatures {
@@ -1344,7 +1400,7 @@ pub extern "C" fn InvoiceFeatures_free(this_obj: InvoiceFeatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn InvoiceFeatures_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInvoiceFeatures); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeInvoiceFeatures) };
 }
 #[allow(unused)]
 impl InvoiceFeatures {
@@ -1356,6 +1412,108 @@ impl InvoiceFeatures {
 	}
 	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
 	pub(crate) fn take_inner(mut self) -> *mut nativeInvoiceFeatures {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+
+use lightning::ln::features::OfferFeatures as nativeOfferFeaturesImport;
+pub(crate) type nativeOfferFeatures = nativeOfferFeaturesImport;
+
+/// Features used within an `offer`.
+#[must_use]
+#[repr(C)]
+pub struct OfferFeatures {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeOfferFeatures,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for OfferFeatures {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeOfferFeatures>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the OfferFeatures, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn OfferFeatures_free(this_obj: OfferFeatures) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn OfferFeatures_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeOfferFeatures) };
+}
+#[allow(unused)]
+impl OfferFeatures {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeOfferFeatures {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeOfferFeatures {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeOfferFeatures {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+
+use lightning::ln::features::InvoiceRequestFeatures as nativeInvoiceRequestFeaturesImport;
+pub(crate) type nativeInvoiceRequestFeatures = nativeInvoiceRequestFeaturesImport;
+
+/// Features used within an `invoice_request`.
+#[must_use]
+#[repr(C)]
+pub struct InvoiceRequestFeatures {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeInvoiceRequestFeatures,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for InvoiceRequestFeatures {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeInvoiceRequestFeatures>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the InvoiceRequestFeatures, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn InvoiceRequestFeatures_free(this_obj: InvoiceRequestFeatures) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn InvoiceRequestFeatures_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeInvoiceRequestFeatures) };
+}
+#[allow(unused)]
+impl InvoiceRequestFeatures {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeInvoiceRequestFeatures {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeInvoiceRequestFeatures {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeInvoiceRequestFeatures {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = core::ptr::null_mut();
@@ -1404,7 +1562,7 @@ pub extern "C" fn ChannelTypeFeatures_free(this_obj: ChannelTypeFeatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelTypeFeatures_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelTypeFeatures); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelTypeFeatures) };
 }
 #[allow(unused)]
 impl ChannelTypeFeatures {
@@ -1486,6 +1644,40 @@ pub extern "C" fn InvoiceFeatures_empty() -> crate::lightning::ln::features::Inv
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InvoiceFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
+	ret
+}
+
+/// Create a blank Features with no features set
+#[must_use]
+#[no_mangle]
+pub extern "C" fn OfferFeatures_empty() -> crate::lightning::ln::features::OfferFeatures {
+	let mut ret = lightning::ln::features::OfferFeatures::empty();
+	crate::lightning::ln::features::OfferFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains unknown feature flags which are set as
+/// \"required\".
+#[must_use]
+#[no_mangle]
+pub extern "C" fn OfferFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::OfferFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
+	ret
+}
+
+/// Create a blank Features with no features set
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceRequestFeatures_empty() -> crate::lightning::ln::features::InvoiceRequestFeatures {
+	let mut ret = lightning::ln::features::InvoiceRequestFeatures::empty();
+	crate::lightning::ln::features::InvoiceRequestFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains unknown feature flags which are set as
+/// \"required\".
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceRequestFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::InvoiceRequestFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
 }
@@ -1585,5 +1777,37 @@ pub(crate) extern "C" fn ChannelTypeFeatures_write_void(obj: *const c_void) -> c
 pub extern "C" fn ChannelTypeFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelTypeFeaturesDecodeErrorZ {
 	let res: Result<lightning::ln::features::ChannelTypeFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the OfferFeatures object into a byte array which can be read by OfferFeatures_read
+pub extern "C" fn OfferFeatures_write(obj: &crate::lightning::ln::features::OfferFeatures) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn OfferFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOfferFeatures) })
+}
+#[no_mangle]
+/// Read a OfferFeatures from a byte array, created by OfferFeatures_write
+pub extern "C" fn OfferFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_OfferFeaturesDecodeErrorZ {
+	let res: Result<lightning::ln::features::OfferFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::OfferFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the InvoiceRequestFeatures object into a byte array which can be read by InvoiceRequestFeatures_read
+pub extern "C" fn InvoiceRequestFeatures_write(obj: &crate::lightning::ln::features::InvoiceRequestFeatures) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn InvoiceRequestFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeInvoiceRequestFeatures) })
+}
+#[no_mangle]
+/// Read a InvoiceRequestFeatures from a byte array, created by InvoiceRequestFeatures_write
+pub extern "C" fn InvoiceRequestFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_InvoiceRequestFeaturesDecodeErrorZ {
+	let res: Result<lightning::ln::features::InvoiceRequestFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::InvoiceRequestFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }

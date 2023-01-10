@@ -76,7 +76,7 @@ pub extern "C" fn BestBlock_free(this_obj: BestBlock) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BestBlock_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBestBlock); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeBestBlock) };
 }
 #[allow(unused)]
 impl BestBlock {
@@ -342,31 +342,35 @@ impl Drop for Listen {
 		}
 	}
 }
-/// The `Confirm` trait is used to notify when transactions have been confirmed on chain or
-/// unconfirmed during a chain reorganization.
+/// The `Confirm` trait is used to notify LDK when relevant transactions have been confirmed on
+/// chain or unconfirmed during a chain reorganization.
 ///
 /// Clients sourcing chain data using a transaction-oriented API should prefer this interface over
-/// [`Listen`]. For instance, an Electrum client may implement [`Filter`] by subscribing to activity
-/// related to registered transactions and outputs. Upon notification, it would pass along the
-/// matching transactions using this interface.
+/// [`Listen`]. For instance, an Electrum-based transaction sync implementation may implement
+/// [`Filter`] to subscribe to relevant transactions and unspent outputs it should monitor for
+/// on-chain activity. Then, it needs to notify LDK via this interface upon observing any changes
+/// with reference to the confirmation status of the monitored objects.
 ///
 /// # Use
-///
 /// The intended use is as follows:
-/// - Call [`transactions_confirmed`] to process any on-chain activity of interest.
-/// - Call [`transaction_unconfirmed`] to process any transaction returned by [`get_relevant_txids`]
-///   that has been reorganized out of the chain.
-/// - Call [`best_block_updated`] whenever a new chain tip becomes available.
+/// - Call [`transactions_confirmed`] to notify LDK whenever any of the registered transactions or
+///   outputs are, respectively, confirmed or spent on chain.
+/// - Call [`transaction_unconfirmed`] to notify LDK whenever any transaction returned by
+///   [`get_relevant_txids`] is no longer confirmed in the block with the given block hash.
+/// - Call [`best_block_updated`] to notify LDK whenever a new chain tip becomes available.
 ///
 /// # Order
 ///
 /// Clients must call these methods in chain order. Specifically:
-/// - Transactions confirmed in a block must be given before transactions confirmed in a later
-///   block.
+/// - Transactions which are confirmed in a particular block must be given before transactions
+///   confirmed in a later block.
 /// - Dependent transactions within the same block must be given in topological order, possibly in
 ///   separate calls.
-/// - Unconfirmed transactions must be given after the original confirmations and before any
-///   reconfirmation.
+/// - All unconfirmed transactions must be given after the original confirmations and before *any*
+///   reconfirmations, i.e., [`transactions_confirmed`] and [`transaction_unconfirmed`] calls should
+///   never be interleaved, but always conduced *en bloc*.
+/// - Any reconfirmed transactions need to be explicitly unconfirmed before they are reconfirmed
+///   in regard to the new block.
 ///
 /// See individual method documentation for further details.
 ///
@@ -379,9 +383,9 @@ pub struct Confirm {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
-	/// Processes transactions confirmed in a block with a given header and height.
+	/// Notifies LDK of transactions confirmed in a block with a given header and height.
 	///
-	/// Should be called for any transactions registered by [`Filter::register_tx`] or any
+	/// Must be called for any transactions registered by [`Filter::register_tx`] or any
 	/// transactions spending an output registered by [`Filter::register_output`]. Such transactions
 	/// appearing in the same block do not need to be included in the same call; instead, multiple
 	/// calls with additional transactions may be made so long as they are made in [chain order].
@@ -393,35 +397,41 @@ pub struct Confirm {
 	/// [chain order]: Confirm#order
 	/// [`best_block_updated`]: Self::best_block_updated
 	pub transactions_confirmed: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, height: u32),
-	/// Processes a transaction that is no longer confirmed as result of a chain reorganization.
+	/// Notifies LDK of a transaction that is no longer confirmed as result of a chain reorganization.
 	///
-	/// Should be called for any transaction returned by [`get_relevant_txids`] if it has been
-	/// reorganized out of the best chain. Once called, the given transaction will not be returned
+	/// Must be called for any transaction returned by [`get_relevant_txids`] if it has been
+	/// reorganized out of the best chain or if it is no longer confirmed in the block with the
+	/// given block hash. Once called, the given transaction will not be returned
 	/// by [`get_relevant_txids`], unless it has been reconfirmed via [`transactions_confirmed`].
 	///
 	/// [`get_relevant_txids`]: Self::get_relevant_txids
 	/// [`transactions_confirmed`]: Self::transactions_confirmed
 	pub transaction_unconfirmed: extern "C" fn (this_arg: *const c_void, txid: *const [u8; 32]),
-	/// Processes an update to the best header connected at the given height.
+	/// Notifies LDK of an update to the best header connected at the given height.
 	///
-	/// Should be called when a new header is available but may be skipped for intermediary blocks
-	/// if they become available at the same time.
+	/// Must be called whenever a new chain tip becomes available. May be skipped for intermediary
+	/// blocks.
 	pub best_block_updated: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], height: u32),
-	/// Returns transactions that should be monitored for reorganization out of the chain.
+	/// Returns transactions that must be monitored for reorganization out of the chain along
+	/// with the hash of the block as part of which it had been previously confirmed.
 	///
 	/// Will include any transactions passed to [`transactions_confirmed`] that have insufficient
 	/// confirmations to be safe from a chain reorganization. Will not include any transactions
 	/// passed to [`transaction_unconfirmed`], unless later reconfirmed.
 	///
-	/// May be called to determine the subset of transactions that must still be monitored for
+	/// Must be called to determine the subset of transactions that must be monitored for
 	/// reorganization. Will be idempotent between calls but may change as a result of calls to the
-	/// other interface methods. Thus, this is useful to determine which transactions may need to be
+	/// other interface methods. Thus, this is useful to determine which transactions must be
 	/// given to [`transaction_unconfirmed`].
+	///
+	/// If any of the returned transactions are confirmed in a block other than the one with the
+	/// given hash, they need to be unconfirmed and reconfirmed via [`transaction_unconfirmed`] and
+	/// [`transactions_confirmed`], respectively.
 	///
 	/// [`transactions_confirmed`]: Self::transactions_confirmed
 	/// [`transaction_unconfirmed`]: Self::transaction_unconfirmed
 	#[must_use]
-	pub get_relevant_txids: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_TxidZ,
+	pub get_relevant_txids: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_TxidBlockHashZZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -454,9 +464,9 @@ impl rustConfirm for Confirm {
 		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
 		(self.best_block_updated)(self.this_arg, &local_header, height)
 	}
-	fn get_relevant_txids(&self) -> Vec<bitcoin::hash_types::Txid> {
+	fn get_relevant_txids(&self) -> Vec<(bitcoin::hash_types::Txid, Option<bitcoin::hash_types::BlockHash>)> {
 		let mut ret = (self.get_relevant_txids)(self.this_arg);
-		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { ::bitcoin::hash_types::Txid::from_slice(&item.data[..]).unwrap() }); };
+		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item.to_rust(); let mut local_orig_ret_0_1 = if orig_ret_0_1.data == [0; 32] { None } else { Some( { ::bitcoin::hash_types::BlockHash::from_slice(&orig_ret_0_1.data[..]).unwrap() }) }; let mut local_ret_0 = (::bitcoin::hash_types::Txid::from_slice(&orig_ret_0_0.data[..]).unwrap(), local_orig_ret_0_1); local_ret_0 }); };
 		local_ret
 	}
 }
@@ -849,7 +859,7 @@ pub extern "C" fn WatchedOutput_free(this_obj: WatchedOutput) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn WatchedOutput_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeWatchedOutput); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeWatchedOutput) };
 }
 #[allow(unused)]
 impl WatchedOutput {

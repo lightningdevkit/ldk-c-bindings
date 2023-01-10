@@ -71,7 +71,7 @@ pub extern "C" fn FilesystemPersister_free(this_obj: FilesystemPersister) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn FilesystemPersister_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeFilesystemPersister); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeFilesystemPersister) };
 }
 #[allow(unused)]
 impl FilesystemPersister {

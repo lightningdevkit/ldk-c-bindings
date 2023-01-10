@@ -312,7 +312,7 @@ pub extern "C" fn MultiThreadedLockableScore_free(this_obj: MultiThreadedLockabl
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn MultiThreadedLockableScore_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeMultiThreadedLockableScore); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeMultiThreadedLockableScore) };
 }
 #[allow(unused)]
 impl MultiThreadedLockableScore {
@@ -363,7 +363,7 @@ pub extern "C" fn MultiThreadedScoreLock_free(this_obj: MultiThreadedScoreLock) 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn MultiThreadedScoreLock_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeMultiThreadedScoreLock); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeMultiThreadedScoreLock) };
 }
 #[allow(unused)]
 impl MultiThreadedScoreLock {
@@ -542,7 +542,7 @@ pub extern "C" fn ChannelUsage_free(this_obj: ChannelUsage) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelUsage_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelUsage); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelUsage) };
 }
 #[allow(unused)]
 impl ChannelUsage {
@@ -657,7 +657,7 @@ pub extern "C" fn FixedPenaltyScorer_free(this_obj: FixedPenaltyScorer) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn FixedPenaltyScorer_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeFixedPenaltyScorer); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeFixedPenaltyScorer) };
 }
 #[allow(unused)]
 impl FixedPenaltyScorer {
@@ -835,7 +835,7 @@ pub extern "C" fn ProbabilisticScorer_free(this_obj: ProbabilisticScorer) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ProbabilisticScorer_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeProbabilisticScorer); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeProbabilisticScorer) };
 }
 #[allow(unused)]
 impl ProbabilisticScorer {
@@ -892,7 +892,7 @@ pub extern "C" fn ProbabilisticScoringParameters_free(this_obj: ProbabilisticSco
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ProbabilisticScoringParameters_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeProbabilisticScoringParameters); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeProbabilisticScoringParameters) };
 }
 #[allow(unused)]
 impl ProbabilisticScoringParameters {

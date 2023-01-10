@@ -52,7 +52,7 @@ pub extern "C" fn ExpandedKey_free(this_obj: ExpandedKey) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ExpandedKey_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeExpandedKey); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeExpandedKey) };
 }
 #[allow(unused)]
 impl ExpandedKey {
@@ -94,7 +94,7 @@ pub extern "C" fn ExpandedKey_new(key_material: *const [u8; 32]) -> crate::light
 #[no_mangle]
 pub extern "C" fn create(keys: &crate::lightning::ln::inbound_payment::ExpandedKey, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut invoice_expiry_delta_secs: u32, keys_manager: &crate::lightning::chain::keysinterface::KeysInterface, mut current_time: u64) -> crate::c_types::derived::CResult_C2Tuple_PaymentHashPaymentSecretZNoneZ {
 	let mut local_min_value_msat = if min_value_msat.is_some() { Some( { min_value_msat.take() }) } else { None };
-	let mut ret = lightning::ln::inbound_payment::create::<crate::lightning::chain::keysinterface::Sign, crate::lightning::chain::keysinterface::KeysInterface>(keys.get_native_ref(), local_min_value_msat, invoice_expiry_delta_secs, keys_manager, current_time);
+	let mut ret = lightning::ln::inbound_payment::create::<crate::lightning::chain::keysinterface::KeysInterface>(keys.get_native_ref(), local_min_value_msat, invoice_expiry_delta_secs, keys_manager, current_time);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.0 }, crate::c_types::ThirtyTwoBytes { data: orig_ret_0_1.0 }).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }

@@ -221,19 +221,19 @@ impl ParseError {
 	pub(crate) fn to_native(&self) -> nativeParseError {
 		match self {
 			ParseError::Bech32Error (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeParseError::Bech32Error (
 					a_nonref.into_rust(),
 				)
 			},
 			ParseError::ParseAmountError (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeParseError::ParseAmountError (
 					u8::from_str_radix(" a", 10).unwrap_err() /*a_nonref*/,
 				)
 			},
 			ParseError::MalformedSignature (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeParseError::MalformedSignature (
 					a_nonref.into_rust(),
 				)
@@ -245,7 +245,7 @@ impl ParseError {
 			ParseError::TooShortDataPart => nativeParseError::TooShortDataPart,
 			ParseError::UnexpectedEndOfTaggedFields => nativeParseError::UnexpectedEndOfTaggedFields,
 			ParseError::DescriptionDecodeError (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeParseError::DescriptionDecodeError (
 					core::str::from_utf8(&[0xff]).unwrap_err() /*a_nonref*/,
 				)
@@ -257,7 +257,7 @@ impl ParseError {
 			ParseError::InvalidScriptHashLength => nativeParseError::InvalidScriptHashLength,
 			ParseError::InvalidRecoveryId => nativeParseError::InvalidRecoveryId,
 			ParseError::InvalidSliceLength (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeParseError::InvalidSliceLength (
 					a_nonref.into_string(),
 				)
@@ -312,19 +312,19 @@ impl ParseError {
 	pub(crate) fn from_native(native: &nativeParseError) -> Self {
 		match native {
 			nativeParseError::Bech32Error (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				ParseError::Bech32Error (
 					crate::c_types::Bech32Error::from_rust(a_nonref),
 				)
 			},
 			nativeParseError::ParseAmountError (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				ParseError::ParseAmountError (
 					crate::c_types::Error { _dummy: 0 } /*a_nonref*/,
 				)
 			},
 			nativeParseError::MalformedSignature (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				ParseError::MalformedSignature (
 					crate::c_types::Secp256k1Error::from_rust(a_nonref),
 				)
@@ -336,7 +336,7 @@ impl ParseError {
 			nativeParseError::TooShortDataPart => ParseError::TooShortDataPart,
 			nativeParseError::UnexpectedEndOfTaggedFields => ParseError::UnexpectedEndOfTaggedFields,
 			nativeParseError::DescriptionDecodeError (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				ParseError::DescriptionDecodeError (
 					crate::c_types::Error { _dummy: 0 } /*a_nonref*/,
 				)
@@ -348,7 +348,7 @@ impl ParseError {
 			nativeParseError::InvalidScriptHashLength => ParseError::InvalidScriptHashLength,
 			nativeParseError::InvalidRecoveryId => ParseError::InvalidRecoveryId,
 			nativeParseError::InvalidSliceLength (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				ParseError::InvalidSliceLength (
 					a_nonref.into(),
 				)
@@ -513,13 +513,13 @@ impl ParseOrSemanticError {
 	pub(crate) fn to_native(&self) -> nativeParseOrSemanticError {
 		match self {
 			ParseOrSemanticError::ParseError (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeParseOrSemanticError::ParseError (
 					a_nonref.into_native(),
 				)
 			},
 			ParseOrSemanticError::SemanticError (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeParseOrSemanticError::SemanticError (
 					a_nonref.into_native(),
 				)
@@ -545,13 +545,13 @@ impl ParseOrSemanticError {
 	pub(crate) fn from_native(native: &nativeParseOrSemanticError) -> Self {
 		match native {
 			nativeParseOrSemanticError::ParseError (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				ParseOrSemanticError::ParseError (
 					crate::lightning_invoice::ParseError::native_into(a_nonref),
 				)
 			},
 			nativeParseOrSemanticError::SemanticError (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				ParseOrSemanticError::SemanticError (
 					crate::lightning_invoice::SemanticError::native_into(a_nonref),
 				)
@@ -658,7 +658,7 @@ pub extern "C" fn Invoice_free(this_obj: Invoice) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Invoice_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInvoice); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeInvoice) };
 }
 #[allow(unused)]
 impl Invoice {
@@ -751,7 +751,7 @@ pub extern "C" fn SignedRawInvoice_free(this_obj: SignedRawInvoice) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn SignedRawInvoice_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeSignedRawInvoice); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeSignedRawInvoice) };
 }
 #[allow(unused)]
 impl SignedRawInvoice {
@@ -844,7 +844,7 @@ pub extern "C" fn RawInvoice_free(this_obj: RawInvoice) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RawInvoice_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRawInvoice); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeRawInvoice) };
 }
 #[allow(unused)]
 impl RawInvoice {
@@ -944,7 +944,7 @@ pub extern "C" fn RawDataPart_free(this_obj: RawDataPart) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RawDataPart_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRawDataPart); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeRawDataPart) };
 }
 #[allow(unused)]
 impl RawDataPart {
@@ -1049,7 +1049,7 @@ pub extern "C" fn PositiveTimestamp_free(this_obj: PositiveTimestamp) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PositiveTimestamp_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePositiveTimestamp); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativePositiveTimestamp) };
 }
 #[allow(unused)]
 impl PositiveTimestamp {
@@ -1339,7 +1339,7 @@ pub extern "C" fn Sha256_free(this_obj: Sha256) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Sha256_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeSha256); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeSha256) };
 }
 #[allow(unused)]
 impl Sha256 {
@@ -1431,7 +1431,7 @@ pub extern "C" fn Description_free(this_obj: Description) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Description_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDescription); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeDescription) };
 }
 #[allow(unused)]
 impl Description {
@@ -1520,7 +1520,7 @@ pub extern "C" fn PayeePubKey_free(this_obj: PayeePubKey) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PayeePubKey_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePayeePubKey); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativePayeePubKey) };
 }
 #[allow(unused)]
 impl PayeePubKey {
@@ -1627,7 +1627,7 @@ pub extern "C" fn ExpiryTime_free(this_obj: ExpiryTime) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ExpiryTime_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeExpiryTime); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeExpiryTime) };
 }
 #[allow(unused)]
 impl ExpiryTime {
@@ -1716,7 +1716,7 @@ pub extern "C" fn MinFinalCltvExpiry_free(this_obj: MinFinalCltvExpiry) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn MinFinalCltvExpiry_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeMinFinalCltvExpiry); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeMinFinalCltvExpiry) };
 }
 #[allow(unused)]
 impl MinFinalCltvExpiry {
@@ -1795,7 +1795,7 @@ pub extern "C" fn MinFinalCltvExpiry_eq(a: &MinFinalCltvExpiry, b: &MinFinalCltv
 #[repr(C)]
 pub enum Fallback {
 	SegWitProgram {
-		version: crate::c_types::u5,
+		version: crate::c_types::U5,
 		program: crate::c_types::derived::CVec_u8Z,
 	},
 	PubKeyHash(
@@ -1811,8 +1811,8 @@ impl Fallback {
 	pub(crate) fn to_native(&self) -> nativeFallback {
 		match self {
 			Fallback::SegWitProgram {ref version, ref program, } => {
-				let mut version_nonref = (*version).clone();
-				let mut program_nonref = (*program).clone();
+				let mut version_nonref = Clone::clone(version);
+				let mut program_nonref = Clone::clone(program);
 				let mut local_program_nonref = Vec::new(); for mut item in program_nonref.into_rust().drain(..) { local_program_nonref.push( { item }); };
 				nativeFallback::SegWitProgram {
 					version: version_nonref.into(),
@@ -1820,13 +1820,13 @@ impl Fallback {
 				}
 			},
 			Fallback::PubKeyHash (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeFallback::PubKeyHash (
 					a_nonref.data,
 				)
 			},
 			Fallback::ScriptHash (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeFallback::ScriptHash (
 					a_nonref.data,
 				)
@@ -1859,8 +1859,8 @@ impl Fallback {
 	pub(crate) fn from_native(native: &nativeFallback) -> Self {
 		match native {
 			nativeFallback::SegWitProgram {ref version, ref program, } => {
-				let mut version_nonref = (*version).clone();
-				let mut program_nonref = (*program).clone();
+				let mut version_nonref = Clone::clone(version);
+				let mut program_nonref = Clone::clone(program);
 				let mut local_program_nonref = Vec::new(); for mut item in program_nonref.drain(..) { local_program_nonref.push( { item }); };
 				Fallback::SegWitProgram {
 					version: version_nonref.into(),
@@ -1868,13 +1868,13 @@ impl Fallback {
 				}
 			},
 			nativeFallback::PubKeyHash (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				Fallback::PubKeyHash (
 					crate::c_types::TwentyBytes { data: a_nonref },
 				)
 			},
 			nativeFallback::ScriptHash (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				Fallback::ScriptHash (
 					crate::c_types::TwentyBytes { data: a_nonref },
 				)
@@ -1914,7 +1914,7 @@ pub extern "C" fn Fallback_clone(orig: &Fallback) -> Fallback {
 }
 #[no_mangle]
 /// Utility method to constructs a new SegWitProgram-variant Fallback
-pub extern "C" fn Fallback_seg_wit_program(version: crate::c_types::u5, program: crate::c_types::derived::CVec_u8Z) -> Fallback {
+pub extern "C" fn Fallback_seg_wit_program(version: crate::c_types::U5, program: crate::c_types::derived::CVec_u8Z) -> Fallback {
 	Fallback::SegWitProgram {
 		version,
 		program,
@@ -1978,7 +1978,7 @@ pub extern "C" fn InvoiceSignature_free(this_obj: InvoiceSignature) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn InvoiceSignature_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeInvoiceSignature); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeInvoiceSignature) };
 }
 #[allow(unused)]
 impl InvoiceSignature {
@@ -2071,7 +2071,7 @@ pub extern "C" fn PrivateRoute_free(this_obj: PrivateRoute) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PrivateRoute_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativePrivateRoute); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativePrivateRoute) };
 }
 #[allow(unused)]
 impl PrivateRoute {
@@ -2874,7 +2874,7 @@ impl SignOrCreationError {
 				)
 			},
 			SignOrCreationError::CreationError (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				nativeSignOrCreationError::CreationError (
 					a_nonref.into_native(),
 				)
@@ -2902,7 +2902,7 @@ impl SignOrCreationError {
 			nativeSignOrCreationError::SignError (ref a, ) => {
 				SignOrCreationError::SignError			},
 			nativeSignOrCreationError::CreationError (ref a, ) => {
-				let mut a_nonref = (*a).clone();
+				let mut a_nonref = Clone::clone(a);
 				SignOrCreationError::CreationError (
 					crate::lightning_invoice::CreationError::native_into(a_nonref),
 				)

@@ -4,6 +4,7 @@
 pub mod derived;
 
 use bitcoin::Transaction as BitcoinTransaction;
+use bitcoin::Witness as BitcoinWitness;
 use bitcoin::hashes::Hash;
 use bitcoin::secp256k1::PublicKey as SecpPublicKey;
 use bitcoin::secp256k1::SecretKey as SecpSecretKey;
@@ -41,13 +42,42 @@ impl From<core::convert::Infallible> for NotConstructable {
 #[derive(PartialEq, Eq, Copy, Clone)]
 #[allow(non_camel_case_types)]
 #[repr(C)]
-pub struct u5(u8);
+pub struct U5(u8);
 
-impl From<bech32::u5> for u5 {
+impl From<bech32::u5> for U5 {
 	fn from(o: bech32::u5) -> Self { Self(o.to_u8()) }
 }
-impl Into<bech32::u5> for u5 {
+impl Into<bech32::u5> for U5 {
 	fn into(self) -> bech32::u5 { bech32::u5::try_from_u8(self.0).expect("u5 objects must be in the range 0..32") }
+}
+
+/// Unsigned, 128-bit integer.
+///
+/// Because LLVM implements an incorrect ABI for 128-bit integers, a wrapper type is defined here.
+/// See https://github.com/rust-lang/rust/issues/54341 for more details.
+#[derive(PartialEq, Eq, Copy, Clone)]
+#[allow(non_camel_case_types)]
+#[repr(C)]
+pub struct U128 {
+	/// The 128-bit integer, as 16 little-endian bytes
+	pub le_bytes: [u8; 16],
+}
+
+#[no_mangle]
+/// Gets the 128-bit integer, as 16 little-endian bytes
+pub extern "C" fn U128_le_bytes(val: U128) -> SixteenBytes { SixteenBytes { data: val.le_bytes } }
+#[no_mangle]
+/// Constructs a new U128 from 16 little-endian bytes
+pub extern "C" fn U128_new(le_bytes: SixteenBytes) -> U128 { U128 { le_bytes: le_bytes.data } }
+
+impl From<u128> for U128 {
+	fn from(o: u128) -> Self { Self { le_bytes: o.to_le_bytes() } }
+}
+impl From<&mut u128> for U128 {
+	fn from(o: &mut u128) -> U128 { Self::from(*o) }
+}
+impl Into<u128> for U128 {
+	fn into(self) -> u128 { u128::from_le_bytes(self.le_bytes) }
 }
 
 /// Integer in the range `0..=16`
@@ -431,6 +461,57 @@ impl Clone for Transaction {
 /// Frees the data buffer, if data_is_owned is set and datalen > 0.
 pub extern "C" fn Transaction_free(_res: Transaction) { }
 
+#[repr(C)]
+/// A serialized witness.
+pub struct Witness {
+	/// The serialized transaction data.
+	///
+	/// This is non-const for your convenience, an object passed to Rust is never written to.
+	pub data: *mut u8,
+	/// The length of the serialized transaction
+	pub datalen: usize,
+	/// Whether the data pointed to by `data` should be freed or not.
+	pub data_is_owned: bool,
+}
+impl Witness {
+	fn from_vec(vec: Vec<u8>) -> Self {
+		let datalen = vec.len();
+		let data = Box::into_raw(vec.into_boxed_slice());
+		Self {
+			data: unsafe { (*data).as_mut_ptr() },
+			datalen,
+			data_is_owned: true,
+		}
+	}
+	pub(crate) fn into_bitcoin(&self) -> BitcoinWitness {
+		::bitcoin::consensus::encode::deserialize(unsafe { core::slice::from_raw_parts(self.data, self.datalen) }).unwrap()
+	}
+	pub(crate) fn from_bitcoin(btc: &BitcoinWitness) -> Self {
+		let vec = ::bitcoin::consensus::encode::serialize(btc);
+		Self::from_vec(vec)
+	}
+}
+
+impl Drop for Witness {
+	fn drop(&mut self) {
+		if self.data_is_owned && self.datalen != 0 {
+			let _ = derived::CVec_u8Z { data: self.data as *mut u8, datalen: self.datalen };
+		}
+	}
+}
+impl Clone for Witness {
+	fn clone(&self) -> Self {
+		let sl = unsafe { core::slice::from_raw_parts(self.data, self.datalen) };
+		let mut v = Vec::new();
+		v.extend_from_slice(&sl);
+		Self::from_vec(v)
+	}
+}
+
+#[no_mangle]
+/// Frees the data pointed to by data
+pub extern "C" fn Witness_free(_res: Witness) { }
+
 pub(crate) fn bitcoin_to_C_outpoint(outpoint: ::bitcoin::blockdata::transaction::OutPoint) -> crate::lightning::chain::transaction::OutPoint {
 	crate::lightning::chain::transaction::OutPoint_new(ThirtyTwoBytes { data: outpoint.txid.into_inner() }, outpoint.vout.try_into().unwrap())
 }
@@ -676,10 +757,10 @@ impl<O, E> Drop for CResultTempl<O, E> {
 	fn drop(&mut self) {
 		if self.result_ok {
 			if unsafe { !self.contents.result.is_null() } {
-				unsafe { Box::from_raw(self.contents.result) };
+				let _ = unsafe { Box::from_raw(self.contents.result) };
 			}
 		} else if unsafe { !self.contents.err.is_null() } {
-			unsafe { Box::from_raw(self.contents.err) };
+			let _ = unsafe { Box::from_raw(self.contents.err) };
 		}
 	}
 }
@@ -780,7 +861,7 @@ impl<T> SmartPtr<T> {
 impl<T> Drop for SmartPtr<T> {
 	fn drop(&mut self) {
 		if self.ptr != core::ptr::null_mut() {
-			unsafe { Box::from_raw(self.ptr); }
+			let _ = unsafe { Box::from_raw(self.ptr) };
 		}
 	}
 }

@@ -17,6 +17,24 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
+/// Maximum number of one-way in-flight HTLC (protocol-level value).
+
+#[no_mangle]
+pub static MAX_HTLCS: u16 = lightning::ln::chan_utils::MAX_HTLCS;
+/// The weight of a BIP141 witnessScript for a BOLT3's \"offered HTLC output\" on a commitment transaction, non-anchor variant.
+
+#[no_mangle]
+pub static OFFERED_HTLC_SCRIPT_WEIGHT: usize = lightning::ln::chan_utils::OFFERED_HTLC_SCRIPT_WEIGHT;
+/// The weight of a BIP141 witnessScript for a BOLT3's \"offered HTLC output\" on a commitment transaction, anchor variant.
+
+#[no_mangle]
+pub static OFFERED_HTLC_SCRIPT_WEIGHT_ANCHORS: usize = lightning::ln::chan_utils::OFFERED_HTLC_SCRIPT_WEIGHT_ANCHORS;
+/// The weight of a BIP141 witnessScript for a BOLT3's \"received HTLC output\" can vary in function of its CLTV argument value.
+/// We define a range that encompasses both its non-anchors and anchors variants.
+/// This is the maximum post-anchor value.
+
+#[no_mangle]
+pub static MAX_ACCEPTED_HTLC_SCRIPT_WEIGHT: usize = lightning::ln::chan_utils::MAX_ACCEPTED_HTLC_SCRIPT_WEIGHT;
 /// Gets the weight for an HTLC-Success transaction.
 #[no_mangle]
 pub extern "C" fn htlc_success_tx_weight(mut opt_anchors: bool) -> u64 {
@@ -29,6 +47,107 @@ pub extern "C" fn htlc_success_tx_weight(mut opt_anchors: bool) -> u64 {
 pub extern "C" fn htlc_timeout_tx_weight(mut opt_anchors: bool) -> u64 {
 	let mut ret = lightning::ln::chan_utils::htlc_timeout_tx_weight(opt_anchors);
 	ret
+}
+
+/// Describes the type of HTLC claim as determined by analyzing the witness.
+#[derive(Clone)]
+#[must_use]
+#[repr(C)]
+pub enum HTLCClaim {
+	/// Claims an offered output on a commitment transaction through the timeout path.
+	OfferedTimeout,
+	/// Claims an offered output on a commitment transaction through the success path.
+	OfferedPreimage,
+	/// Claims an accepted output on a commitment transaction through the timeout path.
+	AcceptedTimeout,
+	/// Claims an accepted output on a commitment transaction through the success path.
+	AcceptedPreimage,
+	/// Claims an offered/accepted output on a commitment transaction through the revocation path.
+	Revocation,
+}
+use lightning::ln::chan_utils::HTLCClaim as HTLCClaimImport;
+pub(crate) type nativeHTLCClaim = HTLCClaimImport;
+
+impl HTLCClaim {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeHTLCClaim {
+		match self {
+			HTLCClaim::OfferedTimeout => nativeHTLCClaim::OfferedTimeout,
+			HTLCClaim::OfferedPreimage => nativeHTLCClaim::OfferedPreimage,
+			HTLCClaim::AcceptedTimeout => nativeHTLCClaim::AcceptedTimeout,
+			HTLCClaim::AcceptedPreimage => nativeHTLCClaim::AcceptedPreimage,
+			HTLCClaim::Revocation => nativeHTLCClaim::Revocation,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeHTLCClaim {
+		match self {
+			HTLCClaim::OfferedTimeout => nativeHTLCClaim::OfferedTimeout,
+			HTLCClaim::OfferedPreimage => nativeHTLCClaim::OfferedPreimage,
+			HTLCClaim::AcceptedTimeout => nativeHTLCClaim::AcceptedTimeout,
+			HTLCClaim::AcceptedPreimage => nativeHTLCClaim::AcceptedPreimage,
+			HTLCClaim::Revocation => nativeHTLCClaim::Revocation,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeHTLCClaim) -> Self {
+		match native {
+			nativeHTLCClaim::OfferedTimeout => HTLCClaim::OfferedTimeout,
+			nativeHTLCClaim::OfferedPreimage => HTLCClaim::OfferedPreimage,
+			nativeHTLCClaim::AcceptedTimeout => HTLCClaim::AcceptedTimeout,
+			nativeHTLCClaim::AcceptedPreimage => HTLCClaim::AcceptedPreimage,
+			nativeHTLCClaim::Revocation => HTLCClaim::Revocation,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeHTLCClaim) -> Self {
+		match native {
+			nativeHTLCClaim::OfferedTimeout => HTLCClaim::OfferedTimeout,
+			nativeHTLCClaim::OfferedPreimage => HTLCClaim::OfferedPreimage,
+			nativeHTLCClaim::AcceptedTimeout => HTLCClaim::AcceptedTimeout,
+			nativeHTLCClaim::AcceptedPreimage => HTLCClaim::AcceptedPreimage,
+			nativeHTLCClaim::Revocation => HTLCClaim::Revocation,
+		}
+	}
+}
+/// Creates a copy of the HTLCClaim
+#[no_mangle]
+pub extern "C" fn HTLCClaim_clone(orig: &HTLCClaim) -> HTLCClaim {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new OfferedTimeout-variant HTLCClaim
+pub extern "C" fn HTLCClaim_offered_timeout() -> HTLCClaim {
+	HTLCClaim::OfferedTimeout}
+#[no_mangle]
+/// Utility method to constructs a new OfferedPreimage-variant HTLCClaim
+pub extern "C" fn HTLCClaim_offered_preimage() -> HTLCClaim {
+	HTLCClaim::OfferedPreimage}
+#[no_mangle]
+/// Utility method to constructs a new AcceptedTimeout-variant HTLCClaim
+pub extern "C" fn HTLCClaim_accepted_timeout() -> HTLCClaim {
+	HTLCClaim::AcceptedTimeout}
+#[no_mangle]
+/// Utility method to constructs a new AcceptedPreimage-variant HTLCClaim
+pub extern "C" fn HTLCClaim_accepted_preimage() -> HTLCClaim {
+	HTLCClaim::AcceptedPreimage}
+#[no_mangle]
+/// Utility method to constructs a new Revocation-variant HTLCClaim
+pub extern "C" fn HTLCClaim_revocation() -> HTLCClaim {
+	HTLCClaim::Revocation}
+/// Checks if two HTLCClaims contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn HTLCClaim_eq(a: &HTLCClaim, b: &HTLCClaim) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
+/// Check if a given input witness attempts to claim a HTLC.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn HTLCClaim_from_witness(mut witness: crate::c_types::Witness) -> crate::c_types::derived::COption_HTLCClaimZ {
+	let mut ret = lightning::ln::chan_utils::HTLCClaim::from_witness(&witness.into_bitcoin());
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_HTLCClaimZ::None } else { crate::c_types::derived::COption_HTLCClaimZ::Some( { crate::lightning::ln::chan_utils::HTLCClaim::native_into(ret.unwrap()) }) };
+	local_ret
 }
 
 /// Build the commitment secret from the seed and the commitment number
@@ -82,7 +201,7 @@ pub extern "C" fn CounterpartyCommitmentSecrets_free(this_obj: CounterpartyCommi
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CounterpartyCommitmentSecrets_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeCounterpartyCommitmentSecrets); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeCounterpartyCommitmentSecrets) };
 }
 #[allow(unused)]
 impl CounterpartyCommitmentSecrets {
@@ -176,27 +295,19 @@ pub extern "C" fn CounterpartyCommitmentSecrets_read(ser: crate::c_types::u8slic
 }
 /// Derives a per-commitment-transaction private key (eg an htlc key or delayed_payment key)
 /// from the base secret and the per_commitment_point.
-///
-/// Note that this is infallible iff we trust that at least one of the two input keys are randomly
-/// generated (ie our own).
 #[no_mangle]
-pub extern "C" fn derive_private_key(mut per_commitment_point: crate::c_types::PublicKey, base_secret: *const [u8; 32]) -> crate::c_types::derived::CResult_SecretKeyErrorZ {
+pub extern "C" fn derive_private_key(mut per_commitment_point: crate::c_types::PublicKey, base_secret: *const [u8; 32]) -> crate::c_types::SecretKey {
 	let mut ret = lightning::ln::chan_utils::derive_private_key(secp256k1::global::SECP256K1, &per_commitment_point.into_rust(), &::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *base_secret}[..]).unwrap());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::SecretKey::from_rust(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
-	local_ret
+	crate::c_types::SecretKey::from_rust(ret)
 }
 
 /// Derives a per-commitment-transaction public key (eg an htlc key or a delayed_payment key)
 /// from the base point and the per_commitment_key. This is the public equivalent of
 /// derive_private_key - using only public keys to derive a public key instead of private keys.
-///
-/// Note that this is infallible iff we trust that at least one of the two input keys are randomly
-/// generated (ie our own).
 #[no_mangle]
-pub extern "C" fn derive_public_key(mut per_commitment_point: crate::c_types::PublicKey, mut base_point: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_PublicKeyErrorZ {
+pub extern "C" fn derive_public_key(mut per_commitment_point: crate::c_types::PublicKey, mut base_point: crate::c_types::PublicKey) -> crate::c_types::PublicKey {
 	let mut ret = lightning::ln::chan_utils::derive_public_key(secp256k1::global::SECP256K1, &per_commitment_point.into_rust(), &base_point.into_rust());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::PublicKey::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
-	local_ret
+	crate::c_types::PublicKey::from_rust(&ret)
 }
 
 /// Derives a per-commitment-transaction revocation key from its constituent parts.
@@ -205,14 +316,10 @@ pub extern "C" fn derive_public_key(mut per_commitment_point: crate::c_types::Pu
 /// commitment transaction, thus per_commitment_secret always come from cheater
 /// and revocation_base_secret always come from punisher, which is the broadcaster
 /// of the transaction spending with this key knowledge.
-///
-/// Note that this is infallible iff we trust that at least one of the two input keys are randomly
-/// generated (ie our own).
 #[no_mangle]
-pub extern "C" fn derive_private_revocation_key(per_commitment_secret: *const [u8; 32], countersignatory_revocation_base_secret: *const [u8; 32]) -> crate::c_types::derived::CResult_SecretKeyErrorZ {
+pub extern "C" fn derive_private_revocation_key(per_commitment_secret: *const [u8; 32], countersignatory_revocation_base_secret: *const [u8; 32]) -> crate::c_types::SecretKey {
 	let mut ret = lightning::ln::chan_utils::derive_private_revocation_key(secp256k1::global::SECP256K1, &::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *per_commitment_secret}[..]).unwrap(), &::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *countersignatory_revocation_base_secret}[..]).unwrap());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::SecretKey::from_rust(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
-	local_ret
+	crate::c_types::SecretKey::from_rust(ret)
 }
 
 /// Derives a per-commitment-transaction revocation public key from its constituent parts. This is
@@ -227,10 +334,9 @@ pub extern "C" fn derive_private_revocation_key(per_commitment_secret: *const [u
 /// Note that this is infallible iff we trust that at least one of the two input keys are randomly
 /// generated (ie our own).
 #[no_mangle]
-pub extern "C" fn derive_public_revocation_key(mut per_commitment_point: crate::c_types::PublicKey, mut countersignatory_revocation_base_point: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_PublicKeyErrorZ {
+pub extern "C" fn derive_public_revocation_key(mut per_commitment_point: crate::c_types::PublicKey, mut countersignatory_revocation_base_point: crate::c_types::PublicKey) -> crate::c_types::PublicKey {
 	let mut ret = lightning::ln::chan_utils::derive_public_revocation_key(secp256k1::global::SECP256K1, &per_commitment_point.into_rust(), &countersignatory_revocation_base_point.into_rust());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::PublicKey::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
-	local_ret
+	crate::c_types::PublicKey::from_rust(&ret)
 }
 
 
@@ -276,7 +382,7 @@ pub extern "C" fn TxCreationKeys_free(this_obj: TxCreationKeys) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TxCreationKeys_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeTxCreationKeys); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeTxCreationKeys) };
 }
 #[allow(unused)]
 impl TxCreationKeys {
@@ -442,7 +548,7 @@ pub extern "C" fn ChannelPublicKeys_free(this_obj: ChannelPublicKeys) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelPublicKeys_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelPublicKeys); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelPublicKeys) };
 }
 #[allow(unused)]
 impl ChannelPublicKeys {
@@ -593,20 +699,18 @@ pub extern "C" fn ChannelPublicKeys_read(ser: crate::c_types::u8slice) -> crate:
 /// Key set is asymmetric and can't be used as part of counter-signatory set of transactions.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn TxCreationKeys_derive_new(mut per_commitment_point: crate::c_types::PublicKey, mut broadcaster_delayed_payment_base: crate::c_types::PublicKey, mut broadcaster_htlc_base: crate::c_types::PublicKey, mut countersignatory_revocation_base: crate::c_types::PublicKey, mut countersignatory_htlc_base: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_TxCreationKeysErrorZ {
+pub extern "C" fn TxCreationKeys_derive_new(mut per_commitment_point: crate::c_types::PublicKey, mut broadcaster_delayed_payment_base: crate::c_types::PublicKey, mut broadcaster_htlc_base: crate::c_types::PublicKey, mut countersignatory_revocation_base: crate::c_types::PublicKey, mut countersignatory_htlc_base: crate::c_types::PublicKey) -> crate::lightning::ln::chan_utils::TxCreationKeys {
 	let mut ret = lightning::ln::chan_utils::TxCreationKeys::derive_new(secp256k1::global::SECP256K1, &per_commitment_point.into_rust(), &broadcaster_delayed_payment_base.into_rust(), &broadcaster_htlc_base.into_rust(), &countersignatory_revocation_base.into_rust(), &countersignatory_htlc_base.into_rust());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::TxCreationKeys { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
-	local_ret
+	crate::lightning::ln::chan_utils::TxCreationKeys { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Generate per-state keys from channel static keys.
 /// Key set is asymmetric and can't be used as part of counter-signatory set of transactions.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn TxCreationKeys_from_channel_static_keys(mut per_commitment_point: crate::c_types::PublicKey, broadcaster_keys: &crate::lightning::ln::chan_utils::ChannelPublicKeys, countersignatory_keys: &crate::lightning::ln::chan_utils::ChannelPublicKeys) -> crate::c_types::derived::CResult_TxCreationKeysErrorZ {
+pub extern "C" fn TxCreationKeys_from_channel_static_keys(mut per_commitment_point: crate::c_types::PublicKey, broadcaster_keys: &crate::lightning::ln::chan_utils::ChannelPublicKeys, countersignatory_keys: &crate::lightning::ln::chan_utils::ChannelPublicKeys) -> crate::lightning::ln::chan_utils::TxCreationKeys {
 	let mut ret = lightning::ln::chan_utils::TxCreationKeys::from_channel_static_keys(&per_commitment_point.into_rust(), broadcaster_keys.get_native_ref(), countersignatory_keys.get_native_ref(), secp256k1::global::SECP256K1);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::chan_utils::TxCreationKeys { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
-	local_ret
+	crate::lightning::ln::chan_utils::TxCreationKeys { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// The maximum length of a script returned by get_revokeable_redeemscript.
@@ -655,7 +759,7 @@ pub extern "C" fn HTLCOutputInCommitment_free(this_obj: HTLCOutputInCommitment) 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn HTLCOutputInCommitment_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeHTLCOutputInCommitment); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeHTLCOutputInCommitment) };
 }
 #[allow(unused)]
 impl HTLCOutputInCommitment {
@@ -823,9 +927,26 @@ pub extern "C" fn make_funding_redeemscript(mut broadcaster: crate::c_types::Pub
 /// Panics if htlc.transaction_output_index.is_none() (as such HTLCs do not appear in the
 /// commitment transaction).
 #[no_mangle]
-pub extern "C" fn build_htlc_transaction(commitment_txid: *const [u8; 32], mut feerate_per_kw: u32, mut contest_delay: u16, htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, mut opt_anchors: bool, mut broadcaster_delayed_payment_key: crate::c_types::PublicKey, mut revocation_key: crate::c_types::PublicKey) -> crate::c_types::Transaction {
-	let mut ret = lightning::ln::chan_utils::build_htlc_transaction(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*commitment_txid }[..]).unwrap(), feerate_per_kw, contest_delay, htlc.get_native_ref(), opt_anchors, &broadcaster_delayed_payment_key.into_rust(), &revocation_key.into_rust());
+pub extern "C" fn build_htlc_transaction(commitment_txid: *const [u8; 32], mut feerate_per_kw: u32, mut contest_delay: u16, htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, mut opt_anchors: bool, mut use_non_zero_fee_anchors: bool, mut broadcaster_delayed_payment_key: crate::c_types::PublicKey, mut revocation_key: crate::c_types::PublicKey) -> crate::c_types::Transaction {
+	let mut ret = lightning::ln::chan_utils::build_htlc_transaction(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*commitment_txid }[..]).unwrap(), feerate_per_kw, contest_delay, htlc.get_native_ref(), opt_anchors, use_non_zero_fee_anchors, &broadcaster_delayed_payment_key.into_rust(), &revocation_key.into_rust());
 	crate::c_types::Transaction::from_bitcoin(&ret)
+}
+
+/// Returns the witness required to satisfy and spend a HTLC input.
+///
+/// Note that preimage (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn build_htlc_input_witness(mut local_sig: crate::c_types::Signature, mut remote_sig: crate::c_types::Signature, mut preimage: crate::c_types::ThirtyTwoBytes, mut redeem_script: crate::c_types::u8slice, mut opt_anchors: bool) -> crate::c_types::Witness {
+	let mut local_preimage = if preimage.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(preimage.data) }) };
+	let mut ret = lightning::ln::chan_utils::build_htlc_input_witness(&local_sig.into_rust(), &remote_sig.into_rust(), &local_preimage, &::bitcoin::blockdata::script::Script::from(Vec::from(redeem_script.to_slice())), opt_anchors);
+	crate::c_types::Witness::from_bitcoin(&ret)
+}
+
+/// Gets the witnessScript for the to_remote output when anchors are enabled.
+#[no_mangle]
+pub extern "C" fn get_to_countersignatory_with_anchors_redeemscript(mut payment_point: crate::c_types::PublicKey) -> crate::c_types::derived::CVec_u8Z {
+	let mut ret = lightning::ln::chan_utils::get_to_countersignatory_with_anchors_redeemscript(&payment_point.into_rust());
+	ret.into_bytes().into()
 }
 
 /// Gets the witnessScript for an anchor output from the funding public key.
@@ -838,6 +959,13 @@ pub extern "C" fn build_htlc_transaction(commitment_txid: *const [u8; 32], mut f
 pub extern "C" fn get_anchor_redeemscript(mut funding_pubkey: crate::c_types::PublicKey) -> crate::c_types::derived::CVec_u8Z {
 	let mut ret = lightning::ln::chan_utils::get_anchor_redeemscript(&funding_pubkey.into_rust());
 	ret.into_bytes().into()
+}
+
+/// Returns the witness required to satisfy and spend an anchor input.
+#[no_mangle]
+pub extern "C" fn build_anchor_input_witness(mut funding_key: crate::c_types::PublicKey, mut funding_sig: crate::c_types::Signature) -> crate::c_types::Witness {
+	let mut ret = lightning::ln::chan_utils::build_anchor_input_witness(&funding_key.into_rust(), &funding_sig.into_rust());
+	crate::c_types::Witness::from_bitcoin(&ret)
 }
 
 
@@ -877,7 +1005,7 @@ pub extern "C" fn ChannelTransactionParameters_free(this_obj: ChannelTransaction
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeChannelTransactionParameters); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelTransactionParameters) };
 }
 #[allow(unused)]
 impl ChannelTransactionParameters {
@@ -981,13 +1109,31 @@ pub extern "C" fn ChannelTransactionParameters_set_opt_anchors(this_ptr: &mut Ch
 	let mut local_val = if val.is_some() { Some( { () /*val.take()*/ }) } else { None };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.opt_anchors = local_val;
 }
+/// Are non-zero-fee anchors are enabled (used in conjuction with opt_anchors)
+/// It is intended merely for backwards compatibility with signers that need it.
+/// There is no support for this feature in LDK channel negotiation.
+#[no_mangle]
+pub extern "C" fn ChannelTransactionParameters_get_opt_non_zero_fee_anchors(this_ptr: &ChannelTransactionParameters) -> crate::c_types::derived::COption_NoneZ {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().opt_non_zero_fee_anchors;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NoneZ::None } else { crate::c_types::derived::COption_NoneZ::Some /*  { () /**/ } */ };
+	local_inner_val
+}
+/// Are non-zero-fee anchors are enabled (used in conjuction with opt_anchors)
+/// It is intended merely for backwards compatibility with signers that need it.
+/// There is no support for this feature in LDK channel negotiation.
+#[no_mangle]
+pub extern "C" fn ChannelTransactionParameters_set_opt_non_zero_fee_anchors(this_ptr: &mut ChannelTransactionParameters, mut val: crate::c_types::derived::COption_NoneZ) {
+	let mut local_val = if val.is_some() { Some( { () /*val.take()*/ }) } else { None };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.opt_non_zero_fee_anchors = local_val;
+}
 /// Constructs a new ChannelTransactionParameters given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelTransactionParameters_new(mut holder_pubkeys_arg: crate::lightning::ln::chan_utils::ChannelPublicKeys, mut holder_selected_contest_delay_arg: u16, mut is_outbound_from_holder_arg: bool, mut counterparty_parameters_arg: crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters, mut funding_outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut opt_anchors_arg: crate::c_types::derived::COption_NoneZ) -> ChannelTransactionParameters {
+pub extern "C" fn ChannelTransactionParameters_new(mut holder_pubkeys_arg: crate::lightning::ln::chan_utils::ChannelPublicKeys, mut holder_selected_contest_delay_arg: u16, mut is_outbound_from_holder_arg: bool, mut counterparty_parameters_arg: crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters, mut funding_outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut opt_anchors_arg: crate::c_types::derived::COption_NoneZ, mut opt_non_zero_fee_anchors_arg: crate::c_types::derived::COption_NoneZ) -> ChannelTransactionParameters {
 	let mut local_counterparty_parameters_arg = if counterparty_parameters_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(counterparty_parameters_arg.take_inner()) } }) };
 	let mut local_funding_outpoint_arg = if funding_outpoint_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(funding_outpoint_arg.take_inner()) } }) };
 	let mut local_opt_anchors_arg = if opt_anchors_arg.is_some() { Some( { () /*opt_anchors_arg.take()*/ }) } else { None };
+	let mut local_opt_non_zero_fee_anchors_arg = if opt_non_zero_fee_anchors_arg.is_some() { Some( { () /*opt_non_zero_fee_anchors_arg.take()*/ }) } else { None };
 	ChannelTransactionParameters { inner: ObjOps::heap_alloc(nativeChannelTransactionParameters {
 		holder_pubkeys: *unsafe { Box::from_raw(holder_pubkeys_arg.take_inner()) },
 		holder_selected_contest_delay: holder_selected_contest_delay_arg,
@@ -995,6 +1141,7 @@ pub extern "C" fn ChannelTransactionParameters_new(mut holder_pubkeys_arg: crate
 		counterparty_parameters: local_counterparty_parameters_arg,
 		funding_outpoint: local_funding_outpoint_arg,
 		opt_anchors: local_opt_anchors_arg,
+		opt_non_zero_fee_anchors: local_opt_non_zero_fee_anchors_arg,
 	}), is_owned: true }
 }
 impl Clone for ChannelTransactionParameters {
@@ -1049,7 +1196,7 @@ pub extern "C" fn CounterpartyChannelTransactionParameters_free(this_obj: Counte
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CounterpartyChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeCounterpartyChannelTransactionParameters); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeCounterpartyChannelTransactionParameters) };
 }
 #[allow(unused)]
 impl CounterpartyChannelTransactionParameters {
@@ -1216,7 +1363,7 @@ pub extern "C" fn DirectedChannelTransactionParameters_free(this_obj: DirectedCh
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn DirectedChannelTransactionParameters_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeDirectedChannelTransactionParameters); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeDirectedChannelTransactionParameters) };
 }
 #[allow(unused)]
 impl DirectedChannelTransactionParameters {
@@ -1321,7 +1468,7 @@ pub extern "C" fn HolderCommitmentTransaction_free(this_obj: HolderCommitmentTra
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn HolderCommitmentTransaction_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeHolderCommitmentTransaction); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeHolderCommitmentTransaction) };
 }
 #[allow(unused)]
 impl HolderCommitmentTransaction {
@@ -1443,7 +1590,7 @@ pub extern "C" fn BuiltCommitmentTransaction_free(this_obj: BuiltCommitmentTrans
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BuiltCommitmentTransaction_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeBuiltCommitmentTransaction); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeBuiltCommitmentTransaction) };
 }
 #[allow(unused)]
 impl BuiltCommitmentTransaction {
@@ -1589,7 +1736,7 @@ pub extern "C" fn ClosingTransaction_free(this_obj: ClosingTransaction) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ClosingTransaction_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeClosingTransaction); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeClosingTransaction) };
 }
 #[allow(unused)]
 impl ClosingTransaction {
@@ -1750,7 +1897,7 @@ pub extern "C" fn TrustedClosingTransaction_free(this_obj: TrustedClosingTransac
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TrustedClosingTransaction_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeTrustedClosingTransaction); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeTrustedClosingTransaction) };
 }
 #[allow(unused)]
 impl TrustedClosingTransaction {
@@ -1833,7 +1980,7 @@ pub extern "C" fn CommitmentTransaction_free(this_obj: CommitmentTransaction) { 
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CommitmentTransaction_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeCommitmentTransaction); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeCommitmentTransaction) };
 }
 #[allow(unused)]
 impl CommitmentTransaction {
@@ -1983,7 +2130,7 @@ pub extern "C" fn TrustedCommitmentTransaction_free(this_obj: TrustedCommitmentT
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TrustedCommitmentTransaction_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeTrustedCommitmentTransaction); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeTrustedCommitmentTransaction) };
 }
 #[allow(unused)]
 impl TrustedCommitmentTransaction {

@@ -174,7 +174,7 @@ pub extern "C" fn Record_free(this_obj: Record) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Record_free_void(this_ptr: *mut c_void) {
-	unsafe { let _ = Box::from_raw(this_ptr as *mut nativeRecord); }
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeRecord) };
 }
 #[allow(unused)]
 impl Record {

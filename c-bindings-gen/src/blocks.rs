@@ -250,7 +250,7 @@ pub fn write_vec_block<W: std::io::Write>(w: &mut W, mangled_container: &str, in
 	writeln!(w, "impl Drop for {} {{", mangled_container).unwrap();
 	writeln!(w, "\tfn drop(&mut self) {{").unwrap();
 	writeln!(w, "\t\tif self.datalen == 0 {{ return; }}").unwrap();
-	writeln!(w, "\t\tunsafe {{ Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }};").unwrap();
+	writeln!(w, "\t\tlet _ = unsafe {{ Box::from_raw(core::slice::from_raw_parts_mut(self.data, self.datalen)) }};").unwrap();
 	writeln!(w, "\t}}").unwrap();
 	writeln!(w, "}}").unwrap();
 	if clonable {

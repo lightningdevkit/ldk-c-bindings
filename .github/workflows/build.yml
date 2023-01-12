@@ -70,14 +70,14 @@ jobs:
         run: rustup target install aarch64-apple-darwin
       - name: Fetch upstream LLVM/clang snapshot
         run: |
-          wget -O clang+llvm-12.0.0-x86_64-apple-darwin.tar.xz https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/clang+llvm-12.0.0-x86_64-apple-darwin.tar.xz
-          if [ "$(shasum -a 256 clang+llvm-12.0.0-x86_64-apple-darwin.tar.xz | awk '{ print $1 }')" != "7bc2259bf75c003f644882460fc8e844ddb23b27236fe43a2787870a4cd8ab50" ]; then
+          wget -O clang+llvm-15.0.3-x86_64-apple-darwin.tar.xz https://github.com/llvm/llvm-project/releases/download/llvmorg-15.0.3/clang+llvm-15.0.3-x86_64-apple-darwin.tar.xz
+          if [ "$(shasum -a 256 clang+llvm-15.0.3-x86_64-apple-darwin.tar.xz | awk '{ print $1 }')" != "ac668586b2b3d068f1e43520a3ef0b1592e5dc3eff1a4a4b772e29803b428a69" ]; then
             echo "Bad hash"
             exit 1
           fi
       - name: Unpack upstream LLVM+clang and use it by default
         run: |
-          tar xvvf clang+llvm-12.0.0-x86_64-apple-darwin.tar.xz
+          tar xvvf clang+llvm-15.0.3-x86_64-apple-darwin.tar.xz
       - name: Checkout source code
         uses: actions/checkout@v2
         with:
@@ -93,5 +93,5 @@ jobs:
         run: ./genbindings.sh ./rust-lightning true
       - name: Rebuild bindings using upstream clang, and check the sample app builds + links
         run: |
-          export PATH=`pwd`/clang+llvm-12.0.0-x86_64-apple-darwin/bin:$PATH
+          export PATH=`pwd`/clang+llvm-15.0.3-x86_64-apple-darwin/bin:$PATH
           CC=clang ./genbindings.sh ./rust-lightning true

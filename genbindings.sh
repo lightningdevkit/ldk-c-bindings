@@ -338,7 +338,7 @@ if [ "$2" = "true" ]; then
 	strip ./a.out
 	echo " C++ Bin size and runtime w/o optimization:"
 	ls -lha a.out
-	time ./a.out > /dev/null
+	./a.out > /dev/null
 fi
 
 # Then, check with memory sanitizer, if we're on Linux and have rustc nightly
@@ -492,7 +492,7 @@ fi
 strip ./a.out
 echo "C++ Bin size and runtime with only RL (LTO) optimized:"
 ls -lha a.out
-time ./a.out > /dev/null
+./a.out > /dev/null
 
 if [ "$CLANGPP" != "" ]; then
 	# If we can use cross-language LTO, use it for building C dependencies (i.e. libsecp256k1) as well
@@ -564,7 +564,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 			strip ./a.out
 			echo "C++ Bin size and runtime with cross-language LTO:"
 			ls -lha a.out
-			time ./a.out > /dev/null
+			./a.out > /dev/null
 		fi
 	fi
 else

@@ -338,7 +338,7 @@ if [ "$2" = "true" ]; then
 	strip ./a.out
 	echo " C++ Bin size and runtime w/o optimization:"
 	ls -lha a.out
-	time ./a.out > /dev/null
+	./a.out > /dev/null
 fi
 
 # Then, check with memory sanitizer, if we're on Linux and have rustc nightly
@@ -492,7 +492,7 @@ fi
 strip ./a.out
 echo "C++ Bin size and runtime with only RL (LTO) optimized:"
 ls -lha a.out
-time ./a.out > /dev/null
+./a.out > /dev/null
 
 if [ "$CLANGPP" != "" ]; then
 	# If we can use cross-language LTO, use it for building C dependencies (i.e. libsecp256k1) as well
@@ -559,11 +559,12 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 		CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge" cargo build $CARGO_BUILD_ARGS -v --release
 
 		if [ "$2" = "true" ]; then
-			$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -O2 demo.cpp target/release/libldk.a -ldl
+			$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -O2 -c demo.cpp -o demo.o
+			$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -Wl,--lto-O2 -Wl,-O2 -O2 demo.o target/release/libldk.a -ldl
 			strip ./a.out
 			echo "C++ Bin size and runtime with cross-language LTO:"
 			ls -lha a.out
-			time ./a.out > /dev/null
+			./a.out > /dev/null
 		fi
 	fi
 else

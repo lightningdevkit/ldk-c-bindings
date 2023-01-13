@@ -336,9 +336,9 @@ fi
 if [ "$2" = "true" ]; then
 	clang++ $LOCAL_CFLAGS -std=c++11 demo.cpp target/debug/libldk.a -ldl
 	strip ./a.out
+	time ./a.out
 	echo " C++ Bin size and runtime w/o optimization:"
 	ls -lha a.out
-	./a.out > /dev/null
 fi
 
 # Then, check with memory sanitizer, if we're on Linux and have rustc nightly
@@ -490,9 +490,9 @@ if [ "$2" = "true" ]; then
 fi
 
 strip ./a.out
+time ./a.out
 echo "C++ Bin size and runtime with only RL (LTO) optimized:"
 ls -lha a.out
-./a.out > /dev/null
 
 if [ "$CLANGPP" != "" ]; then
 	# If we can use cross-language LTO, use it for building C dependencies (i.e. libsecp256k1) as well
@@ -562,9 +562,9 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 			$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -O2 -c demo.cpp -o demo.o
 			$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -Wl,--lto-O2 -Wl,-O2 -O2 demo.o target/release/libldk.a -ldl
 			strip ./a.out
+			time ./a.out
 			echo "C++ Bin size and runtime with cross-language LTO:"
 			ls -lha a.out
-			./a.out > /dev/null
 		fi
 	fi
 else

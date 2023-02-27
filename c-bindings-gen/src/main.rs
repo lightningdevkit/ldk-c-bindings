@@ -1733,7 +1733,6 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 				write!(w, ")").unwrap();
 			}
 		}
-		if var.discriminant.is_some() { unimplemented!(); }
 		write!(&mut constr, ") -> {} {{\n\t{}::{}", e.ident, e.ident, var.ident).unwrap();
 		if let syn::Fields::Named(fields) = &var.fields {
 			writeln!(&mut constr, " {{").unwrap();

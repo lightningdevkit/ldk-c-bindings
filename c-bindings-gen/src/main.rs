@@ -600,18 +600,31 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		(s, i, generic_args) => {
 			if let Some(supertrait) = types.crate_types.traits.get(s) {
 				let resolver = get_module_type_resolver!(s, types.crate_libs, types.crate_types);
+				macro_rules! impl_supertrait {
+					($s: expr, $supertrait: expr, $i: expr, $generic_args: expr) => {
+						let resolver = get_module_type_resolver!($s, types.crate_libs, types.crate_types);
 
-				// Blindly assume that the same imports where `supertrait` is defined are also
-				// imported here. This will almost certainly break at some point, but it should be
-				// a compilation failure when it does so.
-				write!(w, "impl").unwrap();
-				maybe_write_lifetime_generics(w, &supertrait.generics, types);
-				write!(w, " {}", s).unwrap();
-				maybe_write_generics(w, &supertrait.generics, generic_args, types, false);
-				writeln!(w, " for {} {{", trait_name).unwrap();
+						// Blindly assume that the same imports where `supertrait` is defined are also
+						// imported here. This will almost certainly break at some point, but it should be
+						// a compilation failure when it does so.
+						write!(w, "impl").unwrap();
+						maybe_write_lifetime_generics(w, &$supertrait.generics, types);
+						write!(w, " {}", $s).unwrap();
+						maybe_write_generics(w, &$supertrait.generics, $generic_args, types, false);
+						writeln!(w, " for {} {{", trait_name).unwrap();
 
-				impl_trait_for_c!(supertrait, format!(".{}", i), &resolver, generic_args);
-				writeln!(w, "}}").unwrap();
+						impl_trait_for_c!($supertrait, format!(".{}", $i), &resolver, $generic_args);
+						writeln!(w, "}}").unwrap();
+					}
+				}
+				impl_supertrait!(s, supertrait, i, generic_args);
+				walk_supertraits!(supertrait, Some(&resolver), (
+					(s, supertrait_i, generic_args) => {
+						if let Some(supertrait) = types.crate_types.traits.get(s) {
+							impl_supertrait!(s, supertrait, format!("{}.{}", i, supertrait_i), generic_args);
+						}
+					}
+				) );
 			} else {
 				do_write_impl_trait(w, s, i, &trait_name);
 			}
@@ -1061,17 +1074,38 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 							("core::fmt::Debug", _, _) => {},
 							(s, t, _) => {
 								if let Some(supertrait_obj) = types.crate_types.traits.get(s) {
-									writeln!(w, "\t\t{}: crate::{} {{", t, s).unwrap();
-									writeln!(w, "\t\t\tthis_arg: unsafe {{ ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void }},").unwrap();
-									writeln!(w, "\t\t\tfree: None,").unwrap();
-									for item in supertrait_obj.items.iter() {
-										match item {
-											syn::TraitItem::Method(m) => {
-												write_meth!(m, supertrait_obj, "\t");
+									macro_rules! write_impl_fields {
+										($s: expr, $supertrait_obj: expr, $t: expr, $pfx: expr, $resolver: expr) => {
+											writeln!(w, "{}\t{}: crate::{} {{", $pfx, $t, $s).unwrap();
+											writeln!(w, "{}\t\tthis_arg: unsafe {{ ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void }},", $pfx).unwrap();
+											writeln!(w, "{}\t\tfree: None,", $pfx).unwrap();
+											for item in $supertrait_obj.items.iter() {
+												match item {
+													syn::TraitItem::Method(m) => {
+														write_meth!(m, $supertrait_obj, $pfx);
+													},
+													_ => {},
+												}
+											}
+										walk_supertraits!($supertrait_obj, Some(&$resolver), (
+											("Clone", _, _) => {
+												writeln!(w, "{}\tcloned: Some({}_{}_cloned),", $pfx, $supertrait_obj.ident, ident).unwrap();
 											},
-											_ => {},
+											(_, _, _) => {}
+										) );
 										}
 									}
+									write_impl_fields!(s, supertrait_obj, t, "\t", types);
+
+									let resolver = get_module_type_resolver!(s, types.crate_libs, types.crate_types);
+									walk_supertraits!(supertrait_obj, Some(&resolver), (
+										(s, t, _) => {
+											if let Some(supertrait_obj) = types.crate_types.traits.get(s) {
+												write_impl_fields!(s, supertrait_obj, t, "\t\t", resolver);
+												write!(w, "\t\t\t}},\n").unwrap();
+											}
+										}
+									) );
 									write!(w, "\t\t}},\n").unwrap();
 								} else {
 									write_trait_impl_field_assign(w, s, ident);

@@ -1010,7 +1010,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction"),
 			"bitcoin::Witness" => Some("crate::c_types::Witness"),
-			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut"),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network"),
 			"bitcoin::util::address::WitnessVersion" => Some("crate::c_types::WitnessVersion"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref  => Some("*const [u8; 80]"),
@@ -1022,9 +1022,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref => Some("*const [u8; 32]"),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if is_ref  => Some("*const [u8; 32]"),
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
@@ -1105,7 +1105,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::Witness" if is_ref => Some("&"),
 			"bitcoin::Witness" => Some(""),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::C_to_bitcoin_outpoint("),
-			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(""),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(""),
 			"bitcoin::network::constants::Network" => Some(""),
 			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" => Some("&::bitcoin::consensus::encode::deserialize(unsafe { &*"),
@@ -1123,7 +1123,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// Newtypes that we just expose in their original form.
 			"bitcoin::hash_types::Txid" if is_ref => Some("&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*"),
 			"bitcoin::hash_types::Txid" if !is_ref => Some("::bitcoin::hash_types::Txid::from_slice(&"),
-			"bitcoin::hash_types::BlockHash" => Some("::bitcoin::hash_types::BlockHash::from_slice(&"),
+			"bitcoin::hash_types::BlockHash"|"bitcoin::BlockHash" => Some("::bitcoin::hash_types::BlockHash::from_slice(&"),
+			"bitcoin::blockdata::constants::ChainHash" => Some("::bitcoin::blockdata::constants::ChainHash::from_slice(&"),
 			"lightning::ln::PaymentHash" if !is_ref => Some("::lightning::ln::PaymentHash("),
 			"lightning::ln::PaymentHash" if is_ref => Some("&::lightning::ln::PaymentHash(unsafe { *"),
 			"lightning::ln::PaymentPreimage" if !is_ref => Some("::lightning::ln::PaymentPreimage("),
@@ -1196,7 +1197,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(".into_bitcoin()"),
 			"bitcoin::Witness" => Some(".into_bitcoin()"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
-			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(".into_rust()"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(".into_rust()"),
 			"bitcoin::network::constants::Network" => Some(".into_bitcoin()"),
 			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" => Some(" }).unwrap()"),
@@ -1209,7 +1210,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// Newtypes that we just expose in their original form.
 			"bitcoin::hash_types::Txid" if is_ref => Some(" }[..]).unwrap()"),
 			"bitcoin::hash_types::Txid" => Some(".data[..]).unwrap()"),
-			"bitcoin::hash_types::BlockHash" if !is_ref => Some(".data[..]).unwrap()"),
+			"bitcoin::hash_types::BlockHash"|"bitcoin::BlockHash"|"bitcoin::blockdata::constants::ChainHash" if !is_ref => Some(".data[..]).unwrap()"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
 			|"lightning::chain::keysinterface::KeyMaterial"
@@ -1299,7 +1300,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::Witness" if is_ref => Some("crate::c_types::Witness::from_bitcoin("),
 			"bitcoin::Witness" if !is_ref => Some("crate::c_types::Witness::from_bitcoin(&"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::bitcoin_to_C_outpoint("),
-			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network::from_bitcoin("),
 			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some("&local_"),
@@ -1308,9 +1309,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if is_ref => Some(""),
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
@@ -1383,7 +1384,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(")"),
 			"bitcoin::Witness" => Some(")"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
-			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(")"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(")"),
 			"bitcoin::network::constants::Network" => Some(")"),
 			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some(""),
@@ -1392,9 +1393,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if !is_ref => Some(".into_inner() }"),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if is_ref => Some(".as_inner()"),
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if !is_ref => Some(".into_inner() }"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
@@ -1498,7 +1499,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							"lightning::ln::PaymentHash" => true,
 							"lightning::ln::PaymentPreimage" => true,
 							"lightning::ln::channelmanager::PaymentId" => true,
-							"bitcoin::hash_types::BlockHash" => true,
+							"bitcoin::hash_types::BlockHash"|"bitcoin::BlockHash" => true,
 							"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => true,
 							_ => false,
 						}

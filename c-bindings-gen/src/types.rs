@@ -668,7 +668,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				// Now that we've resolved the path to the path as-imported, check whether the path
 				// is actually a pub(.*) use statement and map it to the real path.
 				let path_tmp = path.clone();
-				let crate_name = path_tmp.splitn(1, "::").next().unwrap();
+				let crate_name = path_tmp.splitn(2, "::").next().unwrap();
 				let mut module_riter = path_tmp.rsplitn(2, "::");
 				let obj = module_riter.next().unwrap();
 				if let Some(module_path) = module_riter.next() {

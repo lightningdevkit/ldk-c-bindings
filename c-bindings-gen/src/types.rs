@@ -2377,7 +2377,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					write!(w, "let mut local_{}{} = ", ident,
 						if (!to_c && needs_ref_map) || (to_c && $container_type == "Option" && contains_slice) {"_base"} else { "" }).unwrap();
 					if prefix_location == ContainerPrefixLocation::OutsideConv {
-						var_prefix(w, $args_iter().next().unwrap(), generics, is_ref, ptr_for_ref, true);
+						var_prefix(w, $args_iter().next().unwrap(), generics, is_ref, true, true);
 					}
 					write!(w, "{}{}", prefix, var).unwrap();
 

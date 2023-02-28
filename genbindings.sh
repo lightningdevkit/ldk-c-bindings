@@ -571,5 +571,5 @@ else
 	if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
 		RUSTFLAGS="$BASE_RUSTFLAGS -C embed-bitcode=yes -C lto -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin
 	fi
-	echo "WARNING: Building with cross-language LTO is not avilable without clang-$RUSTC_LLVM_V"
+	echo "WARNING: Building with cross-language LTO is not avilable without clang-$RUSTC_LLVM_V and lld-$RUSTC_LLVM_V"
 fi

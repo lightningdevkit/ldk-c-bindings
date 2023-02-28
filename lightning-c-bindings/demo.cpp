@@ -242,6 +242,14 @@ public:
 		PeerManager_disconnect_by_node_id(&net1, ChannelManager_get_our_node_id(&cm2));
 		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));
 
+		while (true) {
+			// Wait for the new connection handshake...
+			LDK::CVec_C2Tuple_PublicKeyCOption_NetAddressZZZ peers_1 = PeerManager_get_peer_node_ids(&net1);
+			LDK::CVec_C2Tuple_PublicKeyCOption_NetAddressZZZ peers_2 = PeerManager_get_peer_node_ids(&net2);
+			if (peers_1->datalen == 1 && peers_2->datalen == 1) { break; }
+			std::this_thread::yield();
+		}
+
 		// Wait for all our sockets to disconnect (making sure we disconnect any new connections)...
 		while (true) {
 			PeerManager_disconnect_by_node_id(&net1, ChannelManager_get_our_node_id(&cm2));

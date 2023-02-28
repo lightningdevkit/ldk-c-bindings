@@ -2104,11 +2104,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				} else { unimplemented!(); }
 			},
 			syn::Type::Array(a) => {
-				// We assume all arrays contain only [int_literal; X]s.
-				// This may result in some outputs not compiling.
-				if let syn::Expr::Lit(l) = &a.len {
-					if let syn::Lit::Int(i) = &l.lit {
-						write!(w, "{}", path_lookup(&format!("[u8; {}]", i.base10_digits()), is_ref, ptr_for_ref).unwrap()).unwrap();
+				if let syn::Type::Path(p) = &*a.elem {
+					let inner_ty = self.resolve_path(&p.path, generics);
+					if let syn::Expr::Lit(l) = &a.len {
+						if let syn::Lit::Int(i) = &l.lit {
+							write!(w, "{}", path_lookup(&format!("[{}; {}]", inner_ty, i.base10_digits()), is_ref, ptr_for_ref).unwrap()).unwrap();
+						} else { unimplemented!(); }
 					} else { unimplemented!(); }
 				} else { unimplemented!(); }
 			},
@@ -2958,15 +2959,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				} else if is_ref {
 					write!(w, "*const [").unwrap();
 					if !self.write_c_type_intern(w, &a.elem, generics, false, false, ptr_for_ref, with_ref_lifetime, c_ty) { return false; }
-				} else {
-					let mut typecheck = Vec::new();
-					if !self.write_c_type_intern(&mut typecheck, &a.elem, generics, false, false, ptr_for_ref, with_ref_lifetime, c_ty) { return false; }
-					if typecheck[..] != ['u' as u8, '8' as u8] { return false; }
 				}
 				if let syn::Expr::Lit(l) = &a.len {
 					if let syn::Lit::Int(i) = &l.lit {
+						let mut inner_ty = Vec::new();
+						if !self.write_c_type_intern(&mut inner_ty, &*a.elem, generics, false, false, ptr_for_ref, false, c_ty) { return false; }
+						let inner_ty_str = String::from_utf8(inner_ty).unwrap();
 						if !is_ref {
-							if let Some(ty) = self.c_type_from_path(&format!("[u8; {}]", i.base10_digits()), false, ptr_for_ref) {
+							if let Some(ty) = self.c_type_from_path(&format!("[{}; {}]", inner_ty_str, i.base10_digits()), false, ptr_for_ref) {
 								write!(w, "{}", ty).unwrap();
 								true
 							} else { false }

@@ -2817,6 +2817,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 								if let syn::Type::Path(p) = &*refelem.elem {
 									write_path!(p, Some(&mut mangled_tuple_type));
 								} else { return false; }
+							} else if let syn::Type::Array(_) = elem {
+								let mut resolved = Vec::new();
+								if !self.write_c_type_intern(&mut resolved, &elem, generics, false, false, true, false, true) { return false; }
+								let array_inner = String::from_utf8(resolved).unwrap();
+								let arr_name = array_inner.split("::").last().unwrap();
+								write!(w, "{}", arr_name).unwrap();
+								write!(mangled_type, "{}", arr_name).unwrap();
 							} else { return false; }
 						}
 						write!(w, "Z").unwrap();

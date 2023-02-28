@@ -805,6 +805,7 @@ fn initial_clonable_types() -> HashSet<String> {
 	res.insert("crate::c_types::SixteenBytes".to_owned());
 	res.insert("crate::c_types::TwentyBytes".to_owned());
 	res.insert("crate::c_types::ThirtyTwoBytes".to_owned());
+	res.insert("crate::c_types::EightU16s".to_owned());
 	res.insert("crate::c_types::SecretKey".to_owned());
 	res.insert("crate::c_types::PublicKey".to_owned());
 	res.insert("crate::c_types::Transaction".to_owned());
@@ -971,6 +972,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some("crate::c_types::TwelveBytes"),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes"),
 			"[u8; 3]" if !is_ref => Some("crate::c_types::ThreeBytes"), // Used for RGB values
+			"[u16; 8]" if !is_ref => Some("crate::c_types::EightU16s"),
 
 			"str" if is_ref => Some("crate::c_types::Str"),
 			"alloc::string::String"|"String" => Some("crate::c_types::Str"),
@@ -1060,6 +1062,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some(""),
 			"[u8; 4]" if !is_ref => Some(""),
 			"[u8; 3]" if !is_ref => Some(""),
+			"[u16; 8]" if !is_ref => Some(""),
 
 			"[u8]" if is_ref => Some(""),
 			"[usize]" if is_ref => Some(""),
@@ -1155,6 +1158,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some(".data"),
 			"[u8; 4]" if !is_ref => Some(".data"),
 			"[u8; 3]" if !is_ref => Some(".data"),
+			"[u16; 8]" if !is_ref => Some(".data"),
 
 			"[u8]" if is_ref => Some(".to_slice()"),
 			"[usize]" if is_ref => Some(".to_slice()"),
@@ -1253,6 +1257,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some("crate::c_types::TwelveBytes { data: "),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes { data: "),
 			"[u8; 3]" if is_ref => Some(""),
+			"[u16; 8]" if !is_ref => Some("crate::c_types::EightU16s { data: "),
 
 			"[u8]" if is_ref => Some("local_"),
 			"[usize]" if is_ref => Some("local_"),
@@ -1338,6 +1343,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some(" }"),
 			"[u8; 4]" if !is_ref => Some(" }"),
 			"[u8; 3]" if is_ref => Some(""),
+			"[u16; 8]" if !is_ref => Some(" }"),
 
 			"[u8]" if is_ref => Some(""),
 			"[usize]" if is_ref => Some(""),

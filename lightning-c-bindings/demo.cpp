@@ -431,7 +431,7 @@ LDKCVec_u8Z custom_msg_bytes(const void *this_arg) {
 }
 LDKStr custom_msg_debug(const void *this_arg) {
 	return LDKStr {
-		.chars = NULL, .len = 0, .chars_is_owned = false
+		.chars = (const unsigned char*) "Custom Message", .len = 14, .chars_is_owned = false
 	};
 }
 

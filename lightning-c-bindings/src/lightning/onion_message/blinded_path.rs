@@ -164,9 +164,9 @@ pub extern "C" fn BlindedHop_clone(orig: &BlindedHop) -> BlindedHop {
 /// Errors if less than two hops are provided or if `node_pk`(s) are invalid.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BlindedPath_new(mut node_pks: crate::c_types::derived::CVec_PublicKeyZ, keys_manager: &crate::lightning::chain::keysinterface::KeysInterface) -> crate::c_types::derived::CResult_BlindedPathNoneZ {
+pub extern "C" fn BlindedPath_new(mut node_pks: crate::c_types::derived::CVec_PublicKeyZ, entropy_source: &crate::lightning::chain::keysinterface::EntropySource) -> crate::c_types::derived::CResult_BlindedPathNoneZ {
 	let mut local_node_pks = Vec::new(); for mut item in node_pks.into_rust().drain(..) { local_node_pks.push( { item.into_rust() }); };
-	let mut ret = lightning::onion_message::blinded_path::BlindedPath::new(&local_node_pks[..], keys_manager, secp256k1::global::SECP256K1);
+	let mut ret = lightning::onion_message::blinded_path::BlindedPath::new(&local_node_pks[..], entropy_source, secp256k1::global::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::onion_message::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }

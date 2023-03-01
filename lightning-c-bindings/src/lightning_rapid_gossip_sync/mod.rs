@@ -49,9 +49,8 @@
 //! # }
 //! # let logger = FakeLogger {};
 //!
-//! let block_hash = genesis_block(Network::Bitcoin).header.block_hash();
-//! let network_graph = NetworkGraph::new(block_hash, &logger);
-//! let rapid_sync = RapidGossipSync::new(&network_graph);
+//! let network_graph = NetworkGraph::new(Network::Bitcoin, &logger);
+//! let rapid_sync = RapidGossipSync::new(&network_graph, &logger);
 //! let snapshot_contents: &[u8] = &[0; 0];
 //! let new_last_sync_timestamp_result = rapid_sync.update_network_graph(snapshot_contents);
 //! ```
@@ -134,21 +133,33 @@ impl RapidGossipSync {
 /// Instantiate a new [`RapidGossipSync`] instance.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RapidGossipSync_new(network_graph: &crate::lightning::routing::gossip::NetworkGraph) -> crate::lightning_rapid_gossip_sync::RapidGossipSync {
-	let mut ret = lightning_rapid_gossip_sync::RapidGossipSync::new(network_graph.get_native_ref());
+pub extern "C" fn RapidGossipSync_new(network_graph: &crate::lightning::routing::gossip::NetworkGraph, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning_rapid_gossip_sync::RapidGossipSync {
+	let mut ret = lightning_rapid_gossip_sync::RapidGossipSync::new(network_graph.get_native_ref(), logger);
 	crate::lightning_rapid_gossip_sync::RapidGossipSync { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Update network graph from binary data.
 /// Returns the last sync timestamp to be used the next time rapid sync data is queried.
 ///
-/// `network_graph`: network graph to be updated
-///
 /// `update_data`: `&[u8]` binary stream that comprises the update data
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RapidGossipSync_update_network_graph(this_arg: &crate::lightning_rapid_gossip_sync::RapidGossipSync, mut update_data: crate::c_types::u8slice) -> crate::c_types::derived::CResult_u32GraphSyncErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_network_graph(update_data.to_slice());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_rapid_gossip_sync::error::GraphSyncError::native_into(e) }).into() };
+	local_ret
+}
+
+/// Update network graph from binary data.
+/// Returns the last sync timestamp to be used the next time rapid sync data is queried.
+///
+/// `update_data`: `&[u8]` binary stream that comprises the update data
+/// `current_time_unix`: `Option<u64>` optional current timestamp to verify data age
+#[must_use]
+#[no_mangle]
+pub extern "C" fn RapidGossipSync_update_network_graph_no_std(this_arg: &crate::lightning_rapid_gossip_sync::RapidGossipSync, mut update_data: crate::c_types::u8slice, mut current_time_unix: crate::c_types::derived::COption_u64Z) -> crate::c_types::derived::CResult_u32GraphSyncErrorZ {
+	let mut local_current_time_unix = if current_time_unix.is_some() { Some( { current_time_unix.take() }) } else { None };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_network_graph_no_std(update_data.to_slice(), local_current_time_unix);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_rapid_gossip_sync::error::GraphSyncError::native_into(e) }).into() };
 	local_ret
 }

@@ -6,7 +6,7 @@
 // license as that which applies to the original source files from which this
 // source was automatically generated.
 
-//! The top-level network map tracking logic lives here.
+//! The [`NetworkGraph`] stores the network gossip and [`P2PGossipSync`] fetches it from peers
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -418,7 +418,7 @@ pub extern "C" fn NetworkUpdate_read(ser: crate::c_types::u8slice) -> crate::c_t
 }
 
 use lightning::routing::gossip::P2PGossipSync as nativeP2PGossipSyncImport;
-pub(crate) type nativeP2PGossipSync = nativeP2PGossipSyncImport<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::chain::Access, crate::lightning::util::logger::Logger>;
+pub(crate) type nativeP2PGossipSync = nativeP2PGossipSyncImport<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::routing::utxo::UtxoLookup, crate::lightning::util::logger::Logger>;
 
 /// Receives and validates network updates from peers,
 /// stores authentic and relevant data as a network graph.
@@ -473,14 +473,13 @@ impl P2PGossipSync {
 }
 /// Creates a new tracker of the actual state of the network of channels and nodes,
 /// assuming an existing Network Graph.
-/// Chain monitor is used to make sure announced channels exist on-chain,
-/// channel data is correct, and that the announcement is signed with
-/// channel owners' keys.
+/// UTXO lookup is used to make sure announced channels exist on-chain, channel data is
+/// correct, and the announcement is signed with channel owners' keys.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn P2PGossipSync_new(network_graph: &crate::lightning::routing::gossip::NetworkGraph, mut chain_access: crate::c_types::derived::COption_AccessZ, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning::routing::gossip::P2PGossipSync {
-	let mut local_chain_access = { /* chain_access*/ let chain_access_opt = chain_access; { } if chain_access_opt.is_none() { None } else { Some({ chain_access_opt.take() }) } };
-	let mut ret = lightning::routing::gossip::P2PGossipSync::new(network_graph.get_native_ref(), local_chain_access, logger);
+pub extern "C" fn P2PGossipSync_new(network_graph: &crate::lightning::routing::gossip::NetworkGraph, mut utxo_lookup: crate::c_types::derived::COption_UtxoLookupZ, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning::routing::gossip::P2PGossipSync {
+	let mut local_utxo_lookup = { /* utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; { } if utxo_lookup_opt.is_none() { None } else { Some({ utxo_lookup_opt.take() }) } };
+	let mut ret = lightning::routing::gossip::P2PGossipSync::new(network_graph.get_native_ref(), local_utxo_lookup, logger);
 	crate::lightning::routing::gossip::P2PGossipSync { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
@@ -488,9 +487,9 @@ pub extern "C" fn P2PGossipSync_new(network_graph: &crate::lightning::routing::g
 /// existing announcements unless they are updated.
 /// Add, update or remove the provider would replace the current one.
 #[no_mangle]
-pub extern "C" fn P2PGossipSync_add_chain_access(this_arg: &mut crate::lightning::routing::gossip::P2PGossipSync, mut chain_access: crate::c_types::derived::COption_AccessZ) {
-	let mut local_chain_access = { /* chain_access*/ let chain_access_opt = chain_access; { } if chain_access_opt.is_none() { None } else { Some({ chain_access_opt.take() }) } };
-	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::gossip::nativeP2PGossipSync)) }.add_chain_access(local_chain_access)
+pub extern "C" fn P2PGossipSync_add_utxo_lookup(this_arg: &mut crate::lightning::routing::gossip::P2PGossipSync, mut utxo_lookup: crate::c_types::derived::COption_UtxoLookupZ) {
+	let mut local_utxo_lookup = { /* utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; { } if utxo_lookup_opt.is_none() { None } else { Some({ utxo_lookup_opt.take() }) } };
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::gossip::nativeP2PGossipSync)) }.add_utxo_lookup(local_utxo_lookup)
 }
 
 /// Handles any network updates originating from [`Event`]s.
@@ -528,6 +527,7 @@ pub extern "C" fn P2PGossipSync_as_RoutingMessageHandler(this_arg: &P2PGossipSyn
 		handle_reply_short_channel_ids_end: P2PGossipSync_RoutingMessageHandler_handle_reply_short_channel_ids_end,
 		handle_query_channel_range: P2PGossipSync_RoutingMessageHandler_handle_query_channel_range,
 		handle_query_short_channel_ids: P2PGossipSync_RoutingMessageHandler_handle_query_short_channel_ids,
+		processing_queue_high: P2PGossipSync_RoutingMessageHandler_processing_queue_high,
 		provided_node_features: P2PGossipSync_RoutingMessageHandler_provided_node_features,
 		provided_init_features: P2PGossipSync_RoutingMessageHandler_provided_init_features,
 		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider {
@@ -563,15 +563,15 @@ extern "C" fn P2PGossipSync_RoutingMessageHandler_get_next_channel_announcement(
 	local_ret
 }
 #[must_use]
-extern "C" fn P2PGossipSync_RoutingMessageHandler_get_next_node_announcement(this_arg: *const c_void, mut starting_point: crate::c_types::PublicKey) -> crate::lightning::ln::msgs::NodeAnnouncement {
-	let mut local_starting_point_base = if starting_point.is_null() { None } else { Some( { starting_point.into_rust() }) }; let mut local_starting_point = local_starting_point_base.as_ref();
+extern "C" fn P2PGossipSync_RoutingMessageHandler_get_next_node_announcement(this_arg: *const c_void, mut starting_point: crate::lightning::routing::gossip::NodeId) -> crate::lightning::ln::msgs::NodeAnnouncement {
+	let mut local_starting_point = if starting_point.inner.is_null() { None } else { Some( { starting_point.get_native_ref() }) };
 	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::get_next_node_announcement(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, local_starting_point);
 	let mut local_ret = crate::lightning::ln::msgs::NodeAnnouncement { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
 	local_ret
 }
 #[must_use]
-extern "C" fn P2PGossipSync_RoutingMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init) -> crate::c_types::derived::CResult_NoneNoneZ {
-	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, &their_node_id.into_rust(), init.get_native_ref());
+extern "C" fn P2PGossipSync_RoutingMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init, mut inbound: bool) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::peer_connected(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, &their_node_id.into_rust(), init.get_native_ref(), inbound);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
@@ -598,6 +598,11 @@ extern "C" fn P2PGossipSync_RoutingMessageHandler_handle_query_short_channel_ids
 	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::handle_query_short_channel_ids(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, &their_node_id.into_rust(), *unsafe { Box::from_raw(msg.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
+}
+#[must_use]
+extern "C" fn P2PGossipSync_RoutingMessageHandler_processing_queue_high(this_arg: *const c_void) -> bool {
+	let mut ret = <nativeP2PGossipSync as lightning::ln::msgs::RoutingMessageHandler<>>::processing_queue_high(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, );
+	ret
 }
 #[must_use]
 extern "C" fn P2PGossipSync_RoutingMessageHandler_provided_node_features(this_arg: *const c_void) -> crate::lightning::ln::features::NodeFeatures {
@@ -1389,13 +1394,13 @@ impl RoutingFees {
 		ret
 	}
 }
-/// Flat routing fee in satoshis
+/// Flat routing fee in millisatoshis.
 #[no_mangle]
 pub extern "C" fn RoutingFees_get_base_msat(this_ptr: &RoutingFees) -> u32 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().base_msat;
 	*inner_val
 }
-/// Flat routing fee in satoshis
+/// Flat routing fee in millisatoshis.
 #[no_mangle]
 pub extern "C" fn RoutingFees_set_base_msat(this_ptr: &mut RoutingFees, mut val: u32) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.base_msat = val;
@@ -1855,27 +1860,6 @@ pub extern "C" fn NodeInfo_set_channels(this_ptr: &mut NodeInfo, mut val: crate:
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channels = local_val;
 }
-/// Lowest fees enabling routing via any of the enabled, known channels to a node.
-/// The two fields (flat and proportional fee) are independent,
-/// meaning they don't have to refer to the same channel.
-///
-/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
-#[no_mangle]
-pub extern "C" fn NodeInfo_get_lowest_inbound_channel_fees(this_ptr: &NodeInfo) -> crate::lightning::routing::gossip::RoutingFees {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().lowest_inbound_channel_fees;
-	let mut local_inner_val = crate::lightning::routing::gossip::RoutingFees { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::routing::gossip::RoutingFees<>) as *mut _ }, is_owned: false };
-	local_inner_val
-}
-/// Lowest fees enabling routing via any of the enabled, known channels to a node.
-/// The two fields (flat and proportional fee) are independent,
-/// meaning they don't have to refer to the same channel.
-///
-/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
-#[no_mangle]
-pub extern "C" fn NodeInfo_set_lowest_inbound_channel_fees(this_ptr: &mut NodeInfo, mut val: crate::lightning::routing::gossip::RoutingFees) {
-	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.lowest_inbound_channel_fees = local_val;
-}
 /// More information about a node from node_announcement.
 /// Optional because we store a Node entry after learning about it from
 /// a channel announcement, but before receiving a node announcement.
@@ -1900,13 +1884,11 @@ pub extern "C" fn NodeInfo_set_announcement_info(this_ptr: &mut NodeInfo, mut va
 /// Constructs a new NodeInfo given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NodeInfo_new(mut channels_arg: crate::c_types::derived::CVec_u64Z, mut lowest_inbound_channel_fees_arg: crate::lightning::routing::gossip::RoutingFees, mut announcement_info_arg: crate::lightning::routing::gossip::NodeAnnouncementInfo) -> NodeInfo {
+pub extern "C" fn NodeInfo_new(mut channels_arg: crate::c_types::derived::CVec_u64Z, mut announcement_info_arg: crate::lightning::routing::gossip::NodeAnnouncementInfo) -> NodeInfo {
 	let mut local_channels_arg = Vec::new(); for mut item in channels_arg.into_rust().drain(..) { local_channels_arg.push( { item }); };
-	let mut local_lowest_inbound_channel_fees_arg = if lowest_inbound_channel_fees_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(lowest_inbound_channel_fees_arg.take_inner()) } }) };
 	let mut local_announcement_info_arg = if announcement_info_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(announcement_info_arg.take_inner()) } }) };
 	NodeInfo { inner: ObjOps::heap_alloc(nativeNodeInfo {
 		channels: local_channels_arg,
-		lowest_inbound_channel_fees: local_lowest_inbound_channel_fees_arg,
 		announcement_info: local_announcement_info_arg,
 	}), is_owned: true }
 }
@@ -1974,8 +1956,8 @@ pub extern "C" fn NetworkGraph_read(ser: crate::c_types::u8slice, arg: crate::li
 /// Creates a new, empty, network graph.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_new(mut genesis_hash: crate::c_types::ThirtyTwoBytes, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning::routing::gossip::NetworkGraph {
-	let mut ret = lightning::routing::gossip::NetworkGraph::new(::bitcoin::hash_types::BlockHash::from_slice(&genesis_hash.data[..]).unwrap(), logger);
+pub extern "C" fn NetworkGraph_new(mut network: crate::bitcoin::network::Network, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning::routing::gossip::NetworkGraph {
+	let mut ret = lightning::routing::gossip::NetworkGraph::new(network.into_bitcoin(), logger);
 	crate::lightning::routing::gossip::NetworkGraph { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
@@ -2036,13 +2018,13 @@ pub extern "C" fn NetworkGraph_update_node_from_unsigned_announcement(this_arg: 
 /// RoutingMessageHandler implementation to call it indirectly. This may be useful to accept
 /// routing messages from a source using a protocol other than the lightning P2P protocol.
 ///
-/// If a `chain::Access` object is provided via `chain_access`, it will be called to verify
+/// If a [`UtxoLookup`] object is provided via `utxo_lookup`, it will be called to verify
 /// the corresponding UTXO exists on chain and is correctly-formatted.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_update_channel_from_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelAnnouncement, mut chain_access: crate::c_types::derived::COption_AccessZ) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut local_chain_access = { /* chain_access*/ let chain_access_opt = chain_access; { } if chain_access_opt.is_none() { None } else { Some({ chain_access_opt.take() }) } };
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_from_announcement(msg.get_native_ref(), &local_chain_access);
+pub extern "C" fn NetworkGraph_update_channel_from_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelAnnouncement, mut utxo_lookup: crate::c_types::derived::COption_UtxoLookupZ) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut local_utxo_lookup = { /* utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; { } if utxo_lookup_opt.is_none() { None } else { Some({ utxo_lookup_opt.take() }) } };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_from_announcement(msg.get_native_ref(), &local_utxo_lookup);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
@@ -2051,13 +2033,13 @@ pub extern "C" fn NetworkGraph_update_channel_from_announcement(this_arg: &crate
 /// signatures. Because we aren't given the associated signatures here we cannot relay the
 /// channel announcement to any of our peers.
 ///
-/// If a `chain::Access` object is provided via `chain_access`, it will be called to verify
+/// If a [`UtxoLookup`] object is provided via `utxo_lookup`, it will be called to verify
 /// the corresponding UTXO exists on chain and is correctly-formatted.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_update_channel_from_unsigned_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelAnnouncement, mut chain_access: crate::c_types::derived::COption_AccessZ) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut local_chain_access = { /* chain_access*/ let chain_access_opt = chain_access; { } if chain_access_opt.is_none() { None } else { Some({ chain_access_opt.take() }) } };
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_from_unsigned_announcement(msg.get_native_ref(), &local_chain_access);
+pub extern "C" fn NetworkGraph_update_channel_from_unsigned_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelAnnouncement, mut utxo_lookup: crate::c_types::derived::COption_UtxoLookupZ) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut local_utxo_lookup = { /* utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; { } if utxo_lookup_opt.is_none() { None } else { Some({ utxo_lookup_opt.take() }) } };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_from_unsigned_announcement(msg.get_native_ref(), &local_utxo_lookup);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }

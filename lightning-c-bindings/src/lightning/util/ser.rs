@@ -7,7 +7,10 @@
 // source was automatically generated.
 
 //! A very simple serialization framework which is used to serialize/deserialize messages as well
-//! as ChannelsManagers and ChannelMonitors.
+//! as [`ChannelManager`]s and [`ChannelMonitor`]s.
+//!
+//! [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
+//! [`ChannelMonitor`]: crate::chain::channelmonitor::ChannelMonitor
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -25,7 +28,7 @@ pub static MAX_BUF_SIZE: usize = lightning::util::ser::MAX_BUF_SIZE;
 use lightning::util::ser::BigSize as nativeBigSizeImport;
 pub(crate) type nativeBigSize = nativeBigSizeImport;
 
-/// Lightning TLV uses a custom variable-length integer called BigSize. It is similar to Bitcoin's
+/// Lightning TLV uses a custom variable-length integer called `BigSize`. It is similar to Bitcoin's
 /// variable-length integers except that it is serialized in big-endian instead of little-endian.
 ///
 /// Like Bitcoin's variable-length integer, it exhibits ambiguity in that certain values can be
@@ -103,7 +106,9 @@ pub(crate) type nativeHostname = nativeHostnameImport;
 /// Only the character set and length will be validated.
 /// The character set consists of ASCII alphanumeric characters, hyphens, and periods.
 /// Its length is guaranteed to be representable by a single byte.
-/// This serialization is used by BOLT 7 hostnames.
+/// This serialization is used by [`BOLT 7`] hostnames.
+///
+/// [`BOLT 7`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md
 #[must_use]
 #[repr(C)]
 pub struct Hostname {

@@ -33,7 +33,7 @@ pub static TAG_DESCRIPTION_HASH: u8 = lightning_invoice::constants::TAG_DESCRIPT
 pub static TAG_EXPIRY_TIME: u8 = lightning_invoice::constants::TAG_EXPIRY_TIME;
 
 #[no_mangle]
-pub static TAG_MIN_FINAL_CLTV_EXPIRY: u8 = lightning_invoice::constants::TAG_MIN_FINAL_CLTV_EXPIRY;
+pub static TAG_MIN_FINAL_CLTV_EXPIRY_DELTA: u8 = lightning_invoice::constants::TAG_MIN_FINAL_CLTV_EXPIRY_DELTA;
 
 #[no_mangle]
 pub static TAG_FALLBACK: u8 = lightning_invoice::constants::TAG_FALLBACK;

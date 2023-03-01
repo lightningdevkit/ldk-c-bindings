@@ -126,8 +126,8 @@ pub extern "C" fn BestBlock_eq(a: &BestBlock, b: &BestBlock) -> bool {
 /// network.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BestBlock_from_genesis(mut network: crate::bitcoin::network::Network) -> crate::lightning::chain::BestBlock {
-	let mut ret = lightning::chain::BestBlock::from_genesis(network.into_bitcoin());
+pub extern "C" fn BestBlock_from_network(mut network: crate::bitcoin::network::Network) -> crate::lightning::chain::BestBlock {
+	let mut ret = lightning::chain::BestBlock::from_network(network.into_bitcoin());
 	crate::lightning::chain::BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
@@ -155,118 +155,6 @@ pub extern "C" fn BestBlock_height(this_arg: &crate::lightning::chain::BestBlock
 	ret
 }
 
-/// An error when accessing the chain via [`Access`].
-#[derive(Clone)]
-#[must_use]
-#[repr(C)]
-pub enum AccessError {
-	/// The requested chain is unknown.
-	UnknownChain,
-	/// The requested transaction doesn't exist or hasn't confirmed.
-	UnknownTx,
-}
-use lightning::chain::AccessError as AccessErrorImport;
-pub(crate) type nativeAccessError = AccessErrorImport;
-
-impl AccessError {
-	#[allow(unused)]
-	pub(crate) fn to_native(&self) -> nativeAccessError {
-		match self {
-			AccessError::UnknownChain => nativeAccessError::UnknownChain,
-			AccessError::UnknownTx => nativeAccessError::UnknownTx,
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn into_native(self) -> nativeAccessError {
-		match self {
-			AccessError::UnknownChain => nativeAccessError::UnknownChain,
-			AccessError::UnknownTx => nativeAccessError::UnknownTx,
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeAccessError) -> Self {
-		match native {
-			nativeAccessError::UnknownChain => AccessError::UnknownChain,
-			nativeAccessError::UnknownTx => AccessError::UnknownTx,
-		}
-	}
-	#[allow(unused)]
-	pub(crate) fn native_into(native: nativeAccessError) -> Self {
-		match native {
-			nativeAccessError::UnknownChain => AccessError::UnknownChain,
-			nativeAccessError::UnknownTx => AccessError::UnknownTx,
-		}
-	}
-}
-/// Creates a copy of the AccessError
-#[no_mangle]
-pub extern "C" fn AccessError_clone(orig: &AccessError) -> AccessError {
-	orig.clone()
-}
-#[no_mangle]
-/// Utility method to constructs a new UnknownChain-variant AccessError
-pub extern "C" fn AccessError_unknown_chain() -> AccessError {
-	AccessError::UnknownChain}
-#[no_mangle]
-/// Utility method to constructs a new UnknownTx-variant AccessError
-pub extern "C" fn AccessError_unknown_tx() -> AccessError {
-	AccessError::UnknownTx}
-/// The `Access` trait defines behavior for accessing chain data and state, such as blocks and
-/// UTXOs.
-#[repr(C)]
-pub struct Access {
-	/// An opaque pointer which is passed to your function implementations as an argument.
-	/// This has no meaning in the LDK, and can be NULL or any other value.
-	pub this_arg: *mut c_void,
-	/// Returns the transaction output of a funding transaction encoded by [`short_channel_id`].
-	/// Returns an error if `genesis_hash` is for a different chain or if such a transaction output
-	/// is unknown.
-	///
-	/// [`short_channel_id`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#definition-of-short_channel_id
-	#[must_use]
-	pub get_utxo: extern "C" fn (this_arg: *const c_void, genesis_hash: *const [u8; 32], short_channel_id: u64) -> crate::c_types::derived::CResult_TxOutAccessErrorZ,
-	/// Frees any resources associated with this object given its this_arg pointer.
-	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
-	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
-}
-unsafe impl Send for Access {}
-unsafe impl Sync for Access {}
-#[no_mangle]
-pub(crate) extern "C" fn Access_clone_fields(orig: &Access) -> Access {
-	Access {
-		this_arg: orig.this_arg,
-		get_utxo: Clone::clone(&orig.get_utxo),
-		free: Clone::clone(&orig.free),
-	}
-}
-
-use lightning::chain::Access as rustAccess;
-impl rustAccess for Access {
-	fn get_utxo(&self, mut genesis_hash: &bitcoin::hash_types::BlockHash, mut short_channel_id: u64) -> Result<bitcoin::blockdata::transaction::TxOut, lightning::chain::AccessError> {
-		let mut ret = (self.get_utxo)(self.this_arg, genesis_hash.as_inner(), short_channel_id);
-		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_rust() }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
-		local_ret
-	}
-}
-
-// We're essentially a pointer already, or at least a set of pointers, so allow us to be used
-// directly as a Deref trait in higher-level structs:
-impl core::ops::Deref for Access {
-	type Target = Self;
-	fn deref(&self) -> &Self {
-		self
-	}
-}
-/// Calls the free function if one is set
-#[no_mangle]
-pub extern "C" fn Access_free(this_ptr: Access) { }
-impl Drop for Access {
-	fn drop(&mut self) {
-		if let Some(f) = self.free {
-			f(self.this_arg);
-		}
-	}
-}
 /// The `Listen` trait is used to notify when blocks have been connected or disconnected from the
 /// chain.
 ///
@@ -414,6 +302,9 @@ pub struct Confirm {
 	pub best_block_updated: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], height: u32),
 	/// Returns transactions that must be monitored for reorganization out of the chain along
 	/// with the hash of the block as part of which it had been previously confirmed.
+	///
+	/// Note that the returned `Option<BlockHash>` might be `None` for channels created with LDK
+	/// 0.0.112 and prior, in which case you need to manually track previous confirmations.
 	///
 	/// Will include any transactions passed to [`transactions_confirmed`] that have insufficient
 	/// confirmations to be safe from a chain reorganization. Will not include any transactions
@@ -673,7 +564,7 @@ pub struct Watch {
 	///
 	/// [`update_monitor`]: channelmonitor::ChannelMonitor::update_monitor
 	#[must_use]
-	pub update_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::lightning::chain::transaction::OutPoint, update: crate::lightning::chain::channelmonitor::ChannelMonitorUpdate) -> crate::lightning::chain::ChannelMonitorUpdateStatus,
+	pub update_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::lightning::chain::transaction::OutPoint, update: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate) -> crate::lightning::chain::ChannelMonitorUpdateStatus,
 	/// Returns any monitor events since the last call. Subsequent calls must only return new
 	/// events.
 	///
@@ -703,13 +594,13 @@ pub(crate) extern "C" fn Watch_clone_fields(orig: &Watch) -> Watch {
 }
 
 use lightning::chain::Watch as rustWatch;
-impl rustWatch<crate::lightning::chain::keysinterface::Sign> for Watch {
-	fn watch_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>) -> lightning::chain::ChannelMonitorUpdateStatus {
+impl rustWatch<crate::lightning::chain::keysinterface::WriteableEcdsaChannelSigner> for Watch {
+	fn watch_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::WriteableEcdsaChannelSigner>) -> lightning::chain::ChannelMonitorUpdateStatus {
 		let mut ret = (self.watch_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(monitor), is_owned: true });
 		ret.into_native()
 	}
-	fn update_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut update: lightning::chain::channelmonitor::ChannelMonitorUpdate) -> lightning::chain::ChannelMonitorUpdateStatus {
-		let mut ret = (self.update_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: ObjOps::heap_alloc(update), is_owned: true });
+	fn update_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut update: &lightning::chain::channelmonitor::ChannelMonitorUpdate) -> lightning::chain::ChannelMonitorUpdateStatus {
+		let mut ret = (self.update_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo), is_owned: true }, &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate { inner: unsafe { ObjOps::nonnull_ptr_to_inner((update as *const lightning::chain::channelmonitor::ChannelMonitorUpdate<>) as *mut _) }, is_owned: false });
 		ret.into_native()
 	}
 	fn release_pending_monitor_events(&self) -> Vec<(lightning::chain::transaction::OutPoint, Vec<lightning::chain::channelmonitor::MonitorEvent>, Option<bitcoin::secp256k1::PublicKey>)> {

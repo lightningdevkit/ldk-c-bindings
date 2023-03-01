@@ -19,7 +19,7 @@
 //! # use lightning::routing::gossip::NetworkGraph;
 //! # use lightning::routing::router::{RouteParameters, find_route};
 //! # use lightning::routing::scoring::{ProbabilisticScorer, ProbabilisticScoringParameters};
-//! # use lightning::chain::keysinterface::{KeysManager, KeysInterface};
+//! # use lightning::chain::keysinterface::KeysManager;
 //! # use lightning::util::logger::{Logger, Record};
 //! # use bitcoin::secp256k1::PublicKey;
 //! #
@@ -1306,6 +1306,35 @@ pub extern "C" fn ProbabilisticScorer_debug_log_liquidity_stats(this_arg: &crate
 pub extern "C" fn ProbabilisticScorer_estimated_channel_liquidity_range(this_arg: &crate::lightning::routing::scoring::ProbabilisticScorer, mut scid: u64, target: &crate::lightning::routing::gossip::NodeId) -> crate::c_types::derived::COption_C2Tuple_u64u64ZZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.estimated_channel_liquidity_range(scid, target.get_native_ref());
 	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_C2Tuple_u64u64ZZ::None } else { crate::c_types::derived::COption_C2Tuple_u64u64ZZ::Some( { let (mut orig_ret_0_0, mut orig_ret_0_1) = (ret.unwrap()); let mut local_ret_0 = (orig_ret_0_0, orig_ret_0_1).into(); local_ret_0 }) };
+	local_ret
+}
+
+/// Query the historical estimated minimum and maximum liquidity available for sending a
+/// payment over the channel with `scid` towards the given `target` node.
+///
+/// Returns two sets of 8 buckets. The first set describes the octiles for lower-bound
+/// liquidity estimates, the second set describes the octiles for upper-bound liquidity
+/// estimates. Each bucket describes the relative frequency at which we've seen a liquidity
+/// bound in the octile relative to the channel's total capacity, on an arbitrary scale.
+/// Because the values are slowly decayed, more recent data points are weighted more heavily
+/// than older datapoints.
+///
+/// When scoring, the estimated probability that an upper-/lower-bound lies in a given octile
+/// relative to the channel's total capacity is calculated by dividing that bucket's value with
+/// the total of all buckets for the given bound.
+///
+/// For example, a value of `[0, 0, 0, 0, 0, 0, 32]` indicates that we believe the probability
+/// of a bound being in the top octile to be 100%, and have never (recently) seen it in any
+/// other octiles. A value of `[31, 0, 0, 0, 0, 0, 0, 32]` indicates we've seen the bound being
+/// both in the top and bottom octile, and roughly with similar (recent) frequency.
+///
+/// Because the datapoints are decayed slowly over time, values will eventually return to
+/// `Some(([0; 8], [0; 8]))`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ProbabilisticScorer_historical_estimated_channel_liquidity_probabilities(this_arg: &crate::lightning::routing::scoring::ProbabilisticScorer, mut scid: u64, target: &crate::lightning::routing::gossip::NodeId) -> crate::c_types::derived::COption_C2Tuple_EightU16sEightU16sZZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.historical_estimated_channel_liquidity_probabilities(scid, target.get_native_ref());
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_C2Tuple_EightU16sEightU16sZZ::None } else { crate::c_types::derived::COption_C2Tuple_EightU16sEightU16sZZ::Some( { let (mut orig_ret_0_0, mut orig_ret_0_1) = (ret.unwrap()); let mut local_ret_0 = (crate::c_types::EightU16s { data: orig_ret_0_0 }, crate::c_types::EightU16s { data: orig_ret_0_1 }).into(); local_ret_0 }) };
 	local_ret
 }
 

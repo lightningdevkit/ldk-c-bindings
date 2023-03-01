@@ -35,8 +35,15 @@ use alloc::{vec::Vec, boxed::Box};
 ///
 /// `invoice_expiry_delta_secs` describes the number of seconds that the invoice is valid for
 /// in excess of the current time.
+/// 
+/// `duration_since_epoch` is the current time since epoch in seconds.
 ///
-/// Note that the provided `keys_manager`'s `KeysInterface` implementation must support phantom
+/// You can specify a custom `min_final_cltv_expiry_delta`, or let LDK default it to
+/// [`MIN_FINAL_CLTV_EXPIRY_DELTA`]. The provided expiry must be at least [`MIN_FINAL_CLTV_EXPIRY_DELTA`] - 3.
+/// Note that LDK will add a buffer of 3 blocks to the delta to allow for up to a few new block
+/// confirmations during routing.
+///
+/// Note that the provided `keys_manager`'s `NodeSigner` implementation must support phantom
 /// invoices in its `sign_invoice` implementation ([`PhantomKeysManager`] satisfies this
 /// requirement).
 ///
@@ -45,14 +52,19 @@ use alloc::{vec::Vec, boxed::Box};
 /// [`ChannelManager::create_inbound_payment`]: lightning::ln::channelmanager::ChannelManager::create_inbound_payment
 /// [`ChannelManager::create_inbound_payment_for_hash`]: lightning::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
 /// [`PhantomRouteHints::channels`]: lightning::ln::channelmanager::PhantomRouteHints::channels
+/// [`MIN_FINAL_CLTV_EXPIRY_DETLA`]: lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY_DELTA
+/// 
+/// This can be used in a `no_std` environment, where [`std::time::SystemTime`] is not
+/// available and the current time is supplied by the caller.
 ///
 /// Note that payment_hash (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn create_phantom_invoice(mut amt_msat: crate::c_types::derived::COption_u64Z, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut description: crate::c_types::Str, mut invoice_expiry_delta_secs: u32, mut phantom_route_hints: crate::c_types::derived::CVec_PhantomRouteHintsZ, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
+pub extern "C" fn create_phantom_invoice(mut amt_msat: crate::c_types::derived::COption_u64Z, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut description: crate::c_types::Str, mut invoice_expiry_delta_secs: u32, mut phantom_route_hints: crate::c_types::derived::CVec_PhantomRouteHintsZ, mut entropy_source: crate::lightning::chain::keysinterface::EntropySource, mut node_signer: crate::lightning::chain::keysinterface::NodeSigner, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z, mut duration_since_epoch: u64) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
 	let mut local_amt_msat = if amt_msat.is_some() { Some( { amt_msat.take() }) } else { None };
 	let mut local_payment_hash = if payment_hash.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentHash(payment_hash.data) }) };
 	let mut local_phantom_route_hints = Vec::new(); for mut item in phantom_route_hints.into_rust().drain(..) { local_phantom_route_hints.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
-	let mut ret = lightning_invoice::utils::create_phantom_invoice::<crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::util::logger::Logger>(local_amt_msat, local_payment_hash, description.into_string(), invoice_expiry_delta_secs, local_phantom_route_hints, keys_manager, logger, network.into_native());
+	let mut local_min_final_cltv_expiry_delta = if min_final_cltv_expiry_delta.is_some() { Some( { min_final_cltv_expiry_delta.take() }) } else { None };
+	let mut ret = lightning_invoice::utils::create_phantom_invoice::<crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::util::logger::Logger>(local_amt_msat, local_payment_hash, description.into_string(), invoice_expiry_delta_secs, local_phantom_route_hints, entropy_source, node_signer, logger, network.into_native(), local_min_final_cltv_expiry_delta, core::time::Duration::from_secs(duration_since_epoch));
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
 	local_ret
 }
@@ -78,8 +90,10 @@ pub extern "C" fn create_phantom_invoice(mut amt_msat: crate::c_types::derived::
 ///
 /// `invoice_expiry_delta_secs` describes the number of seconds that the invoice is valid for
 /// in excess of the current time.
+/// 
+/// `duration_since_epoch` is the current time since epoch in seconds.
 ///
-/// Note that the provided `keys_manager`'s `KeysInterface` implementation must support phantom
+/// Note that the provided `keys_manager`'s `NodeSigner` implementation must support phantom
 /// invoices in its `sign_invoice` implementation ([`PhantomKeysManager`] satisfies this
 /// requirement).
 ///
@@ -88,14 +102,18 @@ pub extern "C" fn create_phantom_invoice(mut amt_msat: crate::c_types::derived::
 /// [`ChannelManager::create_inbound_payment`]: lightning::ln::channelmanager::ChannelManager::create_inbound_payment
 /// [`ChannelManager::create_inbound_payment_for_hash`]: lightning::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
 /// [`PhantomRouteHints::channels`]: lightning::ln::channelmanager::PhantomRouteHints::channels
+/// 
+/// This can be used in a `no_std` environment, where [`std::time::SystemTime`] is not
+/// available and the current time is supplied by the caller.
 ///
 /// Note that payment_hash (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn create_phantom_invoice_with_description_hash(mut amt_msat: crate::c_types::derived::COption_u64Z, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut invoice_expiry_delta_secs: u32, mut description_hash: crate::lightning_invoice::Sha256, mut phantom_route_hints: crate::c_types::derived::CVec_PhantomRouteHintsZ, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
+pub extern "C" fn create_phantom_invoice_with_description_hash(mut amt_msat: crate::c_types::derived::COption_u64Z, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut invoice_expiry_delta_secs: u32, mut description_hash: crate::lightning_invoice::Sha256, mut phantom_route_hints: crate::c_types::derived::CVec_PhantomRouteHintsZ, mut entropy_source: crate::lightning::chain::keysinterface::EntropySource, mut node_signer: crate::lightning::chain::keysinterface::NodeSigner, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z, mut duration_since_epoch: u64) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
 	let mut local_amt_msat = if amt_msat.is_some() { Some( { amt_msat.take() }) } else { None };
 	let mut local_payment_hash = if payment_hash.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentHash(payment_hash.data) }) };
 	let mut local_phantom_route_hints = Vec::new(); for mut item in phantom_route_hints.into_rust().drain(..) { local_phantom_route_hints.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
-	let mut ret = lightning_invoice::utils::create_phantom_invoice_with_description_hash::<crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::util::logger::Logger>(local_amt_msat, local_payment_hash, invoice_expiry_delta_secs, *unsafe { Box::from_raw(description_hash.take_inner()) }, local_phantom_route_hints, keys_manager, logger, network.into_native());
+	let mut local_min_final_cltv_expiry_delta = if min_final_cltv_expiry_delta.is_some() { Some( { min_final_cltv_expiry_delta.take() }) } else { None };
+	let mut ret = lightning_invoice::utils::create_phantom_invoice_with_description_hash::<crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::util::logger::Logger>(local_amt_msat, local_payment_hash, invoice_expiry_delta_secs, *unsafe { Box::from_raw(description_hash.take_inner()) }, local_phantom_route_hints, entropy_source, node_signer, logger, network.into_native(), local_min_final_cltv_expiry_delta, core::time::Duration::from_secs(duration_since_epoch));
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
 	local_ret
 }
@@ -108,10 +126,18 @@ pub extern "C" fn create_phantom_invoice_with_description_hash(mut amt_msat: cra
 ///
 /// `invoice_expiry_delta_secs` describes the number of seconds that the invoice is valid for
 /// in excess of the current time.
+///
+/// You can specify a custom `min_final_cltv_expiry_delta`, or let LDK default it to
+/// [`MIN_FINAL_CLTV_EXPIRY_DELTA`]. The provided expiry must be at least [`MIN_FINAL_CLTV_EXPIRY_DELTA`].
+/// Note that LDK will add a buffer of 3 blocks to the delta to allow for up to a few new block
+/// confirmations during routing.
+///
+/// [`MIN_FINAL_CLTV_EXPIRY_DETLA`]: lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY_DELTA
 #[no_mangle]
-pub extern "C" fn create_invoice_from_channelmanager(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description: crate::c_types::Str, mut invoice_expiry_delta_secs: u32) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
+pub extern "C" fn create_invoice_from_channelmanager(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut node_signer: crate::lightning::chain::keysinterface::NodeSigner, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description: crate::c_types::Str, mut invoice_expiry_delta_secs: u32, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
 	let mut local_amt_msat = if amt_msat.is_some() { Some( { amt_msat.take() }) } else { None };
-	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), keys_manager, logger, network.into_native(), local_amt_msat, description.into_string(), invoice_expiry_delta_secs);
+	let mut local_min_final_cltv_expiry_delta = if min_final_cltv_expiry_delta.is_some() { Some( { min_final_cltv_expiry_delta.take() }) } else { None };
+	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::chain::keysinterface::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), node_signer, logger, network.into_native(), local_amt_msat, description.into_string(), invoice_expiry_delta_secs, local_min_final_cltv_expiry_delta);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
 	local_ret
 }
@@ -125,10 +151,18 @@ pub extern "C" fn create_invoice_from_channelmanager(channelmanager: &crate::lig
 ///
 /// `invoice_expiry_delta_secs` describes the number of seconds that the invoice is valid for
 /// in excess of the current time.
+///
+/// You can specify a custom `min_final_cltv_expiry_delta`, or let LDK default it to
+/// [`MIN_FINAL_CLTV_EXPIRY_DELTA`]. The provided expiry must be at least [`MIN_FINAL_CLTV_EXPIRY_DELTA`].
+/// Note that LDK will add a buffer of 3 blocks to the delta to allow for up to a few new block
+/// confirmations during routing.
+///
+/// [`MIN_FINAL_CLTV_EXPIRY_DETLA`]: lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY_DELTA
 #[no_mangle]
-pub extern "C" fn create_invoice_from_channelmanager_with_description_hash(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description_hash: crate::lightning_invoice::Sha256, mut invoice_expiry_delta_secs: u32) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
+pub extern "C" fn create_invoice_from_channelmanager_with_description_hash(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut node_signer: crate::lightning::chain::keysinterface::NodeSigner, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description_hash: crate::lightning_invoice::Sha256, mut invoice_expiry_delta_secs: u32, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
 	let mut local_amt_msat = if amt_msat.is_some() { Some( { amt_msat.take() }) } else { None };
-	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager_with_description_hash::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), keys_manager, logger, network.into_native(), local_amt_msat, *unsafe { Box::from_raw(description_hash.take_inner()) }, invoice_expiry_delta_secs);
+	let mut local_min_final_cltv_expiry_delta = if min_final_cltv_expiry_delta.is_some() { Some( { min_final_cltv_expiry_delta.take() }) } else { None };
+	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager_with_description_hash::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::chain::keysinterface::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), node_signer, logger, network.into_native(), local_amt_msat, *unsafe { Box::from_raw(description_hash.take_inner()) }, invoice_expiry_delta_secs, local_min_final_cltv_expiry_delta);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
 	local_ret
 }
@@ -137,9 +171,10 @@ pub extern "C" fn create_invoice_from_channelmanager_with_description_hash(chann
 /// This version can be used in a `no_std` environment, where [`std::time::SystemTime`] is not
 /// available and the current time is supplied by the caller.
 #[no_mangle]
-pub extern "C" fn create_invoice_from_channelmanager_with_description_hash_and_duration_since_epoch(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description_hash: crate::lightning_invoice::Sha256, mut duration_since_epoch: u64, mut invoice_expiry_delta_secs: u32) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
+pub extern "C" fn create_invoice_from_channelmanager_with_description_hash_and_duration_since_epoch(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut node_signer: crate::lightning::chain::keysinterface::NodeSigner, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description_hash: crate::lightning_invoice::Sha256, mut duration_since_epoch: u64, mut invoice_expiry_delta_secs: u32, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
 	let mut local_amt_msat = if amt_msat.is_some() { Some( { amt_msat.take() }) } else { None };
-	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager_with_description_hash_and_duration_since_epoch::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), keys_manager, logger, network.into_native(), local_amt_msat, *unsafe { Box::from_raw(description_hash.take_inner()) }, core::time::Duration::from_secs(duration_since_epoch), invoice_expiry_delta_secs);
+	let mut local_min_final_cltv_expiry_delta = if min_final_cltv_expiry_delta.is_some() { Some( { min_final_cltv_expiry_delta.take() }) } else { None };
+	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager_with_description_hash_and_duration_since_epoch::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::chain::keysinterface::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), node_signer, logger, network.into_native(), local_amt_msat, *unsafe { Box::from_raw(description_hash.take_inner()) }, core::time::Duration::from_secs(duration_since_epoch), invoice_expiry_delta_secs, local_min_final_cltv_expiry_delta);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
 	local_ret
 }
@@ -148,9 +183,10 @@ pub extern "C" fn create_invoice_from_channelmanager_with_description_hash_and_d
 /// This version can be used in a `no_std` environment, where [`std::time::SystemTime`] is not
 /// available and the current time is supplied by the caller.
 #[no_mangle]
-pub extern "C" fn create_invoice_from_channelmanager_and_duration_since_epoch(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description: crate::c_types::Str, mut duration_since_epoch: u64, mut invoice_expiry_delta_secs: u32) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
+pub extern "C" fn create_invoice_from_channelmanager_and_duration_since_epoch(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut node_signer: crate::lightning::chain::keysinterface::NodeSigner, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description: crate::c_types::Str, mut duration_since_epoch: u64, mut invoice_expiry_delta_secs: u32, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
 	let mut local_amt_msat = if amt_msat.is_some() { Some( { amt_msat.take() }) } else { None };
-	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager_and_duration_since_epoch::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), keys_manager, logger, network.into_native(), local_amt_msat, description.into_string(), core::time::Duration::from_secs(duration_since_epoch), invoice_expiry_delta_secs);
+	let mut local_min_final_cltv_expiry_delta = if min_final_cltv_expiry_delta.is_some() { Some( { min_final_cltv_expiry_delta.take() }) } else { None };
+	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager_and_duration_since_epoch::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::chain::keysinterface::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), node_signer, logger, network.into_native(), local_amt_msat, description.into_string(), core::time::Duration::from_secs(duration_since_epoch), invoice_expiry_delta_secs, local_min_final_cltv_expiry_delta);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
 	local_ret
 }
@@ -160,79 +196,11 @@ pub extern "C" fn create_invoice_from_channelmanager_and_duration_since_epoch(ch
 /// This may be useful if you're building an on-chain swap or involving another protocol where
 /// the payment hash is also involved outside the scope of lightning.
 #[no_mangle]
-pub extern "C" fn create_invoice_from_channelmanager_and_duration_since_epoch_with_payment_hash(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut keys_manager: crate::lightning::chain::keysinterface::KeysInterface, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description: crate::c_types::Str, mut duration_since_epoch: u64, mut invoice_expiry_delta_secs: u32, mut payment_hash: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
+pub extern "C" fn create_invoice_from_channelmanager_and_duration_since_epoch_with_payment_hash(channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut node_signer: crate::lightning::chain::keysinterface::NodeSigner, mut logger: crate::lightning::util::logger::Logger, mut network: crate::lightning_invoice::Currency, mut amt_msat: crate::c_types::derived::COption_u64Z, mut description: crate::c_types::Str, mut duration_since_epoch: u64, mut invoice_expiry_delta_secs: u32, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_InvoiceSignOrCreationErrorZ {
 	let mut local_amt_msat = if amt_msat.is_some() { Some( { amt_msat.take() }) } else { None };
-	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager_and_duration_since_epoch_with_payment_hash::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::KeysInterface, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), keys_manager, logger, network.into_native(), local_amt_msat, description.into_string(), core::time::Duration::from_secs(duration_since_epoch), invoice_expiry_delta_secs, ::lightning::ln::PaymentHash(payment_hash.data));
+	let mut local_min_final_cltv_expiry_delta = if min_final_cltv_expiry_delta.is_some() { Some( { min_final_cltv_expiry_delta.take() }) } else { None };
+	let mut ret = lightning_invoice::utils::create_invoice_from_channelmanager_and_duration_since_epoch_with_payment_hash::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::chain::keysinterface::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(channelmanager.get_native_ref(), node_signer, logger, network.into_native(), local_amt_msat, description.into_string(), core::time::Duration::from_secs(duration_since_epoch), invoice_expiry_delta_secs, ::lightning::ln::PaymentHash(payment_hash.data), local_min_final_cltv_expiry_delta);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::Invoice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::SignOrCreationError::native_into(e) }).into() };
 	local_ret
 }
 
-impl From<nativeChannelManager> for crate::lightning_invoice::payment::Payer {
-	fn from(obj: nativeChannelManager) -> Self {
-		let mut rust_obj = ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
-		let mut ret = ChannelManager_as_Payer(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
-		ret.free = Some(ChannelManager_free_void);
-		ret
-	}
-}
-/// Constructs a new Payer which calls the relevant methods on this_arg.
-/// This copies the `inner` pointer in this_arg and thus the returned Payer must be freed before this_arg is
-#[no_mangle]
-pub extern "C" fn ChannelManager_as_Payer(this_arg: &ChannelManager) -> crate::lightning_invoice::payment::Payer {
-	crate::lightning_invoice::payment::Payer {
-		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
-		free: None,
-		node_id: ChannelManager_Payer_node_id,
-		first_hops: ChannelManager_Payer_first_hops,
-		send_payment: ChannelManager_Payer_send_payment,
-		send_spontaneous_payment: ChannelManager_Payer_send_spontaneous_payment,
-		retry_payment: ChannelManager_Payer_retry_payment,
-		abandon_payment: ChannelManager_Payer_abandon_payment,
-		inflight_htlcs: ChannelManager_Payer_inflight_htlcs,
-	}
-}
-
-#[must_use]
-extern "C" fn ChannelManager_Payer_node_id(this_arg: *const c_void) -> crate::c_types::PublicKey {
-	let mut ret = <nativeChannelManager as lightning_invoice::payment::Payer<>>::node_id(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, );
-	crate::c_types::PublicKey::from_rust(&ret)
-}
-#[must_use]
-extern "C" fn ChannelManager_Payer_first_hops(this_arg: *const c_void) -> crate::c_types::derived::CVec_ChannelDetailsZ {
-	let mut ret = <nativeChannelManager as lightning_invoice::payment::Payer<>>::first_hops(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::ln::channelmanager::ChannelDetails { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
-	local_ret.into()
-}
-#[must_use]
-extern "C" fn ChannelManager_Payer_send_payment(this_arg: *const c_void, route: &crate::lightning::routing::router::Route, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut payment_secret: crate::c_types::ThirtyTwoBytes, mut payment_id: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_NonePaymentSendFailureZ {
-	let mut local_payment_secret = if payment_secret.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentSecret(payment_secret.data) }) };
-	let mut ret = <nativeChannelManager as lightning_invoice::payment::Payer<>>::send_payment(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, route.get_native_ref(), ::lightning::ln::PaymentHash(payment_hash.data), &local_payment_secret, ::lightning::ln::channelmanager::PaymentId(payment_id.data));
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::channelmanager::PaymentSendFailure::native_into(e) }).into() };
-	local_ret
-}
-#[must_use]
-extern "C" fn ChannelManager_Payer_send_spontaneous_payment(this_arg: *const c_void, route: &crate::lightning::routing::router::Route, mut payment_preimage: crate::c_types::ThirtyTwoBytes, mut payment_id: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_NonePaymentSendFailureZ {
-	let mut ret = <nativeChannelManager as lightning_invoice::payment::Payer<>>::send_spontaneous_payment(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, route.get_native_ref(), ::lightning::ln::PaymentPreimage(payment_preimage.data), ::lightning::ln::channelmanager::PaymentId(payment_id.data));
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::channelmanager::PaymentSendFailure::native_into(e) }).into() };
-	local_ret
-}
-#[must_use]
-extern "C" fn ChannelManager_Payer_retry_payment(this_arg: *const c_void, route: &crate::lightning::routing::router::Route, mut payment_id: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_NonePaymentSendFailureZ {
-	let mut ret = <nativeChannelManager as lightning_invoice::payment::Payer<>>::retry_payment(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, route.get_native_ref(), ::lightning::ln::channelmanager::PaymentId(payment_id.data));
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::channelmanager::PaymentSendFailure::native_into(e) }).into() };
-	local_ret
-}
-extern "C" fn ChannelManager_Payer_abandon_payment(this_arg: *const c_void, mut payment_id: crate::c_types::ThirtyTwoBytes) {
-	<nativeChannelManager as lightning_invoice::payment::Payer<>>::abandon_payment(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, ::lightning::ln::channelmanager::PaymentId(payment_id.data))
-}
-#[must_use]
-extern "C" fn ChannelManager_Payer_inflight_htlcs(this_arg: *const c_void) -> crate::lightning::routing::router::InFlightHtlcs {
-	let mut ret = <nativeChannelManager as lightning_invoice::payment::Payer<>>::inflight_htlcs(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, );
-	crate::lightning::routing::router::InFlightHtlcs { inner: ObjOps::heap_alloc(ret), is_owned: true }
-}
-
-use crate::lightning::ln::channelmanager::nativeChannelManager as nativeChannelManager;
-use crate::lightning::ln::channelmanager::ChannelManager;
-use crate::lightning::ln::channelmanager::ChannelManager_free_void;

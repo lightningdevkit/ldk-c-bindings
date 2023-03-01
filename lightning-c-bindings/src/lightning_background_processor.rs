@@ -109,7 +109,7 @@ pub enum GossipSync {
 	None,
 }
 use lightning_background_processor::GossipSync as GossipSyncImport;
-pub(crate) type nativeGossipSync = GossipSyncImport<&'static lightning::routing::gossip::P2PGossipSync<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::chain::Access, crate::lightning::util::logger::Logger>, &'static lightning_rapid_gossip_sync::RapidGossipSync<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::util::logger::Logger>, &'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::chain::Access, crate::lightning::util::logger::Logger>;
+pub(crate) type nativeGossipSync = GossipSyncImport<&'static lightning::routing::gossip::P2PGossipSync<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::routing::utxo::UtxoLookup, crate::lightning::util::logger::Logger>, &'static lightning_rapid_gossip_sync::RapidGossipSync<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::util::logger::Logger>, &'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::routing::utxo::UtxoLookup, crate::lightning::util::logger::Logger>;
 
 impl GossipSync {
 	#[allow(unused)]

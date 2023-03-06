@@ -38,6 +38,8 @@ jobs:
           git clone https://github.com/rust-bitcoin/rust-lightning
           cd rust-lightning
           git checkout 0.0.114-bindings
+      - name: Fix Github Actions to not be broken
+        run: git config --global --add safe.directory /__w/ldk-c-bindings/ldk-c-bindings
       - name: Rebuild bindings without std, and check the sample app builds + links
         run: ./genbindings.sh ./rust-lightning false
       - name: Rebuild bindings, and check the sample app builds + links

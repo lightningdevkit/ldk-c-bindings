@@ -16,6 +16,7 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
+pub mod ser_macros;
 pub mod events;
 pub mod errors;
 pub mod ser;
@@ -24,20 +25,10 @@ pub mod invoice;
 pub mod persist;
 pub mod string;
 pub mod wakers;
+pub mod indexed_map;
 pub mod logger;
 pub mod config;
 mod fuzz_wrappers {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
-mod ser_macros {
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -91,17 +82,6 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 }
-}
-mod fairrwlock {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
 }
 mod zbase32 {
 

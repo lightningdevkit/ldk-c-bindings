@@ -790,7 +790,7 @@ pub extern "C" fn Balance_eq(a: &Balance, b: &Balance) -> bool {
 }
 
 use lightning::chain::channelmonitor::ChannelMonitor as nativeChannelMonitorImport;
-pub(crate) type nativeChannelMonitor = nativeChannelMonitorImport<crate::lightning::chain::keysinterface::Sign>;
+pub(crate) type nativeChannelMonitor = nativeChannelMonitorImport<crate::lightning::chain::keysinterface::WriteableEcdsaChannelSigner>;
 
 /// A ChannelMonitor handles chain events (blocks connected and disconnected) and generates
 /// on-chain transactions to ensure no loss of funds occurs.
@@ -1086,9 +1086,11 @@ pub extern "C" fn ChannelMonitor_get_claimable_balances(this_arg: &crate::lightn
 
 #[no_mangle]
 /// Read a C2Tuple_BlockHashChannelMonitorZ from a byte array, created by C2Tuple_BlockHashChannelMonitorZ_write
-pub extern "C" fn C2Tuple_BlockHashChannelMonitorZ_read(ser: crate::c_types::u8slice, arg: &crate::lightning::chain::keysinterface::KeysInterface) -> crate::c_types::derived::CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
-	let arg_conv = arg;
-	let res: Result<(bitcoin::hash_types::BlockHash, lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::Sign>), lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
+pub extern "C" fn C2Tuple_BlockHashChannelMonitorZ_read(ser: crate::c_types::u8slice, arg_a: &crate::lightning::chain::keysinterface::EntropySource, arg_b: &crate::lightning::chain::keysinterface::SignerProvider) -> crate::c_types::derived::CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
+	let arg_a_conv = arg_a;
+	let arg_b_conv = arg_b;
+	let arg_conv = (arg_a_conv, arg_b_conv);
+	let res: Result<(bitcoin::hash_types::BlockHash, lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::WriteableEcdsaChannelSigner>), lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_res_0_0, mut orig_res_0_1) = o; let mut local_res_0 = (crate::c_types::ThirtyTwoBytes { data: orig_res_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_res_0_1), is_owned: true }).into(); local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }

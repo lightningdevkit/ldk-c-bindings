@@ -6,7 +6,11 @@
 // license as that which applies to the original source files from which this
 // source was automatically generated.
 
-//! Structs and impls for receiving messages about the network and storing the topology live here.
+//! Some macros that implement [`Readable`]/[`Writeable`] traits for lightning messages.
+//! They also handle serialization and deserialization of TLVs.
+//!
+//! [`Readable`]: crate::util::ser::Readable
+//! [`Writeable`]: crate::util::ser::Writeable
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -16,7 +20,3 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
-pub mod utxo;
-pub mod gossip;
-pub mod router;
-pub mod scoring;

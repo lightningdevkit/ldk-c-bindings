@@ -308,11 +308,11 @@ pub extern "C" fn ChannelHandshakeConfig_set_announced_channel(this_ptr: &mut Ch
 /// any attacker who is able to take control of a channel can just as easily send the funds via
 /// lightning payments, so we never require that our counterparties support this option.
 ///
-/// The upfront key committed is provided from [`KeysInterface::get_shutdown_scriptpubkey`].
+/// The upfront key committed is provided from [`SignerProvider::get_shutdown_scriptpubkey`].
 ///
 /// Default value: true.
 ///
-/// [`KeysInterface::get_shutdown_scriptpubkey`]: crate::chain::keysinterface::KeysInterface::get_shutdown_scriptpubkey
+/// [`SignerProvider::get_shutdown_scriptpubkey`]: crate::chain::keysinterface::SignerProvider::get_shutdown_scriptpubkey
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_get_commit_upfront_shutdown_pubkey(this_ptr: &ChannelHandshakeConfig) -> bool {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().commit_upfront_shutdown_pubkey;
@@ -326,11 +326,11 @@ pub extern "C" fn ChannelHandshakeConfig_get_commit_upfront_shutdown_pubkey(this
 /// any attacker who is able to take control of a channel can just as easily send the funds via
 /// lightning payments, so we never require that our counterparties support this option.
 ///
-/// The upfront key committed is provided from [`KeysInterface::get_shutdown_scriptpubkey`].
+/// The upfront key committed is provided from [`SignerProvider::get_shutdown_scriptpubkey`].
 ///
 /// Default value: true.
 ///
-/// [`KeysInterface::get_shutdown_scriptpubkey`]: crate::chain::keysinterface::KeysInterface::get_shutdown_scriptpubkey
+/// [`SignerProvider::get_shutdown_scriptpubkey`]: crate::chain::keysinterface::SignerProvider::get_shutdown_scriptpubkey
 #[no_mangle]
 pub extern "C" fn ChannelHandshakeConfig_set_commit_upfront_shutdown_pubkey(this_ptr: &mut ChannelHandshakeConfig, mut val: bool) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.commit_upfront_shutdown_pubkey = val;
@@ -436,7 +436,7 @@ pub(crate) type nativeChannelHandshakeLimits = nativeChannelHandshakeLimitsImpor
 ///
 /// These limits are only applied to our counterparty's limits, not our own.
 ///
-/// Use 0/<type>::max_value() as appropriate to skip checking.
+/// Use 0/`<type>::max_value()` as appropriate to skip checking.
 ///
 /// Provides sane defaults for most configurations.
 ///

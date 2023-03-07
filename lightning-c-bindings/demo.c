@@ -28,7 +28,7 @@ void broadcast_tx(const void *this_arg, LDKTransaction tx) {
 LDKChannelMonitorUpdateStatus add_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, LDKChannelMonitor monitor) {
 	return ChannelMonitorUpdateStatus_completed();
 }
-LDKChannelMonitorUpdateStatus update_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, LDKChannelMonitorUpdate monitor) {
+LDKChannelMonitorUpdateStatus update_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, const LDKChannelMonitorUpdate *monitor) {
 	return ChannelMonitorUpdateStatus_completed();
 }
 LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ monitors_pending_monitor_events(const void *this_arg) {
@@ -42,6 +42,16 @@ LDKCVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ monitors_pending_monitor_e
 void never_handle_event(const void *this_arg, const struct LDKEvent event) {
 	// Note that we never actually generate any events to handle in the code below.
 	assert(false);
+}
+
+LDKCResult_RouteLightningErrorZ do_find_route(const void *this_arg, LDKPublicKey payer, const LDKRouteParameters *route_params, LDKCVec_ChannelDetailsZ *first_hops, const LDKInFlightHtlcs *inflight_htlcs) {
+	LDKStr reason = { .chars = (const unsigned char*)"", .len = 0, .chars_is_owned = false };
+	return CResult_RouteLightningErrorZ_err(LightningError_new(reason, ErrorAction_ignore_error()));
+}
+
+LDKCResult_RouteLightningErrorZ do_find_route_with_id(const void *this_arg, LDKPublicKey payer, const LDKRouteParameters *route_params, LDKCVec_ChannelDetailsZ *first_hops, const LDKInFlightHtlcs *inflight_htlcs, struct LDKThirtyTwoBytes payment_hash, struct LDKThirtyTwoBytes payment_id) {
+	LDKStr reason = { .chars = (const unsigned char*)"", .len = 0, .chars_is_owned = false };
+	return CResult_RouteLightningErrorZ_err(LightningError_new(reason, ErrorAction_ignore_error()));
 }
 
 int main() {
@@ -71,19 +81,28 @@ int main() {
 	};
 
 	LDKBroadcasterInterface broadcast = {
-		broadcast.this_arg = NULL,
-		broadcast.broadcast_transaction = broadcast_tx,
+		.this_arg = NULL,
+		.broadcast_transaction = broadcast_tx,
+		.free = NULL,
+	};
+
+	LDKRouter router = {
+		.this_arg = NULL,
+		.find_route = do_find_route,
+		.find_route_with_id = do_find_route_with_id,
 		.free = NULL,
 	};
 
 	LDKKeysManager keys = KeysManager_new(&node_seed, 0, 0);
-	LDKKeysInterface keys_source = KeysManager_as_KeysInterface(&keys);
+	LDKEntropySource entropy_source = KeysManager_as_EntropySource(&keys);
+	LDKNodeSigner node_signer = KeysManager_as_NodeSigner(&keys);
+	LDKSignerProvider signer_provider = KeysManager_as_SignerProvider(&keys);
 
 	LDKUserConfig config = UserConfig_default();
 	LDKThirtyTwoBytes chain_tip;
 	memset(&chain_tip, 0, 32);
 	LDKChainParameters chain = ChainParameters_new(net, BestBlock_new(chain_tip, 0));
-	LDKChannelManager cm = ChannelManager_new(fee_est, mon, broadcast, logger, keys_source, config, chain);
+	LDKChannelManager cm = ChannelManager_new(fee_est, mon, broadcast, router, logger, entropy_source, node_signer, signer_provider, config, chain);
 
 	LDKCVec_ChannelDetailsZ channels = ChannelManager_list_channels(&cm);
 	assert((unsigned long)channels.data < 4096); // There's an offset, but it should still be an offset against null in the 0 page

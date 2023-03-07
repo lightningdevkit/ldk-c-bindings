@@ -51,6 +51,10 @@
 //!     (see [BOLT-2](https://github.com/lightning/bolts/blob/master/02-peer-protocol.md) for more information).
 //! - `Keysend` - send funds to a node without an invoice
 //!     (see the [`Keysend` feature assignment proposal](https://github.com/lightning/bolts/issues/605#issuecomment-606679798) for more information).
+//! - `AnchorsZeroFeeHtlcTx` - requires/supports that commitment transactions include anchor outputs
+//!   and HTLC transactions are pre-signed with zero fee (see
+//!   [BOLT-3](https://github.com/lightning/bolts/blob/master/03-transactions.md) for more
+//!   information).
 //!
 //! [BOLT #9]: https://github.com/lightning/bolts/blob/master/09-features.md
 //! [messages]: crate::ln::msgs
@@ -573,6 +577,26 @@ pub extern "C" fn InvoiceFeatures_supports_basic_mpp(this_arg: &crate::lightning
 	ret
 }
 
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_set_basic_mpp_optional(this_arg: &mut crate::lightning::ln::features::Bolt12InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt12InvoiceFeatures)) }.set_basic_mpp_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_set_basic_mpp_required(this_arg: &mut crate::lightning::ln::features::Bolt12InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt12InvoiceFeatures)) }.set_basic_mpp_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_supports_basic_mpp(this_arg: &crate::lightning::ln::features::Bolt12InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_basic_mpp();
+	ret
+}
+
 /// Checks if this feature is required.
 #[must_use]
 #[no_mangle]
@@ -593,6 +617,14 @@ pub extern "C" fn NodeFeatures_requires_basic_mpp(this_arg: &crate::lightning::l
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InvoiceFeatures_requires_basic_mpp(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_basic_mpp();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_requires_basic_mpp(this_arg: &crate::lightning::ln::features::Bolt12InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_basic_mpp();
 	ret
 }
@@ -650,6 +682,90 @@ pub extern "C" fn InitFeatures_requires_wumbo(this_arg: &crate::lightning::ln::f
 #[no_mangle]
 pub extern "C" fn NodeFeatures_requires_wumbo(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_wumbo();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_anchors_zero_fee_htlc_tx_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_anchors_zero_fee_htlc_tx_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_anchors_zero_fee_htlc_tx_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_anchors_zero_fee_htlc_tx_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_anchors_zero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_anchors_zero_fee_htlc_tx();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_anchors_zero_fee_htlc_tx_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_anchors_zero_fee_htlc_tx_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_anchors_zero_fee_htlc_tx_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_anchors_zero_fee_htlc_tx_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_anchors_zero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_anchors_zero_fee_htlc_tx();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_anchors_zero_fee_htlc_tx_optional(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_anchors_zero_fee_htlc_tx_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_anchors_zero_fee_htlc_tx_required(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_anchors_zero_fee_htlc_tx_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_supports_anchors_zero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_anchors_zero_fee_htlc_tx();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_anchors_zero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_anchors_zero_fee_htlc_tx();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_anchors_zero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_anchors_zero_fee_htlc_tx();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_requires_anchors_zero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_anchors_zero_fee_htlc_tx();
 	ret
 }
 
@@ -1072,6 +1188,24 @@ pub extern "C" fn InvoiceRequestFeatures_eq(a: &InvoiceRequestFeatures, b: &Invo
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
+/// Checks if two Bolt12InvoiceFeaturess contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_eq(a: &Bolt12InvoiceFeatures, b: &Bolt12InvoiceFeatures) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+/// Checks if two BlindedHopFeaturess contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn BlindedHopFeatures_eq(a: &BlindedHopFeatures, b: &BlindedHopFeatures) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 /// Checks if two ChannelTypeFeaturess contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -1193,6 +1327,44 @@ pub(crate) extern "C" fn InvoiceRequestFeatures_clone_void(this_ptr: *const c_vo
 #[no_mangle]
 /// Creates a copy of the InvoiceRequestFeatures
 pub extern "C" fn InvoiceRequestFeatures_clone(orig: &InvoiceRequestFeatures) -> InvoiceRequestFeatures {
+	orig.clone()
+}
+impl Clone for Bolt12InvoiceFeatures {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeBolt12InvoiceFeatures>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Bolt12InvoiceFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBolt12InvoiceFeatures)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the Bolt12InvoiceFeatures
+pub extern "C" fn Bolt12InvoiceFeatures_clone(orig: &Bolt12InvoiceFeatures) -> Bolt12InvoiceFeatures {
+	orig.clone()
+}
+impl Clone for BlindedHopFeatures {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeBlindedHopFeatures>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn BlindedHopFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBlindedHopFeatures)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the BlindedHopFeatures
+pub extern "C" fn BlindedHopFeatures_clone(orig: &BlindedHopFeatures) -> BlindedHopFeatures {
 	orig.clone()
 }
 impl Clone for ChannelTypeFeatures {
@@ -1521,6 +1693,108 @@ impl InvoiceRequestFeatures {
 	}
 }
 
+use lightning::ln::features::Bolt12InvoiceFeatures as nativeBolt12InvoiceFeaturesImport;
+pub(crate) type nativeBolt12InvoiceFeatures = nativeBolt12InvoiceFeaturesImport;
+
+/// Features used within an `invoice`.
+#[must_use]
+#[repr(C)]
+pub struct Bolt12InvoiceFeatures {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeBolt12InvoiceFeatures,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for Bolt12InvoiceFeatures {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeBolt12InvoiceFeatures>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the Bolt12InvoiceFeatures, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_free(this_obj: Bolt12InvoiceFeatures) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Bolt12InvoiceFeatures_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeBolt12InvoiceFeatures) };
+}
+#[allow(unused)]
+impl Bolt12InvoiceFeatures {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeBolt12InvoiceFeatures {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeBolt12InvoiceFeatures {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeBolt12InvoiceFeatures {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+
+use lightning::ln::features::BlindedHopFeatures as nativeBlindedHopFeaturesImport;
+pub(crate) type nativeBlindedHopFeatures = nativeBlindedHopFeaturesImport;
+
+/// Features used within BOLT 4 encrypted_data_tlv and BOLT 12 blinded_payinfo
+#[must_use]
+#[repr(C)]
+pub struct BlindedHopFeatures {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeBlindedHopFeatures,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for BlindedHopFeatures {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeBlindedHopFeatures>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the BlindedHopFeatures, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn BlindedHopFeatures_free(this_obj: BlindedHopFeatures) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn BlindedHopFeatures_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeBlindedHopFeatures) };
+}
+#[allow(unused)]
+impl BlindedHopFeatures {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeBlindedHopFeatures {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeBlindedHopFeatures {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeBlindedHopFeatures {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+
 use lightning::ln::features::ChannelTypeFeatures as nativeChannelTypeFeaturesImport;
 pub(crate) type nativeChannelTypeFeatures = nativeChannelTypeFeaturesImport;
 
@@ -1685,6 +1959,40 @@ pub extern "C" fn InvoiceRequestFeatures_requires_unknown_bits(this_arg: &crate:
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_empty() -> crate::lightning::ln::features::Bolt12InvoiceFeatures {
+	let mut ret = lightning::ln::features::Bolt12InvoiceFeatures::empty();
+	crate::lightning::ln::features::Bolt12InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains unknown feature flags which are set as
+/// \"required\".
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::Bolt12InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
+	ret
+}
+
+/// Create a blank Features with no features set
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedHopFeatures_empty() -> crate::lightning::ln::features::BlindedHopFeatures {
+	let mut ret = lightning::ln::features::BlindedHopFeatures::empty();
+	crate::lightning::ln::features::BlindedHopFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains unknown feature flags which are set as
+/// \"required\".
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedHopFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::BlindedHopFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
+	ret
+}
+
+/// Create a blank Features with no features set
+#[must_use]
+#[no_mangle]
 pub extern "C" fn ChannelTypeFeatures_empty() -> crate::lightning::ln::features::ChannelTypeFeatures {
 	let mut ret = lightning::ln::features::ChannelTypeFeatures::empty();
 	crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
@@ -1764,6 +2072,22 @@ pub extern "C" fn InvoiceFeatures_read(ser: crate::c_types::u8slice) -> crate::c
 	local_res
 }
 #[no_mangle]
+/// Serialize the BlindedHopFeatures object into a byte array which can be read by BlindedHopFeatures_read
+pub extern "C" fn BlindedHopFeatures_write(obj: &crate::lightning::ln::features::BlindedHopFeatures) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn BlindedHopFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBlindedHopFeatures) })
+}
+#[no_mangle]
+/// Read a BlindedHopFeatures from a byte array, created by BlindedHopFeatures_write
+pub extern "C" fn BlindedHopFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_BlindedHopFeaturesDecodeErrorZ {
+	let res: Result<lightning::ln::features::BlindedHopFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::BlindedHopFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
+}
+#[no_mangle]
 /// Serialize the ChannelTypeFeatures object into a byte array which can be read by ChannelTypeFeatures_read
 pub extern "C" fn ChannelTypeFeatures_write(obj: &crate::lightning::ln::features::ChannelTypeFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
@@ -1777,37 +2101,5 @@ pub(crate) extern "C" fn ChannelTypeFeatures_write_void(obj: *const c_void) -> c
 pub extern "C" fn ChannelTypeFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelTypeFeaturesDecodeErrorZ {
 	let res: Result<lightning::ln::features::ChannelTypeFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
-	local_res
-}
-#[no_mangle]
-/// Serialize the OfferFeatures object into a byte array which can be read by OfferFeatures_read
-pub extern "C" fn OfferFeatures_write(obj: &crate::lightning::ln::features::OfferFeatures) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
-}
-#[no_mangle]
-pub(crate) extern "C" fn OfferFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOfferFeatures) })
-}
-#[no_mangle]
-/// Read a OfferFeatures from a byte array, created by OfferFeatures_write
-pub extern "C" fn OfferFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_OfferFeaturesDecodeErrorZ {
-	let res: Result<lightning::ln::features::OfferFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::OfferFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
-	local_res
-}
-#[no_mangle]
-/// Serialize the InvoiceRequestFeatures object into a byte array which can be read by InvoiceRequestFeatures_read
-pub extern "C" fn InvoiceRequestFeatures_write(obj: &crate::lightning::ln::features::InvoiceRequestFeatures) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
-}
-#[no_mangle]
-pub(crate) extern "C" fn InvoiceRequestFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeInvoiceRequestFeatures) })
-}
-#[no_mangle]
-/// Read a InvoiceRequestFeatures from a byte array, created by InvoiceRequestFeatures_write
-pub extern "C" fn InvoiceRequestFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_InvoiceRequestFeaturesDecodeErrorZ {
-	let res: Result<lightning::ln::features::InvoiceRequestFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::InvoiceRequestFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }

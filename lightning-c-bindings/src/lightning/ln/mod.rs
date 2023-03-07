@@ -35,6 +35,7 @@ pub mod peer_handler;
 pub mod chan_utils;
 pub mod features;
 pub mod script;
+pub mod outbound_payment;
 pub mod wire;
 mod peer_channel_encryptor {
 

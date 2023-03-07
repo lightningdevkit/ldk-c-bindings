@@ -613,13 +613,13 @@ pub static DEFAULT_EXPIRY_TIME: u64 = lightning_invoice::DEFAULT_EXPIRY_TIME;
 /// Default minimum final CLTV expiry as defined by [BOLT 11].
 ///
 /// Note that this is *not* the same value as rust-lightning's minimum CLTV expiry, which is
-/// provided in [`MIN_FINAL_CLTV_EXPIRY`].
+/// provided in [`MIN_FINAL_CLTV_EXPIRY_DELTA`].
 ///
 /// [BOLT 11]: https://github.com/lightning/bolts/blob/master/11-payment-encoding.md
-/// [`MIN_FINAL_CLTV_EXPIRY`]: lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY
+/// [`MIN_FINAL_CLTV_EXPIRY_DELTA`]: lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY_DELTA
 
 #[no_mangle]
-pub static DEFAULT_MIN_FINAL_CLTV_EXPIRY: u64 = lightning_invoice::DEFAULT_MIN_FINAL_CLTV_EXPIRY;
+pub static DEFAULT_MIN_FINAL_CLTV_EXPIRY_DELTA: u64 = lightning_invoice::DEFAULT_MIN_FINAL_CLTV_EXPIRY_DELTA;
 
 use lightning_invoice::Invoice as nativeInvoiceImport;
 pub(crate) type nativeInvoice = nativeInvoiceImport;
@@ -1684,18 +1684,18 @@ pub extern "C" fn ExpiryTime_eq(a: &ExpiryTime, b: &ExpiryTime) -> bool {
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 
-use lightning_invoice::MinFinalCltvExpiry as nativeMinFinalCltvExpiryImport;
-pub(crate) type nativeMinFinalCltvExpiry = nativeMinFinalCltvExpiryImport;
+use lightning_invoice::MinFinalCltvExpiryDelta as nativeMinFinalCltvExpiryDeltaImport;
+pub(crate) type nativeMinFinalCltvExpiryDelta = nativeMinFinalCltvExpiryDeltaImport;
 
-/// `min_final_cltv_expiry` to use for the last HTLC in the route
+/// `min_final_cltv_expiry_delta` to use for the last HTLC in the route
 #[must_use]
 #[repr(C)]
-pub struct MinFinalCltvExpiry {
+pub struct MinFinalCltvExpiryDelta {
 	/// A pointer to the opaque Rust object.
 
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeMinFinalCltvExpiry,
+	pub inner: *mut nativeMinFinalCltvExpiryDelta,
 	/// Indicates that this is the only struct which contains the same pointer.
 
 	/// Rust functions which take ownership of an object provided via an argument require
@@ -1703,31 +1703,31 @@ pub struct MinFinalCltvExpiry {
 	pub is_owned: bool,
 }
 
-impl Drop for MinFinalCltvExpiry {
+impl Drop for MinFinalCltvExpiryDelta {
 	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeMinFinalCltvExpiry>::is_null(self.inner) {
+		if self.is_owned && !<*mut nativeMinFinalCltvExpiryDelta>::is_null(self.inner) {
 			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
-/// Frees any resources used by the MinFinalCltvExpiry, if is_owned is set and inner is non-NULL.
+/// Frees any resources used by the MinFinalCltvExpiryDelta, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn MinFinalCltvExpiry_free(this_obj: MinFinalCltvExpiry) { }
+pub extern "C" fn MinFinalCltvExpiryDelta_free(this_obj: MinFinalCltvExpiryDelta) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn MinFinalCltvExpiry_free_void(this_ptr: *mut c_void) {
-	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeMinFinalCltvExpiry) };
+pub(crate) extern "C" fn MinFinalCltvExpiryDelta_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeMinFinalCltvExpiryDelta) };
 }
 #[allow(unused)]
-impl MinFinalCltvExpiry {
-	pub(crate) fn get_native_ref(&self) -> &'static nativeMinFinalCltvExpiry {
+impl MinFinalCltvExpiryDelta {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeMinFinalCltvExpiryDelta {
 		unsafe { &*ObjOps::untweak_ptr(self.inner) }
 	}
-	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeMinFinalCltvExpiry {
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeMinFinalCltvExpiryDelta {
 		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
 	}
 	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-	pub(crate) fn take_inner(mut self) -> *mut nativeMinFinalCltvExpiry {
+	pub(crate) fn take_inner(mut self) -> *mut nativeMinFinalCltvExpiryDelta {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = core::ptr::null_mut();
@@ -1735,26 +1735,26 @@ impl MinFinalCltvExpiry {
 	}
 }
 #[no_mangle]
-pub extern "C" fn MinFinalCltvExpiry_get_a(this_ptr: &MinFinalCltvExpiry) -> u64 {
+pub extern "C" fn MinFinalCltvExpiryDelta_get_a(this_ptr: &MinFinalCltvExpiryDelta) -> u64 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().0;
 	*inner_val
 }
 #[no_mangle]
-pub extern "C" fn MinFinalCltvExpiry_set_a(this_ptr: &mut MinFinalCltvExpiry, mut val: u64) {
+pub extern "C" fn MinFinalCltvExpiryDelta_set_a(this_ptr: &mut MinFinalCltvExpiryDelta, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.0 = val;
 }
-/// Constructs a new MinFinalCltvExpiry given each field
+/// Constructs a new MinFinalCltvExpiryDelta given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn MinFinalCltvExpiry_new(mut a_arg: u64) -> MinFinalCltvExpiry {
-	MinFinalCltvExpiry { inner: ObjOps::heap_alloc(lightning_invoice::MinFinalCltvExpiry (
+pub extern "C" fn MinFinalCltvExpiryDelta_new(mut a_arg: u64) -> MinFinalCltvExpiryDelta {
+	MinFinalCltvExpiryDelta { inner: ObjOps::heap_alloc(lightning_invoice::MinFinalCltvExpiryDelta (
 		a_arg,
 	)), is_owned: true }
 }
-impl Clone for MinFinalCltvExpiry {
+impl Clone for MinFinalCltvExpiryDelta {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeMinFinalCltvExpiry>::is_null(self.inner) { core::ptr::null_mut() } else {
+			inner: if <*mut nativeMinFinalCltvExpiryDelta>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1762,17 +1762,17 @@ impl Clone for MinFinalCltvExpiry {
 }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn MinFinalCltvExpiry_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeMinFinalCltvExpiry)).clone() })) as *mut c_void
+pub(crate) extern "C" fn MinFinalCltvExpiryDelta_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeMinFinalCltvExpiryDelta)).clone() })) as *mut c_void
 }
 #[no_mangle]
-/// Creates a copy of the MinFinalCltvExpiry
-pub extern "C" fn MinFinalCltvExpiry_clone(orig: &MinFinalCltvExpiry) -> MinFinalCltvExpiry {
+/// Creates a copy of the MinFinalCltvExpiryDelta
+pub extern "C" fn MinFinalCltvExpiryDelta_clone(orig: &MinFinalCltvExpiryDelta) -> MinFinalCltvExpiryDelta {
 	orig.clone()
 }
-/// Checks if two MinFinalCltvExpirys contain equal inner contents.
+/// Checks if two MinFinalCltvExpiryDeltas contain equal inner contents.
 #[no_mangle]
-pub extern "C" fn MinFinalCltvExpiry_hash(o: &MinFinalCltvExpiry) -> u64 {
+pub extern "C" fn MinFinalCltvExpiryDelta_hash(o: &MinFinalCltvExpiryDelta) -> u64 {
 	if o.inner.is_null() { return 0; }
 	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
 	#[allow(deprecated)]
@@ -1780,11 +1780,11 @@ pub extern "C" fn MinFinalCltvExpiry_hash(o: &MinFinalCltvExpiry) -> u64 {
 	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
 	core::hash::Hasher::finish(&hasher)
 }
-/// Checks if two MinFinalCltvExpirys contain equal inner contents.
+/// Checks if two MinFinalCltvExpiryDeltas contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
 #[no_mangle]
-pub extern "C" fn MinFinalCltvExpiry_eq(a: &MinFinalCltvExpiry, b: &MinFinalCltvExpiry) -> bool {
+pub extern "C" fn MinFinalCltvExpiryDelta_eq(a: &MinFinalCltvExpiryDelta, b: &MinFinalCltvExpiryDelta) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
@@ -2243,9 +2243,9 @@ pub extern "C" fn RawInvoice_expiry_time(this_arg: &crate::lightning_invoice::Ra
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawInvoice_min_final_cltv_expiry(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::lightning_invoice::MinFinalCltvExpiry {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.min_final_cltv_expiry();
-	let mut local_ret = crate::lightning_invoice::MinFinalCltvExpiry { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::MinFinalCltvExpiry<>) as *mut _ }, is_owned: false };
+pub extern "C" fn RawInvoice_min_final_cltv_expiry_delta(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::lightning_invoice::MinFinalCltvExpiryDelta {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.min_final_cltv_expiry_delta();
+	let mut local_ret = crate::lightning_invoice::MinFinalCltvExpiryDelta { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning_invoice::MinFinalCltvExpiryDelta<>) as *mut _ }, is_owned: false };
 	local_ret
 }
 
@@ -2487,12 +2487,12 @@ pub extern "C" fn Invoice_would_expire(this_arg: &crate::lightning_invoice::Invo
 	ret
 }
 
-/// Returns the invoice's `min_final_cltv_expiry` time, if present, otherwise
-/// [`DEFAULT_MIN_FINAL_CLTV_EXPIRY`].
+/// Returns the invoice's `min_final_cltv_expiry_delta` time, if present, otherwise
+/// [`DEFAULT_MIN_FINAL_CLTV_EXPIRY_DELTA`].
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Invoice_min_final_cltv_expiry(this_arg: &crate::lightning_invoice::Invoice) -> u64 {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.min_final_cltv_expiry();
+pub extern "C" fn Invoice_min_final_cltv_expiry_delta(this_arg: &crate::lightning_invoice::Invoice) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.min_final_cltv_expiry_delta();
 	ret
 }
 
@@ -2618,6 +2618,10 @@ pub enum CreationError {
 	///
 	/// [phantom invoices]: crate::utils::create_phantom_invoice
 	MissingRouteHints,
+	/// The provided `min_final_cltv_expiry_delta` was less than [`MIN_FINAL_CLTV_EXPIRY_DELTA`].
+	///
+	/// [`MIN_FINAL_CLTV_EXPIRY_DELTA`]: lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY_DELTA
+	MinFinalCltvExpiryDeltaTooShort,
 }
 use lightning_invoice::CreationError as CreationErrorImport;
 pub(crate) type nativeCreationError = CreationErrorImport;
@@ -2631,6 +2635,7 @@ impl CreationError {
 			CreationError::TimestampOutOfBounds => nativeCreationError::TimestampOutOfBounds,
 			CreationError::InvalidAmount => nativeCreationError::InvalidAmount,
 			CreationError::MissingRouteHints => nativeCreationError::MissingRouteHints,
+			CreationError::MinFinalCltvExpiryDeltaTooShort => nativeCreationError::MinFinalCltvExpiryDeltaTooShort,
 		}
 	}
 	#[allow(unused)]
@@ -2641,6 +2646,7 @@ impl CreationError {
 			CreationError::TimestampOutOfBounds => nativeCreationError::TimestampOutOfBounds,
 			CreationError::InvalidAmount => nativeCreationError::InvalidAmount,
 			CreationError::MissingRouteHints => nativeCreationError::MissingRouteHints,
+			CreationError::MinFinalCltvExpiryDeltaTooShort => nativeCreationError::MinFinalCltvExpiryDeltaTooShort,
 		}
 	}
 	#[allow(unused)]
@@ -2651,6 +2657,7 @@ impl CreationError {
 			nativeCreationError::TimestampOutOfBounds => CreationError::TimestampOutOfBounds,
 			nativeCreationError::InvalidAmount => CreationError::InvalidAmount,
 			nativeCreationError::MissingRouteHints => CreationError::MissingRouteHints,
+			nativeCreationError::MinFinalCltvExpiryDeltaTooShort => CreationError::MinFinalCltvExpiryDeltaTooShort,
 		}
 	}
 	#[allow(unused)]
@@ -2661,6 +2668,7 @@ impl CreationError {
 			nativeCreationError::TimestampOutOfBounds => CreationError::TimestampOutOfBounds,
 			nativeCreationError::InvalidAmount => CreationError::InvalidAmount,
 			nativeCreationError::MissingRouteHints => CreationError::MissingRouteHints,
+			nativeCreationError::MinFinalCltvExpiryDeltaTooShort => CreationError::MinFinalCltvExpiryDeltaTooShort,
 		}
 	}
 }
@@ -2689,6 +2697,10 @@ pub extern "C" fn CreationError_invalid_amount() -> CreationError {
 /// Utility method to constructs a new MissingRouteHints-variant CreationError
 pub extern "C" fn CreationError_missing_route_hints() -> CreationError {
 	CreationError::MissingRouteHints}
+#[no_mangle]
+/// Utility method to constructs a new MinFinalCltvExpiryDeltaTooShort-variant CreationError
+pub extern "C" fn CreationError_min_final_cltv_expiry_delta_too_short() -> CreationError {
+	CreationError::MinFinalCltvExpiryDeltaTooShort}
 /// Checks if two CreationErrors contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]

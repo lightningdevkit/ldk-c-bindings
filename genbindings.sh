@@ -183,14 +183,14 @@ echo > /tmp/crate-source.txt
 if [ "$2" = "true" ]; then
 	add_crate lightning lightning --features=std
 	add_crate "lightning-persister" "lightning_persister"
-	add_crate "lightning-background-processor" "lightning_background_processor"
+	add_crate "lightning-background-processor" "lightning_background_processor" --features=std
 	add_crate "lightning-invoice" "lightning_invoice" --features=std
 	add_crate "lightning-rapid-gossip-sync" "lightning_rapid_gossip_sync"
 	CARGO_BUILD_ARGS="--features=std"
 else
 	add_crate lightning lightning --features=no-std
 	drop_crate "lightning-persister"
-	drop_crate "lightning-background-processor"
+	add_crate "lightning-background-processor" "lightning_background_processor"
 	add_crate "lightning-rapid-gossip-sync" "lightning_rapid_gossip_sync" --features=no-std
 	add_crate "lightning-invoice" "lightning_invoice" --features=no-std
 	CARGO_BUILD_ARGS="--features=no-std"
@@ -571,5 +571,5 @@ else
 	if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
 		RUSTFLAGS="$BASE_RUSTFLAGS -C embed-bitcode=yes -C lto -C target-cpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin
 	fi
-	echo "WARNING: Building with cross-language LTO is not avilable without clang-$RUSTC_LLVM_V"
+	echo "WARNING: Building with cross-language LTO is not avilable without clang-$RUSTC_LLVM_V and lld-$RUSTC_LLVM_V"
 fi

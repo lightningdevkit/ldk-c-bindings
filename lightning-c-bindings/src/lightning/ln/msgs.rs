@@ -11,12 +11,12 @@
 //! For a normal node you probably don't need to use anything here, however, if you wish to split a
 //! node into an internet-facing route/message socket handling daemon and a separate daemon (or
 //! server entirely) which handles only channel-related messages you may wish to implement
-//! ChannelMessageHandler yourself and use it to re-serialize messages and pass them across
+//! [`ChannelMessageHandler`] yourself and use it to re-serialize messages and pass them across
 //! daemons/servers.
 //!
 //! Note that if you go with such an architecture (instead of passing raw socket events to a
 //! non-internet-facing system) you trust the frontend internet-facing system to not lie about the
-//! source node_id of the message, however this does allow you to significantly reduce bandwidth
+//! source `node_id` of the message, however this does allow you to significantly reduce bandwidth
 //! between the systems as routing messages can represent a significant chunk of bandwidth usage
 //! (especially for non-channel-publicly-announcing nodes). As an alternate design which avoids
 //! this issue, if you have sufficient bidirectional bandwidth between your systems, you may send
@@ -37,19 +37,22 @@ use alloc::{vec::Vec, boxed::Box};
 #[repr(C)]
 pub enum DecodeError {
 	/// A version byte specified something we don't know how to handle.
-	/// Includes unknown realm byte in an OnionHopData packet
+	///
+	/// Includes unknown realm byte in an onion hop data packet.
 	UnknownVersion,
-	/// Unknown feature mandating we fail to parse message (eg TLV with an even, unknown type)
+	/// Unknown feature mandating we fail to parse message (e.g., TLV with an even, unknown type)
 	UnknownRequiredFeature,
-	/// Value was invalid, eg a byte which was supposed to be a bool was something other than a 0
+	/// Value was invalid.
+	///
+	/// For example, a byte which was supposed to be a bool was something other than a 0
 	/// or 1, a public key/private key/signature was invalid, text wasn't UTF-8, TLV was
-	/// syntactically incorrect, etc
+	/// syntactically incorrect, etc.
 	InvalidValue,
-	/// Buffer too short
+	/// The buffer to be read was too short.
 	ShortRead,
-	/// A length descriptor in the packet didn't describe the later data correctly
+	/// A length descriptor in the packet didn't describe the later data correctly.
 	BadLengthDescriptor,
-	/// Error from std::io
+	/// Error from [`std::io`].
 	Io(
 		crate::c_types::IOError),
 	/// The message included zlib-compressed values, which we don't support.
@@ -173,7 +176,9 @@ pub extern "C" fn DecodeError_eq(a: &DecodeError, b: &DecodeError) -> bool {
 use lightning::ln::msgs::Init as nativeInitImport;
 pub(crate) type nativeInit = nativeInitImport;
 
-/// An init message to be sent or received from a peer
+/// An [`init`] message to be sent to or received from a peer.
+///
+/// [`init`]: https://github.com/lightning/bolts/blob/master/01-messaging.md#the-init-message
 #[must_use]
 #[repr(C)]
 pub struct Init {
@@ -220,31 +225,35 @@ impl Init {
 		ret
 	}
 }
-/// The relevant features which the sender supports
+/// The relevant features which the sender supports.
 #[no_mangle]
 pub extern "C" fn Init_get_features(this_ptr: &Init) -> crate::lightning::ln::features::InitFeatures {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().features;
 	crate::lightning::ln::features::InitFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::features::InitFeatures<>) as *mut _) }, is_owned: false }
 }
-/// The relevant features which the sender supports
+/// The relevant features which the sender supports.
 #[no_mangle]
 pub extern "C" fn Init_set_features(this_ptr: &mut Init, mut val: crate::lightning::ln::features::InitFeatures) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.features = *unsafe { Box::from_raw(val.take_inner()) };
 }
-/// The receipient's network address. This adds the option to report a remote IP address
-/// back to a connecting peer using the init message. A node can decide to use that information
-/// to discover a potential update to its public IPv4 address (NAT) and use
-/// that for a node_announcement update message containing the new address.
+/// The receipient's network address.
+///
+/// This adds the option to report a remote IP address back to a connecting peer using the init
+/// message. A node can decide to use that information to discover a potential update to its
+/// public IPv4 address (NAT) and use that for a [`NodeAnnouncement`] update message containing
+/// the new address.
 #[no_mangle]
 pub extern "C" fn Init_get_remote_network_address(this_ptr: &Init) -> crate::c_types::derived::COption_NetAddressZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().remote_network_address;
 	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NetAddressZ::None } else { crate::c_types::derived::COption_NetAddressZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::lightning::ln::msgs::NetAddress::native_into(inner_val.clone().unwrap()) }) };
 	local_inner_val
 }
-/// The receipient's network address. This adds the option to report a remote IP address
-/// back to a connecting peer using the init message. A node can decide to use that information
-/// to discover a potential update to its public IPv4 address (NAT) and use
-/// that for a node_announcement update message containing the new address.
+/// The receipient's network address.
+///
+/// This adds the option to report a remote IP address back to a connecting peer using the init
+/// message. A node can decide to use that information to discover a potential update to its
+/// public IPv4 address (NAT) and use that for a [`NodeAnnouncement`] update message containing
+/// the new address.
 #[no_mangle]
 pub extern "C" fn Init_set_remote_network_address(this_ptr: &mut Init, mut val: crate::c_types::derived::COption_NetAddressZ) {
 	let mut local_val = { /* val*/ let val_opt = val; { } if val_opt.is_none() { None } else { Some({ val_opt.take().into_native() }) } };
@@ -292,7 +301,9 @@ pub extern "C" fn Init_eq(a: &Init, b: &Init) -> bool {
 use lightning::ln::msgs::ErrorMessage as nativeErrorMessageImport;
 pub(crate) type nativeErrorMessage = nativeErrorMessageImport;
 
-/// An error message to be sent or received from a peer
+/// An [`error`] message to be sent to or received from a peer.
+///
+/// [`error`]: https://github.com/lightning/bolts/blob/master/01-messaging.md#the-error-and-warning-messages
 #[must_use]
 #[repr(C)]
 pub struct ErrorMessage {
@@ -357,8 +368,9 @@ pub extern "C" fn ErrorMessage_set_channel_id(this_ptr: &mut ErrorMessage, mut v
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
 }
 /// A possibly human-readable error description.
-/// The string should be sanitized before it is used (e.g. emitted to logs or printed to
-/// stdout). Otherwise, a well crafted error message may trigger a security vulnerability in
+///
+/// The string should be sanitized before it is used (e.g., emitted to logs or printed to
+/// `stdout`). Otherwise, a well crafted error message may trigger a security vulnerability in
 /// the terminal emulator or the logging subsystem.
 #[no_mangle]
 pub extern "C" fn ErrorMessage_get_data(this_ptr: &ErrorMessage) -> crate::c_types::Str {
@@ -366,8 +378,9 @@ pub extern "C" fn ErrorMessage_get_data(this_ptr: &ErrorMessage) -> crate::c_typ
 	inner_val.as_str().into()
 }
 /// A possibly human-readable error description.
-/// The string should be sanitized before it is used (e.g. emitted to logs or printed to
-/// stdout). Otherwise, a well crafted error message may trigger a security vulnerability in
+///
+/// The string should be sanitized before it is used (e.g., emitted to logs or printed to
+/// `stdout`). Otherwise, a well crafted error message may trigger a security vulnerability in
 /// the terminal emulator or the logging subsystem.
 #[no_mangle]
 pub extern "C" fn ErrorMessage_set_data(this_ptr: &mut ErrorMessage, mut val: crate::c_types::Str) {
@@ -414,7 +427,9 @@ pub extern "C" fn ErrorMessage_eq(a: &ErrorMessage, b: &ErrorMessage) -> bool {
 use lightning::ln::msgs::WarningMessage as nativeWarningMessageImport;
 pub(crate) type nativeWarningMessage = nativeWarningMessageImport;
 
-/// A warning message to be sent or received from a peer
+/// A [`warning`] message to be sent to or received from a peer.
+///
+/// [`warning`]: https://github.com/lightning/bolts/blob/master/01-messaging.md#the-error-and-warning-messages
 #[must_use]
 #[repr(C)]
 pub struct WarningMessage {
@@ -477,6 +492,7 @@ pub extern "C" fn WarningMessage_set_channel_id(this_ptr: &mut WarningMessage, m
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
 }
 /// A possibly human-readable warning description.
+///
 /// The string should be sanitized before it is used (e.g. emitted to logs or printed to
 /// stdout). Otherwise, a well crafted error message may trigger a security vulnerability in
 /// the terminal emulator or the logging subsystem.
@@ -486,6 +502,7 @@ pub extern "C" fn WarningMessage_get_data(this_ptr: &WarningMessage) -> crate::c
 	inner_val.as_str().into()
 }
 /// A possibly human-readable warning description.
+///
 /// The string should be sanitized before it is used (e.g. emitted to logs or printed to
 /// stdout). Otherwise, a well crafted error message may trigger a security vulnerability in
 /// the terminal emulator or the logging subsystem.
@@ -534,7 +551,9 @@ pub extern "C" fn WarningMessage_eq(a: &WarningMessage, b: &WarningMessage) -> b
 use lightning::ln::msgs::Ping as nativePingImport;
 pub(crate) type nativePing = nativePingImport;
 
-/// A ping message to be sent or received from a peer
+/// A [`ping`] message to be sent to or received from a peer.
+///
+/// [`ping`]: https://github.com/lightning/bolts/blob/master/01-messaging.md#the-ping-and-pong-messages
 #[must_use]
 #[repr(C)]
 pub struct Ping {
@@ -581,18 +600,19 @@ impl Ping {
 		ret
 	}
 }
-/// The desired response length
+/// The desired response length.
 #[no_mangle]
 pub extern "C" fn Ping_get_ponglen(this_ptr: &Ping) -> u16 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().ponglen;
 	*inner_val
 }
-/// The desired response length
+/// The desired response length.
 #[no_mangle]
 pub extern "C" fn Ping_set_ponglen(this_ptr: &mut Ping, mut val: u16) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.ponglen = val;
 }
 /// The ping packet size.
+///
 /// This field is not sent on the wire. byteslen zeros are sent.
 #[no_mangle]
 pub extern "C" fn Ping_get_byteslen(this_ptr: &Ping) -> u16 {
@@ -600,6 +620,7 @@ pub extern "C" fn Ping_get_byteslen(this_ptr: &Ping) -> u16 {
 	*inner_val
 }
 /// The ping packet size.
+///
 /// This field is not sent on the wire. byteslen zeros are sent.
 #[no_mangle]
 pub extern "C" fn Ping_set_byteslen(this_ptr: &mut Ping, mut val: u16) {
@@ -646,7 +667,9 @@ pub extern "C" fn Ping_eq(a: &Ping, b: &Ping) -> bool {
 use lightning::ln::msgs::Pong as nativePongImport;
 pub(crate) type nativePong = nativePongImport;
 
-/// A pong message to be sent or received from a peer
+/// A [`pong`] message to be sent to or received from a peer.
+///
+/// [`pong`]: https://github.com/lightning/bolts/blob/master/01-messaging.md#the-ping-and-pong-messages
 #[must_use]
 #[repr(C)]
 pub struct Pong {
@@ -694,6 +717,7 @@ impl Pong {
 	}
 }
 /// The pong packet size.
+///
 /// This field is not sent on the wire. byteslen zeros are sent.
 #[no_mangle]
 pub extern "C" fn Pong_get_byteslen(this_ptr: &Pong) -> u16 {
@@ -701,6 +725,7 @@ pub extern "C" fn Pong_get_byteslen(this_ptr: &Pong) -> u16 {
 	*inner_val
 }
 /// The pong packet size.
+///
 /// This field is not sent on the wire. byteslen zeros are sent.
 #[no_mangle]
 pub extern "C" fn Pong_set_byteslen(this_ptr: &mut Pong, mut val: u16) {
@@ -746,7 +771,9 @@ pub extern "C" fn Pong_eq(a: &Pong, b: &Pong) -> bool {
 use lightning::ln::msgs::OpenChannel as nativeOpenChannelImport;
 pub(crate) type nativeOpenChannel = nativeOpenChannelImport;
 
-/// An open_channel message to be sent or received from a peer
+/// An [`open_channel`] message to be sent to or received from a peer.
+///
+/// [`open_channel`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#the-open_channel-message
 #[must_use]
 #[repr(C)]
 pub struct OpenChannel {
@@ -881,24 +908,28 @@ pub extern "C" fn OpenChannel_get_htlc_minimum_msat(this_ptr: &OpenChannel) -> u
 pub extern "C" fn OpenChannel_set_htlc_minimum_msat(this_ptr: &mut OpenChannel, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc_minimum_msat = val;
 }
-/// The feerate per 1000-weight of sender generated transactions, until updated by update_fee
+/// The feerate per 1000-weight of sender generated transactions, until updated by
+/// [`UpdateFee`]
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_feerate_per_kw(this_ptr: &OpenChannel) -> u32 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().feerate_per_kw;
 	*inner_val
 }
-/// The feerate per 1000-weight of sender generated transactions, until updated by update_fee
+/// The feerate per 1000-weight of sender generated transactions, until updated by
+/// [`UpdateFee`]
 #[no_mangle]
 pub extern "C" fn OpenChannel_set_feerate_per_kw(this_ptr: &mut OpenChannel, mut val: u32) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.feerate_per_kw = val;
 }
-/// The number of blocks which the counterparty will have to wait to claim on-chain funds if they broadcast a commitment transaction
+/// The number of blocks which the counterparty will have to wait to claim on-chain funds if
+/// they broadcast a commitment transaction
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_to_self_delay(this_ptr: &OpenChannel) -> u16 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().to_self_delay;
 	*inner_val
 }
-/// The number of blocks which the counterparty will have to wait to claim on-chain funds if they broadcast a commitment transaction
+/// The number of blocks which the counterparty will have to wait to claim on-chain funds if
+/// they broadcast a commitment transaction
 #[no_mangle]
 pub extern "C" fn OpenChannel_set_to_self_delay(this_ptr: &mut OpenChannel, mut val: u16) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.to_self_delay = val;
@@ -980,20 +1011,21 @@ pub extern "C" fn OpenChannel_get_first_per_commitment_point(this_ptr: &OpenChan
 pub extern "C" fn OpenChannel_set_first_per_commitment_point(this_ptr: &mut OpenChannel, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.first_per_commitment_point = val.into_rust();
 }
-/// Channel flags
+/// The channel flags to be used
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_channel_flags(this_ptr: &OpenChannel) -> u8 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_flags;
 	*inner_val
 }
-/// Channel flags
+/// The channel flags to be used
 #[no_mangle]
 pub extern "C" fn OpenChannel_set_channel_flags(this_ptr: &mut OpenChannel, mut val: u8) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_flags = val;
 }
-/// The channel type that this channel will represent. If none is set, we derive the channel
-/// type from the intersection of our feature bits with our counterparty's feature bits from
-/// the Init message.
+/// The channel type that this channel will represent
+///
+/// If this is `None`, we derive the channel type from the intersection of our
+/// feature bits with our counterparty's feature bits from the [`Init`] message.
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
@@ -1002,9 +1034,10 @@ pub extern "C" fn OpenChannel_get_channel_type(this_ptr: &OpenChannel) -> crate:
 	let mut local_inner_val = crate::lightning::ln::features::ChannelTypeFeatures { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::features::ChannelTypeFeatures<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
-/// The channel type that this channel will represent. If none is set, we derive the channel
-/// type from the intersection of our feature bits with our counterparty's feature bits from
-/// the Init message.
+/// The channel type that this channel will represent
+///
+/// If this is `None`, we derive the channel type from the intersection of our
+/// feature bits with our counterparty's feature bits from the [`Init`] message.
 ///
 /// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
@@ -1044,7 +1077,9 @@ pub extern "C" fn OpenChannel_eq(a: &OpenChannel, b: &OpenChannel) -> bool {
 use lightning::ln::msgs::AcceptChannel as nativeAcceptChannelImport;
 pub(crate) type nativeAcceptChannel = nativeAcceptChannelImport;
 
-/// An accept_channel message to be sent or received from a peer
+/// An [`accept_channel`] message to be sent to or received from a peer.
+///
+/// [`accept_channel`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#the-accept_channel-message
 #[must_use]
 #[repr(C)]
 pub struct AcceptChannel {
@@ -1245,10 +1280,10 @@ pub extern "C" fn AcceptChannel_get_first_per_commitment_point(this_ptr: &Accept
 pub extern "C" fn AcceptChannel_set_first_per_commitment_point(this_ptr: &mut AcceptChannel, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.first_per_commitment_point = val.into_rust();
 }
-/// The channel type that this channel will represent. If none is set, we derive the channel
-/// type from the intersection of our feature bits with our counterparty's feature bits from
-/// the Init message.
+/// The channel type that this channel will represent.
 ///
+/// If this is `None`, we derive the channel type from the intersection of
+/// our feature bits with our counterparty's feature bits from the [`Init`] message.
 /// This is required to match the equivalent field in [`OpenChannel::channel_type`].
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
@@ -1258,10 +1293,10 @@ pub extern "C" fn AcceptChannel_get_channel_type(this_ptr: &AcceptChannel) -> cr
 	let mut local_inner_val = crate::lightning::ln::features::ChannelTypeFeatures { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::features::ChannelTypeFeatures<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
-/// The channel type that this channel will represent. If none is set, we derive the channel
-/// type from the intersection of our feature bits with our counterparty's feature bits from
-/// the Init message.
+/// The channel type that this channel will represent.
 ///
+/// If this is `None`, we derive the channel type from the intersection of
+/// our feature bits with our counterparty's feature bits from the [`Init`] message.
 /// This is required to match the equivalent field in [`OpenChannel::channel_type`].
 ///
 /// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
@@ -1302,7 +1337,9 @@ pub extern "C" fn AcceptChannel_eq(a: &AcceptChannel, b: &AcceptChannel) -> bool
 use lightning::ln::msgs::FundingCreated as nativeFundingCreatedImport;
 pub(crate) type nativeFundingCreated = nativeFundingCreatedImport;
 
-/// A funding_created message to be sent or received from a peer
+/// A [`funding_created`] message to be sent to or received from a peer.
+///
+/// [`funding_created`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#the-funding_created-message
 #[must_use]
 #[repr(C)]
 pub struct FundingCreated {
@@ -1436,7 +1473,9 @@ pub extern "C" fn FundingCreated_eq(a: &FundingCreated, b: &FundingCreated) -> b
 use lightning::ln::msgs::FundingSigned as nativeFundingSignedImport;
 pub(crate) type nativeFundingSigned = nativeFundingSignedImport;
 
-/// A funding_signed message to be sent or received from a peer
+/// A [`funding_signed`] message to be sent to or received from a peer.
+///
+/// [`funding_signed`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#the-funding_signed-message
 #[must_use]
 #[repr(C)]
 pub struct FundingSigned {
@@ -1546,7 +1585,9 @@ pub extern "C" fn FundingSigned_eq(a: &FundingSigned, b: &FundingSigned) -> bool
 use lightning::ln::msgs::ChannelReady as nativeChannelReadyImport;
 pub(crate) type nativeChannelReady = nativeChannelReadyImport;
 
-/// A channel_ready message to be sent or received from a peer
+/// A [`channel_ready`] message to be sent to or received from a peer.
+///
+/// [`channel_ready`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#the-channel_ready-message
 #[must_use]
 #[repr(C)]
 pub struct ChannelReady {
@@ -1615,16 +1656,20 @@ pub extern "C" fn ChannelReady_get_next_per_commitment_point(this_ptr: &ChannelR
 pub extern "C" fn ChannelReady_set_next_per_commitment_point(this_ptr: &mut ChannelReady, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.next_per_commitment_point = val.into_rust();
 }
-/// If set, provides a short_channel_id alias for this channel. The sender will accept payments
-/// to be forwarded over this SCID and forward them to this messages' recipient.
+/// If set, provides a `short_channel_id` alias for this channel.
+///
+/// The sender will accept payments to be forwarded over this SCID and forward them to this
+/// messages' recipient.
 #[no_mangle]
 pub extern "C" fn ChannelReady_get_short_channel_id_alias(this_ptr: &ChannelReady) -> crate::c_types::derived::COption_u64Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().short_channel_id_alias;
 	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { inner_val.unwrap() }) };
 	local_inner_val
 }
-/// If set, provides a short_channel_id alias for this channel. The sender will accept payments
-/// to be forwarded over this SCID and forward them to this messages' recipient.
+/// If set, provides a `short_channel_id` alias for this channel.
+///
+/// The sender will accept payments to be forwarded over this SCID and forward them to this
+/// messages' recipient.
 #[no_mangle]
 pub extern "C" fn ChannelReady_set_short_channel_id_alias(this_ptr: &mut ChannelReady, mut val: crate::c_types::derived::COption_u64Z) {
 	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
@@ -1673,7 +1718,9 @@ pub extern "C" fn ChannelReady_eq(a: &ChannelReady, b: &ChannelReady) -> bool {
 use lightning::ln::msgs::Shutdown as nativeShutdownImport;
 pub(crate) type nativeShutdown = nativeShutdownImport;
 
-/// A shutdown message to be sent or received from a peer
+/// A [`shutdown`] message to be sent to or received from a peer.
+///
+/// [`shutdown`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#closing-initiation-shutdown
 #[must_use]
 #[repr(C)]
 pub struct Shutdown {
@@ -1732,14 +1779,16 @@ pub extern "C" fn Shutdown_set_channel_id(this_ptr: &mut Shutdown, mut val: crat
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
 }
 /// The destination of this peer's funds on closing.
-/// Must be in one of these forms: p2pkh, p2sh, p2wpkh, p2wsh.
+///
+/// Must be in one of these forms: P2PKH, P2SH, P2WPKH, P2WSH, P2TR.
 #[no_mangle]
 pub extern "C" fn Shutdown_get_scriptpubkey(this_ptr: &Shutdown) -> crate::c_types::u8slice {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().scriptpubkey;
 	crate::c_types::u8slice::from_slice(&inner_val[..])
 }
 /// The destination of this peer's funds on closing.
-/// Must be in one of these forms: p2pkh, p2sh, p2wpkh, p2wsh.
+///
+/// Must be in one of these forms: P2PKH, P2SH, P2WPKH, P2WSH, P2TR.
 #[no_mangle]
 pub extern "C" fn Shutdown_set_scriptpubkey(this_ptr: &mut Shutdown, mut val: crate::c_types::derived::CVec_u8Z) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.scriptpubkey = ::bitcoin::blockdata::script::Script::from(val.into_rust());
@@ -1786,6 +1835,7 @@ use lightning::ln::msgs::ClosingSignedFeeRange as nativeClosingSignedFeeRangeImp
 pub(crate) type nativeClosingSignedFeeRange = nativeClosingSignedFeeRangeImport;
 
 /// The minimum and maximum fees which the sender is willing to place on the closing transaction.
+///
 /// This is provided in [`ClosingSigned`] by both sides to indicate the fee range they are willing
 /// to use.
 #[must_use]
@@ -1901,7 +1951,9 @@ pub extern "C" fn ClosingSignedFeeRange_eq(a: &ClosingSignedFeeRange, b: &Closin
 use lightning::ln::msgs::ClosingSigned as nativeClosingSignedImport;
 pub(crate) type nativeClosingSigned = nativeClosingSignedImport;
 
-/// A closing_signed message to be sent or received from a peer
+/// A [`closing_signed`] message to be sent to or received from a peer.
+///
+/// [`closing_signed`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#closing-negotiation-closing_signed
 #[must_use]
 #[repr(C)]
 pub struct ClosingSigned {
@@ -2044,7 +2096,9 @@ pub extern "C" fn ClosingSigned_eq(a: &ClosingSigned, b: &ClosingSigned) -> bool
 use lightning::ln::msgs::UpdateAddHTLC as nativeUpdateAddHTLCImport;
 pub(crate) type nativeUpdateAddHTLC = nativeUpdateAddHTLCImport;
 
-/// An update_add_htlc message to be sent or received from a peer
+/// An [`update_add_htlc`] message to be sent to or received from a peer.
+///
+/// [`update_add_htlc`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#adding-an-htlc-update_add_htlc
 #[must_use]
 #[repr(C)]
 pub struct UpdateAddHTLC {
@@ -2178,7 +2232,8 @@ pub extern "C" fn UpdateAddHTLC_eq(a: &UpdateAddHTLC, b: &UpdateAddHTLC) -> bool
 use lightning::ln::msgs::OnionMessage as nativeOnionMessageImport;
 pub(crate) type nativeOnionMessage = nativeOnionMessageImport;
 
-/// An onion message to be sent or received from a peer
+/// An onion message to be sent to or received from a peer.
+///
 #[must_use]
 #[repr(C)]
 pub struct OnionMessage {
@@ -2268,7 +2323,9 @@ pub extern "C" fn OnionMessage_eq(a: &OnionMessage, b: &OnionMessage) -> bool {
 use lightning::ln::msgs::UpdateFulfillHTLC as nativeUpdateFulfillHTLCImport;
 pub(crate) type nativeUpdateFulfillHTLC = nativeUpdateFulfillHTLCImport;
 
-/// An update_fulfill_htlc message to be sent or received from a peer
+/// An [`update_fulfill_htlc`] message to be sent to or received from a peer.
+///
+/// [`update_fulfill_htlc`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#removing-an-htlc-update_fulfill_htlc-update_fail_htlc-and-update_fail_malformed_htlc
 #[must_use]
 #[repr(C)]
 pub struct UpdateFulfillHTLC {
@@ -2390,7 +2447,9 @@ pub extern "C" fn UpdateFulfillHTLC_eq(a: &UpdateFulfillHTLC, b: &UpdateFulfillH
 use lightning::ln::msgs::UpdateFailHTLC as nativeUpdateFailHTLCImport;
 pub(crate) type nativeUpdateFailHTLC = nativeUpdateFailHTLCImport;
 
-/// An update_fail_htlc message to be sent or received from a peer
+/// An [`update_fail_htlc`] message to be sent to or received from a peer.
+///
+/// [`update_fail_htlc`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#removing-an-htlc-update_fulfill_htlc-update_fail_htlc-and-update_fail_malformed_htlc
 #[must_use]
 #[repr(C)]
 pub struct UpdateFailHTLC {
@@ -2491,7 +2550,9 @@ pub extern "C" fn UpdateFailHTLC_eq(a: &UpdateFailHTLC, b: &UpdateFailHTLC) -> b
 use lightning::ln::msgs::UpdateFailMalformedHTLC as nativeUpdateFailMalformedHTLCImport;
 pub(crate) type nativeUpdateFailMalformedHTLC = nativeUpdateFailMalformedHTLCImport;
 
-/// An update_fail_malformed_htlc message to be sent or received from a peer
+/// An [`update_fail_malformed_htlc`] message to be sent to or received from a peer.
+///
+/// [`update_fail_malformed_htlc`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#removing-an-htlc-update_fulfill_htlc-update_fail_htlc-and-update_fail_malformed_htlc
 #[must_use]
 #[repr(C)]
 pub struct UpdateFailMalformedHTLC {
@@ -2603,7 +2664,9 @@ pub extern "C" fn UpdateFailMalformedHTLC_eq(a: &UpdateFailMalformedHTLC, b: &Up
 use lightning::ln::msgs::CommitmentSigned as nativeCommitmentSignedImport;
 pub(crate) type nativeCommitmentSigned = nativeCommitmentSignedImport;
 
-/// A commitment_signed message to be sent or received from a peer
+/// A [`commitment_signed`] message to be sent to or received from a peer.
+///
+/// [`commitment_signed`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#committing-updates-so-far-commitment_signed
 #[must_use]
 #[repr(C)]
 pub struct CommitmentSigned {
@@ -2730,7 +2793,9 @@ pub extern "C" fn CommitmentSigned_eq(a: &CommitmentSigned, b: &CommitmentSigned
 use lightning::ln::msgs::RevokeAndACK as nativeRevokeAndACKImport;
 pub(crate) type nativeRevokeAndACK = nativeRevokeAndACKImport;
 
-/// A revoke_and_ack message to be sent or received from a peer
+/// A [`revoke_and_ack`] message to be sent to or received from a peer.
+///
+/// [`revoke_and_ack`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#completing-the-transition-to-the-updated-state-revoke_and_ack
 #[must_use]
 #[repr(C)]
 pub struct RevokeAndACK {
@@ -2852,7 +2917,9 @@ pub extern "C" fn RevokeAndACK_eq(a: &RevokeAndACK, b: &RevokeAndACK) -> bool {
 use lightning::ln::msgs::UpdateFee as nativeUpdateFeeImport;
 pub(crate) type nativeUpdateFee = nativeUpdateFeeImport;
 
-/// An update_fee message to be sent or received from a peer
+/// An [`update_fee`] message to be sent to or received from a peer
+///
+/// [`update_fee`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#updating-fees-update_fee
 #[must_use]
 #[repr(C)]
 pub struct UpdateFee {
@@ -2963,8 +3030,9 @@ use lightning::ln::msgs::DataLossProtect as nativeDataLossProtectImport;
 pub(crate) type nativeDataLossProtect = nativeDataLossProtectImport;
 
 /// Proof that the sender knows the per-commitment secret of the previous commitment transaction.
+///
 /// This is used to convince the recipient that the channel is at a certain commitment
-/// number even if they lost that data due to a local failure.  Of course, the peer may lie
+/// number even if they lost that data due to a local failure. Of course, the peer may lie
 /// and even later commitments may have been revoked.
 #[must_use]
 #[repr(C)]
@@ -3077,7 +3145,9 @@ pub extern "C" fn DataLossProtect_eq(a: &DataLossProtect, b: &DataLossProtect) -
 use lightning::ln::msgs::ChannelReestablish as nativeChannelReestablishImport;
 pub(crate) type nativeChannelReestablish = nativeChannelReestablishImport;
 
-/// A channel_reestablish message to be sent or received from a peer
+/// A [`channel_reestablish`] message to be sent to or received from a peer.
+///
+/// [`channel_reestablish`]: https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#message-retransmission
 #[must_use]
 #[repr(C)]
 pub struct ChannelReestablish {
@@ -3189,7 +3259,9 @@ pub extern "C" fn ChannelReestablish_eq(a: &ChannelReestablish, b: &ChannelReest
 use lightning::ln::msgs::AnnouncementSignatures as nativeAnnouncementSignaturesImport;
 pub(crate) type nativeAnnouncementSignatures = nativeAnnouncementSignaturesImport;
 
-/// An announcement_signatures message to be sent or received from a peer
+/// An [`announcement_signatures`] message to be sent to or received from a peer.
+///
+/// [`announcement_signatures`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-announcement_signatures-message
 #[must_use]
 #[repr(C)]
 pub struct AnnouncementSignatures {
@@ -3319,7 +3391,7 @@ pub extern "C" fn AnnouncementSignatures_eq(a: &AnnouncementSignatures, b: &Anno
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
-/// An address which can be used to connect to a remote peer
+/// An address which can be used to connect to a remote peer.
 #[derive(Clone)]
 #[must_use]
 #[repr(C)]
@@ -3345,7 +3417,8 @@ pub enum NetAddress {
 	OnionV2(
 		crate::c_types::TwelveBytes),
 	/// A new-style Tor onion address/port on which the peer is listening.
-	/// To create the human-readable \"hostname\", concatenate ed25519_pubkey, checksum, and version,
+	///
+	/// To create the human-readable \"hostname\", concatenate the ED25519 pubkey, checksum, and version,
 	/// wrap as base32 and append \".onion\".
 	OnionV3 {
 		/// The ed25519 long-term public key of the peer
@@ -3601,11 +3674,147 @@ pub extern "C" fn NetAddress_read(ser: crate::c_types::u8slice) -> crate::c_type
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::NetAddress::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
+/// Represents the set of gossip messages that require a signature from a node's identity key.
+#[derive(Clone)]
+#[must_use]
+#[repr(C)]
+pub enum UnsignedGossipMessage {
+	/// An unsigned channel announcement.
+	ChannelAnnouncement(
+		crate::lightning::ln::msgs::UnsignedChannelAnnouncement),
+	/// An unsigned channel update.
+	ChannelUpdate(
+		crate::lightning::ln::msgs::UnsignedChannelUpdate),
+	/// An unsigned node announcement.
+	NodeAnnouncement(
+		crate::lightning::ln::msgs::UnsignedNodeAnnouncement),
+}
+use lightning::ln::msgs::UnsignedGossipMessage as UnsignedGossipMessageImport;
+pub(crate) type nativeUnsignedGossipMessage = UnsignedGossipMessageImport;
+
+impl UnsignedGossipMessage {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeUnsignedGossipMessage {
+		match self {
+			UnsignedGossipMessage::ChannelAnnouncement (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				nativeUnsignedGossipMessage::ChannelAnnouncement (
+					*unsafe { Box::from_raw(a_nonref.take_inner()) },
+				)
+			},
+			UnsignedGossipMessage::ChannelUpdate (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				nativeUnsignedGossipMessage::ChannelUpdate (
+					*unsafe { Box::from_raw(a_nonref.take_inner()) },
+				)
+			},
+			UnsignedGossipMessage::NodeAnnouncement (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				nativeUnsignedGossipMessage::NodeAnnouncement (
+					*unsafe { Box::from_raw(a_nonref.take_inner()) },
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeUnsignedGossipMessage {
+		match self {
+			UnsignedGossipMessage::ChannelAnnouncement (mut a, ) => {
+				nativeUnsignedGossipMessage::ChannelAnnouncement (
+					*unsafe { Box::from_raw(a.take_inner()) },
+				)
+			},
+			UnsignedGossipMessage::ChannelUpdate (mut a, ) => {
+				nativeUnsignedGossipMessage::ChannelUpdate (
+					*unsafe { Box::from_raw(a.take_inner()) },
+				)
+			},
+			UnsignedGossipMessage::NodeAnnouncement (mut a, ) => {
+				nativeUnsignedGossipMessage::NodeAnnouncement (
+					*unsafe { Box::from_raw(a.take_inner()) },
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeUnsignedGossipMessage) -> Self {
+		match native {
+			nativeUnsignedGossipMessage::ChannelAnnouncement (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				UnsignedGossipMessage::ChannelAnnouncement (
+					crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
+				)
+			},
+			nativeUnsignedGossipMessage::ChannelUpdate (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				UnsignedGossipMessage::ChannelUpdate (
+					crate::lightning::ln::msgs::UnsignedChannelUpdate { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
+				)
+			},
+			nativeUnsignedGossipMessage::NodeAnnouncement (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				UnsignedGossipMessage::NodeAnnouncement (
+					crate::lightning::ln::msgs::UnsignedNodeAnnouncement { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeUnsignedGossipMessage) -> Self {
+		match native {
+			nativeUnsignedGossipMessage::ChannelAnnouncement (mut a, ) => {
+				UnsignedGossipMessage::ChannelAnnouncement (
+					crate::lightning::ln::msgs::UnsignedChannelAnnouncement { inner: ObjOps::heap_alloc(a), is_owned: true },
+				)
+			},
+			nativeUnsignedGossipMessage::ChannelUpdate (mut a, ) => {
+				UnsignedGossipMessage::ChannelUpdate (
+					crate::lightning::ln::msgs::UnsignedChannelUpdate { inner: ObjOps::heap_alloc(a), is_owned: true },
+				)
+			},
+			nativeUnsignedGossipMessage::NodeAnnouncement (mut a, ) => {
+				UnsignedGossipMessage::NodeAnnouncement (
+					crate::lightning::ln::msgs::UnsignedNodeAnnouncement { inner: ObjOps::heap_alloc(a), is_owned: true },
+				)
+			},
+		}
+	}
+}
+/// Frees any resources used by the UnsignedGossipMessage
+#[no_mangle]
+pub extern "C" fn UnsignedGossipMessage_free(this_ptr: UnsignedGossipMessage) { }
+/// Creates a copy of the UnsignedGossipMessage
+#[no_mangle]
+pub extern "C" fn UnsignedGossipMessage_clone(orig: &UnsignedGossipMessage) -> UnsignedGossipMessage {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new ChannelAnnouncement-variant UnsignedGossipMessage
+pub extern "C" fn UnsignedGossipMessage_channel_announcement(a: crate::lightning::ln::msgs::UnsignedChannelAnnouncement) -> UnsignedGossipMessage {
+	UnsignedGossipMessage::ChannelAnnouncement(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new ChannelUpdate-variant UnsignedGossipMessage
+pub extern "C" fn UnsignedGossipMessage_channel_update(a: crate::lightning::ln::msgs::UnsignedChannelUpdate) -> UnsignedGossipMessage {
+	UnsignedGossipMessage::ChannelUpdate(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new NodeAnnouncement-variant UnsignedGossipMessage
+pub extern "C" fn UnsignedGossipMessage_node_announcement(a: crate::lightning::ln::msgs::UnsignedNodeAnnouncement) -> UnsignedGossipMessage {
+	UnsignedGossipMessage::NodeAnnouncement(a, )
+}
+#[no_mangle]
+/// Serialize the UnsignedGossipMessage object into a byte array which can be read by UnsignedGossipMessage_read
+pub extern "C" fn UnsignedGossipMessage_write(obj: &crate::lightning::ln::msgs::UnsignedGossipMessage) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
 
 use lightning::ln::msgs::UnsignedNodeAnnouncement as nativeUnsignedNodeAnnouncementImport;
 pub(crate) type nativeUnsignedNodeAnnouncement = nativeUnsignedNodeAnnouncementImport;
 
-/// The unsigned part of a node_announcement
+/// The unsigned part of a [`node_announcement`] message.
+///
+/// [`node_announcement`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-node_announcement-message
 #[must_use]
 #[repr(C)]
 pub struct UnsignedNodeAnnouncement {
@@ -3674,18 +3883,18 @@ pub extern "C" fn UnsignedNodeAnnouncement_get_timestamp(this_ptr: &UnsignedNode
 pub extern "C" fn UnsignedNodeAnnouncement_set_timestamp(this_ptr: &mut UnsignedNodeAnnouncement, mut val: u32) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.timestamp = val;
 }
-/// The node_id this announcement originated from (don't rebroadcast the node_announcement back
+/// The `node_id` this announcement originated from (don't rebroadcast the `node_announcement` back
 /// to this node).
 #[no_mangle]
-pub extern "C" fn UnsignedNodeAnnouncement_get_node_id(this_ptr: &UnsignedNodeAnnouncement) -> crate::c_types::PublicKey {
+pub extern "C" fn UnsignedNodeAnnouncement_get_node_id(this_ptr: &UnsignedNodeAnnouncement) -> crate::lightning::routing::gossip::NodeId {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_id;
-	crate::c_types::PublicKey::from_rust(&inner_val)
+	crate::lightning::routing::gossip::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::gossip::NodeId<>) as *mut _) }, is_owned: false }
 }
-/// The node_id this announcement originated from (don't rebroadcast the node_announcement back
+/// The `node_id` this announcement originated from (don't rebroadcast the `node_announcement` back
 /// to this node).
 #[no_mangle]
-pub extern "C" fn UnsignedNodeAnnouncement_set_node_id(this_ptr: &mut UnsignedNodeAnnouncement, mut val: crate::c_types::PublicKey) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_id = val.into_rust();
+pub extern "C" fn UnsignedNodeAnnouncement_set_node_id(this_ptr: &mut UnsignedNodeAnnouncement, mut val: crate::lightning::routing::gossip::NodeId) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_id = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// An RGB color for UI purposes
 #[no_mangle]
@@ -3698,15 +3907,17 @@ pub extern "C" fn UnsignedNodeAnnouncement_get_rgb(this_ptr: &UnsignedNodeAnnoun
 pub extern "C" fn UnsignedNodeAnnouncement_set_rgb(this_ptr: &mut UnsignedNodeAnnouncement, mut val: crate::c_types::ThreeBytes) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.rgb = val.data;
 }
-/// An alias, for UI purposes.  This should be sanitized before use.  There is no guarantee
-/// of uniqueness.
+/// An alias, for UI purposes.
+///
+/// This should be sanitized before use. There is no guarantee of uniqueness.
 #[no_mangle]
 pub extern "C" fn UnsignedNodeAnnouncement_get_alias(this_ptr: &UnsignedNodeAnnouncement) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().alias;
 	inner_val
 }
-/// An alias, for UI purposes.  This should be sanitized before use.  There is no guarantee
-/// of uniqueness.
+/// An alias, for UI purposes.
+///
+/// This should be sanitized before use. There is no guarantee of uniqueness.
 #[no_mangle]
 pub extern "C" fn UnsignedNodeAnnouncement_set_alias(this_ptr: &mut UnsignedNodeAnnouncement, mut val: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.alias = val.data;
@@ -3758,7 +3969,9 @@ pub extern "C" fn UnsignedNodeAnnouncement_eq(a: &UnsignedNodeAnnouncement, b: &
 use lightning::ln::msgs::NodeAnnouncement as nativeNodeAnnouncementImport;
 pub(crate) type nativeNodeAnnouncement = nativeNodeAnnouncementImport;
 
-/// A node_announcement message to be sent or received from a peer
+/// A [`node_announcement`] message to be sent to or received from a peer.
+///
+/// [`node_announcement`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-node_announcement-message
 #[must_use]
 #[repr(C)]
 pub struct NodeAnnouncement {
@@ -3868,7 +4081,9 @@ pub extern "C" fn NodeAnnouncement_eq(a: &NodeAnnouncement, b: &NodeAnnouncement
 use lightning::ln::msgs::UnsignedChannelAnnouncement as nativeUnsignedChannelAnnouncementImport;
 pub(crate) type nativeUnsignedChannelAnnouncement = nativeUnsignedChannelAnnouncementImport;
 
-/// The unsigned part of a channel_announcement
+/// The unsigned part of a [`channel_announcement`] message.
+///
+/// [`channel_announcement`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-channel_announcement-message
 #[must_use]
 #[repr(C)]
 pub struct UnsignedChannelAnnouncement {
@@ -3948,49 +4163,49 @@ pub extern "C" fn UnsignedChannelAnnouncement_get_short_channel_id(this_ptr: &Un
 pub extern "C" fn UnsignedChannelAnnouncement_set_short_channel_id(this_ptr: &mut UnsignedChannelAnnouncement, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.short_channel_id = val;
 }
-/// One of the two node_ids which are endpoints of this channel
+/// One of the two `node_id`s which are endpoints of this channel
 #[no_mangle]
-pub extern "C" fn UnsignedChannelAnnouncement_get_node_id_1(this_ptr: &UnsignedChannelAnnouncement) -> crate::c_types::PublicKey {
+pub extern "C" fn UnsignedChannelAnnouncement_get_node_id_1(this_ptr: &UnsignedChannelAnnouncement) -> crate::lightning::routing::gossip::NodeId {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_id_1;
-	crate::c_types::PublicKey::from_rust(&inner_val)
+	crate::lightning::routing::gossip::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::gossip::NodeId<>) as *mut _) }, is_owned: false }
 }
-/// One of the two node_ids which are endpoints of this channel
+/// One of the two `node_id`s which are endpoints of this channel
 #[no_mangle]
-pub extern "C" fn UnsignedChannelAnnouncement_set_node_id_1(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::c_types::PublicKey) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_id_1 = val.into_rust();
+pub extern "C" fn UnsignedChannelAnnouncement_set_node_id_1(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::lightning::routing::gossip::NodeId) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_id_1 = *unsafe { Box::from_raw(val.take_inner()) };
 }
-/// The other of the two node_ids which are endpoints of this channel
+/// The other of the two `node_id`s which are endpoints of this channel
 #[no_mangle]
-pub extern "C" fn UnsignedChannelAnnouncement_get_node_id_2(this_ptr: &UnsignedChannelAnnouncement) -> crate::c_types::PublicKey {
+pub extern "C" fn UnsignedChannelAnnouncement_get_node_id_2(this_ptr: &UnsignedChannelAnnouncement) -> crate::lightning::routing::gossip::NodeId {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_id_2;
-	crate::c_types::PublicKey::from_rust(&inner_val)
+	crate::lightning::routing::gossip::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::gossip::NodeId<>) as *mut _) }, is_owned: false }
 }
-/// The other of the two node_ids which are endpoints of this channel
+/// The other of the two `node_id`s which are endpoints of this channel
 #[no_mangle]
-pub extern "C" fn UnsignedChannelAnnouncement_set_node_id_2(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::c_types::PublicKey) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_id_2 = val.into_rust();
+pub extern "C" fn UnsignedChannelAnnouncement_set_node_id_2(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::lightning::routing::gossip::NodeId) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_id_2 = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// The funding key for the first node
 #[no_mangle]
-pub extern "C" fn UnsignedChannelAnnouncement_get_bitcoin_key_1(this_ptr: &UnsignedChannelAnnouncement) -> crate::c_types::PublicKey {
+pub extern "C" fn UnsignedChannelAnnouncement_get_bitcoin_key_1(this_ptr: &UnsignedChannelAnnouncement) -> crate::lightning::routing::gossip::NodeId {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().bitcoin_key_1;
-	crate::c_types::PublicKey::from_rust(&inner_val)
+	crate::lightning::routing::gossip::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::gossip::NodeId<>) as *mut _) }, is_owned: false }
 }
 /// The funding key for the first node
 #[no_mangle]
-pub extern "C" fn UnsignedChannelAnnouncement_set_bitcoin_key_1(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::c_types::PublicKey) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.bitcoin_key_1 = val.into_rust();
+pub extern "C" fn UnsignedChannelAnnouncement_set_bitcoin_key_1(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::lightning::routing::gossip::NodeId) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.bitcoin_key_1 = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// The funding key for the second node
 #[no_mangle]
-pub extern "C" fn UnsignedChannelAnnouncement_get_bitcoin_key_2(this_ptr: &UnsignedChannelAnnouncement) -> crate::c_types::PublicKey {
+pub extern "C" fn UnsignedChannelAnnouncement_get_bitcoin_key_2(this_ptr: &UnsignedChannelAnnouncement) -> crate::lightning::routing::gossip::NodeId {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().bitcoin_key_2;
-	crate::c_types::PublicKey::from_rust(&inner_val)
+	crate::lightning::routing::gossip::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::gossip::NodeId<>) as *mut _) }, is_owned: false }
 }
 /// The funding key for the second node
 #[no_mangle]
-pub extern "C" fn UnsignedChannelAnnouncement_set_bitcoin_key_2(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::c_types::PublicKey) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.bitcoin_key_2 = val.into_rust();
+pub extern "C" fn UnsignedChannelAnnouncement_set_bitcoin_key_2(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::lightning::routing::gossip::NodeId) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.bitcoin_key_2 = *unsafe { Box::from_raw(val.take_inner()) };
 }
 impl Clone for UnsignedChannelAnnouncement {
 	fn clone(&self) -> Self {
@@ -4024,7 +4239,9 @@ pub extern "C" fn UnsignedChannelAnnouncement_eq(a: &UnsignedChannelAnnouncement
 use lightning::ln::msgs::ChannelAnnouncement as nativeChannelAnnouncementImport;
 pub(crate) type nativeChannelAnnouncement = nativeChannelAnnouncementImport;
 
-/// A channel_announcement message to be sent or received from a peer
+/// A [`channel_announcement`] message to be sent to or received from a peer.
+///
+/// [`channel_announcement`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-channel_announcement-message
 #[must_use]
 #[repr(C)]
 pub struct ChannelAnnouncement {
@@ -4170,7 +4387,9 @@ pub extern "C" fn ChannelAnnouncement_eq(a: &ChannelAnnouncement, b: &ChannelAnn
 use lightning::ln::msgs::UnsignedChannelUpdate as nativeUnsignedChannelUpdateImport;
 pub(crate) type nativeUnsignedChannelUpdate = nativeUnsignedChannelUpdateImport;
 
-/// The unsigned part of a channel_update
+/// The unsigned part of a [`channel_update`] message.
+///
+/// [`channel_update`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-channel_update-message
 #[must_use]
 #[repr(C)]
 pub struct UnsignedChannelUpdate {
@@ -4263,10 +4482,10 @@ pub extern "C" fn UnsignedChannelUpdate_set_flags(this_ptr: &mut UnsignedChannel
 }
 /// The number of blocks such that if:
 /// `incoming_htlc.cltv_expiry < outgoing_htlc.cltv_expiry + cltv_expiry_delta`
-/// then we need to fail the HTLC backwards. When forwarding an HTLC, cltv_expiry_delta determines
-/// the outgoing HTLC's minimum cltv_expiry value -- so, if an incoming HTLC comes in with a
-/// cltv_expiry of 100000, and the node we're forwarding to has a cltv_expiry_delta value of 10,
-/// then we'll check that the outgoing HTLC's cltv_expiry value is at least 100010 before
+/// then we need to fail the HTLC backwards. When forwarding an HTLC, `cltv_expiry_delta` determines
+/// the outgoing HTLC's minimum `cltv_expiry` value -- so, if an incoming HTLC comes in with a
+/// `cltv_expiry` of 100000, and the node we're forwarding to has a `cltv_expiry_delta` value of 10,
+/// then we'll check that the outgoing HTLC's `cltv_expiry` value is at least 100010 before
 /// forwarding. Note that the HTLC sender is the one who originally sets this value when
 /// constructing the route.
 #[no_mangle]
@@ -4276,10 +4495,10 @@ pub extern "C" fn UnsignedChannelUpdate_get_cltv_expiry_delta(this_ptr: &Unsigne
 }
 /// The number of blocks such that if:
 /// `incoming_htlc.cltv_expiry < outgoing_htlc.cltv_expiry + cltv_expiry_delta`
-/// then we need to fail the HTLC backwards. When forwarding an HTLC, cltv_expiry_delta determines
-/// the outgoing HTLC's minimum cltv_expiry value -- so, if an incoming HTLC comes in with a
-/// cltv_expiry of 100000, and the node we're forwarding to has a cltv_expiry_delta value of 10,
-/// then we'll check that the outgoing HTLC's cltv_expiry value is at least 100010 before
+/// then we need to fail the HTLC backwards. When forwarding an HTLC, `cltv_expiry_delta` determines
+/// the outgoing HTLC's minimum `cltv_expiry` value -- so, if an incoming HTLC comes in with a
+/// `cltv_expiry` of 100000, and the node we're forwarding to has a `cltv_expiry_delta` value of 10,
+/// then we'll check that the outgoing HTLC's `cltv_expiry` value is at least 100010 before
 /// forwarding. Note that the HTLC sender is the one who originally sets this value when
 /// constructing the route.
 #[no_mangle]
@@ -4297,13 +4516,17 @@ pub extern "C" fn UnsignedChannelUpdate_get_htlc_minimum_msat(this_ptr: &Unsigne
 pub extern "C" fn UnsignedChannelUpdate_set_htlc_minimum_msat(this_ptr: &mut UnsignedChannelUpdate, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc_minimum_msat = val;
 }
-/// The maximum HTLC value incoming to sender, in milli-satoshi. Used to be optional.
+/// The maximum HTLC value incoming to sender, in milli-satoshi.
+///
+/// This used to be optional.
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_htlc_maximum_msat(this_ptr: &UnsignedChannelUpdate) -> u64 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().htlc_maximum_msat;
 	*inner_val
 }
-/// The maximum HTLC value incoming to sender, in milli-satoshi. Used to be optional.
+/// The maximum HTLC value incoming to sender, in milli-satoshi.
+///
+/// This used to be optional.
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_set_htlc_maximum_msat(this_ptr: &mut UnsignedChannelUpdate, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc_maximum_msat = val;
@@ -4331,8 +4554,9 @@ pub extern "C" fn UnsignedChannelUpdate_set_fee_proportional_millionths(this_ptr
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.fee_proportional_millionths = val;
 }
 /// Excess data which was signed as a part of the message which we do not (yet) understand how
-/// to decode. This is stored to ensure forward-compatibility as new fields are added to the
-/// lightning gossip
+/// to decode.
+///
+/// This is stored to ensure forward-compatibility as new fields are added to the lightning gossip protocol.
 ///
 /// Returns a copy of the field.
 #[no_mangle]
@@ -4342,8 +4566,9 @@ pub extern "C" fn UnsignedChannelUpdate_get_excess_data(this_ptr: &UnsignedChann
 	local_inner_val.into()
 }
 /// Excess data which was signed as a part of the message which we do not (yet) understand how
-/// to decode. This is stored to ensure forward-compatibility as new fields are added to the
-/// lightning gossip
+/// to decode.
+///
+/// This is stored to ensure forward-compatibility as new fields are added to the lightning gossip protocol.
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_set_excess_data(this_ptr: &mut UnsignedChannelUpdate, mut val: crate::c_types::derived::CVec_u8Z) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
@@ -4399,7 +4624,9 @@ pub extern "C" fn UnsignedChannelUpdate_eq(a: &UnsignedChannelUpdate, b: &Unsign
 use lightning::ln::msgs::ChannelUpdate as nativeChannelUpdateImport;
 pub(crate) type nativeChannelUpdate = nativeChannelUpdateImport;
 
-/// A channel_update message to be sent or received from a peer
+/// A [`channel_update`] message to be sent to or received from a peer.
+///
+/// [`channel_update`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-channel_update-message
 #[must_use]
 #[repr(C)]
 pub struct ChannelUpdate {
@@ -4509,10 +4736,12 @@ pub extern "C" fn ChannelUpdate_eq(a: &ChannelUpdate, b: &ChannelUpdate) -> bool
 use lightning::ln::msgs::QueryChannelRange as nativeQueryChannelRangeImport;
 pub(crate) type nativeQueryChannelRange = nativeQueryChannelRangeImport;
 
-/// A query_channel_range message is used to query a peer for channel
+/// A [`query_channel_range`] message is used to query a peer for channel
 /// UTXOs in a range of blocks. The recipient of a query makes a best
-/// effort to reply to the query using one or more reply_channel_range
+/// effort to reply to the query using one or more [`ReplyChannelRange`]
 /// messages.
+///
+/// [`query_channel_range`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-query_channel_range-and-reply_channel_range-messages
 #[must_use]
 #[repr(C)]
 pub struct QueryChannelRange {
@@ -4634,13 +4863,17 @@ pub extern "C" fn QueryChannelRange_eq(a: &QueryChannelRange, b: &QueryChannelRa
 use lightning::ln::msgs::ReplyChannelRange as nativeReplyChannelRangeImport;
 pub(crate) type nativeReplyChannelRange = nativeReplyChannelRangeImport;
 
-/// A reply_channel_range message is a reply to a query_channel_range
-/// message. Multiple reply_channel_range messages can be sent in reply
-/// to a single query_channel_range message. The query recipient makes a
+/// A [`reply_channel_range`] message is a reply to a [`QueryChannelRange`]
+/// message.
+///
+/// Multiple `reply_channel_range` messages can be sent in reply
+/// to a single [`QueryChannelRange`] message. The query recipient makes a
 /// best effort to respond based on their local network view which may
-/// not be a perfect view of the network. The short_channel_ids in the
-/// reply are encoded. We only support encoding_type=0 uncompressed
-/// serialization and do not support encoding_type=1 zlib serialization.
+/// not be a perfect view of the network. The `short_channel_id`s in the
+/// reply are encoded. We only support `encoding_type=0` uncompressed
+/// serialization and do not support `encoding_type=1` zlib serialization.
+///
+/// [`reply_channel_range`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-query_channel_range-and-reply_channel_range-messages
 #[must_use]
 #[repr(C)]
 pub struct ReplyChannelRange {
@@ -4731,7 +4964,7 @@ pub extern "C" fn ReplyChannelRange_get_sync_complete(this_ptr: &ReplyChannelRan
 pub extern "C" fn ReplyChannelRange_set_sync_complete(this_ptr: &mut ReplyChannelRange, mut val: bool) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.sync_complete = val;
 }
-/// The short_channel_ids in the channel range
+/// The `short_channel_id`s in the channel range
 ///
 /// Returns a copy of the field.
 #[no_mangle]
@@ -4740,7 +4973,7 @@ pub extern "C" fn ReplyChannelRange_get_short_channel_ids(this_ptr: &ReplyChanne
 	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { item }); };
 	local_inner_val.into()
 }
-/// The short_channel_ids in the channel range
+/// The `short_channel_id`s in the channel range
 #[no_mangle]
 pub extern "C" fn ReplyChannelRange_set_short_channel_ids(this_ptr: &mut ReplyChannelRange, mut val: crate::c_types::derived::CVec_u64Z) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
@@ -4791,14 +5024,17 @@ pub extern "C" fn ReplyChannelRange_eq(a: &ReplyChannelRange, b: &ReplyChannelRa
 use lightning::ln::msgs::QueryShortChannelIds as nativeQueryShortChannelIdsImport;
 pub(crate) type nativeQueryShortChannelIds = nativeQueryShortChannelIdsImport;
 
-/// A query_short_channel_ids message is used to query a peer for
-/// routing gossip messages related to one or more short_channel_ids.
+/// A [`query_short_channel_ids`] message is used to query a peer for
+/// routing gossip messages related to one or more `short_channel_id`s.
+///
 /// The query recipient will reply with the latest, if available,
-/// channel_announcement, channel_update and node_announcement messages
-/// it maintains for the requested short_channel_ids followed by a
-/// reply_short_channel_ids_end message. The short_channel_ids sent in
-/// this query are encoded. We only support encoding_type=0 uncompressed
-/// serialization and do not support encoding_type=1 zlib serialization.
+/// [`ChannelAnnouncement`], [`ChannelUpdate`] and [`NodeAnnouncement`] messages
+/// it maintains for the requested `short_channel_id`s followed by a
+/// [`ReplyShortChannelIdsEnd`] message. The `short_channel_id`s sent in
+/// this query are encoded. We only support `encoding_type=0` uncompressed
+/// serialization and do not support `encoding_type=1` zlib serialization.
+///
+/// [`query_short_channel_ids`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-query_short_channel_idsreply_short_channel_ids_end-messages
 #[must_use]
 #[repr(C)]
 pub struct QueryShortChannelIds {
@@ -4913,10 +5149,12 @@ pub extern "C" fn QueryShortChannelIds_eq(a: &QueryShortChannelIds, b: &QuerySho
 use lightning::ln::msgs::ReplyShortChannelIdsEnd as nativeReplyShortChannelIdsEndImport;
 pub(crate) type nativeReplyShortChannelIdsEnd = nativeReplyShortChannelIdsEndImport;
 
-/// A reply_short_channel_ids_end message is sent as a reply to a
-/// query_short_channel_ids message. The query recipient makes a best
+/// A [`reply_short_channel_ids_end`] message is sent as a reply to a
+/// message. The query recipient makes a best
 /// effort to respond based on their local network view which may not be
 /// a perfect view of the network.
+///
+/// [`reply_short_channel_ids_end`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-query_short_channel_idsreply_short_channel_ids_end-messages
 #[must_use]
 #[repr(C)]
 pub struct ReplyShortChannelIdsEnd {
@@ -4975,14 +5213,14 @@ pub extern "C" fn ReplyShortChannelIdsEnd_set_chain_hash(this_ptr: &mut ReplySho
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
 }
 /// Indicates if the query recipient maintains up-to-date channel
-/// information for the chain_hash
+/// information for the `chain_hash`
 #[no_mangle]
 pub extern "C" fn ReplyShortChannelIdsEnd_get_full_information(this_ptr: &ReplyShortChannelIdsEnd) -> bool {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().full_information;
 	*inner_val
 }
 /// Indicates if the query recipient maintains up-to-date channel
-/// information for the chain_hash
+/// information for the `chain_hash`
 #[no_mangle]
 pub extern "C" fn ReplyShortChannelIdsEnd_set_full_information(this_ptr: &mut ReplyShortChannelIdsEnd, mut val: bool) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.full_information = val;
@@ -5028,9 +5266,11 @@ pub extern "C" fn ReplyShortChannelIdsEnd_eq(a: &ReplyShortChannelIdsEnd, b: &Re
 use lightning::ln::msgs::GossipTimestampFilter as nativeGossipTimestampFilterImport;
 pub(crate) type nativeGossipTimestampFilter = nativeGossipTimestampFilterImport;
 
-/// A gossip_timestamp_filter message is used by a node to request
+/// A [`gossip_timestamp_filter`] message is used by a node to request
 /// gossip relay for messages in the requested time range when the
-/// gossip_queries feature has been negotiated.
+/// `gossip_queries` feature has been negotiated.
+///
+/// [`gossip_timestamp_filter`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#the-gossip_timestamp_filter-message
 #[must_use]
 #[repr(C)]
 pub struct GossipTimestampFilter {
@@ -5148,7 +5388,7 @@ pub extern "C" fn GossipTimestampFilter_eq(a: &GossipTimestampFilter, b: &Gossip
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
-/// Used to put an error message in a LightningError
+/// Used to put an error message in a [`LightningError`].
 #[derive(Clone)]
 #[must_use]
 #[repr(C)]
@@ -5464,7 +5704,7 @@ pub extern "C" fn LightningError_clone(orig: &LightningError) -> LightningError 
 use lightning::ln::msgs::CommitmentUpdate as nativeCommitmentUpdateImport;
 pub(crate) type nativeCommitmentUpdate = nativeCommitmentUpdateImport;
 
-/// Struct used to return values from revoke_and_ack messages, containing a bunch of commitment
+/// Struct used to return values from [`RevokeAndACK`] messages, containing a bunch of commitment
 /// transaction updates if they were pending.
 #[must_use]
 #[repr(C)]
@@ -5512,59 +5752,59 @@ impl CommitmentUpdate {
 		ret
 	}
 }
-/// update_add_htlc messages which should be sent
+/// `update_add_htlc` messages which should be sent
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_update_add_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateAddHTLCZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_add_htlcs;
 	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateAddHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning::ln::msgs::UpdateAddHTLC<>) as *mut _) }, is_owned: false } }); };
 	local_inner_val.into()
 }
-/// update_add_htlc messages which should be sent
+/// `update_add_htlc` messages which should be sent
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_set_update_add_htlcs(this_ptr: &mut CommitmentUpdate, mut val: crate::c_types::derived::CVec_UpdateAddHTLCZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.update_add_htlcs = local_val;
 }
-/// update_fulfill_htlc messages which should be sent
+/// `update_fulfill_htlc` messages which should be sent
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_update_fulfill_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateFulfillHTLCZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_fulfill_htlcs;
 	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFulfillHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning::ln::msgs::UpdateFulfillHTLC<>) as *mut _) }, is_owned: false } }); };
 	local_inner_val.into()
 }
-/// update_fulfill_htlc messages which should be sent
+/// `update_fulfill_htlc` messages which should be sent
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_set_update_fulfill_htlcs(this_ptr: &mut CommitmentUpdate, mut val: crate::c_types::derived::CVec_UpdateFulfillHTLCZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.update_fulfill_htlcs = local_val;
 }
-/// update_fail_htlc messages which should be sent
+/// `update_fail_htlc` messages which should be sent
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_update_fail_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateFailHTLCZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_fail_htlcs;
 	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFailHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning::ln::msgs::UpdateFailHTLC<>) as *mut _) }, is_owned: false } }); };
 	local_inner_val.into()
 }
-/// update_fail_htlc messages which should be sent
+/// `update_fail_htlc` messages which should be sent
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_set_update_fail_htlcs(this_ptr: &mut CommitmentUpdate, mut val: crate::c_types::derived::CVec_UpdateFailHTLCZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.update_fail_htlcs = local_val;
 }
-/// update_fail_malformed_htlc messages which should be sent
+/// `update_fail_malformed_htlc` messages which should be sent
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_update_fail_malformed_htlcs(this_ptr: &CommitmentUpdate) -> crate::c_types::derived::CVec_UpdateFailMalformedHTLCZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().update_fail_malformed_htlcs;
 	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::ln::msgs::UpdateFailMalformedHTLC { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning::ln::msgs::UpdateFailMalformedHTLC<>) as *mut _) }, is_owned: false } }); };
 	local_inner_val.into()
 }
-/// update_fail_malformed_htlc messages which should be sent
+/// `update_fail_malformed_htlc` messages which should be sent
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_set_update_fail_malformed_htlcs(this_ptr: &mut CommitmentUpdate, mut val: crate::c_types::derived::CVec_UpdateFailMalformedHTLCZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.update_fail_malformed_htlcs = local_val;
 }
-/// An update_fee message which should be sent
+/// An `update_fee` message which should be sent
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
@@ -5573,7 +5813,7 @@ pub extern "C" fn CommitmentUpdate_get_update_fee(this_ptr: &CommitmentUpdate) -
 	let mut local_inner_val = crate::lightning::ln::msgs::UpdateFee { inner: unsafe { (if inner_val.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (inner_val.as_ref().unwrap()) }) } as *const lightning::ln::msgs::UpdateFee<>) as *mut _ }, is_owned: false };
 	local_inner_val
 }
-/// An update_fee message which should be sent
+/// An `update_fee` message which should be sent
 ///
 /// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
@@ -5581,13 +5821,13 @@ pub extern "C" fn CommitmentUpdate_set_update_fee(this_ptr: &mut CommitmentUpdat
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.update_fee = local_val;
 }
-/// Finally, the commitment_signed message which should be sent
+/// A `commitment_signed` message which should be sent
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_get_commitment_signed(this_ptr: &CommitmentUpdate) -> crate::lightning::ln::msgs::CommitmentSigned {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().commitment_signed;
 	crate::lightning::ln::msgs::CommitmentSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::msgs::CommitmentSigned<>) as *mut _) }, is_owned: false }
 }
-/// Finally, the commitment_signed message which should be sent
+/// A `commitment_signed` message which should be sent
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_set_commitment_signed(this_ptr: &mut CommitmentUpdate, mut val: crate::lightning::ln::msgs::CommitmentSigned) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.commitment_signed = *unsafe { Box::from_raw(val.take_inner()) };
@@ -5640,63 +5880,57 @@ pub extern "C" fn CommitmentUpdate_eq(a: &CommitmentUpdate, b: &CommitmentUpdate
 }
 /// A trait to describe an object which can receive channel messages.
 ///
-/// Messages MAY be called in parallel when they originate from different their_node_ids, however
-/// they MUST NOT be called in parallel when the two calls have the same their_node_id.
+/// Messages MAY be called in parallel when they originate from different `their_node_ids`, however
+/// they MUST NOT be called in parallel when the two calls have the same `their_node_id`.
 #[repr(C)]
 pub struct ChannelMessageHandler {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
-	/// Handle an incoming open_channel message from the given peer.
-	pub handle_open_channel: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, their_features: crate::lightning::ln::features::InitFeatures, msg: &crate::lightning::ln::msgs::OpenChannel),
-	/// Handle an incoming accept_channel message from the given peer.
-	pub handle_accept_channel: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, their_features: crate::lightning::ln::features::InitFeatures, msg: &crate::lightning::ln::msgs::AcceptChannel),
-	/// Handle an incoming funding_created message from the given peer.
+	/// Handle an incoming `open_channel` message from the given peer.
+	pub handle_open_channel: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::OpenChannel),
+	/// Handle an incoming `accept_channel` message from the given peer.
+	pub handle_accept_channel: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::AcceptChannel),
+	/// Handle an incoming `funding_created` message from the given peer.
 	pub handle_funding_created: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::FundingCreated),
-	/// Handle an incoming funding_signed message from the given peer.
+	/// Handle an incoming `funding_signed` message from the given peer.
 	pub handle_funding_signed: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::FundingSigned),
-	/// Handle an incoming channel_ready message from the given peer.
+	/// Handle an incoming `channel_ready` message from the given peer.
 	pub handle_channel_ready: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelReady),
-	/// Handle an incoming shutdown message from the given peer.
-	pub handle_shutdown: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, their_features: &crate::lightning::ln::features::InitFeatures, msg: &crate::lightning::ln::msgs::Shutdown),
-	/// Handle an incoming closing_signed message from the given peer.
+	/// Handle an incoming `shutdown` message from the given peer.
+	pub handle_shutdown: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::Shutdown),
+	/// Handle an incoming `closing_signed` message from the given peer.
 	pub handle_closing_signed: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ClosingSigned),
-	/// Handle an incoming update_add_htlc message from the given peer.
+	/// Handle an incoming `update_add_htlc` message from the given peer.
 	pub handle_update_add_htlc: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::UpdateAddHTLC),
-	/// Handle an incoming update_fulfill_htlc message from the given peer.
+	/// Handle an incoming `update_fulfill_htlc` message from the given peer.
 	pub handle_update_fulfill_htlc: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::UpdateFulfillHTLC),
-	/// Handle an incoming update_fail_htlc message from the given peer.
+	/// Handle an incoming `update_fail_htlc` message from the given peer.
 	pub handle_update_fail_htlc: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::UpdateFailHTLC),
-	/// Handle an incoming update_fail_malformed_htlc message from the given peer.
+	/// Handle an incoming `update_fail_malformed_htlc` message from the given peer.
 	pub handle_update_fail_malformed_htlc: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::UpdateFailMalformedHTLC),
-	/// Handle an incoming commitment_signed message from the given peer.
+	/// Handle an incoming `commitment_signed` message from the given peer.
 	pub handle_commitment_signed: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::CommitmentSigned),
-	/// Handle an incoming revoke_and_ack message from the given peer.
+	/// Handle an incoming `revoke_and_ack` message from the given peer.
 	pub handle_revoke_and_ack: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::RevokeAndACK),
-	/// Handle an incoming update_fee message from the given peer.
+	/// Handle an incoming `update_fee` message from the given peer.
 	pub handle_update_fee: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::UpdateFee),
-	/// Handle an incoming announcement_signatures message from the given peer.
+	/// Handle an incoming `announcement_signatures` message from the given peer.
 	pub handle_announcement_signatures: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::AnnouncementSignatures),
-	/// Indicates a connection to the peer failed/an existing connection was lost. If no connection
-	/// is believed to be possible in the future (eg they're sending us messages we don't
-	/// understand or indicate they require unknown feature bits), no_connection_possible is set
-	/// and any outstanding channels should be failed.
-	///
-	/// Note that in some rare cases this may be called without a corresponding
-	/// [`Self::peer_connected`].
-	pub peer_disconnected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, no_connection_possible: bool),
-	/// Handle a peer reconnecting, possibly generating channel_reestablish message(s).
+	/// Indicates a connection to the peer failed/an existing connection was lost.
+	pub peer_disconnected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey),
+	/// Handle a peer reconnecting, possibly generating `channel_reestablish` message(s).
 	///
 	/// May return an `Err(())` if the features the peer supports are not sufficient to communicate
 	/// with us. Implementors should be somewhat conservative about doing so, however, as other
 	/// message handlers may still wish to communicate with this peer.
 	#[must_use]
-	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::Init) -> crate::c_types::derived::CResult_NoneNoneZ,
-	/// Handle an incoming channel_reestablish message from the given peer.
+	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::Init, inbound: bool) -> crate::c_types::derived::CResult_NoneNoneZ,
+	/// Handle an incoming `channel_reestablish` message from the given peer.
 	pub handle_channel_reestablish: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelReestablish),
-	/// Handle an incoming channel update from the given peer.
+	/// Handle an incoming `channel_update` message from the given peer.
 	pub handle_channel_update: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ChannelUpdate),
-	/// Handle an incoming error message from the given peer.
+	/// Handle an incoming `error` message from the given peer.
 	pub handle_error: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ErrorMessage),
 	/// Gets the node feature flags which this handler itself supports. All available handlers are
 	/// queried similarly and their feature flags are OR'd together to form the [`NodeFeatures`]
@@ -5758,11 +5992,11 @@ impl lightning::util::events::MessageSendEventsProvider for ChannelMessageHandle
 
 use lightning::ln::msgs::ChannelMessageHandler as rustChannelMessageHandler;
 impl rustChannelMessageHandler for ChannelMessageHandler {
-	fn handle_open_channel(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut their_features: lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::OpenChannel) {
-		(self.handle_open_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(their_features), is_owned: true }, &crate::lightning::ln::msgs::OpenChannel { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::OpenChannel<>) as *mut _) }, is_owned: false })
+	fn handle_open_channel(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::OpenChannel) {
+		(self.handle_open_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::OpenChannel { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::OpenChannel<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_accept_channel(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut their_features: lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::AcceptChannel) {
-		(self.handle_accept_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(their_features), is_owned: true }, &crate::lightning::ln::msgs::AcceptChannel { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::AcceptChannel<>) as *mut _) }, is_owned: false })
+	fn handle_accept_channel(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::AcceptChannel) {
+		(self.handle_accept_channel)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::AcceptChannel { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::AcceptChannel<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_funding_created(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::FundingCreated) {
 		(self.handle_funding_created)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::FundingCreated { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::FundingCreated<>) as *mut _) }, is_owned: false })
@@ -5773,8 +6007,8 @@ impl rustChannelMessageHandler for ChannelMessageHandler {
 	fn handle_channel_ready(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::ChannelReady) {
 		(self.handle_channel_ready)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ChannelReady { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ChannelReady<>) as *mut _) }, is_owned: false })
 	}
-	fn handle_shutdown(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut their_features: &lightning::ln::features::InitFeatures, mut msg: &lightning::ln::msgs::Shutdown) {
-		(self.handle_shutdown)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::features::InitFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((their_features as *const lightning::ln::features::InitFeatures<>) as *mut _) }, is_owned: false }, &crate::lightning::ln::msgs::Shutdown { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Shutdown<>) as *mut _) }, is_owned: false })
+	fn handle_shutdown(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::Shutdown) {
+		(self.handle_shutdown)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Shutdown { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Shutdown<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_closing_signed(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::ClosingSigned) {
 		(self.handle_closing_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ClosingSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ClosingSigned<>) as *mut _) }, is_owned: false })
@@ -5803,11 +6037,11 @@ impl rustChannelMessageHandler for ChannelMessageHandler {
 	fn handle_announcement_signatures(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::AnnouncementSignatures) {
 		(self.handle_announcement_signatures)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::AnnouncementSignatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::AnnouncementSignatures<>) as *mut _) }, is_owned: false })
 	}
-	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut no_connection_possible: bool) {
-		(self.peer_disconnected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), no_connection_possible)
+	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey) {
+		(self.peer_disconnected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id))
 	}
-	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::Init) -> Result<(), ()> {
-		let mut ret = (self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false });
+	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::Init, mut inbound: bool) -> Result<(), ()> {
+		let mut ret = (self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false }, inbound);
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
@@ -5852,40 +6086,40 @@ impl Drop for ChannelMessageHandler {
 ///
 /// # Implementor DoS Warnings
 ///
-/// For `gossip_queries` messages there are potential DoS vectors when handling
-/// inbound queries. Implementors using an on-disk network graph should be aware of
+/// For messages enabled with the `gossip_queries` feature there are potential DoS vectors when
+/// handling inbound queries. Implementors using an on-disk network graph should be aware of
 /// repeated disk I/O for queries accessing different parts of the network graph.
 #[repr(C)]
 pub struct RoutingMessageHandler {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
-	/// Handle an incoming node_announcement message, returning true if it should be forwarded on,
-	/// false or returning an Err otherwise.
+	/// Handle an incoming `node_announcement` message, returning `true` if it should be forwarded on,
+	/// `false` or returning an `Err` otherwise.
 	#[must_use]
 	pub handle_node_announcement: extern "C" fn (this_arg: *const c_void, msg: &crate::lightning::ln::msgs::NodeAnnouncement) -> crate::c_types::derived::CResult_boolLightningErrorZ,
-	/// Handle a channel_announcement message, returning true if it should be forwarded on, false
-	/// or returning an Err otherwise.
+	/// Handle a `channel_announcement` message, returning `true` if it should be forwarded on, `false`
+	/// or returning an `Err` otherwise.
 	#[must_use]
 	pub handle_channel_announcement: extern "C" fn (this_arg: *const c_void, msg: &crate::lightning::ln::msgs::ChannelAnnouncement) -> crate::c_types::derived::CResult_boolLightningErrorZ,
-	/// Handle an incoming channel_update message, returning true if it should be forwarded on,
-	/// false or returning an Err otherwise.
+	/// Handle an incoming `channel_update` message, returning true if it should be forwarded on,
+	/// `false` or returning an `Err` otherwise.
 	#[must_use]
 	pub handle_channel_update: extern "C" fn (this_arg: *const c_void, msg: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CResult_boolLightningErrorZ,
 	/// Gets channel announcements and updates required to dump our routing table to a remote node,
-	/// starting at the short_channel_id indicated by starting_point and including announcements
+	/// starting at the `short_channel_id` indicated by `starting_point` and including announcements
 	/// for a single channel.
 	#[must_use]
 	pub get_next_channel_announcement: extern "C" fn (this_arg: *const c_void, starting_point: u64) -> crate::c_types::derived::COption_C3Tuple_ChannelAnnouncementChannelUpdateChannelUpdateZZ,
 	/// Gets a node announcement required to dump our routing table to a remote node, starting at
 	/// the node *after* the provided pubkey and including up to one announcement immediately
-	/// higher (as defined by <PublicKey as Ord>::cmp) than starting_point.
-	/// If None is provided for starting_point, we start at the first node.
+	/// higher (as defined by `<PublicKey as Ord>::cmp`) than `starting_point`.
+	/// If `None` is provided for `starting_point`, we start at the first node.
 	///
 	/// Note that starting_point (or a relevant inner pointer) may be NULL or all-0s to represent None
 	/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 	#[must_use]
-	pub get_next_node_announcement: extern "C" fn (this_arg: *const c_void, starting_point: crate::c_types::PublicKey) -> crate::lightning::ln::msgs::NodeAnnouncement,
+	pub get_next_node_announcement: extern "C" fn (this_arg: *const c_void, starting_point: crate::lightning::routing::gossip::NodeId) -> crate::lightning::ln::msgs::NodeAnnouncement,
 	/// Called when a connection is established with a peer. This can be used to
 	/// perform routing table synchronization using a strategy defined by the
 	/// implementor.
@@ -5894,7 +6128,7 @@ pub struct RoutingMessageHandler {
 	/// with us. Implementors should be somewhat conservative about doing so, however, as other
 	/// message handlers may still wish to communicate with this peer.
 	#[must_use]
-	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init) -> crate::c_types::derived::CResult_NoneNoneZ,
+	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init, inbound: bool) -> crate::c_types::derived::CResult_NoneNoneZ,
 	/// Handles the reply of a query we initiated to learn about channels
 	/// for a given range of blocks. We can expect to receive one or more
 	/// replies to a single query.
@@ -5906,14 +6140,20 @@ pub struct RoutingMessageHandler {
 	/// gossip messages.
 	#[must_use]
 	pub handle_reply_short_channel_ids_end: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::ReplyShortChannelIdsEnd) -> crate::c_types::derived::CResult_NoneLightningErrorZ,
-	/// Handles when a peer asks us to send a list of short_channel_ids
+	/// Handles when a peer asks us to send a list of `short_channel_id`s
 	/// for the requested range of blocks.
 	#[must_use]
 	pub handle_query_channel_range: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::QueryChannelRange) -> crate::c_types::derived::CResult_NoneLightningErrorZ,
 	/// Handles when a peer asks us to send routing gossip messages for a
-	/// list of short_channel_ids.
+	/// list of `short_channel_id`s.
 	#[must_use]
 	pub handle_query_short_channel_ids: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::QueryShortChannelIds) -> crate::c_types::derived::CResult_NoneLightningErrorZ,
+	/// Indicates that there are a large number of [`ChannelAnnouncement`] (or other) messages
+	/// pending some async action. While there is no guarantee of the rate of future messages, the
+	/// caller should seek to reduce the rate of new gossip messages handled, especially
+	/// [`ChannelAnnouncement`]s.
+	#[must_use]
+	pub processing_queue_high: extern "C" fn (this_arg: *const c_void) -> bool,
 	/// Gets the node feature flags which this handler itself supports. All available handlers are
 	/// queried similarly and their feature flags are OR'd together to form the [`NodeFeatures`]
 	/// which are broadcasted in our [`NodeAnnouncement`] message.
@@ -5948,6 +6188,7 @@ pub(crate) extern "C" fn RoutingMessageHandler_clone_fields(orig: &RoutingMessag
 		handle_reply_short_channel_ids_end: Clone::clone(&orig.handle_reply_short_channel_ids_end),
 		handle_query_channel_range: Clone::clone(&orig.handle_query_channel_range),
 		handle_query_short_channel_ids: Clone::clone(&orig.handle_query_short_channel_ids),
+		processing_queue_high: Clone::clone(&orig.processing_queue_high),
 		provided_node_features: Clone::clone(&orig.provided_node_features),
 		provided_init_features: Clone::clone(&orig.provided_init_features),
 		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider_clone_fields(&orig.MessageSendEventsProvider),
@@ -5984,14 +6225,14 @@ impl rustRoutingMessageHandler for RoutingMessageHandler {
 		let mut local_ret = if ret.is_some() { Some( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = ret.take().to_rust(); let mut local_orig_ret_0_1 = if orig_ret_0_1.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(orig_ret_0_1.take_inner()) } }) }; let mut local_orig_ret_0_2 = if orig_ret_0_2.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(orig_ret_0_2.take_inner()) } }) }; let mut local_ret_0 = (*unsafe { Box::from_raw(orig_ret_0_0.take_inner()) }, local_orig_ret_0_1, local_orig_ret_0_2); local_ret_0 }) } else { None };
 		local_ret
 	}
-	fn get_next_node_announcement(&self, mut starting_point: Option<&bitcoin::secp256k1::PublicKey>) -> Option<lightning::ln::msgs::NodeAnnouncement> {
-		let mut local_starting_point = if starting_point.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(starting_point.unwrap())) } };
+	fn get_next_node_announcement(&self, mut starting_point: Option<&lightning::routing::gossip::NodeId>) -> Option<lightning::ln::msgs::NodeAnnouncement> {
+		let mut local_starting_point = crate::lightning::routing::gossip::NodeId { inner: unsafe { (if starting_point.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (starting_point.unwrap()) }) } as *const lightning::routing::gossip::NodeId<>) as *mut _ }, is_owned: false };
 		let mut ret = (self.get_next_node_announcement)(self.this_arg, local_starting_point);
 		let mut local_ret = if ret.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(ret.take_inner()) } }) };
 		local_ret
 	}
-	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init) -> Result<(), ()> {
-		let mut ret = (self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false });
+	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init, mut inbound: bool) -> Result<(), ()> {
+		let mut ret = (self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false }, inbound);
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
@@ -6014,6 +6255,10 @@ impl rustRoutingMessageHandler for RoutingMessageHandler {
 		let mut ret = (self.handle_query_short_channel_ids)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), crate::lightning::ln::msgs::QueryShortChannelIds { inner: ObjOps::heap_alloc(msg), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
+	}
+	fn processing_queue_high(&self) -> bool {
+		let mut ret = (self.processing_queue_high)(self.this_arg);
+		ret
 	}
 	fn provided_node_features(&self) -> lightning::ln::features::NodeFeatures {
 		let mut ret = (self.provided_node_features)(self.this_arg);
@@ -6049,7 +6294,7 @@ pub struct OnionMessageHandler {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
-	/// Handle an incoming onion_message message from the given peer.
+	/// Handle an incoming `onion_message` message from the given peer.
 	pub handle_onion_message: extern "C" fn (this_arg: *const c_void, peer_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::OnionMessage),
 	/// Called when a connection is established with a peer. Can be used to track which peers
 	/// advertise onion message support and are online.
@@ -6058,13 +6303,10 @@ pub struct OnionMessageHandler {
 	/// with us. Implementors should be somewhat conservative about doing so, however, as other
 	/// message handlers may still wish to communicate with this peer.
 	#[must_use]
-	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init) -> crate::c_types::derived::CResult_NoneNoneZ,
+	pub peer_connected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init, inbound: bool) -> crate::c_types::derived::CResult_NoneNoneZ,
 	/// Indicates a connection to the peer failed/an existing connection was lost. Allows handlers to
 	/// drop and refuse to forward onion messages to this peer.
-	///
-	/// Note that in some rare cases this may be called without a corresponding
-	/// [`Self::peer_connected`].
-	pub peer_disconnected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, no_connection_possible: bool),
+	pub peer_disconnected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey),
 	/// Gets the node feature flags which this handler itself supports. All available handlers are
 	/// queried similarly and their feature flags are OR'd together to form the [`NodeFeatures`]
 	/// which are broadcasted in our [`NodeAnnouncement`] message.
@@ -6111,13 +6353,13 @@ impl rustOnionMessageHandler for OnionMessageHandler {
 	fn handle_onion_message(&self, mut peer_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::OnionMessage) {
 		(self.handle_onion_message)(self.this_arg, crate::c_types::PublicKey::from_rust(&peer_node_id), &crate::lightning::ln::msgs::OnionMessage { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::OnionMessage<>) as *mut _) }, is_owned: false })
 	}
-	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init) -> Result<(), ()> {
-		let mut ret = (self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false });
+	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init, mut inbound: bool) -> Result<(), ()> {
+		let mut ret = (self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false }, inbound);
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
 	}
-	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut no_connection_possible: bool) {
-		(self.peer_disconnected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), no_connection_possible)
+	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey) {
+		(self.peer_disconnected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id))
 	}
 	fn provided_node_features(&self) -> lightning::ln::features::NodeFeatures {
 		let mut ret = (self.provided_node_features)(self.this_arg);
@@ -6654,7 +6896,9 @@ pub extern "C" fn ReplyShortChannelIdsEnd_read(ser: crate::c_types::u8slice) -> 
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::ReplyShortChannelIdsEnd { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
-///\n\t * Calculates the overflow safe ending block height for the query.\n\t * Overflow returns `0xffffffff`, otherwise returns `first_blocknum + number_of_blocks`\n\t 
+/// Calculates the overflow safe ending block height for the query.
+///
+/// Overflow returns `0xffffffff`, otherwise returns `first_blocknum + number_of_blocks`.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn QueryChannelRange_end_blocknum(this_arg: &crate::lightning::ln::msgs::QueryChannelRange) -> u32 {

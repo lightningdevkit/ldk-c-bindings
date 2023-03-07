@@ -668,7 +668,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 				// Now that we've resolved the path to the path as-imported, check whether the path
 				// is actually a pub(.*) use statement and map it to the real path.
 				let path_tmp = path.clone();
-				let crate_name = path_tmp.splitn(1, "::").next().unwrap();
+				let crate_name = path_tmp.splitn(2, "::").next().unwrap();
 				let mut module_riter = path_tmp.rsplitn(2, "::");
 				let obj = module_riter.next().unwrap();
 				if let Some(module_path) = module_riter.next() {
@@ -805,6 +805,7 @@ fn initial_clonable_types() -> HashSet<String> {
 	res.insert("crate::c_types::SixteenBytes".to_owned());
 	res.insert("crate::c_types::TwentyBytes".to_owned());
 	res.insert("crate::c_types::ThirtyTwoBytes".to_owned());
+	res.insert("crate::c_types::EightU16s".to_owned());
 	res.insert("crate::c_types::SecretKey".to_owned());
 	res.insert("crate::c_types::PublicKey".to_owned());
 	res.insert("crate::c_types::Transaction".to_owned());
@@ -971,6 +972,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some("crate::c_types::TwelveBytes"),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes"),
 			"[u8; 3]" if !is_ref => Some("crate::c_types::ThreeBytes"), // Used for RGB values
+			"[u16; 8]" if !is_ref => Some("crate::c_types::EightU16s"),
 
 			"str" if is_ref => Some("crate::c_types::Str"),
 			"alloc::string::String"|"String" => Some("crate::c_types::Str"),
@@ -1008,7 +1010,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction"),
 			"bitcoin::Witness" => Some("crate::c_types::Witness"),
-			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut"),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network"),
 			"bitcoin::util::address::WitnessVersion" => Some("crate::c_types::WitnessVersion"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref  => Some("*const [u8; 80]"),
@@ -1020,9 +1022,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref => Some("*const [u8; 32]"),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if is_ref  => Some("*const [u8; 32]"),
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
@@ -1060,6 +1062,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some(""),
 			"[u8; 4]" if !is_ref => Some(""),
 			"[u8; 3]" if !is_ref => Some(""),
+			"[u16; 8]" if !is_ref => Some(""),
 
 			"[u8]" if is_ref => Some(""),
 			"[usize]" if is_ref => Some(""),
@@ -1102,7 +1105,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::Witness" if is_ref => Some("&"),
 			"bitcoin::Witness" => Some(""),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::C_to_bitcoin_outpoint("),
-			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(""),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(""),
 			"bitcoin::network::constants::Network" => Some(""),
 			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" => Some("&::bitcoin::consensus::encode::deserialize(unsafe { &*"),
@@ -1120,7 +1123,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// Newtypes that we just expose in their original form.
 			"bitcoin::hash_types::Txid" if is_ref => Some("&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*"),
 			"bitcoin::hash_types::Txid" if !is_ref => Some("::bitcoin::hash_types::Txid::from_slice(&"),
-			"bitcoin::hash_types::BlockHash" => Some("::bitcoin::hash_types::BlockHash::from_slice(&"),
+			"bitcoin::hash_types::BlockHash"|"bitcoin::BlockHash" => Some("::bitcoin::hash_types::BlockHash::from_slice(&"),
+			"bitcoin::blockdata::constants::ChainHash" => Some("::bitcoin::blockdata::constants::ChainHash::from_slice(&"),
 			"lightning::ln::PaymentHash" if !is_ref => Some("::lightning::ln::PaymentHash("),
 			"lightning::ln::PaymentHash" if is_ref => Some("&::lightning::ln::PaymentHash(unsafe { *"),
 			"lightning::ln::PaymentPreimage" if !is_ref => Some("::lightning::ln::PaymentPreimage("),
@@ -1155,6 +1159,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some(".data"),
 			"[u8; 4]" if !is_ref => Some(".data"),
 			"[u8; 3]" if !is_ref => Some(".data"),
+			"[u16; 8]" if !is_ref => Some(".data"),
 
 			"[u8]" if is_ref => Some(".to_slice()"),
 			"[usize]" if is_ref => Some(".to_slice()"),
@@ -1192,7 +1197,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(".into_bitcoin()"),
 			"bitcoin::Witness" => Some(".into_bitcoin()"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
-			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(".into_rust()"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(".into_rust()"),
 			"bitcoin::network::constants::Network" => Some(".into_bitcoin()"),
 			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" => Some(" }).unwrap()"),
@@ -1205,7 +1210,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// Newtypes that we just expose in their original form.
 			"bitcoin::hash_types::Txid" if is_ref => Some(" }[..]).unwrap()"),
 			"bitcoin::hash_types::Txid" => Some(".data[..]).unwrap()"),
-			"bitcoin::hash_types::BlockHash" if !is_ref => Some(".data[..]).unwrap()"),
+			"bitcoin::hash_types::BlockHash"|"bitcoin::BlockHash"|"bitcoin::blockdata::constants::ChainHash" if !is_ref => Some(".data[..]).unwrap()"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
 			|"lightning::chain::keysinterface::KeyMaterial"
@@ -1253,6 +1258,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some("crate::c_types::TwelveBytes { data: "),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes { data: "),
 			"[u8; 3]" if is_ref => Some(""),
+			"[u16; 8]" if !is_ref => Some("crate::c_types::EightU16s { data: "),
 
 			"[u8]" if is_ref => Some("local_"),
 			"[usize]" if is_ref => Some("local_"),
@@ -1294,7 +1300,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::Witness" if is_ref => Some("crate::c_types::Witness::from_bitcoin("),
 			"bitcoin::Witness" if !is_ref => Some("crate::c_types::Witness::from_bitcoin(&"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::bitcoin_to_C_outpoint("),
-			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network::from_bitcoin("),
 			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some("&local_"),
@@ -1303,9 +1309,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if is_ref => Some(""),
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
@@ -1338,6 +1344,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some(" }"),
 			"[u8; 4]" if !is_ref => Some(" }"),
 			"[u8; 3]" if is_ref => Some(""),
+			"[u16; 8]" if !is_ref => Some(" }"),
 
 			"[u8]" if is_ref => Some(""),
 			"[usize]" if is_ref => Some(""),
@@ -1377,7 +1384,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(")"),
 			"bitcoin::Witness" => Some(")"),
 			"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
-			"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(")"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(")"),
 			"bitcoin::network::constants::Network" => Some(")"),
 			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some(""),
@@ -1386,9 +1393,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::hash_types::Txid" if !is_ref => Some(".into_inner() }"),
 
 			// Newtypes that we just expose in their original form.
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if is_ref => Some(".as_inner()"),
-			"bitcoin::hash_types::Txid"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
+			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"|"bitcoin::blockdata::constants::ChainHash"
 				if !is_ref => Some(".into_inner() }"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
@@ -1492,7 +1499,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							"lightning::ln::PaymentHash" => true,
 							"lightning::ln::PaymentPreimage" => true,
 							"lightning::ln::channelmanager::PaymentId" => true,
-							"bitcoin::hash_types::BlockHash" => true,
+							"bitcoin::hash_types::BlockHash"|"bitcoin::BlockHash" => true,
 							"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => true,
 							_ => false,
 						}
@@ -2104,11 +2111,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				} else { unimplemented!(); }
 			},
 			syn::Type::Array(a) => {
-				// We assume all arrays contain only [int_literal; X]s.
-				// This may result in some outputs not compiling.
-				if let syn::Expr::Lit(l) = &a.len {
-					if let syn::Lit::Int(i) = &l.lit {
-						write!(w, "{}", path_lookup(&format!("[u8; {}]", i.base10_digits()), is_ref, ptr_for_ref).unwrap()).unwrap();
+				if let syn::Type::Path(p) = &*a.elem {
+					let inner_ty = self.resolve_path(&p.path, generics);
+					if let syn::Expr::Lit(l) = &a.len {
+						if let syn::Lit::Int(i) = &l.lit {
+							write!(w, "{}", path_lookup(&format!("[{}; {}]", inner_ty, i.base10_digits()), is_ref, ptr_for_ref).unwrap()).unwrap();
+						} else { unimplemented!(); }
 					} else { unimplemented!(); }
 				} else { unimplemented!(); }
 			},
@@ -2377,7 +2385,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					write!(w, "let mut local_{}{} = ", ident,
 						if (!to_c && needs_ref_map) || (to_c && $container_type == "Option" && contains_slice) {"_base"} else { "" }).unwrap();
 					if prefix_location == ContainerPrefixLocation::OutsideConv {
-						var_prefix(w, $args_iter().next().unwrap(), generics, is_ref, ptr_for_ref, true);
+						var_prefix(w, $args_iter().next().unwrap(), generics, is_ref, true, true);
 					}
 					write!(w, "{}{}", prefix, var).unwrap();
 
@@ -2810,6 +2818,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 								if let syn::Type::Path(p) = &*refelem.elem {
 									write_path!(p, Some(&mut mangled_tuple_type));
 								} else { return false; }
+							} else if let syn::Type::Array(_) = elem {
+								let mut resolved = Vec::new();
+								if !self.write_c_type_intern(&mut resolved, &elem, generics, false, false, true, false, true) { return false; }
+								let array_inner = String::from_utf8(resolved).unwrap();
+								let arr_name = array_inner.split("::").last().unwrap();
+								write!(w, "{}", arr_name).unwrap();
+								write!(mangled_type, "{}", arr_name).unwrap();
 							} else { return false; }
 						}
 						write!(w, "Z").unwrap();
@@ -2958,15 +2973,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				} else if is_ref {
 					write!(w, "*const [").unwrap();
 					if !self.write_c_type_intern(w, &a.elem, generics, false, false, ptr_for_ref, with_ref_lifetime, c_ty) { return false; }
-				} else {
-					let mut typecheck = Vec::new();
-					if !self.write_c_type_intern(&mut typecheck, &a.elem, generics, false, false, ptr_for_ref, with_ref_lifetime, c_ty) { return false; }
-					if typecheck[..] != ['u' as u8, '8' as u8] { return false; }
 				}
 				if let syn::Expr::Lit(l) = &a.len {
 					if let syn::Lit::Int(i) = &l.lit {
+						let mut inner_ty = Vec::new();
+						if !self.write_c_type_intern(&mut inner_ty, &*a.elem, generics, false, false, ptr_for_ref, false, c_ty) { return false; }
+						let inner_ty_str = String::from_utf8(inner_ty).unwrap();
 						if !is_ref {
-							if let Some(ty) = self.c_type_from_path(&format!("[u8; {}]", i.base10_digits()), false, ptr_for_ref) {
+							if let Some(ty) = self.c_type_from_path(&format!("[{}; {}]", inner_ty_str, i.base10_digits()), false, ptr_for_ref) {
 								write!(w, "{}", ty).unwrap();
 								true
 							} else { false }

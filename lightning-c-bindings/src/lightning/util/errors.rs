@@ -59,13 +59,13 @@ pub enum APIError {
 	/// [`chain::Watch::update_channel`]: crate::chain::Watch::update_channel
 	/// [`ChannelMonitorUpdateStatus::InProgress`]: crate::chain::ChannelMonitorUpdateStatus::InProgress
 	MonitorUpdateInProgress,
-	/// [`KeysInterface::get_shutdown_scriptpubkey`] returned a shutdown scriptpubkey incompatible
+	/// [`SignerProvider::get_shutdown_scriptpubkey`] returned a shutdown scriptpubkey incompatible
 	/// with the channel counterparty as negotiated in [`InitFeatures`].
 	///
 	/// Using a SegWit v0 script should resolve this issue. If you cannot, you won't be able to open
 	/// a channel or cooperatively close one with this peer (and will have to force-close instead).
 	///
-	/// [`KeysInterface::get_shutdown_scriptpubkey`]: crate::chain::keysinterface::KeysInterface::get_shutdown_scriptpubkey
+	/// [`SignerProvider::get_shutdown_scriptpubkey`]: crate::chain::keysinterface::SignerProvider::get_shutdown_scriptpubkey
 	/// [`InitFeatures`]: crate::ln::features::InitFeatures
 	IncompatibleShutdownScript {
 		/// The incompatible shutdown script.
@@ -96,7 +96,7 @@ impl APIError {
 			APIError::InvalidRoute {ref err, } => {
 				let mut err_nonref = Clone::clone(err);
 				nativeAPIError::InvalidRoute {
-					err: err_nonref.into_str(),
+					err: err_nonref.into_string(),
 				}
 			},
 			APIError::ChannelUnavailable {ref err, } => {
@@ -130,7 +130,7 @@ impl APIError {
 			},
 			APIError::InvalidRoute {mut err, } => {
 				nativeAPIError::InvalidRoute {
-					err: err.into_str(),
+					err: err.into_string(),
 				}
 			},
 			APIError::ChannelUnavailable {mut err, } => {
@@ -270,4 +270,16 @@ pub extern "C" fn APIError_incompatible_shutdown_script(script: crate::lightning
 #[no_mangle]
 pub extern "C" fn APIError_eq(a: &APIError, b: &APIError) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
+}
+#[no_mangle]
+/// Serialize the APIError object into a byte array which can be read by APIError_read
+pub extern "C" fn APIError_write(obj: &crate::lightning::util::errors::APIError) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[no_mangle]
+/// Read a APIError from a byte array, created by APIError_write
+pub extern "C" fn APIError_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_APIErrorZDecodeErrorZ {
+	let res: Result<Option<lightning::util::errors::APIError>, lightning::ln::msgs::DecodeError> = crate::c_types::maybe_deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_res_0 = if o.is_none() { crate::c_types::derived::COption_APIErrorZ::None } else { crate::c_types::derived::COption_APIErrorZ::Some( { crate::lightning::util::errors::APIError::native_into(o.unwrap()) }) }; local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
 }

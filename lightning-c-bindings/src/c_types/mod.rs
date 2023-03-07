@@ -629,6 +629,11 @@ pub struct SixteenBytes { /** The sixteen bytes */ pub data: [u8; 16], }
 /// A 20-byte byte array.
 pub struct TwentyBytes { /** The twenty bytes */ pub data: [u8; 20], }
 
+#[derive(Clone)]
+#[repr(C)]
+/// 8 u16s
+pub struct EightU16s { /** The eight 16-bit integers */ pub data: [u16; 8], }
+
 pub(crate) struct VecWriter(pub Vec<u8>);
 impl lightning::util::ser::Writer for VecWriter {
 	fn write_all(&mut self, buf: &[u8]) -> Result<(), io::Error> {

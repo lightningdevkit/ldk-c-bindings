@@ -6,10 +6,7 @@
 // license as that which applies to the original source files from which this
 // source was automatically generated.
 
-//! The top-level routing/network map tracking logic lives here.
-//!
-//! You probably want to create a P2PGossipSync and use that as your RoutingMessageHandler and then
-//! interrogate it to get routes for your own payments.
+//! The router finds paths within a [`NetworkGraph`] for a payment.
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -97,42 +94,22 @@ pub extern "C" fn DefaultRouter_as_Router(this_arg: &DefaultRouter) -> crate::li
 		free: None,
 		find_route: DefaultRouter_Router_find_route,
 		find_route_with_id: DefaultRouter_Router_find_route_with_id,
-		notify_payment_path_failed: DefaultRouter_Router_notify_payment_path_failed,
-		notify_payment_path_successful: DefaultRouter_Router_notify_payment_path_successful,
-		notify_payment_probe_successful: DefaultRouter_Router_notify_payment_probe_successful,
-		notify_payment_probe_failed: DefaultRouter_Router_notify_payment_probe_failed,
 	}
 }
 
 #[must_use]
-extern "C" fn DefaultRouter_Router_find_route(this_arg: *const c_void, mut payer: crate::c_types::PublicKey, route_params: &crate::lightning::routing::router::RouteParameters, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut inflight_htlcs: crate::lightning::routing::router::InFlightHtlcs) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+extern "C" fn DefaultRouter_Router_find_route(this_arg: *const c_void, mut payer: crate::c_types::PublicKey, route_params: &crate::lightning::routing::router::RouteParameters, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, inflight_htlcs: &crate::lightning::routing::router::InFlightHtlcs) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
 	let mut local_first_hops_base = if first_hops == core::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { item.get_native_ref() }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
-	let mut ret = <nativeDefaultRouter as lightning::routing::router::Router<>>::find_route(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &payer.into_rust(), route_params.get_native_ref(), local_first_hops, *unsafe { Box::from_raw(inflight_htlcs.take_inner()) });
+	let mut ret = <nativeDefaultRouter as lightning::routing::router::Router<>>::find_route(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &payer.into_rust(), route_params.get_native_ref(), local_first_hops, inflight_htlcs.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }
 #[must_use]
-extern "C" fn DefaultRouter_Router_find_route_with_id(this_arg: *const c_void, mut payer: crate::c_types::PublicKey, route_params: &crate::lightning::routing::router::RouteParameters, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, mut inflight_htlcs: crate::lightning::routing::router::InFlightHtlcs, mut _payment_hash: crate::c_types::ThirtyTwoBytes, mut _payment_id: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
+extern "C" fn DefaultRouter_Router_find_route_with_id(this_arg: *const c_void, mut payer: crate::c_types::PublicKey, route_params: &crate::lightning::routing::router::RouteParameters, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, inflight_htlcs: &crate::lightning::routing::router::InFlightHtlcs, mut _payment_hash: crate::c_types::ThirtyTwoBytes, mut _payment_id: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_RouteLightningErrorZ {
 	let mut local_first_hops_base = if first_hops == core::ptr::null_mut() { None } else { Some( { let mut local_first_hops_0 = Vec::new(); for mut item in unsafe { &mut *first_hops }.as_slice().iter() { local_first_hops_0.push( { item.get_native_ref() }); }; local_first_hops_0 }) }; let mut local_first_hops = local_first_hops_base.as_ref().map(|a| &a[..]);
-	let mut ret = <nativeDefaultRouter as lightning::routing::router::Router<>>::find_route_with_id(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &payer.into_rust(), route_params.get_native_ref(), local_first_hops, *unsafe { Box::from_raw(inflight_htlcs.take_inner()) }, ::lightning::ln::PaymentHash(_payment_hash.data), ::lightning::ln::channelmanager::PaymentId(_payment_id.data));
+	let mut ret = <nativeDefaultRouter as lightning::routing::router::Router<>>::find_route_with_id(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &payer.into_rust(), route_params.get_native_ref(), local_first_hops, inflight_htlcs.get_native_ref(), ::lightning::ln::PaymentHash(_payment_hash.data), ::lightning::ln::channelmanager::PaymentId(_payment_id.data));
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::Route { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
-}
-extern "C" fn DefaultRouter_Router_notify_payment_path_failed(this_arg: *const c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeDefaultRouter as lightning::routing::router::Router<>>::notify_payment_path_failed(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &local_path[..], short_channel_id)
-}
-extern "C" fn DefaultRouter_Router_notify_payment_path_successful(this_arg: *const c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeDefaultRouter as lightning::routing::router::Router<>>::notify_payment_path_successful(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &local_path[..])
-}
-extern "C" fn DefaultRouter_Router_notify_payment_probe_successful(this_arg: *const c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeDefaultRouter as lightning::routing::router::Router<>>::notify_payment_probe_successful(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &local_path[..])
-}
-extern "C" fn DefaultRouter_Router_notify_payment_probe_failed(this_arg: *const c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeDefaultRouter as lightning::routing::router::Router<>>::notify_payment_probe_failed(unsafe { &mut *(this_arg as *mut nativeDefaultRouter) }, &local_path[..], short_channel_id)
 }
 
 /// A trait defining behavior for routing a payment.
@@ -145,21 +122,13 @@ pub struct Router {
 	///
 	/// Note that first_hops (or a relevant inner pointer) may be NULL or all-0s to represent None
 	#[must_use]
-	pub find_route: extern "C" fn (this_arg: *const c_void, payer: crate::c_types::PublicKey, route_params: &crate::lightning::routing::router::RouteParameters, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, inflight_htlcs: crate::lightning::routing::router::InFlightHtlcs) -> crate::c_types::derived::CResult_RouteLightningErrorZ,
+	pub find_route: extern "C" fn (this_arg: *const c_void, payer: crate::c_types::PublicKey, route_params: &crate::lightning::routing::router::RouteParameters, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, inflight_htlcs: &crate::lightning::routing::router::InFlightHtlcs) -> crate::c_types::derived::CResult_RouteLightningErrorZ,
 	/// Finds a [`Route`] between `payer` and `payee` for a payment with the given values. Includes
 	/// `PaymentHash` and `PaymentId` to be able to correlate the request with a specific payment.
 	///
 	/// Note that first_hops (or a relevant inner pointer) may be NULL or all-0s to represent None
 	#[must_use]
-	pub find_route_with_id: extern "C" fn (this_arg: *const c_void, payer: crate::c_types::PublicKey, route_params: &crate::lightning::routing::router::RouteParameters, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, inflight_htlcs: crate::lightning::routing::router::InFlightHtlcs, _payment_hash: crate::c_types::ThirtyTwoBytes, _payment_id: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_RouteLightningErrorZ,
-	/// Lets the router know that payment through a specific path has failed.
-	pub notify_payment_path_failed: extern "C" fn (this_arg: *const c_void, path: crate::c_types::derived::CVec_RouteHopZ, short_channel_id: u64),
-	/// Lets the router know that payment through a specific path was successful.
-	pub notify_payment_path_successful: extern "C" fn (this_arg: *const c_void, path: crate::c_types::derived::CVec_RouteHopZ),
-	/// Lets the router know that a payment probe was successful.
-	pub notify_payment_probe_successful: extern "C" fn (this_arg: *const c_void, path: crate::c_types::derived::CVec_RouteHopZ),
-	/// Lets the router know that a payment probe failed.
-	pub notify_payment_probe_failed: extern "C" fn (this_arg: *const c_void, path: crate::c_types::derived::CVec_RouteHopZ, short_channel_id: u64),
+	pub find_route_with_id: extern "C" fn (this_arg: *const c_void, payer: crate::c_types::PublicKey, route_params: &crate::lightning::routing::router::RouteParameters, first_hops: *mut crate::c_types::derived::CVec_ChannelDetailsZ, inflight_htlcs: &crate::lightning::routing::router::InFlightHtlcs, _payment_hash: crate::c_types::ThirtyTwoBytes, _payment_id: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_RouteLightningErrorZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -172,43 +141,23 @@ pub(crate) extern "C" fn Router_clone_fields(orig: &Router) -> Router {
 		this_arg: orig.this_arg,
 		find_route: Clone::clone(&orig.find_route),
 		find_route_with_id: Clone::clone(&orig.find_route_with_id),
-		notify_payment_path_failed: Clone::clone(&orig.notify_payment_path_failed),
-		notify_payment_path_successful: Clone::clone(&orig.notify_payment_path_successful),
-		notify_payment_probe_successful: Clone::clone(&orig.notify_payment_probe_successful),
-		notify_payment_probe_failed: Clone::clone(&orig.notify_payment_probe_failed),
 		free: Clone::clone(&orig.free),
 	}
 }
 
 use lightning::routing::router::Router as rustRouter;
 impl rustRouter for Router {
-	fn find_route(&self, mut payer: &bitcoin::secp256k1::PublicKey, mut route_params: &lightning::routing::router::RouteParameters, mut first_hops: Option<&[&lightning::ln::channelmanager::ChannelDetails]>, mut inflight_htlcs: lightning::routing::router::InFlightHtlcs) -> Result<lightning::routing::router::Route, lightning::ln::msgs::LightningError> {
+	fn find_route(&self, mut payer: &bitcoin::secp256k1::PublicKey, mut route_params: &lightning::routing::router::RouteParameters, mut first_hops: Option<&[&lightning::ln::channelmanager::ChannelDetails]>, mut inflight_htlcs: &lightning::routing::router::InFlightHtlcs) -> Result<lightning::routing::router::Route, lightning::ln::msgs::LightningError> {
 		let mut local_first_hops_base = if first_hops.is_none() { SmartPtr::null() } else { SmartPtr::from_obj( { let mut local_first_hops_0 = Vec::new(); for item in (first_hops.unwrap()).iter() { local_first_hops_0.push( { crate::lightning::ln::channelmanager::ChannelDetails { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::ln::channelmanager::ChannelDetails<>) as *mut _) }, is_owned: false } }); }; local_first_hops_0.into() }) }; let mut local_first_hops = *local_first_hops_base;
-		let mut ret = (self.find_route)(self.this_arg, crate::c_types::PublicKey::from_rust(&payer), &crate::lightning::routing::router::RouteParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((route_params as *const lightning::routing::router::RouteParameters<>) as *mut _) }, is_owned: false }, local_first_hops, crate::lightning::routing::router::InFlightHtlcs { inner: ObjOps::heap_alloc(inflight_htlcs), is_owned: true });
+		let mut ret = (self.find_route)(self.this_arg, crate::c_types::PublicKey::from_rust(&payer), &crate::lightning::routing::router::RouteParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((route_params as *const lightning::routing::router::RouteParameters<>) as *mut _) }, is_owned: false }, local_first_hops, &crate::lightning::routing::router::InFlightHtlcs { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inflight_htlcs as *const lightning::routing::router::InFlightHtlcs<>) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).take_inner()) } }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
 	}
-	fn find_route_with_id(&self, mut payer: &bitcoin::secp256k1::PublicKey, mut route_params: &lightning::routing::router::RouteParameters, mut first_hops: Option<&[&lightning::ln::channelmanager::ChannelDetails]>, mut inflight_htlcs: lightning::routing::router::InFlightHtlcs, mut _payment_hash: lightning::ln::PaymentHash, mut _payment_id: lightning::ln::channelmanager::PaymentId) -> Result<lightning::routing::router::Route, lightning::ln::msgs::LightningError> {
+	fn find_route_with_id(&self, mut payer: &bitcoin::secp256k1::PublicKey, mut route_params: &lightning::routing::router::RouteParameters, mut first_hops: Option<&[&lightning::ln::channelmanager::ChannelDetails]>, mut inflight_htlcs: &lightning::routing::router::InFlightHtlcs, mut _payment_hash: lightning::ln::PaymentHash, mut _payment_id: lightning::ln::channelmanager::PaymentId) -> Result<lightning::routing::router::Route, lightning::ln::msgs::LightningError> {
 		let mut local_first_hops_base = if first_hops.is_none() { SmartPtr::null() } else { SmartPtr::from_obj( { let mut local_first_hops_0 = Vec::new(); for item in (first_hops.unwrap()).iter() { local_first_hops_0.push( { crate::lightning::ln::channelmanager::ChannelDetails { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::ln::channelmanager::ChannelDetails<>) as *mut _) }, is_owned: false } }); }; local_first_hops_0.into() }) }; let mut local_first_hops = *local_first_hops_base;
-		let mut ret = (self.find_route_with_id)(self.this_arg, crate::c_types::PublicKey::from_rust(&payer), &crate::lightning::routing::router::RouteParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((route_params as *const lightning::routing::router::RouteParameters<>) as *mut _) }, is_owned: false }, local_first_hops, crate::lightning::routing::router::InFlightHtlcs { inner: ObjOps::heap_alloc(inflight_htlcs), is_owned: true }, crate::c_types::ThirtyTwoBytes { data: _payment_hash.0 }, crate::c_types::ThirtyTwoBytes { data: _payment_id.0 });
+		let mut ret = (self.find_route_with_id)(self.this_arg, crate::c_types::PublicKey::from_rust(&payer), &crate::lightning::routing::router::RouteParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((route_params as *const lightning::routing::router::RouteParameters<>) as *mut _) }, is_owned: false }, local_first_hops, &crate::lightning::routing::router::InFlightHtlcs { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inflight_htlcs as *const lightning::routing::router::InFlightHtlcs<>) as *mut _) }, is_owned: false }, crate::c_types::ThirtyTwoBytes { data: _payment_hash.0 }, crate::c_types::ThirtyTwoBytes { data: _payment_id.0 });
 		let mut local_ret = match ret.result_ok { true => Ok( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).take_inner()) } }), false => Err( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).take_inner()) } })};
 		local_ret
-	}
-	fn notify_payment_path_failed(&self, mut path: &[&lightning::routing::router::RouteHop], mut short_channel_id: u64) {
-		let mut local_path = Vec::new(); for item in path.iter() { local_path.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::routing::router::RouteHop<>) as *mut _) }, is_owned: false } }); };
-		(self.notify_payment_path_failed)(self.this_arg, local_path.into(), short_channel_id)
-	}
-	fn notify_payment_path_successful(&self, mut path: &[&lightning::routing::router::RouteHop]) {
-		let mut local_path = Vec::new(); for item in path.iter() { local_path.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::routing::router::RouteHop<>) as *mut _) }, is_owned: false } }); };
-		(self.notify_payment_path_successful)(self.this_arg, local_path.into())
-	}
-	fn notify_payment_probe_successful(&self, mut path: &[&lightning::routing::router::RouteHop]) {
-		let mut local_path = Vec::new(); for item in path.iter() { local_path.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::routing::router::RouteHop<>) as *mut _) }, is_owned: false } }); };
-		(self.notify_payment_probe_successful)(self.this_arg, local_path.into())
-	}
-	fn notify_payment_probe_failed(&self, mut path: &[&lightning::routing::router::RouteHop], mut short_channel_id: u64) {
-		let mut local_path = Vec::new(); for item in path.iter() { local_path.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::routing::router::RouteHop<>) as *mut _) }, is_owned: false } }); };
-		(self.notify_payment_probe_failed)(self.this_arg, local_path.into(), short_channel_id)
 	}
 }
 
@@ -232,7 +181,7 @@ impl Drop for Router {
 }
 
 use lightning::routing::router::ScorerAccountingForInFlightHtlcs as nativeScorerAccountingForInFlightHtlcsImport;
-pub(crate) type nativeScorerAccountingForInFlightHtlcs = nativeScorerAccountingForInFlightHtlcsImport<crate::lightning::routing::scoring::Score>;
+pub(crate) type nativeScorerAccountingForInFlightHtlcs = nativeScorerAccountingForInFlightHtlcsImport<'static, crate::lightning::routing::scoring::Score>;
 
 /// [`Score`] implementation that factors in in-flight HTLC liquidity.
 ///
@@ -289,8 +238,8 @@ impl ScorerAccountingForInFlightHtlcs {
 /// Initialize a new `ScorerAccountingForInFlightHtlcs`.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ScorerAccountingForInFlightHtlcs_new(mut scorer: crate::lightning::routing::scoring::Score, mut inflight_htlcs: crate::lightning::routing::router::InFlightHtlcs) -> crate::lightning::routing::router::ScorerAccountingForInFlightHtlcs {
-	let mut ret = lightning::routing::router::ScorerAccountingForInFlightHtlcs::new(scorer, *unsafe { Box::from_raw(inflight_htlcs.take_inner()) });
+pub extern "C" fn ScorerAccountingForInFlightHtlcs_new(mut scorer: crate::lightning::routing::scoring::Score, inflight_htlcs: &crate::lightning::routing::router::InFlightHtlcs) -> crate::lightning::routing::router::ScorerAccountingForInFlightHtlcs {
+	let mut ret = lightning::routing::router::ScorerAccountingForInFlightHtlcs::new(scorer, inflight_htlcs.get_native_ref());
 	crate::lightning::routing::router::ScorerAccountingForInFlightHtlcs { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
@@ -839,7 +788,7 @@ pub(crate) type nativeRouteParameters = nativeRouteParametersImport;
 /// Parameters needed to find a [`Route`].
 ///
 /// Passed to [`find_route`] and [`build_route_from_hops`], but also provided in
-/// [`Event::PaymentPathFailed`] for retrying a failed payment path.
+/// [`Event::PaymentPathFailed`].
 ///
 /// [`Event::PaymentPathFailed`]: crate::util::events::Event::PaymentPathFailed
 #[must_use]
@@ -910,25 +859,13 @@ pub extern "C" fn RouteParameters_get_final_value_msat(this_ptr: &RouteParameter
 pub extern "C" fn RouteParameters_set_final_value_msat(this_ptr: &mut RouteParameters, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.final_value_msat = val;
 }
-/// The CLTV on the final hop of the failed payment path.
-#[no_mangle]
-pub extern "C" fn RouteParameters_get_final_cltv_expiry_delta(this_ptr: &RouteParameters) -> u32 {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().final_cltv_expiry_delta;
-	*inner_val
-}
-/// The CLTV on the final hop of the failed payment path.
-#[no_mangle]
-pub extern "C" fn RouteParameters_set_final_cltv_expiry_delta(this_ptr: &mut RouteParameters, mut val: u32) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.final_cltv_expiry_delta = val;
-}
 /// Constructs a new RouteParameters given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RouteParameters_new(mut payment_params_arg: crate::lightning::routing::router::PaymentParameters, mut final_value_msat_arg: u64, mut final_cltv_expiry_delta_arg: u32) -> RouteParameters {
+pub extern "C" fn RouteParameters_new(mut payment_params_arg: crate::lightning::routing::router::PaymentParameters, mut final_value_msat_arg: u64) -> RouteParameters {
 	RouteParameters { inner: ObjOps::heap_alloc(nativeRouteParameters {
 		payment_params: *unsafe { Box::from_raw(payment_params_arg.take_inner()) },
 		final_value_msat: final_value_msat_arg,
-		final_cltv_expiry_delta: final_cltv_expiry_delta_arg,
 	}), is_owned: true }
 }
 impl Clone for RouteParameters {
@@ -949,6 +886,15 @@ pub(crate) extern "C" fn RouteParameters_clone_void(this_ptr: *const c_void) -> 
 /// Creates a copy of the RouteParameters
 pub extern "C" fn RouteParameters_clone(orig: &RouteParameters) -> RouteParameters {
 	orig.clone()
+}
+/// Checks if two RouteParameterss contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RouteParameters_eq(a: &RouteParameters, b: &RouteParameters) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 #[no_mangle]
 /// Serialize the RouteParameters object into a byte array which can be read by RouteParameters_read
@@ -1169,10 +1115,21 @@ pub extern "C" fn PaymentParameters_set_previously_failed_channels(this_ptr: &mu
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.previously_failed_channels = local_val;
 }
+/// The minimum CLTV delta at the end of the route. This value must not be zero.
+#[no_mangle]
+pub extern "C" fn PaymentParameters_get_final_cltv_expiry_delta(this_ptr: &PaymentParameters) -> u32 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().final_cltv_expiry_delta;
+	*inner_val
+}
+/// The minimum CLTV delta at the end of the route. This value must not be zero.
+#[no_mangle]
+pub extern "C" fn PaymentParameters_set_final_cltv_expiry_delta(this_ptr: &mut PaymentParameters, mut val: u32) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.final_cltv_expiry_delta = val;
+}
 /// Constructs a new PaymentParameters given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PaymentParameters_new(mut payee_pubkey_arg: crate::c_types::PublicKey, mut features_arg: crate::lightning::ln::features::InvoiceFeatures, mut route_hints_arg: crate::c_types::derived::CVec_RouteHintZ, mut expiry_time_arg: crate::c_types::derived::COption_u64Z, mut max_total_cltv_expiry_delta_arg: u32, mut max_path_count_arg: u8, mut max_channel_saturation_power_of_half_arg: u8, mut previously_failed_channels_arg: crate::c_types::derived::CVec_u64Z) -> PaymentParameters {
+pub extern "C" fn PaymentParameters_new(mut payee_pubkey_arg: crate::c_types::PublicKey, mut features_arg: crate::lightning::ln::features::InvoiceFeatures, mut route_hints_arg: crate::c_types::derived::CVec_RouteHintZ, mut expiry_time_arg: crate::c_types::derived::COption_u64Z, mut max_total_cltv_expiry_delta_arg: u32, mut max_path_count_arg: u8, mut max_channel_saturation_power_of_half_arg: u8, mut previously_failed_channels_arg: crate::c_types::derived::CVec_u64Z, mut final_cltv_expiry_delta_arg: u32) -> PaymentParameters {
 	let mut local_features_arg = if features_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(features_arg.take_inner()) } }) };
 	let mut local_route_hints_arg = Vec::new(); for mut item in route_hints_arg.into_rust().drain(..) { local_route_hints_arg.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
 	let mut local_expiry_time_arg = if expiry_time_arg.is_some() { Some( { expiry_time_arg.take() }) } else { None };
@@ -1186,6 +1143,7 @@ pub extern "C" fn PaymentParameters_new(mut payee_pubkey_arg: crate::c_types::Pu
 		max_path_count: max_path_count_arg,
 		max_channel_saturation_power_of_half: max_channel_saturation_power_of_half_arg,
 		previously_failed_channels: local_previously_failed_channels_arg,
+		final_cltv_expiry_delta: final_cltv_expiry_delta_arg,
 	}), is_owned: true }
 }
 impl Clone for PaymentParameters {
@@ -1237,24 +1195,31 @@ pub(crate) extern "C" fn PaymentParameters_write_void(obj: *const c_void) -> cra
 }
 #[no_mangle]
 /// Read a PaymentParameters from a byte array, created by PaymentParameters_write
-pub extern "C" fn PaymentParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_PaymentParametersDecodeErrorZ {
-	let res: Result<lightning::routing::router::PaymentParameters, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+pub extern "C" fn PaymentParameters_read(ser: crate::c_types::u8slice, arg: u32) -> crate::c_types::derived::CResult_PaymentParametersDecodeErrorZ {
+	let arg_conv = arg;
+	let res: Result<lightning::routing::router::PaymentParameters, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::routing::router::PaymentParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 /// Creates a payee with the node id of the given `pubkey`.
+///
+/// The `final_cltv_expiry_delta` should match the expected final CLTV delta the recipient has
+/// provided.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PaymentParameters_from_node_id(mut payee_pubkey: crate::c_types::PublicKey) -> crate::lightning::routing::router::PaymentParameters {
-	let mut ret = lightning::routing::router::PaymentParameters::from_node_id(payee_pubkey.into_rust());
+pub extern "C" fn PaymentParameters_from_node_id(mut payee_pubkey: crate::c_types::PublicKey, mut final_cltv_expiry_delta: u32) -> crate::lightning::routing::router::PaymentParameters {
+	let mut ret = lightning::routing::router::PaymentParameters::from_node_id(payee_pubkey.into_rust(), final_cltv_expiry_delta);
 	crate::lightning::routing::router::PaymentParameters { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
 /// Creates a payee with the node id of the given `pubkey` to use for keysend payments.
+///
+/// The `final_cltv_expiry_delta` should match the expected final CLTV delta the recipient has
+/// provided.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PaymentParameters_for_keysend(mut payee_pubkey: crate::c_types::PublicKey) -> crate::lightning::routing::router::PaymentParameters {
-	let mut ret = lightning::routing::router::PaymentParameters::for_keysend(payee_pubkey.into_rust());
+pub extern "C" fn PaymentParameters_for_keysend(mut payee_pubkey: crate::c_types::PublicKey, mut final_cltv_expiry_delta: u32) -> crate::lightning::routing::router::PaymentParameters {
+	let mut ret = lightning::routing::router::PaymentParameters::for_keysend(payee_pubkey.into_rust(), final_cltv_expiry_delta);
 	crate::lightning::routing::router::PaymentParameters { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 

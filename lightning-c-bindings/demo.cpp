@@ -482,7 +482,7 @@ uint64_t get_chan_score(const void *this_arg, uint64_t scid, const LDKNodeId *sr
 	return 42;
 }
 
-struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, struct LDKPublicKey payer, const struct LDKRouteParameters *NONNULL_PTR route_params, struct LDKCVec_ChannelDetailsZ *first_hops, const struct LDKInFlightHtlcs *in_flights) {
+struct LDKCResult_RouteLightningErrorZ custom_find_route(const void *this_arg, struct LDKPublicKey payer, const struct LDKRouteParameters *NONNULL_PTR route_params, struct LDKCVec_ChannelDetailsZ *first_hops, const struct LDKInFlightHtlcs *in_flights, LDKThirtyTwoBytes payment_id, LDKThirtyTwoBytes payment_hash) {
 	const LDK::DefaultRouter *router = (LDK::DefaultRouter *)this_arg;
 	assert(first_hops->datalen == 1);
 	assert(ChannelDetails_get_is_usable(&first_hops->data[0]));

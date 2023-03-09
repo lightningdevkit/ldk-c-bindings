@@ -553,6 +553,7 @@ int main() {
 	LDKRouter panic_router = {
 		.this_arg = NULL,
 		.find_route = NULL, // Segfault if we ever try to find a route
+		.find_route_with_id = NULL, // Segfault if we ever try to find a route
 		.free = NULL,
 	};
 
@@ -898,7 +899,8 @@ int main() {
 	const LDK::DefaultRouter default_router_1 = DefaultRouter_new(&net_graph1, logger1, entropy_source1.get_secure_random_bytes(), std::move(scorer_mtx_trait1));
 	LDKRouter router1 = {
 		.this_arg = (void*)&default_router_1,
-		.find_route = custom_find_route,
+		.find_route = NULL, // LDK currently doesn't use this, its just a default-impl
+		.find_route_with_id = custom_find_route,
 		.free = NULL,
 	};
 

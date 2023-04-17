@@ -134,7 +134,7 @@ pub fn export_status(attrs: &[syn::Attribute]) -> ExportStatus {
 		match token_iter.next().unwrap() {
 			TokenTree::Literal(lit) => {
 				let line = format!("{}", lit);
-				if line.contains("(C-not exported)") {
+				if line.contains("(C-not exported)") || line.contains("This is not exported to bindings users") {
 					return ExportStatus::NoExport;
 				} else if line.contains("(C-not implementable)") {
 					return ExportStatus::NotImplementable;

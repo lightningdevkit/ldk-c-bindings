@@ -1624,7 +1624,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 							let inner_name = self.get_c_mangled_container_type(vec![single_contained.unwrap()], generics, "Option").unwrap();
 							return Some(("if ", vec![
 								(format!(".is_none() {{ {}::None }} else {{ {}::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */", inner_name, inner_name),
-								 format!("{}.clone().unwrap()", var_access))
+								 format!("(*{}.as_ref().unwrap()).clone()", var_access))
 								], ") }", ContainerPrefixLocation::PerConv));
 						}
 					} else {

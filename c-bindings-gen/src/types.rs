@@ -1717,10 +1717,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 										(format!("{} {{ None }} else {{ Some(", s), format!("unsafe {{ &mut *{} }}", var_access))
 									], ") }", ContainerPrefixLocation::NoPrefix)),
 								EmptyValExpectedTy::OptionType =>
-									return Some(("{ /* ", vec![
-										(format!("*/ let {}_opt = {};", var_name, var_access),
-										format!("}} if {}_opt{} {{ None }} else {{ Some({{ {}_opt.take()", var_name, s, var_name))
-									], ") } }", ContainerPrefixLocation::PerConv)),
+									return Some(("{ /*", vec![
+										(format!("*/ let {}_opt = {}; if {}_opt{} {{ None }} else {{ Some({{", var_name, var_access, var_name, s),
+										format!("{{ {}_opt.take() }}", var_name))
+									], "})} }", ContainerPrefixLocation::PerConv)),
 								EmptyValExpectedTy::NonPointer =>
 									return Some(("if ", vec![
 										(format!("{} {{ None }} else {{ Some(", s), format!("{}", var_access))

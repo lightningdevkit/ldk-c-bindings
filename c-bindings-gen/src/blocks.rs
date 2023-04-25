@@ -442,7 +442,7 @@ fn writeln_docs_impl<'a, W: std::io::Write, I>(w: &mut W, attrs: &[syn::Attribut
 				match token_iter.next().unwrap() {
 					TokenTree::Literal(lit) => {
 						// Drop the first and last chars from lit as they are always "
-						let doc = format!("{}", lit);
+						let doc = format!("{}", lit).trim().replace("\n", &format!("\n{}//!", prefix));
 						writeln!(w, "{}//!{}", prefix, &doc[1..doc.len() - 1]).unwrap();
 					},
 					_ => unimplemented!(),
@@ -452,7 +452,7 @@ fn writeln_docs_impl<'a, W: std::io::Write, I>(w: &mut W, attrs: &[syn::Attribut
 				match token_iter.next().unwrap() {
 					TokenTree::Literal(lit) => {
 						// Drop the first and last chars from lit as they are always "
-						let doc = format!("{}", lit);
+						let doc = format!("{}", lit).trim().replace("\n", &format!("\n{}///", prefix));
 						writeln!(w, "{}///{}", prefix, &doc[1..doc.len() - 1]).unwrap();
 					},
 					_ => unimplemented!(),

@@ -686,6 +686,35 @@ int main() {
 			std::this_thread::yield();
 		}
 
+		// Note that the channel ID is the same as the channel txid reversed as the output index is 0
+		uint8_t expected_chan_id[32];
+		for (int i = 0; i < 32; i++) { expected_chan_id[i] = channel_open_txid[31-i]; }
+
+		while (true) {
+			EventQueue queue;
+			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
+			ev1.process_pending_events(handler);
+			if (queue.events.size() == 1) {
+				assert(queue.events[0]->tag == LDKEvent_ChannelPending);
+				assert(!memcmp(queue.events[0]->channel_pending.channel_id.data, expected_chan_id, 32));
+				break;
+			}
+			std::this_thread::yield();
+		}
+
+		LDK::EventsProvider ev2 = ChannelManager_as_EventsProvider(&cm2);
+		while (true) {
+			EventQueue queue;
+			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
+			ev2.process_pending_events(handler);
+			if (queue.events.size() == 1) {
+				assert(queue.events[0]->tag == LDKEvent_ChannelPending);
+				assert(!memcmp(queue.events[0]->channel_pending.channel_id.data, expected_chan_id, 32));
+				break;
+			}
+			std::this_thread::yield();
+		}
+
 		LDK::Listen listener1 = ChannelManager_as_Listen(&cm1);
 		listener1->block_connected(listener1->this_arg, LDKu8slice { .data = channel_open_block, .datalen = sizeof(channel_open_block) }, 1);
 
@@ -713,11 +742,6 @@ int main() {
 		PeerManager_process_events(&net1);
 		PeerManager_process_events(&net2);
 
-		// Note that the channel ID is the same as the channel txid reversed as the output index is 0
-		uint8_t expected_chan_id[32];
-		for (int i = 0; i < 32; i++) { expected_chan_id[i] = channel_open_txid[31-i]; }
-
-		LDK::EventsProvider ev2 = ChannelManager_as_EventsProvider(&cm2);
 		while (true) {
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
@@ -794,8 +818,8 @@ int main() {
 			LDK::RouteParameters route_params = RouteParameters_new(PaymentParameters_new(
 					ChannelManager_get_our_node_id(&cm2), LDKInvoiceFeatures {
 						.inner = NULL, .is_owned = false
-					}, Invoice_route_hints(invoice->contents.result), COption_u64Z_none(), 0xffffffff,
-					1, 2, LDKCVec_u64Z { .data = NULL, .datalen = 0 },
+					}, Hints_clear(Invoice_route_hints(invoice->contents.result)), COption_u64Z_none(),
+					0xffffffff, 1, 2, LDKCVec_u64Z { .data = NULL, .datalen = 0 },
 					Invoice_min_final_cltv_expiry_delta(invoice->contents.result)),
 				5000);
 			random_bytes = entropy_source1.get_secure_random_bytes();
@@ -803,15 +827,17 @@ int main() {
 			LDK::CResult_RouteLightningErrorZ route = find_route(ChannelManager_get_our_node_id(&cm1), &route_params, &net_graph2, &outbound_channels, logger1, &chan_scorer, &random_bytes.data);
 
 			assert(route->result_ok);
-			LDK::CVec_CVec_RouteHopZZ paths = Route_get_paths(route->contents.result);
+			LDK::CVec_PathZ paths = Route_get_paths(route->contents.result);
 			assert(paths->datalen == 1);
-			assert(paths->data[0].datalen == 1);
-			assert(!memcmp(RouteHop_get_pubkey(&paths->data[0].data[0]).compressed_form,
+			LDK::CVec_RouteHopZ hops = Path_get_hops(&paths->data[0]);
+			assert(hops->datalen == 1);
+			assert(!memcmp(RouteHop_get_pubkey(&hops->data[0]).compressed_form,
 				ChannelManager_get_our_node_id(&cm2).compressed_form, 33));
-			assert(RouteHop_get_short_channel_id(&paths->data[0].data[0]) == channel_scid);
+			assert(RouteHop_get_short_channel_id(&hops->data[0]) == channel_scid);
 			LDKThirtyTwoBytes payment_secret;
 			memcpy(payment_secret.data, Invoice_payment_secret(invoice->contents.result), 32);
-			LDK::CResult_NonePaymentSendFailureZ send_res = ChannelManager_send_payment(&cm1, route->contents.result, payment_hash, payment_secret, payment_hash);
+			LDK::CResult_NonePaymentSendFailureZ send_res = ChannelManager_send_payment_with_route(&cm1,
+				route->contents.result, payment_hash, RecipientOnionFields_secret_only(payment_secret), payment_hash);
 			assert(send_res->result_ok);
 		}
 
@@ -991,6 +1017,7 @@ int main() {
 		if (outbound_channels->datalen == 1) {
 			break;
 		}
+		std::this_thread::yield();
 	}
 
 	// Send another payment, this time via the retires path
@@ -1103,5 +1130,5 @@ int main() {
 	memset(&sk, 42, 32);
 	LDKThirtyTwoBytes kdiv_params;
 	memset(&kdiv_params, 43, 32);
-	LDK::InMemorySigner signer = InMemorySigner_new(sk, sk, sk, sk, sk, random_bytes, 42, kdiv_params);
+	LDK::InMemorySigner signer = InMemorySigner_new(sk, sk, sk, sk, sk, random_bytes, 42, kdiv_params, kdiv_params);
 }

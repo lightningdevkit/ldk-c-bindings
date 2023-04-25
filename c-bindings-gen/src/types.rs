@@ -2685,10 +2685,16 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			} else if let syn::Type::Path(p_arg) = t {
 				if let Some(resolved) = self.maybe_resolve_path(&p_arg.path, generics) {
 					if !self.is_primitive(&resolved) {
-						assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
+						if is_ref {
+							// We don't currently support outer reference types for non-primitive inners
+							return false;
+						}
 					}
 				} else {
-					assert!(!is_ref); // We don't currently support outer reference types for non-primitive inners
+					if is_ref {
+						// We don't currently support outer reference types for non-primitive inners
+						return false;
+					}
 				}
 				if !self.write_c_type_intern(w, t, generics, false, false, false, true, true) { return false; }
 			} else {

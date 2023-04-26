@@ -16,12 +16,23 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
+mod utils {
 
-use lightning::onion_message::blinded_path::BlindedPath as nativeBlindedPathImport;
+use alloc::str::FromStr;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
+
+use lightning::blinded_path::BlindedPath as nativeBlindedPathImport;
 pub(crate) type nativeBlindedPath = nativeBlindedPathImport;
 
-/// Onion messages can be sent and received to blinded paths, which serve to hide the identity of
-/// the recipient.
+/// Onion messages and payments can be sent and received to blinded paths, which serve to hide the
+/// identity of the recipient.
 #[must_use]
 #[repr(C)]
 pub struct BlindedPath {
@@ -87,8 +98,27 @@ pub(crate) extern "C" fn BlindedPath_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn BlindedPath_clone(orig: &BlindedPath) -> BlindedPath {
 	orig.clone()
 }
+/// Generates a non-cryptographic 64-bit hash of the BlindedPath.
+#[no_mangle]
+pub extern "C" fn BlindedPath_hash(o: &BlindedPath) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Checks if two BlindedPaths contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn BlindedPath_eq(a: &BlindedPath, b: &BlindedPath) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
-use lightning::onion_message::blinded_path::BlindedHop as nativeBlindedHopImport;
+use lightning::blinded_path::BlindedHop as nativeBlindedHopImport;
 pub(crate) type nativeBlindedHop = nativeBlindedHopImport;
 
 /// Used to construct the blinded hops portion of a blinded path. These hops cannot be identified
@@ -158,22 +188,41 @@ pub(crate) extern "C" fn BlindedHop_clone_void(this_ptr: *const c_void) -> *mut 
 pub extern "C" fn BlindedHop_clone(orig: &BlindedHop) -> BlindedHop {
 	orig.clone()
 }
-/// Create a blinded path to be forwarded along `node_pks`. The last node pubkey in `node_pks`
-/// will be the destination node.
+/// Generates a non-cryptographic 64-bit hash of the BlindedHop.
+#[no_mangle]
+pub extern "C" fn BlindedHop_hash(o: &BlindedHop) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Checks if two BlindedHops contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn BlindedHop_eq(a: &BlindedHop, b: &BlindedHop) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+/// Create a blinded path for an onion message, to be forwarded along `node_pks`. The last node
+/// pubkey in `node_pks` will be the destination node.
 ///
 /// Errors if less than two hops are provided or if `node_pk`(s) are invalid.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BlindedPath_new(mut node_pks: crate::c_types::derived::CVec_PublicKeyZ, entropy_source: &crate::lightning::chain::keysinterface::EntropySource) -> crate::c_types::derived::CResult_BlindedPathNoneZ {
+pub extern "C" fn BlindedPath_new_for_message(mut node_pks: crate::c_types::derived::CVec_PublicKeyZ, entropy_source: &crate::lightning::chain::keysinterface::EntropySource) -> crate::c_types::derived::CResult_BlindedPathNoneZ {
 	let mut local_node_pks = Vec::new(); for mut item in node_pks.into_rust().drain(..) { local_node_pks.push( { item.into_rust() }); };
-	let mut ret = lightning::onion_message::blinded_path::BlindedPath::new(&local_node_pks[..], entropy_source, secp256k1::global::SECP256K1);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::onion_message::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	let mut ret = lightning::blinded_path::BlindedPath::new_for_message(&local_node_pks[..], entropy_source, secp256k1::global::SECP256K1);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 
 #[no_mangle]
 /// Serialize the BlindedPath object into a byte array which can be read by BlindedPath_read
-pub extern "C" fn BlindedPath_write(obj: &crate::lightning::onion_message::blinded_path::BlindedPath) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn BlindedPath_write(obj: &crate::lightning::blinded_path::BlindedPath) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -183,13 +232,13 @@ pub(crate) extern "C" fn BlindedPath_write_void(obj: *const c_void) -> crate::c_
 #[no_mangle]
 /// Read a BlindedPath from a byte array, created by BlindedPath_write
 pub extern "C" fn BlindedPath_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_BlindedPathDecodeErrorZ {
-	let res: Result<lightning::onion_message::blinded_path::BlindedPath, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::onion_message::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	let res: Result<lightning::blinded_path::BlindedPath, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
 /// Serialize the BlindedHop object into a byte array which can be read by BlindedHop_read
-pub extern "C" fn BlindedHop_write(obj: &crate::lightning::onion_message::blinded_path::BlindedHop) -> crate::c_types::derived::CVec_u8Z {
+pub extern "C" fn BlindedHop_write(obj: &crate::lightning::blinded_path::BlindedHop) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
@@ -199,7 +248,7 @@ pub(crate) extern "C" fn BlindedHop_write_void(obj: *const c_void) -> crate::c_t
 #[no_mangle]
 /// Read a BlindedHop from a byte array, created by BlindedHop_write
 pub extern "C" fn BlindedHop_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_BlindedHopDecodeErrorZ {
-	let res: Result<lightning::onion_message::blinded_path::BlindedHop, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::onion_message::blinded_path::BlindedHop { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	let res: Result<lightning::blinded_path::BlindedHop, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::blinded_path::BlindedHop { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }

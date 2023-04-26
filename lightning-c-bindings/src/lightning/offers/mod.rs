@@ -6,7 +6,10 @@
 // license as that which applies to the original source files from which this
 // source was automatically generated.
 
-//! Implementations of various parts of the Lightning protocol are in this module.
+//! Implementation of Lightning Offers
+//! ([BOLT 12](https://github.com/lightning/bolts/blob/master/12-offer-encoding.md)).
+//!
+//! Offers are a flexible protocol for Lightning payments.
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -16,27 +19,12 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
-pub mod channelmanager;
-pub mod inbound_payment;
-pub mod msgs;
-pub mod peer_handler;
-pub mod chan_utils;
-pub mod features;
-pub mod script;
-pub mod outbound_payment;
-pub mod wire;
-mod peer_channel_encryptor {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
-mod channel {
+pub mod invoice;
+pub mod invoice_request;
+pub mod offer;
+pub mod parse;
+pub mod refund;
+mod merkle {
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -47,7 +35,18 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 }
-mod onion_utils {
+mod payer {
+
+use alloc::str::FromStr;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
+mod signer {
 
 use alloc::str::FromStr;
 use core::ffi::c_void;

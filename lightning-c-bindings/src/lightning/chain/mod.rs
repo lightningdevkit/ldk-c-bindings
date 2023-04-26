@@ -846,7 +846,7 @@ pub extern "C" fn WatchedOutput_eq(a: &WatchedOutput, b: &WatchedOutput) -> bool
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
-/// Checks if two WatchedOutputs contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the WatchedOutput.
 #[no_mangle]
 pub extern "C" fn WatchedOutput_hash(o: &WatchedOutput) -> u64 {
 	if o.inner.is_null() { return 0; }

@@ -135,7 +135,7 @@ pub extern "C" fn ConfirmationTarget_normal() -> ConfirmationTarget {
 /// Utility method to constructs a new HighPriority-variant ConfirmationTarget
 pub extern "C" fn ConfirmationTarget_high_priority() -> ConfirmationTarget {
 	ConfirmationTarget::HighPriority}
-/// Checks if two ConfirmationTargets contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the ConfirmationTarget.
 #[no_mangle]
 pub extern "C" fn ConfirmationTarget_hash(o: &ConfirmationTarget) -> u64 {
 	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core

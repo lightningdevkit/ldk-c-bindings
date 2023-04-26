@@ -245,7 +245,7 @@ pub extern "C" fn Init_set_features(this_ptr: &mut Init, mut val: crate::lightni
 #[no_mangle]
 pub extern "C" fn Init_get_remote_network_address(this_ptr: &Init) -> crate::c_types::derived::COption_NetAddressZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().remote_network_address;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NetAddressZ::None } else { crate::c_types::derived::COption_NetAddressZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::lightning::ln::msgs::NetAddress::native_into(inner_val.clone().unwrap()) }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NetAddressZ::None } else { crate::c_types::derived::COption_NetAddressZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::lightning::ln::msgs::NetAddress::native_into((*inner_val.as_ref().unwrap()).clone()) }) };
 	local_inner_val
 }
 /// The receipient's network address.
@@ -256,14 +256,14 @@ pub extern "C" fn Init_get_remote_network_address(this_ptr: &Init) -> crate::c_t
 /// the new address.
 #[no_mangle]
 pub extern "C" fn Init_set_remote_network_address(this_ptr: &mut Init, mut val: crate::c_types::derived::COption_NetAddressZ) {
-	let mut local_val = { /* val*/ let val_opt = val; { } if val_opt.is_none() { None } else { Some({ val_opt.take().into_native() }) } };
+	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { { val_opt.take() }.into_native() }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.remote_network_address = local_val;
 }
 /// Constructs a new Init given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Init_new(mut features_arg: crate::lightning::ln::features::InitFeatures, mut remote_network_address_arg: crate::c_types::derived::COption_NetAddressZ) -> Init {
-	let mut local_remote_network_address_arg = { /* remote_network_address_arg*/ let remote_network_address_arg_opt = remote_network_address_arg; { } if remote_network_address_arg_opt.is_none() { None } else { Some({ remote_network_address_arg_opt.take().into_native() }) } };
+	let mut local_remote_network_address_arg = { /*remote_network_address_arg*/ let remote_network_address_arg_opt = remote_network_address_arg; if remote_network_address_arg_opt.is_none() { None } else { Some({ { { remote_network_address_arg_opt.take() }.into_native() }})} };
 	Init { inner: ObjOps::heap_alloc(nativeInit {
 		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
 		remote_network_address: local_remote_network_address_arg,
@@ -3911,16 +3911,16 @@ pub extern "C" fn UnsignedNodeAnnouncement_set_rgb(this_ptr: &mut UnsignedNodeAn
 ///
 /// This should be sanitized before use. There is no guarantee of uniqueness.
 #[no_mangle]
-pub extern "C" fn UnsignedNodeAnnouncement_get_alias(this_ptr: &UnsignedNodeAnnouncement) -> *const [u8; 32] {
+pub extern "C" fn UnsignedNodeAnnouncement_get_alias(this_ptr: &UnsignedNodeAnnouncement) -> crate::lightning::routing::gossip::NodeAlias {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().alias;
-	inner_val
+	crate::lightning::routing::gossip::NodeAlias { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::routing::gossip::NodeAlias<>) as *mut _) }, is_owned: false }
 }
 /// An alias, for UI purposes.
 ///
 /// This should be sanitized before use. There is no guarantee of uniqueness.
 #[no_mangle]
-pub extern "C" fn UnsignedNodeAnnouncement_set_alias(this_ptr: &mut UnsignedNodeAnnouncement, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.alias = val.data;
+pub extern "C" fn UnsignedNodeAnnouncement_set_alias(this_ptr: &mut UnsignedNodeAnnouncement, mut val: crate::lightning::routing::gossip::NodeAlias) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.alias = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// List of addresses on which this node is reachable
 ///
@@ -5945,7 +5945,7 @@ pub struct ChannelMessageHandler {
 	#[must_use]
 	pub provided_init_features: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::features::InitFeatures,
 	/// Implementation of MessageSendEventsProvider for this object.
-	pub MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider,
+	pub MessageSendEventsProvider: crate::lightning::events::MessageSendEventsProvider,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -5978,12 +5978,12 @@ pub(crate) extern "C" fn ChannelMessageHandler_clone_fields(orig: &ChannelMessag
 		handle_error: Clone::clone(&orig.handle_error),
 		provided_node_features: Clone::clone(&orig.provided_node_features),
 		provided_init_features: Clone::clone(&orig.provided_init_features),
-		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider_clone_fields(&orig.MessageSendEventsProvider),
+		MessageSendEventsProvider: crate::lightning::events::MessageSendEventsProvider_clone_fields(&orig.MessageSendEventsProvider),
 		free: Clone::clone(&orig.free),
 	}
 }
-impl lightning::util::events::MessageSendEventsProvider for ChannelMessageHandler {
-	fn get_and_clear_pending_msg_events(&self) -> Vec<lightning::util::events::MessageSendEvent> {
+impl lightning::events::MessageSendEventsProvider for ChannelMessageHandler {
+	fn get_and_clear_pending_msg_events(&self) -> Vec<lightning::events::MessageSendEvent> {
 		let mut ret = (self.MessageSendEventsProvider.get_and_clear_pending_msg_events)(self.MessageSendEventsProvider.this_arg);
 		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { item.into_native() }); };
 		local_ret
@@ -6167,7 +6167,7 @@ pub struct RoutingMessageHandler {
 	#[must_use]
 	pub provided_init_features: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::features::InitFeatures,
 	/// Implementation of MessageSendEventsProvider for this object.
-	pub MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider,
+	pub MessageSendEventsProvider: crate::lightning::events::MessageSendEventsProvider,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -6191,12 +6191,12 @@ pub(crate) extern "C" fn RoutingMessageHandler_clone_fields(orig: &RoutingMessag
 		processing_queue_high: Clone::clone(&orig.processing_queue_high),
 		provided_node_features: Clone::clone(&orig.provided_node_features),
 		provided_init_features: Clone::clone(&orig.provided_init_features),
-		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider_clone_fields(&orig.MessageSendEventsProvider),
+		MessageSendEventsProvider: crate::lightning::events::MessageSendEventsProvider_clone_fields(&orig.MessageSendEventsProvider),
 		free: Clone::clone(&orig.free),
 	}
 }
-impl lightning::util::events::MessageSendEventsProvider for RoutingMessageHandler {
-	fn get_and_clear_pending_msg_events(&self) -> Vec<lightning::util::events::MessageSendEvent> {
+impl lightning::events::MessageSendEventsProvider for RoutingMessageHandler {
+	fn get_and_clear_pending_msg_events(&self) -> Vec<lightning::events::MessageSendEvent> {
 		let mut ret = (self.MessageSendEventsProvider.get_and_clear_pending_msg_events)(self.MessageSendEventsProvider.this_arg);
 		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { item.into_native() }); };
 		local_ret
@@ -6320,7 +6320,7 @@ pub struct OnionMessageHandler {
 	#[must_use]
 	pub provided_init_features: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::features::InitFeatures,
 	/// Implementation of OnionMessageProvider for this object.
-	pub OnionMessageProvider: crate::lightning::util::events::OnionMessageProvider,
+	pub OnionMessageProvider: crate::lightning::events::OnionMessageProvider,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -6336,11 +6336,11 @@ pub(crate) extern "C" fn OnionMessageHandler_clone_fields(orig: &OnionMessageHan
 		peer_disconnected: Clone::clone(&orig.peer_disconnected),
 		provided_node_features: Clone::clone(&orig.provided_node_features),
 		provided_init_features: Clone::clone(&orig.provided_init_features),
-		OnionMessageProvider: crate::lightning::util::events::OnionMessageProvider_clone_fields(&orig.OnionMessageProvider),
+		OnionMessageProvider: crate::lightning::events::OnionMessageProvider_clone_fields(&orig.OnionMessageProvider),
 		free: Clone::clone(&orig.free),
 	}
 }
-impl lightning::util::events::OnionMessageProvider for OnionMessageHandler {
+impl lightning::events::OnionMessageProvider for OnionMessageHandler {
 	fn next_onion_message_for_peer(&self, mut peer_node_id: bitcoin::secp256k1::PublicKey) -> Option<lightning::ln::msgs::OnionMessage> {
 		let mut ret = (self.OnionMessageProvider.next_onion_message_for_peer)(self.OnionMessageProvider.this_arg, crate::c_types::PublicKey::from_rust(&peer_node_id));
 		let mut local_ret = if ret.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(ret.take_inner()) } }) };

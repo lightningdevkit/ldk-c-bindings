@@ -1289,7 +1289,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 
 						writeln!(w, " {{ true }} else {{ false }}\n}}").unwrap();
 					} else if path_matches_nongeneric(&trait_path.1, &["core", "hash", "Hash"]) {
-						writeln!(w, "/// Checks if two {}s contain equal inner contents.", ident).unwrap();
+						writeln!(w, "/// Generates a non-cryptographic 64-bit hash of the {}.", ident).unwrap();
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_hash(o: &{}) -> u64 {{\n", ident, ident).unwrap();
 						if types.c_type_has_inner_from_path(&resolved_path) {
 							write!(w, "\tif o.inner.is_null() {{ return 0; }}\n").unwrap();

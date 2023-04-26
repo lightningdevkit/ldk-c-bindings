@@ -6,7 +6,7 @@
 // license as that which applies to the original source files from which this
 // source was automatically generated.
 
-//! Implementations of various parts of the Lightning protocol are in this module.
+//! Parsing and formatting for bech32 message encoding.
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -16,38 +16,7 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
-pub mod channelmanager;
-pub mod inbound_payment;
-pub mod msgs;
-pub mod peer_handler;
-pub mod chan_utils;
-pub mod features;
-pub mod script;
-pub mod outbound_payment;
-pub mod wire;
-mod peer_channel_encryptor {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
-mod channel {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
-mod onion_utils {
+mod sealed {
 
 use alloc::str::FromStr;
 use core::ffi::c_void;

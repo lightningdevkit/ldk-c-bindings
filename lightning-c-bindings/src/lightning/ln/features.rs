@@ -44,17 +44,24 @@
 //!     (see [BOLT-2](https://github.com/lightning/bolts/blob/master/02-peer-protocol.md) for more information).
 //! - `OnionMessages` - requires/supports forwarding onion messages
 //!     (see [BOLT-7](https://github.com/lightning/bolts/pull/759/files) for more information).
-//!     TODO: update link
 //! - `ChannelType` - node supports the channel_type field in open/accept
 //!     (see [BOLT-2](https://github.com/lightning/bolts/blob/master/02-peer-protocol.md) for more information).
 //! - `SCIDPrivacy` - supply channel aliases for routing
 //!     (see [BOLT-2](https://github.com/lightning/bolts/blob/master/02-peer-protocol.md) for more information).
+//! - `PaymentMetadata` - include additional data in invoices which is passed to recipients in the
+//!      onion.
+//!      (see [BOLT-11](https://github.com/lightning/bolts/blob/master/11-payment-encoding.md) for
+//!      more).
+//! - `ZeroConf` - supports accepting HTLCs and using channels prior to funding confirmation
+//!      (see
+//!      [BOLT-2](https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#the-channel_ready-message)
+//!      for more info).
 //! - `Keysend` - send funds to a node without an invoice
 //!     (see the [`Keysend` feature assignment proposal](https://github.com/lightning/bolts/issues/605#issuecomment-606679798) for more information).
 //! - `AnchorsZeroFeeHtlcTx` - requires/supports that commitment transactions include anchor outputs
-//!   and HTLC transactions are pre-signed with zero fee (see
-//!   [BOLT-3](https://github.com/lightning/bolts/blob/master/03-transactions.md) for more
-//!   information).
+//!     and HTLC transactions are pre-signed with zero fee (see
+//!     [BOLT-3](https://github.com/lightning/bolts/blob/master/03-transactions.md) for more
+//!     information).
 //!
 //! [BOLT #9]: https://github.com/lightning/bolts/blob/master/09-features.md
 //! [messages]: crate::ln::msgs
@@ -1018,6 +1025,34 @@ pub extern "C" fn NodeFeatures_requires_scid_privacy(this_arg: &crate::lightning
 #[no_mangle]
 pub extern "C" fn ChannelTypeFeatures_requires_scid_privacy(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_scid_privacy();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_set_payment_metadata_optional(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_payment_metadata_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_set_payment_metadata_required(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_payment_metadata_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_supports_payment_metadata(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_payment_metadata();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceFeatures_requires_payment_metadata(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_payment_metadata();
 	ret
 }
 

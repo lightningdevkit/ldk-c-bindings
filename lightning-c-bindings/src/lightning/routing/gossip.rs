@@ -103,7 +103,16 @@ pub extern "C" fn NodeId_as_slice(this_arg: &crate::lightning::routing::gossip::
 	local_ret
 }
 
-/// Checks if two NodeIds contain equal inner contents.
+/// Get the public key from this NodeId
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeId_as_pubkey(this_arg: &crate::lightning::routing::gossip::NodeId) -> crate::c_types::derived::CResult_PublicKeyErrorZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_pubkey();
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::PublicKey::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
+	local_ret
+}
+
+/// Generates a non-cryptographic 64-bit hash of the NodeId.
 #[no_mangle]
 pub extern "C" fn NodeId_hash(o: &NodeId) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -246,7 +255,7 @@ pub enum NetworkUpdate {
 		msg: crate::lightning::ln::msgs::ChannelUpdate,
 	},
 	/// An error indicating that a channel failed to route a payment, which should be applied via
-	/// [`NetworkGraph::channel_failed`].
+	/// [`NetworkGraph::channel_failed_permanent`] if permanent.
 	ChannelFailure {
 		/// The short channel id of the closed channel.
 		short_channel_id: u64,
@@ -472,13 +481,13 @@ impl P2PGossipSync {
 	}
 }
 /// Creates a new tracker of the actual state of the network of channels and nodes,
-/// assuming an existing Network Graph.
+/// assuming an existing [`NetworkGraph`].
 /// UTXO lookup is used to make sure announced channels exist on-chain, channel data is
 /// correct, and the announcement is signed with channel owners' keys.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn P2PGossipSync_new(network_graph: &crate::lightning::routing::gossip::NetworkGraph, mut utxo_lookup: crate::c_types::derived::COption_UtxoLookupZ, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning::routing::gossip::P2PGossipSync {
-	let mut local_utxo_lookup = { /* utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; { } if utxo_lookup_opt.is_none() { None } else { Some({ utxo_lookup_opt.take() }) } };
+	let mut local_utxo_lookup = { /*utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; if utxo_lookup_opt.is_none() { None } else { Some({ { { utxo_lookup_opt.take() } }})} };
 	let mut ret = lightning::routing::gossip::P2PGossipSync::new(network_graph.get_native_ref(), local_utxo_lookup, logger);
 	crate::lightning::routing::gossip::P2PGossipSync { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
@@ -488,13 +497,13 @@ pub extern "C" fn P2PGossipSync_new(network_graph: &crate::lightning::routing::g
 /// Add, update or remove the provider would replace the current one.
 #[no_mangle]
 pub extern "C" fn P2PGossipSync_add_utxo_lookup(this_arg: &mut crate::lightning::routing::gossip::P2PGossipSync, mut utxo_lookup: crate::c_types::derived::COption_UtxoLookupZ) {
-	let mut local_utxo_lookup = { /* utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; { } if utxo_lookup_opt.is_none() { None } else { Some({ utxo_lookup_opt.take() }) } };
+	let mut local_utxo_lookup = { /*utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; if utxo_lookup_opt.is_none() { None } else { Some({ { { utxo_lookup_opt.take() } }})} };
 	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::routing::gossip::nativeP2PGossipSync)) }.add_utxo_lookup(local_utxo_lookup)
 }
 
 /// Handles any network updates originating from [`Event`]s.
 ///
-/// [`Event`]: crate::util::events::Event
+/// [`Event`]: crate::events::Event
 #[no_mangle]
 pub extern "C" fn NetworkGraph_handle_network_update(this_arg: &crate::lightning::routing::gossip::NetworkGraph, network_update: &crate::lightning::routing::gossip::NetworkUpdate) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.handle_network_update(&network_update.to_native())
@@ -530,7 +539,7 @@ pub extern "C" fn P2PGossipSync_as_RoutingMessageHandler(this_arg: &P2PGossipSyn
 		processing_queue_high: P2PGossipSync_RoutingMessageHandler_processing_queue_high,
 		provided_node_features: P2PGossipSync_RoutingMessageHandler_provided_node_features,
 		provided_init_features: P2PGossipSync_RoutingMessageHandler_provided_init_features,
-		MessageSendEventsProvider: crate::lightning::util::events::MessageSendEventsProvider {
+		MessageSendEventsProvider: crate::lightning::events::MessageSendEventsProvider {
 			this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 			free: None,
 			get_and_clear_pending_msg_events: P2PGossipSync_MessageSendEventsProvider_get_and_clear_pending_msg_events,
@@ -615,7 +624,7 @@ extern "C" fn P2PGossipSync_RoutingMessageHandler_provided_init_features(this_ar
 	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-impl From<nativeP2PGossipSync> for crate::lightning::util::events::MessageSendEventsProvider {
+impl From<nativeP2PGossipSync> for crate::lightning::events::MessageSendEventsProvider {
 	fn from(obj: nativeP2PGossipSync) -> Self {
 		let mut rust_obj = P2PGossipSync { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = P2PGossipSync_as_MessageSendEventsProvider(&rust_obj);
@@ -628,8 +637,8 @@ impl From<nativeP2PGossipSync> for crate::lightning::util::events::MessageSendEv
 /// Constructs a new MessageSendEventsProvider which calls the relevant methods on this_arg.
 /// This copies the `inner` pointer in this_arg and thus the returned MessageSendEventsProvider must be freed before this_arg is
 #[no_mangle]
-pub extern "C" fn P2PGossipSync_as_MessageSendEventsProvider(this_arg: &P2PGossipSync) -> crate::lightning::util::events::MessageSendEventsProvider {
-	crate::lightning::util::events::MessageSendEventsProvider {
+pub extern "C" fn P2PGossipSync_as_MessageSendEventsProvider(this_arg: &P2PGossipSync) -> crate::lightning::events::MessageSendEventsProvider {
+	crate::lightning::events::MessageSendEventsProvider {
 		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		get_and_clear_pending_msg_events: P2PGossipSync_MessageSendEventsProvider_get_and_clear_pending_msg_events,
@@ -638,8 +647,8 @@ pub extern "C" fn P2PGossipSync_as_MessageSendEventsProvider(this_arg: &P2PGossi
 
 #[must_use]
 extern "C" fn P2PGossipSync_MessageSendEventsProvider_get_and_clear_pending_msg_events(this_arg: *const c_void) -> crate::c_types::derived::CVec_MessageSendEventZ {
-	let mut ret = <nativeP2PGossipSync as lightning::util::events::MessageSendEventsProvider<>>::get_and_clear_pending_msg_events(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::util::events::MessageSendEvent::native_into(item) }); };
+	let mut ret = <nativeP2PGossipSync as lightning::events::MessageSendEventsProvider<>>::get_and_clear_pending_msg_events(unsafe { &mut *(this_arg as *mut nativeP2PGossipSync) }, );
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::events::MessageSendEvent::native_into(item) }); };
 	local_ret.into()
 }
 
@@ -1455,7 +1464,7 @@ pub(crate) extern "C" fn RoutingFees_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn RoutingFees_clone(orig: &RoutingFees) -> RoutingFees {
 	orig.clone()
 }
-/// Checks if two RoutingFeess contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the RoutingFees.
 #[no_mangle]
 pub extern "C" fn RoutingFees_hash(o: &RoutingFees) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -1582,21 +1591,6 @@ pub extern "C" fn NodeAnnouncementInfo_get_alias(this_ptr: &NodeAnnouncementInfo
 pub extern "C" fn NodeAnnouncementInfo_set_alias(this_ptr: &mut NodeAnnouncementInfo, mut val: crate::lightning::routing::gossip::NodeAlias) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.alias = *unsafe { Box::from_raw(val.take_inner()) };
 }
-/// Internet-level addresses via which one can connect to the node
-///
-/// Returns a copy of the field.
-#[no_mangle]
-pub extern "C" fn NodeAnnouncementInfo_get_addresses(this_ptr: &NodeAnnouncementInfo) -> crate::c_types::derived::CVec_NetAddressZ {
-	let mut inner_val = this_ptr.get_native_mut_ref().addresses.clone();
-	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::lightning::ln::msgs::NetAddress::native_into(item) }); };
-	local_inner_val.into()
-}
-/// Internet-level addresses via which one can connect to the node
-#[no_mangle]
-pub extern "C" fn NodeAnnouncementInfo_set_addresses(this_ptr: &mut NodeAnnouncementInfo, mut val: crate::c_types::derived::CVec_NetAddressZ) {
-	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item.into_native() }); };
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.addresses = local_val;
-}
 /// An initial announcement of the node
 /// Mostly redundant with the data we store in fields explicitly.
 /// Everything else is useful only for sending out for initial routing sync.
@@ -1623,15 +1617,13 @@ pub extern "C" fn NodeAnnouncementInfo_set_announcement_message(this_ptr: &mut N
 /// Constructs a new NodeAnnouncementInfo given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NodeAnnouncementInfo_new(mut features_arg: crate::lightning::ln::features::NodeFeatures, mut last_update_arg: u32, mut rgb_arg: crate::c_types::ThreeBytes, mut alias_arg: crate::lightning::routing::gossip::NodeAlias, mut addresses_arg: crate::c_types::derived::CVec_NetAddressZ, mut announcement_message_arg: crate::lightning::ln::msgs::NodeAnnouncement) -> NodeAnnouncementInfo {
-	let mut local_addresses_arg = Vec::new(); for mut item in addresses_arg.into_rust().drain(..) { local_addresses_arg.push( { item.into_native() }); };
+pub extern "C" fn NodeAnnouncementInfo_new(mut features_arg: crate::lightning::ln::features::NodeFeatures, mut last_update_arg: u32, mut rgb_arg: crate::c_types::ThreeBytes, mut alias_arg: crate::lightning::routing::gossip::NodeAlias, mut announcement_message_arg: crate::lightning::ln::msgs::NodeAnnouncement) -> NodeAnnouncementInfo {
 	let mut local_announcement_message_arg = if announcement_message_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(announcement_message_arg.take_inner()) } }) };
 	NodeAnnouncementInfo { inner: ObjOps::heap_alloc(nativeNodeAnnouncementInfo {
 		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
 		last_update: last_update_arg,
 		rgb: rgb_arg.data,
 		alias: *unsafe { Box::from_raw(alias_arg.take_inner()) },
-		addresses: local_addresses_arg,
 		announcement_message: local_announcement_message_arg,
 	}), is_owned: true }
 }
@@ -1663,6 +1655,15 @@ pub extern "C" fn NodeAnnouncementInfo_eq(a: &NodeAnnouncementInfo, b: &NodeAnno
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
+/// Internet-level addresses via which one can connect to the node
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeAnnouncementInfo_addresses(this_arg: &crate::lightning::routing::gossip::NodeAnnouncementInfo) -> crate::c_types::derived::CVec_NetAddressZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.addresses();
+	let mut local_ret_clone = Vec::new(); local_ret_clone.extend_from_slice(ret); let mut ret = local_ret_clone; let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::ln::msgs::NetAddress::native_into(item) }); };
+	local_ret.into()
+}
+
 #[no_mangle]
 /// Serialize the NodeAnnouncementInfo object into a byte array which can be read by NodeAnnouncementInfo_read
 pub extern "C" fn NodeAnnouncementInfo_write(obj: &crate::lightning::routing::gossip::NodeAnnouncementInfo) -> crate::c_types::derived::CVec_u8Z {
@@ -2023,7 +2024,7 @@ pub extern "C" fn NetworkGraph_update_node_from_unsigned_announcement(this_arg: 
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NetworkGraph_update_channel_from_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelAnnouncement, mut utxo_lookup: crate::c_types::derived::COption_UtxoLookupZ) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut local_utxo_lookup = { /* utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; { } if utxo_lookup_opt.is_none() { None } else { Some({ utxo_lookup_opt.take() }) } };
+	let mut local_utxo_lookup = { /*utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; if utxo_lookup_opt.is_none() { None } else { Some({ { { utxo_lookup_opt.take() } }})} };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_from_announcement(msg.get_native_ref(), &local_utxo_lookup);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
@@ -2038,7 +2039,7 @@ pub extern "C" fn NetworkGraph_update_channel_from_announcement(this_arg: &crate
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NetworkGraph_update_channel_from_unsigned_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelAnnouncement, mut utxo_lookup: crate::c_types::derived::COption_UtxoLookupZ) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
-	let mut local_utxo_lookup = { /* utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; { } if utxo_lookup_opt.is_none() { None } else { Some({ utxo_lookup_opt.take() }) } };
+	let mut local_utxo_lookup = { /*utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; if utxo_lookup_opt.is_none() { None } else { Some({ { { utxo_lookup_opt.take() } }})} };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_from_unsigned_announcement(msg.get_native_ref(), &local_utxo_lookup);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
@@ -2058,13 +2059,12 @@ pub extern "C" fn NetworkGraph_add_channel_from_partial_announcement(this_arg: &
 	local_ret
 }
 
-/// Marks a channel in the graph as failed if a corresponding HTLC fail was sent.
-/// If permanent, removes a channel from the local storage.
-/// May cause the removal of nodes too, if this was their last channel.
-/// If not permanent, makes channels unavailable for routing.
+/// Marks a channel in the graph as failed permanently.
+///
+/// The channel and any node for which this was their last channel are removed from the graph.
 #[no_mangle]
-pub extern "C" fn NetworkGraph_channel_failed(this_arg: &crate::lightning::routing::gossip::NetworkGraph, mut short_channel_id: u64, mut is_permanent: bool) {
-	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel_failed(short_channel_id, is_permanent)
+pub extern "C" fn NetworkGraph_channel_failed_permanent(this_arg: &crate::lightning::routing::gossip::NetworkGraph, mut short_channel_id: u64) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel_failed_permanent(short_channel_id)
 }
 
 /// Marks a node in the graph as permanently failed, effectively removing it and its channels

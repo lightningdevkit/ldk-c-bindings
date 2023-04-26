@@ -31,9 +31,9 @@ pub(crate) type nativeOnionMessenger = nativeOnionMessengerImport<crate::lightni
 /// # extern crate bitcoin;
 /// # use bitcoin::hashes::_export::_core::time::Duration;
 /// # use bitcoin::secp256k1::{PublicKey, Secp256k1, SecretKey};
+/// # use lightning::blinded_path::BlindedPath;
 /// # use lightning::chain::keysinterface::KeysManager;
 /// # use lightning::ln::peer_handler::IgnoringMessageHandler;
-/// # use lightning::onion_message::blinded_path::BlindedPath;
 /// # use lightning::onion_message::messenger::{Destination, OnionMessenger};
 /// # use lightning::onion_message::packet::{CustomOnionMessageContents, OnionMessageContents};
 /// # use lightning::util::logger::{Logger, Record};
@@ -81,7 +81,7 @@ pub(crate) type nativeOnionMessenger = nativeOnionMessengerImport<crate::lightni
 /// // Create a blinded path to yourself, for someone to send an onion message to.
 /// # let your_node_id = hop_node_id1;
 /// let hops = [hop_node_id3, hop_node_id4, your_node_id];
-/// let blinded_path = BlindedPath::new(&hops, &keys_manager, &secp_ctx).unwrap();
+/// let blinded_path = BlindedPath::new_for_message(&hops, &keys_manager, &secp_ctx).unwrap();
 ///
 /// // Send a custom onion message to a blinded path.
 /// # let intermediate_hops = [hop_node_id1, hop_node_id2];
@@ -149,7 +149,7 @@ pub enum Destination {
 		crate::c_types::PublicKey),
 	/// We're sending this onion message to a blinded path.
 	BlindedPath(
-		crate::lightning::onion_message::blinded_path::BlindedPath),
+		crate::lightning::blinded_path::BlindedPath),
 }
 use lightning::onion_message::messenger::Destination as DestinationImport;
 pub(crate) type nativeDestination = DestinationImport;
@@ -199,7 +199,7 @@ impl Destination {
 			nativeDestination::BlindedPath (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
 				Destination::BlindedPath (
-					crate::lightning::onion_message::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
+					crate::lightning::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
 				)
 			},
 		}
@@ -214,7 +214,7 @@ impl Destination {
 			},
 			nativeDestination::BlindedPath (mut a, ) => {
 				Destination::BlindedPath (
-					crate::lightning::onion_message::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(a), is_owned: true },
+					crate::lightning::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(a), is_owned: true },
 				)
 			},
 		}
@@ -235,7 +235,7 @@ pub extern "C" fn Destination_node(a: crate::c_types::PublicKey) -> Destination 
 }
 #[no_mangle]
 /// Utility method to constructs a new BlindedPath-variant Destination
-pub extern "C" fn Destination_blinded_path(a: crate::lightning::onion_message::blinded_path::BlindedPath) -> Destination {
+pub extern "C" fn Destination_blinded_path(a: crate::lightning::blinded_path::BlindedPath) -> Destination {
 	Destination::BlindedPath(a, )
 }
 /// Errors that may occur when [sending an onion message].
@@ -437,7 +437,7 @@ impl rustCustomOnionMessageHandler for CustomOnionMessageHandler {
 	}
 	fn read_custom_message<R:crate::c_types::io::Read>(&self, mut message_type: u64, mut buffer: &mut R) -> Result<Option<crate::lightning::onion_message::packet::CustomOnionMessageContents>, lightning::ln::msgs::DecodeError> {
 		let mut ret = (self.read_custom_message)(self.this_arg, message_type, crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec(buffer)));
-		let mut local_ret = match ret.result_ok { true => Ok( { let mut local_ret_0 = { /* (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ let ret_0_opt = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }); { } if ret_0_opt.is_none() { None } else { Some({ ret_0_opt.take() }) } }; local_ret_0 }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
+		let mut local_ret = match ret.result_ok { true => Ok( { let mut local_ret_0 = { /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ let ret_0_opt = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }); if ret_0_opt.is_none() { None } else { Some({ { { ret_0_opt.take() } }})} }; local_ret_0 }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
 }
@@ -475,7 +475,7 @@ pub extern "C" fn OnionMessenger_new(mut entropy_source: crate::lightning::chain
 /// Note that reply_path (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn OnionMessenger_send_onion_message(this_arg: &crate::lightning::onion_message::messenger::OnionMessenger, mut intermediate_nodes: crate::c_types::derived::CVec_PublicKeyZ, mut destination: crate::lightning::onion_message::messenger::Destination, mut message: crate::lightning::onion_message::packet::OnionMessageContents, mut reply_path: crate::lightning::onion_message::blinded_path::BlindedPath) -> crate::c_types::derived::CResult_NoneSendErrorZ {
+pub extern "C" fn OnionMessenger_send_onion_message(this_arg: &crate::lightning::onion_message::messenger::OnionMessenger, mut intermediate_nodes: crate::c_types::derived::CVec_PublicKeyZ, mut destination: crate::lightning::onion_message::messenger::Destination, mut message: crate::lightning::onion_message::packet::OnionMessageContents, mut reply_path: crate::lightning::blinded_path::BlindedPath) -> crate::c_types::derived::CResult_NoneSendErrorZ {
 	let mut local_intermediate_nodes = Vec::new(); for mut item in intermediate_nodes.into_rust().drain(..) { local_intermediate_nodes.push( { item.into_rust() }); };
 	let mut local_reply_path = if reply_path.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(reply_path.take_inner()) } }) };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.send_onion_message(&local_intermediate_nodes[..], destination.into_native(), message.into_native(), local_reply_path);
@@ -505,7 +505,7 @@ pub extern "C" fn OnionMessenger_as_OnionMessageHandler(this_arg: &OnionMessenge
 		peer_disconnected: OnionMessenger_OnionMessageHandler_peer_disconnected,
 		provided_node_features: OnionMessenger_OnionMessageHandler_provided_node_features,
 		provided_init_features: OnionMessenger_OnionMessageHandler_provided_init_features,
-		OnionMessageProvider: crate::lightning::util::events::OnionMessageProvider {
+		OnionMessageProvider: crate::lightning::events::OnionMessageProvider {
 			this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 			free: None,
 			next_onion_message_for_peer: OnionMessenger_OnionMessageProvider_next_onion_message_for_peer,
@@ -536,7 +536,7 @@ extern "C" fn OnionMessenger_OnionMessageHandler_provided_init_features(this_arg
 	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-impl From<nativeOnionMessenger> for crate::lightning::util::events::OnionMessageProvider {
+impl From<nativeOnionMessenger> for crate::lightning::events::OnionMessageProvider {
 	fn from(obj: nativeOnionMessenger) -> Self {
 		let mut rust_obj = OnionMessenger { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = OnionMessenger_as_OnionMessageProvider(&rust_obj);
@@ -549,8 +549,8 @@ impl From<nativeOnionMessenger> for crate::lightning::util::events::OnionMessage
 /// Constructs a new OnionMessageProvider which calls the relevant methods on this_arg.
 /// This copies the `inner` pointer in this_arg and thus the returned OnionMessageProvider must be freed before this_arg is
 #[no_mangle]
-pub extern "C" fn OnionMessenger_as_OnionMessageProvider(this_arg: &OnionMessenger) -> crate::lightning::util::events::OnionMessageProvider {
-	crate::lightning::util::events::OnionMessageProvider {
+pub extern "C" fn OnionMessenger_as_OnionMessageProvider(this_arg: &OnionMessenger) -> crate::lightning::events::OnionMessageProvider {
+	crate::lightning::events::OnionMessageProvider {
 		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		next_onion_message_for_peer: OnionMessenger_OnionMessageProvider_next_onion_message_for_peer,
@@ -559,7 +559,7 @@ pub extern "C" fn OnionMessenger_as_OnionMessageProvider(this_arg: &OnionMesseng
 
 #[must_use]
 extern "C" fn OnionMessenger_OnionMessageProvider_next_onion_message_for_peer(this_arg: *const c_void, mut peer_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::msgs::OnionMessage {
-	let mut ret = <nativeOnionMessenger as lightning::util::events::OnionMessageProvider<>>::next_onion_message_for_peer(unsafe { &mut *(this_arg as *mut nativeOnionMessenger) }, peer_node_id.into_rust());
+	let mut ret = <nativeOnionMessenger as lightning::events::OnionMessageProvider<>>::next_onion_message_for_peer(unsafe { &mut *(this_arg as *mut nativeOnionMessenger) }, peer_node_id.into_rust());
 	let mut local_ret = crate::lightning::ln::msgs::OnionMessage { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
 	local_ret
 }

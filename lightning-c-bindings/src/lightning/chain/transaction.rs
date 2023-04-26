@@ -129,7 +129,7 @@ pub extern "C" fn OutPoint_eq(a: &OutPoint, b: &OutPoint) -> bool {
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
-/// Checks if two OutPoints contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the OutPoint.
 #[no_mangle]
 pub extern "C" fn OutPoint_hash(o: &OutPoint) -> u64 {
 	if o.inner.is_null() { return 0; }

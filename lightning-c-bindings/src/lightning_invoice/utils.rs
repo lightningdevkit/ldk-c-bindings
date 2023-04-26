@@ -35,7 +35,7 @@ use alloc::{vec::Vec, boxed::Box};
 ///
 /// `invoice_expiry_delta_secs` describes the number of seconds that the invoice is valid for
 /// in excess of the current time.
-/// 
+///
 /// `duration_since_epoch` is the current time since epoch in seconds.
 ///
 /// You can specify a custom `min_final_cltv_expiry_delta`, or let LDK default it to
@@ -53,7 +53,7 @@ use alloc::{vec::Vec, boxed::Box};
 /// [`ChannelManager::create_inbound_payment_for_hash`]: lightning::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
 /// [`PhantomRouteHints::channels`]: lightning::ln::channelmanager::PhantomRouteHints::channels
 /// [`MIN_FINAL_CLTV_EXPIRY_DETLA`]: lightning::ln::channelmanager::MIN_FINAL_CLTV_EXPIRY_DELTA
-/// 
+///
 /// This can be used in a `no_std` environment, where [`std::time::SystemTime`] is not
 /// available and the current time is supplied by the caller.
 ///
@@ -90,7 +90,7 @@ pub extern "C" fn create_phantom_invoice(mut amt_msat: crate::c_types::derived::
 ///
 /// `invoice_expiry_delta_secs` describes the number of seconds that the invoice is valid for
 /// in excess of the current time.
-/// 
+///
 /// `duration_since_epoch` is the current time since epoch in seconds.
 ///
 /// Note that the provided `keys_manager`'s `NodeSigner` implementation must support phantom
@@ -102,7 +102,7 @@ pub extern "C" fn create_phantom_invoice(mut amt_msat: crate::c_types::derived::
 /// [`ChannelManager::create_inbound_payment`]: lightning::ln::channelmanager::ChannelManager::create_inbound_payment
 /// [`ChannelManager::create_inbound_payment_for_hash`]: lightning::ln::channelmanager::ChannelManager::create_inbound_payment_for_hash
 /// [`PhantomRouteHints::channels`]: lightning::ln::channelmanager::PhantomRouteHints::channels
-/// 
+///
 /// This can be used in a `no_std` environment, where [`std::time::SystemTime`] is not
 /// available and the current time is supplied by the caller.
 ///

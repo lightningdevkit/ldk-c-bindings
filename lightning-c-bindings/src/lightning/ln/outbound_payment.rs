@@ -25,7 +25,7 @@ pub enum Retry {
 	///
 	/// Each attempt may be multiple HTLCs along multiple paths if the router decides to split up a
 	/// retry, and may retry multiple failed HTLCs at once if they failed around the same time and
-	/// were retried along a route from a single call to [`Router::find_route`].
+	/// were retried along a route from a single call to [`Router::find_route_with_id`].
 	Attempts(
 		usize),
 	/// Time elapsed before abandoning retries for a payment. At least one attempt at payment is made;
@@ -128,7 +128,7 @@ pub extern "C" fn Retry_timeout(a: u64) -> Retry {
 pub extern "C" fn Retry_eq(a: &Retry, b: &Retry) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
-/// Checks if two Retrys contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the Retry.
 #[no_mangle]
 pub extern "C" fn Retry_hash(o: &Retry) -> u64 {
 	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
@@ -137,12 +137,12 @@ pub extern "C" fn Retry_hash(o: &Retry) -> u64 {
 	core::hash::Hash::hash(&o.to_native(), &mut hasher);
 	core::hash::Hasher::finish(&hasher)
 }
-/// Indicates an immediate error on [`ChannelManager::send_payment_with_retry`]. Further errors
-/// may be surfaced later via [`Event::PaymentPathFailed`] and [`Event::PaymentFailed`].
+/// Indicates an immediate error on [`ChannelManager::send_payment`]. Further errors may be
+/// surfaced later via [`Event::PaymentPathFailed`] and [`Event::PaymentFailed`].
 ///
-/// [`ChannelManager::send_payment_with_retry`]: crate::ln::channelmanager::ChannelManager::send_payment_with_retry
-/// [`Event::PaymentPathFailed`]: crate::util::events::Event::PaymentPathFailed
-/// [`Event::PaymentFailed`]: crate::util::events::Event::PaymentFailed
+/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+/// [`Event::PaymentPathFailed`]: crate::events::Event::PaymentPathFailed
+/// [`Event::PaymentFailed`]: crate::events::Event::PaymentFailed
 #[derive(Clone)]
 #[must_use]
 #[repr(C)]
@@ -158,8 +158,8 @@ pub enum RetryableSendFailure {
 	/// yet completed (i.e. generated an [`Event::PaymentSent`] or [`Event::PaymentFailed`]).
 	///
 	/// [`PaymentId`]: crate::ln::channelmanager::PaymentId
-	/// [`Event::PaymentSent`]: crate::util::events::Event::PaymentSent
-	/// [`Event::PaymentFailed`]: crate::util::events::Event::PaymentFailed
+	/// [`Event::PaymentSent`]: crate::events::Event::PaymentSent
+	/// [`Event::PaymentFailed`]: crate::events::Event::PaymentFailed
 	DuplicatePayment,
 }
 use lightning::ln::outbound_payment::RetryableSendFailure as RetryableSendFailureImport;
@@ -216,11 +216,11 @@ pub extern "C" fn RetryableSendFailure_route_not_found() -> RetryableSendFailure
 /// Utility method to constructs a new DuplicatePayment-variant RetryableSendFailure
 pub extern "C" fn RetryableSendFailure_duplicate_payment() -> RetryableSendFailure {
 	RetryableSendFailure::DuplicatePayment}
-/// If a payment fails to send with [`ChannelManager::send_payment`], it can be in one of several
-/// states. This enum is returned as the Err() type describing which state the payment is in, see
-/// the description of individual enum states for more.
+/// If a payment fails to send with [`ChannelManager::send_payment_with_route`], it can be in one
+/// of several states. This enum is returned as the Err() type describing which state the payment
+/// is in, see the description of individual enum states for more.
 ///
-/// [`ChannelManager::send_payment`]: crate::ln::channelmanager::ChannelManager::send_payment
+/// [`ChannelManager::send_payment_with_route`]: crate::ln::channelmanager::ChannelManager::send_payment_with_route
 #[derive(Clone)]
 #[must_use]
 #[repr(C)]
@@ -233,8 +233,8 @@ pub enum PaymentSendFailure {
 	/// Because the payment failed outright, no payment tracking is done and no
 	/// [`Event::PaymentPathFailed`] or [`Event::PaymentFailed`] events will be generated.
 	///
-	/// [`Event::PaymentPathFailed`]: crate::util::events::Event::PaymentPathFailed
-	/// [`Event::PaymentFailed`]: crate::util::events::Event::PaymentFailed
+	/// [`Event::PaymentPathFailed`]: crate::events::Event::PaymentPathFailed
+	/// [`Event::PaymentFailed`]: crate::events::Event::PaymentFailed
 	ParameterError(
 		crate::lightning::util::errors::APIError),
 	/// A parameter in a single path which was passed to send_payment was invalid, preventing us
@@ -248,8 +248,8 @@ pub enum PaymentSendFailure {
 	/// The results here are ordered the same as the paths in the route object which was passed to
 	/// send_payment.
 	///
-	/// [`Event::PaymentPathFailed`]: crate::util::events::Event::PaymentPathFailed
-	/// [`Event::PaymentFailed`]: crate::util::events::Event::PaymentFailed
+	/// [`Event::PaymentPathFailed`]: crate::events::Event::PaymentPathFailed
+	/// [`Event::PaymentFailed`]: crate::events::Event::PaymentFailed
 	PathParameterError(
 		crate::c_types::derived::CVec_CResult_NoneAPIErrorZZ),
 	/// All paths which were attempted failed to send, with no channel state change taking place.
@@ -259,16 +259,16 @@ pub enum PaymentSendFailure {
 	/// Because the payment failed outright, no payment tracking is done and no
 	/// [`Event::PaymentPathFailed`] or [`Event::PaymentFailed`] events will be generated.
 	///
-	/// [`Event::PaymentPathFailed`]: crate::util::events::Event::PaymentPathFailed
-	/// [`Event::PaymentFailed`]: crate::util::events::Event::PaymentFailed
+	/// [`Event::PaymentPathFailed`]: crate::events::Event::PaymentPathFailed
+	/// [`Event::PaymentFailed`]: crate::events::Event::PaymentFailed
 	AllFailedResendSafe(
 		crate::c_types::derived::CVec_APIErrorZ),
 	/// Indicates that a payment for the provided [`PaymentId`] is already in-flight and has not
 	/// yet completed (i.e. generated an [`Event::PaymentSent`] or [`Event::PaymentFailed`]).
 	///
 	/// [`PaymentId`]: crate::ln::channelmanager::PaymentId
-	/// [`Event::PaymentSent`]: crate::util::events::Event::PaymentSent
-	/// [`Event::PaymentFailed`]: crate::util::events::Event::PaymentFailed
+	/// [`Event::PaymentSent`]: crate::events::Event::PaymentSent
+	/// [`Event::PaymentFailed`]: crate::events::Event::PaymentFailed
 	DuplicatePayment,
 	/// Some paths that were attempted failed to send, though some paths may have succeeded. At least
 	/// some paths have irrevocably committed to the HTLC.
@@ -473,3 +473,208 @@ pub extern "C" fn PaymentSendFailure_partial_failure(results: crate::c_types::de
 		payment_id,
 	}
 }
+
+use lightning::ln::outbound_payment::RecipientOnionFields as nativeRecipientOnionFieldsImport;
+pub(crate) type nativeRecipientOnionFields = nativeRecipientOnionFieldsImport;
+
+/// Information which is provided, encrypted, to the payment recipient when sending HTLCs.
+///
+/// This should generally be constructed with data communicated to us from the recipient (via a
+/// BOLT11 or BOLT12 invoice).
+#[must_use]
+#[repr(C)]
+pub struct RecipientOnionFields {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeRecipientOnionFields,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for RecipientOnionFields {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeRecipientOnionFields>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the RecipientOnionFields, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn RecipientOnionFields_free(this_obj: RecipientOnionFields) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn RecipientOnionFields_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeRecipientOnionFields) };
+}
+#[allow(unused)]
+impl RecipientOnionFields {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeRecipientOnionFields {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeRecipientOnionFields {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeRecipientOnionFields {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// The [`PaymentSecret`] is an arbitrary 32 bytes provided by the recipient for us to repeat
+/// in the onion. It is unrelated to `payment_hash` (or [`PaymentPreimage`]) and exists to
+/// authenticate the sender to the recipient and prevent payment-probing (deanonymization)
+/// attacks.
+///
+/// If you do not have one, the [`Route`] you pay over must not contain multiple paths as
+/// multi-path payments require a recipient-provided secret.
+///
+/// Note that for spontaneous payments most lightning nodes do not currently support MPP
+/// receives, thus you should generally never be providing a secret here for spontaneous
+/// payments.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn RecipientOnionFields_get_payment_secret(this_ptr: &RecipientOnionFields) -> crate::c_types::ThirtyTwoBytes {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().payment_secret;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (inner_val.unwrap()).0 } } };
+	local_inner_val
+}
+/// The [`PaymentSecret`] is an arbitrary 32 bytes provided by the recipient for us to repeat
+/// in the onion. It is unrelated to `payment_hash` (or [`PaymentPreimage`]) and exists to
+/// authenticate the sender to the recipient and prevent payment-probing (deanonymization)
+/// attacks.
+///
+/// If you do not have one, the [`Route`] you pay over must not contain multiple paths as
+/// multi-path payments require a recipient-provided secret.
+///
+/// Note that for spontaneous payments most lightning nodes do not currently support MPP
+/// receives, thus you should generally never be providing a secret here for spontaneous
+/// payments.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn RecipientOnionFields_set_payment_secret(this_ptr: &mut RecipientOnionFields, mut val: crate::c_types::ThirtyTwoBytes) {
+	let mut local_val = if val.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentSecret(val.data) }) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.payment_secret = local_val;
+}
+/// The payment metadata serves a similar purpose as [`Self::payment_secret`] but is of
+/// arbitrary length. This gives recipients substantially more flexibility to receive
+/// additional data.
+///
+/// In LDK, while the [`Self::payment_secret`] is fixed based on an internal authentication
+/// scheme to authenticate received payments against expected payments and invoices, this field
+/// is not used in LDK for received payments, and can be used to store arbitrary data in
+/// invoices which will be received with the payment.
+///
+/// Note that this field was added to the lightning specification more recently than
+/// [`Self::payment_secret`] and while nearly all lightning senders support secrets, metadata
+/// may not be supported as universally.
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn RecipientOnionFields_get_payment_metadata(this_ptr: &RecipientOnionFields) -> crate::c_types::derived::COption_CVec_u8ZZ {
+	let mut inner_val = this_ptr.get_native_mut_ref().payment_metadata.clone();
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some( { let mut local_inner_val_0 = Vec::new(); for mut item in inner_val.unwrap().drain(..) { local_inner_val_0.push( { item }); }; local_inner_val_0.into() }) };
+	local_inner_val
+}
+/// The payment metadata serves a similar purpose as [`Self::payment_secret`] but is of
+/// arbitrary length. This gives recipients substantially more flexibility to receive
+/// additional data.
+///
+/// In LDK, while the [`Self::payment_secret`] is fixed based on an internal authentication
+/// scheme to authenticate received payments against expected payments and invoices, this field
+/// is not used in LDK for received payments, and can be used to store arbitrary data in
+/// invoices which will be received with the payment.
+///
+/// Note that this field was added to the lightning specification more recently than
+/// [`Self::payment_secret`] and while nearly all lightning senders support secrets, metadata
+/// may not be supported as universally.
+#[no_mangle]
+pub extern "C" fn RecipientOnionFields_set_payment_metadata(this_ptr: &mut RecipientOnionFields, mut val: crate::c_types::derived::COption_CVec_u8ZZ) {
+	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { let mut local_val_0 = Vec::new(); for mut item in { val_opt.take() }.into_rust().drain(..) { local_val_0.push( { item }); }; local_val_0 }})} };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.payment_metadata = local_val;
+}
+/// Constructs a new RecipientOnionFields given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn RecipientOnionFields_new(mut payment_secret_arg: crate::c_types::ThirtyTwoBytes, mut payment_metadata_arg: crate::c_types::derived::COption_CVec_u8ZZ) -> RecipientOnionFields {
+	let mut local_payment_secret_arg = if payment_secret_arg.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentSecret(payment_secret_arg.data) }) };
+	let mut local_payment_metadata_arg = { /*payment_metadata_arg*/ let payment_metadata_arg_opt = payment_metadata_arg; if payment_metadata_arg_opt.is_none() { None } else { Some({ { let mut local_payment_metadata_arg_0 = Vec::new(); for mut item in { payment_metadata_arg_opt.take() }.into_rust().drain(..) { local_payment_metadata_arg_0.push( { item }); }; local_payment_metadata_arg_0 }})} };
+	RecipientOnionFields { inner: ObjOps::heap_alloc(nativeRecipientOnionFields {
+		payment_secret: local_payment_secret_arg,
+		payment_metadata: local_payment_metadata_arg,
+	}), is_owned: true }
+}
+impl Clone for RecipientOnionFields {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeRecipientOnionFields>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn RecipientOnionFields_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRecipientOnionFields)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the RecipientOnionFields
+pub extern "C" fn RecipientOnionFields_clone(orig: &RecipientOnionFields) -> RecipientOnionFields {
+	orig.clone()
+}
+/// Checks if two RecipientOnionFieldss contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn RecipientOnionFields_eq(a: &RecipientOnionFields, b: &RecipientOnionFields) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+#[no_mangle]
+/// Serialize the RecipientOnionFields object into a byte array which can be read by RecipientOnionFields_read
+pub extern "C" fn RecipientOnionFields_write(obj: &crate::lightning::ln::outbound_payment::RecipientOnionFields) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn RecipientOnionFields_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRecipientOnionFields) })
+}
+#[no_mangle]
+/// Read a RecipientOnionFields from a byte array, created by RecipientOnionFields_write
+pub extern "C" fn RecipientOnionFields_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RecipientOnionFieldsDecodeErrorZ {
+	let res: Result<lightning::ln::outbound_payment::RecipientOnionFields, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::outbound_payment::RecipientOnionFields { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
+}
+/// Creates a [`RecipientOnionFields`] from only a [`PaymentSecret`]. This is the most common
+/// set of onion fields for today's BOLT11 invoices - most nodes require a [`PaymentSecret`]
+/// but do not require or provide any further data.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn RecipientOnionFields_secret_only(mut payment_secret: crate::c_types::ThirtyTwoBytes) -> crate::lightning::ln::outbound_payment::RecipientOnionFields {
+	let mut ret = lightning::ln::outbound_payment::RecipientOnionFields::secret_only(::lightning::ln::PaymentSecret(payment_secret.data));
+	crate::lightning::ln::outbound_payment::RecipientOnionFields { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Creates a new [`RecipientOnionFields`] with no fields. This generally does not create
+/// payable HTLCs except for spontaneous payments, i.e. this should generally only be used for
+/// calls to [`ChannelManager::send_spontaneous_payment`].
+///
+/// [`ChannelManager::send_spontaneous_payment`]: super::channelmanager::ChannelManager::send_spontaneous_payment
+#[must_use]
+#[no_mangle]
+pub extern "C" fn RecipientOnionFields_spontaneous_empty() -> crate::lightning::ln::outbound_payment::RecipientOnionFields {
+	let mut ret = lightning::ln::outbound_payment::RecipientOnionFields::spontaneous_empty();
+	crate::lightning::ln::outbound_payment::RecipientOnionFields { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+

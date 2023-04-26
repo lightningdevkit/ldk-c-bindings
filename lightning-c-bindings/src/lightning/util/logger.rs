@@ -123,7 +123,7 @@ pub extern "C" fn Level_error() -> Level {
 pub extern "C" fn Level_eq(a: &Level, b: &Level) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
-/// Checks if two Levels contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the Level.
 #[no_mangle]
 pub extern "C" fn Level_hash(o: &Level) -> u64 {
 	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core

@@ -17,7 +17,7 @@
 //! information on its usage.
 //!
 //! [offers]: <https://github.com/lightning/bolts/pull/798>
-//! [blinded paths]: crate::onion_message::BlindedPath
+//! [blinded paths]: crate::blinded_path::BlindedPath
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -27,17 +27,5 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
-pub mod blinded_path;
 pub mod messenger;
 pub mod packet;
-mod utils {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}

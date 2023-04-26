@@ -45,4 +45,7 @@ pub static TAG_PRIVATE_ROUTE: u8 = lightning_invoice::constants::TAG_PRIVATE_ROU
 pub static TAG_PAYMENT_SECRET: u8 = lightning_invoice::constants::TAG_PAYMENT_SECRET;
 
 #[no_mangle]
+pub static TAG_PAYMENT_METADATA: u8 = lightning_invoice::constants::TAG_PAYMENT_METADATA;
+
+#[no_mangle]
 pub static TAG_FEATURES: u8 = lightning_invoice::constants::TAG_FEATURES;

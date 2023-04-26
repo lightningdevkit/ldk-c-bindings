@@ -46,107 +46,11 @@ use alloc::{vec::Vec, boxed::Box};
 pub mod util;
 pub mod chain;
 pub mod ln;
+pub mod offers;
 pub mod routing;
 pub mod onion_message;
-mod offers {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-mod invoice {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
-mod invoice_request {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
-mod merkle {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
-mod offer {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
-mod parse {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-mod sealed {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
-}
-mod payer {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
-mod refund {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
-}
+pub mod blinded_path;
+pub mod events;
 mod io_extras {
 
 use alloc::str::FromStr;

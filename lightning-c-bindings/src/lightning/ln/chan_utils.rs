@@ -7,7 +7,7 @@
 // source was automatically generated.
 
 //! Various utilities for building scripts and deriving keys related to channels. These are
-//! largely of interest for those implementing chain::keysinterface::Sign message signing by hand.
+//! largely of interest for those implementing the traits on [`chain::keysinterface`] by hand.
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -1163,6 +1163,15 @@ pub(crate) extern "C" fn ChannelTransactionParameters_clone_void(this_ptr: *cons
 pub extern "C" fn ChannelTransactionParameters_clone(orig: &ChannelTransactionParameters) -> ChannelTransactionParameters {
 	orig.clone()
 }
+/// Checks if two ChannelTransactionParameterss contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ChannelTransactionParameters_eq(a: &ChannelTransactionParameters, b: &ChannelTransactionParameters) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
 
 use lightning::ln::chan_utils::CounterpartyChannelTransactionParameters as nativeCounterpartyChannelTransactionParametersImport;
 pub(crate) type nativeCounterpartyChannelTransactionParameters = nativeCounterpartyChannelTransactionParametersImport;
@@ -1263,6 +1272,15 @@ pub(crate) extern "C" fn CounterpartyChannelTransactionParameters_clone_void(thi
 /// Creates a copy of the CounterpartyChannelTransactionParameters
 pub extern "C" fn CounterpartyChannelTransactionParameters_clone(orig: &CounterpartyChannelTransactionParameters) -> CounterpartyChannelTransactionParameters {
 	orig.clone()
+}
+/// Checks if two CounterpartyChannelTransactionParameterss contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn CounterpartyChannelTransactionParameters_eq(a: &CounterpartyChannelTransactionParameters, b: &CounterpartyChannelTransactionParameters) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
 /// Whether the late bound parameters are populated.
 #[must_use]
@@ -1690,12 +1708,19 @@ pub extern "C" fn BuiltCommitmentTransaction_get_sighash_all(this_arg: &crate::l
 	crate::c_types::ThirtyTwoBytes { data: ret.as_ref().clone() }
 }
 
-/// Sign a transaction, either because we are counter-signing the counterparty's transaction or
-/// because we are about to broadcast a holder transaction.
+/// Signs the counterparty's commitment transaction.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BuiltCommitmentTransaction_sign(this_arg: &crate::lightning::ln::chan_utils::BuiltCommitmentTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64) -> crate::c_types::Signature {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, secp256k1::global::SECP256K1);
+pub extern "C" fn BuiltCommitmentTransaction_sign_counterparty_commitment(this_arg: &crate::lightning::ln::chan_utils::BuiltCommitmentTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64) -> crate::c_types::Signature {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign_counterparty_commitment(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, secp256k1::global::SECP256K1);
+	crate::c_types::Signature::from_rust(&ret)
+}
+
+/// Signs the holder commitment transaction because we are about to broadcast it.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BuiltCommitmentTransaction_sign_holder_commitment(this_arg: &crate::lightning::ln::chan_utils::BuiltCommitmentTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64, entropy_source: &crate::lightning::chain::keysinterface::EntropySource) -> crate::c_types::Signature {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign_holder_commitment(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, entropy_source, secp256k1::global::SECP256K1);
 	crate::c_types::Signature::from_rust(&ret)
 }
 
@@ -1773,7 +1798,7 @@ pub(crate) extern "C" fn ClosingTransaction_clone_void(this_ptr: *const c_void) 
 pub extern "C" fn ClosingTransaction_clone(orig: &ClosingTransaction) -> ClosingTransaction {
 	orig.clone()
 }
-/// Checks if two ClosingTransactions contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the ClosingTransaction.
 #[no_mangle]
 pub extern "C" fn ClosingTransaction_hash(o: &ClosingTransaction) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -2188,8 +2213,8 @@ pub extern "C" fn TrustedCommitmentTransaction_opt_anchors(this_arg: &crate::lig
 /// This function is only valid in the holder commitment context, it always uses EcdsaSighashType::All.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn TrustedCommitmentTransaction_get_htlc_sigs(this_arg: &crate::lightning::ln::chan_utils::TrustedCommitmentTransaction, htlc_base_key: *const [u8; 32], channel_parameters: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters) -> crate::c_types::derived::CResult_CVec_SignatureZNoneZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_htlc_sigs(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *htlc_base_key}[..]).unwrap(), channel_parameters.get_native_ref(), secp256k1::global::SECP256K1);
+pub extern "C" fn TrustedCommitmentTransaction_get_htlc_sigs(this_arg: &crate::lightning::ln::chan_utils::TrustedCommitmentTransaction, htlc_base_key: *const [u8; 32], channel_parameters: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters, entropy_source: &crate::lightning::chain::keysinterface::EntropySource) -> crate::c_types::derived::CResult_CVec_SignatureZNoneZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_htlc_sigs(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *htlc_base_key}[..]).unwrap(), channel_parameters.get_native_ref(), entropy_source, secp256k1::global::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { crate::c_types::Signature::from_rust(&item) }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }

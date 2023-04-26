@@ -52,7 +52,7 @@ impl rustCustomMessageReader for CustomMessageReader {
 	type CustomMessage = crate::lightning::ln::wire::Type;
 	fn read<R:crate::c_types::io::Read>(&self, mut message_type: u16, mut buffer: &mut R) -> Result<Option<crate::lightning::ln::wire::Type>, lightning::ln::msgs::DecodeError> {
 		let mut ret = (self.read)(self.this_arg, message_type, crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec(buffer)));
-		let mut local_ret = match ret.result_ok { true => Ok( { let mut local_ret_0 = { /* (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ let ret_0_opt = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }); { } if ret_0_opt.is_none() { None } else { Some({ ret_0_opt.take() }) } }; local_ret_0 }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
+		let mut local_ret = match ret.result_ok { true => Ok( { let mut local_ret_0 = { /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ let ret_0_opt = (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }); if ret_0_opt.is_none() { None } else { Some({ { { ret_0_opt.take() } }})} }; local_ret_0 }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).into_native() })};
 		local_ret
 	}
 }

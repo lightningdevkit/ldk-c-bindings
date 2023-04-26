@@ -45,14 +45,17 @@
 //! # use lightning::util::logger::{Logger, Record};
 //! # struct FakeLogger {}
 //! # impl Logger for FakeLogger {
-//! #     fn log(&self, record: &Record) { unimplemented!() }
+//! #     fn log(&self, record: &Record) { }
 //! # }
 //! # let logger = FakeLogger {};
 //!
 //! let network_graph = NetworkGraph::new(Network::Bitcoin, &logger);
 //! let rapid_sync = RapidGossipSync::new(&network_graph, &logger);
 //! let snapshot_contents: &[u8] = &[0; 0];
-//! let new_last_sync_timestamp_result = rapid_sync.update_network_graph(snapshot_contents);
+//! // In no-std you need to provide the current time in unix epoch seconds
+//! // otherwise you can use update_network_graph
+//! let current_time_unix = 0;
+//! let new_last_sync_timestamp_result = rapid_sync.update_network_graph_no_std(snapshot_contents, Some(current_time_unix));
 //! ```
 
 use alloc::str::FromStr;
@@ -136,18 +139,6 @@ impl RapidGossipSync {
 pub extern "C" fn RapidGossipSync_new(network_graph: &crate::lightning::routing::gossip::NetworkGraph, mut logger: crate::lightning::util::logger::Logger) -> crate::lightning_rapid_gossip_sync::RapidGossipSync {
 	let mut ret = lightning_rapid_gossip_sync::RapidGossipSync::new(network_graph.get_native_ref(), logger);
 	crate::lightning_rapid_gossip_sync::RapidGossipSync { inner: ObjOps::heap_alloc(ret), is_owned: true }
-}
-
-/// Update network graph from binary data.
-/// Returns the last sync timestamp to be used the next time rapid sync data is queried.
-///
-/// `update_data`: `&[u8]` binary stream that comprises the update data
-#[must_use]
-#[no_mangle]
-pub extern "C" fn RapidGossipSync_update_network_graph(this_arg: &crate::lightning_rapid_gossip_sync::RapidGossipSync, mut update_data: crate::c_types::u8slice) -> crate::c_types::derived::CResult_u32GraphSyncErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_network_graph(update_data.to_slice());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_rapid_gossip_sync::error::GraphSyncError::native_into(e) }).into() };
-	local_ret
 }
 
 /// Update network graph from binary data.

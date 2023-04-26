@@ -29,8 +29,8 @@ pub(crate) type nativeBackgroundProcessor = nativeBackgroundProcessorImport;
 /// * Monitoring whether the [`ChannelManager`] needs to be re-persisted to disk, and if so,
 ///   writing it to disk/backups by invoking the callback given to it at startup.
 ///   [`ChannelManager`] persistence should be done in the background.
-/// * Calling [`ChannelManager::timer_tick_occurred`] and [`PeerManager::timer_tick_occurred`]
-///   at the appropriate intervals.
+/// * Calling [`ChannelManager::timer_tick_occurred`], [`ChainMonitor::rebroadcast_pending_claims`]
+///   and [`PeerManager::timer_tick_occurred`] at the appropriate intervals.
 /// * Calling [`NetworkGraph::remove_stale_channels_and_tracking`] (if a [`GossipSync`] with a
 ///   [`NetworkGraph`] is provided to [`BackgroundProcessor::start`]).
 ///
@@ -45,7 +45,7 @@ pub(crate) type nativeBackgroundProcessor = nativeBackgroundProcessorImport;
 /// unilateral chain closure fees are at risk.
 ///
 /// [`ChannelMonitor`]: lightning::chain::channelmonitor::ChannelMonitor
-/// [`Event`]: lightning::util::events::Event
+/// [`Event`]: lightning::events::Event
 ///BackgroundProcessor will immediately stop on drop. It should be stored until shutdown.
 #[must_use]
 #[repr(C)]
@@ -208,8 +208,8 @@ pub extern "C" fn GossipSync_none() -> GossipSync {
 /// [`NetworkGraph::write`]: lightning::routing::gossip::NetworkGraph#impl-Writeable
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning::util::persist::Persister, mut event_handler: crate::lightning::util::events::EventHandler, chain_monitor: &crate::lightning::chain::chainmonitor::ChainMonitor, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager, mut gossip_sync: crate::lightning_background_processor::GossipSync, peer_manager: &crate::lightning::ln::peer_handler::PeerManager, mut logger: crate::lightning::util::logger::Logger, mut scorer: crate::c_types::derived::COption_WriteableScoreZ) -> crate::lightning_background_processor::BackgroundProcessor {
-	let mut local_scorer = { /* scorer*/ let scorer_opt = scorer; { } if scorer_opt.is_none() { None } else { Some({ scorer_opt.take() }) } };
+pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning::util::persist::Persister, mut event_handler: crate::lightning::events::EventHandler, chain_monitor: &crate::lightning::chain::chainmonitor::ChainMonitor, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager, mut gossip_sync: crate::lightning_background_processor::GossipSync, peer_manager: &crate::lightning::ln::peer_handler::PeerManager, mut logger: crate::lightning::util::logger::Logger, mut scorer: crate::c_types::derived::COption_WriteableScoreZ) -> crate::lightning_background_processor::BackgroundProcessor {
+	let mut local_scorer = { /*scorer*/ let scorer_opt = scorer; if scorer_opt.is_none() { None } else { Some({ { { scorer_opt.take() } }})} };
 	let mut ret = lightning_background_processor::BackgroundProcessor::start(persister, event_handler, chain_monitor.get_native_ref(), channel_manager.get_native_ref(), gossip_sync.into_native(), peer_manager.get_native_ref(), logger, local_scorer);
 	crate::lightning_background_processor::BackgroundProcessor { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }

@@ -100,7 +100,7 @@ pub(crate) extern "C" fn MonitorUpdateId_clone_void(this_ptr: *const c_void) -> 
 pub extern "C" fn MonitorUpdateId_clone(orig: &MonitorUpdateId) -> MonitorUpdateId {
 	orig.clone()
 }
-/// Checks if two MonitorUpdateIds contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the MonitorUpdateId.
 #[no_mangle]
 pub extern "C" fn MonitorUpdateId_hash(o: &MonitorUpdateId) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -310,8 +310,15 @@ pub(crate) type nativeChainMonitor = nativeChainMonitorImport<crate::lightning::
 /// or used independently to monitor channels remotely. See the [module-level documentation] for
 /// details.
 ///
+/// Note that `ChainMonitor` should regularly trigger rebroadcasts/fee bumps of pending claims from
+/// a force-closed channel. This is crucial in preventing certain classes of pinning attacks,
+/// detecting substantial mempool feerate changes between blocks, and ensuring reliability if
+/// broadcasting fails. We recommend invoking this every 30 seconds, or lower if running in an
+/// environment with spotty connections, like on mobile.
+///
 /// [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
 /// [module-level documentation]: crate::chain::chainmonitor
+/// [`rebroadcast_pending_claims`]: Self::rebroadcast_pending_claims
 #[must_use]
 #[repr(C)]
 pub struct ChainMonitor {
@@ -368,7 +375,7 @@ impl ChainMonitor {
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChainMonitor_new(mut chain_source: crate::c_types::derived::COption_FilterZ, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut logger: crate::lightning::util::logger::Logger, mut feeest: crate::lightning::chain::chaininterface::FeeEstimator, mut persister: crate::lightning::chain::chainmonitor::Persist) -> crate::lightning::chain::chainmonitor::ChainMonitor {
-	let mut local_chain_source = { /* chain_source*/ let chain_source_opt = chain_source; { } if chain_source_opt.is_none() { None } else { Some({ chain_source_opt.take() }) } };
+	let mut local_chain_source = { /*chain_source*/ let chain_source_opt = chain_source; if chain_source_opt.is_none() { None } else { Some({ { { chain_source_opt.take() } }})} };
 	let mut ret = lightning::chain::chainmonitor::ChainMonitor::new(local_chain_source, broadcaster, logger, feeest, persister);
 	crate::lightning::chain::chainmonitor::ChainMonitor { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
@@ -444,6 +451,31 @@ pub extern "C" fn ChainMonitor_channel_monitor_updated(this_arg: &crate::lightni
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel_monitor_updated(*unsafe { Box::from_raw(funding_txo.take_inner()) }, *unsafe { Box::from_raw(completed_update_id.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
+}
+
+/// Gets a [`Future`] that completes when an event is available either via
+/// [`chain::Watch::release_pending_monitor_events`] or
+/// [`EventsProvider::process_pending_events`].
+///
+/// Note that callbacks registered on the [`Future`] MUST NOT call back into this
+/// [`ChainMonitor`] and should instead register actions to be taken later.
+///
+/// [`EventsProvider::process_pending_events`]: crate::events::EventsProvider::process_pending_events
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChainMonitor_get_update_future(this_arg: &crate::lightning::chain::chainmonitor::ChainMonitor) -> crate::lightning::util::wakers::Future {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_update_future();
+	crate::lightning::util::wakers::Future { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Triggers rebroadcasts/fee-bumps of pending claims from a force-closed channel. This is
+/// crucial in preventing certain classes of pinning attacks, detecting substantial mempool
+/// feerate changes between blocks, and ensuring reliability if broadcasting fails. We recommend
+/// invoking this every 30 seconds, or lower if running in an environment with spotty
+/// connections, like on mobile.
+#[no_mangle]
+pub extern "C" fn ChainMonitor_rebroadcast_pending_claims(this_arg: &crate::lightning::chain::chainmonitor::ChainMonitor) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.rebroadcast_pending_claims()
 }
 
 impl From<nativeChainMonitor> for crate::lightning::chain::Listen {
@@ -561,7 +593,7 @@ extern "C" fn ChainMonitor_Watch_release_pending_monitor_events(this_arg: *const
 	local_ret.into()
 }
 
-impl From<nativeChainMonitor> for crate::lightning::util::events::EventsProvider {
+impl From<nativeChainMonitor> for crate::lightning::events::EventsProvider {
 	fn from(obj: nativeChainMonitor) -> Self {
 		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_EventsProvider(&rust_obj);
@@ -574,15 +606,15 @@ impl From<nativeChainMonitor> for crate::lightning::util::events::EventsProvider
 /// Constructs a new EventsProvider which calls the relevant methods on this_arg.
 /// This copies the `inner` pointer in this_arg and thus the returned EventsProvider must be freed before this_arg is
 #[no_mangle]
-pub extern "C" fn ChainMonitor_as_EventsProvider(this_arg: &ChainMonitor) -> crate::lightning::util::events::EventsProvider {
-	crate::lightning::util::events::EventsProvider {
+pub extern "C" fn ChainMonitor_as_EventsProvider(this_arg: &ChainMonitor) -> crate::lightning::events::EventsProvider {
+	crate::lightning::events::EventsProvider {
 		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		process_pending_events: ChainMonitor_EventsProvider_process_pending_events,
 	}
 }
 
-extern "C" fn ChainMonitor_EventsProvider_process_pending_events(this_arg: *const c_void, mut handler: crate::lightning::util::events::EventHandler) {
-	<nativeChainMonitor as lightning::util::events::EventsProvider<>>::process_pending_events(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, handler)
+extern "C" fn ChainMonitor_EventsProvider_process_pending_events(this_arg: *const c_void, mut handler: crate::lightning::events::EventHandler) {
+	<nativeChainMonitor as lightning::events::EventsProvider<>>::process_pending_events(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, handler)
 }
 

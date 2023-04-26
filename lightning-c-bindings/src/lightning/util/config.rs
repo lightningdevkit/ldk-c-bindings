@@ -388,10 +388,41 @@ pub extern "C" fn ChannelHandshakeConfig_get_their_channel_reserve_proportional_
 pub extern "C" fn ChannelHandshakeConfig_set_their_channel_reserve_proportional_millionths(this_ptr: &mut ChannelHandshakeConfig, mut val: u32) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.their_channel_reserve_proportional_millionths = val;
 }
+/// The maximum number of HTLCs in-flight from our counterparty towards us at the same time.
+///
+/// Increasing the value can help improve liquidity and stability in
+/// routing at the cost of higher long term disk / DB usage.
+///
+/// Note: Versions of LDK earlier than v0.0.115 will fail to read channels with a configuration
+/// other than the default value.
+///
+/// Default value: 50
+/// Maximum value: 483, any values larger will be treated as 483.
+///                     This is the BOLT #2 spec limit on `max_accepted_htlcs`.
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_get_our_max_accepted_htlcs(this_ptr: &ChannelHandshakeConfig) -> u16 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().our_max_accepted_htlcs;
+	*inner_val
+}
+/// The maximum number of HTLCs in-flight from our counterparty towards us at the same time.
+///
+/// Increasing the value can help improve liquidity and stability in
+/// routing at the cost of higher long term disk / DB usage.
+///
+/// Note: Versions of LDK earlier than v0.0.115 will fail to read channels with a configuration
+/// other than the default value.
+///
+/// Default value: 50
+/// Maximum value: 483, any values larger will be treated as 483.
+///                     This is the BOLT #2 spec limit on `max_accepted_htlcs`.
+#[no_mangle]
+pub extern "C" fn ChannelHandshakeConfig_set_our_max_accepted_htlcs(this_ptr: &mut ChannelHandshakeConfig, mut val: u16) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.our_max_accepted_htlcs = val;
+}
 /// Constructs a new ChannelHandshakeConfig given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our_to_self_delay_arg: u16, mut our_htlc_minimum_msat_arg: u64, mut max_inbound_htlc_value_in_flight_percent_of_channel_arg: u8, mut negotiate_scid_privacy_arg: bool, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool, mut their_channel_reserve_proportional_millionths_arg: u32) -> ChannelHandshakeConfig {
+pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our_to_self_delay_arg: u16, mut our_htlc_minimum_msat_arg: u64, mut max_inbound_htlc_value_in_flight_percent_of_channel_arg: u8, mut negotiate_scid_privacy_arg: bool, mut announced_channel_arg: bool, mut commit_upfront_shutdown_pubkey_arg: bool, mut their_channel_reserve_proportional_millionths_arg: u32, mut our_max_accepted_htlcs_arg: u16) -> ChannelHandshakeConfig {
 	ChannelHandshakeConfig { inner: ObjOps::heap_alloc(nativeChannelHandshakeConfig {
 		minimum_depth: minimum_depth_arg,
 		our_to_self_delay: our_to_self_delay_arg,
@@ -401,6 +432,7 @@ pub extern "C" fn ChannelHandshakeConfig_new(mut minimum_depth_arg: u32, mut our
 		announced_channel: announced_channel_arg,
 		commit_upfront_shutdown_pubkey: commit_upfront_shutdown_pubkey_arg,
 		their_channel_reserve_proportional_millionths: their_channel_reserve_proportional_millionths_arg,
+		our_max_accepted_htlcs: our_max_accepted_htlcs_arg,
 	}), is_owned: true }
 }
 impl Clone for ChannelHandshakeConfig {
@@ -1217,7 +1249,7 @@ pub extern "C" fn UserConfig_set_accept_inbound_channels(this_ptr: &mut UserConf
 ///
 /// Default value: false.
 ///
-/// [`Event::OpenChannelRequest`]: crate::util::events::Event::OpenChannelRequest
+/// [`Event::OpenChannelRequest`]: crate::events::Event::OpenChannelRequest
 /// [`msgs::OpenChannel`]: crate::ln::msgs::OpenChannel
 /// [`msgs::AcceptChannel`]: crate::ln::msgs::AcceptChannel
 #[no_mangle]
@@ -1235,7 +1267,7 @@ pub extern "C" fn UserConfig_get_manually_accept_inbound_channels(this_ptr: &Use
 ///
 /// Default value: false.
 ///
-/// [`Event::OpenChannelRequest`]: crate::util::events::Event::OpenChannelRequest
+/// [`Event::OpenChannelRequest`]: crate::events::Event::OpenChannelRequest
 /// [`msgs::OpenChannel`]: crate::ln::msgs::OpenChannel
 /// [`msgs::AcceptChannel`]: crate::ln::msgs::AcceptChannel
 #[no_mangle]
@@ -1251,7 +1283,7 @@ pub extern "C" fn UserConfig_set_manually_accept_inbound_channels(this_ptr: &mut
 ///  Default value: false.
 ///
 /// [`ChannelManager::get_intercept_scid`]: crate::ln::channelmanager::ChannelManager::get_intercept_scid
-/// [`Event::HTLCIntercepted`]: crate::util::events::Event::HTLCIntercepted
+/// [`Event::HTLCIntercepted`]: crate::events::Event::HTLCIntercepted
 #[no_mangle]
 pub extern "C" fn UserConfig_get_accept_intercept_htlcs(this_ptr: &UserConfig) -> bool {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().accept_intercept_htlcs;
@@ -1266,7 +1298,7 @@ pub extern "C" fn UserConfig_get_accept_intercept_htlcs(this_ptr: &UserConfig) -
 ///  Default value: false.
 ///
 /// [`ChannelManager::get_intercept_scid`]: crate::ln::channelmanager::ChannelManager::get_intercept_scid
-/// [`Event::HTLCIntercepted`]: crate::util::events::Event::HTLCIntercepted
+/// [`Event::HTLCIntercepted`]: crate::events::Event::HTLCIntercepted
 #[no_mangle]
 pub extern "C" fn UserConfig_set_accept_intercept_htlcs(this_ptr: &mut UserConfig, mut val: bool) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.accept_intercept_htlcs = val;

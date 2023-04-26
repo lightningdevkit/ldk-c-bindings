@@ -86,15 +86,17 @@ impl ChannelMonitorUpdate {
 }
 /// The sequence number of this update. Updates *must* be replayed in-order according to this
 /// sequence number (and updates may panic if they are not). The update_id values are strictly
-/// increasing and increase by one for each new update, with one exception specified below.
+/// increasing and increase by one for each new update, with two exceptions specified below.
 ///
 /// This sequence number is also used to track up to which points updates which returned
 /// [`ChannelMonitorUpdateStatus::InProgress`] have been applied to all copies of a given
 /// ChannelMonitor when ChannelManager::channel_monitor_updated is called.
 ///
-/// The only instance where update_id values are not strictly increasing is the case where we
-/// allow post-force-close updates with a special update ID of [`CLOSED_CHANNEL_UPDATE_ID`]. See
-/// its docs for more details.
+/// The only instances we allow where update_id values are not strictly increasing have a
+/// special update ID of [`CLOSED_CHANNEL_UPDATE_ID`]. This update ID is used for updates that
+/// will force close the channel by broadcasting the latest commitment transaction or
+/// special post-force-close updates, like providing preimages necessary to claim outputs on the
+/// broadcast commitment transaction. See its docs for more details.
 ///
 /// [`ChannelMonitorUpdateStatus::InProgress`]: super::ChannelMonitorUpdateStatus::InProgress
 #[no_mangle]
@@ -104,15 +106,17 @@ pub extern "C" fn ChannelMonitorUpdate_get_update_id(this_ptr: &ChannelMonitorUp
 }
 /// The sequence number of this update. Updates *must* be replayed in-order according to this
 /// sequence number (and updates may panic if they are not). The update_id values are strictly
-/// increasing and increase by one for each new update, with one exception specified below.
+/// increasing and increase by one for each new update, with two exceptions specified below.
 ///
 /// This sequence number is also used to track up to which points updates which returned
 /// [`ChannelMonitorUpdateStatus::InProgress`] have been applied to all copies of a given
 /// ChannelMonitor when ChannelManager::channel_monitor_updated is called.
 ///
-/// The only instance where update_id values are not strictly increasing is the case where we
-/// allow post-force-close updates with a special update ID of [`CLOSED_CHANNEL_UPDATE_ID`]. See
-/// its docs for more details.
+/// The only instances we allow where update_id values are not strictly increasing have a
+/// special update ID of [`CLOSED_CHANNEL_UPDATE_ID`]. This update ID is used for updates that
+/// will force close the channel by broadcasting the latest commitment transaction or
+/// special post-force-close updates, like providing preimages necessary to claim outputs on the
+/// broadcast commitment transaction. See its docs for more details.
 ///
 /// [`ChannelMonitorUpdateStatus::InProgress`]: super::ChannelMonitorUpdateStatus::InProgress
 #[no_mangle]
@@ -138,13 +142,23 @@ pub(crate) extern "C" fn ChannelMonitorUpdate_clone_void(this_ptr: *const c_void
 pub extern "C" fn ChannelMonitorUpdate_clone(orig: &ChannelMonitorUpdate) -> ChannelMonitorUpdate {
 	orig.clone()
 }
-/// If:
-///    (1) a channel has been force closed and
-///    (2) we receive a preimage from a forward link that allows us to spend an HTLC output on
-///        this channel's (the backward link's) broadcasted commitment transaction
-/// then we allow the `ChannelManager` to send a `ChannelMonitorUpdate` with this update ID,
-/// with the update providing said payment preimage. No other update types are allowed after
-/// force-close.
+/// Checks if two ChannelMonitorUpdates contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn ChannelMonitorUpdate_eq(a: &ChannelMonitorUpdate, b: &ChannelMonitorUpdate) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+/// The update ID used for a [`ChannelMonitorUpdate`] that is either:
+///
+///\t(1) attempting to force close the channel by broadcasting our latest commitment transaction or
+///\t(2) providing a preimage (after the channel has been force closed) from a forward link that
+///\t\tallows us to spend an HTLC output on this channel's (the backward link's) broadcasted
+///\t\tcommitment transaction.
+///
+/// No other [`ChannelMonitorUpdate`]s are allowed after force-close.
 
 #[no_mangle]
 pub static CLOSED_CHANNEL_UPDATE_ID: u64 = lightning::chain::channelmonitor::CLOSED_CHANNEL_UPDATE_ID;
@@ -927,13 +941,13 @@ pub extern "C" fn ChannelMonitor_get_and_clear_pending_monitor_events(this_arg: 
 /// This is called by the [`EventsProvider::process_pending_events`] implementation for
 /// [`ChainMonitor`].
 ///
-/// [`EventsProvider::process_pending_events`]: crate::util::events::EventsProvider::process_pending_events
+/// [`EventsProvider::process_pending_events`]: crate::events::EventsProvider::process_pending_events
 /// [`ChainMonitor`]: crate::chain::chainmonitor::ChainMonitor
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_get_and_clear_pending_events(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_EventZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_and_clear_pending_events();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::util::events::Event::native_into(item) }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::events::Event::native_into(item) }); };
 	local_ret.into()
 }
 
@@ -1059,6 +1073,16 @@ pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &crate::lightning:
 pub extern "C" fn ChannelMonitor_current_best_block(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::lightning::chain::BestBlock {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.current_best_block();
 	crate::lightning::chain::BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Triggers rebroadcasts/fee-bumps of pending claims from a force-closed channel. This is
+/// crucial in preventing certain classes of pinning attacks, detecting substantial mempool
+/// feerate changes between blocks, and ensuring reliability if broadcasting fails. We recommend
+/// invoking this every 30 seconds, or lower if running in an environment with spotty
+/// connections, like on mobile.
+#[no_mangle]
+pub extern "C" fn ChannelMonitor_rebroadcast_pending_claims(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.rebroadcast_pending_claims(broadcaster, fee_estimator, logger)
 }
 
 /// Gets the balances in this channel which are either claimable by us if we were to

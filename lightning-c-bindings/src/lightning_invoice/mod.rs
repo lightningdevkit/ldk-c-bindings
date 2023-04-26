@@ -11,9 +11,11 @@
 //! invoices and functions to create, encode and decode these. If you just want to use the standard
 //! en-/decoding functionality this should get you started:
 //!
-//!   * For parsing use `str::parse::<Invoice>(&self)` (see the docs of `impl FromStr for Invoice`)
-//!   * For constructing invoices use the `InvoiceBuilder`
-//!   * For serializing invoices use the `Display`/`ToString` traits
+//!   * For parsing use `str::parse::<Invoice>(&self)` (see [`Invoice::from_str`])
+//!   * For constructing invoices use the [`InvoiceBuilder`]
+//!   * For serializing invoices use the [`Display`]/[`ToString`] traits
+//!
+//! [`Invoice::from_str`]: crate::Invoice#impl-FromStr
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -627,9 +629,11 @@ pub(crate) type nativeInvoice = nativeInvoiceImport;
 /// Represents a syntactically and semantically correct lightning BOLT11 invoice.
 ///
 /// There are three ways to construct an `Invoice`:
-///  1. using `InvoiceBuilder`
-///  2. using `Invoice::from_signed(SignedRawInvoice)`
-///  3. using `str::parse::<Invoice>(&str)`
+///  1. using [`InvoiceBuilder`]
+///  2. using [`Invoice::from_signed`]
+///  3. using `str::parse::<Invoice>(&str)` (see [`Invoice::from_str`])
+///
+/// [`Invoice::from_str`]: crate::Invoice#impl-FromStr
 #[must_use]
 #[repr(C)]
 pub struct Invoice {
@@ -704,7 +708,7 @@ pub(crate) extern "C" fn Invoice_clone_void(this_ptr: *const c_void) -> *mut c_v
 pub extern "C" fn Invoice_clone(orig: &Invoice) -> Invoice {
 	orig.clone()
 }
-/// Checks if two Invoices contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the Invoice.
 #[no_mangle]
 pub extern "C" fn Invoice_hash(o: &Invoice) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -718,11 +722,11 @@ pub extern "C" fn Invoice_hash(o: &Invoice) -> u64 {
 use lightning_invoice::SignedRawInvoice as nativeSignedRawInvoiceImport;
 pub(crate) type nativeSignedRawInvoice = nativeSignedRawInvoiceImport;
 
-/// Represents a signed `RawInvoice` with cached hash. The signature is not checked and may be
+/// Represents a signed [`RawInvoice`] with cached hash. The signature is not checked and may be
 /// invalid.
 ///
 /// # Invariants
-/// The hash has to be either from the deserialized invoice or from the serialized `raw_invoice`.
+/// The hash has to be either from the deserialized invoice or from the serialized [`RawInvoice`].
 #[must_use]
 #[repr(C)]
 pub struct SignedRawInvoice {
@@ -797,7 +801,7 @@ pub(crate) extern "C" fn SignedRawInvoice_clone_void(this_ptr: *const c_void) ->
 pub extern "C" fn SignedRawInvoice_clone(orig: &SignedRawInvoice) -> SignedRawInvoice {
 	orig.clone()
 }
-/// Checks if two SignedRawInvoices contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the SignedRawInvoice.
 #[no_mangle]
 pub extern "C" fn SignedRawInvoice_hash(o: &SignedRawInvoice) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -811,11 +815,11 @@ pub extern "C" fn SignedRawInvoice_hash(o: &SignedRawInvoice) -> u64 {
 use lightning_invoice::RawInvoice as nativeRawInvoiceImport;
 pub(crate) type nativeRawInvoice = nativeRawInvoiceImport;
 
-/// Represents an syntactically correct Invoice for a payment on the lightning network,
+/// Represents an syntactically correct [`Invoice`] for a payment on the lightning network,
 /// but without the signature information.
-/// De- and encoding should not lead to information loss but may lead to different hashes.
+/// Decoding and encoding should not lead to information loss but may lead to different hashes.
 ///
-/// For methods without docs see the corresponding methods in `Invoice`.
+/// For methods without docs see the corresponding methods in [`Invoice`].
 #[must_use]
 #[repr(C)]
 pub struct RawInvoice {
@@ -901,7 +905,7 @@ pub(crate) extern "C" fn RawInvoice_clone_void(this_ptr: *const c_void) -> *mut 
 pub extern "C" fn RawInvoice_clone(orig: &RawInvoice) -> RawInvoice {
 	orig.clone()
 }
-/// Checks if two RawInvoices contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the RawInvoice.
 #[no_mangle]
 pub extern "C" fn RawInvoice_hash(o: &RawInvoice) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -915,7 +919,7 @@ pub extern "C" fn RawInvoice_hash(o: &RawInvoice) -> u64 {
 use lightning_invoice::RawDataPart as nativeRawDataPartImport;
 pub(crate) type nativeRawDataPart = nativeRawDataPartImport;
 
-/// Data of the `RawInvoice` that is encoded in the data part
+/// Data of the [`RawInvoice`] that is encoded in the data part
 #[must_use]
 #[repr(C)]
 pub struct RawDataPart {
@@ -1001,7 +1005,7 @@ pub(crate) extern "C" fn RawDataPart_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn RawDataPart_clone(orig: &RawDataPart) -> RawDataPart {
 	orig.clone()
 }
-/// Checks if two RawDataParts contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the RawDataPart.
 #[no_mangle]
 pub extern "C" fn RawDataPart_hash(o: &RawDataPart) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -1095,7 +1099,7 @@ pub(crate) extern "C" fn PositiveTimestamp_clone_void(this_ptr: *const c_void) -
 pub extern "C" fn PositiveTimestamp_clone(orig: &PositiveTimestamp) -> PositiveTimestamp {
 	orig.clone()
 }
-/// Checks if two PositiveTimestamps contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the PositiveTimestamp.
 #[no_mangle]
 pub extern "C" fn PositiveTimestamp_hash(o: &PositiveTimestamp) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -1187,7 +1191,7 @@ pub extern "C" fn SiPrefix_pico() -> SiPrefix {
 pub extern "C" fn SiPrefix_eq(a: &SiPrefix, b: &SiPrefix) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
-/// Checks if two SiPrefixs contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the SiPrefix.
 #[no_mangle]
 pub extern "C" fn SiPrefix_hash(o: &SiPrefix) -> u64 {
 	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
@@ -1291,7 +1295,7 @@ pub extern "C" fn Currency_simnet() -> Currency {
 /// Utility method to constructs a new Signet-variant Currency
 pub extern "C" fn Currency_signet() -> Currency {
 	Currency::Signet}
-/// Checks if two Currencys contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the Currency.
 #[no_mangle]
 pub extern "C" fn Currency_hash(o: &Currency) -> u64 {
 	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
@@ -1376,7 +1380,7 @@ pub(crate) extern "C" fn Sha256_clone_void(this_ptr: *const c_void) -> *mut c_vo
 pub extern "C" fn Sha256_clone(orig: &Sha256) -> Sha256 {
 	orig.clone()
 }
-/// Checks if two Sha256s contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the Sha256.
 #[no_mangle]
 pub extern "C" fn Sha256_hash(o: &Sha256) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -1395,6 +1399,15 @@ pub extern "C" fn Sha256_eq(a: &Sha256, b: &Sha256) -> bool {
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
+/// Constructs a new [`Sha256`] from the given bytes, which are assumed to be the output of a
+/// single sha256 hash.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Sha256_from_bytes(bytes: *const [u8; 32]) -> crate::lightning_invoice::Sha256 {
+	let mut ret = lightning_invoice::Sha256::from_bytes(unsafe { &*bytes});
+	crate::lightning_invoice::Sha256 { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
 
 use lightning_invoice::Description as nativeDescriptionImport;
 pub(crate) type nativeDescription = nativeDescriptionImport;
@@ -1468,7 +1481,7 @@ pub(crate) extern "C" fn Description_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn Description_clone(orig: &Description) -> Description {
 	orig.clone()
 }
-/// Checks if two Descriptions contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the Description.
 #[no_mangle]
 pub extern "C" fn Description_hash(o: &Description) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -1574,7 +1587,7 @@ pub(crate) extern "C" fn PayeePubKey_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn PayeePubKey_clone(orig: &PayeePubKey) -> PayeePubKey {
 	orig.clone()
 }
-/// Checks if two PayeePubKeys contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the PayeePubKey.
 #[no_mangle]
 pub extern "C" fn PayeePubKey_hash(o: &PayeePubKey) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -1664,7 +1677,7 @@ pub(crate) extern "C" fn ExpiryTime_clone_void(this_ptr: *const c_void) -> *mut 
 pub extern "C" fn ExpiryTime_clone(orig: &ExpiryTime) -> ExpiryTime {
 	orig.clone()
 }
-/// Checks if two ExpiryTimes contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the ExpiryTime.
 #[no_mangle]
 pub extern "C" fn ExpiryTime_hash(o: &ExpiryTime) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -1770,7 +1783,7 @@ pub(crate) extern "C" fn MinFinalCltvExpiryDelta_clone_void(this_ptr: *const c_v
 pub extern "C" fn MinFinalCltvExpiryDelta_clone(orig: &MinFinalCltvExpiryDelta) -> MinFinalCltvExpiryDelta {
 	orig.clone()
 }
-/// Checks if two MinFinalCltvExpiryDeltas contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the MinFinalCltvExpiryDelta.
 #[no_mangle]
 pub extern "C" fn MinFinalCltvExpiryDelta_hash(o: &MinFinalCltvExpiryDelta) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -1795,7 +1808,7 @@ pub extern "C" fn MinFinalCltvExpiryDelta_eq(a: &MinFinalCltvExpiryDelta, b: &Mi
 #[repr(C)]
 pub enum Fallback {
 	SegWitProgram {
-		version: crate::c_types::U5,
+		version: crate::c_types::WitnessVersion,
 		program: crate::c_types::derived::CVec_u8Z,
 	},
 	PubKeyHash(
@@ -1822,13 +1835,13 @@ impl Fallback {
 			Fallback::PubKeyHash (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
 				nativeFallback::PubKeyHash (
-					a_nonref.data,
+					bitcoin::hash_types::PubkeyHash::from_hash(bitcoin::hashes::Hash::from_inner(a_nonref.data)),
 				)
 			},
 			Fallback::ScriptHash (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
 				nativeFallback::ScriptHash (
-					a_nonref.data,
+					bitcoin::hash_types::ScriptHash::from_hash(bitcoin::hashes::Hash::from_inner(a_nonref.data)),
 				)
 			},
 		}
@@ -1845,12 +1858,12 @@ impl Fallback {
 			},
 			Fallback::PubKeyHash (mut a, ) => {
 				nativeFallback::PubKeyHash (
-					a.data,
+					bitcoin::hash_types::PubkeyHash::from_hash(bitcoin::hashes::Hash::from_inner(a.data)),
 				)
 			},
 			Fallback::ScriptHash (mut a, ) => {
 				nativeFallback::ScriptHash (
-					a.data,
+					bitcoin::hash_types::ScriptHash::from_hash(bitcoin::hashes::Hash::from_inner(a.data)),
 				)
 			},
 		}
@@ -1870,13 +1883,13 @@ impl Fallback {
 			nativeFallback::PubKeyHash (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
 				Fallback::PubKeyHash (
-					crate::c_types::TwentyBytes { data: a_nonref },
+					crate::c_types::TwentyBytes { data: a_nonref.as_hash().into_inner() },
 				)
 			},
 			nativeFallback::ScriptHash (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
 				Fallback::ScriptHash (
-					crate::c_types::TwentyBytes { data: a_nonref },
+					crate::c_types::TwentyBytes { data: a_nonref.as_hash().into_inner() },
 				)
 			},
 		}
@@ -1893,12 +1906,12 @@ impl Fallback {
 			},
 			nativeFallback::PubKeyHash (mut a, ) => {
 				Fallback::PubKeyHash (
-					crate::c_types::TwentyBytes { data: a },
+					crate::c_types::TwentyBytes { data: a.as_hash().into_inner() },
 				)
 			},
 			nativeFallback::ScriptHash (mut a, ) => {
 				Fallback::ScriptHash (
-					crate::c_types::TwentyBytes { data: a },
+					crate::c_types::TwentyBytes { data: a.as_hash().into_inner() },
 				)
 			},
 		}
@@ -1914,7 +1927,7 @@ pub extern "C" fn Fallback_clone(orig: &Fallback) -> Fallback {
 }
 #[no_mangle]
 /// Utility method to constructs a new SegWitProgram-variant Fallback
-pub extern "C" fn Fallback_seg_wit_program(version: crate::c_types::U5, program: crate::c_types::derived::CVec_u8Z) -> Fallback {
+pub extern "C" fn Fallback_seg_wit_program(version: crate::c_types::WitnessVersion, program: crate::c_types::derived::CVec_u8Z) -> Fallback {
 	Fallback::SegWitProgram {
 		version,
 		program,
@@ -1930,7 +1943,7 @@ pub extern "C" fn Fallback_pub_key_hash(a: crate::c_types::TwentyBytes) -> Fallb
 pub extern "C" fn Fallback_script_hash(a: crate::c_types::TwentyBytes) -> Fallback {
 	Fallback::ScriptHash(a, )
 }
-/// Checks if two Fallbacks contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the Fallback.
 #[no_mangle]
 pub extern "C" fn Fallback_hash(o: &Fallback) -> u64 {
 	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
@@ -2015,7 +2028,7 @@ pub(crate) extern "C" fn InvoiceSignature_clone_void(this_ptr: *const c_void) ->
 pub extern "C" fn InvoiceSignature_clone(orig: &InvoiceSignature) -> InvoiceSignature {
 	orig.clone()
 }
-/// Checks if two InvoiceSignatures contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the InvoiceSignature.
 #[no_mangle]
 pub extern "C" fn InvoiceSignature_hash(o: &InvoiceSignature) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -2108,7 +2121,7 @@ pub(crate) extern "C" fn PrivateRoute_clone_void(this_ptr: *const c_void) -> *mu
 pub extern "C" fn PrivateRoute_clone(orig: &PrivateRoute) -> PrivateRoute {
 	orig.clone()
 }
-/// Checks if two PrivateRoutes contain equal inner contents.
+/// Generates a non-cryptographic 64-bit hash of the PrivateRoute.
 #[no_mangle]
 pub extern "C" fn PrivateRoute_hash(o: &PrivateRoute) -> u64 {
 	if o.inner.is_null() { return 0; }
@@ -2139,7 +2152,7 @@ pub extern "C" fn SignedRawInvoice_into_parts(mut this_arg: crate::lightning_inv
 	local_ret
 }
 
-/// The `RawInvoice` which was signed.
+/// The [`RawInvoice`] which was signed.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn SignedRawInvoice_raw_invoice(this_arg: &crate::lightning_invoice::SignedRawInvoice) -> crate::lightning_invoice::RawInvoice {
@@ -2147,7 +2160,7 @@ pub extern "C" fn SignedRawInvoice_raw_invoice(this_arg: &crate::lightning_invoi
 	crate::lightning_invoice::RawInvoice { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning_invoice::RawInvoice<>) as *mut _) }, is_owned: false }
 }
 
-/// The hash of the `RawInvoice` that was signed.
+/// The hash of the [`RawInvoice`] that was signed.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn SignedRawInvoice_signable_hash(this_arg: &crate::lightning_invoice::SignedRawInvoice) -> *const [u8; 32] {
@@ -2155,7 +2168,7 @@ pub extern "C" fn SignedRawInvoice_signable_hash(this_arg: &crate::lightning_inv
 	ret
 }
 
-/// InvoiceSignature for the invoice.
+/// Signature for the invoice.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn SignedRawInvoice_signature(this_arg: &crate::lightning_invoice::SignedRawInvoice) -> crate::lightning_invoice::InvoiceSignature {
@@ -2259,6 +2272,14 @@ pub extern "C" fn RawInvoice_payment_secret(this_arg: &crate::lightning_invoice:
 	local_ret
 }
 
+#[must_use]
+#[no_mangle]
+pub extern "C" fn RawInvoice_payment_metadata(this_arg: &crate::lightning_invoice::RawInvoice) -> crate::c_types::derived::COption_CVec_u8ZZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_metadata();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { let mut local_ret_0 = Vec::new(); for mut item in (*ret.as_ref().unwrap()).clone().drain(..) { local_ret_0.push( { item }); }; local_ret_0.into() }) };
+	local_ret
+}
+
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
@@ -2355,6 +2376,14 @@ pub extern "C" fn PositiveTimestamp_as_time(this_arg: &crate::lightning_invoice:
 	ret.duration_since(::std::time::SystemTime::UNIX_EPOCH).expect("Times must be post-1970").as_secs()
 }
 
+/// The hash of the [`RawInvoice`] that was signed.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Invoice_signable_hash(this_arg: &crate::lightning_invoice::Invoice) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signable_hash();
+	crate::c_types::ThirtyTwoBytes { data: ret }
+}
+
 /// Transform the `Invoice` into it's unchecked version
 #[must_use]
 #[no_mangle]
@@ -2372,7 +2401,7 @@ pub extern "C" fn Invoice_check_signature(this_arg: &crate::lightning_invoice::I
 	local_ret
 }
 
-/// Constructs an `Invoice` from a `SignedRawInvoice` by checking all its invariants.
+/// Constructs an `Invoice` from a [`SignedRawInvoice`] by checking all its invariants.
 /// ```
 /// use lightning_invoice::*;
 ///
@@ -2443,6 +2472,15 @@ pub extern "C" fn Invoice_payment_secret(this_arg: &crate::lightning_invoice::In
 	&ret.0
 }
 
+/// Get the payment metadata blob if one was included in the invoice
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Invoice_payment_metadata(this_arg: &crate::lightning_invoice::Invoice) -> crate::c_types::derived::COption_CVec_u8ZZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_metadata();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { let mut local_ret_0 = Vec::new(); for mut item in (*ret.as_ref().unwrap()).clone().drain(..) { local_ret_0.push( { item }); }; local_ret_0.into() }) };
+	local_ret
+}
+
 /// Get the invoice features if they were included in the invoice
 ///
 /// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
@@ -2462,6 +2500,16 @@ pub extern "C" fn Invoice_recover_payee_pub_key(this_arg: &crate::lightning_invo
 	crate::c_types::PublicKey::from_rust(&ret)
 }
 
+/// Returns the Duration since the Unix epoch at which the invoice expires.
+/// Returning None if overflow occurred.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Invoice_expires_at(this_arg: &crate::lightning_invoice::Invoice) -> crate::c_types::derived::COption_DurationZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.expires_at();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_DurationZ::None } else { crate::c_types::derived::COption_DurationZ::Some( { ret.unwrap().as_secs() }) };
+	local_ret
+}
+
 /// Returns the invoice's expiry time, if present, otherwise [`DEFAULT_EXPIRY_TIME`].
 #[must_use]
 #[no_mangle]
@@ -2476,6 +2524,23 @@ pub extern "C" fn Invoice_expiry_time(this_arg: &crate::lightning_invoice::Invoi
 pub extern "C" fn Invoice_is_expired(this_arg: &crate::lightning_invoice::Invoice) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_expired();
 	ret
+}
+
+/// Returns the Duration remaining until the invoice expires.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Invoice_duration_until_expiry(this_arg: &crate::lightning_invoice::Invoice) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.duration_until_expiry();
+	ret.as_secs()
+}
+
+/// Returns the Duration remaining until the invoice expires given the current time.
+/// `time` is the timestamp as a duration since the Unix epoch.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Invoice_expiration_remaining_from_epoch(this_arg: &crate::lightning_invoice::Invoice, mut time: u64) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.expiration_remaining_from_epoch(core::time::Duration::from_secs(time));
+	ret.as_secs()
 }
 
 /// Returns whether the expiry time would pass at the given point in time.
@@ -2494,6 +2559,15 @@ pub extern "C" fn Invoice_would_expire(this_arg: &crate::lightning_invoice::Invo
 pub extern "C" fn Invoice_min_final_cltv_expiry_delta(this_arg: &crate::lightning_invoice::Invoice) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.min_final_cltv_expiry_delta();
 	ret
+}
+
+/// Returns a list of all fallback addresses as [`Address`]es
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Invoice_fallback_addresses(this_arg: &crate::lightning_invoice::Invoice) -> crate::c_types::derived::CVec_AddressZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.fallback_addresses();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { alloc::string::ToString::to_string(&item).into() }); };
+	local_ret.into()
 }
 
 /// Returns a list of all routes included in the invoice
@@ -2532,7 +2606,7 @@ pub extern "C" fn Invoice_amount_milli_satoshis(this_arg: &crate::lightning_invo
 }
 
 /// Creates a new `Description` if `description` is at most 1023 __bytes__ long,
-/// returns `CreationError::DescriptionTooLong` otherwise
+/// returns [`CreationError::DescriptionTooLong`] otherwise
 ///
 /// Please note that single characters may use more than one byte due to UTF8 encoding.
 #[must_use]
@@ -2543,7 +2617,7 @@ pub extern "C" fn Description_new(mut description: crate::c_types::Str) -> crate
 	local_ret
 }
 
-/// Returns the underlying description `String`
+/// Returns the underlying description [`String`]
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Description_into_inner(mut this_arg: crate::lightning_invoice::Description) -> crate::c_types::Str {
@@ -2559,7 +2633,7 @@ pub extern "C" fn ExpiryTime_from_seconds(mut seconds: u64) -> crate::lightning_
 	crate::lightning_invoice::ExpiryTime { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Construct an `ExpiryTime` from a `Duration`, dropping the sub-second part.
+/// Construct an `ExpiryTime` from a [`Duration`], dropping the sub-second part.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ExpiryTime_from_duration(mut duration: u64) -> crate::lightning_invoice::ExpiryTime {
@@ -2575,7 +2649,7 @@ pub extern "C" fn ExpiryTime_as_seconds(this_arg: &crate::lightning_invoice::Exp
 	ret
 }
 
-/// Returns a reference to the underlying `Duration` (=expiry time)
+/// Returns a reference to the underlying [`Duration`] (=expiry time)
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ExpiryTime_as_duration(this_arg: &crate::lightning_invoice::ExpiryTime) -> u64 {
@@ -2600,12 +2674,12 @@ pub extern "C" fn PrivateRoute_into_inner(mut this_arg: crate::lightning_invoice
 	crate::lightning::routing::router::RouteHint { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Errors that may occur when constructing a new `RawInvoice` or `Invoice`
+/// Errors that may occur when constructing a new [`RawInvoice`] or [`Invoice`]
 #[derive(Clone)]
 #[must_use]
 #[repr(C)]
 pub enum CreationError {
-	/// The supplied description string was longer than 639 __bytes__ (see [`Description::new(…)`](./struct.Description.html#method.new))
+	/// The supplied description string was longer than 639 __bytes__ (see [`Description::new`])
 	DescriptionTooLong,
 	/// The specified route has too many hops and can't be encoded
 	RouteTooLong,
@@ -2712,7 +2786,7 @@ pub extern "C" fn CreationError_eq(a: &CreationError, b: &CreationError) -> bool
 pub extern "C" fn CreationError_to_str(o: &crate::lightning_invoice::CreationError) -> Str {
 	alloc::format!("{}", &o.to_native()).into()
 }
-/// Errors that may occur when converting a `RawInvoice` to an `Invoice`. They relate to the
+/// Errors that may occur when converting a [`RawInvoice`] to an [`Invoice`]. They relate to the
 /// requirements sections in BOLT #11
 #[derive(Clone)]
 #[must_use]
@@ -2861,7 +2935,7 @@ pub extern "C" fn SemanticError_eq(a: &SemanticError, b: &SemanticError) -> bool
 pub extern "C" fn SemanticError_to_str(o: &crate::lightning_invoice::SemanticError) -> Str {
 	alloc::format!("{}", &o.to_native()).into()
 }
-/// When signing using a fallible method either an user-supplied `SignError` or a `CreationError`
+/// When signing using a fallible method either an user-supplied `SignError` or a [`CreationError`]
 /// may occur.
 #[derive(Clone)]
 #[must_use]

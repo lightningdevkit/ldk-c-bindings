@@ -17,7 +17,6 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 pub mod ser_macros;
-pub mod events;
 pub mod errors;
 pub mod ser;
 pub mod message_signing;

@@ -80,13 +80,13 @@ pub struct Score {
 	#[must_use]
 	pub channel_penalty_msat: extern "C" fn (this_arg: *const c_void, short_channel_id: u64, source: &crate::lightning::routing::gossip::NodeId, target: &crate::lightning::routing::gossip::NodeId, usage: crate::lightning::routing::scoring::ChannelUsage) -> u64,
 	/// Handles updating channel penalties after failing to route through a channel.
-	pub payment_path_failed: extern "C" fn (this_arg: *mut c_void, path: crate::c_types::derived::CVec_RouteHopZ, short_channel_id: u64),
+	pub payment_path_failed: extern "C" fn (this_arg: *mut c_void, path: &crate::lightning::routing::router::Path, short_channel_id: u64),
 	/// Handles updating channel penalties after successfully routing along a path.
-	pub payment_path_successful: extern "C" fn (this_arg: *mut c_void, path: crate::c_types::derived::CVec_RouteHopZ),
+	pub payment_path_successful: extern "C" fn (this_arg: *mut c_void, path: &crate::lightning::routing::router::Path),
 	/// Handles updating channel penalties after a probe over the given path failed.
-	pub probe_failed: extern "C" fn (this_arg: *mut c_void, path: crate::c_types::derived::CVec_RouteHopZ, short_channel_id: u64),
+	pub probe_failed: extern "C" fn (this_arg: *mut c_void, path: &crate::lightning::routing::router::Path, short_channel_id: u64),
 	/// Handles updating channel penalties after a probe over the given path succeeded.
-	pub probe_successful: extern "C" fn (this_arg: *mut c_void, path: crate::c_types::derived::CVec_RouteHopZ),
+	pub probe_successful: extern "C" fn (this_arg: *mut c_void, path: &crate::lightning::routing::router::Path),
 	/// Serialize the object into a byte array
 	pub write: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_u8Z,
 	/// Frees any resources associated with this object given its this_arg pointer.
@@ -121,21 +121,17 @@ impl rustScore for Score {
 		let mut ret = (self.channel_penalty_msat)(self.this_arg, short_channel_id, &crate::lightning::routing::gossip::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((source as *const lightning::routing::gossip::NodeId<>) as *mut _) }, is_owned: false }, &crate::lightning::routing::gossip::NodeId { inner: unsafe { ObjOps::nonnull_ptr_to_inner((target as *const lightning::routing::gossip::NodeId<>) as *mut _) }, is_owned: false }, crate::lightning::routing::scoring::ChannelUsage { inner: ObjOps::heap_alloc(usage), is_owned: true });
 		ret
 	}
-	fn payment_path_failed(&mut self, mut path: &[&lightning::routing::router::RouteHop], mut short_channel_id: u64) {
-		let mut local_path = Vec::new(); for item in path.iter() { local_path.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::routing::router::RouteHop<>) as *mut _) }, is_owned: false } }); };
-		(self.payment_path_failed)(self.this_arg, local_path.into(), short_channel_id)
+	fn payment_path_failed(&mut self, mut path: &lightning::routing::router::Path, mut short_channel_id: u64) {
+		(self.payment_path_failed)(self.this_arg, &crate::lightning::routing::router::Path { inner: unsafe { ObjOps::nonnull_ptr_to_inner((path as *const lightning::routing::router::Path<>) as *mut _) }, is_owned: false }, short_channel_id)
 	}
-	fn payment_path_successful(&mut self, mut path: &[&lightning::routing::router::RouteHop]) {
-		let mut local_path = Vec::new(); for item in path.iter() { local_path.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::routing::router::RouteHop<>) as *mut _) }, is_owned: false } }); };
-		(self.payment_path_successful)(self.this_arg, local_path.into())
+	fn payment_path_successful(&mut self, mut path: &lightning::routing::router::Path) {
+		(self.payment_path_successful)(self.this_arg, &crate::lightning::routing::router::Path { inner: unsafe { ObjOps::nonnull_ptr_to_inner((path as *const lightning::routing::router::Path<>) as *mut _) }, is_owned: false })
 	}
-	fn probe_failed(&mut self, mut path: &[&lightning::routing::router::RouteHop], mut short_channel_id: u64) {
-		let mut local_path = Vec::new(); for item in path.iter() { local_path.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::routing::router::RouteHop<>) as *mut _) }, is_owned: false } }); };
-		(self.probe_failed)(self.this_arg, local_path.into(), short_channel_id)
+	fn probe_failed(&mut self, mut path: &lightning::routing::router::Path, mut short_channel_id: u64) {
+		(self.probe_failed)(self.this_arg, &crate::lightning::routing::router::Path { inner: unsafe { ObjOps::nonnull_ptr_to_inner((path as *const lightning::routing::router::Path<>) as *mut _) }, is_owned: false }, short_channel_id)
 	}
-	fn probe_successful(&mut self, mut path: &[&lightning::routing::router::RouteHop]) {
-		let mut local_path = Vec::new(); for item in path.iter() { local_path.push( { crate::lightning::routing::router::RouteHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner(((*item) as *const lightning::routing::router::RouteHop<>) as *mut _) }, is_owned: false } }); };
-		(self.probe_successful)(self.this_arg, local_path.into())
+	fn probe_successful(&mut self, mut path: &lightning::routing::router::Path) {
+		(self.probe_successful)(self.this_arg, &crate::lightning::routing::router::Path { inner: unsafe { ObjOps::nonnull_ptr_to_inner((path as *const lightning::routing::router::Path<>) as *mut _) }, is_owned: false })
 	}
 }
 
@@ -412,21 +408,17 @@ extern "C" fn MultiThreadedScoreLock_Score_channel_penalty_msat(this_arg: *const
 	let mut ret = <nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::channel_penalty_msat(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, short_channel_id, source.get_native_ref(), target.get_native_ref(), *unsafe { Box::from_raw(usage.take_inner()) });
 	ret
 }
-extern "C" fn MultiThreadedScoreLock_Score_payment_path_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::payment_path_failed(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, &local_path[..], short_channel_id)
+extern "C" fn MultiThreadedScoreLock_Score_payment_path_failed(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path, mut short_channel_id: u64) {
+	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::payment_path_failed(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, path.get_native_ref(), short_channel_id)
 }
-extern "C" fn MultiThreadedScoreLock_Score_payment_path_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, &local_path[..])
+extern "C" fn MultiThreadedScoreLock_Score_payment_path_successful(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path) {
+	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, path.get_native_ref())
 }
-extern "C" fn MultiThreadedScoreLock_Score_probe_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::probe_failed(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, &local_path[..], short_channel_id)
+extern "C" fn MultiThreadedScoreLock_Score_probe_failed(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path, mut short_channel_id: u64) {
+	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::probe_failed(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, path.get_native_ref(), short_channel_id)
 }
-extern "C" fn MultiThreadedScoreLock_Score_probe_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::probe_successful(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, &local_path[..])
+extern "C" fn MultiThreadedScoreLock_Score_probe_successful(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path) {
+	<nativeMultiThreadedScoreLock as lightning::routing::scoring::Score<>>::probe_successful(unsafe { &mut *(this_arg as *mut nativeMultiThreadedScoreLock) }, path.get_native_ref())
 }
 
 #[no_mangle]
@@ -733,21 +725,17 @@ extern "C" fn FixedPenaltyScorer_Score_channel_penalty_msat(this_arg: *const c_v
 	let mut ret = <nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::channel_penalty_msat(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, short_channel_id, source.get_native_ref(), target.get_native_ref(), *unsafe { Box::from_raw(usage.take_inner()) });
 	ret
 }
-extern "C" fn FixedPenaltyScorer_Score_payment_path_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::payment_path_failed(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local_path[..], short_channel_id)
+extern "C" fn FixedPenaltyScorer_Score_payment_path_failed(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path, mut short_channel_id: u64) {
+	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::payment_path_failed(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, path.get_native_ref(), short_channel_id)
 }
-extern "C" fn FixedPenaltyScorer_Score_payment_path_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local_path[..])
+extern "C" fn FixedPenaltyScorer_Score_payment_path_successful(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path) {
+	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, path.get_native_ref())
 }
-extern "C" fn FixedPenaltyScorer_Score_probe_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::probe_failed(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local_path[..], short_channel_id)
+extern "C" fn FixedPenaltyScorer_Score_probe_failed(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path, mut short_channel_id: u64) {
+	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::probe_failed(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, path.get_native_ref(), short_channel_id)
 }
-extern "C" fn FixedPenaltyScorer_Score_probe_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::probe_successful(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, &local_path[..])
+extern "C" fn FixedPenaltyScorer_Score_probe_successful(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path) {
+	<nativeFixedPenaltyScorer as lightning::routing::scoring::Score<>>::probe_successful(unsafe { &mut *(this_arg as *mut nativeFixedPenaltyScorer) }, path.get_native_ref())
 }
 
 #[no_mangle]
@@ -1414,21 +1402,17 @@ extern "C" fn ProbabilisticScorer_Score_channel_penalty_msat(this_arg: *const c_
 	let mut ret = <nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::channel_penalty_msat(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, short_channel_id, source.get_native_ref(), target.get_native_ref(), *unsafe { Box::from_raw(usage.take_inner()) });
 	ret
 }
-extern "C" fn ProbabilisticScorer_Score_payment_path_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::payment_path_failed(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, &local_path[..], short_channel_id)
+extern "C" fn ProbabilisticScorer_Score_payment_path_failed(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path, mut short_channel_id: u64) {
+	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::payment_path_failed(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, path.get_native_ref(), short_channel_id)
 }
-extern "C" fn ProbabilisticScorer_Score_payment_path_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, &local_path[..])
+extern "C" fn ProbabilisticScorer_Score_payment_path_successful(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path) {
+	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::payment_path_successful(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, path.get_native_ref())
 }
-extern "C" fn ProbabilisticScorer_Score_probe_failed(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ, mut short_channel_id: u64) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::probe_failed(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, &local_path[..], short_channel_id)
+extern "C" fn ProbabilisticScorer_Score_probe_failed(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path, mut short_channel_id: u64) {
+	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::probe_failed(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, path.get_native_ref(), short_channel_id)
 }
-extern "C" fn ProbabilisticScorer_Score_probe_successful(this_arg: *mut c_void, mut path: crate::c_types::derived::CVec_RouteHopZ) {
-	let mut local_path = Vec::new(); for mut item in path.as_slice().iter() { local_path.push( { item.get_native_ref() }); };
-	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::probe_successful(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, &local_path[..])
+extern "C" fn ProbabilisticScorer_Score_probe_successful(this_arg: *mut c_void, path: &crate::lightning::routing::router::Path) {
+	<nativeProbabilisticScorer as lightning::routing::scoring::Score<>>::probe_successful(unsafe { &mut *(this_arg as *mut nativeProbabilisticScorer) }, path.get_native_ref())
 }
 
 mod approx {

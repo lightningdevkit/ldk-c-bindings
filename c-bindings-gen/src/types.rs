@@ -814,6 +814,7 @@ fn initial_clonable_types() -> HashSet<String> {
 	res.insert("crate::c_types::TxOut".to_owned());
 	res.insert("crate::c_types::Signature".to_owned());
 	res.insert("crate::c_types::RecoverableSignature".to_owned());
+	res.insert("crate::c_types::BigEndianScalar".to_owned());
 	res.insert("crate::c_types::Bech32Error".to_owned());
 	res.insert("crate::c_types::Secp256k1Error".to_owned());
 	res.insert("crate::c_types::IOError".to_owned());

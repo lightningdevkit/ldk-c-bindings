@@ -20,6 +20,7 @@ extern "C" {
 #include <thread>
 #include <mutex>
 #include <vector>
+#include <iostream>
 
 const uint8_t valid_node_announcement[] = {
 	0x94, 0xe4, 0xf5, 0x61, 0x41, 0x24, 0x7d, 0x90, 0x23, 0xa0, 0xc8, 0x34, 0x8c, 0xc4, 0xca, 0x51,
@@ -226,6 +227,7 @@ public:
 
 		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));
 
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting initial handshake completion..." << std::endl;
 		while (true) {
 			// Wait for the initial handshakes to complete...
 			LDK::CVec_C2Tuple_PublicKeyCOption_NetAddressZZZ peers_1 = PeerManager_get_peer_node_ids(&net1);
@@ -233,6 +235,7 @@ public:
 			if (peers_1->datalen == 1 && peers_2->datalen == 1) { break; }
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Initial handshake complete!" << std::endl;
 
 		// Connect twice, which should auto-disconnect, and is a good test of our disconnect pipeline
 		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));
@@ -242,6 +245,7 @@ public:
 		PeerManager_disconnect_by_node_id(&net1, ChannelManager_get_our_node_id(&cm2));
 		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));
 
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting new connection handshake..." << std::endl;
 		while (true) {
 			// Wait for the new connection handshake...
 			LDK::CVec_C2Tuple_PublicKeyCOption_NetAddressZZZ peers_1 = PeerManager_get_peer_node_ids(&net1);
@@ -249,8 +253,10 @@ public:
 			if (peers_1->datalen == 1 && peers_2->datalen == 1) { break; }
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "New connection handshake complete!" << std::endl;
 
 		// Wait for all our sockets to disconnect (making sure we disconnect any new connections)...
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting peer disconnection..." << std::endl;
 		while (true) {
 			PeerManager_disconnect_by_node_id(&net1, ChannelManager_get_our_node_id(&cm2));
 			// Wait for the peers to disconnect...
@@ -259,6 +265,7 @@ public:
 			if (peers_1->datalen == 0 && peers_2->datalen == 0) { break; }
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Peers disconnected!" << std::endl;
 		// Note that the above is somewhat race-y, as node 2 may still think its connected.
 		// Thus, make sure any connections are disconnected on its end as well.
 		PeerManager_disconnect_by_node_id(&net2, ChannelManager_get_our_node_id(&cm1));
@@ -266,6 +273,7 @@ public:
 		// Finally make an actual connection and keep it this time
 		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));
 
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting initial handshake completion..." << std::endl;
 		while (true) {
 			// Wait for the initial handshakes to complete...
 			LDK::CVec_C2Tuple_PublicKeyCOption_NetAddressZZZ peers_1 = PeerManager_get_peer_node_ids(&net1);
@@ -273,6 +281,7 @@ public:
 			if (peers_1->datalen == 1 && peers_2->datalen == 1) { break; }
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Initial handshake complete!" << std::endl;
 	}
 	void stop() {
 		interrupt_socket_handling(node1_handler);
@@ -354,6 +363,7 @@ public:
 		auto writelen = write(pipefds_1_to_2[1], con_res->contents.result->data, con_res->contents.result->datalen);
 		assert(writelen > 0 && uint64_t(writelen) == con_res->contents.result->datalen);
 
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting initial handshake completion..." << std::endl;
 		while (true) {
 			// Wait for the initial handshakes to complete...
 			LDK::CVec_C2Tuple_PublicKeyCOption_NetAddressZZZ peers_1 = PeerManager_get_peer_node_ids(&net1);
@@ -361,6 +371,7 @@ public:
 			if (peers_1->datalen == 1 && peers_2->datalen ==1) { break; }
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Initial handshake complete!" << std::endl;
 	}
 
 	void stop() {
@@ -644,6 +655,7 @@ int main() {
 		LDKPublicKey chan_open_pk = ChannelCounterparty_get_node_id(&new_channels_counterparty);
 		assert(!memcmp(chan_open_pk.compressed_form, ChannelManager_get_our_node_id(&cm2).compressed_form, 33));
 
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting first channel..." << std::endl;
 		while (true) {
 			LDK::CVec_ChannelDetailsZ new_channels_2 = ChannelManager_list_channels(&cm2);
 			if (new_channels_2->datalen == 1) {
@@ -655,8 +667,10 @@ int main() {
 			}
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "First channel listed!" << std::endl;
 
 		LDK::EventsProvider ev1 = ChannelManager_as_EventsProvider(&cm1);
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting FundingGenerationReady event..." << std::endl;
 		while (true) {
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
@@ -677,19 +691,23 @@ int main() {
 			}
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Received FundingGenerationReady event!" << std::endl;
 
 		// We observe when the funding signed messages have been exchanged by
 		// waiting for two monitors to be registered.
 		assert(num_txs_broadcasted == 0);
 		PeerManager_process_events(&net1);
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting transaction broadcast..." << std::endl;
 		while (num_txs_broadcasted != 1) {
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Transaction was broadcast!" << std::endl;
 
 		// Note that the channel ID is the same as the channel txid reversed as the output index is 0
 		uint8_t expected_chan_id[32];
 		for (int i = 0; i < 32; i++) { expected_chan_id[i] = channel_open_txid[31-i]; }
 
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting ChannelPending event..." << std::endl;
 		while (true) {
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
@@ -701,8 +719,10 @@ int main() {
 			}
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Received ChannelPending event!" << std::endl;
 
 		LDK::EventsProvider ev2 = ChannelManager_as_EventsProvider(&cm2);
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting ChannelPending event..." << std::endl;
 		while (true) {
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
@@ -714,6 +734,7 @@ int main() {
 			}
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Received ChannelPending event!" << std::endl;
 
 		LDK::Listen listener1 = ChannelManager_as_Listen(&cm1);
 		listener1->block_connected(listener1->this_arg, LDKu8slice { .data = channel_open_block, .datalen = sizeof(channel_open_block) }, 1);
@@ -742,6 +763,7 @@ int main() {
 		PeerManager_process_events(&net1);
 		PeerManager_process_events(&net2);
 
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting ChannelReady event..." << std::endl;
 		while (true) {
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
@@ -753,7 +775,9 @@ int main() {
 			}
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Received ChannelReady event!" << std::endl;
 
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting ChannelReady event..." << std::endl;
 		while (true) {
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
@@ -765,9 +789,11 @@ int main() {
 			}
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Received ChannelReady event!" << std::endl;
 
 		// Now send funds from 1 to 2!
 		uint64_t channel_scid;
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting usable channel..." << std::endl;
 		while (true) {
 			LDK::CVec_ChannelDetailsZ outbound_channels = ChannelManager_list_usable_channels(&cm1);
 			if (outbound_channels->datalen == 1) {
@@ -793,6 +819,7 @@ int main() {
 			}
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Listed usable channel!" << std::endl;
 
 		LDKCOption_u64Z min_value = {
 			.tag = LDKCOption_u64Z_Some,
@@ -843,11 +870,14 @@ int main() {
 
 		mons_updated = 0;
 		PeerManager_process_events(&net1);
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting 4 updated monitors..." << std::endl;
 		while (mons_updated != 4) {
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "4 monitors updated!" << std::endl;
 
 		// Check that we received the payment!
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting PendingHTLCsForwardable event..." << std::endl;
 		while (true) {
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
@@ -858,6 +888,7 @@ int main() {
 			}
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Received PendingHTLCsForwardable event!" << std::endl;
 		ChannelManager_process_pending_htlc_forwards(&cm2);
 		PeerManager_process_events(&net2);
 
@@ -886,14 +917,20 @@ int main() {
 		}
 		PeerManager_process_events(&net2);
 		// Wait until we've passed through a full set of monitor updates (ie new preimage + CS/RAA messages)
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting 5 updated monitors..." << std::endl;
 		while (mons_updated != 5) {
 			std::this_thread::yield();
 		}
+		std::cout << __FILE__ << ":" << __LINE__ << " - " << "5 monitors updated!" << std::endl;
 		{
 			EventQueue queue;
 			LDKEventHandler handler = { .this_arg = &queue, .handle_event = handle_event, .free = NULL };
-			while (queue.events.size() < 2)
+			std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting PaymentSent and PaymentPathSuccessful events..." << std::endl;
+			while (queue.events.size() < 2) {
 				ev1.process_pending_events(handler);
+				std::this_thread::yield();
+			}
+			std::cout << __FILE__ << ":" << __LINE__ << " - " << "Received PaymentSent and PaymentPathSuccessful events (presumably)!" << std::endl;
 			assert(queue.events.size() == 2);
 			assert(queue.events[0]->tag == LDKEvent_PaymentSent);
 			assert(!memcmp(queue.events[0]->payment_sent.payment_preimage.data, payment_preimage.data, 32));
@@ -1011,6 +1048,7 @@ int main() {
 
 	PeersConnection conn(cm1, cm2, net1, net2);
 
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting usable channel..." << std::endl;
 	while (true) {
 		// Wait for the channels to be considered up once the reestablish messages are processed
 		LDK::CVec_ChannelDetailsZ outbound_channels = ChannelManager_list_usable_channels(&cm1);
@@ -1019,6 +1057,7 @@ int main() {
 		}
 		std::this_thread::yield();
 	}
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Listed usable channel!" << std::endl;
 
 	// Send another payment, this time via the retires path
 	LDK::CResult_InvoiceSignOrCreationErrorZ invoice_res2 = create_invoice_from_channelmanager(&cm2,
@@ -1036,6 +1075,7 @@ int main() {
 	PeerManager_process_events(&net1);
 
 	// Check that we received the payment!
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting PendingHTLCsForwardable event..." << std::endl;
 	while (true) {
 		EventQueue queue2;
 		LDKEventHandler handler2 = { .this_arg = &queue2, .handle_event = handle_event, .free = NULL };
@@ -1047,9 +1087,11 @@ int main() {
 		}
 		std::this_thread::yield();
 	}
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Received PendingHTLCsForwardable event!" << std::endl;
 	ChannelManager_process_pending_htlc_forwards(&cm2);
 	PeerManager_process_events(&net2);
 
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting PaymentClaimable/PaymentClaimed event..." << std::endl;
 	while (true) {
 		EventQueue queue2;
 		LDKEventHandler handler2 = { .this_arg = &queue2, .handle_event = handle_event, .free = NULL };
@@ -1076,16 +1118,20 @@ int main() {
 		}
 		std::this_thread::yield();
 	}
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Received PaymentClaimable/PaymentClaimed event!" << std::endl;
 
 	EventQueue queue1;
 	LDKEventHandler handler1 = { .this_arg = &queue1, .handle_event = handle_event, .free = NULL };
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting PaymentSent and PaymentPathSuccessful events..." << std::endl;
 	while (queue1.events.size() < 2) {
 		PeerManager_process_events(&net2);
 		PeerManager_process_events(&net1);
 
 		LDK::EventsProvider ev1 = ChannelManager_as_EventsProvider(&cm1);
 		ev1.process_pending_events(handler1);
+		std::this_thread::yield();
 	}
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Received PaymentSent and PaymentPathSuccessful events (presumably)!" << std::endl;
 	assert(queue1.events.size() == 2);
 	assert(queue1.events[0]->tag == LDKEvent_PaymentSent);
 	assert(queue1.events[1]->tag == LDKEvent_PaymentPathSuccessful);
@@ -1095,9 +1141,11 @@ int main() {
 	close_res = ChannelManager_close_channel(&cm1, &chan_id, ChannelManager_get_our_node_id(&cm2));
 	assert(close_res->result_ok);
 	PeerManager_process_events(&net1);
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting 2 transaction broadcasts..." << std::endl;
 	while (num_txs_broadcasted != 2) {
 		std::this_thread::yield();
 	}
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Broadcast 2 transactions!" << std::endl;
 	LDK::CVec_ChannelDetailsZ chans_after_close1 = ChannelManager_list_channels(&cm1);
 	assert(chans_after_close1->datalen == 0);
 	LDK::CVec_ChannelDetailsZ chans_after_close2 = ChannelManager_list_channels(&cm2);
@@ -1112,11 +1160,13 @@ int main() {
 			}, LDKBlindedPath { .inner = NULL, .is_owned = true })
 		.result_ok);
 	PeerManager_process_events(&net1);
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting onion message..." << std::endl;
 	while (true) {
 		std::this_thread::yield();
 		std::unique_lock<std::mutex> lck(peer_2_custom_onion_messages.mtx);
 		if (peer_2_custom_onion_messages.msgs.size() != 0) break;
 	}
+	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Received onion message!" << std::endl;
 
 	conn.stop();
 

@@ -7826,6 +7826,7 @@ impl Clone for CResult_PublicKeyNoneZ {
 /// but with all dynamically-allocated buffers duplicated in new buffers.
 pub extern "C" fn CResult_PublicKeyNoneZ_clone(orig: &CResult_PublicKeyNoneZ) -> CResult_PublicKeyNoneZ { Clone::clone(&orig) }
 #[repr(C)]
+#[derive(Clone)]
 /// An enum which can either contain a crate::c_types::BigEndianScalar or not
 pub enum COption_ScalarZ {
 	/// When we're in this state, this COption_ScalarZ contains a crate::c_types::BigEndianScalar
@@ -7857,6 +7858,10 @@ pub extern "C" fn COption_ScalarZ_none() -> COption_ScalarZ {
 #[no_mangle]
 /// Frees any resources associated with the crate::c_types::BigEndianScalar, if we are in the Some state
 pub extern "C" fn COption_ScalarZ_free(_res: COption_ScalarZ) { }
+#[no_mangle]
+/// Creates a new COption_ScalarZ which has the same data as `orig`
+/// but with all dynamically-allocated buffers duplicated in new buffers.
+pub extern "C" fn COption_ScalarZ_clone(orig: &COption_ScalarZ) -> COption_ScalarZ { Clone::clone(&orig) }
 #[repr(C)]
 /// The contents of CResult_SharedSecretNoneZ
 pub union CResult_SharedSecretNoneZPtr {

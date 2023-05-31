@@ -18325,6 +18325,12 @@ struct LDKCOption_ScalarZ COption_ScalarZ_none(void);
 void COption_ScalarZ_free(struct LDKCOption_ScalarZ _res);
 
 /**
+ * Creates a new COption_ScalarZ which has the same data as `orig`
+ * but with all dynamically-allocated buffers duplicated in new buffers.
+ */
+struct LDKCOption_ScalarZ COption_ScalarZ_clone(const struct LDKCOption_ScalarZ *NONNULL_PTR orig);
+
+/**
  * Creates a new CResult_SharedSecretNoneZ in the success state.
  */
 struct LDKCResult_SharedSecretNoneZ CResult_SharedSecretNoneZ_ok(struct LDKThirtyTwoBytes o);

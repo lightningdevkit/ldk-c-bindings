@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # We want to use rustc's -C linker-plugin-lto, but it passes several arguments
 # that are not understood by OSX clang/ld64.lld. Specifically, it passes
 # -plugin-opt* arguments to set optimization levels, which are not supported.

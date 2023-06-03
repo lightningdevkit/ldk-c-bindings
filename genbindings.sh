@@ -450,8 +450,8 @@ if [ "$CLANG" != "" -a "$CLANGPP" = "" ]; then
 	echo "You should create a symlink called clang++-$RUSTC_LLVM_V pointing to $CLANG in $(dirname $CLANG)"
 fi
 
-# Finally, if we're on OSX or on Linux, build the final debug binary with address sanitizer (and leave it there)
-if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "x86_64-apple-darwin" ]; then
+# Finally, if we're on Linux, build the final debug binary with address sanitizer (and leave it there)
+if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" ]; then
 	if [ "$CLANGPP" != "" ]; then
 		if is_gnu_sed; then
 			sed -i.bk 's/,"cdylib"]/]/g' Cargo.toml
@@ -460,9 +460,6 @@ if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "x86_64
 			sed -i .bk 's/,"cdylib"]/]/g' Cargo.toml
 		fi
 
-		if [ "$CFLAGS_aarch64_apple_darwin" != "" -a "$HOST_OSX" = "true" ]; then
-			RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" RUSTC_BOOTSTRAP=1 cargo rustc $CARGO_BUILD_ARGS --target aarch64-apple-darwin -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
-		fi
 		RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" RUSTC_BOOTSTRAP=1 cargo rustc $CARGO_BUILD_ARGS -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
 		mv Cargo.toml.bk Cargo.toml
 
@@ -484,7 +481,7 @@ if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "x86_64
 		echo "WARNING: Please install clang-$RUSTC_LLVM_V and clang++-$RUSTC_LLVM_V to build with address sanitizer"
 	fi
 else
-	echo "WARNING: Can't use address sanitizer on non-Linux, non-OSX non-x86 platforms"
+	echo "WARNING: Can't use address sanitizer on non-Linux, non-x86 platforms"
 fi
 
 # Now build with LTO on on both C++ and rust, but without cross-language LTO:

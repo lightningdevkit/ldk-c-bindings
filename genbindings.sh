@@ -53,14 +53,20 @@ fi
 
 BASE_HOST_CFLAGS="$BASE_CFLAGS"
 
-if [ "$HOST_OSX" = "true" ]; then
+if [ "$MACOS_SDK" = "" -a "$HOST_OSX" = "true" ]; then
+	MACOS_SDK="$(xcrun --show-sdk-path)"
+	[ "$MACOS_SDK" = "" ] && exit 1
+fi
+
+if [ "$MACOS_SDK" != "" ]; then
 	export MACOSX_DEPLOYMENT_TARGET=10.9
-	LOCAL_CFLAGS="$LOCAL_CFLAGS --target=$HOST_PLATFORM -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
-	BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS --target=$HOST_PLATFORM -isysroot$(xcrun --show-sdk-path) -mmacosx-version-min=10.9"
-	# Targeting aarch64 appears to be supported only starting with Big Sur, so check it before use
-	clang -o /dev/null $BASE_HOST_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14 genbindings_path_map_test_file.c &&
-	export CFLAGS_aarch64_apple_darwin="$BASE_HOST_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14" ||
-	echo "WARNING: Can not build targeting aarch64-apple-darin. Upgrade to Big Sur or try upstream clang"
+	BASE_HOST_OSX_CFLAGS="$BASE_HOST_CFLAGS -isysroot$MACOS_SDK -mmacosx-version-min=10.9"
+	export CFLAGS_aarch64_apple_darwin="$BASE_HOST_OSX_CFLAGS --target=aarch64-apple-darwin -mcpu=apple-a14"
+	export CFLAGS_x86_64_apple_darwin="$BASE_HOST_OSX_CFLAGS --target=x86_64-apple-darwin -march=sandybridge -mtune=sandybridge"
+	if [ "$HOST_OSX" = "true" ]; then
+		LOCAL_CFLAGS="$LOCAL_CFLAGS --target=$HOST_PLATFORM -isysroot$MACOS_SDK -mmacosx-version-min=10.9"
+		BASE_HOST_CFLAGS="$BASE_HOST_OSX_CFLAGS --target=$HOST_PLATFORM"
+	fi
 fi
 
 rm genbindings_path_map_test_file.c
@@ -214,7 +220,7 @@ EOF
 cd lightning-c-bindings
 
 RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" cargo build $CARGO_BUILD_ARGS
-if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
+if [ "$CFLAGS_aarch64_apple_darwin" != "" -a "$HOST_OSX" = "true" ]; then
 	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" cargo build $CARGO_BUILD_ARGS --target aarch64-apple-darwin
 fi
 cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1
@@ -454,7 +460,7 @@ if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" -o "$HOST_PLATFORM" = "x86_64
 			sed -i .bk 's/,"cdylib"]/]/g' Cargo.toml
 		fi
 
-		if [ "$CFLAGS_aarch64_apple_darwin" != "" ]; then
+		if [ "$CFLAGS_aarch64_apple_darwin" != "" -a "$HOST_OSX" = "true" ]; then
 			RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" RUSTC_BOOTSTRAP=1 cargo rustc $CARGO_BUILD_ARGS --target aarch64-apple-darwin -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
 		fi
 		RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" RUSTC_BOOTSTRAP=1 cargo rustc $CARGO_BUILD_ARGS -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
@@ -541,18 +547,27 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 	# packaging than simply shipping the rustup binaries (eg Debian should Just Work
 	# here).
 	LINK_ARG_FLAGS="-C link-arg=-fuse-ld=$LLD"
-	if [ "$HOST_OSX" = "true" ]; then
-		export LDK_CLANG_PATH=$(which $CLANG)
+	export LDK_CLANG_PATH=$(which $CLANG)
+	if [ "$MACOS_SDK" != "" ]; then
 		export CLANG="$(pwd)/../deterministic-build-wrappers/clang-lto-link-osx"
-		for ARG in "CFLAGS_aarch64_apple_darwin"; do
+		for ARG in $CFLAGS_aarch64_apple_darwin; do
 			MANUAL_LINK_CFLAGS="$MANUAL_LINK_CFLAGS -C link-arg=$ARG"
 		done
 		export CFLAGS_aarch64_apple_darwin="$CFLAGS_aarch64_apple_darwin -O3 -fPIC -fembed-bitcode"
-		LINK_ARG_FLAGS="$LINK_ARG_FLAGS -C link-arg="-isysroot$(xcrun --show-sdk-path)" -C link-arg=-mmacosx-version-min=10.9"
-		RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14 -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-mcpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin
+		RUSTC_BOOTSTRAP=1 RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14 -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $MANUAL_LINK_CFLAGS $LINK_ARG_FLAGS -C link-arg=-mcpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin -Zbuild-std=std,panic_abort
+		if [ "$HOST_OSX" != "true" ]; then
+			# If we're not on OSX but can build OSX binaries, build the x86_64 OSX release now
+			MANUAL_LINK_CFLAGS=""
+			for ARG in $CFLAGS_x86_64_apple_darwin; do
+				MANUAL_LINK_CFLAGS="$MANUAL_LINK_CFLAGS -C link-arg=$ARG"
+			done
+			export CFLAGS_x86_64_apple_darwin="$CFLAGS_x86_64_apple_darwin -O3 -fPIC -fembed-bitcode"
+			RUSTC_BOOTSTRAP=1 RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $MANUAL_LINK_CFLAGS $LINK_ARG_FLAGS -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target x86_64-apple-darwin -Zbuild-std=std,panic_abort
+		fi
 	fi
 	# If we're on an M1 don't bother building X86 binaries
 	if [ "$HOST_PLATFORM" != "aarch64-apple-darwin" ]; then
+		[ "$HOST_OSX" != "true" ] && export CLANG="$LDK_CLANG_PATH"
 		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -O3 -fPIC -fembed-bitcode"
 		# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 		cargo clean --release

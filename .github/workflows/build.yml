@@ -15,7 +15,7 @@ jobs:
         run: |
           apt-get update
           apt-get -y dist-upgrade
-          apt-get -y install cargo libstd-rust-dev-wasm32 valgrind lld git g++ clang
+          apt-get -y install cargo libstd-rust-dev-wasm32 valgrind lld git g++ clang wget
       - name: Checkout source code
         uses: actions/checkout@v2
         with:
@@ -58,12 +58,61 @@ jobs:
             git diff --exit-code
           fi
 
+  check_macos:
+    runs-on: ubuntu-latest
+    # Ubuntu's version of rustc uses its own LLVM instead of being a real native package.
+    # This leaves us with an incompatible LLVM version when linking. Instead, use a real OS.
+    container: debian:bookworm
+    env:
+      TOOLCHAIN: stable
+    steps:
+      - name: Install native Rust toolchain, Valgrind, and build utilitis
+        run: |
+          apt-get update
+          apt-get -y dist-upgrade
+          apt-get -y install cargo libstd-rust-dev-wasm32 valgrind lld git g++ clang wget rust-src
+      - name: Checkout source code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Sanity test bindings against Cargo.toml RL
+        working-directory: lightning-c-bindings
+        run: |
+          # Note that the version tags aren't checked into git
+          touch src/version.rs
+          RUSTFLAGS="--cfg=c_bindings" cargo check --features std
+      - name: Install cbindgen
+        run: |
+          git clone https://github.com/eqrion/cbindgen
+          cd cbindgen/
+          git checkout v0.20.0
+          cargo update -p indexmap --precise "1.6.2" --verbose
+          cargo install --locked --path .
+      - name: Checkout Rust-Lightning git
+        run: |
+          git clone https://github.com/rust-bitcoin/rust-lightning
+          cd rust-lightning
+          git checkout 0.0.115-bindings
+      - name: Fix Github Actions to not be broken
+        run: git config --global --add safe.directory /__w/ldk-c-bindings/ldk-c-bindings
+      - name: Fetch MacOS SDK
+        run: |
+          wget https://bitcoincore.org/depends-sources/sdks/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz
+          tar xvvf Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz
+      - name: Rebuild bindings, and check the sample app builds + links
+        run: |
+          # rust-src doesn't distribute the rustlib Cargo.lock, but an empty
+          # file seems to suffice to make `-Zbuild-std` happy.
+          touch /usr/lib/rustlib/src/rust/Cargo.lock
+          MACOS_SDK="$PWD/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers" ./genbindings.sh ./rust-lightning true
+
   osx:
     strategy:
       matrix:
         include:
-          - platform: macos-10.15
           - platform: macos-11
+          - platform: macos-12
+          - platform: macos-13
     runs-on: ${{ matrix.platform }}
     env:
       TOOLCHAIN: stable

@@ -1455,7 +1455,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 	fn empty_val_check_suffix_from_path(&self, full_path: &str) -> Option<&str> {
 		match full_path {
-			"lightning::ln::PaymentSecret" => Some(".data == [0; 32]"),
 			"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => Some(".is_null()"),
 			"bitcoin::secp256k1::ecdsa::Signature" => Some(".is_null()"),
 			_ => None
@@ -1535,11 +1534,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						// clear for users. Thus, we default to false but override for a few
 						// types which had mappings defined when we were avoiding the `Option_`s.
 						match &resolved as &str {
-							"lightning::ln::PaymentSecret" => true,
-							"lightning::ln::PaymentHash" => true,
-							"lightning::ln::PaymentPreimage" => true,
-							"lightning::ln::channelmanager::PaymentId" => true,
-							"bitcoin::hash_types::BlockHash"|"bitcoin::BlockHash" => true,
 							"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => true,
 							_ => false,
 						}
@@ -1996,19 +1990,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 
-	fn is_real_type_array(&self, resolved_type: &str) -> Option<syn::Type> {
-		if let Some(real_ty) = self.c_type_from_path(&resolved_type, true, false) {
-			if real_ty.ends_with("]") && real_ty.starts_with("*const [u8; ") {
-				let mut split = real_ty.split("; ");
-				split.next().unwrap();
-				let tail_str = split.next().unwrap();
-				assert!(split.next().is_none());
-				let len = usize::from_str_radix(&tail_str[..tail_str.len() - 1], 10).unwrap();
-				Some(parse_quote!([u8; #len]))
-			} else { None }
-		} else { None }
-	}
-
 	/// Prints a suffix to determine if a variable is empty (ie was set by write_empty_rust_val).
 	/// See EmptyValExpectedTy for information on return types.
 	fn write_empty_rust_val_check_suffix<W: std::io::Write>(&self, generics: Option<&GenericTypes>, w: &mut W, t: &syn::Type) -> EmptyValExpectedTy {
@@ -2018,9 +1999,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			},
 			syn::Type::Path(p) => {
 				let resolved = self.resolve_path(&p.path, generics);
-				if let Some(arr_ty) = self.is_real_type_array(&resolved) {
-					return self.write_empty_rust_val_check_suffix(generics, w, &arr_ty);
-				}
 				if self.crate_types.opaques.get(&resolved).is_some() {
 					write!(w, ".inner.is_null()").unwrap();
 					EmptyValExpectedTy::NonPointer
@@ -2810,12 +2788,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 								if self.c_type_has_inner_from_path(&subtype) {
 									if !self.write_c_path_intern(w, &$p_arg.path, generics, is_ref, is_mut, ptr_for_ref, false, true) { return false; }
 								} else {
-									if let Some(arr_ty) = self.is_real_type_array(&subtype) {
-										if !self.write_c_type_intern(w, &arr_ty, generics, false, true, false, false, true) { return false; }
-									} else {
-										// Option<T> needs to be converted to a *mut T, ie mut ptr-for-ref
-										if !self.write_c_path_intern(w, &$p_arg.path, generics, true, true, true, false, true) { return false; }
-									}
+									// Option<T> needs to be converted to a *mut T, ie mut ptr-for-ref
+									if !self.write_c_path_intern(w, &$p_arg.path, generics, true, true, true, false, true) { return false; }
 								}
 							} else {
 								write!(w, "{}", $p_arg.path.segments.last().unwrap().ident).unwrap();

@@ -366,9 +366,6 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						writeln!(extra_headers, "struct LDK{};", trait_name).unwrap();
 						continue;
 					}
-					// Sadly, this currently doesn't do what we want, but it should be easy to get
-					// cbindgen to support it. See https://github.com/eqrion/cbindgen/issues/531
-					writeln!(w, "\t#[must_use]").unwrap();
 				}
 
 				let mut cpp_docs = Vec::new();

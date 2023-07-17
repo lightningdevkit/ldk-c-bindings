@@ -2200,9 +2200,13 @@ fn walk_private_mod<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, modul
 					if let Some(trait_path) = i.trait_.as_ref() {
 						if let Some(tp) = import_resolver.maybe_resolve_path(&trait_path.1, None) {
 							if let Some(sp) = import_resolver.maybe_resolve_path(&p.path, None) {
-								match crate_types.trait_impls.entry(sp) {
-									hash_map::Entry::Occupied(mut e) => { e.get_mut().push(tp); },
-									hash_map::Entry::Vacant(e) => { e.insert(vec![tp]); },
+								match crate_types.trait_impls.entry(sp.clone()) {
+									hash_map::Entry::Occupied(mut e) => { e.get_mut().push(tp.clone()); },
+									hash_map::Entry::Vacant(e) => { e.insert(vec![tp.clone()]); },
+								}
+								match crate_types.traits_impld.entry(tp) {
+									hash_map::Entry::Occupied(mut e) => { e.get_mut().push(sp); },
+									hash_map::Entry::Vacant(e) => { e.insert(vec![sp]); },
 								}
 							}
 						}
@@ -2312,9 +2316,13 @@ fn walk_ast_first_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut Cr
 							}
 							if let Some(tp) = import_resolver.maybe_resolve_path(&trait_path.1, None) {
 								if let Some(sp) = import_resolver.maybe_resolve_path(&p.path, None) {
-									match crate_types.trait_impls.entry(sp) {
-										hash_map::Entry::Occupied(mut e) => { e.get_mut().push(tp); },
-										hash_map::Entry::Vacant(e) => { e.insert(vec![tp]); },
+									match crate_types.trait_impls.entry(sp.clone()) {
+										hash_map::Entry::Occupied(mut e) => { e.get_mut().push(tp.clone()); },
+										hash_map::Entry::Vacant(e) => { e.insert(vec![tp.clone()]); },
+									}
+									match crate_types.traits_impld.entry(tp) {
+										hash_map::Entry::Occupied(mut e) => { e.get_mut().push(sp); },
+										hash_map::Entry::Vacant(e) => { e.insert(vec![sp]); },
 									}
 								}
 							}

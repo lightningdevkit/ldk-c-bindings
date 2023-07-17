@@ -864,6 +864,8 @@ pub struct CrateTypes<'a> {
 	clonable_types: RefCell<HashSet<String>>,
 	/// Key impls Value
 	pub trait_impls: HashMap<String, Vec<String>>,
+	/// Value impls Key
+	pub traits_impld: HashMap<String, Vec<String>>,
 	/// The full set of modules in the crate(s)
 	pub lib_ast: &'a FullLibraryAST,
 }
@@ -874,7 +876,8 @@ impl<'a> CrateTypes<'a> {
 			opaques: HashMap::new(), mirrored_enums: HashMap::new(), traits: HashMap::new(),
 			type_aliases: HashMap::new(), reverse_alias_map: HashMap::new(),
 			templates_defined: RefCell::new(HashMap::default()), priv_structs: HashMap::new(),
-			clonable_types: RefCell::new(initial_clonable_types()), trait_impls: HashMap::new(),
+			clonable_types: RefCell::new(initial_clonable_types()),
+			trait_impls: HashMap::new(), traits_impld: HashMap::new(),
 			template_file: RefCell::new(template_file), lib_ast: &libast,
 		}
 	}
@@ -2131,7 +2134,19 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					if let Some(decl_type) = self.types.maybe_resolve_declared(ident) {
 						decl_lookup(w, decl_type, &self.maybe_resolve_ident(ident).unwrap(), is_ref, is_mut);
 					} else { unimplemented!(); }
-				} else { unimplemented!(); }
+				} else {
+					if let Some(trait_impls) = self.crate_types.traits_impld.get(&resolved_path) {
+						if trait_impls.len() == 1 {
+							// If this is a no-export'd crate and there's only one implementation
+							// in the whole crate, just treat it as a reference to whatever the
+							// implementor is.
+							let implementor = self.crate_types.opaques.get(&trait_impls[0]).unwrap();
+							decl_lookup(w, &DeclType::StructImported { generics: &implementor.1 }, &trait_impls[0], true, is_mut);
+							return;
+						}
+					}
+					unimplemented!();
+				}
 			},
 			syn::Type::Array(a) => {
 				if let syn::Type::Path(p) = &*a.elem {
@@ -2969,6 +2984,18 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			}
 			true
 		} else {
+			if let Some(trait_impls) = self.crate_types.traits_impld.get(&full_path) {
+				if trait_impls.len() == 1 {
+					// If this is a no-export'd crate and there's only one implementation in the
+					// whole crate, just treat it as a reference to whatever the implementor is.
+					if with_ref_lifetime {
+						write!(w, "&'static crate::{}", trait_impls[0]).unwrap();
+					} else {
+						write!(w, "&crate::{}", trait_impls[0]).unwrap();
+					}
+					return true;
+				}
+			}
 			false
 		}
 	}

@@ -215,7 +215,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 					'bound_loop: for bound in type_param.bounds.iter() {
 						if let syn::TypeParamBound::Trait(trait_bound) = bound {
 							if let Some(ident) = single_ident_generic_path_to_ident(&trait_bound.path) {
-								match &format!("{}", ident) as &str { "Send" => continue, "Sync" => continue, _ => {} }
+								match &format!("{}", ident) as &str { "Send" => continue, "Sync" => continue, "Sized" => continue, _ => {} }
 							}
 							if path_matches_nongeneric(&trait_bound.path, &["core", "clone", "Clone"]) { continue; }
 
@@ -352,7 +352,12 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 									}
 								} else { unimplemented!(); }
 								for bound in bounds_iter {
-									if let syn::TypeParamBound::Trait(_) = bound { unimplemented!(); }
+									if let syn::TypeParamBound::Trait(t) = bound {
+										// We only allow for `?Sized` here.
+										if let syn::TraitBoundModifier::Maybe(_) = t.modifier {} else { panic!(); }
+										assert_eq!(t.path.segments.len(), 1);
+										assert_eq!(format!("{}", t.path.segments[0].ident), "Sized");
+									}
 								}
 								break;
 							},

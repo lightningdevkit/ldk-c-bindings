@@ -474,9 +474,12 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 					let crate_name_ident = format_ident!("{}", crate_name);
 					path.push(parse_quote!(#crate_name_ident));
 				} else if partial_path == "" && !dependencies.contains(&$ident) {
-					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
-					let crate_name_ident = format_ident!("{}", crate_name);
-					path.push(parse_quote!(#crate_name_ident));
+					new_path = format!("{}::{}{}", module_path, $ident, $path_suffix);
+					for module in module_path.split("::") {
+						path.push(syn::PathSegment { ident: syn::Ident::new(module, Span::call_site()), arguments: syn::PathArguments::None });
+					}
+					let ident_str = format_ident!("{}", $ident);
+					path.push(parse_quote!(#ident_str));
 				} else if format!("{}", $ident) == "self" {
 					let mut path_iter = partial_path.rsplitn(2, "::");
 					path_iter.next().unwrap();

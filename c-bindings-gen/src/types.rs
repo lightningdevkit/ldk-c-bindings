@@ -594,13 +594,8 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 					}
 				},
 				syn::Item::Trait(t) => {
-					match export_status(&t.attrs) {
-						ExportStatus::Export|ExportStatus::NotImplementable => {
-							if let syn::Visibility::Public(_) = t.vis {
-								declared.insert(t.ident.clone(), DeclType::Trait(t));
-							}
-						},
-						_ => continue,
+					if let syn::Visibility::Public(_) = t.vis {
+						declared.insert(t.ident.clone(), DeclType::Trait(t));
 					}
 				},
 				syn::Item::Mod(m) => {

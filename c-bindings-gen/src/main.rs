@@ -73,7 +73,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 			let mut for_obj_vec = Vec::new();
 			types.write_c_type(&mut for_obj_vec, for_ty, Some(generics), false);
 			full_obj_path = String::from_utf8(for_obj_vec).unwrap();
-			assert!(full_obj_path.starts_with(TypeResolver::generated_container_path()));
+			if !full_obj_path.starts_with(TypeResolver::generated_container_path()) { return; }
 			for_obj = full_obj_path[TypeResolver::generated_container_path().len() + 2..].into();
 		}
 
@@ -945,9 +945,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 				if i.defaultness.is_some() || i.unsafety.is_some() { unimplemented!(); }
 				if let Some(trait_path) = i.trait_.as_ref() {
 					if trait_path.0.is_some() { unimplemented!(); }
-					if types.understood_c_path(&trait_path.1) {
-						let full_trait_path = types.resolve_path(&trait_path.1, None);
-						let trait_obj = *types.crate_types.traits.get(&full_trait_path).unwrap();
+					let full_trait_path_opt = types.maybe_resolve_path(&trait_path.1, None);
+					let trait_obj_opt = full_trait_path_opt.as_ref().and_then(|path| types.crate_types.traits.get(path));
+					if types.understood_c_path(&trait_path.1) && trait_obj_opt.is_some() {
+						let full_trait_path = full_trait_path_opt.unwrap();
+						let trait_obj = *trait_obj_opt.unwrap();
 
 						let supertrait_name;
 						let supertrait_resolver;

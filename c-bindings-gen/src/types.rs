@@ -548,6 +548,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		// Add primitives to the "imports" list:
 		Self::insert_primitive(&mut imports, "bool");
 		Self::insert_primitive(&mut imports, "u128");
+		Self::insert_primitive(&mut imports, "i64");
 		Self::insert_primitive(&mut imports, "u64");
 		Self::insert_primitive(&mut imports, "u32");
 		Self::insert_primitive(&mut imports, "u16");
@@ -814,6 +815,7 @@ fn initial_clonable_types() -> HashSet<String> {
 	res.insert("crate::c_types::Transaction".to_owned());
 	res.insert("crate::c_types::Witness".to_owned());
 	res.insert("crate::c_types::WitnessVersion".to_owned());
+	res.insert("crate::c_types::TxIn".to_owned());
 	res.insert("crate::c_types::TxOut".to_owned());
 	res.insert("crate::c_types::Signature".to_owned());
 	res.insert("crate::c_types::RecoverableSignature".to_owned());
@@ -948,6 +950,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	pub fn is_primitive(&self, full_path: &str) -> bool {
 		match full_path {
 			"bool" => true,
+			"i64" => true,
 			"u64" => true,
 			"u32" => true,
 			"u16" => true,
@@ -1011,20 +1014,26 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature"),
 			"bitcoin::secp256k1::SecretKey" if is_ref  => Some("*const [u8; 32]"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey"),
+			"bitcoin::secp256k1::KeyPair" if !is_ref => Some("crate::c_types::SecretKey"),
 			"bitcoin::secp256k1::Scalar" if is_ref  => Some("*const crate::c_types::BigEndianScalar"),
 			"bitcoin::secp256k1::Scalar" if !is_ref => Some("crate::c_types::BigEndianScalar"),
 			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 
-			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
-			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if is_ref => Some("crate::c_types::u8slice"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction"),
 			"bitcoin::Witness" => Some("crate::c_types::Witness"),
-			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut"),
+			"bitcoin::TxIn"|"bitcoin::blockdata::transaction::TxIn" if !is_ref => Some("crate::c_types::TxIn"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" => Some("crate::c_types::TxOut"),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network"),
 			"bitcoin::util::address::WitnessVersion" => Some("crate::c_types::WitnessVersion"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref  => Some("*const [u8; 80]"),
 			"bitcoin::blockdata::block::Block" if is_ref  => Some("crate::c_types::u8slice"),
+
+			"bitcoin::PackedLockTime"|"bitcoin::blockdata::locktime::PackedLockTime" => Some("u32"),
+
+			"bitcoin::psbt::PartiallySignedTransaction" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 
 			"bitcoin::PubkeyHash"|"bitcoin::hash_types::PubkeyHash"|
 			"bitcoin::hash_types::WPubkeyHash"|
@@ -1045,11 +1054,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if is_ref => Some("*const [u8; 32]"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice"),
@@ -1111,22 +1120,28 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(""),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some("&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(""),
+			"bitcoin::secp256k1::KeyPair" if !is_ref => Some("::bitcoin::secp256k1::KeyPair::new("),
 			"bitcoin::secp256k1::Scalar" if is_ref => Some("&"),
 			"bitcoin::secp256k1::Scalar" if !is_ref => Some(""),
 			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("::bitcoin::secp256k1::ecdh::SharedSecret::from_bytes("),
 
-			"bitcoin::blockdata::script::Script" if is_ref => Some("&::bitcoin::blockdata::script::Script::from(Vec::from("),
-			"bitcoin::blockdata::script::Script" if !is_ref => Some("::bitcoin::blockdata::script::Script::from("),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if is_ref => Some("&::bitcoin::blockdata::script::Script::from(Vec::from("),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if !is_ref => Some("::bitcoin::blockdata::script::Script::from("),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("&"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(""),
 			"bitcoin::Witness" if is_ref => Some("&"),
 			"bitcoin::Witness" => Some(""),
 			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::C_to_bitcoin_outpoint("),
+			"bitcoin::TxIn"|"bitcoin::blockdata::transaction::TxIn" if !is_ref => Some(""),
 			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(""),
 			"bitcoin::network::constants::Network" => Some(""),
 			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" => Some("&::bitcoin::consensus::encode::deserialize(unsafe { &*"),
 			"bitcoin::blockdata::block::Block" if is_ref => Some("&::bitcoin::consensus::encode::deserialize("),
+
+			"bitcoin::PackedLockTime"|"bitcoin::blockdata::locktime::PackedLockTime" => Some("::bitcoin::PackedLockTime("),
+
+			"bitcoin::psbt::PartiallySignedTransaction" if !is_ref => Some("::bitcoin::consensus::encode::deserialize("),
 
 			"bitcoin::PubkeyHash"|"bitcoin::hash_types::PubkeyHash" if !is_ref =>
 				Some("bitcoin::hash_types::PubkeyHash::from_hash(bitcoin::hashes::Hash::from_inner("),
@@ -1155,8 +1170,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::channelmanager::PaymentId" if is_ref=> Some("&::lightning::ln::channelmanager::PaymentId( unsafe { *"),
 			"lightning::ln::channelmanager::InterceptId" if !is_ref => Some("::lightning::ln::channelmanager::InterceptId("),
 			"lightning::ln::channelmanager::InterceptId" if is_ref=> Some("&::lightning::ln::channelmanager::InterceptId( unsafe { *"),
-			"lightning::chain::keysinterface::KeyMaterial" if !is_ref => Some("::lightning::chain::keysinterface::KeyMaterial("),
-			"lightning::chain::keysinterface::KeyMaterial" if is_ref=> Some("&::lightning::chain::keysinterface::KeyMaterial( unsafe { *"),
+			"lightning::sign::KeyMaterial" if !is_ref => Some("::lightning::sign::KeyMaterial("),
+			"lightning::sign::KeyMaterial" if is_ref=> Some("&::lightning::sign::KeyMaterial( unsafe { *"),
+			"lightning::chain::ClaimId" if !is_ref => Some("::lightning::chain::ClaimId("),
+			"lightning::chain::ClaimId" if is_ref=> Some("&::lightning::chain::ClaimId( unsafe { *"),
 
 			// List of traits we map (possibly during processing of other files):
 			"lightning::io::Read" => Some("&mut "),
@@ -1210,19 +1227,25 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(".into_rust()"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(".into_rust()"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some("}[..]).unwrap()"),
+			"bitcoin::secp256k1::KeyPair" if !is_ref => Some(".into_rust())"),
 			"bitcoin::secp256k1::Scalar" => Some(".into_rust()"),
 			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some(".data)"),
 
-			"bitcoin::blockdata::script::Script" if is_ref => Some(".to_slice()))"),
-			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_rust())"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if is_ref => Some(".to_slice()))"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if !is_ref => Some(".into_rust())"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(".into_bitcoin()"),
 			"bitcoin::Witness" => Some(".into_bitcoin()"),
 			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
+			"bitcoin::TxIn"|"bitcoin::blockdata::transaction::TxIn" if !is_ref => Some(".into_rust()"),
 			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(".into_rust()"),
 			"bitcoin::network::constants::Network" => Some(".into_bitcoin()"),
 			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" => Some(" }).unwrap()"),
 			"bitcoin::blockdata::block::Block" => Some(".to_slice()).unwrap()"),
+
+			"bitcoin::PackedLockTime"|"bitcoin::blockdata::locktime::PackedLockTime" => Some(")"),
+
+			"bitcoin::psbt::PartiallySignedTransaction" if !is_ref => Some(".as_slice()).expect(\"Invalid PSBT format\")"),
 
 			"bitcoin::PubkeyHash"|"bitcoin::hash_types::PubkeyHash"|
 			"bitcoin::hash_types::WPubkeyHash"|"bitcoin::hash_types::WScriptHash"|
@@ -1240,11 +1263,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::constants::ChainHash" if !is_ref => Some(".data[..])"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if !is_ref => Some(".data)"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if is_ref => Some(" })"),
 
 			// List of traits we map (possibly during processing of other files):
@@ -1319,21 +1342,29 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature::from_rust(&"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some(""),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
+			"bitcoin::secp256k1::KeyPair" if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
 			"bitcoin::secp256k1::Scalar" if !is_ref => Some("crate::c_types::BigEndianScalar::from_rust(&"),
 			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
-			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
-			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if !is_ref => Some(""),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction::from_bitcoin(&"),
 			"bitcoin::Witness" if is_ref => Some("crate::c_types::Witness::from_bitcoin("),
 			"bitcoin::Witness" if !is_ref => Some("crate::c_types::Witness::from_bitcoin(&"),
-			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::bitcoin_to_C_outpoint("),
-			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
+			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" if is_ref => Some("crate::c_types::bitcoin_to_C_outpoint("),
+			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" if !is_ref => Some("crate::c_types::bitcoin_to_C_outpoint(&"),
+			"bitcoin::TxIn"|"bitcoin::blockdata::transaction::TxIn" if !is_ref => Some("crate::c_types::TxIn::from_rust(&"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust(&"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if is_ref => Some("crate::c_types::TxOut::from_rust("),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network::from_bitcoin("),
 			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some("&local_"),
 			"bitcoin::blockdata::block::Block" if is_ref => Some("crate::c_types::u8slice::from_slice(&local_"),
+
+			"bitcoin::PackedLockTime"|"bitcoin::blockdata::locktime::PackedLockTime" => Some(""),
+
+			"bitcoin::psbt::PartiallySignedTransaction" if !is_ref => Some("::bitcoin::consensus::encode::serialize(&"),
 
 			"bitcoin::hash_types::Txid" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
@@ -1350,11 +1381,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if is_ref => Some("&"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec("),
@@ -1412,19 +1443,25 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(")"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(")"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some(".as_ref()"),
+			"bitcoin::secp256k1::KeyPair" if !is_ref => Some(".secret_key())"),
 			"bitcoin::secp256k1::Scalar" if !is_ref => Some(")"),
 			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some(".secret_bytes() }"),
 
-			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
-			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if is_ref => Some("[..])"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if !is_ref => Some(".into_bytes().into()"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(")"),
 			"bitcoin::Witness" => Some(")"),
 			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
-			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(")"),
+			"bitcoin::TxIn"|"bitcoin::blockdata::transaction::TxIn" if !is_ref => Some(")"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" => Some(")"),
 			"bitcoin::network::constants::Network" => Some(")"),
 			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some(""),
 			"bitcoin::blockdata::block::Block" if is_ref => Some(")"),
+
+			"bitcoin::PackedLockTime"|"bitcoin::blockdata::locktime::PackedLockTime" => Some(".0"),
+
+			"bitcoin::psbt::PartiallySignedTransaction" if !is_ref => Some(").into()"),
 
 			"bitcoin::hash_types::Txid" if !is_ref => Some(".into_inner() }"),
 
@@ -1443,11 +1480,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if is_ref => Some(".0"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if !is_ref => Some(".0 }"),
 
 			"lightning::io::Read" => Some("))"),

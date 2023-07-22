@@ -805,7 +805,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 				define_field!(('a' as u8 + idx as u8) as char, ('0' as u8 + idx as u8) as char, field);
 			}
 		}
-		_ => unimplemented!()
+		syn::Fields::Unit => {},
 	}
 
 	if all_fields_settable {
@@ -828,7 +828,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 					types.write_c_type(w, &field.ty, Some(&gen_types), false);
 				}
 			}
-			_ => unreachable!()
+			syn::Fields::Unit => {},
 		}
 		write!(w, ") -> {} {{\n\t", struct_name).unwrap();
 		match &s.fields {
@@ -848,7 +848,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 					}
 				}
 			},
-			_ => unreachable!()
+			syn::Fields::Unit => {},
 		}
 		write!(w, "{} {{ inner: ObjOps::heap_alloc(", struct_name).unwrap();
 		match &s.fields {
@@ -876,7 +876,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 				}
 				write!(w, "\t)").unwrap();
 			},
-			_ => unreachable!()
+			syn::Fields::Unit => write!(w, "{}::{} {{}}", types.module_path, struct_name).unwrap(),
 		}
 		writeln!(w, "), is_owned: true }}\n}}").unwrap();
 	}

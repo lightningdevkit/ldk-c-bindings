@@ -156,7 +156,7 @@ function is_gnu_sed(){
 
 function add_crate() {
 	pushd "$LIGHTNING_PATH/$1"
-	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check --no-default-features $3 -- --cfg=c_bindings -Zunpretty=expanded > /tmp/$1-crate-source.txt
+	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check -Z avoid-dev-deps --no-default-features $3 -- --cfg=c_bindings -Zunpretty=expanded > /tmp/$1-crate-source.txt
 	popd
 	if [ "$HOST_OSX" = "true" ]; then
 		sed -i".original" "1i\\
@@ -191,12 +191,12 @@ if [ "$2" = "true" ]; then
 	add_crate "lightning-persister" "lightning_persister"
 	add_crate "lightning-background-processor" "lightning_background_processor" --features=std
 	add_crate "lightning-invoice" "lightning_invoice" --features=std
-	add_crate "lightning-rapid-gossip-sync" "lightning_rapid_gossip_sync"
+	add_crate "lightning-rapid-gossip-sync" "lightning_rapid_gossip_sync" --features=std
 	CARGO_BUILD_ARGS="--features=std"
 else
 	add_crate lightning lightning --features=no-std
 	drop_crate "lightning-persister"
-	add_crate "lightning-background-processor" "lightning_background_processor"
+	add_crate "lightning-background-processor" "lightning_background_processor" --features=no-std
 	add_crate "lightning-rapid-gossip-sync" "lightning_rapid_gossip_sync" --features=no-std
 	add_crate "lightning-invoice" "lightning_invoice" --features=no-std
 	CARGO_BUILD_ARGS="--features=no-std"

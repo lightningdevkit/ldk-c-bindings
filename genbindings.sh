@@ -231,12 +231,18 @@ cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1
 if is_gnu_sed; then
 	sed -i 's/typedef LDKnative.*Import.*LDKnative.*;//g' include/lightning.h
 
+	# UnsafeCell is `repr(transparent)` so should be ignored here
+	sed -i 's/LDKUnsafeCell<\(.*\)> /\1 /g' include/lightning.h
+
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.
 	sed -i 's/#include <stdlib.h>/#include "ldk_rust_types.h"/g' include/lightning.h
 else
 	# OSX sed is for some reason not compatible with GNU sed
 	sed -i '' 's/typedef LDKnative.*Import.*LDKnative.*;//g' include/lightning.h
+
+	# UnsafeCell is `repr(transparent)` so should be ignored by cbindgen
+	sed -i '' 's/LDKUnsafeCell<\(.*\)> /\1 /g' include/lightning.h
 
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.

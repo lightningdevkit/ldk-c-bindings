@@ -7884,7 +7884,7 @@ typedef struct LDKChannelSigner {
    /**
     * Returns the holder's channel public keys and basepoints.
     */
-   struct LDKChannelPublicKeys pubkeys;
+   LDKChannelPublicKeys pubkeys;
    /**
     * Fill in the pubkeys field as a reference to it will be given to Rust after this returns
     * Note that this takes a pointer to this object, not the this_ptr like other methods do

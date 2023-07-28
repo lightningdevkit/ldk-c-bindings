@@ -20,7 +20,6 @@ pub mod chaininterface;
 pub mod chainmonitor;
 pub mod channelmonitor;
 pub mod transaction;
-pub mod keysinterface;
 mod onchaintx {
 
 use alloc::str::FromStr;
@@ -321,8 +320,7 @@ pub struct Confirm {
 	///
 	/// [`transactions_confirmed`]: Self::transactions_confirmed
 	/// [`transaction_unconfirmed`]: Self::transaction_unconfirmed
-	#[must_use]
-	pub get_relevant_txids: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_TxidBlockHashZZ,
+	pub get_relevant_txids: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_TxidCOption_BlockHashZZZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -357,7 +355,7 @@ impl rustConfirm for Confirm {
 	}
 	fn get_relevant_txids(&self) -> Vec<(bitcoin::hash_types::Txid, Option<bitcoin::hash_types::BlockHash>)> {
 		let mut ret = (self.get_relevant_txids)(self.this_arg);
-		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item.to_rust(); let mut local_orig_ret_0_1 = if orig_ret_0_1.data == [0; 32] { None } else { Some( { ::bitcoin::hash_types::BlockHash::from_slice(&orig_ret_0_1.data[..]).unwrap() }) }; let mut local_ret_0 = (::bitcoin::hash_types::Txid::from_slice(&orig_ret_0_0.data[..]).unwrap(), local_orig_ret_0_1); local_ret_0 }); };
+		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item.to_rust(); let mut local_orig_ret_0_1 = { /*orig_ret_0_1*/ let orig_ret_0_1_opt = orig_ret_0_1; if orig_ret_0_1_opt.is_none() { None } else { Some({ { ::bitcoin::hash_types::BlockHash::from_slice(&{ orig_ret_0_1_opt.take() }.data[..]).unwrap() }})} }; let mut local_ret_0 = (::bitcoin::hash_types::Txid::from_slice(&orig_ret_0_0.data[..]).unwrap(), local_orig_ret_0_1); local_ret_0 }); };
 		local_ret
 	}
 }
@@ -555,7 +553,6 @@ pub struct Watch {
 	/// [`get_outputs_to_watch`]: channelmonitor::ChannelMonitor::get_outputs_to_watch
 	/// [`block_connected`]: channelmonitor::ChannelMonitor::block_connected
 	/// [`block_disconnected`]: channelmonitor::ChannelMonitor::block_disconnected
-	#[must_use]
 	pub watch_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::lightning::chain::transaction::OutPoint, monitor: crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::lightning::chain::ChannelMonitorUpdateStatus,
 	/// Updates a channel identified by `funding_txo` by applying `update` to its monitor.
 	///
@@ -563,7 +560,6 @@ pub struct Watch {
 	/// [`ChannelMonitorUpdateStatus`] for invariants around returning an error.
 	///
 	/// [`update_monitor`]: channelmonitor::ChannelMonitor::update_monitor
-	#[must_use]
 	pub update_channel: extern "C" fn (this_arg: *const c_void, funding_txo: crate::lightning::chain::transaction::OutPoint, update: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate) -> crate::lightning::chain::ChannelMonitorUpdateStatus,
 	/// Returns any monitor events since the last call. Subsequent calls must only return new
 	/// events.
@@ -574,7 +570,6 @@ pub struct Watch {
 	///
 	/// For details on asynchronous [`ChannelMonitor`] updating and returning
 	/// [`MonitorEvent::Completed`] here, see [`ChannelMonitorUpdateStatus::InProgress`].
-	#[must_use]
 	pub release_pending_monitor_events: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_C3Tuple_OutPointCVec_MonitorEventZPublicKeyZZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -594,8 +589,8 @@ pub(crate) extern "C" fn Watch_clone_fields(orig: &Watch) -> Watch {
 }
 
 use lightning::chain::Watch as rustWatch;
-impl rustWatch<crate::lightning::chain::keysinterface::WriteableEcdsaChannelSigner> for Watch {
-	fn watch_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::WriteableEcdsaChannelSigner>) -> lightning::chain::ChannelMonitorUpdateStatus {
+impl rustWatch<crate::lightning::sign::WriteableEcdsaChannelSigner> for Watch {
+	fn watch_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::sign::WriteableEcdsaChannelSigner>) -> lightning::chain::ChannelMonitorUpdateStatus {
 		let mut ret = (self.watch_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(monitor), is_owned: true });
 		ret.into_native()
 	}
@@ -769,20 +764,16 @@ impl WatchedOutput {
 	}
 }
 /// First block where the transaction output may have been spent.
-///
-/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn WatchedOutput_get_block_hash(this_ptr: &WatchedOutput) -> crate::c_types::ThirtyTwoBytes {
+pub extern "C" fn WatchedOutput_get_block_hash(this_ptr: &WatchedOutput) -> crate::c_types::derived::COption_BlockHashZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().block_hash;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (inner_val.unwrap()).into_inner() } } };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_BlockHashZ::None } else { crate::c_types::derived::COption_BlockHashZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().into_inner() } }) };
 	local_inner_val
 }
 /// First block where the transaction output may have been spent.
-///
-/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn WatchedOutput_set_block_hash(this_ptr: &mut WatchedOutput, mut val: crate::c_types::ThirtyTwoBytes) {
-	let mut local_val = if val.data == [0; 32] { None } else { Some( { ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap() }) };
+pub extern "C" fn WatchedOutput_set_block_hash(this_ptr: &mut WatchedOutput, mut val: crate::c_types::derived::COption_BlockHashZ) {
+	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::hash_types::BlockHash::from_slice(&{ val_opt.take() }.data[..]).unwrap() }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.block_hash = local_val;
 }
 /// Outpoint identifying the transaction output.
@@ -810,8 +801,8 @@ pub extern "C" fn WatchedOutput_set_script_pubkey(this_ptr: &mut WatchedOutput, 
 /// Constructs a new WatchedOutput given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn WatchedOutput_new(mut block_hash_arg: crate::c_types::ThirtyTwoBytes, mut outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut script_pubkey_arg: crate::c_types::derived::CVec_u8Z) -> WatchedOutput {
-	let mut local_block_hash_arg = if block_hash_arg.data == [0; 32] { None } else { Some( { ::bitcoin::hash_types::BlockHash::from_slice(&block_hash_arg.data[..]).unwrap() }) };
+pub extern "C" fn WatchedOutput_new(mut block_hash_arg: crate::c_types::derived::COption_BlockHashZ, mut outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut script_pubkey_arg: crate::c_types::derived::CVec_u8Z) -> WatchedOutput {
+	let mut local_block_hash_arg = { /*block_hash_arg*/ let block_hash_arg_opt = block_hash_arg; if block_hash_arg_opt.is_none() { None } else { Some({ { ::bitcoin::hash_types::BlockHash::from_slice(&{ block_hash_arg_opt.take() }.data[..]).unwrap() }})} };
 	WatchedOutput { inner: ObjOps::heap_alloc(nativeWatchedOutput {
 		block_hash: local_block_hash_arg,
 		outpoint: *unsafe { Box::from_raw(outpoint_arg.take_inner()) },

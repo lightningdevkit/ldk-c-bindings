@@ -30,7 +30,6 @@ pub struct CustomMessageReader {
 	/// implementation and the message could be decoded, must return `Ok(Some(message))`. If the
 	/// message type is unknown to the implementation, must return `Ok(None)`. If a decoding error
 	/// occur, must return `Err(DecodeError::X)` where `X` details the encountered error.
-	#[must_use]
 	pub read: extern "C" fn (this_arg: *const c_void, message_type: u16, buffer: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_TypeZDecodeErrorZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -95,7 +94,6 @@ pub struct Type {
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Returns the type identifying the message payload.
-	#[must_use]
 	pub type_id: extern "C" fn (this_arg: *const c_void) -> u16,
 	/// Return a human-readable "debug" string describing this object
 	pub debug_str: extern "C" fn (this_arg: *const c_void) -> crate::c_types::Str,

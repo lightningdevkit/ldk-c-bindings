@@ -25,13 +25,10 @@ pub struct Persister {
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Persist the given ['ChannelManager'] to disk, returning an error if persistence failed.
-	#[must_use]
 	pub persist_manager: extern "C" fn (this_arg: *const c_void, channel_manager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NoneErrorZ,
 	/// Persist the given [`NetworkGraph`] to disk, returning an error if persistence failed.
-	#[must_use]
 	pub persist_graph: extern "C" fn (this_arg: *const c_void, network_graph: &crate::lightning::routing::gossip::NetworkGraph) -> crate::c_types::derived::CResult_NoneErrorZ,
 	/// Persist the given [`WriteableScore`] to disk, returning an error if persistence failed.
-	#[must_use]
 	pub persist_scorer: extern "C" fn (this_arg: *const c_void, scorer: &crate::lightning::routing::scoring::WriteableScore) -> crate::c_types::derived::CResult_NoneErrorZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -51,8 +48,8 @@ pub(crate) extern "C" fn Persister_clone_fields(orig: &Persister) -> Persister {
 }
 
 use lightning::util::persist::Persister as rustPersister;
-impl<'a> rustPersister<'a, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::chain::keysinterface::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger, crate::lightning::routing::scoring::WriteableScore> for Persister {
-	fn persist_manager(&self, mut channel_manager: &lightning::ln::channelmanager::ChannelManager<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::chain::keysinterface::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>) -> Result<(), lightning::io::Error> {
+impl<'a> rustPersister<'a, crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger, crate::lightning::routing::scoring::WriteableScore> for Persister {
+	fn persist_manager(&self, mut channel_manager: &lightning::ln::channelmanager::ChannelManager<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>) -> Result<(), lightning::io::Error> {
 		let mut ret = (self.persist_manager)(self.this_arg, &crate::lightning::ln::channelmanager::ChannelManager { inner: unsafe { ObjOps::nonnull_ptr_to_inner((channel_manager as *const lightning::ln::channelmanager::ChannelManager<_, _, _, _, _, _, _, _, >) as *mut _) }, is_owned: false });
 		let mut local_ret = match ret.result_ok { true => Ok( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) })*/ }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) }).to_rust() })};
 		local_ret

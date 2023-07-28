@@ -20,6 +20,7 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 pub mod invoice;
+pub mod invoice_error;
 pub mod invoice_request;
 pub mod offer;
 pub mod parse;

@@ -7,7 +7,7 @@
 // source was automatically generated.
 
 //! Various utilities for building scripts and deriving keys related to channels. These are
-//! largely of interest for those implementing the traits on [`chain::keysinterface`] by hand.
+//! largely of interest for those implementing the traits on [`crate::sign`] by hand.
 
 use alloc::str::FromStr;
 use core::ffi::c_void;
@@ -35,17 +35,31 @@ pub static OFFERED_HTLC_SCRIPT_WEIGHT_ANCHORS: usize = lightning::ln::chan_utils
 
 #[no_mangle]
 pub static MAX_ACCEPTED_HTLC_SCRIPT_WEIGHT: usize = lightning::ln::chan_utils::MAX_ACCEPTED_HTLC_SCRIPT_WEIGHT;
+/// The upper bound weight of an anchor input.
+
+#[no_mangle]
+pub static ANCHOR_INPUT_WITNESS_WEIGHT: u64 = lightning::ln::chan_utils::ANCHOR_INPUT_WITNESS_WEIGHT;
+/// The upper bound weight of an HTLC timeout input from a commitment transaction with anchor
+/// outputs.
+
+#[no_mangle]
+pub static HTLC_TIMEOUT_INPUT_ANCHOR_WITNESS_WEIGHT: u64 = lightning::ln::chan_utils::HTLC_TIMEOUT_INPUT_ANCHOR_WITNESS_WEIGHT;
+/// The upper bound weight of an HTLC success input from a commitment transaction with anchor
+/// outputs.
+
+#[no_mangle]
+pub static HTLC_SUCCESS_INPUT_ANCHOR_WITNESS_WEIGHT: u64 = lightning::ln::chan_utils::HTLC_SUCCESS_INPUT_ANCHOR_WITNESS_WEIGHT;
 /// Gets the weight for an HTLC-Success transaction.
 #[no_mangle]
-pub extern "C" fn htlc_success_tx_weight(mut opt_anchors: bool) -> u64 {
-	let mut ret = lightning::ln::chan_utils::htlc_success_tx_weight(opt_anchors);
+pub extern "C" fn htlc_success_tx_weight(channel_type_features: &crate::lightning::ln::features::ChannelTypeFeatures) -> u64 {
+	let mut ret = lightning::ln::chan_utils::htlc_success_tx_weight(channel_type_features.get_native_ref());
 	ret
 }
 
 /// Gets the weight for an HTLC-Timeout transaction.
 #[no_mangle]
-pub extern "C" fn htlc_timeout_tx_weight(mut opt_anchors: bool) -> u64 {
-	let mut ret = lightning::ln::chan_utils::htlc_timeout_tx_weight(opt_anchors);
+pub extern "C" fn htlc_timeout_tx_weight(channel_type_features: &crate::lightning::ln::features::ChannelTypeFeatures) -> u64 {
+	let mut ret = lightning::ln::chan_utils::htlc_timeout_tx_weight(channel_type_features.get_native_ref());
 	ret
 }
 
@@ -906,8 +920,8 @@ pub extern "C" fn HTLCOutputInCommitment_read(ser: crate::c_types::u8slice) -> c
 /// Gets the witness redeemscript for an HTLC output in a commitment transaction. Note that htlc
 /// does not need to have its previous_output_index filled.
 #[no_mangle]
-pub extern "C" fn get_htlc_redeemscript(htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, mut opt_anchors: bool, keys: &crate::lightning::ln::chan_utils::TxCreationKeys) -> crate::c_types::derived::CVec_u8Z {
-	let mut ret = lightning::ln::chan_utils::get_htlc_redeemscript(htlc.get_native_ref(), opt_anchors, keys.get_native_ref());
+pub extern "C" fn get_htlc_redeemscript(htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, channel_type_features: &crate::lightning::ln::features::ChannelTypeFeatures, keys: &crate::lightning::ln::chan_utils::TxCreationKeys) -> crate::c_types::derived::CVec_u8Z {
+	let mut ret = lightning::ln::chan_utils::get_htlc_redeemscript(htlc.get_native_ref(), channel_type_features.get_native_ref(), keys.get_native_ref());
 	ret.into_bytes().into()
 }
 
@@ -927,18 +941,16 @@ pub extern "C" fn make_funding_redeemscript(mut broadcaster: crate::c_types::Pub
 /// Panics if htlc.transaction_output_index.is_none() (as such HTLCs do not appear in the
 /// commitment transaction).
 #[no_mangle]
-pub extern "C" fn build_htlc_transaction(commitment_txid: *const [u8; 32], mut feerate_per_kw: u32, mut contest_delay: u16, htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, mut opt_anchors: bool, mut use_non_zero_fee_anchors: bool, mut broadcaster_delayed_payment_key: crate::c_types::PublicKey, mut revocation_key: crate::c_types::PublicKey) -> crate::c_types::Transaction {
-	let mut ret = lightning::ln::chan_utils::build_htlc_transaction(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*commitment_txid }[..]).unwrap(), feerate_per_kw, contest_delay, htlc.get_native_ref(), opt_anchors, use_non_zero_fee_anchors, &broadcaster_delayed_payment_key.into_rust(), &revocation_key.into_rust());
+pub extern "C" fn build_htlc_transaction(commitment_txid: *const [u8; 32], mut feerate_per_kw: u32, mut contest_delay: u16, htlc: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment, channel_type_features: &crate::lightning::ln::features::ChannelTypeFeatures, mut broadcaster_delayed_payment_key: crate::c_types::PublicKey, mut revocation_key: crate::c_types::PublicKey) -> crate::c_types::Transaction {
+	let mut ret = lightning::ln::chan_utils::build_htlc_transaction(&::bitcoin::hash_types::Txid::from_slice(&unsafe { &*commitment_txid }[..]).unwrap(), feerate_per_kw, contest_delay, htlc.get_native_ref(), channel_type_features.get_native_ref(), &broadcaster_delayed_payment_key.into_rust(), &revocation_key.into_rust());
 	crate::c_types::Transaction::from_bitcoin(&ret)
 }
 
 /// Returns the witness required to satisfy and spend a HTLC input.
-///
-/// Note that preimage (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[no_mangle]
-pub extern "C" fn build_htlc_input_witness(mut local_sig: crate::c_types::Signature, mut remote_sig: crate::c_types::Signature, mut preimage: crate::c_types::ThirtyTwoBytes, mut redeem_script: crate::c_types::u8slice, mut opt_anchors: bool) -> crate::c_types::Witness {
-	let mut local_preimage = if preimage.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentPreimage(preimage.data) }) };
-	let mut ret = lightning::ln::chan_utils::build_htlc_input_witness(&local_sig.into_rust(), &remote_sig.into_rust(), &local_preimage, &::bitcoin::blockdata::script::Script::from(Vec::from(redeem_script.to_slice())), opt_anchors);
+pub extern "C" fn build_htlc_input_witness(mut local_sig: crate::c_types::Signature, mut remote_sig: crate::c_types::Signature, mut preimage: crate::c_types::derived::COption_PaymentPreimageZ, mut redeem_script: crate::c_types::u8slice, channel_type_features: &crate::lightning::ln::features::ChannelTypeFeatures) -> crate::c_types::Witness {
+	let mut local_preimage = { /*preimage*/ let preimage_opt = preimage; if preimage_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentPreimage({ preimage_opt.take() }.data) }})} };
+	let mut ret = lightning::ln::chan_utils::build_htlc_input_witness(&local_sig.into_rust(), &remote_sig.into_rust(), &local_preimage, &::bitcoin::blockdata::script::Script::from(Vec::from(redeem_script.to_slice())), channel_type_features.get_native_ref());
 	crate::c_types::Witness::from_bitcoin(&ret)
 }
 
@@ -1094,54 +1106,32 @@ pub extern "C" fn ChannelTransactionParameters_set_funding_outpoint(this_ptr: &m
 	let mut local_val = if val.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(val.take_inner()) } }) };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.funding_outpoint = local_val;
 }
-/// Are anchors (zero fee HTLC transaction variant) used for this channel. Boolean is
-/// serialization backwards-compatible.
+/// This channel's type, as negotiated during channel open. For old objects where this field
+/// wasn't serialized, it will default to static_remote_key at deserialization.
 #[no_mangle]
-pub extern "C" fn ChannelTransactionParameters_get_opt_anchors(this_ptr: &ChannelTransactionParameters) -> crate::c_types::derived::COption_NoneZ {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().opt_anchors;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NoneZ::None } else { crate::c_types::derived::COption_NoneZ::Some /*  { () /**/ } */ };
-	local_inner_val
+pub extern "C" fn ChannelTransactionParameters_get_channel_type_features(this_ptr: &ChannelTransactionParameters) -> crate::lightning::ln::features::ChannelTypeFeatures {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_type_features;
+	crate::lightning::ln::features::ChannelTypeFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::features::ChannelTypeFeatures<>) as *mut _) }, is_owned: false }
 }
-/// Are anchors (zero fee HTLC transaction variant) used for this channel. Boolean is
-/// serialization backwards-compatible.
+/// This channel's type, as negotiated during channel open. For old objects where this field
+/// wasn't serialized, it will default to static_remote_key at deserialization.
 #[no_mangle]
-pub extern "C" fn ChannelTransactionParameters_set_opt_anchors(this_ptr: &mut ChannelTransactionParameters, mut val: crate::c_types::derived::COption_NoneZ) {
-	let mut local_val = if val.is_some() { Some( { () /*val.take()*/ }) } else { None };
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.opt_anchors = local_val;
-}
-/// Are non-zero-fee anchors are enabled (used in conjuction with opt_anchors)
-/// It is intended merely for backwards compatibility with signers that need it.
-/// There is no support for this feature in LDK channel negotiation.
-#[no_mangle]
-pub extern "C" fn ChannelTransactionParameters_get_opt_non_zero_fee_anchors(this_ptr: &ChannelTransactionParameters) -> crate::c_types::derived::COption_NoneZ {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().opt_non_zero_fee_anchors;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NoneZ::None } else { crate::c_types::derived::COption_NoneZ::Some /*  { () /**/ } */ };
-	local_inner_val
-}
-/// Are non-zero-fee anchors are enabled (used in conjuction with opt_anchors)
-/// It is intended merely for backwards compatibility with signers that need it.
-/// There is no support for this feature in LDK channel negotiation.
-#[no_mangle]
-pub extern "C" fn ChannelTransactionParameters_set_opt_non_zero_fee_anchors(this_ptr: &mut ChannelTransactionParameters, mut val: crate::c_types::derived::COption_NoneZ) {
-	let mut local_val = if val.is_some() { Some( { () /*val.take()*/ }) } else { None };
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.opt_non_zero_fee_anchors = local_val;
+pub extern "C" fn ChannelTransactionParameters_set_channel_type_features(this_ptr: &mut ChannelTransactionParameters, mut val: crate::lightning::ln::features::ChannelTypeFeatures) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_type_features = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Constructs a new ChannelTransactionParameters given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelTransactionParameters_new(mut holder_pubkeys_arg: crate::lightning::ln::chan_utils::ChannelPublicKeys, mut holder_selected_contest_delay_arg: u16, mut is_outbound_from_holder_arg: bool, mut counterparty_parameters_arg: crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters, mut funding_outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut opt_anchors_arg: crate::c_types::derived::COption_NoneZ, mut opt_non_zero_fee_anchors_arg: crate::c_types::derived::COption_NoneZ) -> ChannelTransactionParameters {
+pub extern "C" fn ChannelTransactionParameters_new(mut holder_pubkeys_arg: crate::lightning::ln::chan_utils::ChannelPublicKeys, mut holder_selected_contest_delay_arg: u16, mut is_outbound_from_holder_arg: bool, mut counterparty_parameters_arg: crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters, mut funding_outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut channel_type_features_arg: crate::lightning::ln::features::ChannelTypeFeatures) -> ChannelTransactionParameters {
 	let mut local_counterparty_parameters_arg = if counterparty_parameters_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(counterparty_parameters_arg.take_inner()) } }) };
 	let mut local_funding_outpoint_arg = if funding_outpoint_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(funding_outpoint_arg.take_inner()) } }) };
-	let mut local_opt_anchors_arg = if opt_anchors_arg.is_some() { Some( { () /*opt_anchors_arg.take()*/ }) } else { None };
-	let mut local_opt_non_zero_fee_anchors_arg = if opt_non_zero_fee_anchors_arg.is_some() { Some( { () /*opt_non_zero_fee_anchors_arg.take()*/ }) } else { None };
 	ChannelTransactionParameters { inner: ObjOps::heap_alloc(nativeChannelTransactionParameters {
 		holder_pubkeys: *unsafe { Box::from_raw(holder_pubkeys_arg.take_inner()) },
 		holder_selected_contest_delay: holder_selected_contest_delay_arg,
 		is_outbound_from_holder: is_outbound_from_holder_arg,
 		counterparty_parameters: local_counterparty_parameters_arg,
 		funding_outpoint: local_funding_outpoint_arg,
-		opt_anchors: local_opt_anchors_arg,
-		opt_non_zero_fee_anchors: local_opt_non_zero_fee_anchors_arg,
+		channel_type_features: *unsafe { Box::from_raw(channel_type_features_arg.take_inner()) },
 	}), is_owned: true }
 }
 impl Clone for ChannelTransactionParameters {
@@ -1440,15 +1430,15 @@ pub extern "C" fn DirectedChannelTransactionParameters_is_outbound(this_arg: &cr
 #[no_mangle]
 pub extern "C" fn DirectedChannelTransactionParameters_funding_outpoint(this_arg: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters) -> crate::lightning::chain::transaction::OutPoint {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.funding_outpoint();
-	crate::c_types::bitcoin_to_C_outpoint(ret)
+	crate::c_types::bitcoin_to_C_outpoint(&ret)
 }
 
 /// Whether to use anchors for this channel
 #[must_use]
 #[no_mangle]
-pub extern "C" fn DirectedChannelTransactionParameters_opt_anchors(this_arg: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters) -> bool {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.opt_anchors();
-	ret
+pub extern "C" fn DirectedChannelTransactionParameters_channel_type_features(this_arg: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters) -> crate::lightning::ln::features::ChannelTypeFeatures {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel_type_features();
+	crate::lightning::ln::features::ChannelTypeFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::features::ChannelTypeFeatures<>) as *mut _) }, is_owned: false }
 }
 
 
@@ -1719,7 +1709,7 @@ pub extern "C" fn BuiltCommitmentTransaction_sign_counterparty_commitment(this_a
 /// Signs the holder commitment transaction because we are about to broadcast it.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BuiltCommitmentTransaction_sign_holder_commitment(this_arg: &crate::lightning::ln::chan_utils::BuiltCommitmentTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64, entropy_source: &crate::lightning::chain::keysinterface::EntropySource) -> crate::c_types::Signature {
+pub extern "C" fn BuiltCommitmentTransaction_sign_holder_commitment(this_arg: &crate::lightning::ln::chan_utils::BuiltCommitmentTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64, entropy_source: &crate::lightning::sign::EntropySource) -> crate::c_types::Signature {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign_holder_commitment(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, entropy_source, secp256k1::global::SECP256K1);
 	crate::c_types::Signature::from_rust(&ret)
 }
@@ -2200,9 +2190,9 @@ pub extern "C" fn TrustedCommitmentTransaction_keys(this_arg: &crate::lightning:
 /// Should anchors be used.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn TrustedCommitmentTransaction_opt_anchors(this_arg: &crate::lightning::ln::chan_utils::TrustedCommitmentTransaction) -> bool {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.opt_anchors();
-	ret
+pub extern "C" fn TrustedCommitmentTransaction_channel_type_features(this_arg: &crate::lightning::ln::chan_utils::TrustedCommitmentTransaction) -> crate::lightning::ln::features::ChannelTypeFeatures {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.channel_type_features();
+	crate::lightning::ln::features::ChannelTypeFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::features::ChannelTypeFeatures<>) as *mut _) }, is_owned: false }
 }
 
 /// Get a signature for each HTLC which was included in the commitment transaction (ie for
@@ -2213,7 +2203,7 @@ pub extern "C" fn TrustedCommitmentTransaction_opt_anchors(this_arg: &crate::lig
 /// This function is only valid in the holder commitment context, it always uses EcdsaSighashType::All.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn TrustedCommitmentTransaction_get_htlc_sigs(this_arg: &crate::lightning::ln::chan_utils::TrustedCommitmentTransaction, htlc_base_key: *const [u8; 32], channel_parameters: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters, entropy_source: &crate::lightning::chain::keysinterface::EntropySource) -> crate::c_types::derived::CResult_CVec_SignatureZNoneZ {
+pub extern "C" fn TrustedCommitmentTransaction_get_htlc_sigs(this_arg: &crate::lightning::ln::chan_utils::TrustedCommitmentTransaction, htlc_base_key: *const [u8; 32], channel_parameters: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters, entropy_source: &crate::lightning::sign::EntropySource) -> crate::c_types::derived::CResult_CVec_SignatureZNoneZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_htlc_sigs(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *htlc_base_key}[..]).unwrap(), channel_parameters.get_native_ref(), entropy_source, secp256k1::global::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { crate::c_types::Signature::from_rust(&item) }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret

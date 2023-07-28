@@ -19,7 +19,7 @@ use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning::onion_message::messenger::OnionMessenger as nativeOnionMessengerImport;
-pub(crate) type nativeOnionMessenger = nativeOnionMessengerImport<crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::util::logger::Logger, crate::lightning::onion_message::messenger::CustomOnionMessageHandler>;
+pub(crate) type nativeOnionMessenger = nativeOnionMessengerImport<crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::util::logger::Logger, crate::lightning::onion_message::messenger::MessageRouter, crate::lightning::onion_message::offers::OffersMessageHandler, crate::lightning::onion_message::messenger::CustomOnionMessageHandler>;
 
 /// A sender, receiver and forwarder of onion messages. In upcoming releases, this object will be
 /// used to retrieve invoices and fulfill invoice requests from [offers]. Currently, only sending
@@ -32,9 +32,9 @@ pub(crate) type nativeOnionMessenger = nativeOnionMessengerImport<crate::lightni
 /// # use bitcoin::hashes::_export::_core::time::Duration;
 /// # use bitcoin::secp256k1::{PublicKey, Secp256k1, SecretKey};
 /// # use lightning::blinded_path::BlindedPath;
-/// # use lightning::chain::keysinterface::KeysManager;
+/// # use lightning::sign::KeysManager;
 /// # use lightning::ln::peer_handler::IgnoringMessageHandler;
-/// # use lightning::onion_message::messenger::{Destination, OnionMessenger};
+/// # use lightning::onion_message::messenger::{Destination, MessageRouter, OnionMessenger, OnionMessagePath};
 /// # use lightning::onion_message::packet::{CustomOnionMessageContents, OnionMessageContents};
 /// # use lightning::util::logger::{Logger, Record};
 /// # use lightning::util::ser::{Writeable, Writer};
@@ -43,6 +43,12 @@ pub(crate) type nativeOnionMessenger = nativeOnionMessengerImport<crate::lightni
 /// # struct FakeLogger;
 /// # impl Logger for FakeLogger {
 /// #     fn log(&self, record: &Record) { unimplemented!() }
+/// # }
+/// # struct FakeMessageRouter {}
+/// # impl MessageRouter for FakeMessageRouter {
+/// #     fn find_path(&self, sender: PublicKey, peers: Vec<PublicKey>, destination: Destination) -> Result<OnionMessagePath, ()> {
+/// #         unimplemented!()
+/// #     }
 /// # }
 /// # let seed = [42u8; 32];
 /// # let time = Duration::from_secs(123456);
@@ -53,10 +59,15 @@ pub(crate) type nativeOnionMessenger = nativeOnionMessengerImport<crate::lightni
 /// # let hop_node_id1 = PublicKey::from_secret_key(&secp_ctx, &node_secret);
 /// # let (hop_node_id2, hop_node_id3, hop_node_id4) = (hop_node_id1, hop_node_id1, hop_node_id1);
 /// # let destination_node_id = hop_node_id1;
-/// # let your_custom_message_handler = IgnoringMessageHandler {};
+/// # let message_router = Arc::new(FakeMessageRouter {});
+/// # let custom_message_handler = IgnoringMessageHandler {};
+/// # let offers_message_handler = IgnoringMessageHandler {};
 /// // Create the onion messenger. This must use the same `keys_manager` as is passed to your
 /// // ChannelManager.
-/// let onion_messenger = OnionMessenger::new(&keys_manager, &keys_manager, logger, &your_custom_message_handler);
+/// let onion_messenger = OnionMessenger::new(
+///     &keys_manager, &keys_manager, logger, message_router, &offers_message_handler,
+///     &custom_message_handler
+/// );
 ///
 /// # struct YourCustomMessage {}
 /// impl Writeable for YourCustomMessage {
@@ -72,11 +83,14 @@ pub(crate) type nativeOnionMessenger = nativeOnionMessengerImport<crate::lightni
 /// \t}
 /// }
 /// // Send a custom onion message to a node id.
-/// let intermediate_hops = [hop_node_id1, hop_node_id2];
+/// let path = OnionMessagePath {
+/// \tintermediate_nodes: vec![hop_node_id1, hop_node_id2],
+/// \tdestination: Destination::Node(destination_node_id),
+/// };
 /// let reply_path = None;
 /// # let your_custom_message = YourCustomMessage {};
 /// let message = OnionMessageContents::Custom(your_custom_message);
-/// onion_messenger.send_onion_message(&intermediate_hops, Destination::Node(destination_node_id), message, reply_path);
+/// onion_messenger.send_onion_message(path, message, reply_path);
 ///
 /// // Create a blinded path to yourself, for someone to send an onion message to.
 /// # let your_node_id = hop_node_id1;
@@ -84,11 +98,14 @@ pub(crate) type nativeOnionMessenger = nativeOnionMessengerImport<crate::lightni
 /// let blinded_path = BlindedPath::new_for_message(&hops, &keys_manager, &secp_ctx).unwrap();
 ///
 /// // Send a custom onion message to a blinded path.
-/// # let intermediate_hops = [hop_node_id1, hop_node_id2];
+/// let path = OnionMessagePath {
+/// \tintermediate_nodes: vec![hop_node_id1, hop_node_id2],
+/// \tdestination: Destination::BlindedPath(blinded_path),
+/// };
 /// let reply_path = None;
 /// # let your_custom_message = YourCustomMessage {};
 /// let message = OnionMessageContents::Custom(your_custom_message);
-/// onion_messenger.send_onion_message(&intermediate_hops, Destination::BlindedPath(blinded_path), message, reply_path);
+/// onion_messenger.send_onion_message(path, message, reply_path);
 /// ```
 ///
 /// [offers]: <https://github.com/lightning/bolts/pull/798>
@@ -138,6 +155,253 @@ impl OnionMessenger {
 		self.inner = core::ptr::null_mut();
 		ret
 	}
+}
+/// A trait defining behavior for routing an [`OnionMessage`].
+///
+/// [`OnionMessage`]: msgs::OnionMessage
+#[repr(C)]
+pub struct MessageRouter {
+	/// An opaque pointer which is passed to your function implementations as an argument.
+	/// This has no meaning in the LDK, and can be NULL or any other value.
+	pub this_arg: *mut c_void,
+	/// Returns a route for sending an [`OnionMessage`] to the given [`Destination`].
+	///
+	/// [`OnionMessage`]: msgs::OnionMessage
+	pub find_path: extern "C" fn (this_arg: *const c_void, sender: crate::c_types::PublicKey, peers: crate::c_types::derived::CVec_PublicKeyZ, destination: crate::lightning::onion_message::messenger::Destination) -> crate::c_types::derived::CResult_OnionMessagePathNoneZ,
+	/// Frees any resources associated with this object given its this_arg pointer.
+	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
+	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
+}
+unsafe impl Send for MessageRouter {}
+unsafe impl Sync for MessageRouter {}
+#[no_mangle]
+pub(crate) extern "C" fn MessageRouter_clone_fields(orig: &MessageRouter) -> MessageRouter {
+	MessageRouter {
+		this_arg: orig.this_arg,
+		find_path: Clone::clone(&orig.find_path),
+		free: Clone::clone(&orig.free),
+	}
+}
+
+use lightning::onion_message::messenger::MessageRouter as rustMessageRouter;
+impl rustMessageRouter for MessageRouter {
+	fn find_path(&self, mut sender: bitcoin::secp256k1::PublicKey, mut peers: Vec<bitcoin::secp256k1::PublicKey>, mut destination: lightning::onion_message::messenger::Destination) -> Result<lightning::onion_message::messenger::OnionMessagePath, ()> {
+		let mut local_peers = Vec::new(); for mut item in peers.drain(..) { local_peers.push( { crate::c_types::PublicKey::from_rust(&item) }); };
+		let mut ret = (self.find_path)(self.this_arg, crate::c_types::PublicKey::from_rust(&sender), local_peers.into(), crate::lightning::onion_message::messenger::Destination::native_into(destination));
+		let mut local_ret = match ret.result_ok { true => Ok( { *unsafe { Box::from_raw((*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).take_inner()) } }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
+		local_ret
+	}
+}
+
+// We're essentially a pointer already, or at least a set of pointers, so allow us to be used
+// directly as a Deref trait in higher-level structs:
+impl core::ops::Deref for MessageRouter {
+	type Target = Self;
+	fn deref(&self) -> &Self {
+		self
+	}
+}
+/// Calls the free function if one is set
+#[no_mangle]
+pub extern "C" fn MessageRouter_free(this_ptr: MessageRouter) { }
+impl Drop for MessageRouter {
+	fn drop(&mut self) {
+		if let Some(f) = self.free {
+			f(self.this_arg);
+		}
+	}
+}
+
+use lightning::onion_message::messenger::DefaultMessageRouter as nativeDefaultMessageRouterImport;
+pub(crate) type nativeDefaultMessageRouter = nativeDefaultMessageRouterImport;
+
+/// A [`MessageRouter`] that always fails.
+#[must_use]
+#[repr(C)]
+pub struct DefaultMessageRouter {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeDefaultMessageRouter,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for DefaultMessageRouter {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeDefaultMessageRouter>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the DefaultMessageRouter, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn DefaultMessageRouter_free(this_obj: DefaultMessageRouter) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn DefaultMessageRouter_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeDefaultMessageRouter) };
+}
+#[allow(unused)]
+impl DefaultMessageRouter {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeDefaultMessageRouter {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeDefaultMessageRouter {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeDefaultMessageRouter {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// Constructs a new DefaultMessageRouter given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn DefaultMessageRouter_new() -> DefaultMessageRouter {
+	DefaultMessageRouter { inner: ObjOps::heap_alloc(lightning::onion_message::messenger::DefaultMessageRouter {}), is_owned: true }
+}
+impl From<nativeDefaultMessageRouter> for crate::lightning::onion_message::messenger::MessageRouter {
+	fn from(obj: nativeDefaultMessageRouter) -> Self {
+		let mut rust_obj = DefaultMessageRouter { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let mut ret = DefaultMessageRouter_as_MessageRouter(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
+		rust_obj.inner = core::ptr::null_mut();
+		ret.free = Some(DefaultMessageRouter_free_void);
+		ret
+	}
+}
+/// Constructs a new MessageRouter which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned MessageRouter must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn DefaultMessageRouter_as_MessageRouter(this_arg: &DefaultMessageRouter) -> crate::lightning::onion_message::messenger::MessageRouter {
+	crate::lightning::onion_message::messenger::MessageRouter {
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
+		free: None,
+		find_path: DefaultMessageRouter_MessageRouter_find_path,
+	}
+}
+
+#[must_use]
+extern "C" fn DefaultMessageRouter_MessageRouter_find_path(this_arg: *const c_void, mut sender: crate::c_types::PublicKey, mut peers: crate::c_types::derived::CVec_PublicKeyZ, mut destination: crate::lightning::onion_message::messenger::Destination) -> crate::c_types::derived::CResult_OnionMessagePathNoneZ {
+	let mut local_peers = Vec::new(); for mut item in peers.into_rust().drain(..) { local_peers.push( { item.into_rust() }); };
+	let mut ret = <nativeDefaultMessageRouter as lightning::onion_message::messenger::MessageRouter<>>::find_path(unsafe { &mut *(this_arg as *mut nativeDefaultMessageRouter) }, sender.into_rust(), local_peers, destination.into_native());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::onion_message::messenger::OnionMessagePath { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+
+use lightning::onion_message::messenger::OnionMessagePath as nativeOnionMessagePathImport;
+pub(crate) type nativeOnionMessagePath = nativeOnionMessagePathImport;
+
+/// A path for sending an [`msgs::OnionMessage`].
+#[must_use]
+#[repr(C)]
+pub struct OnionMessagePath {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeOnionMessagePath,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for OnionMessagePath {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeOnionMessagePath>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the OnionMessagePath, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn OnionMessagePath_free(this_obj: OnionMessagePath) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn OnionMessagePath_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeOnionMessagePath) };
+}
+#[allow(unused)]
+impl OnionMessagePath {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeOnionMessagePath {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeOnionMessagePath {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeOnionMessagePath {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// Nodes on the path between the sender and the destination.
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn OnionMessagePath_get_intermediate_nodes(this_ptr: &OnionMessagePath) -> crate::c_types::derived::CVec_PublicKeyZ {
+	let mut inner_val = this_ptr.get_native_mut_ref().intermediate_nodes.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::c_types::PublicKey::from_rust(&item) }); };
+	local_inner_val.into()
+}
+/// Nodes on the path between the sender and the destination.
+#[no_mangle]
+pub extern "C" fn OnionMessagePath_set_intermediate_nodes(this_ptr: &mut OnionMessagePath, mut val: crate::c_types::derived::CVec_PublicKeyZ) {
+	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item.into_rust() }); };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.intermediate_nodes = local_val;
+}
+/// The recipient of the message.
+#[no_mangle]
+pub extern "C" fn OnionMessagePath_get_destination(this_ptr: &OnionMessagePath) -> crate::lightning::onion_message::messenger::Destination {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().destination;
+	crate::lightning::onion_message::messenger::Destination::from_native(inner_val)
+}
+/// The recipient of the message.
+#[no_mangle]
+pub extern "C" fn OnionMessagePath_set_destination(this_ptr: &mut OnionMessagePath, mut val: crate::lightning::onion_message::messenger::Destination) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.destination = val.into_native();
+}
+/// Constructs a new OnionMessagePath given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn OnionMessagePath_new(mut intermediate_nodes_arg: crate::c_types::derived::CVec_PublicKeyZ, mut destination_arg: crate::lightning::onion_message::messenger::Destination) -> OnionMessagePath {
+	let mut local_intermediate_nodes_arg = Vec::new(); for mut item in intermediate_nodes_arg.into_rust().drain(..) { local_intermediate_nodes_arg.push( { item.into_rust() }); };
+	OnionMessagePath { inner: ObjOps::heap_alloc(nativeOnionMessagePath {
+		intermediate_nodes: local_intermediate_nodes_arg,
+		destination: destination_arg.into_native(),
+	}), is_owned: true }
+}
+impl Clone for OnionMessagePath {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeOnionMessagePath>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn OnionMessagePath_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeOnionMessagePath)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the OnionMessagePath
+pub extern "C" fn OnionMessagePath_clone(orig: &OnionMessagePath) -> OnionMessagePath {
+	orig.clone()
 }
 /// The destination of an onion message.
 #[derive(Clone)]
@@ -262,7 +526,7 @@ pub enum SendError {
 	BufferFull,
 	/// Failed to retrieve our node id from the provided [`NodeSigner`].
 	///
-	/// [`NodeSigner`]: crate::chain::keysinterface::NodeSigner
+	/// [`NodeSigner`]: crate::sign::NodeSigner
 	GetNodeIdFailed,
 	/// We attempted to send to a blinded path where we are the introduction node, and failed to
 	/// advance the blinded path to make the second hop the new introduction node. Either
@@ -407,11 +671,10 @@ pub struct CustomOnionMessageHandler {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
-	/// Called with the custom message that was received.
-	pub handle_custom_message: extern "C" fn (this_arg: *const c_void, msg: crate::lightning::onion_message::packet::CustomOnionMessageContents),
+	/// Called with the custom message that was received, returning a response to send, if any.
+	pub handle_custom_message: extern "C" fn (this_arg: *const c_void, msg: crate::lightning::onion_message::packet::CustomOnionMessageContents) -> crate::c_types::derived::COption_CustomOnionMessageContentsZ,
 	/// Read a custom message of type `message_type` from `buffer`, returning `Ok(None)` if the
 	/// message type is unknown.
-	#[must_use]
 	pub read_custom_message: extern "C" fn (this_arg: *const c_void, message_type: u64, buffer: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_CustomOnionMessageContentsZDecodeErrorZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -432,8 +695,10 @@ pub(crate) extern "C" fn CustomOnionMessageHandler_clone_fields(orig: &CustomOni
 use lightning::onion_message::messenger::CustomOnionMessageHandler as rustCustomOnionMessageHandler;
 impl rustCustomOnionMessageHandler for CustomOnionMessageHandler {
 	type CustomMessage = crate::lightning::onion_message::packet::CustomOnionMessageContents;
-	fn handle_custom_message(&self, mut msg: crate::lightning::onion_message::packet::CustomOnionMessageContents) {
-		(self.handle_custom_message)(self.this_arg, Into::into(msg))
+	fn handle_custom_message(&self, mut msg: crate::lightning::onion_message::packet::CustomOnionMessageContents) -> Option<crate::lightning::onion_message::packet::CustomOnionMessageContents> {
+		let mut ret = (self.handle_custom_message)(self.this_arg, Into::into(msg));
+		let mut local_ret = { /*ret*/ let ret_opt = ret; if ret_opt.is_none() { None } else { Some({ { { ret_opt.take() } }})} };
+		local_ret
 	}
 	fn read_custom_message<R:crate::c_types::io::Read>(&self, mut message_type: u64, mut buffer: &mut R) -> Result<Option<crate::lightning::onion_message::packet::CustomOnionMessageContents>, lightning::ln::msgs::DecodeError> {
 		let mut ret = (self.read_custom_message)(self.this_arg, message_type, crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec(buffer)));
@@ -464,21 +729,21 @@ impl Drop for CustomOnionMessageHandler {
 /// their respective handlers.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn OnionMessenger_new(mut entropy_source: crate::lightning::chain::keysinterface::EntropySource, mut node_signer: crate::lightning::chain::keysinterface::NodeSigner, mut logger: crate::lightning::util::logger::Logger, mut custom_handler: crate::lightning::onion_message::messenger::CustomOnionMessageHandler) -> crate::lightning::onion_message::messenger::OnionMessenger {
-	let mut ret = lightning::onion_message::messenger::OnionMessenger::new(entropy_source, node_signer, logger, custom_handler);
+pub extern "C" fn OnionMessenger_new(mut entropy_source: crate::lightning::sign::EntropySource, mut node_signer: crate::lightning::sign::NodeSigner, mut logger: crate::lightning::util::logger::Logger, mut message_router: crate::lightning::onion_message::messenger::MessageRouter, mut offers_handler: crate::lightning::onion_message::offers::OffersMessageHandler, mut custom_handler: crate::lightning::onion_message::messenger::CustomOnionMessageHandler) -> crate::lightning::onion_message::messenger::OnionMessenger {
+	let mut ret = lightning::onion_message::messenger::OnionMessenger::new(entropy_source, node_signer, logger, message_router, offers_handler, custom_handler);
 	crate::lightning::onion_message::messenger::OnionMessenger { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Send an onion message with contents `message` to `destination`, routing it through `intermediate_nodes`.
+/// Send an onion message with contents `message` to the destination of `path`.
+///
 /// See [`OnionMessenger`] for example usage.
 ///
 /// Note that reply_path (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn OnionMessenger_send_onion_message(this_arg: &crate::lightning::onion_message::messenger::OnionMessenger, mut intermediate_nodes: crate::c_types::derived::CVec_PublicKeyZ, mut destination: crate::lightning::onion_message::messenger::Destination, mut message: crate::lightning::onion_message::packet::OnionMessageContents, mut reply_path: crate::lightning::blinded_path::BlindedPath) -> crate::c_types::derived::CResult_NoneSendErrorZ {
-	let mut local_intermediate_nodes = Vec::new(); for mut item in intermediate_nodes.into_rust().drain(..) { local_intermediate_nodes.push( { item.into_rust() }); };
+pub extern "C" fn OnionMessenger_send_onion_message(this_arg: &crate::lightning::onion_message::messenger::OnionMessenger, mut path: crate::lightning::onion_message::messenger::OnionMessagePath, mut message: crate::lightning::onion_message::packet::OnionMessageContents, mut reply_path: crate::lightning::blinded_path::BlindedPath) -> crate::c_types::derived::CResult_NoneSendErrorZ {
 	let mut local_reply_path = if reply_path.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(reply_path.take_inner()) } }) };
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.send_onion_message(&local_intermediate_nodes[..], destination.into_native(), message.into_native(), local_reply_path);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.send_onion_message(*unsafe { Box::from_raw(path.take_inner()) }, message.into_native(), local_reply_path);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::onion_message::messenger::SendError::native_into(e) }).into() };
 	local_ret
 }

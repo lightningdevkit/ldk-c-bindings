@@ -23,7 +23,7 @@ pub(crate) type nativeExpandedKey = nativeExpandedKeyImport;
 /// A set of keys that were HKDF-expanded from an initial call to
 /// [`NodeSigner::get_inbound_payment_key_material`].
 ///
-/// [`NodeSigner::get_inbound_payment_key_material`]: crate::chain::keysinterface::NodeSigner::get_inbound_payment_key_material
+/// [`NodeSigner::get_inbound_payment_key_material`]: crate::sign::NodeSigner::get_inbound_payment_key_material
 #[must_use]
 #[repr(C)]
 pub struct ExpandedKey {
@@ -76,7 +76,7 @@ impl ExpandedKey {
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ExpandedKey_new(key_material: *const [u8; 32]) -> crate::lightning::ln::inbound_payment::ExpandedKey {
-	let mut ret = lightning::ln::inbound_payment::ExpandedKey::new(&::lightning::chain::keysinterface::KeyMaterial( unsafe { *key_material }));
+	let mut ret = lightning::ln::inbound_payment::ExpandedKey::new(&::lightning::sign::KeyMaterial( unsafe { *key_material }));
 	crate::lightning::ln::inbound_payment::ExpandedKey { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
@@ -93,13 +93,13 @@ pub extern "C" fn ExpandedKey_new(key_material: *const [u8; 32]) -> crate::light
 /// Note that if `min_final_cltv_expiry_delta` is set to some value, then the payment will not be receivable
 /// on versions of LDK prior to 0.0.114.
 ///
-/// [phantom node payments]: crate::chain::keysinterface::PhantomKeysManager
-/// [`NodeSigner::get_inbound_payment_key_material`]: crate::chain::keysinterface::NodeSigner::get_inbound_payment_key_material
+/// [phantom node payments]: crate::sign::PhantomKeysManager
+/// [`NodeSigner::get_inbound_payment_key_material`]: crate::sign::NodeSigner::get_inbound_payment_key_material
 #[no_mangle]
-pub extern "C" fn create(keys: &crate::lightning::ln::inbound_payment::ExpandedKey, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut invoice_expiry_delta_secs: u32, entropy_source: &crate::lightning::chain::keysinterface::EntropySource, mut current_time: u64, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_C2Tuple_PaymentHashPaymentSecretZNoneZ {
+pub extern "C" fn create(keys: &crate::lightning::ln::inbound_payment::ExpandedKey, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut invoice_expiry_delta_secs: u32, entropy_source: &crate::lightning::sign::EntropySource, mut current_time: u64, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_C2Tuple_PaymentHashPaymentSecretZNoneZ {
 	let mut local_min_value_msat = if min_value_msat.is_some() { Some( { min_value_msat.take() }) } else { None };
 	let mut local_min_final_cltv_expiry_delta = if min_final_cltv_expiry_delta.is_some() { Some( { min_final_cltv_expiry_delta.take() }) } else { None };
-	let mut ret = lightning::ln::inbound_payment::create::<crate::lightning::chain::keysinterface::EntropySource>(keys.get_native_ref(), local_min_value_msat, invoice_expiry_delta_secs, entropy_source, current_time, local_min_final_cltv_expiry_delta);
+	let mut ret = lightning::ln::inbound_payment::create::<crate::lightning::sign::EntropySource>(keys.get_native_ref(), local_min_value_msat, invoice_expiry_delta_secs, entropy_source, current_time, local_min_final_cltv_expiry_delta);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.0 }, crate::c_types::ThirtyTwoBytes { data: orig_ret_0_1.0 }).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
@@ -113,7 +113,7 @@ pub extern "C" fn create(keys: &crate::lightning::ln::inbound_payment::ExpandedK
 /// Note that if `min_final_cltv_expiry_delta` is set to some value, then the payment will not be receivable
 /// on versions of LDK prior to 0.0.114.
 ///
-/// [phantom node payments]: crate::chain::keysinterface::PhantomKeysManager
+/// [phantom node payments]: crate::sign::PhantomKeysManager
 #[no_mangle]
 pub extern "C" fn create_from_hash(keys: &crate::lightning::ln::inbound_payment::ExpandedKey, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut invoice_expiry_delta_secs: u32, mut current_time: u64, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_PaymentSecretNoneZ {
 	let mut local_min_value_msat = if min_value_msat.is_some() { Some( { min_value_msat.take() }) } else { None };

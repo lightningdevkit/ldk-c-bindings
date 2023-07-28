@@ -140,7 +140,7 @@ impl UtxoResult {
 		match native {
 			nativeUtxoResult::Sync (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
-				let mut local_a_nonref = match a_nonref { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::TxOut::from_rust(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::routing::utxo::UtxoLookupError::native_into(e) }).into() };
+				let mut local_a_nonref = match a_nonref { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::TxOut::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::routing::utxo::UtxoLookupError::native_into(e) }).into() };
 				UtxoResult::Sync (
 					local_a_nonref,
 				)
@@ -157,7 +157,7 @@ impl UtxoResult {
 	pub(crate) fn native_into(native: nativeUtxoResult) -> Self {
 		match native {
 			nativeUtxoResult::Sync (mut a, ) => {
-				let mut local_a = match a { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::TxOut::from_rust(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::routing::utxo::UtxoLookupError::native_into(e) }).into() };
+				let mut local_a = match a { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::TxOut::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::routing::utxo::UtxoLookupError::native_into(e) }).into() };
 				UtxoResult::Sync (
 					local_a,
 				)
@@ -199,7 +199,6 @@ pub struct UtxoLookup {
 	/// is unknown.
 	///
 	/// [`short_channel_id`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#definition-of-short_channel_id
-	#[must_use]
 	pub get_utxo: extern "C" fn (this_arg: *const c_void, genesis_hash: *const [u8; 32], short_channel_id: u64) -> crate::lightning::routing::utxo::UtxoResult,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.

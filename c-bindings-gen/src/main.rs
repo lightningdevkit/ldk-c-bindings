@@ -351,10 +351,10 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						// the Rust type and a flag to indicate whether deallocation needs to
 						// happen) as well as provide an Option<>al function pointer which is
 						// called when the trait method is called which allows updating on the fly.
-						write!(w, "\tpub {}: ", m.sig.ident).unwrap();
-						generated_fields.push((format!("{}", m.sig.ident), None, None));
+						write!(w, "\tpub {}: core::cell::UnsafeCell<", m.sig.ident).unwrap();
+						generated_fields.push((format!("{}", m.sig.ident), Some(("Clone::clone(unsafe { &*core::cell::UnsafeCell::get(".to_owned(), ")}).into()")), None));
 						types.write_c_type(w, &*r.elem, Some(&meth_gen_types), false);
-						writeln!(w, ",").unwrap();
+						writeln!(w, ">,").unwrap();
 						writeln!(w, "\t/// Fill in the {} field as a reference to it will be given to Rust after this returns", m.sig.ident).unwrap();
 						writeln!(w, "\t/// Note that this takes a pointer to this object, not the this_ptr like other methods do").unwrap();
 						writeln!(w, "\t/// This function pointer may be NULL if {} is filled in when this object is created and never needs updating.", m.sig.ident).unwrap();
@@ -430,7 +430,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 				let is_clonable = types.is_clonable(s);
 				writeln!(w, "\tpub {}: crate::{},", i, s).unwrap();
 				(format!("{}", i), if !is_clonable {
-					Some(format!("crate::{}_clone_fields", s))
+					Some((format!("crate::{}_clone_fields(", s), ")"))
 				} else { None }, None)
 			});
 		}
@@ -513,7 +513,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 								writeln!(w, "\t\t\t(f)(&self{});", $impl_accessor).unwrap();
 								write!(w, "\t\t}}\n\t\t").unwrap();
 								$type_resolver.write_from_c_conversion_to_ref_prefix(w, &*r.elem, Some(&meth_gen_types));
-								write!(w, "self{}.{}", $impl_accessor, m.sig.ident).unwrap();
+								write!(w, "unsafe {{ &*self{}.{}.get() }}", $impl_accessor, m.sig.ident).unwrap();
 								$type_resolver.write_from_c_conversion_to_ref_suffix(w, &*r.elem, Some(&meth_gen_types));
 								writeln!(w, "\n\t}}").unwrap();
 								continue;
@@ -557,9 +557,9 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "\t{} {{", trait_name).unwrap();
 	writeln!(w, "\t\tthis_arg: orig.this_arg,").unwrap();
 	for (field, clone_fn, _) in generated_fields.iter() {
-		if let Some(f) = clone_fn {
+		if let Some((pfx, sfx)) = clone_fn {
 			// If the field isn't clonable, blindly assume its a trait and hope for the best.
-			writeln!(w, "\t\t{}: {}(&orig.{}),", field, f, field).unwrap();
+			writeln!(w, "\t\t{}: {}&orig.{}{},", field, pfx, field, sfx).unwrap();
 		} else {
 			writeln!(w, "\t\t{}: Clone::clone(&orig.{}),", field, field).unwrap();
 		}
@@ -1046,7 +1046,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 									if let syn::Type::Reference(r) = &**rtype {
 										write!(w, "\n\t\t{}{}: ", $indent, $m.sig.ident).unwrap();
 										types.write_empty_rust_val(Some(&gen_types), w, &*r.elem);
-										writeln!(w, ",\n{}\t\tset_{}: Some({}_{}_set_{}),", $indent, $m.sig.ident, ident, $trait.ident, $m.sig.ident).unwrap();
+										writeln!(w, ".into(),\n{}\t\tset_{}: Some({}_{}_set_{}),", $indent, $m.sig.ident, ident, $trait.ident, $m.sig.ident).unwrap();
 										printed = true;
 									}
 								}
@@ -1198,9 +1198,9 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 										writeln!(w, "\t// This is a bit race-y in the general case, but for our specific use-cases today, we're safe").unwrap();
 										writeln!(w, "\t// Specifically, we must ensure that the first time we're called it can never be in parallel").unwrap();
 										write!(w, "\tif ").unwrap();
-										$types.write_empty_rust_val_check(Some(&meth_gen_types), w, &*r.elem, &format!("trait_self_arg.{}", $m.sig.ident));
+										$types.write_empty_rust_val_check(Some(&meth_gen_types), w, &*r.elem, &format!("unsafe {{ &*trait_self_arg.{}.get() }}", $m.sig.ident));
 										writeln!(w, " {{").unwrap();
-										writeln!(w, "\t\tunsafe {{ &mut *(trait_self_arg as *const {}  as *mut {}) }}.{} = {}_{}_{}(trait_self_arg.this_arg);", $trait.ident, $trait.ident, $m.sig.ident, ident, $trait.ident, $m.sig.ident).unwrap();
+										writeln!(w, "\t\t*unsafe {{ &mut *(&*(trait_self_arg as *const {})).{}.get() }} = {}_{}_{}(trait_self_arg.this_arg).into();", $trait.ident, $m.sig.ident, ident, $trait.ident, $m.sig.ident).unwrap();
 										writeln!(w, "\t}}").unwrap();
 										writeln!(w, "}}").unwrap();
 									}

@@ -629,7 +629,7 @@ pub struct ChannelSigner {
 	#[must_use]
 	pub validate_holder_commitment: extern "C" fn (this_arg: *const c_void, holder_tx: &crate::lightning::ln::chan_utils::HolderCommitmentTransaction, preimages: crate::c_types::derived::CVec_PaymentPreimageZ) -> crate::c_types::derived::CResult_NoneNoneZ,
 	/// Returns the holder's channel public keys and basepoints.
-	pub pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys,
+	pub pubkeys: core::cell::UnsafeCell<crate::lightning::ln::chan_utils::ChannelPublicKeys>,
 	/// Fill in the pubkeys field as a reference to it will be given to Rust after this returns
 	/// Note that this takes a pointer to this object, not the this_ptr like other methods do
 	/// This function pointer may be NULL if pubkeys is filled in when this object is created and never needs updating.
@@ -662,7 +662,7 @@ pub(crate) extern "C" fn ChannelSigner_clone_fields(orig: &ChannelSigner) -> Cha
 		get_per_commitment_point: Clone::clone(&orig.get_per_commitment_point),
 		release_commitment_secret: Clone::clone(&orig.release_commitment_secret),
 		validate_holder_commitment: Clone::clone(&orig.validate_holder_commitment),
-		pubkeys: Clone::clone(&orig.pubkeys),
+		pubkeys: Clone::clone(unsafe { &*core::cell::UnsafeCell::get(&orig.pubkeys)}).into(),
 		set_pubkeys: Clone::clone(&orig.set_pubkeys),
 		channel_keys_id: Clone::clone(&orig.channel_keys_id),
 		provide_channel_parameters: Clone::clone(&orig.provide_channel_parameters),
@@ -690,7 +690,7 @@ impl rustChannelSigner for ChannelSigner {
 		if let Some(f) = self.set_pubkeys {
 			(f)(&self);
 		}
-		self.pubkeys.get_native_ref()
+		unsafe { &*self.pubkeys.get() }.get_native_ref()
 	}
 	fn channel_keys_id(&self) -> [u8; 32] {
 		let mut ret = (self.channel_keys_id)(self.this_arg);
@@ -889,7 +889,7 @@ impl lightning::chain::keysinterface::ChannelSigner for EcdsaChannelSigner {
 		if let Some(f) = self.ChannelSigner.set_pubkeys {
 			(f)(&self.ChannelSigner);
 		}
-		self.ChannelSigner.pubkeys.get_native_ref()
+		unsafe { &*self.ChannelSigner.pubkeys.get() }.get_native_ref()
 	}
 	fn channel_keys_id(&self) -> [u8; 32] {
 		let mut ret = (self.ChannelSigner.channel_keys_id)(self.ChannelSigner.this_arg);
@@ -1066,7 +1066,7 @@ impl lightning::chain::keysinterface::ChannelSigner for WriteableEcdsaChannelSig
 		if let Some(f) = self.EcdsaChannelSigner.ChannelSigner.set_pubkeys {
 			(f)(&self.EcdsaChannelSigner.ChannelSigner);
 		}
-		self.EcdsaChannelSigner.ChannelSigner.pubkeys.get_native_ref()
+		unsafe { &*self.EcdsaChannelSigner.ChannelSigner.pubkeys.get() }.get_native_ref()
 	}
 	fn channel_keys_id(&self) -> [u8; 32] {
 		let mut ret = (self.EcdsaChannelSigner.ChannelSigner.channel_keys_id)(self.EcdsaChannelSigner.ChannelSigner.this_arg);
@@ -1761,7 +1761,7 @@ pub extern "C" fn InMemorySigner_as_ChannelSigner(this_arg: &InMemorySigner) -> 
 		release_commitment_secret: InMemorySigner_ChannelSigner_release_commitment_secret,
 		validate_holder_commitment: InMemorySigner_ChannelSigner_validate_holder_commitment,
 
-		pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: core::ptr::null_mut(), is_owned: true },
+		pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: core::ptr::null_mut(), is_owned: true }.into(),
 		set_pubkeys: Some(InMemorySigner_ChannelSigner_set_pubkeys),
 		channel_keys_id: InMemorySigner_ChannelSigner_channel_keys_id,
 		provide_channel_parameters: InMemorySigner_ChannelSigner_provide_channel_parameters,
@@ -1793,8 +1793,8 @@ extern "C" fn InMemorySigner_ChannelSigner_pubkeys(this_arg: *const c_void) -> c
 extern "C" fn InMemorySigner_ChannelSigner_set_pubkeys(trait_self_arg: &ChannelSigner) {
 	// This is a bit race-y in the general case, but for our specific use-cases today, we're safe
 	// Specifically, we must ensure that the first time we're called it can never be in parallel
-	if trait_self_arg.pubkeys.inner.is_null() {
-		unsafe { &mut *(trait_self_arg as *const ChannelSigner  as *mut ChannelSigner) }.pubkeys = InMemorySigner_ChannelSigner_pubkeys(trait_self_arg.this_arg);
+	if unsafe { &*trait_self_arg.pubkeys.get() }.inner.is_null() {
+		*unsafe { &mut *(&*(trait_self_arg as *const ChannelSigner)).pubkeys.get() } = InMemorySigner_ChannelSigner_pubkeys(trait_self_arg.this_arg).into();
 	}
 }
 #[must_use]
@@ -1839,7 +1839,7 @@ pub extern "C" fn InMemorySigner_as_EcdsaChannelSigner(this_arg: &InMemorySigner
 			release_commitment_secret: InMemorySigner_ChannelSigner_release_commitment_secret,
 			validate_holder_commitment: InMemorySigner_ChannelSigner_validate_holder_commitment,
 
-			pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: core::ptr::null_mut(), is_owned: true },
+			pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: core::ptr::null_mut(), is_owned: true }.into(),
 			set_pubkeys: Some(InMemorySigner_ChannelSigner_set_pubkeys),
 			channel_keys_id: InMemorySigner_ChannelSigner_channel_keys_id,
 			provide_channel_parameters: InMemorySigner_ChannelSigner_provide_channel_parameters,
@@ -1939,7 +1939,7 @@ pub extern "C" fn InMemorySigner_as_WriteableEcdsaChannelSigner(this_arg: &InMem
 				release_commitment_secret: InMemorySigner_ChannelSigner_release_commitment_secret,
 				validate_holder_commitment: InMemorySigner_ChannelSigner_validate_holder_commitment,
 
-				pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: core::ptr::null_mut(), is_owned: true },
+				pubkeys: crate::lightning::ln::chan_utils::ChannelPublicKeys { inner: core::ptr::null_mut(), is_owned: true }.into(),
 				set_pubkeys: Some(InMemorySigner_ChannelSigner_set_pubkeys),
 				channel_keys_id: InMemorySigner_ChannelSigner_channel_keys_id,
 				provide_channel_parameters: InMemorySigner_ChannelSigner_provide_channel_parameters,

@@ -232,7 +232,7 @@ if is_gnu_sed; then
 	sed -i 's/typedef LDKnative.*Import.*LDKnative.*;//g' include/lightning.h
 
 	# UnsafeCell is `repr(transparent)` so should be ignored here
-	sed -i 's/LDKUnsafeCell<\(.*\)> /\1 /g' include/lightning.h
+	sed -i 's/LDKUnsafeCell<\(.*\)> /struct \1 /g' include/lightning.h
 
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.
@@ -242,7 +242,7 @@ else
 	sed -i '' 's/typedef LDKnative.*Import.*LDKnative.*;//g' include/lightning.h
 
 	# UnsafeCell is `repr(transparent)` so should be ignored by cbindgen
-	sed -i '' 's/LDKUnsafeCell<\(.*\)> /\1 /g' include/lightning.h
+	sed -i '' 's/LDKUnsafeCell<\(.*\)> /struct \1 /g' include/lightning.h
 
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.

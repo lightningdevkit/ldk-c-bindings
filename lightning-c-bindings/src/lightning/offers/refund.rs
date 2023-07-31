@@ -9,11 +9,11 @@
 //! Data structures and encoding for refunds.
 //!
 //! A [`Refund`] is an \"offer for money\" and is typically constructed by a merchant and presented
-//! directly to the customer. The recipient responds with an [`Invoice`] to be paid.
+//! directly to the customer. The recipient responds with a [`Bolt12Invoice`] to be paid.
 //!
 //! This is an [`InvoiceRequest`] produced *not* in response to an [`Offer`].
 //!
-//! [`Invoice`]: crate::offers::invoice::Invoice
+//! [`Bolt12Invoice`]: crate::offers::invoice::Bolt12Invoice
 //! [`InvoiceRequest`]: crate::offers::invoice_request::InvoiceRequest
 //! [`Offer`]: crate::offers::offer::Offer
 //!
@@ -27,7 +27,7 @@
 //!
 //! use bitcoin::network::constants::Network;
 //! use bitcoin::secp256k1::{KeyPair, PublicKey, Secp256k1, SecretKey};
-//! use lightning::offers::parse::ParseError;
+//! use lightning::offers::parse::Bolt12ParseError;
 //! use lightning::offers::refund::{Refund, RefundBuilder};
 //! use lightning::util::ser::{Readable, Writeable};
 //!
@@ -39,7 +39,7 @@
 //! # fn create_another_blinded_path() -> BlindedPath { unimplemented!() }
 //! #
 //! # #[cfg(feature = \"std\")]
-//! # fn build() -> Result<(), ParseError> {
+//! # fn build() -> Result<(), Bolt12ParseError> {
 //! let secp_ctx = Secp256k1::new();
 //! let keys = KeyPair::from_secret_key(&secp_ctx, &SecretKey::from_slice(&[42; 32]).unwrap());
 //! let pubkey = PublicKey::from(keys);
@@ -82,13 +82,13 @@ use alloc::{vec::Vec, boxed::Box};
 use lightning::offers::refund::Refund as nativeRefundImport;
 pub(crate) type nativeRefund = nativeRefundImport;
 
-/// A `Refund` is a request to send an [`Invoice`] without a preceding [`Offer`].
+/// A `Refund` is a request to send an [`Bolt12Invoice`] without a preceding [`Offer`].
 ///
 /// Typically, after an invoice is paid, the recipient may publish a refund allowing the sender to
 /// recoup their funds. A refund may be used more generally as an \"offer for money\", such as with a
 /// bitcoin ATM.
 ///
-/// [`Invoice`]: crate::offers::invoice::Invoice
+/// [`Bolt12Invoice`]: crate::offers::invoice::Bolt12Invoice
 /// [`Offer`]: crate::offers::offer::Offer
 #[must_use]
 #[repr(C)]
@@ -282,4 +282,20 @@ pub extern "C" fn Refund_write(obj: &crate::lightning::offers::refund::Refund) -
 #[no_mangle]
 pub(crate) extern "C" fn Refund_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRefund) })
+}
+#[no_mangle]
+/// Read a Refund object from a string
+pub extern "C" fn Refund_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_RefundBolt12ParseErrorZ {
+	match lightning::offers::refund::Refund::from_str(s.into_str()) {
+		Ok(r) => {
+			crate::c_types::CResultTempl::ok(
+				crate::lightning::offers::refund::Refund { inner: ObjOps::heap_alloc(r), is_owned: true }
+			)
+		},
+		Err(e) => {
+			crate::c_types::CResultTempl::err(
+				crate::lightning::offers::parse::Bolt12ParseError { inner: ObjOps::heap_alloc(e), is_owned: true }
+			)
+		},
+	}.into()
 }

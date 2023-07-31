@@ -8,9 +8,9 @@
 
 //! Data structures and encoding for `invoice` messages.
 //!
-//! An [`Invoice`] can be built from a parsed [`InvoiceRequest`] for the \"offer to be paid\" flow or
-//! from a [`Refund`] as an \"offer for money\" flow. The expected recipient of the payment then sends
-//! the invoice to the intended payer, who will then pay it.
+//! A [`Bolt12Invoice`] can be built from a parsed [`InvoiceRequest`] for the \"offer to be paid\"
+//! flow or from a [`Refund`] as an \"offer for money\" flow. The expected recipient of the payment
+//! then sends the invoice to the intended payer, who will then pay it.
 //!
 //! The payment recipient must include a [`PaymentHash`], so as to reveal the preimage upon payment
 //! receipt, and one or more [`BlindedPath`]s for the payer to use when sending the payment.
@@ -30,10 +30,10 @@
 //! # use lightning::offers::invoice::BlindedPayInfo;
 //! # use lightning::blinded_path::BlindedPath;
 //! #
-//! # fn create_payment_paths() -> Vec<(BlindedPath, BlindedPayInfo)> { unimplemented!() }
+//! # fn create_payment_paths() -> Vec<(BlindedPayInfo, BlindedPath)> { unimplemented!() }
 //! # fn create_payment_hash() -> PaymentHash { unimplemented!() }
 //! #
-//! # fn parse_invoice_request(bytes: Vec<u8>) -> Result<(), lightning::offers::parse::ParseError> {
+//! # fn parse_invoice_request(bytes: Vec<u8>) -> Result<(), lightning::offers::parse::Bolt12ParseError> {
 //! let payment_paths = create_payment_paths();
 //! let payment_hash = create_payment_hash();
 //! let secp_ctx = Secp256k1::new();
@@ -58,7 +58,7 @@
 //! # Ok(())
 //! # }
 //!
-//! # fn parse_refund(bytes: Vec<u8>) -> Result<(), lightning::offers::parse::ParseError> {
+//! # fn parse_refund(bytes: Vec<u8>) -> Result<(), lightning::offers::parse::Bolt12ParseError> {
 //! # let payment_paths = create_payment_paths();
 //! # let payment_hash = create_payment_hash();
 //! # let secp_ctx = Secp256k1::new();
@@ -95,18 +95,18 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 
-use lightning::offers::invoice::UnsignedInvoice as nativeUnsignedInvoiceImport;
-pub(crate) type nativeUnsignedInvoice = nativeUnsignedInvoiceImport<'static>;
+use lightning::offers::invoice::UnsignedBolt12Invoice as nativeUnsignedBolt12InvoiceImport;
+pub(crate) type nativeUnsignedBolt12Invoice = nativeUnsignedBolt12InvoiceImport<'static>;
 
-/// A semantically valid [`Invoice`] that hasn't been signed.
+/// A semantically valid [`Bolt12Invoice`] that hasn't been signed.
 #[must_use]
 #[repr(C)]
-pub struct UnsignedInvoice {
+pub struct UnsignedBolt12Invoice {
 	/// A pointer to the opaque Rust object.
 
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeUnsignedInvoice,
+	pub inner: *mut nativeUnsignedBolt12Invoice,
 	/// Indicates that this is the only struct which contains the same pointer.
 
 	/// Rust functions which take ownership of an object provided via an argument require
@@ -114,31 +114,31 @@ pub struct UnsignedInvoice {
 	pub is_owned: bool,
 }
 
-impl Drop for UnsignedInvoice {
+impl Drop for UnsignedBolt12Invoice {
 	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeUnsignedInvoice>::is_null(self.inner) {
+		if self.is_owned && !<*mut nativeUnsignedBolt12Invoice>::is_null(self.inner) {
 			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
-/// Frees any resources used by the UnsignedInvoice, if is_owned is set and inner is non-NULL.
+/// Frees any resources used by the UnsignedBolt12Invoice, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn UnsignedInvoice_free(this_obj: UnsignedInvoice) { }
+pub extern "C" fn UnsignedBolt12Invoice_free(this_obj: UnsignedBolt12Invoice) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn UnsignedInvoice_free_void(this_ptr: *mut c_void) {
-	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeUnsignedInvoice) };
+pub(crate) extern "C" fn UnsignedBolt12Invoice_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeUnsignedBolt12Invoice) };
 }
 #[allow(unused)]
-impl UnsignedInvoice {
-	pub(crate) fn get_native_ref(&self) -> &'static nativeUnsignedInvoice {
+impl UnsignedBolt12Invoice {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeUnsignedBolt12Invoice {
 		unsafe { &*ObjOps::untweak_ptr(self.inner) }
 	}
-	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeUnsignedInvoice {
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeUnsignedBolt12Invoice {
 		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
 	}
 	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-	pub(crate) fn take_inner(mut self) -> *mut nativeUnsignedInvoice {
+	pub(crate) fn take_inner(mut self) -> *mut nativeUnsignedBolt12Invoice {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = core::ptr::null_mut();
@@ -148,11 +148,179 @@ impl UnsignedInvoice {
 /// The public key corresponding to the key needed to sign the invoice.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn UnsignedInvoice_signing_pubkey(this_arg: &crate::lightning::offers::invoice::UnsignedInvoice) -> crate::c_types::PublicKey {
+pub extern "C" fn UnsignedBolt12Invoice_signing_pubkey(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::PublicKey {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signing_pubkey();
 	crate::c_types::PublicKey::from_rust(&ret)
 }
 
+
+use lightning::offers::invoice::Bolt12Invoice as nativeBolt12InvoiceImport;
+pub(crate) type nativeBolt12Invoice = nativeBolt12InvoiceImport;
+
+/// A `Bolt12Invoice` is a payment request, typically corresponding to an [`Offer`] or a [`Refund`].
+///
+/// An invoice may be sent in response to an [`InvoiceRequest`] in the case of an offer or sent
+/// directly after scanning a refund. It includes all the information needed to pay a recipient.
+///
+/// [`Offer`]: crate::offers::offer::Offer
+/// [`Refund`]: crate::offers::refund::Refund
+/// [`InvoiceRequest`]: crate::offers::invoice_request::InvoiceRequest
+#[must_use]
+#[repr(C)]
+pub struct Bolt12Invoice {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeBolt12Invoice,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for Bolt12Invoice {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeBolt12Invoice>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the Bolt12Invoice, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_free(this_obj: Bolt12Invoice) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Bolt12Invoice_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeBolt12Invoice) };
+}
+#[allow(unused)]
+impl Bolt12Invoice {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeBolt12Invoice {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeBolt12Invoice {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeBolt12Invoice {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+impl Clone for Bolt12Invoice {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeBolt12Invoice>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Bolt12Invoice_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBolt12Invoice)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the Bolt12Invoice
+pub extern "C" fn Bolt12Invoice_clone(orig: &Bolt12Invoice) -> Bolt12Invoice {
+	orig.clone()
+}
+/// A complete description of the purpose of the originating offer or refund. Intended to be
+/// displayed to the user but with the caveat that it has not been verified in any way.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_description(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::lightning::util::string::PrintableString {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.description();
+	crate::lightning::util::string::PrintableString { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Duration since the Unix epoch when the invoice was created.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_created_at(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.created_at();
+	ret.as_secs()
+}
+
+/// Duration since [`Bolt12Invoice::created_at`] when the invoice has expired and therefore
+/// should no longer be paid.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_relative_expiry(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.relative_expiry();
+	ret.as_secs()
+}
+
+/// Whether the invoice has expired.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_is_expired(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_expired();
+	ret
+}
+
+/// SHA256 hash of the payment preimage that will be given in return for paying the invoice.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_payment_hash(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_hash();
+	crate::c_types::ThirtyTwoBytes { data: ret.0 }
+}
+
+/// The minimum amount required for a successful payment of the invoice.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_amount_msats(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.amount_msats();
+	ret
+}
+
+/// Features pertaining to paying an invoice.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_features(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::lightning::ln::features::Bolt12InvoiceFeatures {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.features();
+	crate::lightning::ln::features::Bolt12InvoiceFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::features::Bolt12InvoiceFeatures<>) as *mut _) }, is_owned: false }
+}
+
+/// The public key corresponding to the key used to sign the invoice.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_signing_pubkey(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::PublicKey {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signing_pubkey();
+	crate::c_types::PublicKey::from_rust(&ret)
+}
+
+/// Hash that was used for signing the invoice.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_signable_hash(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signable_hash();
+	crate::c_types::ThirtyTwoBytes { data: ret }
+}
+
+/// Verifies that the invoice was for a request or refund created using the given key.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_verify(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice, key: &crate::lightning::ln::inbound_payment::ExpandedKey) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.verify(key.get_native_ref(), secp256k1::global::SECP256K1);
+	ret
+}
+
+#[no_mangle]
+/// Serialize the Bolt12Invoice object into a byte array which can be read by Bolt12Invoice_read
+pub extern "C" fn Bolt12Invoice_write(obj: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn Bolt12Invoice_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBolt12Invoice) })
+}
 
 use lightning::offers::invoice::BlindedPayInfo as nativeBlindedPayInfoImport;
 pub(crate) type nativeBlindedPayInfo = nativeBlindedPayInfoImport;

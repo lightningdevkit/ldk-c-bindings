@@ -216,6 +216,12 @@ pub extern "C" fn RetryableSendFailure_route_not_found() -> RetryableSendFailure
 /// Utility method to constructs a new DuplicatePayment-variant RetryableSendFailure
 pub extern "C" fn RetryableSendFailure_duplicate_payment() -> RetryableSendFailure {
 	RetryableSendFailure::DuplicatePayment}
+/// Checks if two RetryableSendFailures contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn RetryableSendFailure_eq(a: &RetryableSendFailure, b: &RetryableSendFailure) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 /// If a payment fails to send with [`ChannelManager::send_payment_with_route`], it can be in one
 /// of several states. This enum is returned as the Err() type describing which state the payment
 /// is in, see the description of individual enum states for more.
@@ -535,15 +541,13 @@ impl RecipientOnionFields {
 /// If you do not have one, the [`Route`] you pay over must not contain multiple paths as
 /// multi-path payments require a recipient-provided secret.
 ///
-/// Note that for spontaneous payments most lightning nodes do not currently support MPP
-/// receives, thus you should generally never be providing a secret here for spontaneous
-/// payments.
-///
-/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+/// Some implementations may reject spontaneous payments with payment secrets, so you may only
+/// want to provide a secret for a spontaneous payment if MPP is needed and you know your
+/// recipient will not reject it.
 #[no_mangle]
-pub extern "C" fn RecipientOnionFields_get_payment_secret(this_ptr: &RecipientOnionFields) -> crate::c_types::ThirtyTwoBytes {
+pub extern "C" fn RecipientOnionFields_get_payment_secret(this_ptr: &RecipientOnionFields) -> crate::c_types::derived::COption_PaymentSecretZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().payment_secret;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (inner_val.unwrap()).0 } } };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_PaymentSecretZ::None } else { crate::c_types::derived::COption_PaymentSecretZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().0 } }) };
 	local_inner_val
 }
 /// The [`PaymentSecret`] is an arbitrary 32 bytes provided by the recipient for us to repeat
@@ -554,14 +558,12 @@ pub extern "C" fn RecipientOnionFields_get_payment_secret(this_ptr: &RecipientOn
 /// If you do not have one, the [`Route`] you pay over must not contain multiple paths as
 /// multi-path payments require a recipient-provided secret.
 ///
-/// Note that for spontaneous payments most lightning nodes do not currently support MPP
-/// receives, thus you should generally never be providing a secret here for spontaneous
-/// payments.
-///
-/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+/// Some implementations may reject spontaneous payments with payment secrets, so you may only
+/// want to provide a secret for a spontaneous payment if MPP is needed and you know your
+/// recipient will not reject it.
 #[no_mangle]
-pub extern "C" fn RecipientOnionFields_set_payment_secret(this_ptr: &mut RecipientOnionFields, mut val: crate::c_types::ThirtyTwoBytes) {
-	let mut local_val = if val.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentSecret(val.data) }) };
+pub extern "C" fn RecipientOnionFields_set_payment_secret(this_ptr: &mut RecipientOnionFields, mut val: crate::c_types::derived::COption_PaymentSecretZ) {
+	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentSecret({ val_opt.take() }.data) }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.payment_secret = local_val;
 }
 /// The payment metadata serves a similar purpose as [`Self::payment_secret`] but is of
@@ -604,8 +606,8 @@ pub extern "C" fn RecipientOnionFields_set_payment_metadata(this_ptr: &mut Recip
 /// Constructs a new RecipientOnionFields given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RecipientOnionFields_new(mut payment_secret_arg: crate::c_types::ThirtyTwoBytes, mut payment_metadata_arg: crate::c_types::derived::COption_CVec_u8ZZ) -> RecipientOnionFields {
-	let mut local_payment_secret_arg = if payment_secret_arg.data == [0; 32] { None } else { Some( { ::lightning::ln::PaymentSecret(payment_secret_arg.data) }) };
+pub extern "C" fn RecipientOnionFields_new(mut payment_secret_arg: crate::c_types::derived::COption_PaymentSecretZ, mut payment_metadata_arg: crate::c_types::derived::COption_CVec_u8ZZ) -> RecipientOnionFields {
+	let mut local_payment_secret_arg = { /*payment_secret_arg*/ let payment_secret_arg_opt = payment_secret_arg; if payment_secret_arg_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentSecret({ payment_secret_arg_opt.take() }.data) }})} };
 	let mut local_payment_metadata_arg = { /*payment_metadata_arg*/ let payment_metadata_arg_opt = payment_metadata_arg; if payment_metadata_arg_opt.is_none() { None } else { Some({ { let mut local_payment_metadata_arg_0 = Vec::new(); for mut item in { payment_metadata_arg_opt.take() }.into_rust().drain(..) { local_payment_metadata_arg_0.push( { item }); }; local_payment_metadata_arg_0 }})} };
 	RecipientOnionFields { inner: ObjOps::heap_alloc(nativeRecipientOnionFields {
 		payment_secret: local_payment_secret_arg,
@@ -667,10 +669,13 @@ pub extern "C" fn RecipientOnionFields_secret_only(mut payment_secret: crate::c_
 }
 
 /// Creates a new [`RecipientOnionFields`] with no fields. This generally does not create
-/// payable HTLCs except for spontaneous payments, i.e. this should generally only be used for
-/// calls to [`ChannelManager::send_spontaneous_payment`].
+/// payable HTLCs except for single-path spontaneous payments, i.e. this should generally
+/// only be used for calls to [`ChannelManager::send_spontaneous_payment`]. If you are sending
+/// a spontaneous MPP this will not work as all MPP require payment secrets; you may
+/// instead want to use [`RecipientOnionFields::secret_only`].
 ///
 /// [`ChannelManager::send_spontaneous_payment`]: super::channelmanager::ChannelManager::send_spontaneous_payment
+/// [`RecipientOnionFields::secret_only`]: RecipientOnionFields::secret_only
 #[must_use]
 #[no_mangle]
 pub extern "C" fn RecipientOnionFields_spontaneous_empty() -> crate::lightning::ln::outbound_payment::RecipientOnionFields {

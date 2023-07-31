@@ -63,6 +63,12 @@
 //!     [BOLT-3](https://github.com/lightning/bolts/blob/master/03-transactions.md) for more
 //!     information).
 //!
+//! LDK knows about the following features, but does not support them:
+//! - `AnchorsNonzeroFeeHtlcTx` - the initial version of anchor outputs, which was later found to be
+//!     vulnerable (see this
+//!     [mailing list post](https://lists.linuxfoundation.org/pipermail/lightning-dev/2020-September/002796.html)
+//!     for more information).
+//!
 //! [BOLT #9]: https://github.com/lightning/bolts/blob/master/09-features.md
 //! [messages]: crate::ln::msgs
 
@@ -314,20 +320,20 @@ pub extern "C" fn NodeFeatures_supports_variable_length_onion(this_arg: &crate::
 
 /// Set this feature as optional.
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_set_variable_length_onion_optional(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
-	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_variable_length_onion_optional()
+pub extern "C" fn Bolt11InvoiceFeatures_set_variable_length_onion_optional(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_variable_length_onion_optional()
 }
 
 /// Set this feature as required.
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_set_variable_length_onion_required(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
-	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_variable_length_onion_required()
+pub extern "C" fn Bolt11InvoiceFeatures_set_variable_length_onion_required(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_variable_length_onion_required()
 }
 
 /// Checks if this feature is supported.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_supports_variable_length_onion(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+pub extern "C" fn Bolt11InvoiceFeatures_supports_variable_length_onion(this_arg: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_variable_length_onion();
 	ret
 }
@@ -351,7 +357,7 @@ pub extern "C" fn NodeFeatures_requires_variable_length_onion(this_arg: &crate::
 /// Checks if this feature is required.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_requires_variable_length_onion(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+pub extern "C" fn Bolt11InvoiceFeatures_requires_variable_length_onion(this_arg: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_variable_length_onion();
 	ret
 }
@@ -482,20 +488,20 @@ pub extern "C" fn NodeFeatures_supports_payment_secret(this_arg: &crate::lightni
 
 /// Set this feature as optional.
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_set_payment_secret_optional(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
-	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_payment_secret_optional()
+pub extern "C" fn Bolt11InvoiceFeatures_set_payment_secret_optional(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_payment_secret_optional()
 }
 
 /// Set this feature as required.
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_set_payment_secret_required(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
-	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_payment_secret_required()
+pub extern "C" fn Bolt11InvoiceFeatures_set_payment_secret_required(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_payment_secret_required()
 }
 
 /// Checks if this feature is supported.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_supports_payment_secret(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+pub extern "C" fn Bolt11InvoiceFeatures_supports_payment_secret(this_arg: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_payment_secret();
 	ret
 }
@@ -519,7 +525,7 @@ pub extern "C" fn NodeFeatures_requires_payment_secret(this_arg: &crate::lightni
 /// Checks if this feature is required.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_requires_payment_secret(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+pub extern "C" fn Bolt11InvoiceFeatures_requires_payment_secret(this_arg: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_payment_secret();
 	ret
 }
@@ -566,20 +572,20 @@ pub extern "C" fn NodeFeatures_supports_basic_mpp(this_arg: &crate::lightning::l
 
 /// Set this feature as optional.
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_set_basic_mpp_optional(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
-	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_basic_mpp_optional()
+pub extern "C" fn Bolt11InvoiceFeatures_set_basic_mpp_optional(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_basic_mpp_optional()
 }
 
 /// Set this feature as required.
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_set_basic_mpp_required(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
-	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_basic_mpp_required()
+pub extern "C" fn Bolt11InvoiceFeatures_set_basic_mpp_required(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_basic_mpp_required()
 }
 
 /// Checks if this feature is supported.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_supports_basic_mpp(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+pub extern "C" fn Bolt11InvoiceFeatures_supports_basic_mpp(this_arg: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_basic_mpp();
 	ret
 }
@@ -623,7 +629,7 @@ pub extern "C" fn NodeFeatures_requires_basic_mpp(this_arg: &crate::lightning::l
 /// Checks if this feature is required.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_requires_basic_mpp(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+pub extern "C" fn Bolt11InvoiceFeatures_requires_basic_mpp(this_arg: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_basic_mpp();
 	ret
 }
@@ -689,6 +695,90 @@ pub extern "C" fn InitFeatures_requires_wumbo(this_arg: &crate::lightning::ln::f
 #[no_mangle]
 pub extern "C" fn NodeFeatures_requires_wumbo(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_wumbo();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_anchors_nonzero_fee_htlc_tx_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_anchors_nonzero_fee_htlc_tx_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_anchors_nonzero_fee_htlc_tx_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_anchors_nonzero_fee_htlc_tx_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_anchors_nonzero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_anchors_nonzero_fee_htlc_tx();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_anchors_nonzero_fee_htlc_tx_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_anchors_nonzero_fee_htlc_tx_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_anchors_nonzero_fee_htlc_tx_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_anchors_nonzero_fee_htlc_tx_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_anchors_nonzero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_anchors_nonzero_fee_htlc_tx();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_anchors_nonzero_fee_htlc_tx_optional(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_anchors_nonzero_fee_htlc_tx_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_anchors_nonzero_fee_htlc_tx_required(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_anchors_nonzero_fee_htlc_tx_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_supports_anchors_nonzero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_anchors_nonzero_fee_htlc_tx();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_anchors_nonzero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_anchors_nonzero_fee_htlc_tx();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_anchors_nonzero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_anchors_nonzero_fee_htlc_tx();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_requires_anchors_nonzero_fee_htlc_tx(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_anchors_nonzero_fee_htlc_tx();
 	ret
 }
 
@@ -1030,20 +1120,20 @@ pub extern "C" fn ChannelTypeFeatures_requires_scid_privacy(this_arg: &crate::li
 
 /// Set this feature as optional.
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_set_payment_metadata_optional(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
-	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_payment_metadata_optional()
+pub extern "C" fn Bolt11InvoiceFeatures_set_payment_metadata_optional(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_payment_metadata_optional()
 }
 
 /// Set this feature as required.
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_set_payment_metadata_required(this_arg: &mut crate::lightning::ln::features::InvoiceFeatures) {
-	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceFeatures)) }.set_payment_metadata_required()
+pub extern "C" fn Bolt11InvoiceFeatures_set_payment_metadata_required(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_payment_metadata_required()
 }
 
 /// Checks if this feature is supported.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_supports_payment_metadata(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+pub extern "C" fn Bolt11InvoiceFeatures_supports_payment_metadata(this_arg: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_payment_metadata();
 	ret
 }
@@ -1051,7 +1141,7 @@ pub extern "C" fn InvoiceFeatures_supports_payment_metadata(this_arg: &crate::li
 /// Checks if this feature is required.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_requires_payment_metadata(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+pub extern "C" fn Bolt11InvoiceFeatures_requires_payment_metadata(this_arg: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_payment_metadata();
 	ret
 }
@@ -1196,11 +1286,11 @@ pub extern "C" fn ChannelFeatures_eq(a: &ChannelFeatures, b: &ChannelFeatures) -
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
-/// Checks if two InvoiceFeaturess contain equal inner contents.
+/// Checks if two Bolt11InvoiceFeaturess contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_eq(a: &InvoiceFeatures, b: &InvoiceFeatures) -> bool {
+pub extern "C" fn Bolt11InvoiceFeatures_eq(a: &Bolt11InvoiceFeatures, b: &Bolt11InvoiceFeatures) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
@@ -1307,10 +1397,10 @@ pub(crate) extern "C" fn ChannelFeatures_clone_void(this_ptr: *const c_void) -> 
 pub extern "C" fn ChannelFeatures_clone(orig: &ChannelFeatures) -> ChannelFeatures {
 	orig.clone()
 }
-impl Clone for InvoiceFeatures {
+impl Clone for Bolt11InvoiceFeatures {
 	fn clone(&self) -> Self {
 		Self {
-			inner: if <*mut nativeInvoiceFeatures>::is_null(self.inner) { core::ptr::null_mut() } else {
+			inner: if <*mut nativeBolt11InvoiceFeatures>::is_null(self.inner) { core::ptr::null_mut() } else {
 				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
 			is_owned: true,
 		}
@@ -1318,12 +1408,12 @@ impl Clone for InvoiceFeatures {
 }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn InvoiceFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInvoiceFeatures)).clone() })) as *mut c_void
+pub(crate) extern "C" fn Bolt11InvoiceFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBolt11InvoiceFeatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
-/// Creates a copy of the InvoiceFeatures
-pub extern "C" fn InvoiceFeatures_clone(orig: &InvoiceFeatures) -> InvoiceFeatures {
+/// Creates a copy of the Bolt11InvoiceFeatures
+pub extern "C" fn Bolt11InvoiceFeatures_clone(orig: &Bolt11InvoiceFeatures) -> Bolt11InvoiceFeatures {
 	orig.clone()
 }
 impl Clone for OfferFeatures {
@@ -1575,18 +1665,18 @@ impl ChannelFeatures {
 	}
 }
 
-use lightning::ln::features::InvoiceFeatures as nativeInvoiceFeaturesImport;
-pub(crate) type nativeInvoiceFeatures = nativeInvoiceFeaturesImport;
+use lightning::ln::features::Bolt11InvoiceFeatures as nativeBolt11InvoiceFeaturesImport;
+pub(crate) type nativeBolt11InvoiceFeatures = nativeBolt11InvoiceFeaturesImport;
 
 /// Features used within an invoice.
 #[must_use]
 #[repr(C)]
-pub struct InvoiceFeatures {
+pub struct Bolt11InvoiceFeatures {
 	/// A pointer to the opaque Rust object.
 
 	/// Nearly everywhere, inner must be non-null, however in places where
 	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeInvoiceFeatures,
+	pub inner: *mut nativeBolt11InvoiceFeatures,
 	/// Indicates that this is the only struct which contains the same pointer.
 
 	/// Rust functions which take ownership of an object provided via an argument require
@@ -1594,31 +1684,31 @@ pub struct InvoiceFeatures {
 	pub is_owned: bool,
 }
 
-impl Drop for InvoiceFeatures {
+impl Drop for Bolt11InvoiceFeatures {
 	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeInvoiceFeatures>::is_null(self.inner) {
+		if self.is_owned && !<*mut nativeBolt11InvoiceFeatures>::is_null(self.inner) {
 			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
 		}
 	}
 }
-/// Frees any resources used by the InvoiceFeatures, if is_owned is set and inner is non-NULL.
+/// Frees any resources used by the Bolt11InvoiceFeatures, if is_owned is set and inner is non-NULL.
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_free(this_obj: InvoiceFeatures) { }
+pub extern "C" fn Bolt11InvoiceFeatures_free(this_obj: Bolt11InvoiceFeatures) { }
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn InvoiceFeatures_free_void(this_ptr: *mut c_void) {
-	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeInvoiceFeatures) };
+pub(crate) extern "C" fn Bolt11InvoiceFeatures_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeBolt11InvoiceFeatures) };
 }
 #[allow(unused)]
-impl InvoiceFeatures {
-	pub(crate) fn get_native_ref(&self) -> &'static nativeInvoiceFeatures {
+impl Bolt11InvoiceFeatures {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeBolt11InvoiceFeatures {
 		unsafe { &*ObjOps::untweak_ptr(self.inner) }
 	}
-	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeInvoiceFeatures {
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeBolt11InvoiceFeatures {
 		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
 	}
 	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-	pub(crate) fn take_inner(mut self) -> *mut nativeInvoiceFeatures {
+	pub(crate) fn take_inner(mut self) -> *mut nativeBolt11InvoiceFeatures {
 		assert!(self.is_owned);
 		let ret = ObjOps::untweak_ptr(self.inner);
 		self.inner = core::ptr::null_mut();
@@ -1897,6 +1987,14 @@ pub extern "C" fn InitFeatures_empty() -> crate::lightning::ln::features::InitFe
 	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
+/// Returns true if this `Features` object contains required features unknown by `other`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_unknown_bits_from(this_arg: &crate::lightning::ln::features::InitFeatures, other: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits_from(other.get_native_ref());
+	ret
+}
+
 /// Returns true if this `Features` object contains unknown feature flags which are set as
 /// \"required\".
 #[must_use]
@@ -1906,12 +2004,50 @@ pub extern "C" fn InitFeatures_requires_unknown_bits(this_arg: &crate::lightning
 	ret
 }
 
+/// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_required_custom_bit(this_arg: &mut crate::lightning::ln::features::InitFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_required_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_optional_custom_bit(this_arg: &mut crate::lightning::ln::features::InitFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_optional_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
 pub extern "C" fn NodeFeatures_empty() -> crate::lightning::ln::features::NodeFeatures {
 	let mut ret = lightning::ln::features::NodeFeatures::empty();
 	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains required features unknown by `other`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_unknown_bits_from(this_arg: &crate::lightning::ln::features::NodeFeatures, other: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits_from(other.get_native_ref());
+	ret
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
@@ -1923,12 +2059,50 @@ pub extern "C" fn NodeFeatures_requires_unknown_bits(this_arg: &crate::lightning
 	ret
 }
 
+/// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_required_custom_bit(this_arg: &mut crate::lightning::ln::features::NodeFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_required_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_optional_custom_bit(this_arg: &mut crate::lightning::ln::features::NodeFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_optional_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelFeatures_empty() -> crate::lightning::ln::features::ChannelFeatures {
 	let mut ret = lightning::ln::features::ChannelFeatures::empty();
 	crate::lightning::ln::features::ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains required features unknown by `other`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelFeatures_requires_unknown_bits_from(this_arg: &crate::lightning::ln::features::ChannelFeatures, other: &crate::lightning::ln::features::ChannelFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits_from(other.get_native_ref());
+	ret
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
@@ -1940,21 +2114,89 @@ pub extern "C" fn ChannelFeatures_requires_unknown_bits(this_arg: &crate::lightn
 	ret
 }
 
+/// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelFeatures_set_required_custom_bit(this_arg: &mut crate::lightning::ln::features::ChannelFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelFeatures)) }.set_required_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelFeatures_set_optional_custom_bit(this_arg: &mut crate::lightning::ln::features::ChannelFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelFeatures)) }.set_optional_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_empty() -> crate::lightning::ln::features::InvoiceFeatures {
-	let mut ret = lightning::ln::features::InvoiceFeatures::empty();
-	crate::lightning::ln::features::InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+pub extern "C" fn Bolt11InvoiceFeatures_empty() -> crate::lightning::ln::features::Bolt11InvoiceFeatures {
+	let mut ret = lightning::ln::features::Bolt11InvoiceFeatures::empty();
+	crate::lightning::ln::features::Bolt11InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains required features unknown by `other`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt11InvoiceFeatures_requires_unknown_bits_from(this_arg: &crate::lightning::ln::features::Bolt11InvoiceFeatures, other: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits_from(other.get_native_ref());
+	ret
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
 /// \"required\".
 #[must_use]
 #[no_mangle]
-pub extern "C" fn InvoiceFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::InvoiceFeatures) -> bool {
+pub extern "C" fn Bolt11InvoiceFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
+}
+
+/// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt11InvoiceFeatures_set_required_custom_bit(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_required_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt11InvoiceFeatures_set_optional_custom_bit(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_optional_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
 }
 
 /// Create a blank Features with no features set
@@ -1963,6 +2205,14 @@ pub extern "C" fn InvoiceFeatures_requires_unknown_bits(this_arg: &crate::lightn
 pub extern "C" fn OfferFeatures_empty() -> crate::lightning::ln::features::OfferFeatures {
 	let mut ret = lightning::ln::features::OfferFeatures::empty();
 	crate::lightning::ln::features::OfferFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains required features unknown by `other`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn OfferFeatures_requires_unknown_bits_from(this_arg: &crate::lightning::ln::features::OfferFeatures, other: &crate::lightning::ln::features::OfferFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits_from(other.get_native_ref());
+	ret
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
@@ -1974,12 +2224,50 @@ pub extern "C" fn OfferFeatures_requires_unknown_bits(this_arg: &crate::lightnin
 	ret
 }
 
+/// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn OfferFeatures_set_required_custom_bit(this_arg: &mut crate::lightning::ln::features::OfferFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeOfferFeatures)) }.set_required_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn OfferFeatures_set_optional_custom_bit(this_arg: &mut crate::lightning::ln::features::OfferFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeOfferFeatures)) }.set_optional_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InvoiceRequestFeatures_empty() -> crate::lightning::ln::features::InvoiceRequestFeatures {
 	let mut ret = lightning::ln::features::InvoiceRequestFeatures::empty();
 	crate::lightning::ln::features::InvoiceRequestFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains required features unknown by `other`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceRequestFeatures_requires_unknown_bits_from(this_arg: &crate::lightning::ln::features::InvoiceRequestFeatures, other: &crate::lightning::ln::features::InvoiceRequestFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits_from(other.get_native_ref());
+	ret
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
@@ -1991,12 +2279,50 @@ pub extern "C" fn InvoiceRequestFeatures_requires_unknown_bits(this_arg: &crate:
 	ret
 }
 
+/// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceRequestFeatures_set_required_custom_bit(this_arg: &mut crate::lightning::ln::features::InvoiceRequestFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceRequestFeatures)) }.set_required_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceRequestFeatures_set_optional_custom_bit(this_arg: &mut crate::lightning::ln::features::InvoiceRequestFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceRequestFeatures)) }.set_optional_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Bolt12InvoiceFeatures_empty() -> crate::lightning::ln::features::Bolt12InvoiceFeatures {
 	let mut ret = lightning::ln::features::Bolt12InvoiceFeatures::empty();
 	crate::lightning::ln::features::Bolt12InvoiceFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains required features unknown by `other`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_requires_unknown_bits_from(this_arg: &crate::lightning::ln::features::Bolt12InvoiceFeatures, other: &crate::lightning::ln::features::Bolt12InvoiceFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits_from(other.get_native_ref());
+	ret
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
@@ -2008,12 +2334,50 @@ pub extern "C" fn Bolt12InvoiceFeatures_requires_unknown_bits(this_arg: &crate::
 	ret
 }
 
+/// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_set_required_custom_bit(this_arg: &mut crate::lightning::ln::features::Bolt12InvoiceFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt12InvoiceFeatures)) }.set_required_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_set_optional_custom_bit(this_arg: &mut crate::lightning::ln::features::Bolt12InvoiceFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt12InvoiceFeatures)) }.set_optional_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
 pub extern "C" fn BlindedHopFeatures_empty() -> crate::lightning::ln::features::BlindedHopFeatures {
 	let mut ret = lightning::ln::features::BlindedHopFeatures::empty();
 	crate::lightning::ln::features::BlindedHopFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains required features unknown by `other`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedHopFeatures_requires_unknown_bits_from(this_arg: &crate::lightning::ln::features::BlindedHopFeatures, other: &crate::lightning::ln::features::BlindedHopFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits_from(other.get_native_ref());
+	ret
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
@@ -2025,12 +2389,50 @@ pub extern "C" fn BlindedHopFeatures_requires_unknown_bits(this_arg: &crate::lig
 	ret
 }
 
+/// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedHopFeatures_set_required_custom_bit(this_arg: &mut crate::lightning::ln::features::BlindedHopFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBlindedHopFeatures)) }.set_required_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedHopFeatures_set_optional_custom_bit(this_arg: &mut crate::lightning::ln::features::BlindedHopFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBlindedHopFeatures)) }.set_optional_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Create a blank Features with no features set
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelTypeFeatures_empty() -> crate::lightning::ln::features::ChannelTypeFeatures {
 	let mut ret = lightning::ln::features::ChannelTypeFeatures::empty();
 	crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this `Features` object contains required features unknown by `other`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_requires_unknown_bits_from(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures, other: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits_from(other.get_native_ref());
+	ret
 }
 
 /// Returns true if this `Features` object contains unknown feature flags which are set as
@@ -2040,6 +2442,36 @@ pub extern "C" fn ChannelTypeFeatures_empty() -> crate::lightning::ln::features:
 pub extern "C" fn ChannelTypeFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
+}
+
+/// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_required_custom_bit(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_required_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional custom feature bit. Errors if `bit` is outside the custom range as defined
+/// by [bLIP 2] or if it is a known `T` feature.
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [bLIP 2]: https://github.com/lightning/blips/blob/master/blip-0002.md#feature-bits
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_optional_custom_bit(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_optional_custom_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
 }
 
 #[no_mangle]
@@ -2091,19 +2523,35 @@ pub extern "C" fn NodeFeatures_read(ser: crate::c_types::u8slice) -> crate::c_ty
 	local_res
 }
 #[no_mangle]
-/// Serialize the InvoiceFeatures object into a byte array which can be read by InvoiceFeatures_read
-pub extern "C" fn InvoiceFeatures_write(obj: &crate::lightning::ln::features::InvoiceFeatures) -> crate::c_types::derived::CVec_u8Z {
+/// Serialize the Bolt11InvoiceFeatures object into a byte array which can be read by Bolt11InvoiceFeatures_read
+pub extern "C" fn Bolt11InvoiceFeatures_write(obj: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
 #[no_mangle]
-pub(crate) extern "C" fn InvoiceFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeInvoiceFeatures) })
+pub(crate) extern "C" fn Bolt11InvoiceFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBolt11InvoiceFeatures) })
 }
 #[no_mangle]
-/// Read a InvoiceFeatures from a byte array, created by InvoiceFeatures_write
-pub extern "C" fn InvoiceFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_InvoiceFeaturesDecodeErrorZ {
-	let res: Result<lightning::ln::features::InvoiceFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::InvoiceFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+/// Read a Bolt11InvoiceFeatures from a byte array, created by Bolt11InvoiceFeatures_write
+pub extern "C" fn Bolt11InvoiceFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_Bolt11InvoiceFeaturesDecodeErrorZ {
+	let res: Result<lightning::ln::features::Bolt11InvoiceFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::Bolt11InvoiceFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the Bolt12InvoiceFeatures object into a byte array which can be read by Bolt12InvoiceFeatures_read
+pub extern "C" fn Bolt12InvoiceFeatures_write(obj: &crate::lightning::ln::features::Bolt12InvoiceFeatures) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn Bolt12InvoiceFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBolt12InvoiceFeatures) })
+}
+#[no_mangle]
+/// Read a Bolt12InvoiceFeatures from a byte array, created by Bolt12InvoiceFeatures_write
+pub extern "C" fn Bolt12InvoiceFeatures_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_Bolt12InvoiceFeaturesDecodeErrorZ {
+	let res: Result<lightning::ln::features::Bolt12InvoiceFeatures, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::features::Bolt12InvoiceFeatures { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]

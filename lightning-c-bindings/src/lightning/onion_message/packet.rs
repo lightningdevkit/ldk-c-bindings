@@ -21,6 +21,9 @@ use alloc::{vec::Vec, boxed::Box};
 #[must_use]
 #[repr(C)]
 pub enum OnionMessageContents {
+	/// A message related to BOLT 12 Offers.
+	Offers(
+		crate::lightning::onion_message::offers::OffersMessage),
 	/// A custom onion message specified by the user.
 	Custom(
 		crate::lightning::onion_message::packet::CustomOnionMessageContents),
@@ -32,6 +35,11 @@ impl OnionMessageContents {
 	#[allow(unused)]
 	pub(crate) fn into_native(self) -> nativeOnionMessageContents {
 		match self {
+			OnionMessageContents::Offers (mut a, ) => {
+				nativeOnionMessageContents::Offers (
+					a.into_native(),
+				)
+			},
 			OnionMessageContents::Custom (mut a, ) => {
 				nativeOnionMessageContents::Custom (
 					a,
@@ -42,6 +50,11 @@ impl OnionMessageContents {
 	#[allow(unused)]
 	pub(crate) fn native_into(native: nativeOnionMessageContents) -> Self {
 		match native {
+			nativeOnionMessageContents::Offers (mut a, ) => {
+				OnionMessageContents::Offers (
+					crate::lightning::onion_message::offers::OffersMessage::native_into(a),
+				)
+			},
 			nativeOnionMessageContents::Custom (mut a, ) => {
 				OnionMessageContents::Custom (
 					Into::into(a),
@@ -54,6 +67,11 @@ impl OnionMessageContents {
 #[no_mangle]
 pub extern "C" fn OnionMessageContents_free(this_ptr: OnionMessageContents) { }
 #[no_mangle]
+/// Utility method to constructs a new Offers-variant OnionMessageContents
+pub extern "C" fn OnionMessageContents_offers(a: crate::lightning::onion_message::offers::OffersMessage) -> OnionMessageContents {
+	OnionMessageContents::Offers(a, )
+}
+#[no_mangle]
 /// Utility method to constructs a new Custom-variant OnionMessageContents
 pub extern "C" fn OnionMessageContents_custom(a: crate::lightning::onion_message::packet::CustomOnionMessageContents) -> OnionMessageContents {
 	OnionMessageContents::Custom(a, )
@@ -65,7 +83,6 @@ pub struct CustomOnionMessageContents {
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Returns the TLV type identifying the message contents. MUST be >= 64.
-	#[must_use]
 	pub tlv_type: extern "C" fn (this_arg: *const c_void) -> u64,
 	/// Serialize the object into a byte array
 	pub write: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_u8Z,

@@ -26,8 +26,20 @@ pub struct BroadcasterInterface {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
-	/// Sends a transaction out to (hopefully) be mined.
-	pub broadcast_transaction: extern "C" fn (this_arg: *const c_void, tx: crate::c_types::Transaction),
+	/// Sends a list of transactions out to (hopefully) be mined.
+	/// This only needs to handle the actual broadcasting of transactions, LDK will automatically
+	/// rebroadcast transactions that haven't made it into a block.
+	///
+	/// In some cases LDK may attempt to broadcast a transaction which double-spends another
+	/// and this isn't a bug and can be safely ignored.
+	///
+	/// If more than one transaction is given, these transactions should be considered to be a
+	/// package and broadcast together. Some of the transactions may or may not depend on each other,
+	/// be sure to manage both cases correctly.
+	///
+	/// Bitcoin transaction packages are defined in BIP 331 and here:
+	/// https://github.com/bitcoin/bitcoin/blob/master/doc/policy/packages.md
+	pub broadcast_transactions: extern "C" fn (this_arg: *const c_void, txs: crate::c_types::derived::CVec_TransactionZ),
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -38,15 +50,16 @@ unsafe impl Sync for BroadcasterInterface {}
 pub(crate) extern "C" fn BroadcasterInterface_clone_fields(orig: &BroadcasterInterface) -> BroadcasterInterface {
 	BroadcasterInterface {
 		this_arg: orig.this_arg,
-		broadcast_transaction: Clone::clone(&orig.broadcast_transaction),
+		broadcast_transactions: Clone::clone(&orig.broadcast_transactions),
 		free: Clone::clone(&orig.free),
 	}
 }
 
 use lightning::chain::chaininterface::BroadcasterInterface as rustBroadcasterInterface;
 impl rustBroadcasterInterface for BroadcasterInterface {
-	fn broadcast_transaction(&self, mut tx: &bitcoin::blockdata::transaction::Transaction) {
-		(self.broadcast_transaction)(self.this_arg, crate::c_types::Transaction::from_bitcoin(tx))
+	fn broadcast_transactions(&self, mut txs: &[&bitcoin::blockdata::transaction::Transaction]) {
+		let mut local_txs = Vec::new(); for item in txs.iter() { local_txs.push( { crate::c_types::Transaction::from_bitcoin((*item)) }); };
+		(self.broadcast_transactions)(self.this_arg, local_txs.into())
 	}
 }
 
@@ -68,17 +81,26 @@ impl Drop for BroadcasterInterface {
 		}
 	}
 }
-/// An enum that represents the speed at which we want a transaction to confirm used for feerate
+/// An enum that represents the priority at which we want a transaction to confirm used for feerate
 /// estimation.
 #[derive(Clone)]
 #[must_use]
 #[repr(C)]
 pub enum ConfirmationTarget {
-	/// We are happy with this transaction confirming slowly when feerate drops some.
+	/// We'd like a transaction to confirm in the future, but don't want to commit most of the fees
+	/// required to do so yet. The remaining fees will come via a Child-Pays-For-Parent (CPFP) fee
+	/// bump of the transaction.
+	///
+	/// The feerate returned should be the absolute minimum feerate required to enter most node
+	/// mempools across the network. Note that if you are not able to obtain this feerate estimate,
+	/// you should likely use the furthest-out estimate allowed by your fee estimator.
+	MempoolMinimum,
+	/// We are happy with a transaction confirming slowly, at least within a day or so worth of
+	/// blocks.
 	Background,
-	/// We'd like this transaction to confirm without major delay, but 12-18 blocks is fine.
+	/// We'd like a transaction to confirm without major delayed, i.e., within the next 12-24 blocks.
 	Normal,
-	/// We'd like this transaction to confirm in the next few blocks.
+	/// We'd like a transaction to confirm in the next few blocks.
 	HighPriority,
 }
 use lightning::chain::chaininterface::ConfirmationTarget as ConfirmationTargetImport;
@@ -88,6 +110,7 @@ impl ConfirmationTarget {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeConfirmationTarget {
 		match self {
+			ConfirmationTarget::MempoolMinimum => nativeConfirmationTarget::MempoolMinimum,
 			ConfirmationTarget::Background => nativeConfirmationTarget::Background,
 			ConfirmationTarget::Normal => nativeConfirmationTarget::Normal,
 			ConfirmationTarget::HighPriority => nativeConfirmationTarget::HighPriority,
@@ -96,6 +119,7 @@ impl ConfirmationTarget {
 	#[allow(unused)]
 	pub(crate) fn into_native(self) -> nativeConfirmationTarget {
 		match self {
+			ConfirmationTarget::MempoolMinimum => nativeConfirmationTarget::MempoolMinimum,
 			ConfirmationTarget::Background => nativeConfirmationTarget::Background,
 			ConfirmationTarget::Normal => nativeConfirmationTarget::Normal,
 			ConfirmationTarget::HighPriority => nativeConfirmationTarget::HighPriority,
@@ -104,6 +128,7 @@ impl ConfirmationTarget {
 	#[allow(unused)]
 	pub(crate) fn from_native(native: &nativeConfirmationTarget) -> Self {
 		match native {
+			nativeConfirmationTarget::MempoolMinimum => ConfirmationTarget::MempoolMinimum,
 			nativeConfirmationTarget::Background => ConfirmationTarget::Background,
 			nativeConfirmationTarget::Normal => ConfirmationTarget::Normal,
 			nativeConfirmationTarget::HighPriority => ConfirmationTarget::HighPriority,
@@ -112,6 +137,7 @@ impl ConfirmationTarget {
 	#[allow(unused)]
 	pub(crate) fn native_into(native: nativeConfirmationTarget) -> Self {
 		match native {
+			nativeConfirmationTarget::MempoolMinimum => ConfirmationTarget::MempoolMinimum,
 			nativeConfirmationTarget::Background => ConfirmationTarget::Background,
 			nativeConfirmationTarget::Normal => ConfirmationTarget::Normal,
 			nativeConfirmationTarget::HighPriority => ConfirmationTarget::HighPriority,
@@ -123,6 +149,10 @@ impl ConfirmationTarget {
 pub extern "C" fn ConfirmationTarget_clone(orig: &ConfirmationTarget) -> ConfirmationTarget {
 	orig.clone()
 }
+#[no_mangle]
+/// Utility method to constructs a new MempoolMinimum-variant ConfirmationTarget
+pub extern "C" fn ConfirmationTarget_mempool_minimum() -> ConfirmationTarget {
+	ConfirmationTarget::MempoolMinimum}
 #[no_mangle]
 /// Utility method to constructs a new Background-variant ConfirmationTarget
 pub extern "C" fn ConfirmationTarget_background() -> ConfirmationTarget {
@@ -153,6 +183,11 @@ pub extern "C" fn ConfirmationTarget_eq(a: &ConfirmationTarget, b: &Confirmation
 /// A trait which should be implemented to provide feerate information on a number of time
 /// horizons.
 ///
+/// If access to a local mempool is not feasible, feerate estimates should be fetched from a set of
+/// third-parties hosting them. Note that this enables them to affect the propagation of your
+/// pre-signed transactions at any time and therefore endangers the safety of channels funds. It
+/// should be considered carefully as a deployment.
+///
 /// Note that all of the functions implemented here *must* be reentrant-safe (obviously - they're
 /// called from inside the library in response to chain events, P2P events, or timer events).
 #[repr(C)]
@@ -168,7 +203,6 @@ pub struct FeeEstimator {
 	/// The following unit conversions can be used to convert to sats/KW:
 	///  * satoshis-per-byte * 250
 	///  * satoshis-per-kbyte / 4
-	#[must_use]
 	pub get_est_sat_per_1000_weight: extern "C" fn (this_arg: *const c_void, confirmation_target: crate::lightning::chain::chaininterface::ConfirmationTarget) -> u32,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.

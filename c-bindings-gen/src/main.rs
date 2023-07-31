@@ -73,7 +73,7 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 			let mut for_obj_vec = Vec::new();
 			types.write_c_type(&mut for_obj_vec, for_ty, Some(generics), false);
 			full_obj_path = String::from_utf8(for_obj_vec).unwrap();
-			assert!(full_obj_path.starts_with(TypeResolver::generated_container_path()));
+			if !full_obj_path.starts_with(TypeResolver::generated_container_path()) { return; }
 			for_obj = full_obj_path[TypeResolver::generated_container_path().len() + 2..].into();
 		}
 
@@ -366,9 +366,6 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 						writeln!(extra_headers, "struct LDK{};", trait_name).unwrap();
 						continue;
 					}
-					// Sadly, this currently doesn't do what we want, but it should be easy to get
-					// cbindgen to support it. See https://github.com/eqrion/cbindgen/issues/531
-					writeln!(w, "\t#[must_use]").unwrap();
 				}
 
 				let mut cpp_docs = Vec::new();
@@ -535,7 +532,12 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 								syn::TypeParamBound::Trait(tr) => {
 									writeln!(w, "\ttype {} = crate::{};", t.ident, $type_resolver.resolve_path(&tr.path, Some(&gen_types))).unwrap();
 									for bound in bounds_iter {
-										if let syn::TypeParamBound::Trait(_) = bound { panic!("11"); }
+										if let syn::TypeParamBound::Trait(t) = bound {
+											// We only allow for `?Sized` here.
+											if let syn::TraitBoundModifier::Maybe(_) = t.modifier {} else { panic!(); }
+											assert_eq!(t.path.segments.len(), 1);
+											assert_eq!(format!("{}", t.path.segments[0].ident), "Sized");
+										}
 									}
 									break;
 								},
@@ -803,7 +805,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 				define_field!(('a' as u8 + idx as u8) as char, ('0' as u8 + idx as u8) as char, field);
 			}
 		}
-		_ => unimplemented!()
+		syn::Fields::Unit => {},
 	}
 
 	if all_fields_settable {
@@ -826,7 +828,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 					types.write_c_type(w, &field.ty, Some(&gen_types), false);
 				}
 			}
-			_ => unreachable!()
+			syn::Fields::Unit => {},
 		}
 		write!(w, ") -> {} {{\n\t", struct_name).unwrap();
 		match &s.fields {
@@ -846,7 +848,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 					}
 				}
 			},
-			_ => unreachable!()
+			syn::Fields::Unit => {},
 		}
 		write!(w, "{} {{ inner: ObjOps::heap_alloc(", struct_name).unwrap();
 		match &s.fields {
@@ -874,7 +876,7 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 				}
 				write!(w, "\t)").unwrap();
 			},
-			_ => unreachable!()
+			syn::Fields::Unit => write!(w, "{}::{} {{}}", types.module_path, struct_name).unwrap(),
 		}
 		writeln!(w, "), is_owned: true }}\n}}").unwrap();
 	}
@@ -943,9 +945,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 				if i.defaultness.is_some() || i.unsafety.is_some() { unimplemented!(); }
 				if let Some(trait_path) = i.trait_.as_ref() {
 					if trait_path.0.is_some() { unimplemented!(); }
-					if types.understood_c_path(&trait_path.1) {
-						let full_trait_path = types.resolve_path(&trait_path.1, None);
-						let trait_obj = *types.crate_types.traits.get(&full_trait_path).unwrap();
+					let full_trait_path_opt = types.maybe_resolve_path(&trait_path.1, None);
+					let trait_obj_opt = full_trait_path_opt.as_ref().and_then(|path| types.crate_types.traits.get(path));
+					if types.understood_c_path(&trait_path.1) && trait_obj_opt.is_some() {
+						let full_trait_path = full_trait_path_opt.unwrap();
+						let trait_obj = *trait_obj_opt.unwrap();
 
 						let supertrait_name;
 						let supertrait_resolver;
@@ -2198,9 +2202,13 @@ fn walk_private_mod<'a>(ast_storage: &'a FullLibraryAST, orig_crate: &str, modul
 					if let Some(trait_path) = i.trait_.as_ref() {
 						if let Some(tp) = import_resolver.maybe_resolve_path(&trait_path.1, None) {
 							if let Some(sp) = import_resolver.maybe_resolve_path(&p.path, None) {
-								match crate_types.trait_impls.entry(sp) {
-									hash_map::Entry::Occupied(mut e) => { e.get_mut().push(tp); },
-									hash_map::Entry::Vacant(e) => { e.insert(vec![tp]); },
+								match crate_types.trait_impls.entry(sp.clone()) {
+									hash_map::Entry::Occupied(mut e) => { e.get_mut().push(tp.clone()); },
+									hash_map::Entry::Vacant(e) => { e.insert(vec![tp.clone()]); },
+								}
+								match crate_types.traits_impld.entry(tp) {
+									hash_map::Entry::Occupied(mut e) => { e.get_mut().push(sp); },
+									hash_map::Entry::Vacant(e) => { e.insert(vec![sp]); },
 								}
 							}
 						}
@@ -2310,9 +2318,13 @@ fn walk_ast_first_pass<'a>(ast_storage: &'a FullLibraryAST, crate_types: &mut Cr
 							}
 							if let Some(tp) = import_resolver.maybe_resolve_path(&trait_path.1, None) {
 								if let Some(sp) = import_resolver.maybe_resolve_path(&p.path, None) {
-									match crate_types.trait_impls.entry(sp) {
-										hash_map::Entry::Occupied(mut e) => { e.get_mut().push(tp); },
-										hash_map::Entry::Vacant(e) => { e.insert(vec![tp]); },
+									match crate_types.trait_impls.entry(sp.clone()) {
+										hash_map::Entry::Occupied(mut e) => { e.get_mut().push(tp.clone()); },
+										hash_map::Entry::Vacant(e) => { e.insert(vec![tp.clone()]); },
+									}
+									match crate_types.traits_impld.entry(tp) {
+										hash_map::Entry::Occupied(mut e) => { e.get_mut().push(sp); },
+										hash_map::Entry::Vacant(e) => { e.insert(vec![sp]); },
 									}
 								}
 							}

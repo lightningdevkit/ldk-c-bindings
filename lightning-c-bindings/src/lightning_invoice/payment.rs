@@ -16,66 +16,67 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
-/// Pays the given [`Invoice`], retrying if needed based on [`Retry`].
+/// Pays the given [`Bolt11Invoice`], retrying if needed based on [`Retry`].
 ///
-/// [`Invoice::payment_hash`] is used as the [`PaymentId`], which ensures idempotency as long
-/// as the payment is still pending. Once the payment completes or fails, you must ensure that
-/// a second payment with the same [`PaymentHash`] is never sent.
+/// [`Bolt11Invoice::payment_hash`] is used as the [`PaymentId`], which ensures idempotency as long
+/// as the payment is still pending. If the payment succeeds, you must ensure that a second payment
+/// with the same [`PaymentHash`] is never sent.
 ///
 /// If you wish to use a different payment idempotency token, see [`pay_invoice_with_id`].
 #[no_mangle]
-pub extern "C" fn pay_invoice(invoice: &crate::lightning_invoice::Invoice, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
-	let mut ret = lightning_invoice::payment::pay_invoice::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::chain::keysinterface::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), retry_strategy.into_native(), channelmanager.get_native_ref());
+pub extern "C" fn pay_invoice(invoice: &crate::lightning_invoice::Bolt11Invoice, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
+	let mut ret = lightning_invoice::payment::pay_invoice::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), retry_strategy.into_native(), channelmanager.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::PaymentError::native_into(e) }).into() };
 	local_ret
 }
 
-/// Pays the given [`Invoice`] with a custom idempotency key, retrying if needed based on [`Retry`].
+/// Pays the given [`Bolt11Invoice`] with a custom idempotency key, retrying if needed based on
+/// [`Retry`].
 ///
 /// Note that idempotency is only guaranteed as long as the payment is still pending. Once the
 /// payment completes or fails, no idempotency guarantees are made.
 ///
-/// You should ensure that the [`Invoice::payment_hash`] is unique and the same [`PaymentHash`]
-/// has never been paid before.
+/// You should ensure that the [`Bolt11Invoice::payment_hash`] is unique and the same
+/// [`PaymentHash`] has never been paid before.
 ///
 /// See [`pay_invoice`] for a variant which uses the [`PaymentHash`] for the idempotency token.
 #[no_mangle]
-pub extern "C" fn pay_invoice_with_id(invoice: &crate::lightning_invoice::Invoice, mut payment_id: crate::c_types::ThirtyTwoBytes, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NonePaymentErrorZ {
-	let mut ret = lightning_invoice::payment::pay_invoice_with_id::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::chain::keysinterface::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), ::lightning::ln::channelmanager::PaymentId(payment_id.data), retry_strategy.into_native(), channelmanager.get_native_ref());
+pub extern "C" fn pay_invoice_with_id(invoice: &crate::lightning_invoice::Bolt11Invoice, mut payment_id: crate::c_types::ThirtyTwoBytes, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NonePaymentErrorZ {
+	let mut ret = lightning_invoice::payment::pay_invoice_with_id::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), ::lightning::ln::channelmanager::PaymentId(payment_id.data), retry_strategy.into_native(), channelmanager.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::PaymentError::native_into(e) }).into() };
 	local_ret
 }
 
-/// Pays the given zero-value [`Invoice`] using the given amount, retrying if needed based on
+/// Pays the given zero-value [`Bolt11Invoice`] using the given amount, retrying if needed based on
 /// [`Retry`].
 ///
-/// [`Invoice::payment_hash`] is used as the [`PaymentId`], which ensures idempotency as long
-/// as the payment is still pending. Once the payment completes or fails, you must ensure that
-/// a second payment with the same [`PaymentHash`] is never sent.
+/// [`Bolt11Invoice::payment_hash`] is used as the [`PaymentId`], which ensures idempotency as long
+/// as the payment is still pending. If the payment succeeds, you must ensure that a second payment
+/// with the same [`PaymentHash`] is never sent.
 ///
 /// If you wish to use a different payment idempotency token, see
 /// [`pay_zero_value_invoice_with_id`].
 #[no_mangle]
-pub extern "C" fn pay_zero_value_invoice(invoice: &crate::lightning_invoice::Invoice, mut amount_msats: u64, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
-	let mut ret = lightning_invoice::payment::pay_zero_value_invoice::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::chain::keysinterface::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), amount_msats, retry_strategy.into_native(), channelmanager.get_native_ref());
+pub extern "C" fn pay_zero_value_invoice(invoice: &crate::lightning_invoice::Bolt11Invoice, mut amount_msats: u64, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
+	let mut ret = lightning_invoice::payment::pay_zero_value_invoice::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), amount_msats, retry_strategy.into_native(), channelmanager.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::PaymentError::native_into(e) }).into() };
 	local_ret
 }
 
-/// Pays the given zero-value [`Invoice`] using the given amount and custom idempotency key,
-/// , retrying if needed based on [`Retry`].
+/// Pays the given zero-value [`Bolt11Invoice`] using the given amount and custom idempotency key,
+/// retrying if needed based on [`Retry`].
 ///
 /// Note that idempotency is only guaranteed as long as the payment is still pending. Once the
 /// payment completes or fails, no idempotency guarantees are made.
 ///
-/// You should ensure that the [`Invoice::payment_hash`] is unique and the same [`PaymentHash`]
-/// has never been paid before.
+/// You should ensure that the [`Bolt11Invoice::payment_hash`] is unique and the same
+/// [`PaymentHash`] has never been paid before.
 ///
 /// See [`pay_zero_value_invoice`] for a variant which uses the [`PaymentHash`] for the
 /// idempotency token.
 #[no_mangle]
-pub extern "C" fn pay_zero_value_invoice_with_id(invoice: &crate::lightning_invoice::Invoice, mut amount_msats: u64, mut payment_id: crate::c_types::ThirtyTwoBytes, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NonePaymentErrorZ {
-	let mut ret = lightning_invoice::payment::pay_zero_value_invoice_with_id::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::chain::keysinterface::EntropySource, crate::lightning::chain::keysinterface::NodeSigner, crate::lightning::chain::keysinterface::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), amount_msats, ::lightning::ln::channelmanager::PaymentId(payment_id.data), retry_strategy.into_native(), channelmanager.get_native_ref());
+pub extern "C" fn pay_zero_value_invoice_with_id(invoice: &crate::lightning_invoice::Bolt11Invoice, mut amount_msats: u64, mut payment_id: crate::c_types::ThirtyTwoBytes, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NonePaymentErrorZ {
+	let mut ret = lightning_invoice::payment::pay_zero_value_invoice_with_id::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), amount_msats, ::lightning::ln::channelmanager::PaymentId(payment_id.data), retry_strategy.into_native(), channelmanager.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::PaymentError::native_into(e) }).into() };
 	local_ret
 }
@@ -85,7 +86,7 @@ pub extern "C" fn pay_zero_value_invoice_with_id(invoice: &crate::lightning_invo
 #[must_use]
 #[repr(C)]
 pub enum PaymentError {
-	/// An error resulting from the provided [`Invoice`] or payment hash.
+	/// An error resulting from the provided [`Bolt11Invoice`] or payment hash.
 	Invoice(
 		crate::c_types::Str),
 	/// An error occurring when sending a payment.
@@ -178,4 +179,10 @@ pub extern "C" fn PaymentError_invoice(a: crate::c_types::Str) -> PaymentError {
 /// Utility method to constructs a new Sending-variant PaymentError
 pub extern "C" fn PaymentError_sending(a: crate::lightning::ln::outbound_payment::RetryableSendFailure) -> PaymentError {
 	PaymentError::Sending(a, )
+}
+/// Checks if two PaymentErrors contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn PaymentError_eq(a: &PaymentError, b: &PaymentError) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
 }

@@ -20,9 +20,9 @@ uint32_t get_fee(const void *this_arg, LDKConfirmationTarget target) {
 	}
 }
 
-void broadcast_tx(const void *this_arg, LDKTransaction tx) {
+void broadcast_txn(const void *this_arg, LDKCVec_TransactionZ txn) {
 	//TODO
-	Transaction_free(tx);
+	CVec_TransactionZ_free(txn);
 }
 
 LDKChannelMonitorUpdateStatus add_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, LDKChannelMonitor monitor) {
@@ -44,12 +44,12 @@ void never_handle_event(const void *this_arg, const struct LDKEvent event) {
 	assert(false);
 }
 
-LDKCResult_RouteLightningErrorZ do_find_route(const void *this_arg, LDKPublicKey payer, const LDKRouteParameters *route_params, LDKCVec_ChannelDetailsZ *first_hops, const LDKInFlightHtlcs *inflight_htlcs) {
+LDKCResult_RouteLightningErrorZ do_find_route(const void *this_arg, LDKPublicKey payer, const LDKRouteParameters *route_params, LDKCVec_ChannelDetailsZ *first_hops, const LDKInFlightHtlcs inflight_htlcs) {
 	LDKStr reason = { .chars = (const unsigned char*)"", .len = 0, .chars_is_owned = false };
 	return CResult_RouteLightningErrorZ_err(LightningError_new(reason, ErrorAction_ignore_error()));
 }
 
-LDKCResult_RouteLightningErrorZ do_find_route_with_id(const void *this_arg, LDKPublicKey payer, const LDKRouteParameters *route_params, LDKCVec_ChannelDetailsZ *first_hops, const LDKInFlightHtlcs *inflight_htlcs, struct LDKThirtyTwoBytes payment_hash, struct LDKThirtyTwoBytes payment_id) {
+LDKCResult_RouteLightningErrorZ do_find_route_with_id(const void *this_arg, LDKPublicKey payer, const LDKRouteParameters *route_params, LDKCVec_ChannelDetailsZ *first_hops, const LDKInFlightHtlcs inflight_htlcs, struct LDKThirtyTwoBytes payment_hash, struct LDKThirtyTwoBytes payment_id) {
 	LDKStr reason = { .chars = (const unsigned char*)"", .len = 0, .chars_is_owned = false };
 	return CResult_RouteLightningErrorZ_err(LightningError_new(reason, ErrorAction_ignore_error()));
 }
@@ -82,7 +82,7 @@ int main() {
 
 	LDKBroadcasterInterface broadcast = {
 		.this_arg = NULL,
-		.broadcast_transaction = broadcast_tx,
+		.broadcast_transactions = broadcast_txn,
 		.free = NULL,
 	};
 
@@ -102,7 +102,7 @@ int main() {
 	LDKThirtyTwoBytes chain_tip;
 	memset(&chain_tip, 0, 32);
 	LDKChainParameters chain = ChainParameters_new(net, BestBlock_new(chain_tip, 0));
-	LDKChannelManager cm = ChannelManager_new(fee_est, mon, broadcast, router, logger, entropy_source, node_signer, signer_provider, config, chain);
+	LDKChannelManager cm = ChannelManager_new(fee_est, mon, broadcast, router, logger, entropy_source, node_signer, signer_provider, config, chain, 42);
 
 	LDKCVec_ChannelDetailsZ channels = ChannelManager_list_channels(&cm);
 	assert((unsigned long)channels.data < 4096); // There's an offset, but it should still be an offset against null in the 0 page

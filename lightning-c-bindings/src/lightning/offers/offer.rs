@@ -23,7 +23,7 @@
 //!
 //! use bitcoin::secp256k1::{KeyPair, PublicKey, Secp256k1, SecretKey};
 //! use lightning::offers::offer::{Offer, OfferBuilder, Quantity};
-//! use lightning::offers::parse::ParseError;
+//! use lightning::offers::parse::Bolt12ParseError;
 //! use lightning::util::ser::{Readable, Writeable};
 //!
 //! # use lightning::blinded_path::BlindedPath;
@@ -34,7 +34,7 @@
 //! # fn create_another_blinded_path() -> BlindedPath { unimplemented!() }
 //! #
 //! # #[cfg(feature = \"std\")]
-//! # fn build() -> Result<(), ParseError> {
+//! # fn build() -> Result<(), Bolt12ParseError> {
 //! let secp_ctx = Secp256k1::new();
 //! let keys = KeyPair::from_secret_key(&secp_ctx, &SecretKey::from_slice(&[42; 32]).unwrap());
 //! let pubkey = PublicKey::from(keys);
@@ -80,8 +80,8 @@ pub(crate) type nativeOffer = nativeOfferImport;
 /// An `Offer` is a potentially long-lived proposal for payment of a good or service.
 ///
 /// An offer is a precursor to an [`InvoiceRequest`]. A merchant publishes an offer from which a
-/// customer may request an [`Invoice`] for a specific quantity and using an amount sufficient to
-/// cover that quantity (i.e., at least `quantity * amount`). See [`Offer::amount`].
+/// customer may request an [`Bolt12Invoice`] for a specific quantity and using an amount sufficient
+/// to cover that quantity (i.e., at least `quantity * amount`). See [`Offer::amount`].
 ///
 /// Offers may be denominated in currency other than bitcoin but are ultimately paid using the
 /// latter.
@@ -89,7 +89,7 @@ pub(crate) type nativeOffer = nativeOfferImport;
 /// Through the use of [`BlindedPath`]s, offers provide recipient privacy.
 ///
 /// [`InvoiceRequest`]: crate::offers::invoice_request::InvoiceRequest
-/// [`Invoice`]: crate::offers::invoice::Invoice
+/// [`Bolt12Invoice`]: crate::offers::invoice::Bolt12Invoice
 #[must_use]
 #[repr(C)]
 pub struct Offer {
@@ -436,4 +436,20 @@ pub(crate) extern "C" fn Quantity_clone_void(this_ptr: *const c_void) -> *mut c_
 /// Creates a copy of the Quantity
 pub extern "C" fn Quantity_clone(orig: &Quantity) -> Quantity {
 	orig.clone()
+}
+#[no_mangle]
+/// Read a Offer object from a string
+pub extern "C" fn Offer_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_OfferBolt12ParseErrorZ {
+	match lightning::offers::offer::Offer::from_str(s.into_str()) {
+		Ok(r) => {
+			crate::c_types::CResultTempl::ok(
+				crate::lightning::offers::offer::Offer { inner: ObjOps::heap_alloc(r), is_owned: true }
+			)
+		},
+		Err(e) => {
+			crate::c_types::CResultTempl::err(
+				crate::lightning::offers::parse::Bolt12ParseError { inner: ObjOps::heap_alloc(e), is_owned: true }
+			)
+		},
+	}.into()
 }

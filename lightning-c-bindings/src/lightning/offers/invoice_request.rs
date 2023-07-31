@@ -10,12 +10,12 @@
 //!
 //! An [`InvoiceRequest`] can be built from a parsed [`Offer`] as an \"offer to be paid\". It is
 //! typically constructed by a customer and sent to the merchant who had published the corresponding
-//! offer. The recipient of the request responds with an [`Invoice`].
+//! offer. The recipient of the request responds with a [`Bolt12Invoice`].
 //!
 //! For an \"offer for money\" (e.g., refund, ATM withdrawal), where an offer doesn't exist as a
 //! precursor, see [`Refund`].
 //!
-//! [`Invoice`]: crate::offers::invoice::Invoice
+//! [`Bolt12Invoice`]: crate::offers::invoice::Bolt12Invoice
 //! [`Refund`]: crate::offers::refund::Refund
 //!
 //! ```
@@ -29,7 +29,7 @@
 //! use lightning::offers::offer::Offer;
 //! use lightning::util::ser::Writeable;
 //!
-//! # fn parse() -> Result<(), lightning::offers::parse::ParseError> {
+//! # fn parse() -> Result<(), lightning::offers::parse::Bolt12ParseError> {
 //! let secp_ctx = Secp256k1::new();
 //! let keys = KeyPair::from_secret_key(&secp_ctx, &SecretKey::from_slice(&[42; 32])?);
 //! let pubkey = PublicKey::from(keys);
@@ -114,12 +114,12 @@ impl UnsignedInvoiceRequest {
 use lightning::offers::invoice_request::InvoiceRequest as nativeInvoiceRequestImport;
 pub(crate) type nativeInvoiceRequest = nativeInvoiceRequestImport;
 
-/// An `InvoiceRequest` is a request for an [`Invoice`] formulated from an [`Offer`].
+/// An `InvoiceRequest` is a request for a [`Bolt12Invoice`] formulated from an [`Offer`].
 ///
 /// An offer may provide choices such as quantity, amount, chain, features, etc. An invoice request
 /// specifies these such that its recipient can send an invoice for payment.
 ///
-/// [`Invoice`]: crate::offers::invoice::Invoice
+/// [`Bolt12Invoice`]: crate::offers::invoice::Bolt12Invoice
 /// [`Offer`]: crate::offers::offer::Offer
 #[must_use]
 #[repr(C)]
@@ -252,6 +252,19 @@ pub extern "C" fn InvoiceRequest_payer_id(this_arg: &crate::lightning::offers::i
 pub extern "C" fn InvoiceRequest_payer_note(this_arg: &crate::lightning::offers::invoice_request::InvoiceRequest) -> crate::lightning::util::string::PrintableString {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payer_note();
 	let mut local_ret = crate::lightning::util::string::PrintableString { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
+	local_ret
+}
+
+/// Verifies that the request was for an offer created using the given key. Returns the derived
+/// keys need to sign an [`Bolt12Invoice`] for the request if they could be extracted from the
+/// metadata.
+///
+/// [`Bolt12Invoice`]: crate::offers::invoice::Bolt12Invoice
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceRequest_verify(this_arg: &crate::lightning::offers::invoice_request::InvoiceRequest, key: &crate::lightning::ln::inbound_payment::ExpandedKey) -> crate::c_types::derived::CResult_COption_KeyPairZNoneZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.verify(key.get_native_ref(), secp256k1::global::SECP256K1);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = if o.is_none() { crate::c_types::derived::COption_KeyPairZ::None } else { crate::c_types::derived::COption_KeyPairZ::Some( { crate::c_types::SecretKey::from_rust(o.unwrap().secret_key()) }) }; local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 

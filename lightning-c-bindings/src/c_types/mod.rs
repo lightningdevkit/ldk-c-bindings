@@ -509,10 +509,14 @@ impl Clone for Witness {
 }
 
 #[no_mangle]
+/// Creates a new Witness which has the same data as `orig` but with a new buffer.
+pub extern "C" fn Witness_clone(orig: &Witness) -> Witness { orig.clone() }
+
+#[no_mangle]
 /// Frees the data pointed to by data
 pub extern "C" fn Witness_free(_res: Witness) { }
 
-pub(crate) fn bitcoin_to_C_outpoint(outpoint: ::bitcoin::blockdata::transaction::OutPoint) -> crate::lightning::chain::transaction::OutPoint {
+pub(crate) fn bitcoin_to_C_outpoint(outpoint: &::bitcoin::blockdata::transaction::OutPoint) -> crate::lightning::chain::transaction::OutPoint {
 	crate::lightning::chain::transaction::OutPoint_new(ThirtyTwoBytes { data: outpoint.txid.into_inner() }, outpoint.vout.try_into().unwrap())
 }
 pub(crate) fn C_to_bitcoin_outpoint(outpoint: crate::lightning::chain::transaction::OutPoint) -> ::bitcoin::blockdata::transaction::OutPoint {
@@ -522,6 +526,49 @@ pub(crate) fn C_to_bitcoin_outpoint(outpoint: crate::lightning::chain::transacti
 		}
 	}
 }
+
+#[repr(C)]
+#[derive(Clone)]
+/// An input to a transaction.
+///
+/// This contains the witness, the scriptSig and the previous outpoint and represents a single
+/// input to a transaction
+pub struct TxIn {
+	/// The witness which includes any signatures required to spend a segwit output.
+	pub witness: Witness,
+	/// The script_sig which includes signatures requires to spend a pre-segwit output (or a
+	/// P2SH-wrapped segwit output).
+	pub script_sig: derived::CVec_u8Z,
+	/// The sequence number of the transaction input
+	pub sequence: u32,
+	/// The txid of the transaction being spent.
+	pub previous_txid: ThirtyTwoBytes,
+	/// The output index of the transaction being spent.
+	pub previous_vout: u32,
+}
+
+impl TxIn {
+	pub(crate) fn from_rust(txin: &::bitcoin::blockdata::transaction::TxIn) -> Self {
+		TxIn {
+			witness: Witness::from_bitcoin(&txin.witness),
+			script_sig: derived::CVec_u8Z::from(txin.script_sig.clone().into_bytes()),
+			sequence: txin.sequence.0,
+			previous_txid: ThirtyTwoBytes { data: txin.previous_output.txid.into_inner() },
+			previous_vout: txin.previous_output.vout,
+		}
+	}
+}
+
+#[no_mangle]
+/// Frees the witness and script_sig in a TxIn
+pub extern "C" fn TxIn_free(_res: TxIn) { }
+
+#[no_mangle]
+/// Convenience function for constructing a new TxIn
+pub extern "C" fn TxIn_new(witness: Witness, script_sig: derived::CVec_u8Z, sequence: u32, previous_txid: ThirtyTwoBytes, previous_vout: u32) -> TxIn {
+	TxIn { witness, script_sig, sequence, previous_txid, previous_vout }
+}
+
 
 #[repr(C)]
 #[derive(Clone)]
@@ -541,9 +588,9 @@ impl TxOut {
 			value: self.value,
 		}
 	}
-	pub(crate) fn from_rust(txout: ::bitcoin::blockdata::transaction::TxOut) -> Self {
+	pub(crate) fn from_rust(txout: &::bitcoin::blockdata::transaction::TxOut) -> Self {
 		Self {
-			script_pubkey: derived::CVec_u8Z::from(txout.script_pubkey.into_bytes()),
+			script_pubkey: derived::CVec_u8Z::from(txout.script_pubkey.clone().into_bytes()),
 			value: txout.value
 		}
 	}
@@ -602,11 +649,6 @@ pub(crate) fn reader_to_vec<R: Read>(r: &mut R) -> derived::CVec_u8Z {
 pub struct ThirtyTwoBytes {
 	/// The thirty-two bytes
 	pub data: [u8; 32],
-}
-impl ThirtyTwoBytes {
-	pub(crate) fn null() -> Self {
-		Self { data: [0; 32] }
-	}
 }
 
 #[repr(C)]

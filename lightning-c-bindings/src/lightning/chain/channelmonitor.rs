@@ -525,6 +525,10 @@ pub enum Balance {
 		/// The height at which the counterparty may be able to claim the balance if we have not
 		/// done so.
 		timeout_height: u32,
+		/// The payment hash that locks this HTLC.
+		payment_hash: crate::c_types::ThirtyTwoBytes,
+		/// The preimage that can be used to claim this HTLC.
+		payment_preimage: crate::c_types::ThirtyTwoBytes,
 	},
 	/// HTLCs which we sent to our counterparty which are claimable after a timeout (less on-chain
 	/// fees) if the counterparty does not know the preimage for the HTLCs. These are somewhat
@@ -536,6 +540,8 @@ pub enum Balance {
 		/// The height at which we will be able to claim the balance if our counterparty has not
 		/// done so.
 		claimable_height: u32,
+		/// The payment hash whose preimage our counterparty needs to claim this HTLC.
+		payment_hash: crate::c_types::ThirtyTwoBytes,
 	},
 	/// HTLCs which we received from our counterparty which are claimable with a preimage which we
 	/// do not currently have. This will only be claimable if we receive the preimage from the node
@@ -547,6 +553,8 @@ pub enum Balance {
 		/// The height at which our counterparty will be able to claim the balance if we have not
 		/// yet received the preimage and claimed it ourselves.
 		expiry_height: u32,
+		/// The payment hash whose preimage we need to claim this HTLC.
+		payment_hash: crate::c_types::ThirtyTwoBytes,
 	},
 	/// The channel has been closed, and our counterparty broadcasted a revoked commitment
 	/// transaction.
@@ -582,28 +590,36 @@ impl Balance {
 					confirmation_height: confirmation_height_nonref,
 				}
 			},
-			Balance::ContentiousClaimable {ref claimable_amount_satoshis, ref timeout_height, } => {
+			Balance::ContentiousClaimable {ref claimable_amount_satoshis, ref timeout_height, ref payment_hash, ref payment_preimage, } => {
 				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
 				let mut timeout_height_nonref = Clone::clone(timeout_height);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut payment_preimage_nonref = Clone::clone(payment_preimage);
 				nativeBalance::ContentiousClaimable {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					timeout_height: timeout_height_nonref,
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
+					payment_preimage: ::lightning::ln::PaymentPreimage(payment_preimage_nonref.data),
 				}
 			},
-			Balance::MaybeTimeoutClaimableHTLC {ref claimable_amount_satoshis, ref claimable_height, } => {
+			Balance::MaybeTimeoutClaimableHTLC {ref claimable_amount_satoshis, ref claimable_height, ref payment_hash, } => {
 				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
 				let mut claimable_height_nonref = Clone::clone(claimable_height);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				nativeBalance::MaybeTimeoutClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					claimable_height: claimable_height_nonref,
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 				}
 			},
-			Balance::MaybePreimageClaimableHTLC {ref claimable_amount_satoshis, ref expiry_height, } => {
+			Balance::MaybePreimageClaimableHTLC {ref claimable_amount_satoshis, ref expiry_height, ref payment_hash, } => {
 				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
 				let mut expiry_height_nonref = Clone::clone(expiry_height);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				nativeBalance::MaybePreimageClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					expiry_height: expiry_height_nonref,
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 				}
 			},
 			Balance::CounterpartyRevokedOutputClaimable {ref claimable_amount_satoshis, } => {
@@ -628,22 +644,26 @@ impl Balance {
 					confirmation_height: confirmation_height,
 				}
 			},
-			Balance::ContentiousClaimable {mut claimable_amount_satoshis, mut timeout_height, } => {
+			Balance::ContentiousClaimable {mut claimable_amount_satoshis, mut timeout_height, mut payment_hash, mut payment_preimage, } => {
 				nativeBalance::ContentiousClaimable {
 					claimable_amount_satoshis: claimable_amount_satoshis,
 					timeout_height: timeout_height,
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
+					payment_preimage: ::lightning::ln::PaymentPreimage(payment_preimage.data),
 				}
 			},
-			Balance::MaybeTimeoutClaimableHTLC {mut claimable_amount_satoshis, mut claimable_height, } => {
+			Balance::MaybeTimeoutClaimableHTLC {mut claimable_amount_satoshis, mut claimable_height, mut payment_hash, } => {
 				nativeBalance::MaybeTimeoutClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis,
 					claimable_height: claimable_height,
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
 				}
 			},
-			Balance::MaybePreimageClaimableHTLC {mut claimable_amount_satoshis, mut expiry_height, } => {
+			Balance::MaybePreimageClaimableHTLC {mut claimable_amount_satoshis, mut expiry_height, mut payment_hash, } => {
 				nativeBalance::MaybePreimageClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis,
 					expiry_height: expiry_height,
+					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
 				}
 			},
 			Balance::CounterpartyRevokedOutputClaimable {mut claimable_amount_satoshis, } => {
@@ -670,28 +690,36 @@ impl Balance {
 					confirmation_height: confirmation_height_nonref,
 				}
 			},
-			nativeBalance::ContentiousClaimable {ref claimable_amount_satoshis, ref timeout_height, } => {
+			nativeBalance::ContentiousClaimable {ref claimable_amount_satoshis, ref timeout_height, ref payment_hash, ref payment_preimage, } => {
 				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
 				let mut timeout_height_nonref = Clone::clone(timeout_height);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
+				let mut payment_preimage_nonref = Clone::clone(payment_preimage);
 				Balance::ContentiousClaimable {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					timeout_height: timeout_height_nonref,
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
+					payment_preimage: crate::c_types::ThirtyTwoBytes { data: payment_preimage_nonref.0 },
 				}
 			},
-			nativeBalance::MaybeTimeoutClaimableHTLC {ref claimable_amount_satoshis, ref claimable_height, } => {
+			nativeBalance::MaybeTimeoutClaimableHTLC {ref claimable_amount_satoshis, ref claimable_height, ref payment_hash, } => {
 				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
 				let mut claimable_height_nonref = Clone::clone(claimable_height);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				Balance::MaybeTimeoutClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					claimable_height: claimable_height_nonref,
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
 				}
 			},
-			nativeBalance::MaybePreimageClaimableHTLC {ref claimable_amount_satoshis, ref expiry_height, } => {
+			nativeBalance::MaybePreimageClaimableHTLC {ref claimable_amount_satoshis, ref expiry_height, ref payment_hash, } => {
 				let mut claimable_amount_satoshis_nonref = Clone::clone(claimable_amount_satoshis);
 				let mut expiry_height_nonref = Clone::clone(expiry_height);
+				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				Balance::MaybePreimageClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis_nonref,
 					expiry_height: expiry_height_nonref,
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
 				}
 			},
 			nativeBalance::CounterpartyRevokedOutputClaimable {ref claimable_amount_satoshis, } => {
@@ -716,22 +744,26 @@ impl Balance {
 					confirmation_height: confirmation_height,
 				}
 			},
-			nativeBalance::ContentiousClaimable {mut claimable_amount_satoshis, mut timeout_height, } => {
+			nativeBalance::ContentiousClaimable {mut claimable_amount_satoshis, mut timeout_height, mut payment_hash, mut payment_preimage, } => {
 				Balance::ContentiousClaimable {
 					claimable_amount_satoshis: claimable_amount_satoshis,
 					timeout_height: timeout_height,
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
+					payment_preimage: crate::c_types::ThirtyTwoBytes { data: payment_preimage.0 },
 				}
 			},
-			nativeBalance::MaybeTimeoutClaimableHTLC {mut claimable_amount_satoshis, mut claimable_height, } => {
+			nativeBalance::MaybeTimeoutClaimableHTLC {mut claimable_amount_satoshis, mut claimable_height, mut payment_hash, } => {
 				Balance::MaybeTimeoutClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis,
 					claimable_height: claimable_height,
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
 				}
 			},
-			nativeBalance::MaybePreimageClaimableHTLC {mut claimable_amount_satoshis, mut expiry_height, } => {
+			nativeBalance::MaybePreimageClaimableHTLC {mut claimable_amount_satoshis, mut expiry_height, mut payment_hash, } => {
 				Balance::MaybePreimageClaimableHTLC {
 					claimable_amount_satoshis: claimable_amount_satoshis,
 					expiry_height: expiry_height,
+					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
 				}
 			},
 			nativeBalance::CounterpartyRevokedOutputClaimable {mut claimable_amount_satoshis, } => {
@@ -767,26 +799,30 @@ pub extern "C" fn Balance_claimable_awaiting_confirmations(claimable_amount_sato
 }
 #[no_mangle]
 /// Utility method to constructs a new ContentiousClaimable-variant Balance
-pub extern "C" fn Balance_contentious_claimable(claimable_amount_satoshis: u64, timeout_height: u32) -> Balance {
+pub extern "C" fn Balance_contentious_claimable(claimable_amount_satoshis: u64, timeout_height: u32, payment_hash: crate::c_types::ThirtyTwoBytes, payment_preimage: crate::c_types::ThirtyTwoBytes) -> Balance {
 	Balance::ContentiousClaimable {
 		claimable_amount_satoshis,
 		timeout_height,
+		payment_hash,
+		payment_preimage,
 	}
 }
 #[no_mangle]
 /// Utility method to constructs a new MaybeTimeoutClaimableHTLC-variant Balance
-pub extern "C" fn Balance_maybe_timeout_claimable_htlc(claimable_amount_satoshis: u64, claimable_height: u32) -> Balance {
+pub extern "C" fn Balance_maybe_timeout_claimable_htlc(claimable_amount_satoshis: u64, claimable_height: u32, payment_hash: crate::c_types::ThirtyTwoBytes) -> Balance {
 	Balance::MaybeTimeoutClaimableHTLC {
 		claimable_amount_satoshis,
 		claimable_height,
+		payment_hash,
 	}
 }
 #[no_mangle]
 /// Utility method to constructs a new MaybePreimageClaimableHTLC-variant Balance
-pub extern "C" fn Balance_maybe_preimage_claimable_htlc(claimable_amount_satoshis: u64, expiry_height: u32) -> Balance {
+pub extern "C" fn Balance_maybe_preimage_claimable_htlc(claimable_amount_satoshis: u64, expiry_height: u32, payment_hash: crate::c_types::ThirtyTwoBytes) -> Balance {
 	Balance::MaybePreimageClaimableHTLC {
 		claimable_amount_satoshis,
 		expiry_height,
+		payment_hash,
 	}
 }
 #[no_mangle]
@@ -802,20 +838,28 @@ pub extern "C" fn Balance_counterparty_revoked_output_claimable(claimable_amount
 pub extern "C" fn Balance_eq(a: &Balance, b: &Balance) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
+/// The amount claimable, in satoshis. This excludes balances that we are unsure if we are able
+/// to claim, this is because we are waiting for a preimage or for a timeout to expire. For more
+/// information on these balances see [`Balance::MaybeTimeoutClaimableHTLC`] and
+/// [`Balance::MaybePreimageClaimableHTLC`].
+///
+/// On-chain fees required to claim the balance are not included in this amount.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Balance_claimable_amount_satoshis(this_arg: &crate::lightning::chain::channelmonitor::Balance) -> u64 {
+	let mut ret = this_arg.to_native().claimable_amount_satoshis();
+	ret
+}
+
 
 use lightning::chain::channelmonitor::ChannelMonitor as nativeChannelMonitorImport;
-pub(crate) type nativeChannelMonitor = nativeChannelMonitorImport<crate::lightning::chain::keysinterface::WriteableEcdsaChannelSigner>;
+pub(crate) type nativeChannelMonitor = nativeChannelMonitorImport<crate::lightning::sign::WriteableEcdsaChannelSigner>;
 
 /// A ChannelMonitor handles chain events (blocks connected and disconnected) and generates
 /// on-chain transactions to ensure no loss of funds occurs.
 ///
 /// You MUST ensure that no ChannelMonitors for a given channel anywhere contain out-of-date
 /// information and are actively monitoring the chain.
-///
-/// Pending Events or updated HTLCs which have not yet been read out by
-/// get_and_clear_pending_monitor_events or get_and_clear_pending_events are serialized to disk and
-/// reloaded at deserialize-time. Thus, you must ensure that, when handling events, all events
-/// gotten are fully handled before re-serializing the new state.
 ///
 /// Note that the deserializer is only implemented for (BlockHash, ChannelMonitor), which
 /// tells you the last block hash which was block_connect()ed. You MUST rescan any blocks along
@@ -935,20 +979,22 @@ pub extern "C" fn ChannelMonitor_get_and_clear_pending_monitor_events(this_arg: 
 	local_ret.into()
 }
 
-/// Gets the list of pending events which were generated by previous actions, clearing the list
-/// in the process.
+/// Processes [`SpendableOutputs`] events produced from each [`ChannelMonitor`] upon maturity.
 ///
-/// This is called by the [`EventsProvider::process_pending_events`] implementation for
-/// [`ChainMonitor`].
+/// For channels featuring anchor outputs, this method will also process [`BumpTransaction`]
+/// events produced from each [`ChannelMonitor`] while there is a balance to claim onchain
+/// within each channel. As the confirmation of a commitment transaction may be critical to the
+/// safety of funds, we recommend invoking this every 30 seconds, or lower if running in an
+/// environment with spotty connections, like on mobile.
 ///
-/// [`EventsProvider::process_pending_events`]: crate::events::EventsProvider::process_pending_events
-/// [`ChainMonitor`]: crate::chain::chainmonitor::ChainMonitor
-#[must_use]
+/// An [`EventHandler`] may safely call back to the provider, though this shouldn't be needed in
+/// order to handle these events.
+///
+/// [`SpendableOutputs`]: crate::events::Event::SpendableOutputs
+/// [`BumpTransaction`]: crate::events::Event::BumpTransaction
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_get_and_clear_pending_events(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_EventZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_and_clear_pending_events();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::events::Event::native_into(item) }); };
-	local_ret.into()
+pub extern "C" fn ChannelMonitor_process_pending_events(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, handler: &crate::lightning::events::EventHandler) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.process_pending_events(handler)
 }
 
 /// Gets the `node_id` of the counterparty for this channel.
@@ -1004,7 +1050,7 @@ pub extern "C" fn ChannelMonitor_get_latest_holder_commitment_txn(this_arg: &cra
 pub extern "C" fn ChannelMonitor_block_connected(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
 	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.block_connected(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height, broadcaster, fee_estimator, logger);
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(&orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
 }
 
@@ -1027,7 +1073,7 @@ pub extern "C" fn ChannelMonitor_block_disconnected(this_arg: &crate::lightning:
 pub extern "C" fn ChannelMonitor_transactions_confirmed(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, header: *const [u8; 80], mut txdata: crate::c_types::derived::CVec_C2Tuple_usizeTransactionZZ, mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
 	let mut local_txdata = Vec::new(); for mut item in txdata.into_rust().drain(..) { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item.to_rust(); let mut local_txdata_0 = (orig_txdata_0_0, orig_txdata_0_1.into_bitcoin()); local_txdata_0 }); };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.transactions_confirmed(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), &local_txdata.iter().map(|(a, b)| (*a, b)).collect::<Vec<_>>()[..], height, broadcaster, fee_estimator, logger);
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(&orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
 }
 
@@ -1053,16 +1099,16 @@ pub extern "C" fn ChannelMonitor_transaction_unconfirmed(this_arg: &crate::light
 #[no_mangle]
 pub extern "C" fn ChannelMonitor_best_block_updated(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor, header: *const [u8; 80], mut height: u32, mut broadcaster: crate::lightning::chain::chaininterface::BroadcasterInterface, mut fee_estimator: crate::lightning::chain::chaininterface::FeeEstimator, mut logger: crate::lightning::util::logger::Logger) -> crate::c_types::derived::CVec_TransactionOutputsZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.best_block_updated(&::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height, broadcaster, fee_estimator, logger);
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { let (mut orig_orig_ret_0_1_0_0, mut orig_orig_ret_0_1_0_1) = item; let mut local_orig_ret_0_1_0 = (orig_orig_ret_0_1_0_0, crate::c_types::TxOut::from_rust(&orig_orig_ret_0_1_0_1)).into(); local_orig_ret_0_1_0 }); }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
 	local_ret.into()
 }
 
 /// Returns the set of txids that should be monitored for re-organization out of the chain.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_C2Tuple_TxidBlockHashZZ {
+pub extern "C" fn ChannelMonitor_get_relevant_txids(this_arg: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_C2Tuple_TxidCOption_BlockHashZZZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_relevant_txids();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = if orig_ret_0_1.is_none() { crate::c_types::ThirtyTwoBytes::null() } else {  { crate::c_types::ThirtyTwoBytes { data: (orig_ret_0_1.unwrap()).into_inner() } } }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1).into(); local_ret_0 }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = if orig_ret_0_1.is_none() { crate::c_types::derived::COption_BlockHashZ::None } else { crate::c_types::derived::COption_BlockHashZ::Some( { crate::c_types::ThirtyTwoBytes { data: orig_ret_0_1.unwrap().into_inner() } }) }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1).into(); local_ret_0 }); };
 	local_ret.into()
 }
 
@@ -1110,11 +1156,11 @@ pub extern "C" fn ChannelMonitor_get_claimable_balances(this_arg: &crate::lightn
 
 #[no_mangle]
 /// Read a C2Tuple_BlockHashChannelMonitorZ from a byte array, created by C2Tuple_BlockHashChannelMonitorZ_write
-pub extern "C" fn C2Tuple_BlockHashChannelMonitorZ_read(ser: crate::c_types::u8slice, arg_a: &crate::lightning::chain::keysinterface::EntropySource, arg_b: &crate::lightning::chain::keysinterface::SignerProvider) -> crate::c_types::derived::CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
+pub extern "C" fn C2Tuple_BlockHashChannelMonitorZ_read(ser: crate::c_types::u8slice, arg_a: &crate::lightning::sign::EntropySource, arg_b: &crate::lightning::sign::SignerProvider) -> crate::c_types::derived::CResult_C2Tuple_BlockHashChannelMonitorZDecodeErrorZ {
 	let arg_a_conv = arg_a;
 	let arg_b_conv = arg_b;
 	let arg_conv = (arg_a_conv, arg_b_conv);
-	let res: Result<(bitcoin::hash_types::BlockHash, lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::chain::keysinterface::WriteableEcdsaChannelSigner>), lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
+	let res: Result<(bitcoin::hash_types::BlockHash, lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::sign::WriteableEcdsaChannelSigner>), lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_res_0_0, mut orig_res_0_1) = o; let mut local_res_0 = (crate::c_types::ThirtyTwoBytes { data: orig_res_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_res_0_1), is_owned: true }).into(); local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }

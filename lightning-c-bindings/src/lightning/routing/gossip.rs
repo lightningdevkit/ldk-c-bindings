@@ -509,6 +509,34 @@ pub extern "C" fn NetworkGraph_handle_network_update(this_arg: &crate::lightning
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.handle_network_update(&network_update.to_native())
 }
 
+/// Gets the genesis hash for this network graph.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NetworkGraph_get_genesis_hash(this_arg: &crate::lightning::routing::gossip::NetworkGraph) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_genesis_hash();
+	crate::c_types::ThirtyTwoBytes { data: ret.into_inner() }
+}
+
+/// Verifies the signature of a [`NodeAnnouncement`].
+///
+/// Returns an error if it is invalid.
+#[no_mangle]
+pub extern "C" fn verify_node_announcement(msg: &crate::lightning::ln::msgs::NodeAnnouncement) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = lightning::routing::gossip::verify_node_announcement(msg.get_native_ref(), secp256k1::global::SECP256K1);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_ret
+}
+
+/// Verifies all signatures included in a [`ChannelAnnouncement`].
+///
+/// Returns an error if one of the signatures is invalid.
+#[no_mangle]
+pub extern "C" fn verify_channel_announcement(msg: &crate::lightning::ln::msgs::ChannelAnnouncement) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = lightning::routing::gossip::verify_channel_announcement(msg.get_native_ref(), secp256k1::global::SECP256K1);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_ret
+}
+
 impl From<nativeP2PGossipSync> for crate::lightning::ln::msgs::RoutingMessageHandler {
 	fn from(obj: nativeP2PGossipSync) -> Self {
 		let mut rust_obj = P2PGossipSync { inner: ObjOps::heap_alloc(obj), is_owned: true };
@@ -1178,7 +1206,7 @@ pub enum EffectiveCapacity {
 		liquidity_msat: u64,
 	},
 	/// The maximum HTLC amount in one direction as advertised on the gossip network.
-	MaximumHTLC {
+	AdvertisedMaxHTLC {
 		/// The maximum HTLC amount denominated in millisatoshi.
 		amount_msat: u64,
 	},
@@ -1192,6 +1220,11 @@ pub enum EffectiveCapacity {
 	/// A capacity sufficient to route any payment, typically used for private channels provided by
 	/// an invoice.
 	Infinite,
+	/// The maximum HTLC amount as provided by an invoice route hint.
+	HintMaxHTLC {
+		/// The maximum HTLC amount denominated in millisatoshi.
+		amount_msat: u64,
+	},
 	/// A capacity that is unknown possibly because either the chain state is unavailable to know
 	/// the total capacity or the `htlc_maximum_msat` was not advertised on the gossip network.
 	Unknown,
@@ -1209,9 +1242,9 @@ impl EffectiveCapacity {
 					liquidity_msat: liquidity_msat_nonref,
 				}
 			},
-			EffectiveCapacity::MaximumHTLC {ref amount_msat, } => {
+			EffectiveCapacity::AdvertisedMaxHTLC {ref amount_msat, } => {
 				let mut amount_msat_nonref = Clone::clone(amount_msat);
-				nativeEffectiveCapacity::MaximumHTLC {
+				nativeEffectiveCapacity::AdvertisedMaxHTLC {
 					amount_msat: amount_msat_nonref,
 				}
 			},
@@ -1224,6 +1257,12 @@ impl EffectiveCapacity {
 				}
 			},
 			EffectiveCapacity::Infinite => nativeEffectiveCapacity::Infinite,
+			EffectiveCapacity::HintMaxHTLC {ref amount_msat, } => {
+				let mut amount_msat_nonref = Clone::clone(amount_msat);
+				nativeEffectiveCapacity::HintMaxHTLC {
+					amount_msat: amount_msat_nonref,
+				}
+			},
 			EffectiveCapacity::Unknown => nativeEffectiveCapacity::Unknown,
 		}
 	}
@@ -1235,8 +1274,8 @@ impl EffectiveCapacity {
 					liquidity_msat: liquidity_msat,
 				}
 			},
-			EffectiveCapacity::MaximumHTLC {mut amount_msat, } => {
-				nativeEffectiveCapacity::MaximumHTLC {
+			EffectiveCapacity::AdvertisedMaxHTLC {mut amount_msat, } => {
+				nativeEffectiveCapacity::AdvertisedMaxHTLC {
 					amount_msat: amount_msat,
 				}
 			},
@@ -1247,6 +1286,11 @@ impl EffectiveCapacity {
 				}
 			},
 			EffectiveCapacity::Infinite => nativeEffectiveCapacity::Infinite,
+			EffectiveCapacity::HintMaxHTLC {mut amount_msat, } => {
+				nativeEffectiveCapacity::HintMaxHTLC {
+					amount_msat: amount_msat,
+				}
+			},
 			EffectiveCapacity::Unknown => nativeEffectiveCapacity::Unknown,
 		}
 	}
@@ -1259,9 +1303,9 @@ impl EffectiveCapacity {
 					liquidity_msat: liquidity_msat_nonref,
 				}
 			},
-			nativeEffectiveCapacity::MaximumHTLC {ref amount_msat, } => {
+			nativeEffectiveCapacity::AdvertisedMaxHTLC {ref amount_msat, } => {
 				let mut amount_msat_nonref = Clone::clone(amount_msat);
-				EffectiveCapacity::MaximumHTLC {
+				EffectiveCapacity::AdvertisedMaxHTLC {
 					amount_msat: amount_msat_nonref,
 				}
 			},
@@ -1274,6 +1318,12 @@ impl EffectiveCapacity {
 				}
 			},
 			nativeEffectiveCapacity::Infinite => EffectiveCapacity::Infinite,
+			nativeEffectiveCapacity::HintMaxHTLC {ref amount_msat, } => {
+				let mut amount_msat_nonref = Clone::clone(amount_msat);
+				EffectiveCapacity::HintMaxHTLC {
+					amount_msat: amount_msat_nonref,
+				}
+			},
 			nativeEffectiveCapacity::Unknown => EffectiveCapacity::Unknown,
 		}
 	}
@@ -1285,8 +1335,8 @@ impl EffectiveCapacity {
 					liquidity_msat: liquidity_msat,
 				}
 			},
-			nativeEffectiveCapacity::MaximumHTLC {mut amount_msat, } => {
-				EffectiveCapacity::MaximumHTLC {
+			nativeEffectiveCapacity::AdvertisedMaxHTLC {mut amount_msat, } => {
+				EffectiveCapacity::AdvertisedMaxHTLC {
 					amount_msat: amount_msat,
 				}
 			},
@@ -1297,6 +1347,11 @@ impl EffectiveCapacity {
 				}
 			},
 			nativeEffectiveCapacity::Infinite => EffectiveCapacity::Infinite,
+			nativeEffectiveCapacity::HintMaxHTLC {mut amount_msat, } => {
+				EffectiveCapacity::HintMaxHTLC {
+					amount_msat: amount_msat,
+				}
+			},
 			nativeEffectiveCapacity::Unknown => EffectiveCapacity::Unknown,
 		}
 	}
@@ -1317,9 +1372,9 @@ pub extern "C" fn EffectiveCapacity_exact_liquidity(liquidity_msat: u64) -> Effe
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new MaximumHTLC-variant EffectiveCapacity
-pub extern "C" fn EffectiveCapacity_maximum_htlc(amount_msat: u64) -> EffectiveCapacity {
-	EffectiveCapacity::MaximumHTLC {
+/// Utility method to constructs a new AdvertisedMaxHTLC-variant EffectiveCapacity
+pub extern "C" fn EffectiveCapacity_advertised_max_htlc(amount_msat: u64) -> EffectiveCapacity {
+	EffectiveCapacity::AdvertisedMaxHTLC {
 		amount_msat,
 	}
 }
@@ -1335,6 +1390,13 @@ pub extern "C" fn EffectiveCapacity_total(capacity_msat: u64, htlc_maximum_msat:
 /// Utility method to constructs a new Infinite-variant EffectiveCapacity
 pub extern "C" fn EffectiveCapacity_infinite() -> EffectiveCapacity {
 	EffectiveCapacity::Infinite}
+#[no_mangle]
+/// Utility method to constructs a new HintMaxHTLC-variant EffectiveCapacity
+pub extern "C" fn EffectiveCapacity_hint_max_htlc(amount_msat: u64) -> EffectiveCapacity {
+	EffectiveCapacity::HintMaxHTLC {
+		amount_msat,
+	}
+}
 #[no_mangle]
 /// Utility method to constructs a new Unknown-variant EffectiveCapacity
 pub extern "C" fn EffectiveCapacity_unknown() -> EffectiveCapacity {
@@ -2015,8 +2077,8 @@ pub extern "C" fn NetworkGraph_update_node_from_unsigned_announcement(this_arg: 
 
 /// Store or update channel info from a channel announcement.
 ///
-/// You probably don't want to call this directly, instead relying on a P2PGossipSync's
-/// RoutingMessageHandler implementation to call it indirectly. This may be useful to accept
+/// You probably don't want to call this directly, instead relying on a [`P2PGossipSync`]'s
+/// [`RoutingMessageHandler`] implementation to call it indirectly. This may be useful to accept
 /// routing messages from a source using a protocol other than the lightning P2P protocol.
 ///
 /// If a [`UtxoLookup`] object is provided via `utxo_lookup`, it will be called to verify
@@ -2026,6 +2088,21 @@ pub extern "C" fn NetworkGraph_update_node_from_unsigned_announcement(this_arg: 
 pub extern "C" fn NetworkGraph_update_channel_from_announcement(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelAnnouncement, mut utxo_lookup: crate::c_types::derived::COption_UtxoLookupZ) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
 	let mut local_utxo_lookup = { /*utxo_lookup*/ let utxo_lookup_opt = utxo_lookup; if utxo_lookup_opt.is_none() { None } else { Some({ { { utxo_lookup_opt.take() } }})} };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_from_announcement(msg.get_native_ref(), &local_utxo_lookup);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_ret
+}
+
+/// Store or update channel info from a channel announcement.
+///
+/// You probably don't want to call this directly, instead relying on a [`P2PGossipSync`]'s
+/// [`RoutingMessageHandler`] implementation to call it indirectly. This may be useful to accept
+/// routing messages from a source using a protocol other than the lightning P2P protocol.
+///
+/// This will skip verification of if the channel is actually on-chain.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NetworkGraph_update_channel_from_announcement_no_lookup(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelAnnouncement) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_from_announcement_no_lookup(msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }

@@ -28,4 +28,5 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 pub mod messenger;
+pub mod offers;
 pub mod packet;

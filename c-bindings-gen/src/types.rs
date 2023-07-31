@@ -215,7 +215,7 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 					'bound_loop: for bound in type_param.bounds.iter() {
 						if let syn::TypeParamBound::Trait(trait_bound) = bound {
 							if let Some(ident) = single_ident_generic_path_to_ident(&trait_bound.path) {
-								match &format!("{}", ident) as &str { "Send" => continue, "Sync" => continue, _ => {} }
+								match &format!("{}", ident) as &str { "Send" => continue, "Sync" => continue, "Sized" => continue, _ => {} }
 							}
 							if path_matches_nongeneric(&trait_bound.path, &["core", "clone", "Clone"]) { continue; }
 
@@ -352,7 +352,12 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 									}
 								} else { unimplemented!(); }
 								for bound in bounds_iter {
-									if let syn::TypeParamBound::Trait(_) = bound { unimplemented!(); }
+									if let syn::TypeParamBound::Trait(t) = bound {
+										// We only allow for `?Sized` here.
+										if let syn::TraitBoundModifier::Maybe(_) = t.modifier {} else { panic!(); }
+										assert_eq!(t.path.segments.len(), 1);
+										assert_eq!(format!("{}", t.path.segments[0].ident), "Sized");
+									}
 								}
 								break;
 							},
@@ -474,9 +479,12 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 					let crate_name_ident = format_ident!("{}", crate_name);
 					path.push(parse_quote!(#crate_name_ident));
 				} else if partial_path == "" && !dependencies.contains(&$ident) {
-					new_path = format!("{}::{}{}", crate_name, $ident, $path_suffix);
-					let crate_name_ident = format_ident!("{}", crate_name);
-					path.push(parse_quote!(#crate_name_ident));
+					new_path = format!("{}::{}{}", module_path, $ident, $path_suffix);
+					for module in module_path.split("::") {
+						path.push(syn::PathSegment { ident: syn::Ident::new(module, Span::call_site()), arguments: syn::PathArguments::None });
+					}
+					let ident_str = format_ident!("{}", $ident);
+					path.push(parse_quote!(#ident_str));
 				} else if format!("{}", $ident) == "self" {
 					let mut path_iter = partial_path.rsplitn(2, "::");
 					path_iter.next().unwrap();
@@ -540,6 +548,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		// Add primitives to the "imports" list:
 		Self::insert_primitive(&mut imports, "bool");
 		Self::insert_primitive(&mut imports, "u128");
+		Self::insert_primitive(&mut imports, "i64");
 		Self::insert_primitive(&mut imports, "u64");
 		Self::insert_primitive(&mut imports, "u32");
 		Self::insert_primitive(&mut imports, "u16");
@@ -586,13 +595,8 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 					}
 				},
 				syn::Item::Trait(t) => {
-					match export_status(&t.attrs) {
-						ExportStatus::Export|ExportStatus::NotImplementable => {
-							if let syn::Visibility::Public(_) = t.vis {
-								declared.insert(t.ident.clone(), DeclType::Trait(t));
-							}
-						},
-						_ => continue,
+					if let syn::Visibility::Public(_) = t.vis {
+						declared.insert(t.ident.clone(), DeclType::Trait(t));
 					}
 				},
 				syn::Item::Mod(m) => {
@@ -811,6 +815,7 @@ fn initial_clonable_types() -> HashSet<String> {
 	res.insert("crate::c_types::Transaction".to_owned());
 	res.insert("crate::c_types::Witness".to_owned());
 	res.insert("crate::c_types::WitnessVersion".to_owned());
+	res.insert("crate::c_types::TxIn".to_owned());
 	res.insert("crate::c_types::TxOut".to_owned());
 	res.insert("crate::c_types::Signature".to_owned());
 	res.insert("crate::c_types::RecoverableSignature".to_owned());
@@ -856,6 +861,8 @@ pub struct CrateTypes<'a> {
 	clonable_types: RefCell<HashSet<String>>,
 	/// Key impls Value
 	pub trait_impls: HashMap<String, Vec<String>>,
+	/// Value impls Key
+	pub traits_impld: HashMap<String, Vec<String>>,
 	/// The full set of modules in the crate(s)
 	pub lib_ast: &'a FullLibraryAST,
 }
@@ -866,7 +873,8 @@ impl<'a> CrateTypes<'a> {
 			opaques: HashMap::new(), mirrored_enums: HashMap::new(), traits: HashMap::new(),
 			type_aliases: HashMap::new(), reverse_alias_map: HashMap::new(),
 			templates_defined: RefCell::new(HashMap::default()), priv_structs: HashMap::new(),
-			clonable_types: RefCell::new(initial_clonable_types()), trait_impls: HashMap::new(),
+			clonable_types: RefCell::new(initial_clonable_types()),
+			trait_impls: HashMap::new(), traits_impld: HashMap::new(),
 			template_file: RefCell::new(template_file), lib_ast: &libast,
 		}
 	}
@@ -942,6 +950,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	pub fn is_primitive(&self, full_path: &str) -> bool {
 		match full_path {
 			"bool" => true,
+			"i64" => true,
 			"u64" => true,
 			"u32" => true,
 			"u16" => true,
@@ -1005,20 +1014,26 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature"),
 			"bitcoin::secp256k1::SecretKey" if is_ref  => Some("*const [u8; 32]"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey"),
+			"bitcoin::secp256k1::KeyPair" if !is_ref => Some("crate::c_types::SecretKey"),
 			"bitcoin::secp256k1::Scalar" if is_ref  => Some("*const crate::c_types::BigEndianScalar"),
 			"bitcoin::secp256k1::Scalar" if !is_ref => Some("crate::c_types::BigEndianScalar"),
 			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 
-			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice"),
-			"bitcoin::blockdata::script::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if is_ref => Some("crate::c_types::u8slice"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" => Some("crate::lightning::chain::transaction::OutPoint"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction"),
 			"bitcoin::Witness" => Some("crate::c_types::Witness"),
-			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut"),
+			"bitcoin::TxIn"|"bitcoin::blockdata::transaction::TxIn" if !is_ref => Some("crate::c_types::TxIn"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" => Some("crate::c_types::TxOut"),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network"),
 			"bitcoin::util::address::WitnessVersion" => Some("crate::c_types::WitnessVersion"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref  => Some("*const [u8; 80]"),
 			"bitcoin::blockdata::block::Block" if is_ref  => Some("crate::c_types::u8slice"),
+
+			"bitcoin::PackedLockTime"|"bitcoin::blockdata::locktime::PackedLockTime" => Some("u32"),
+
+			"bitcoin::psbt::PartiallySignedTransaction" if !is_ref => Some("crate::c_types::derived::CVec_u8Z"),
 
 			"bitcoin::PubkeyHash"|"bitcoin::hash_types::PubkeyHash"|
 			"bitcoin::hash_types::WPubkeyHash"|
@@ -1039,11 +1054,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if is_ref => Some("*const [u8; 32]"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice"),
@@ -1105,22 +1120,28 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(""),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some("&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(""),
+			"bitcoin::secp256k1::KeyPair" if !is_ref => Some("::bitcoin::secp256k1::KeyPair::new("),
 			"bitcoin::secp256k1::Scalar" if is_ref => Some("&"),
 			"bitcoin::secp256k1::Scalar" if !is_ref => Some(""),
 			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("::bitcoin::secp256k1::ecdh::SharedSecret::from_bytes("),
 
-			"bitcoin::blockdata::script::Script" if is_ref => Some("&::bitcoin::blockdata::script::Script::from(Vec::from("),
-			"bitcoin::blockdata::script::Script" if !is_ref => Some("::bitcoin::blockdata::script::Script::from("),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if is_ref => Some("&::bitcoin::blockdata::script::Script::from(Vec::from("),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if !is_ref => Some("::bitcoin::blockdata::script::Script::from("),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("&"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(""),
 			"bitcoin::Witness" if is_ref => Some("&"),
 			"bitcoin::Witness" => Some(""),
 			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::C_to_bitcoin_outpoint("),
+			"bitcoin::TxIn"|"bitcoin::blockdata::transaction::TxIn" if !is_ref => Some(""),
 			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(""),
 			"bitcoin::network::constants::Network" => Some(""),
 			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" => Some("&::bitcoin::consensus::encode::deserialize(unsafe { &*"),
 			"bitcoin::blockdata::block::Block" if is_ref => Some("&::bitcoin::consensus::encode::deserialize("),
+
+			"bitcoin::PackedLockTime"|"bitcoin::blockdata::locktime::PackedLockTime" => Some("::bitcoin::PackedLockTime("),
+
+			"bitcoin::psbt::PartiallySignedTransaction" if !is_ref => Some("::bitcoin::consensus::encode::deserialize("),
 
 			"bitcoin::PubkeyHash"|"bitcoin::hash_types::PubkeyHash" if !is_ref =>
 				Some("bitcoin::hash_types::PubkeyHash::from_hash(bitcoin::hashes::Hash::from_inner("),
@@ -1149,8 +1170,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::channelmanager::PaymentId" if is_ref=> Some("&::lightning::ln::channelmanager::PaymentId( unsafe { *"),
 			"lightning::ln::channelmanager::InterceptId" if !is_ref => Some("::lightning::ln::channelmanager::InterceptId("),
 			"lightning::ln::channelmanager::InterceptId" if is_ref=> Some("&::lightning::ln::channelmanager::InterceptId( unsafe { *"),
-			"lightning::chain::keysinterface::KeyMaterial" if !is_ref => Some("::lightning::chain::keysinterface::KeyMaterial("),
-			"lightning::chain::keysinterface::KeyMaterial" if is_ref=> Some("&::lightning::chain::keysinterface::KeyMaterial( unsafe { *"),
+			"lightning::sign::KeyMaterial" if !is_ref => Some("::lightning::sign::KeyMaterial("),
+			"lightning::sign::KeyMaterial" if is_ref=> Some("&::lightning::sign::KeyMaterial( unsafe { *"),
+			"lightning::chain::ClaimId" if !is_ref => Some("::lightning::chain::ClaimId("),
+			"lightning::chain::ClaimId" if is_ref=> Some("&::lightning::chain::ClaimId( unsafe { *"),
 
 			// List of traits we map (possibly during processing of other files):
 			"lightning::io::Read" => Some("&mut "),
@@ -1204,19 +1227,25 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(".into_rust()"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(".into_rust()"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some("}[..]).unwrap()"),
+			"bitcoin::secp256k1::KeyPair" if !is_ref => Some(".into_rust())"),
 			"bitcoin::secp256k1::Scalar" => Some(".into_rust()"),
 			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some(".data)"),
 
-			"bitcoin::blockdata::script::Script" if is_ref => Some(".to_slice()))"),
-			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_rust())"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if is_ref => Some(".to_slice()))"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if !is_ref => Some(".into_rust())"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(".into_bitcoin()"),
 			"bitcoin::Witness" => Some(".into_bitcoin()"),
 			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
+			"bitcoin::TxIn"|"bitcoin::blockdata::transaction::TxIn" if !is_ref => Some(".into_rust()"),
 			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(".into_rust()"),
 			"bitcoin::network::constants::Network" => Some(".into_bitcoin()"),
 			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" => Some(" }).unwrap()"),
 			"bitcoin::blockdata::block::Block" => Some(".to_slice()).unwrap()"),
+
+			"bitcoin::PackedLockTime"|"bitcoin::blockdata::locktime::PackedLockTime" => Some(")"),
+
+			"bitcoin::psbt::PartiallySignedTransaction" if !is_ref => Some(".as_slice()).expect(\"Invalid PSBT format\")"),
 
 			"bitcoin::PubkeyHash"|"bitcoin::hash_types::PubkeyHash"|
 			"bitcoin::hash_types::WPubkeyHash"|"bitcoin::hash_types::WScriptHash"|
@@ -1234,11 +1263,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::blockdata::constants::ChainHash" if !is_ref => Some(".data[..])"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if !is_ref => Some(".data)"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if is_ref => Some(" })"),
 
 			// List of traits we map (possibly during processing of other files):
@@ -1313,21 +1342,29 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature::from_rust(&"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some(""),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
+			"bitcoin::secp256k1::KeyPair" if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
 			"bitcoin::secp256k1::Scalar" if !is_ref => Some("crate::c_types::BigEndianScalar::from_rust(&"),
 			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
-			"bitcoin::blockdata::script::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
-			"bitcoin::blockdata::script::Script" if !is_ref => Some(""),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if is_ref => Some("crate::c_types::u8slice::from_slice(&"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if !is_ref => Some(""),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" if is_ref => Some("crate::c_types::Transaction::from_bitcoin("),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some("crate::c_types::Transaction::from_bitcoin(&"),
 			"bitcoin::Witness" if is_ref => Some("crate::c_types::Witness::from_bitcoin("),
 			"bitcoin::Witness" if !is_ref => Some("crate::c_types::Witness::from_bitcoin(&"),
-			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" => Some("crate::c_types::bitcoin_to_C_outpoint("),
-			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust("),
+			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" if is_ref => Some("crate::c_types::bitcoin_to_C_outpoint("),
+			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" if !is_ref => Some("crate::c_types::bitcoin_to_C_outpoint(&"),
+			"bitcoin::TxIn"|"bitcoin::blockdata::transaction::TxIn" if !is_ref => Some("crate::c_types::TxIn::from_rust(&"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some("crate::c_types::TxOut::from_rust(&"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if is_ref => Some("crate::c_types::TxOut::from_rust("),
 			"bitcoin::network::constants::Network" => Some("crate::bitcoin::network::Network::from_bitcoin("),
 			"bitcoin::util::address::WitnessVersion" => Some(""),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some("&local_"),
 			"bitcoin::blockdata::block::Block" if is_ref => Some("crate::c_types::u8slice::from_slice(&local_"),
+
+			"bitcoin::PackedLockTime"|"bitcoin::blockdata::locktime::PackedLockTime" => Some(""),
+
+			"bitcoin::psbt::PartiallySignedTransaction" if !is_ref => Some("::bitcoin::consensus::encode::serialize(&"),
 
 			"bitcoin::hash_types::Txid" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
@@ -1344,11 +1381,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::Message" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if is_ref => Some("&"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec("),
@@ -1406,19 +1443,25 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(")"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(")"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some(".as_ref()"),
+			"bitcoin::secp256k1::KeyPair" if !is_ref => Some(".secret_key())"),
 			"bitcoin::secp256k1::Scalar" if !is_ref => Some(")"),
 			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some(".secret_bytes() }"),
 
-			"bitcoin::blockdata::script::Script" if is_ref => Some("[..])"),
-			"bitcoin::blockdata::script::Script" if !is_ref => Some(".into_bytes().into()"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if is_ref => Some("[..])"),
+			"bitcoin::blockdata::script::Script"|"bitcoin::Script" if !is_ref => Some(".into_bytes().into()"),
 			"bitcoin::blockdata::transaction::Transaction"|"bitcoin::Transaction" => Some(")"),
 			"bitcoin::Witness" => Some(")"),
 			"bitcoin::OutPoint"|"bitcoin::blockdata::transaction::OutPoint" => Some(")"),
-			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" if !is_ref => Some(")"),
+			"bitcoin::TxIn"|"bitcoin::blockdata::transaction::TxIn" if !is_ref => Some(")"),
+			"bitcoin::TxOut"|"bitcoin::blockdata::transaction::TxOut" => Some(")"),
 			"bitcoin::network::constants::Network" => Some(")"),
 			"bitcoin::util::address::WitnessVersion" => Some(".into()"),
 			"bitcoin::blockdata::block::BlockHeader" if is_ref => Some(""),
 			"bitcoin::blockdata::block::Block" if is_ref => Some(")"),
+
+			"bitcoin::PackedLockTime"|"bitcoin::blockdata::locktime::PackedLockTime" => Some(".0"),
+
+			"bitcoin::psbt::PartiallySignedTransaction" if !is_ref => Some(").into()"),
 
 			"bitcoin::hash_types::Txid" if !is_ref => Some(".into_inner() }"),
 
@@ -1437,11 +1480,11 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if is_ref => Some(".0"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
-			|"lightning::chain::keysinterface::KeyMaterial"
+			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
 				if !is_ref => Some(".0 }"),
 
 			"lightning::io::Read" => Some("))"),
@@ -1452,7 +1495,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 	fn empty_val_check_suffix_from_path(&self, full_path: &str) -> Option<&str> {
 		match full_path {
-			"lightning::ln::PaymentSecret" => Some(".data == [0; 32]"),
 			"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => Some(".is_null()"),
 			"bitcoin::secp256k1::ecdsa::Signature" => Some(".is_null()"),
 			_ => None
@@ -1532,11 +1574,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 						// clear for users. Thus, we default to false but override for a few
 						// types which had mappings defined when we were avoiding the `Option_`s.
 						match &resolved as &str {
-							"lightning::ln::PaymentSecret" => true,
-							"lightning::ln::PaymentHash" => true,
-							"lightning::ln::PaymentPreimage" => true,
-							"lightning::ln::channelmanager::PaymentId" => true,
-							"bitcoin::hash_types::BlockHash"|"bitcoin::BlockHash" => true,
 							"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => true,
 							_ => false,
 						}
@@ -1993,19 +2030,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		}
 	}
 
-	fn is_real_type_array(&self, resolved_type: &str) -> Option<syn::Type> {
-		if let Some(real_ty) = self.c_type_from_path(&resolved_type, true, false) {
-			if real_ty.ends_with("]") && real_ty.starts_with("*const [u8; ") {
-				let mut split = real_ty.split("; ");
-				split.next().unwrap();
-				let tail_str = split.next().unwrap();
-				assert!(split.next().is_none());
-				let len = usize::from_str_radix(&tail_str[..tail_str.len() - 1], 10).unwrap();
-				Some(parse_quote!([u8; #len]))
-			} else { None }
-		} else { None }
-	}
-
 	/// Prints a suffix to determine if a variable is empty (ie was set by write_empty_rust_val).
 	/// See EmptyValExpectedTy for information on return types.
 	fn write_empty_rust_val_check_suffix<W: std::io::Write>(&self, generics: Option<&GenericTypes>, w: &mut W, t: &syn::Type) -> EmptyValExpectedTy {
@@ -2015,9 +2039,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			},
 			syn::Type::Path(p) => {
 				let resolved = self.resolve_path(&p.path, generics);
-				if let Some(arr_ty) = self.is_real_type_array(&resolved) {
-					return self.write_empty_rust_val_check_suffix(generics, w, &arr_ty);
-				}
 				if self.crate_types.opaques.get(&resolved).is_some() {
 					write!(w, ".inner.is_null()").unwrap();
 					EmptyValExpectedTy::NonPointer
@@ -2145,7 +2166,19 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 					if let Some(decl_type) = self.types.maybe_resolve_declared(ident) {
 						decl_lookup(w, decl_type, &self.maybe_resolve_ident(ident).unwrap(), is_ref, is_mut);
 					} else { unimplemented!(); }
-				} else { unimplemented!(); }
+				} else {
+					if let Some(trait_impls) = self.crate_types.traits_impld.get(&resolved_path) {
+						if trait_impls.len() == 1 {
+							// If this is a no-export'd crate and there's only one implementation
+							// in the whole crate, just treat it as a reference to whatever the
+							// implementor is.
+							let implementor = self.crate_types.opaques.get(&trait_impls[0]).unwrap();
+							decl_lookup(w, &DeclType::StructImported { generics: &implementor.1 }, &trait_impls[0], true, is_mut);
+							return;
+						}
+					}
+					unimplemented!();
+				}
 			},
 			syn::Type::Array(a) => {
 				if let syn::Type::Path(p) = &*a.elem {
@@ -2685,17 +2718,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				} else { unimplemented!(); }
 			} else if let syn::Type::Path(p_arg) = t {
 				if let Some(resolved) = self.maybe_resolve_path(&p_arg.path, generics) {
-					if !self.is_primitive(&resolved) {
+					if !self.is_primitive(&resolved) && self.c_type_from_path(&resolved, false, false).is_none() {
 						if is_ref {
 							// We don't currently support outer reference types for non-primitive inners
 							return false;
 						}
 					}
 				} else {
-					if is_ref {
-						// We don't currently support outer reference types for non-primitive inners
-						return false;
-					}
+					return false;
 				}
 				if !self.write_c_type_intern(w, t, generics, false, false, false, true, true) { return false; }
 			} else {
@@ -2807,12 +2837,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 								if self.c_type_has_inner_from_path(&subtype) {
 									if !self.write_c_path_intern(w, &$p_arg.path, generics, is_ref, is_mut, ptr_for_ref, false, true) { return false; }
 								} else {
-									if let Some(arr_ty) = self.is_real_type_array(&subtype) {
-										if !self.write_c_type_intern(w, &arr_ty, generics, false, true, false, false, true) { return false; }
-									} else {
-										// Option<T> needs to be converted to a *mut T, ie mut ptr-for-ref
-										if !self.write_c_path_intern(w, &$p_arg.path, generics, true, true, true, false, true) { return false; }
-									}
+									// Option<T> needs to be converted to a *mut T, ie mut ptr-for-ref
+									if !self.write_c_path_intern(w, &$p_arg.path, generics, true, true, true, false, true) { return false; }
 								}
 							} else {
 								write!(w, "{}", $p_arg.path.segments.last().unwrap().ident).unwrap();
@@ -2987,6 +3013,18 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			}
 			true
 		} else {
+			if let Some(trait_impls) = self.crate_types.traits_impld.get(&full_path) {
+				if trait_impls.len() == 1 {
+					// If this is a no-export'd crate and there's only one implementation in the
+					// whole crate, just treat it as a reference to whatever the implementor is.
+					if with_ref_lifetime {
+						write!(w, "&'static crate::{}", trait_impls[0]).unwrap();
+					} else {
+						write!(w, "&crate::{}", trait_impls[0]).unwrap();
+					}
+					return true;
+				}
+			}
 			false
 		}
 	}

@@ -647,6 +647,8 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		writeln!(w, "// directly as a Deref trait in higher-level structs:").unwrap();
 		writeln!(w, "impl core::ops::Deref for {} {{\n\ttype Target = Self;", trait_name).unwrap();
 		writeln!(w, "\tfn deref(&self) -> &Self {{\n\t\tself\n\t}}\n}}").unwrap();
+		writeln!(w, "impl core::ops::DerefMut for {} {{", trait_name).unwrap();
+		writeln!(w, "\tfn deref_mut(&mut self) -> &mut Self {{\n\t\tself\n\t}}\n}}").unwrap();
 	}
 
 	writeln!(w, "/// Calls the free function if one is set").unwrap();

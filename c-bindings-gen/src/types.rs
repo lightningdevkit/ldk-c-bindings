@@ -548,6 +548,7 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 		Self::insert_primitive(&mut imports, "bool");
 		Self::insert_primitive(&mut imports, "u128");
 		Self::insert_primitive(&mut imports, "i64");
+		Self::insert_primitive(&mut imports, "f64");
 		Self::insert_primitive(&mut imports, "u64");
 		Self::insert_primitive(&mut imports, "u32");
 		Self::insert_primitive(&mut imports, "u16");
@@ -950,6 +951,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 		match full_path {
 			"bool" => true,
 			"i64" => true,
+			"f64" => true,
 			"u64" => true,
 			"u32" => true,
 			"u16" => true,

@@ -534,8 +534,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 									writeln!(w, "\ttype {} = crate::{};", t.ident, $type_resolver.resolve_path(&tr.path, Some(&gen_types))).unwrap();
 									for bound in bounds_iter {
 										if let syn::TypeParamBound::Trait(t) = bound {
-											// We only allow for `?Sized` here.
-											if let syn::TraitBoundModifier::Maybe(_) = t.modifier {} else { panic!(); }
+											// We only allow for `Sized` here.
 											assert_eq!(t.path.segments.len(), 1);
 											assert_eq!(format!("{}", t.path.segments[0].ident), "Sized");
 										}

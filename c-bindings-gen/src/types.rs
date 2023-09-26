@@ -354,7 +354,6 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								for bound in bounds_iter {
 									if let syn::TypeParamBound::Trait(t) = bound {
 										// We only allow for `?Sized` here.
-										if let syn::TraitBoundModifier::Maybe(_) = t.modifier {} else { panic!(); }
 										assert_eq!(t.path.segments.len(), 1);
 										assert_eq!(format!("{}", t.path.segments[0].ident), "Sized");
 									}

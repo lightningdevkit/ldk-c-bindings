@@ -36,6 +36,7 @@ use blocks::*;
 
 const DEFAULT_IMPORTS: &'static str = "
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;

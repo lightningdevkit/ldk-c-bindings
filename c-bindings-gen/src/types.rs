@@ -2900,7 +2900,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 									generics, &subtype, is_ref, is_mut, ptr_for_ref, true);
 							}
 						} else {
-							let id = subtype.rsplitn(2, ':').next().unwrap(); // Get the "Base" name of the resolved type
+							let mut resolved = Vec::new();
+							let id =
+								if self.write_c_path_intern(&mut resolved, &$p_arg.path, generics, false, false, false, false, false) {
+									let inner = std::str::from_utf8(&resolved).unwrap();
+									inner.rsplitn(2, "::").next().unwrap()
+								} else {
+									subtype.rsplitn(2, "::").next().unwrap()
+								};
 							write!(w, "{}", id).unwrap();
 							write!(mangled_type, "{}", id).unwrap();
 							if let Some(w2) = $extra_write as Option<&mut Vec<u8>> {
@@ -2934,9 +2941,9 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 								} else { return false; }
 							} else if let syn::Type::Array(_) = elem {
 								let mut resolved = Vec::new();
-								if !self.write_c_type_intern(&mut resolved, &elem, generics, false, false, true, false, true) { return false; }
+								if !self.write_c_type_intern(&mut resolved, &elem, generics, false, false, false, false, false) { return false; }
 								let array_inner = String::from_utf8(resolved).unwrap();
-								let arr_name = array_inner.split("::").last().unwrap();
+								let arr_name = array_inner.rsplitn(2, "::").next().unwrap();
 								write!(w, "{}", arr_name).unwrap();
 								write!(mangled_type, "{}", arr_name).unwrap();
 							} else { return false; }

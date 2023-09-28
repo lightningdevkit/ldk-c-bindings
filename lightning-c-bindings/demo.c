@@ -25,8 +25,8 @@ void broadcast_txn(const void *this_arg, LDKCVec_TransactionZ txn) {
 	CVec_TransactionZ_free(txn);
 }
 
-LDKChannelMonitorUpdateStatus add_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, LDKChannelMonitor monitor) {
-	return ChannelMonitorUpdateStatus_completed();
+LDKCResult_ChannelMonitorUpdateStatusNoneZ add_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, LDKChannelMonitor monitor) {
+	return CResult_ChannelMonitorUpdateStatusNoneZ_ok(ChannelMonitorUpdateStatus_completed());
 }
 LDKChannelMonitorUpdateStatus update_channel_monitor(const void *this_arg, LDKOutPoint funding_txo, const LDKChannelMonitorUpdate *monitor) {
 	return ChannelMonitorUpdateStatus_completed();

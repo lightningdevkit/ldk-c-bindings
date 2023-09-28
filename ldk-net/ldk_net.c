@@ -168,11 +168,11 @@ static inline LDKSocketDescriptor get_descriptor(struct SocketHandler *handler, 
 	return ret;
 }
 
-static LDKCOption_NetAddressZ get_remote_network_address(int fd) {
+static LDKCOption_SocketAddressZ get_remote_network_address(int fd) {
 	struct sockaddr_storage sockaddr;
 	socklen_t remote_addr_len = sizeof(sockaddr);
 	if (getpeername(fd, (struct sockaddr*)&sockaddr, &remote_addr_len) == -1) {
-		return COption_NetAddressZ_none();
+		return COption_SocketAddressZ_none();
 	}
 
 	switch (sockaddr.ss_family) {
@@ -180,16 +180,16 @@ static LDKCOption_NetAddressZ get_remote_network_address(int fd) {
 		const struct sockaddr_in *remote_addr = (struct sockaddr_in*)&sockaddr;
 		LDKFourBytes addr;
 		memcpy(&addr, &remote_addr->sin_addr.s_addr, 4);
-		return COption_NetAddressZ_some(NetAddress_ipv4(addr, ntohs(remote_addr->sin_port)));
+		return COption_SocketAddressZ_some(SocketAddress_tcp_ip_v4(addr, ntohs(remote_addr->sin_port)));
 	}
 	case AF_INET6: {
 		const struct sockaddr_in6 *remote_addr = (struct sockaddr_in6*)&sockaddr;
 		LDKSixteenBytes addr;
 		memcpy(&addr, &remote_addr->sin6_addr.s6_addr, 16);
-		return COption_NetAddressZ_some(NetAddress_ipv6(addr, ntohs(remote_addr->sin6_port)));
+		return COption_SocketAddressZ_some(SocketAddress_tcp_ip_v6(addr, ntohs(remote_addr->sin6_port)));
 	}
 	default:
-		return COption_NetAddressZ_none();
+		return COption_SocketAddressZ_none();
 	}
 }
 

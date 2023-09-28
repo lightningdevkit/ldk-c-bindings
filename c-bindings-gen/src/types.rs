@@ -863,7 +863,8 @@ fn initial_clonable_types() -> HashSet<String> {
 	res.insert("crate::c_types::WitnessVersion".to_owned());
 	res.insert("crate::c_types::TxIn".to_owned());
 	res.insert("crate::c_types::TxOut".to_owned());
-	res.insert("crate::c_types::Signature".to_owned());
+	res.insert("crate::c_types::ECDSASignature".to_owned());
+	res.insert("crate::c_types::SchnorrSignature".to_owned());
 	res.insert("crate::c_types::RecoverableSignature".to_owned());
 	res.insert("crate::c_types::BigEndianScalar".to_owned());
 	res.insert("crate::c_types::Bech32Error".to_owned());
@@ -1030,10 +1031,10 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some("crate::c_types::TwelveBytes"),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes"),
 			"[u8; 3]" if !is_ref => Some("crate::c_types::ThreeBytes"), // Used for RGB values
-			"[u16; 8]" if !is_ref => Some("crate::c_types::EightU16s"),
+			"[u16; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoU16s"),
 
 			"str" if is_ref => Some("crate::c_types::Str"),
-			"alloc::string::String"|"String" => Some("crate::c_types::Str"),
+			"alloc::string::String"|"String"|"std::path::PathBuf" => Some("crate::c_types::Str"),
 
 			"bitcoin::Address" => Some("crate::c_types::Str"),
 
@@ -1057,7 +1058,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"core::num::NonZeroU8" => Some("u8"),
 
 			"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => Some("crate::c_types::PublicKey"),
-			"bitcoin::secp256k1::ecdsa::Signature" => Some("crate::c_types::Signature"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some("crate::c_types::ECDSASignature"),
+			"bitcoin::secp256k1::schnorr::Signature" => Some("crate::c_types::SchnorrSignature"),
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature"),
 			"bitcoin::secp256k1::SecretKey" if is_ref  => Some("*const [u8; 32]"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey"),
@@ -1102,10 +1104,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
 			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
+			|"lightning::ln::ChannelId"|"lightning::ln::channel_id::ChannelId"
 				if is_ref => Some("*const [u8; 32]"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
 			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
+			|"lightning::ln::ChannelId"|"lightning::ln::channel_id::ChannelId"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice"),
@@ -1134,13 +1138,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some(""),
 			"[u8; 4]" if !is_ref => Some(""),
 			"[u8; 3]" if !is_ref => Some(""),
-			"[u16; 8]" if !is_ref => Some(""),
+			"[u16; 32]" if !is_ref => Some(""),
 
 			"[u8]" if is_ref => Some(""),
 			"[usize]" if is_ref => Some(""),
 
 			"str" if is_ref => Some(""),
-			"alloc::string::String"|"String" => Some(""),
+			"alloc::string::String"|"String"|"std::path::PathBuf" => Some(""),
 			"std::io::Error"|"lightning::io::Error"|"lightning::io::ErrorKind" => Some(""),
 			// Note that we'll panic for String if is_ref, as we only have non-owned memory, we
 			// cannot create a &String.
@@ -1162,12 +1166,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 
 			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" if is_ref => Some("&"),
 			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some(""),
-			"bitcoin::secp256k1::ecdsa::Signature" if is_ref => Some("&"),
-			"bitcoin::secp256k1::ecdsa::Signature" => Some(""),
+			"bitcoin::secp256k1::ecdsa::Signature"|"bitcoin::secp256k1::schnorr::Signature" if is_ref => Some("&"),
+			"bitcoin::secp256k1::ecdsa::Signature"|"bitcoin::secp256k1::schnorr::Signature" => Some(""),
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(""),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some("&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(""),
-			"bitcoin::secp256k1::KeyPair" if !is_ref => Some("::bitcoin::secp256k1::KeyPair::new("),
+			"bitcoin::secp256k1::KeyPair" if !is_ref => Some("::bitcoin::secp256k1::KeyPair::from_secret_key(&secp256k1::global::SECP256K1, &"),
 			"bitcoin::secp256k1::Scalar" if is_ref => Some("&"),
 			"bitcoin::secp256k1::Scalar" if !is_ref => Some(""),
 			"bitcoin::secp256k1::ecdh::SharedSecret" if !is_ref => Some("::bitcoin::secp256k1::ecdh::SharedSecret::from_bytes("),
@@ -1217,6 +1221,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::channelmanager::PaymentId" if is_ref=> Some("&::lightning::ln::channelmanager::PaymentId( unsafe { *"),
 			"lightning::ln::channelmanager::InterceptId" if !is_ref => Some("::lightning::ln::channelmanager::InterceptId("),
 			"lightning::ln::channelmanager::InterceptId" if is_ref=> Some("&::lightning::ln::channelmanager::InterceptId( unsafe { *"),
+			"lightning::ln::ChannelId"|"lightning::ln::channel_id::ChannelId" if !is_ref => Some("::lightning::ln::ChannelId("),
+			"lightning::ln::ChannelId"|"lightning::ln::channel_id::ChannelId" if is_ref => Some("&::lightning::ln::ChannelId(unsafe { *"),
 			"lightning::sign::KeyMaterial" if !is_ref => Some("::lightning::sign::KeyMaterial("),
 			"lightning::sign::KeyMaterial" if is_ref=> Some("&::lightning::sign::KeyMaterial( unsafe { *"),
 			"lightning::chain::ClaimId" if !is_ref => Some("::lightning::chain::ClaimId("),
@@ -1244,13 +1250,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some(".data"),
 			"[u8; 4]" if !is_ref => Some(".data"),
 			"[u8; 3]" if !is_ref => Some(".data"),
-			"[u16; 8]" if !is_ref => Some(".data"),
+			"[u16; 32]" if !is_ref => Some(".data"),
 
 			"[u8]" if is_ref => Some(".to_slice()"),
 			"[usize]" if is_ref => Some(".to_slice()"),
 
 			"str" if is_ref => Some(".into_str()"),
 			"alloc::string::String"|"String" => Some(".into_string()"),
+			"std::path::PathBuf" => Some(".into_pathbuf()"),
 			"std::io::Error"|"lightning::io::Error" => Some(".to_rust()"),
 			"lightning::io::ErrorKind" => Some(".to_rust_kind()"),
 
@@ -1270,7 +1277,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"core::num::NonZeroU8" => Some(").expect(\"Value must be non-zero\")"),
 
 			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some(".into_rust()"),
-			"bitcoin::secp256k1::ecdsa::Signature" => Some(".into_rust()"),
+			"bitcoin::secp256k1::ecdsa::Signature"|"bitcoin::secp256k1::schnorr::Signature" => Some(".into_rust()"),
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(".into_rust()"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(".into_rust()"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some("}[..]).unwrap()"),
@@ -1311,10 +1318,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
 			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
+			|"lightning::ln::ChannelId"|"lightning::ln::channel_id::ChannelId"
 				if !is_ref => Some(".data)"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
 			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
+			|"lightning::ln::ChannelId"|"lightning::ln::channel_id::ChannelId"
 				if is_ref => Some(" })"),
 
 			// List of traits we map (possibly during processing of other files):
@@ -1355,13 +1364,13 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some("crate::c_types::TwelveBytes { data: "),
 			"[u8; 4]" if !is_ref => Some("crate::c_types::FourBytes { data: "),
 			"[u8; 3]" if is_ref => Some(""),
-			"[u16; 8]" if !is_ref => Some("crate::c_types::EightU16s { data: "),
+			"[u16; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoU16s { data: "),
 
 			"[u8]" if is_ref => Some("local_"),
 			"[usize]" if is_ref => Some("local_"),
 
 			"str" if is_ref => Some(""),
-			"alloc::string::String"|"String" => Some(""),
+			"alloc::string::String"|"String"|"std::path::PathBuf" => Some(""),
 
 			"bitcoin::Address" => Some("alloc::string::ToString::to_string(&"),
 
@@ -1385,7 +1394,8 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"u128" => Some(""),
 
 			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some("crate::c_types::PublicKey::from_rust(&"),
-			"bitcoin::secp256k1::ecdsa::Signature" => Some("crate::c_types::Signature::from_rust(&"),
+			"bitcoin::secp256k1::ecdsa::Signature" => Some("crate::c_types::ECDSASignature::from_rust(&"),
+			"bitcoin::secp256k1::schnorr::Signature" => Some("crate::c_types::SchnorrSignature::from_rust(&"),
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some("crate::c_types::RecoverableSignature::from_rust(&"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some(""),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some("crate::c_types::SecretKey::from_rust("),
@@ -1429,10 +1439,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
 			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
+			|"lightning::ln::ChannelId"|"lightning::ln::channel_id::ChannelId"
 				if is_ref => Some("&"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
 			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
+			|"lightning::ln::ChannelId"|"lightning::ln::channel_id::ChannelId"
 				if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 
 			"lightning::io::Read" => Some("crate::c_types::u8slice::from_vec(&crate::c_types::reader_to_vec("),
@@ -1456,14 +1468,14 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"[u8; 12]" if !is_ref => Some(" }"),
 			"[u8; 4]" if !is_ref => Some(" }"),
 			"[u8; 3]" if is_ref => Some(""),
-			"[u16; 8]" if !is_ref => Some(" }"),
+			"[u16; 32]" if !is_ref => Some(" }"),
 
 			"[u8]" if is_ref => Some(""),
 			"[usize]" if is_ref => Some(""),
 
 			"str" if is_ref => Some(".into()"),
-			"alloc::string::String"|"String" if is_ref => Some(".as_str().into()"),
-			"alloc::string::String"|"String" => Some(".into()"),
+			"alloc::string::String"|"String"|"std::path::PathBuf" if is_ref => Some(".as_str().into()"),
+			"alloc::string::String"|"String"|"std::path::PathBuf" => Some(".into()"),
 
 			"bitcoin::Address" => Some(").into()"),
 
@@ -1486,7 +1498,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"u128" => Some(".into()"),
 
 			"bitcoin::secp256k1::PublicKey"|"secp256k1::PublicKey" => Some(")"),
-			"bitcoin::secp256k1::ecdsa::Signature" => Some(")"),
+			"bitcoin::secp256k1::ecdsa::Signature"|"bitcoin::secp256k1::schnorr::Signature" => Some(")"),
 			"bitcoin::secp256k1::ecdsa::RecoverableSignature" => Some(")"),
 			"bitcoin::secp256k1::SecretKey" if !is_ref => Some(")"),
 			"bitcoin::secp256k1::SecretKey" if is_ref => Some(".as_ref()"),
@@ -1528,10 +1540,12 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
 			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
+			|"lightning::ln::ChannelId"|"lightning::ln::channel_id::ChannelId"
 				if is_ref => Some(".0"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"
 			|"lightning::ln::channelmanager::PaymentId"|"lightning::ln::channelmanager::InterceptId"
 			|"lightning::sign::KeyMaterial"|"lightning::chain::ClaimId"
+			|"lightning::ln::ChannelId"|"lightning::ln::channel_id::ChannelId"
 				if !is_ref => Some(".0 }"),
 
 			"lightning::io::Read" => Some("))"),

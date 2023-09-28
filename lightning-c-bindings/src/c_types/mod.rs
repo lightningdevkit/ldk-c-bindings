@@ -8,7 +8,8 @@ use bitcoin::Witness as BitcoinWitness;
 use bitcoin::hashes::Hash;
 use bitcoin::secp256k1::PublicKey as SecpPublicKey;
 use bitcoin::secp256k1::SecretKey as SecpSecretKey;
-use bitcoin::secp256k1::ecdsa::Signature as SecpSignature;
+use bitcoin::secp256k1::ecdsa::Signature as ECDSASecpSignature;
+use bitcoin::secp256k1::schnorr::Signature as SchnorrSecpSignature;
 use bitcoin::secp256k1::Error as SecpError;
 use bitcoin::secp256k1::ecdsa::RecoveryId;
 use bitcoin::secp256k1::ecdsa::RecoverableSignature as SecpRecoverableSignature;
@@ -17,6 +18,7 @@ use bitcoin::bech32;
 use bitcoin::util::address;
 
 use core::convert::TryInto; // Bindings need at least rustc 1.34
+use alloc::borrow::ToOwned;
 use core::ffi::c_void;
 
 #[cfg(feature = "std")]
@@ -135,23 +137,38 @@ impl SecretKey {
 
 #[repr(C)]
 #[derive(Clone)]
-/// Represents a secp256k1 signature serialized as two 32-byte numbers
-pub struct Signature {
+/// Represents a secp256k1 ECDSA signature serialized as two 32-byte numbers
+pub struct ECDSASignature {
 	/// The bytes of the signature in "compact" form
 	pub compact_form: [u8; 64],
 }
-impl Signature {
-	pub(crate) fn from_rust(pk: &SecpSignature) -> Self {
+impl ECDSASignature {
+	pub(crate) fn from_rust(pk: &ECDSASecpSignature) -> Self {
 		Self {
 			compact_form: pk.serialize_compact(),
 		}
 	}
-	pub(crate) fn into_rust(&self) -> SecpSignature {
-		SecpSignature::from_compact(&self.compact_form).unwrap()
+	pub(crate) fn into_rust(&self) -> ECDSASecpSignature {
+		ECDSASecpSignature::from_compact(&self.compact_form).unwrap()
 	}
-	// The following are used for Option<Signature> which we support, but don't use anymore
-	#[allow(unused)] pub(crate) fn is_null(&self) -> bool { self.compact_form[..] == [0; 64][..] }
-	#[allow(unused)] pub(crate) fn null() -> Self { Self { compact_form: [0; 64] } }
+}
+
+#[repr(C)]
+#[derive(Clone)]
+/// Represents a secp256k1 Schnorr signature serialized as two 32-byte numbers
+pub struct SchnorrSignature {
+	/// The bytes of the signature as two 32-byte numbers
+	pub compact_form: [u8; 64],
+}
+impl SchnorrSignature {
+	pub(crate) fn from_rust(pk: &SchnorrSecpSignature) -> Self {
+		Self {
+			compact_form: pk.as_ref().clone(),
+		}
+	}
+	pub(crate) fn into_rust(&self) -> SchnorrSecpSignature {
+		SchnorrSecpSignature::from_slice(&self.compact_form).unwrap()
+	}
 }
 
 #[repr(C)]
@@ -673,8 +690,8 @@ pub struct TwentyBytes { /** The twenty bytes */ pub data: [u8; 20], }
 
 #[derive(Clone)]
 #[repr(C)]
-/// 8 u16s
-pub struct EightU16s { /** The eight 16-bit integers */ pub data: [u16; 8], }
+/// 32 u16s
+pub struct ThirtyTwoU16s { /** The thirty-two 16-bit integers */ pub data: [u16; 32], }
 
 pub(crate) struct VecWriter(pub Vec<u8>);
 impl lightning::util::ser::Writer for VecWriter {
@@ -709,14 +726,14 @@ pub struct Str {
 	/// Whether the data pointed to by `chars` should be freed or not.
 	pub chars_is_owned: bool,
 }
-impl Into<Str> for &'static str {
+impl Into<Str> for &str {
 	fn into(self) -> Str {
-		Str { chars: self.as_ptr(), len: self.len(), chars_is_owned: false }
+		self.to_owned().into()
 	}
 }
-impl Into<Str> for &mut &'static str {
+impl Into<Str> for &mut &str {
 	fn into(self) -> Str {
-		let us: &'static str = *self;
+		let us: &str = *self;
 		us.into()
 	}
 }
@@ -742,11 +759,21 @@ impl Str {
 		};
 		String::from_utf8(bytes).unwrap()
 	}
+	#[cfg(feature = "std")]
+	pub(crate) fn into_pathbuf(mut self) -> std::path::PathBuf {
+		std::path::PathBuf::from(self.into_string())
+	}
 }
 impl Into<Str> for String {
 	fn into(self) -> Str {
 		let s = Box::leak(self.into_boxed_str());
 		Str { chars: s.as_ptr(), len: s.len(), chars_is_owned: true }
+	}
+}
+#[cfg(feature = "std")]
+impl Into<Str> for std::path::PathBuf {
+	fn into(self) -> Str {
+		self.into_os_string().into_string().expect("We expect paths to be UTF-8 valid").into()
 	}
 }
 impl Clone for Str {

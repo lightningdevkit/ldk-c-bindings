@@ -1543,7 +1543,6 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 	fn empty_val_check_suffix_from_path(&self, full_path: &str) -> Option<&str> {
 		match full_path {
 			"secp256k1::PublicKey"|"bitcoin::secp256k1::PublicKey" => Some(".is_null()"),
-			"bitcoin::secp256k1::ecdsa::Signature" => Some(".is_null()"),
 			_ => None
 		}
 	}

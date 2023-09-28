@@ -10,6 +10,7 @@
 //! more information.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -69,6 +70,7 @@ pub(crate) type nativeOnionMessenger = nativeOnionMessengerImport<crate::lightni
 ///     &custom_message_handler
 /// );
 ///
+/// # #[derive(Clone)]
 /// # struct YourCustomMessage {}
 /// impl Writeable for YourCustomMessage {
 /// \tfn write<W: Writer>(&self, w: &mut W) -> Result<(), io::Error> {
@@ -174,8 +176,7 @@ pub struct MessageRouter {
 }
 unsafe impl Send for MessageRouter {}
 unsafe impl Sync for MessageRouter {}
-#[no_mangle]
-pub(crate) extern "C" fn MessageRouter_clone_fields(orig: &MessageRouter) -> MessageRouter {
+pub(crate) fn MessageRouter_clone_fields(orig: &MessageRouter) -> MessageRouter {
 	MessageRouter {
 		this_arg: orig.this_arg,
 		find_path: Clone::clone(&orig.find_path),
@@ -198,6 +199,11 @@ impl rustMessageRouter for MessageRouter {
 impl core::ops::Deref for MessageRouter {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for MessageRouter {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }
@@ -682,8 +688,7 @@ pub struct CustomOnionMessageHandler {
 }
 unsafe impl Send for CustomOnionMessageHandler {}
 unsafe impl Sync for CustomOnionMessageHandler {}
-#[no_mangle]
-pub(crate) extern "C" fn CustomOnionMessageHandler_clone_fields(orig: &CustomOnionMessageHandler) -> CustomOnionMessageHandler {
+pub(crate) fn CustomOnionMessageHandler_clone_fields(orig: &CustomOnionMessageHandler) -> CustomOnionMessageHandler {
 	CustomOnionMessageHandler {
 		this_arg: orig.this_arg,
 		handle_custom_message: Clone::clone(&orig.handle_custom_message),
@@ -715,6 +720,11 @@ impl core::ops::Deref for CustomOnionMessageHandler {
 		self
 	}
 }
+impl core::ops::DerefMut for CustomOnionMessageHandler {
+	fn deref_mut(&mut self) -> &mut Self {
+		self
+	}
+}
 /// Calls the free function if one is set
 #[no_mangle]
 pub extern "C" fn CustomOnionMessageHandler_free(this_ptr: CustomOnionMessageHandler) { }
@@ -725,6 +735,18 @@ impl Drop for CustomOnionMessageHandler {
 		}
 	}
 }
+/// Create an onion message with contents `message` to the destination of `path`.
+/// Returns (introduction_node_id, onion_msg)
+///
+/// Note that reply_path (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn create_onion_message(entropy_source: &crate::lightning::sign::EntropySource, node_signer: &crate::lightning::sign::NodeSigner, mut path: crate::lightning::onion_message::messenger::OnionMessagePath, mut message: crate::lightning::onion_message::packet::OnionMessageContents, mut reply_path: crate::lightning::blinded_path::BlindedPath) -> crate::c_types::derived::CResult_C2Tuple_PublicKeyOnionMessageZSendErrorZ {
+	let mut local_reply_path = if reply_path.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(reply_path.take_inner()) } }) };
+	let mut ret = lightning::onion_message::messenger::create_onion_message::<crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::onion_message::packet::CustomOnionMessageContents>(entropy_source, node_signer, secp256k1::global::SECP256K1, *unsafe { Box::from_raw(path.take_inner()) }, message.into_native(), local_reply_path);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_ret_0 = (crate::c_types::PublicKey::from_rust(&orig_ret_0_0), crate::lightning::ln::msgs::OnionMessage { inner: ObjOps::heap_alloc(orig_ret_0_1), is_owned: true }).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::onion_message::messenger::SendError::native_into(e) }).into() };
+	local_ret
+}
+
 /// Constructs a new `OnionMessenger` to send, forward, and delegate received onion messages to
 /// their respective handlers.
 #[must_use]

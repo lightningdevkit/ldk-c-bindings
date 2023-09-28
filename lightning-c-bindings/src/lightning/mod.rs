@@ -36,6 +36,7 @@
 //!     * `max_level_trace`
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -55,6 +56,7 @@ pub mod events;
 mod io_extras {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -66,6 +68,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod prelude {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -77,6 +80,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod sync {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -87,6 +91,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod fairrwlock {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -98,6 +103,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod ext_impl {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;

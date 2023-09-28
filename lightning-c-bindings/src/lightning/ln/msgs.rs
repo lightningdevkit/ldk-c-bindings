@@ -24,6 +24,7 @@
 //! track the network on the less-secure system.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -242,16 +243,16 @@ pub extern "C" fn Init_set_features(this_ptr: &mut Init, mut val: crate::lightni
 ///
 /// Returns a copy of the field.
 #[no_mangle]
-pub extern "C" fn Init_get_networks(this_ptr: &Init) -> crate::c_types::derived::COption_CVec_ChainHashZZ {
+pub extern "C" fn Init_get_networks(this_ptr: &Init) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
 	let mut inner_val = this_ptr.get_native_mut_ref().networks.clone();
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_ChainHashZZ::None } else { crate::c_types::derived::COption_CVec_ChainHashZZ::Some( { let mut local_inner_val_0 = Vec::new(); for mut item in inner_val.unwrap().drain(..) { local_inner_val_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_inner_val_0.into() }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_inner_val_0 = Vec::new(); for mut item in inner_val.unwrap().drain(..) { local_inner_val_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_inner_val_0.into() }) };
 	local_inner_val
 }
 /// Indicates chains the sender is interested in.
 ///
 /// If there are no common chains, the connection will be closed.
 #[no_mangle]
-pub extern "C" fn Init_set_networks(this_ptr: &mut Init, mut val: crate::c_types::derived::COption_CVec_ChainHashZZ) {
+pub extern "C" fn Init_set_networks(this_ptr: &mut Init, mut val: crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ) {
 	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { let mut local_val_0 = Vec::new(); for mut item in { val_opt.take() }.into_rust().drain(..) { local_val_0.push( { ::bitcoin::blockdata::constants::ChainHash::from(&item.data[..]) }); }; local_val_0 }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.networks = local_val;
 }
@@ -262,9 +263,9 @@ pub extern "C" fn Init_set_networks(this_ptr: &mut Init, mut val: crate::c_types
 /// public IPv4 address (NAT) and use that for a [`NodeAnnouncement`] update message containing
 /// the new address.
 #[no_mangle]
-pub extern "C" fn Init_get_remote_network_address(this_ptr: &Init) -> crate::c_types::derived::COption_NetAddressZ {
+pub extern "C" fn Init_get_remote_network_address(this_ptr: &Init) -> crate::c_types::derived::COption_SocketAddressZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().remote_network_address;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_NetAddressZ::None } else { crate::c_types::derived::COption_NetAddressZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::lightning::ln::msgs::NetAddress::native_into((*inner_val.as_ref().unwrap()).clone()) }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_SocketAddressZ::None } else { crate::c_types::derived::COption_SocketAddressZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::lightning::ln::msgs::SocketAddress::native_into((*inner_val.as_ref().unwrap()).clone()) }) };
 	local_inner_val
 }
 /// The receipient's network address.
@@ -274,14 +275,14 @@ pub extern "C" fn Init_get_remote_network_address(this_ptr: &Init) -> crate::c_t
 /// public IPv4 address (NAT) and use that for a [`NodeAnnouncement`] update message containing
 /// the new address.
 #[no_mangle]
-pub extern "C" fn Init_set_remote_network_address(this_ptr: &mut Init, mut val: crate::c_types::derived::COption_NetAddressZ) {
+pub extern "C" fn Init_set_remote_network_address(this_ptr: &mut Init, mut val: crate::c_types::derived::COption_SocketAddressZ) {
 	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { { val_opt.take() }.into_native() }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.remote_network_address = local_val;
 }
 /// Constructs a new Init given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Init_new(mut features_arg: crate::lightning::ln::features::InitFeatures, mut networks_arg: crate::c_types::derived::COption_CVec_ChainHashZZ, mut remote_network_address_arg: crate::c_types::derived::COption_NetAddressZ) -> Init {
+pub extern "C" fn Init_new(mut features_arg: crate::lightning::ln::features::InitFeatures, mut networks_arg: crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ, mut remote_network_address_arg: crate::c_types::derived::COption_SocketAddressZ) -> Init {
 	let mut local_networks_arg = { /*networks_arg*/ let networks_arg_opt = networks_arg; if networks_arg_opt.is_none() { None } else { Some({ { let mut local_networks_arg_0 = Vec::new(); for mut item in { networks_arg_opt.take() }.into_rust().drain(..) { local_networks_arg_0.push( { ::bitcoin::blockdata::constants::ChainHash::from(&item.data[..]) }); }; local_networks_arg_0 }})} };
 	let mut local_remote_network_address_arg = { /*remote_network_address_arg*/ let remote_network_address_arg_opt = remote_network_address_arg; if remote_network_address_arg_opt.is_none() { None } else { Some({ { { remote_network_address_arg_opt.take() }.into_native() }})} };
 	Init { inner: ObjOps::heap_alloc(nativeInit {
@@ -378,7 +379,7 @@ impl ErrorMessage {
 #[no_mangle]
 pub extern "C" fn ErrorMessage_get_channel_id(this_ptr: &ErrorMessage) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID involved in the error.
 ///
@@ -386,7 +387,7 @@ pub extern "C" fn ErrorMessage_get_channel_id(this_ptr: &ErrorMessage) -> *const
 /// with the sending peer should be closed.
 #[no_mangle]
 pub extern "C" fn ErrorMessage_set_channel_id(this_ptr: &mut ErrorMessage, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// A possibly human-readable error description.
 ///
@@ -412,7 +413,7 @@ pub extern "C" fn ErrorMessage_set_data(this_ptr: &mut ErrorMessage, mut val: cr
 #[no_mangle]
 pub extern "C" fn ErrorMessage_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut data_arg: crate::c_types::Str) -> ErrorMessage {
 	ErrorMessage { inner: ObjOps::heap_alloc(nativeErrorMessage {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		data: data_arg.into_string(),
 	}), is_owned: true }
 }
@@ -503,14 +504,14 @@ impl WarningMessage {
 #[no_mangle]
 pub extern "C" fn WarningMessage_get_channel_id(this_ptr: &WarningMessage) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID involved in the warning.
 ///
 /// All-0s indicates a warning unrelated to a specific channel.
 #[no_mangle]
 pub extern "C" fn WarningMessage_set_channel_id(this_ptr: &mut WarningMessage, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// A possibly human-readable warning description.
 ///
@@ -536,7 +537,7 @@ pub extern "C" fn WarningMessage_set_data(this_ptr: &mut WarningMessage, mut val
 #[no_mangle]
 pub extern "C" fn WarningMessage_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut data_arg: crate::c_types::Str) -> WarningMessage {
 	WarningMessage { inner: ObjOps::heap_alloc(nativeWarningMessage {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		data: data_arg.into_string(),
 	}), is_owned: true }
 }
@@ -858,12 +859,12 @@ pub extern "C" fn OpenChannel_set_chain_hash(this_ptr: &mut OpenChannel, mut val
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_temporary_channel_id(this_ptr: &OpenChannel) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().temporary_channel_id;
-	inner_val
+	&inner_val.0
 }
 /// A temporary channel ID, until the funding outpoint is announced
 #[no_mangle]
 pub extern "C" fn OpenChannel_set_temporary_channel_id(this_ptr: &mut OpenChannel, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.temporary_channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.temporary_channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The channel value
 #[no_mangle]
@@ -1047,14 +1048,14 @@ pub extern "C" fn OpenChannel_set_channel_flags(this_ptr: &mut OpenChannel, mut 
 }
 /// A request to pre-set the to-sender output's `scriptPubkey` for when we collaboratively close
 #[no_mangle]
-pub extern "C" fn OpenChannel_get_shutdown_scriptpubkey(this_ptr: &OpenChannel) -> crate::c_types::derived::COption_ScriptZ {
+pub extern "C" fn OpenChannel_get_shutdown_scriptpubkey(this_ptr: &OpenChannel) -> crate::c_types::derived::COption_CVec_u8ZZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().shutdown_scriptpubkey;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ScriptZ::None } else { crate::c_types::derived::COption_ScriptZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
 	local_inner_val
 }
 /// A request to pre-set the to-sender output's `scriptPubkey` for when we collaboratively close
 #[no_mangle]
-pub extern "C" fn OpenChannel_set_shutdown_scriptpubkey(this_ptr: &mut OpenChannel, mut val: crate::c_types::derived::COption_ScriptZ) {
+pub extern "C" fn OpenChannel_set_shutdown_scriptpubkey(this_ptr: &mut OpenChannel, mut val: crate::c_types::derived::COption_CVec_u8ZZ) {
 	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ val_opt.take() }.into_rust()) }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.shutdown_scriptpubkey = local_val;
 }
@@ -1082,14 +1083,16 @@ pub extern "C" fn OpenChannel_set_channel_type(this_ptr: &mut OpenChannel, mut v
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_type = local_val;
 }
 /// Constructs a new OpenChannel given each field
+///
+/// Note that channel_type_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn OpenChannel_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_satoshis_arg: u64, mut push_msat_arg: u64, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut channel_reserve_satoshis_arg: u64, mut htlc_minimum_msat_arg: u64, mut feerate_per_kw_arg: u32, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_point_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut channel_flags_arg: u8, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_ScriptZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures) -> OpenChannel {
+pub extern "C" fn OpenChannel_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_satoshis_arg: u64, mut push_msat_arg: u64, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut channel_reserve_satoshis_arg: u64, mut htlc_minimum_msat_arg: u64, mut feerate_per_kw_arg: u32, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_point_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut channel_flags_arg: u8, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_CVec_u8ZZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures) -> OpenChannel {
 	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
 	let mut local_channel_type_arg = if channel_type_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(channel_type_arg.take_inner()) } }) };
 	OpenChannel { inner: ObjOps::heap_alloc(nativeOpenChannel {
 		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
-		temporary_channel_id: temporary_channel_id_arg.data,
+		temporary_channel_id: ::lightning::ln::ChannelId(temporary_channel_id_arg.data),
 		funding_satoshis: funding_satoshis_arg,
 		push_msat: push_msat_arg,
 		dust_limit_satoshis: dust_limit_satoshis_arg,
@@ -1207,12 +1210,12 @@ pub extern "C" fn OpenChannelV2_set_chain_hash(this_ptr: &mut OpenChannelV2, mut
 #[no_mangle]
 pub extern "C" fn OpenChannelV2_get_temporary_channel_id(this_ptr: &OpenChannelV2) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().temporary_channel_id;
-	inner_val
+	&inner_val.0
 }
 /// A temporary channel ID derived using a zeroed out value for the channel acceptor's revocation basepoint
 #[no_mangle]
 pub extern "C" fn OpenChannelV2_set_temporary_channel_id(this_ptr: &mut OpenChannelV2, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.temporary_channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.temporary_channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The feerate for the funding transaction set by the channel initiator
 #[no_mangle]
@@ -1410,15 +1413,15 @@ pub extern "C" fn OpenChannelV2_set_channel_flags(this_ptr: &mut OpenChannelV2, 
 /// Optionally, a request to pre-set the to-channel-initiator output's scriptPubkey for when we
 /// collaboratively close
 #[no_mangle]
-pub extern "C" fn OpenChannelV2_get_shutdown_scriptpubkey(this_ptr: &OpenChannelV2) -> crate::c_types::derived::COption_ScriptZ {
+pub extern "C" fn OpenChannelV2_get_shutdown_scriptpubkey(this_ptr: &OpenChannelV2) -> crate::c_types::derived::COption_CVec_u8ZZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().shutdown_scriptpubkey;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ScriptZ::None } else { crate::c_types::derived::COption_ScriptZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
 	local_inner_val
 }
 /// Optionally, a request to pre-set the to-channel-initiator output's scriptPubkey for when we
 /// collaboratively close
 #[no_mangle]
-pub extern "C" fn OpenChannelV2_set_shutdown_scriptpubkey(this_ptr: &mut OpenChannelV2, mut val: crate::c_types::derived::COption_ScriptZ) {
+pub extern "C" fn OpenChannelV2_set_shutdown_scriptpubkey(this_ptr: &mut OpenChannelV2, mut val: crate::c_types::derived::COption_CVec_u8ZZ) {
 	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ val_opt.take() }.into_rust()) }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.shutdown_scriptpubkey = local_val;
 }
@@ -1457,15 +1460,17 @@ pub extern "C" fn OpenChannelV2_set_require_confirmed_inputs(this_ptr: &mut Open
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.require_confirmed_inputs = local_val;
 }
 /// Constructs a new OpenChannelV2 given each field
+///
+/// Note that channel_type_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn OpenChannelV2_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_feerate_sat_per_1000_weight_arg: u32, mut commitment_feerate_sat_per_1000_weight_arg: u32, mut funding_satoshis_arg: u64, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut htlc_minimum_msat_arg: u64, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut locktime_arg: u32, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_basepoint_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut second_per_commitment_point_arg: crate::c_types::PublicKey, mut channel_flags_arg: u8, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_ScriptZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures, mut require_confirmed_inputs_arg: crate::c_types::derived::COption_NoneZ) -> OpenChannelV2 {
+pub extern "C" fn OpenChannelV2_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_feerate_sat_per_1000_weight_arg: u32, mut commitment_feerate_sat_per_1000_weight_arg: u32, mut funding_satoshis_arg: u64, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut htlc_minimum_msat_arg: u64, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut locktime_arg: u32, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_basepoint_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut second_per_commitment_point_arg: crate::c_types::PublicKey, mut channel_flags_arg: u8, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_CVec_u8ZZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures, mut require_confirmed_inputs_arg: crate::c_types::derived::COption_NoneZ) -> OpenChannelV2 {
 	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
 	let mut local_channel_type_arg = if channel_type_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(channel_type_arg.take_inner()) } }) };
 	let mut local_require_confirmed_inputs_arg = if require_confirmed_inputs_arg.is_some() { Some( { () /*require_confirmed_inputs_arg.take()*/ }) } else { None };
 	OpenChannelV2 { inner: ObjOps::heap_alloc(nativeOpenChannelV2 {
 		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
-		temporary_channel_id: temporary_channel_id_arg.data,
+		temporary_channel_id: ::lightning::ln::ChannelId(temporary_channel_id_arg.data),
 		funding_feerate_sat_per_1000_weight: funding_feerate_sat_per_1000_weight_arg,
 		commitment_feerate_sat_per_1000_weight: commitment_feerate_sat_per_1000_weight_arg,
 		funding_satoshis: funding_satoshis_arg,
@@ -1575,12 +1580,12 @@ impl AcceptChannel {
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_temporary_channel_id(this_ptr: &AcceptChannel) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().temporary_channel_id;
-	inner_val
+	&inner_val.0
 }
 /// A temporary channel ID, until the funding outpoint is announced
 #[no_mangle]
 pub extern "C" fn AcceptChannel_set_temporary_channel_id(this_ptr: &mut AcceptChannel, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.temporary_channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.temporary_channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The threshold below which outputs on transactions broadcast by sender will be omitted
 #[no_mangle]
@@ -1727,14 +1732,14 @@ pub extern "C" fn AcceptChannel_set_first_per_commitment_point(this_ptr: &mut Ac
 }
 /// A request to pre-set the to-sender output's scriptPubkey for when we collaboratively close
 #[no_mangle]
-pub extern "C" fn AcceptChannel_get_shutdown_scriptpubkey(this_ptr: &AcceptChannel) -> crate::c_types::derived::COption_ScriptZ {
+pub extern "C" fn AcceptChannel_get_shutdown_scriptpubkey(this_ptr: &AcceptChannel) -> crate::c_types::derived::COption_CVec_u8ZZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().shutdown_scriptpubkey;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ScriptZ::None } else { crate::c_types::derived::COption_ScriptZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
 	local_inner_val
 }
 /// A request to pre-set the to-sender output's scriptPubkey for when we collaboratively close
 #[no_mangle]
-pub extern "C" fn AcceptChannel_set_shutdown_scriptpubkey(this_ptr: &mut AcceptChannel, mut val: crate::c_types::derived::COption_ScriptZ) {
+pub extern "C" fn AcceptChannel_set_shutdown_scriptpubkey(this_ptr: &mut AcceptChannel, mut val: crate::c_types::derived::COption_CVec_u8ZZ) {
 	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ val_opt.take() }.into_rust()) }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.shutdown_scriptpubkey = local_val;
 }
@@ -1764,13 +1769,15 @@ pub extern "C" fn AcceptChannel_set_channel_type(this_ptr: &mut AcceptChannel, m
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_type = local_val;
 }
 /// Constructs a new AcceptChannel given each field
+///
+/// Note that channel_type_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn AcceptChannel_new(mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut channel_reserve_satoshis_arg: u64, mut htlc_minimum_msat_arg: u64, mut minimum_depth_arg: u32, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_point_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_ScriptZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures) -> AcceptChannel {
+pub extern "C" fn AcceptChannel_new(mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut channel_reserve_satoshis_arg: u64, mut htlc_minimum_msat_arg: u64, mut minimum_depth_arg: u32, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_point_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_CVec_u8ZZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures) -> AcceptChannel {
 	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
 	let mut local_channel_type_arg = if channel_type_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(channel_type_arg.take_inner()) } }) };
 	AcceptChannel { inner: ObjOps::heap_alloc(nativeAcceptChannel {
-		temporary_channel_id: temporary_channel_id_arg.data,
+		temporary_channel_id: ::lightning::ln::ChannelId(temporary_channel_id_arg.data),
 		dust_limit_satoshis: dust_limit_satoshis_arg,
 		max_htlc_value_in_flight_msat: max_htlc_value_in_flight_msat_arg,
 		channel_reserve_satoshis: channel_reserve_satoshis_arg,
@@ -1874,12 +1881,12 @@ impl AcceptChannelV2 {
 #[no_mangle]
 pub extern "C" fn AcceptChannelV2_get_temporary_channel_id(this_ptr: &AcceptChannelV2) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().temporary_channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The same `temporary_channel_id` received from the initiator's `open_channel2` message.
 #[no_mangle]
 pub extern "C" fn AcceptChannelV2_set_temporary_channel_id(this_ptr: &mut AcceptChannelV2, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.temporary_channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.temporary_channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// Part of the channel value contributed by the channel acceptor
 #[no_mangle]
@@ -2044,15 +2051,15 @@ pub extern "C" fn AcceptChannelV2_set_second_per_commitment_point(this_ptr: &mut
 /// Optionally, a request to pre-set the to-channel-acceptor output's scriptPubkey for when we
 /// collaboratively close
 #[no_mangle]
-pub extern "C" fn AcceptChannelV2_get_shutdown_scriptpubkey(this_ptr: &AcceptChannelV2) -> crate::c_types::derived::COption_ScriptZ {
+pub extern "C" fn AcceptChannelV2_get_shutdown_scriptpubkey(this_ptr: &AcceptChannelV2) -> crate::c_types::derived::COption_CVec_u8ZZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().shutdown_scriptpubkey;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ScriptZ::None } else { crate::c_types::derived::COption_ScriptZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
 	local_inner_val
 }
 /// Optionally, a request to pre-set the to-channel-acceptor output's scriptPubkey for when we
 /// collaboratively close
 #[no_mangle]
-pub extern "C" fn AcceptChannelV2_set_shutdown_scriptpubkey(this_ptr: &mut AcceptChannelV2, mut val: crate::c_types::derived::COption_ScriptZ) {
+pub extern "C" fn AcceptChannelV2_set_shutdown_scriptpubkey(this_ptr: &mut AcceptChannelV2, mut val: crate::c_types::derived::COption_CVec_u8ZZ) {
 	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ val_opt.take() }.into_rust()) }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.shutdown_scriptpubkey = local_val;
 }
@@ -2095,14 +2102,16 @@ pub extern "C" fn AcceptChannelV2_set_require_confirmed_inputs(this_ptr: &mut Ac
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.require_confirmed_inputs = local_val;
 }
 /// Constructs a new AcceptChannelV2 given each field
+///
+/// Note that channel_type_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn AcceptChannelV2_new(mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_satoshis_arg: u64, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut htlc_minimum_msat_arg: u64, mut minimum_depth_arg: u32, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_basepoint_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut second_per_commitment_point_arg: crate::c_types::PublicKey, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_ScriptZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures, mut require_confirmed_inputs_arg: crate::c_types::derived::COption_NoneZ) -> AcceptChannelV2 {
+pub extern "C" fn AcceptChannelV2_new(mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_satoshis_arg: u64, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut htlc_minimum_msat_arg: u64, mut minimum_depth_arg: u32, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_basepoint_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut second_per_commitment_point_arg: crate::c_types::PublicKey, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_CVec_u8ZZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures, mut require_confirmed_inputs_arg: crate::c_types::derived::COption_NoneZ) -> AcceptChannelV2 {
 	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
 	let mut local_channel_type_arg = if channel_type_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(channel_type_arg.take_inner()) } }) };
 	let mut local_require_confirmed_inputs_arg = if require_confirmed_inputs_arg.is_some() { Some( { () /*require_confirmed_inputs_arg.take()*/ }) } else { None };
 	AcceptChannelV2 { inner: ObjOps::heap_alloc(nativeAcceptChannelV2 {
-		temporary_channel_id: temporary_channel_id_arg.data,
+		temporary_channel_id: ::lightning::ln::ChannelId(temporary_channel_id_arg.data),
 		funding_satoshis: funding_satoshis_arg,
 		dust_limit_satoshis: dust_limit_satoshis_arg,
 		max_htlc_value_in_flight_msat: max_htlc_value_in_flight_msat_arg,
@@ -2209,12 +2218,12 @@ impl FundingCreated {
 #[no_mangle]
 pub extern "C" fn FundingCreated_get_temporary_channel_id(this_ptr: &FundingCreated) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().temporary_channel_id;
-	inner_val
+	&inner_val.0
 }
 /// A temporary channel ID, until the funding is established
 #[no_mangle]
 pub extern "C" fn FundingCreated_set_temporary_channel_id(this_ptr: &mut FundingCreated, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.temporary_channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.temporary_channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The funding transaction ID
 #[no_mangle]
@@ -2240,21 +2249,21 @@ pub extern "C" fn FundingCreated_set_funding_output_index(this_ptr: &mut Funding
 }
 /// The signature of the channel initiator (funder) on the initial commitment transaction
 #[no_mangle]
-pub extern "C" fn FundingCreated_get_signature(this_ptr: &FundingCreated) -> crate::c_types::Signature {
+pub extern "C" fn FundingCreated_get_signature(this_ptr: &FundingCreated) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().signature;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// The signature of the channel initiator (funder) on the initial commitment transaction
 #[no_mangle]
-pub extern "C" fn FundingCreated_set_signature(this_ptr: &mut FundingCreated, mut val: crate::c_types::Signature) {
+pub extern "C" fn FundingCreated_set_signature(this_ptr: &mut FundingCreated, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.signature = val.into_rust();
 }
 /// Constructs a new FundingCreated given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn FundingCreated_new(mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_txid_arg: crate::c_types::ThirtyTwoBytes, mut funding_output_index_arg: u16, mut signature_arg: crate::c_types::Signature) -> FundingCreated {
+pub extern "C" fn FundingCreated_new(mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_txid_arg: crate::c_types::ThirtyTwoBytes, mut funding_output_index_arg: u16, mut signature_arg: crate::c_types::ECDSASignature) -> FundingCreated {
 	FundingCreated { inner: ObjOps::heap_alloc(nativeFundingCreated {
-		temporary_channel_id: temporary_channel_id_arg.data,
+		temporary_channel_id: ::lightning::ln::ChannelId(temporary_channel_id_arg.data),
 		funding_txid: ::bitcoin::hash_types::Txid::from_slice(&funding_txid_arg.data[..]).unwrap(),
 		funding_output_index: funding_output_index_arg,
 		signature: signature_arg.into_rust(),
@@ -2347,30 +2356,30 @@ impl FundingSigned {
 #[no_mangle]
 pub extern "C" fn FundingSigned_get_channel_id(this_ptr: &FundingSigned) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn FundingSigned_set_channel_id(this_ptr: &mut FundingSigned, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The signature of the channel acceptor (fundee) on the initial commitment transaction
 #[no_mangle]
-pub extern "C" fn FundingSigned_get_signature(this_ptr: &FundingSigned) -> crate::c_types::Signature {
+pub extern "C" fn FundingSigned_get_signature(this_ptr: &FundingSigned) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().signature;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// The signature of the channel acceptor (fundee) on the initial commitment transaction
 #[no_mangle]
-pub extern "C" fn FundingSigned_set_signature(this_ptr: &mut FundingSigned, mut val: crate::c_types::Signature) {
+pub extern "C" fn FundingSigned_set_signature(this_ptr: &mut FundingSigned, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.signature = val.into_rust();
 }
 /// Constructs a new FundingSigned given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn FundingSigned_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut signature_arg: crate::c_types::Signature) -> FundingSigned {
+pub extern "C" fn FundingSigned_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut signature_arg: crate::c_types::ECDSASignature) -> FundingSigned {
 	FundingSigned { inner: ObjOps::heap_alloc(nativeFundingSigned {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		signature: signature_arg.into_rust(),
 	}), is_owned: true }
 }
@@ -2459,12 +2468,12 @@ impl ChannelReady {
 #[no_mangle]
 pub extern "C" fn ChannelReady_get_channel_id(this_ptr: &ChannelReady) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn ChannelReady_set_channel_id(this_ptr: &mut ChannelReady, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The per-commitment point of the second commitment transaction
 #[no_mangle]
@@ -2502,7 +2511,7 @@ pub extern "C" fn ChannelReady_set_short_channel_id_alias(this_ptr: &mut Channel
 pub extern "C" fn ChannelReady_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut next_per_commitment_point_arg: crate::c_types::PublicKey, mut short_channel_id_alias_arg: crate::c_types::derived::COption_u64Z) -> ChannelReady {
 	let mut local_short_channel_id_alias_arg = if short_channel_id_alias_arg.is_some() { Some( { short_channel_id_alias_arg.take() }) } else { None };
 	ChannelReady { inner: ObjOps::heap_alloc(nativeChannelReady {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		next_per_commitment_point: next_per_commitment_point_arg.into_rust(),
 		short_channel_id_alias: local_short_channel_id_alias_arg,
 	}), is_owned: true }
@@ -2591,12 +2600,12 @@ impl TxAddInput {
 #[no_mangle]
 pub extern "C" fn TxAddInput_get_channel_id(this_ptr: &TxAddInput) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn TxAddInput_set_channel_id(this_ptr: &mut TxAddInput, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// A randomly chosen unique identifier for this input, which is even for initiators and odd for
 /// non-initiators.
@@ -2651,7 +2660,7 @@ pub extern "C" fn TxAddInput_set_sequence(this_ptr: &mut TxAddInput, mut val: u3
 #[no_mangle]
 pub extern "C" fn TxAddInput_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut serial_id_arg: u64, mut prevtx_arg: crate::lightning::util::ser::TransactionU16LenLimited, mut prevtx_out_arg: u32, mut sequence_arg: u32) -> TxAddInput {
 	TxAddInput { inner: ObjOps::heap_alloc(nativeTxAddInput {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		serial_id: serial_id_arg,
 		prevtx: *unsafe { Box::from_raw(prevtx_arg.take_inner()) },
 		prevtx_out: prevtx_out_arg,
@@ -2742,12 +2751,12 @@ impl TxAddOutput {
 #[no_mangle]
 pub extern "C" fn TxAddOutput_get_channel_id(this_ptr: &TxAddOutput) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn TxAddOutput_set_channel_id(this_ptr: &mut TxAddOutput, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// A randomly chosen unique identifier for this output, which is even for initiators and odd for
 /// non-initiators.
@@ -2789,7 +2798,7 @@ pub extern "C" fn TxAddOutput_set_script(this_ptr: &mut TxAddOutput, mut val: cr
 #[no_mangle]
 pub extern "C" fn TxAddOutput_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut serial_id_arg: u64, mut sats_arg: u64, mut script_arg: crate::c_types::derived::CVec_u8Z) -> TxAddOutput {
 	TxAddOutput { inner: ObjOps::heap_alloc(nativeTxAddOutput {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		serial_id: serial_id_arg,
 		sats: sats_arg,
 		script: ::bitcoin::blockdata::script::Script::from(script_arg.into_rust()),
@@ -2879,12 +2888,12 @@ impl TxRemoveInput {
 #[no_mangle]
 pub extern "C" fn TxRemoveInput_get_channel_id(this_ptr: &TxRemoveInput) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn TxRemoveInput_set_channel_id(this_ptr: &mut TxRemoveInput, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The serial ID of the input to be removed
 #[no_mangle]
@@ -2902,7 +2911,7 @@ pub extern "C" fn TxRemoveInput_set_serial_id(this_ptr: &mut TxRemoveInput, mut 
 #[no_mangle]
 pub extern "C" fn TxRemoveInput_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut serial_id_arg: u64) -> TxRemoveInput {
 	TxRemoveInput { inner: ObjOps::heap_alloc(nativeTxRemoveInput {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		serial_id: serial_id_arg,
 	}), is_owned: true }
 }
@@ -2990,12 +2999,12 @@ impl TxRemoveOutput {
 #[no_mangle]
 pub extern "C" fn TxRemoveOutput_get_channel_id(this_ptr: &TxRemoveOutput) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn TxRemoveOutput_set_channel_id(this_ptr: &mut TxRemoveOutput, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The serial ID of the output to be removed
 #[no_mangle]
@@ -3013,7 +3022,7 @@ pub extern "C" fn TxRemoveOutput_set_serial_id(this_ptr: &mut TxRemoveOutput, mu
 #[no_mangle]
 pub extern "C" fn TxRemoveOutput_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut serial_id_arg: u64) -> TxRemoveOutput {
 	TxRemoveOutput { inner: ObjOps::heap_alloc(nativeTxRemoveOutput {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		serial_id: serial_id_arg,
 	}), is_owned: true }
 }
@@ -3102,19 +3111,19 @@ impl TxComplete {
 #[no_mangle]
 pub extern "C" fn TxComplete_get_channel_id(this_ptr: &TxComplete) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn TxComplete_set_channel_id(this_ptr: &mut TxComplete, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// Constructs a new TxComplete given each field
 #[must_use]
 #[no_mangle]
 pub extern "C" fn TxComplete_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes) -> TxComplete {
 	TxComplete { inner: ObjOps::heap_alloc(nativeTxComplete {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 	}), is_owned: true }
 }
 impl Clone for TxComplete {
@@ -3202,12 +3211,12 @@ impl TxSignatures {
 #[no_mangle]
 pub extern "C" fn TxSignatures_get_channel_id(this_ptr: &TxSignatures) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn TxSignatures_set_channel_id(this_ptr: &mut TxSignatures, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The TXID
 #[no_mangle]
@@ -3241,7 +3250,7 @@ pub extern "C" fn TxSignatures_set_witnesses(this_ptr: &mut TxSignatures, mut va
 pub extern "C" fn TxSignatures_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut tx_hash_arg: crate::c_types::ThirtyTwoBytes, mut witnesses_arg: crate::c_types::derived::CVec_WitnessZ) -> TxSignatures {
 	let mut local_witnesses_arg = Vec::new(); for mut item in witnesses_arg.into_rust().drain(..) { local_witnesses_arg.push( { item.into_bitcoin() }); };
 	TxSignatures { inner: ObjOps::heap_alloc(nativeTxSignatures {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		tx_hash: ::bitcoin::hash_types::Txid::from_slice(&tx_hash_arg.data[..]).unwrap(),
 		witnesses: local_witnesses_arg,
 	}), is_owned: true }
@@ -3331,12 +3340,12 @@ impl TxInitRbf {
 #[no_mangle]
 pub extern "C" fn TxInitRbf_get_channel_id(this_ptr: &TxInitRbf) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn TxInitRbf_set_channel_id(this_ptr: &mut TxInitRbf, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The locktime of the transaction
 #[no_mangle]
@@ -3381,7 +3390,7 @@ pub extern "C" fn TxInitRbf_set_funding_output_contribution(this_ptr: &mut TxIni
 pub extern "C" fn TxInitRbf_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut locktime_arg: u32, mut feerate_sat_per_1000_weight_arg: u32, mut funding_output_contribution_arg: crate::c_types::derived::COption_i64Z) -> TxInitRbf {
 	let mut local_funding_output_contribution_arg = if funding_output_contribution_arg.is_some() { Some( { funding_output_contribution_arg.take() }) } else { None };
 	TxInitRbf { inner: ObjOps::heap_alloc(nativeTxInitRbf {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		locktime: locktime_arg,
 		feerate_sat_per_1000_weight: feerate_sat_per_1000_weight_arg,
 		funding_output_contribution: local_funding_output_contribution_arg,
@@ -3472,12 +3481,12 @@ impl TxAckRbf {
 #[no_mangle]
 pub extern "C" fn TxAckRbf_get_channel_id(this_ptr: &TxAckRbf) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn TxAckRbf_set_channel_id(this_ptr: &mut TxAckRbf, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The number of satoshis the sender will contribute to or, if negative, remove from
 /// (e.g. splice-out) the funding output of the transaction
@@ -3500,7 +3509,7 @@ pub extern "C" fn TxAckRbf_set_funding_output_contribution(this_ptr: &mut TxAckR
 pub extern "C" fn TxAckRbf_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_output_contribution_arg: crate::c_types::derived::COption_i64Z) -> TxAckRbf {
 	let mut local_funding_output_contribution_arg = if funding_output_contribution_arg.is_some() { Some( { funding_output_contribution_arg.take() }) } else { None };
 	TxAckRbf { inner: ObjOps::heap_alloc(nativeTxAckRbf {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		funding_output_contribution: local_funding_output_contribution_arg,
 	}), is_owned: true }
 }
@@ -3588,12 +3597,12 @@ impl TxAbort {
 #[no_mangle]
 pub extern "C" fn TxAbort_get_channel_id(this_ptr: &TxAbort) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn TxAbort_set_channel_id(this_ptr: &mut TxAbort, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// Message data
 ///
@@ -3616,7 +3625,7 @@ pub extern "C" fn TxAbort_set_data(this_ptr: &mut TxAbort, mut val: crate::c_typ
 pub extern "C" fn TxAbort_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut data_arg: crate::c_types::derived::CVec_u8Z) -> TxAbort {
 	let mut local_data_arg = Vec::new(); for mut item in data_arg.into_rust().drain(..) { local_data_arg.push( { item }); };
 	TxAbort { inner: ObjOps::heap_alloc(nativeTxAbort {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		data: local_data_arg,
 	}), is_owned: true }
 }
@@ -3705,12 +3714,12 @@ impl Shutdown {
 #[no_mangle]
 pub extern "C" fn Shutdown_get_channel_id(this_ptr: &Shutdown) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn Shutdown_set_channel_id(this_ptr: &mut Shutdown, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The destination of this peer's funds on closing.
 ///
@@ -3732,7 +3741,7 @@ pub extern "C" fn Shutdown_set_scriptpubkey(this_ptr: &mut Shutdown, mut val: cr
 #[no_mangle]
 pub extern "C" fn Shutdown_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut scriptpubkey_arg: crate::c_types::derived::CVec_u8Z) -> Shutdown {
 	Shutdown { inner: ObjOps::heap_alloc(nativeShutdown {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		scriptpubkey: ::bitcoin::blockdata::script::Script::from(scriptpubkey_arg.into_rust()),
 	}), is_owned: true }
 }
@@ -3938,12 +3947,12 @@ impl ClosingSigned {
 #[no_mangle]
 pub extern "C" fn ClosingSigned_get_channel_id(this_ptr: &ClosingSigned) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn ClosingSigned_set_channel_id(this_ptr: &mut ClosingSigned, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The proposed total fee for the closing transaction
 #[no_mangle]
@@ -3958,13 +3967,13 @@ pub extern "C" fn ClosingSigned_set_fee_satoshis(this_ptr: &mut ClosingSigned, m
 }
 /// A signature on the closing transaction
 #[no_mangle]
-pub extern "C" fn ClosingSigned_get_signature(this_ptr: &ClosingSigned) -> crate::c_types::Signature {
+pub extern "C" fn ClosingSigned_get_signature(this_ptr: &ClosingSigned) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().signature;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// A signature on the closing transaction
 #[no_mangle]
-pub extern "C" fn ClosingSigned_set_signature(this_ptr: &mut ClosingSigned, mut val: crate::c_types::Signature) {
+pub extern "C" fn ClosingSigned_set_signature(this_ptr: &mut ClosingSigned, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.signature = val.into_rust();
 }
 /// The minimum and maximum fees which the sender is willing to accept, provided only by new
@@ -3987,12 +3996,14 @@ pub extern "C" fn ClosingSigned_set_fee_range(this_ptr: &mut ClosingSigned, mut 
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.fee_range = local_val;
 }
 /// Constructs a new ClosingSigned given each field
+///
+/// Note that fee_range_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ClosingSigned_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut fee_satoshis_arg: u64, mut signature_arg: crate::c_types::Signature, mut fee_range_arg: crate::lightning::ln::msgs::ClosingSignedFeeRange) -> ClosingSigned {
+pub extern "C" fn ClosingSigned_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut fee_satoshis_arg: u64, mut signature_arg: crate::c_types::ECDSASignature, mut fee_range_arg: crate::lightning::ln::msgs::ClosingSignedFeeRange) -> ClosingSigned {
 	let mut local_fee_range_arg = if fee_range_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(fee_range_arg.take_inner()) } }) };
 	ClosingSigned { inner: ObjOps::heap_alloc(nativeClosingSigned {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		fee_satoshis: fee_satoshis_arg,
 		signature: signature_arg.into_rust(),
 		fee_range: local_fee_range_arg,
@@ -4083,12 +4094,12 @@ impl UpdateAddHTLC {
 #[no_mangle]
 pub extern "C" fn UpdateAddHTLC_get_channel_id(this_ptr: &UpdateAddHTLC) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn UpdateAddHTLC_set_channel_id(this_ptr: &mut UpdateAddHTLC, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The HTLC ID
 #[no_mangle]
@@ -4244,6 +4255,26 @@ pub extern "C" fn OnionMessage_get_blinding_point(this_ptr: &OnionMessage) -> cr
 pub extern "C" fn OnionMessage_set_blinding_point(this_ptr: &mut OnionMessage, mut val: crate::c_types::PublicKey) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.blinding_point = val.into_rust();
 }
+/// The full onion packet including hop data, pubkey, and hmac
+#[no_mangle]
+pub extern "C" fn OnionMessage_get_onion_routing_packet(this_ptr: &OnionMessage) -> crate::lightning::onion_message::packet::Packet {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().onion_routing_packet;
+	crate::lightning::onion_message::packet::Packet { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::onion_message::packet::Packet<>) as *mut _) }, is_owned: false }
+}
+/// The full onion packet including hop data, pubkey, and hmac
+#[no_mangle]
+pub extern "C" fn OnionMessage_set_onion_routing_packet(this_ptr: &mut OnionMessage, mut val: crate::lightning::onion_message::packet::Packet) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.onion_routing_packet = *unsafe { Box::from_raw(val.take_inner()) };
+}
+/// Constructs a new OnionMessage given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn OnionMessage_new(mut blinding_point_arg: crate::c_types::PublicKey, mut onion_routing_packet_arg: crate::lightning::onion_message::packet::Packet) -> OnionMessage {
+	OnionMessage { inner: ObjOps::heap_alloc(nativeOnionMessage {
+		blinding_point: blinding_point_arg.into_rust(),
+		onion_routing_packet: *unsafe { Box::from_raw(onion_routing_packet_arg.take_inner()) },
+	}), is_owned: true }
+}
 impl Clone for OnionMessage {
 	fn clone(&self) -> Self {
 		Self {
@@ -4329,12 +4360,12 @@ impl UpdateFulfillHTLC {
 #[no_mangle]
 pub extern "C" fn UpdateFulfillHTLC_get_channel_id(this_ptr: &UpdateFulfillHTLC) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn UpdateFulfillHTLC_set_channel_id(this_ptr: &mut UpdateFulfillHTLC, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The HTLC ID
 #[no_mangle]
@@ -4363,7 +4394,7 @@ pub extern "C" fn UpdateFulfillHTLC_set_payment_preimage(this_ptr: &mut UpdateFu
 #[no_mangle]
 pub extern "C" fn UpdateFulfillHTLC_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut htlc_id_arg: u64, mut payment_preimage_arg: crate::c_types::ThirtyTwoBytes) -> UpdateFulfillHTLC {
 	UpdateFulfillHTLC { inner: ObjOps::heap_alloc(nativeUpdateFulfillHTLC {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		htlc_id: htlc_id_arg,
 		payment_preimage: ::lightning::ln::PaymentPreimage(payment_preimage_arg.data),
 	}), is_owned: true }
@@ -4453,12 +4484,12 @@ impl UpdateFailHTLC {
 #[no_mangle]
 pub extern "C" fn UpdateFailHTLC_get_channel_id(this_ptr: &UpdateFailHTLC) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn UpdateFailHTLC_set_channel_id(this_ptr: &mut UpdateFailHTLC, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The HTLC ID
 #[no_mangle]
@@ -4556,12 +4587,12 @@ impl UpdateFailMalformedHTLC {
 #[no_mangle]
 pub extern "C" fn UpdateFailMalformedHTLC_get_channel_id(this_ptr: &UpdateFailMalformedHTLC) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn UpdateFailMalformedHTLC_set_channel_id(this_ptr: &mut UpdateFailMalformedHTLC, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The HTLC ID
 #[no_mangle]
@@ -4670,46 +4701,46 @@ impl CommitmentSigned {
 #[no_mangle]
 pub extern "C" fn CommitmentSigned_get_channel_id(this_ptr: &CommitmentSigned) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn CommitmentSigned_set_channel_id(this_ptr: &mut CommitmentSigned, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// A signature on the commitment transaction
 #[no_mangle]
-pub extern "C" fn CommitmentSigned_get_signature(this_ptr: &CommitmentSigned) -> crate::c_types::Signature {
+pub extern "C" fn CommitmentSigned_get_signature(this_ptr: &CommitmentSigned) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().signature;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// A signature on the commitment transaction
 #[no_mangle]
-pub extern "C" fn CommitmentSigned_set_signature(this_ptr: &mut CommitmentSigned, mut val: crate::c_types::Signature) {
+pub extern "C" fn CommitmentSigned_set_signature(this_ptr: &mut CommitmentSigned, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.signature = val.into_rust();
 }
 /// Signatures on the HTLC transactions
 ///
 /// Returns a copy of the field.
 #[no_mangle]
-pub extern "C" fn CommitmentSigned_get_htlc_signatures(this_ptr: &CommitmentSigned) -> crate::c_types::derived::CVec_SignatureZ {
+pub extern "C" fn CommitmentSigned_get_htlc_signatures(this_ptr: &CommitmentSigned) -> crate::c_types::derived::CVec_ECDSASignatureZ {
 	let mut inner_val = this_ptr.get_native_mut_ref().htlc_signatures.clone();
-	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::c_types::Signature::from_rust(&item) }); };
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::c_types::ECDSASignature::from_rust(&item) }); };
 	local_inner_val.into()
 }
 /// Signatures on the HTLC transactions
 #[no_mangle]
-pub extern "C" fn CommitmentSigned_set_htlc_signatures(this_ptr: &mut CommitmentSigned, mut val: crate::c_types::derived::CVec_SignatureZ) {
+pub extern "C" fn CommitmentSigned_set_htlc_signatures(this_ptr: &mut CommitmentSigned, mut val: crate::c_types::derived::CVec_ECDSASignatureZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item.into_rust() }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc_signatures = local_val;
 }
 /// Constructs a new CommitmentSigned given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn CommitmentSigned_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut signature_arg: crate::c_types::Signature, mut htlc_signatures_arg: crate::c_types::derived::CVec_SignatureZ) -> CommitmentSigned {
+pub extern "C" fn CommitmentSigned_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut signature_arg: crate::c_types::ECDSASignature, mut htlc_signatures_arg: crate::c_types::derived::CVec_ECDSASignatureZ) -> CommitmentSigned {
 	let mut local_htlc_signatures_arg = Vec::new(); for mut item in htlc_signatures_arg.into_rust().drain(..) { local_htlc_signatures_arg.push( { item.into_rust() }); };
 	CommitmentSigned { inner: ObjOps::heap_alloc(nativeCommitmentSigned {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		signature: signature_arg.into_rust(),
 		htlc_signatures: local_htlc_signatures_arg,
 	}), is_owned: true }
@@ -4799,12 +4830,12 @@ impl RevokeAndACK {
 #[no_mangle]
 pub extern "C" fn RevokeAndACK_get_channel_id(this_ptr: &RevokeAndACK) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn RevokeAndACK_set_channel_id(this_ptr: &mut RevokeAndACK, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The secret corresponding to the per-commitment point
 #[no_mangle]
@@ -4833,7 +4864,7 @@ pub extern "C" fn RevokeAndACK_set_next_per_commitment_point(this_ptr: &mut Revo
 #[no_mangle]
 pub extern "C" fn RevokeAndACK_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut per_commitment_secret_arg: crate::c_types::ThirtyTwoBytes, mut next_per_commitment_point_arg: crate::c_types::PublicKey) -> RevokeAndACK {
 	RevokeAndACK { inner: ObjOps::heap_alloc(nativeRevokeAndACK {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		per_commitment_secret: per_commitment_secret_arg.data,
 		next_per_commitment_point: next_per_commitment_point_arg.into_rust(),
 	}), is_owned: true }
@@ -4923,12 +4954,12 @@ impl UpdateFee {
 #[no_mangle]
 pub extern "C" fn UpdateFee_get_channel_id(this_ptr: &UpdateFee) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn UpdateFee_set_channel_id(this_ptr: &mut UpdateFee, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// Fee rate per 1000-weight of the transaction
 #[no_mangle]
@@ -4946,7 +4977,7 @@ pub extern "C" fn UpdateFee_set_feerate_per_kw(this_ptr: &mut UpdateFee, mut val
 #[no_mangle]
 pub extern "C" fn UpdateFee_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut feerate_per_kw_arg: u32) -> UpdateFee {
 	UpdateFee { inner: ObjOps::heap_alloc(nativeUpdateFee {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		feerate_per_kw: feerate_per_kw_arg,
 	}), is_owned: true }
 }
@@ -5035,12 +5066,12 @@ impl ChannelReestablish {
 #[no_mangle]
 pub extern "C" fn ChannelReestablish_get_channel_id(this_ptr: &ChannelReestablish) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn ChannelReestablish_set_channel_id(this_ptr: &mut ChannelReestablish, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The next commitment number for the sender
 #[no_mangle]
@@ -5090,24 +5121,24 @@ pub extern "C" fn ChannelReestablish_set_my_current_per_commitment_point(this_pt
 }
 /// The next funding transaction ID
 #[no_mangle]
-pub extern "C" fn ChannelReestablish_get_next_funding_txid(this_ptr: &ChannelReestablish) -> crate::c_types::derived::COption_TxidZ {
+pub extern "C" fn ChannelReestablish_get_next_funding_txid(this_ptr: &ChannelReestablish) -> crate::c_types::derived::COption_ThirtyTwoBytesZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().next_funding_txid;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_TxidZ::None } else { crate::c_types::derived::COption_TxidZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().into_inner() } }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().into_inner() } }) };
 	local_inner_val
 }
 /// The next funding transaction ID
 #[no_mangle]
-pub extern "C" fn ChannelReestablish_set_next_funding_txid(this_ptr: &mut ChannelReestablish, mut val: crate::c_types::derived::COption_TxidZ) {
+pub extern "C" fn ChannelReestablish_set_next_funding_txid(this_ptr: &mut ChannelReestablish, mut val: crate::c_types::derived::COption_ThirtyTwoBytesZ) {
 	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::hash_types::Txid::from_slice(&{ val_opt.take() }.data[..]).unwrap() }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.next_funding_txid = local_val;
 }
 /// Constructs a new ChannelReestablish given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelReestablish_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut next_local_commitment_number_arg: u64, mut next_remote_commitment_number_arg: u64, mut your_last_per_commitment_secret_arg: crate::c_types::ThirtyTwoBytes, mut my_current_per_commitment_point_arg: crate::c_types::PublicKey, mut next_funding_txid_arg: crate::c_types::derived::COption_TxidZ) -> ChannelReestablish {
+pub extern "C" fn ChannelReestablish_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut next_local_commitment_number_arg: u64, mut next_remote_commitment_number_arg: u64, mut your_last_per_commitment_secret_arg: crate::c_types::ThirtyTwoBytes, mut my_current_per_commitment_point_arg: crate::c_types::PublicKey, mut next_funding_txid_arg: crate::c_types::derived::COption_ThirtyTwoBytesZ) -> ChannelReestablish {
 	let mut local_next_funding_txid_arg = { /*next_funding_txid_arg*/ let next_funding_txid_arg_opt = next_funding_txid_arg; if next_funding_txid_arg_opt.is_none() { None } else { Some({ { ::bitcoin::hash_types::Txid::from_slice(&{ next_funding_txid_arg_opt.take() }.data[..]).unwrap() }})} };
 	ChannelReestablish { inner: ObjOps::heap_alloc(nativeChannelReestablish {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		next_local_commitment_number: next_local_commitment_number_arg,
 		next_remote_commitment_number: next_remote_commitment_number_arg,
 		your_last_per_commitment_secret: your_last_per_commitment_secret_arg.data,
@@ -5200,12 +5231,12 @@ impl AnnouncementSignatures {
 #[no_mangle]
 pub extern "C" fn AnnouncementSignatures_get_channel_id(this_ptr: &AnnouncementSignatures) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel ID
 #[no_mangle]
 pub extern "C" fn AnnouncementSignatures_set_channel_id(this_ptr: &mut AnnouncementSignatures, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// The short channel ID
 #[no_mangle]
@@ -5220,32 +5251,32 @@ pub extern "C" fn AnnouncementSignatures_set_short_channel_id(this_ptr: &mut Ann
 }
 /// A signature by the node key
 #[no_mangle]
-pub extern "C" fn AnnouncementSignatures_get_node_signature(this_ptr: &AnnouncementSignatures) -> crate::c_types::Signature {
+pub extern "C" fn AnnouncementSignatures_get_node_signature(this_ptr: &AnnouncementSignatures) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_signature;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// A signature by the node key
 #[no_mangle]
-pub extern "C" fn AnnouncementSignatures_set_node_signature(this_ptr: &mut AnnouncementSignatures, mut val: crate::c_types::Signature) {
+pub extern "C" fn AnnouncementSignatures_set_node_signature(this_ptr: &mut AnnouncementSignatures, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_signature = val.into_rust();
 }
 /// A signature by the funding key
 #[no_mangle]
-pub extern "C" fn AnnouncementSignatures_get_bitcoin_signature(this_ptr: &AnnouncementSignatures) -> crate::c_types::Signature {
+pub extern "C" fn AnnouncementSignatures_get_bitcoin_signature(this_ptr: &AnnouncementSignatures) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().bitcoin_signature;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// A signature by the funding key
 #[no_mangle]
-pub extern "C" fn AnnouncementSignatures_set_bitcoin_signature(this_ptr: &mut AnnouncementSignatures, mut val: crate::c_types::Signature) {
+pub extern "C" fn AnnouncementSignatures_set_bitcoin_signature(this_ptr: &mut AnnouncementSignatures, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.bitcoin_signature = val.into_rust();
 }
 /// Constructs a new AnnouncementSignatures given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn AnnouncementSignatures_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut short_channel_id_arg: u64, mut node_signature_arg: crate::c_types::Signature, mut bitcoin_signature_arg: crate::c_types::Signature) -> AnnouncementSignatures {
+pub extern "C" fn AnnouncementSignatures_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut short_channel_id_arg: u64, mut node_signature_arg: crate::c_types::ECDSASignature, mut bitcoin_signature_arg: crate::c_types::ECDSASignature) -> AnnouncementSignatures {
 	AnnouncementSignatures { inner: ObjOps::heap_alloc(nativeAnnouncementSignatures {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		short_channel_id: short_channel_id_arg,
 		node_signature: node_signature_arg.into_rust(),
 		bitcoin_signature: bitcoin_signature_arg.into_rust(),
@@ -5283,16 +5314,16 @@ pub extern "C" fn AnnouncementSignatures_eq(a: &AnnouncementSignatures, b: &Anno
 #[derive(Clone)]
 #[must_use]
 #[repr(C)]
-pub enum NetAddress {
-	/// An IPv4 address/port on which the peer is listening.
-	IPv4 {
+pub enum SocketAddress {
+	/// An IPv4 address and port on which the peer is listening.
+	TcpIpV4 {
 		/// The 4-byte IPv4 address
 		addr: crate::c_types::FourBytes,
 		/// The port on which the node is listening
 		port: u16,
 	},
-	/// An IPv6 address/port on which the peer is listening.
-	IPv6 {
+	/// An IPv6 address and port on which the peer is listening.
+	TcpIpV6 {
 		/// The 16-byte IPv6 address
 		addr: crate::c_types::SixteenBytes,
 		/// The port on which the node is listening
@@ -5326,51 +5357,51 @@ pub enum NetAddress {
 		port: u16,
 	},
 }
-use lightning::ln::msgs::NetAddress as NetAddressImport;
-pub(crate) type nativeNetAddress = NetAddressImport;
+use lightning::ln::msgs::SocketAddress as SocketAddressImport;
+pub(crate) type nativeSocketAddress = SocketAddressImport;
 
-impl NetAddress {
+impl SocketAddress {
 	#[allow(unused)]
-	pub(crate) fn to_native(&self) -> nativeNetAddress {
+	pub(crate) fn to_native(&self) -> nativeSocketAddress {
 		match self {
-			NetAddress::IPv4 {ref addr, ref port, } => {
+			SocketAddress::TcpIpV4 {ref addr, ref port, } => {
 				let mut addr_nonref = Clone::clone(addr);
 				let mut port_nonref = Clone::clone(port);
-				nativeNetAddress::IPv4 {
+				nativeSocketAddress::TcpIpV4 {
 					addr: addr_nonref.data,
 					port: port_nonref,
 				}
 			},
-			NetAddress::IPv6 {ref addr, ref port, } => {
+			SocketAddress::TcpIpV6 {ref addr, ref port, } => {
 				let mut addr_nonref = Clone::clone(addr);
 				let mut port_nonref = Clone::clone(port);
-				nativeNetAddress::IPv6 {
+				nativeSocketAddress::TcpIpV6 {
 					addr: addr_nonref.data,
 					port: port_nonref,
 				}
 			},
-			NetAddress::OnionV2 (ref a, ) => {
+			SocketAddress::OnionV2 (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
-				nativeNetAddress::OnionV2 (
+				nativeSocketAddress::OnionV2 (
 					a_nonref.data,
 				)
 			},
-			NetAddress::OnionV3 {ref ed25519_pubkey, ref checksum, ref version, ref port, } => {
+			SocketAddress::OnionV3 {ref ed25519_pubkey, ref checksum, ref version, ref port, } => {
 				let mut ed25519_pubkey_nonref = Clone::clone(ed25519_pubkey);
 				let mut checksum_nonref = Clone::clone(checksum);
 				let mut version_nonref = Clone::clone(version);
 				let mut port_nonref = Clone::clone(port);
-				nativeNetAddress::OnionV3 {
+				nativeSocketAddress::OnionV3 {
 					ed25519_pubkey: ed25519_pubkey_nonref.data,
 					checksum: checksum_nonref,
 					version: version_nonref,
 					port: port_nonref,
 				}
 			},
-			NetAddress::Hostname {ref hostname, ref port, } => {
+			SocketAddress::Hostname {ref hostname, ref port, } => {
 				let mut hostname_nonref = Clone::clone(hostname);
 				let mut port_nonref = Clone::clone(port);
-				nativeNetAddress::Hostname {
+				nativeSocketAddress::Hostname {
 					hostname: *unsafe { Box::from_raw(hostname_nonref.take_inner()) },
 					port: port_nonref,
 				}
@@ -5378,35 +5409,35 @@ impl NetAddress {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn into_native(self) -> nativeNetAddress {
+	pub(crate) fn into_native(self) -> nativeSocketAddress {
 		match self {
-			NetAddress::IPv4 {mut addr, mut port, } => {
-				nativeNetAddress::IPv4 {
+			SocketAddress::TcpIpV4 {mut addr, mut port, } => {
+				nativeSocketAddress::TcpIpV4 {
 					addr: addr.data,
 					port: port,
 				}
 			},
-			NetAddress::IPv6 {mut addr, mut port, } => {
-				nativeNetAddress::IPv6 {
+			SocketAddress::TcpIpV6 {mut addr, mut port, } => {
+				nativeSocketAddress::TcpIpV6 {
 					addr: addr.data,
 					port: port,
 				}
 			},
-			NetAddress::OnionV2 (mut a, ) => {
-				nativeNetAddress::OnionV2 (
+			SocketAddress::OnionV2 (mut a, ) => {
+				nativeSocketAddress::OnionV2 (
 					a.data,
 				)
 			},
-			NetAddress::OnionV3 {mut ed25519_pubkey, mut checksum, mut version, mut port, } => {
-				nativeNetAddress::OnionV3 {
+			SocketAddress::OnionV3 {mut ed25519_pubkey, mut checksum, mut version, mut port, } => {
+				nativeSocketAddress::OnionV3 {
 					ed25519_pubkey: ed25519_pubkey.data,
 					checksum: checksum,
 					version: version,
 					port: port,
 				}
 			},
-			NetAddress::Hostname {mut hostname, mut port, } => {
-				nativeNetAddress::Hostname {
+			SocketAddress::Hostname {mut hostname, mut port, } => {
+				nativeSocketAddress::Hostname {
 					hostname: *unsafe { Box::from_raw(hostname.take_inner()) },
 					port: port,
 				}
@@ -5414,46 +5445,46 @@ impl NetAddress {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeNetAddress) -> Self {
+	pub(crate) fn from_native(native: &nativeSocketAddress) -> Self {
 		match native {
-			nativeNetAddress::IPv4 {ref addr, ref port, } => {
+			nativeSocketAddress::TcpIpV4 {ref addr, ref port, } => {
 				let mut addr_nonref = Clone::clone(addr);
 				let mut port_nonref = Clone::clone(port);
-				NetAddress::IPv4 {
+				SocketAddress::TcpIpV4 {
 					addr: crate::c_types::FourBytes { data: addr_nonref },
 					port: port_nonref,
 				}
 			},
-			nativeNetAddress::IPv6 {ref addr, ref port, } => {
+			nativeSocketAddress::TcpIpV6 {ref addr, ref port, } => {
 				let mut addr_nonref = Clone::clone(addr);
 				let mut port_nonref = Clone::clone(port);
-				NetAddress::IPv6 {
+				SocketAddress::TcpIpV6 {
 					addr: crate::c_types::SixteenBytes { data: addr_nonref },
 					port: port_nonref,
 				}
 			},
-			nativeNetAddress::OnionV2 (ref a, ) => {
+			nativeSocketAddress::OnionV2 (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
-				NetAddress::OnionV2 (
+				SocketAddress::OnionV2 (
 					crate::c_types::TwelveBytes { data: a_nonref },
 				)
 			},
-			nativeNetAddress::OnionV3 {ref ed25519_pubkey, ref checksum, ref version, ref port, } => {
+			nativeSocketAddress::OnionV3 {ref ed25519_pubkey, ref checksum, ref version, ref port, } => {
 				let mut ed25519_pubkey_nonref = Clone::clone(ed25519_pubkey);
 				let mut checksum_nonref = Clone::clone(checksum);
 				let mut version_nonref = Clone::clone(version);
 				let mut port_nonref = Clone::clone(port);
-				NetAddress::OnionV3 {
+				SocketAddress::OnionV3 {
 					ed25519_pubkey: crate::c_types::ThirtyTwoBytes { data: ed25519_pubkey_nonref },
 					checksum: checksum_nonref,
 					version: version_nonref,
 					port: port_nonref,
 				}
 			},
-			nativeNetAddress::Hostname {ref hostname, ref port, } => {
+			nativeSocketAddress::Hostname {ref hostname, ref port, } => {
 				let mut hostname_nonref = Clone::clone(hostname);
 				let mut port_nonref = Clone::clone(port);
-				NetAddress::Hostname {
+				SocketAddress::Hostname {
 					hostname: crate::lightning::util::ser::Hostname { inner: ObjOps::heap_alloc(hostname_nonref), is_owned: true },
 					port: port_nonref,
 				}
@@ -5461,35 +5492,35 @@ impl NetAddress {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn native_into(native: nativeNetAddress) -> Self {
+	pub(crate) fn native_into(native: nativeSocketAddress) -> Self {
 		match native {
-			nativeNetAddress::IPv4 {mut addr, mut port, } => {
-				NetAddress::IPv4 {
+			nativeSocketAddress::TcpIpV4 {mut addr, mut port, } => {
+				SocketAddress::TcpIpV4 {
 					addr: crate::c_types::FourBytes { data: addr },
 					port: port,
 				}
 			},
-			nativeNetAddress::IPv6 {mut addr, mut port, } => {
-				NetAddress::IPv6 {
+			nativeSocketAddress::TcpIpV6 {mut addr, mut port, } => {
+				SocketAddress::TcpIpV6 {
 					addr: crate::c_types::SixteenBytes { data: addr },
 					port: port,
 				}
 			},
-			nativeNetAddress::OnionV2 (mut a, ) => {
-				NetAddress::OnionV2 (
+			nativeSocketAddress::OnionV2 (mut a, ) => {
+				SocketAddress::OnionV2 (
 					crate::c_types::TwelveBytes { data: a },
 				)
 			},
-			nativeNetAddress::OnionV3 {mut ed25519_pubkey, mut checksum, mut version, mut port, } => {
-				NetAddress::OnionV3 {
+			nativeSocketAddress::OnionV3 {mut ed25519_pubkey, mut checksum, mut version, mut port, } => {
+				SocketAddress::OnionV3 {
 					ed25519_pubkey: crate::c_types::ThirtyTwoBytes { data: ed25519_pubkey },
 					checksum: checksum,
 					version: version,
 					port: port,
 				}
 			},
-			nativeNetAddress::Hostname {mut hostname, mut port, } => {
-				NetAddress::Hostname {
+			nativeSocketAddress::Hostname {mut hostname, mut port, } => {
+				SocketAddress::Hostname {
 					hostname: crate::lightning::util::ser::Hostname { inner: ObjOps::heap_alloc(hostname), is_owned: true },
 					port: port,
 				}
@@ -5497,39 +5528,39 @@ impl NetAddress {
 		}
 	}
 }
-/// Frees any resources used by the NetAddress
+/// Frees any resources used by the SocketAddress
 #[no_mangle]
-pub extern "C" fn NetAddress_free(this_ptr: NetAddress) { }
-/// Creates a copy of the NetAddress
+pub extern "C" fn SocketAddress_free(this_ptr: SocketAddress) { }
+/// Creates a copy of the SocketAddress
 #[no_mangle]
-pub extern "C" fn NetAddress_clone(orig: &NetAddress) -> NetAddress {
+pub extern "C" fn SocketAddress_clone(orig: &SocketAddress) -> SocketAddress {
 	orig.clone()
 }
 #[no_mangle]
-/// Utility method to constructs a new IPv4-variant NetAddress
-pub extern "C" fn NetAddress_ipv4(addr: crate::c_types::FourBytes, port: u16) -> NetAddress {
-	NetAddress::IPv4 {
+/// Utility method to constructs a new TcpIpV4-variant SocketAddress
+pub extern "C" fn SocketAddress_tcp_ip_v4(addr: crate::c_types::FourBytes, port: u16) -> SocketAddress {
+	SocketAddress::TcpIpV4 {
 		addr,
 		port,
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new IPv6-variant NetAddress
-pub extern "C" fn NetAddress_ipv6(addr: crate::c_types::SixteenBytes, port: u16) -> NetAddress {
-	NetAddress::IPv6 {
+/// Utility method to constructs a new TcpIpV6-variant SocketAddress
+pub extern "C" fn SocketAddress_tcp_ip_v6(addr: crate::c_types::SixteenBytes, port: u16) -> SocketAddress {
+	SocketAddress::TcpIpV6 {
 		addr,
 		port,
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new OnionV2-variant NetAddress
-pub extern "C" fn NetAddress_onion_v2(a: crate::c_types::TwelveBytes) -> NetAddress {
-	NetAddress::OnionV2(a, )
+/// Utility method to constructs a new OnionV2-variant SocketAddress
+pub extern "C" fn SocketAddress_onion_v2(a: crate::c_types::TwelveBytes) -> SocketAddress {
+	SocketAddress::OnionV2(a, )
 }
 #[no_mangle]
-/// Utility method to constructs a new OnionV3-variant NetAddress
-pub extern "C" fn NetAddress_onion_v3(ed25519_pubkey: crate::c_types::ThirtyTwoBytes, checksum: u16, version: u8, port: u16) -> NetAddress {
-	NetAddress::OnionV3 {
+/// Utility method to constructs a new OnionV3-variant SocketAddress
+pub extern "C" fn SocketAddress_onion_v3(ed25519_pubkey: crate::c_types::ThirtyTwoBytes, checksum: u16, version: u8, port: u16) -> SocketAddress {
+	SocketAddress::OnionV3 {
 		ed25519_pubkey,
 		checksum,
 		version,
@@ -5537,30 +5568,138 @@ pub extern "C" fn NetAddress_onion_v3(ed25519_pubkey: crate::c_types::ThirtyTwoB
 	}
 }
 #[no_mangle]
-/// Utility method to constructs a new Hostname-variant NetAddress
-pub extern "C" fn NetAddress_hostname(hostname: crate::lightning::util::ser::Hostname, port: u16) -> NetAddress {
-	NetAddress::Hostname {
+/// Utility method to constructs a new Hostname-variant SocketAddress
+pub extern "C" fn SocketAddress_hostname(hostname: crate::lightning::util::ser::Hostname, port: u16) -> SocketAddress {
+	SocketAddress::Hostname {
 		hostname,
 		port,
 	}
 }
-/// Checks if two NetAddresss contain equal inner contents.
+/// Checks if two SocketAddresss contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
-pub extern "C" fn NetAddress_eq(a: &NetAddress, b: &NetAddress) -> bool {
+pub extern "C" fn SocketAddress_eq(a: &SocketAddress, b: &SocketAddress) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
 #[no_mangle]
-/// Serialize the NetAddress object into a byte array which can be read by NetAddress_read
-pub extern "C" fn NetAddress_write(obj: &crate::lightning::ln::msgs::NetAddress) -> crate::c_types::derived::CVec_u8Z {
+/// Serialize the SocketAddress object into a byte array which can be read by SocketAddress_read
+pub extern "C" fn SocketAddress_write(obj: &crate::lightning::ln::msgs::SocketAddress) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
 }
 #[no_mangle]
-/// Read a NetAddress from a byte array, created by NetAddress_write
-pub extern "C" fn NetAddress_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_NetAddressDecodeErrorZ {
-	let res: Result<lightning::ln::msgs::NetAddress, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::NetAddress::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+/// Read a SocketAddress from a byte array, created by SocketAddress_write
+pub extern "C" fn SocketAddress_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_SocketAddressDecodeErrorZ {
+	let res: Result<lightning::ln::msgs::SocketAddress, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::SocketAddress::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
+}
+/// [`SocketAddress`] error variants
+#[derive(Clone)]
+#[must_use]
+#[repr(C)]
+pub enum SocketAddressParseError {
+	/// Socket address (IPv4/IPv6) parsing error
+	SocketAddrParse,
+	/// Invalid input format
+	InvalidInput,
+	/// Invalid port
+	InvalidPort,
+	/// Invalid onion v3 address
+	InvalidOnionV3,
+}
+use lightning::ln::msgs::SocketAddressParseError as SocketAddressParseErrorImport;
+pub(crate) type nativeSocketAddressParseError = SocketAddressParseErrorImport;
+
+impl SocketAddressParseError {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeSocketAddressParseError {
+		match self {
+			SocketAddressParseError::SocketAddrParse => nativeSocketAddressParseError::SocketAddrParse,
+			SocketAddressParseError::InvalidInput => nativeSocketAddressParseError::InvalidInput,
+			SocketAddressParseError::InvalidPort => nativeSocketAddressParseError::InvalidPort,
+			SocketAddressParseError::InvalidOnionV3 => nativeSocketAddressParseError::InvalidOnionV3,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeSocketAddressParseError {
+		match self {
+			SocketAddressParseError::SocketAddrParse => nativeSocketAddressParseError::SocketAddrParse,
+			SocketAddressParseError::InvalidInput => nativeSocketAddressParseError::InvalidInput,
+			SocketAddressParseError::InvalidPort => nativeSocketAddressParseError::InvalidPort,
+			SocketAddressParseError::InvalidOnionV3 => nativeSocketAddressParseError::InvalidOnionV3,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeSocketAddressParseError) -> Self {
+		match native {
+			nativeSocketAddressParseError::SocketAddrParse => SocketAddressParseError::SocketAddrParse,
+			nativeSocketAddressParseError::InvalidInput => SocketAddressParseError::InvalidInput,
+			nativeSocketAddressParseError::InvalidPort => SocketAddressParseError::InvalidPort,
+			nativeSocketAddressParseError::InvalidOnionV3 => SocketAddressParseError::InvalidOnionV3,
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeSocketAddressParseError) -> Self {
+		match native {
+			nativeSocketAddressParseError::SocketAddrParse => SocketAddressParseError::SocketAddrParse,
+			nativeSocketAddressParseError::InvalidInput => SocketAddressParseError::InvalidInput,
+			nativeSocketAddressParseError::InvalidPort => SocketAddressParseError::InvalidPort,
+			nativeSocketAddressParseError::InvalidOnionV3 => SocketAddressParseError::InvalidOnionV3,
+		}
+	}
+}
+/// Creates a copy of the SocketAddressParseError
+#[no_mangle]
+pub extern "C" fn SocketAddressParseError_clone(orig: &SocketAddressParseError) -> SocketAddressParseError {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new SocketAddrParse-variant SocketAddressParseError
+pub extern "C" fn SocketAddressParseError_socket_addr_parse() -> SocketAddressParseError {
+	SocketAddressParseError::SocketAddrParse}
+#[no_mangle]
+/// Utility method to constructs a new InvalidInput-variant SocketAddressParseError
+pub extern "C" fn SocketAddressParseError_invalid_input() -> SocketAddressParseError {
+	SocketAddressParseError::InvalidInput}
+#[no_mangle]
+/// Utility method to constructs a new InvalidPort-variant SocketAddressParseError
+pub extern "C" fn SocketAddressParseError_invalid_port() -> SocketAddressParseError {
+	SocketAddressParseError::InvalidPort}
+#[no_mangle]
+/// Utility method to constructs a new InvalidOnionV3-variant SocketAddressParseError
+pub extern "C" fn SocketAddressParseError_invalid_onion_v3() -> SocketAddressParseError {
+	SocketAddressParseError::InvalidOnionV3}
+/// Checks if two SocketAddressParseErrors contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn SocketAddressParseError_eq(a: &SocketAddressParseError, b: &SocketAddressParseError) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
+/// Parses an OnionV3 host and port into a [`SocketAddress::OnionV3`].
+///
+/// The host part must end with \".onion\".
+#[no_mangle]
+pub extern "C" fn parse_onion_address(mut host: crate::c_types::Str, mut port: u16) -> crate::c_types::derived::CResult_SocketAddressSocketAddressParseErrorZ {
+	let mut ret = lightning::ln::msgs::parse_onion_address(host.into_str(), port);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::SocketAddress::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::SocketAddressParseError::native_into(e) }).into() };
+	local_ret
+}
+
+#[no_mangle]
+/// Read a SocketAddress object from a string
+pub extern "C" fn SocketAddress_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_SocketAddressSocketAddressParseErrorZ {
+	match lightning::ln::msgs::SocketAddress::from_str(s.into_str()) {
+		Ok(r) => {
+			crate::c_types::CResultTempl::ok(
+				crate::lightning::ln::msgs::SocketAddress::native_into(r)
+			)
+		},
+		Err(e) => {
+			crate::c_types::CResultTempl::err(
+				crate::lightning::ln::msgs::SocketAddressParseError::native_into(e)
+			)
+		},
+	}.into()
 }
 /// Represents the set of gossip messages that require a signature from a node's identity key.
 #[derive(Clone)]
@@ -5814,14 +5953,14 @@ pub extern "C" fn UnsignedNodeAnnouncement_set_alias(this_ptr: &mut UnsignedNode
 ///
 /// Returns a copy of the field.
 #[no_mangle]
-pub extern "C" fn UnsignedNodeAnnouncement_get_addresses(this_ptr: &UnsignedNodeAnnouncement) -> crate::c_types::derived::CVec_NetAddressZ {
+pub extern "C" fn UnsignedNodeAnnouncement_get_addresses(this_ptr: &UnsignedNodeAnnouncement) -> crate::c_types::derived::CVec_SocketAddressZ {
 	let mut inner_val = this_ptr.get_native_mut_ref().addresses.clone();
-	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::lightning::ln::msgs::NetAddress::native_into(item) }); };
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::lightning::ln::msgs::SocketAddress::native_into(item) }); };
 	local_inner_val.into()
 }
 /// List of addresses on which this node is reachable
 #[no_mangle]
-pub extern "C" fn UnsignedNodeAnnouncement_set_addresses(this_ptr: &mut UnsignedNodeAnnouncement, mut val: crate::c_types::derived::CVec_NetAddressZ) {
+pub extern "C" fn UnsignedNodeAnnouncement_set_addresses(this_ptr: &mut UnsignedNodeAnnouncement, mut val: crate::c_types::derived::CVec_SocketAddressZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item.into_native() }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.addresses = local_val;
 }
@@ -5908,13 +6047,13 @@ impl NodeAnnouncement {
 }
 /// The signature by the node key
 #[no_mangle]
-pub extern "C" fn NodeAnnouncement_get_signature(this_ptr: &NodeAnnouncement) -> crate::c_types::Signature {
+pub extern "C" fn NodeAnnouncement_get_signature(this_ptr: &NodeAnnouncement) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().signature;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// The signature by the node key
 #[no_mangle]
-pub extern "C" fn NodeAnnouncement_set_signature(this_ptr: &mut NodeAnnouncement, mut val: crate::c_types::Signature) {
+pub extern "C" fn NodeAnnouncement_set_signature(this_ptr: &mut NodeAnnouncement, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.signature = val.into_rust();
 }
 /// The actual content of the announcement
@@ -5931,7 +6070,7 @@ pub extern "C" fn NodeAnnouncement_set_contents(this_ptr: &mut NodeAnnouncement,
 /// Constructs a new NodeAnnouncement given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NodeAnnouncement_new(mut signature_arg: crate::c_types::Signature, mut contents_arg: crate::lightning::ln::msgs::UnsignedNodeAnnouncement) -> NodeAnnouncement {
+pub extern "C" fn NodeAnnouncement_new(mut signature_arg: crate::c_types::ECDSASignature, mut contents_arg: crate::lightning::ln::msgs::UnsignedNodeAnnouncement) -> NodeAnnouncement {
 	NodeAnnouncement { inner: ObjOps::heap_alloc(nativeNodeAnnouncement {
 		signature: signature_arg.into_rust(),
 		contents: *unsafe { Box::from_raw(contents_arg.take_inner()) },
@@ -6095,6 +6234,43 @@ pub extern "C" fn UnsignedChannelAnnouncement_get_bitcoin_key_2(this_ptr: &Unsig
 pub extern "C" fn UnsignedChannelAnnouncement_set_bitcoin_key_2(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::lightning::routing::gossip::NodeId) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.bitcoin_key_2 = *unsafe { Box::from_raw(val.take_inner()) };
 }
+/// Excess data which was signed as a part of the message which we do not (yet) understand how
+/// to decode.
+///
+/// This is stored to ensure forward-compatibility as new fields are added to the lightning gossip protocol.
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn UnsignedChannelAnnouncement_get_excess_data(this_ptr: &UnsignedChannelAnnouncement) -> crate::c_types::derived::CVec_u8Z {
+	let mut inner_val = this_ptr.get_native_mut_ref().excess_data.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { item }); };
+	local_inner_val.into()
+}
+/// Excess data which was signed as a part of the message which we do not (yet) understand how
+/// to decode.
+///
+/// This is stored to ensure forward-compatibility as new fields are added to the lightning gossip protocol.
+#[no_mangle]
+pub extern "C" fn UnsignedChannelAnnouncement_set_excess_data(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::c_types::derived::CVec_u8Z) {
+	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.excess_data = local_val;
+}
+/// Constructs a new UnsignedChannelAnnouncement given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedChannelAnnouncement_new(mut features_arg: crate::lightning::ln::features::ChannelFeatures, mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut short_channel_id_arg: u64, mut node_id_1_arg: crate::lightning::routing::gossip::NodeId, mut node_id_2_arg: crate::lightning::routing::gossip::NodeId, mut bitcoin_key_1_arg: crate::lightning::routing::gossip::NodeId, mut bitcoin_key_2_arg: crate::lightning::routing::gossip::NodeId, mut excess_data_arg: crate::c_types::derived::CVec_u8Z) -> UnsignedChannelAnnouncement {
+	let mut local_excess_data_arg = Vec::new(); for mut item in excess_data_arg.into_rust().drain(..) { local_excess_data_arg.push( { item }); };
+	UnsignedChannelAnnouncement { inner: ObjOps::heap_alloc(nativeUnsignedChannelAnnouncement {
+		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
+		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
+		short_channel_id: short_channel_id_arg,
+		node_id_1: *unsafe { Box::from_raw(node_id_1_arg.take_inner()) },
+		node_id_2: *unsafe { Box::from_raw(node_id_2_arg.take_inner()) },
+		bitcoin_key_1: *unsafe { Box::from_raw(bitcoin_key_1_arg.take_inner()) },
+		bitcoin_key_2: *unsafe { Box::from_raw(bitcoin_key_2_arg.take_inner()) },
+		excess_data: local_excess_data_arg,
+	}), is_owned: true }
+}
 impl Clone for UnsignedChannelAnnouncement {
 	fn clone(&self) -> Self {
 		Self {
@@ -6178,46 +6354,46 @@ impl ChannelAnnouncement {
 }
 /// Authentication of the announcement by the first public node
 #[no_mangle]
-pub extern "C" fn ChannelAnnouncement_get_node_signature_1(this_ptr: &ChannelAnnouncement) -> crate::c_types::Signature {
+pub extern "C" fn ChannelAnnouncement_get_node_signature_1(this_ptr: &ChannelAnnouncement) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_signature_1;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// Authentication of the announcement by the first public node
 #[no_mangle]
-pub extern "C" fn ChannelAnnouncement_set_node_signature_1(this_ptr: &mut ChannelAnnouncement, mut val: crate::c_types::Signature) {
+pub extern "C" fn ChannelAnnouncement_set_node_signature_1(this_ptr: &mut ChannelAnnouncement, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_signature_1 = val.into_rust();
 }
 /// Authentication of the announcement by the second public node
 #[no_mangle]
-pub extern "C" fn ChannelAnnouncement_get_node_signature_2(this_ptr: &ChannelAnnouncement) -> crate::c_types::Signature {
+pub extern "C" fn ChannelAnnouncement_get_node_signature_2(this_ptr: &ChannelAnnouncement) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().node_signature_2;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// Authentication of the announcement by the second public node
 #[no_mangle]
-pub extern "C" fn ChannelAnnouncement_set_node_signature_2(this_ptr: &mut ChannelAnnouncement, mut val: crate::c_types::Signature) {
+pub extern "C" fn ChannelAnnouncement_set_node_signature_2(this_ptr: &mut ChannelAnnouncement, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.node_signature_2 = val.into_rust();
 }
 /// Proof of funding UTXO ownership by the first public node
 #[no_mangle]
-pub extern "C" fn ChannelAnnouncement_get_bitcoin_signature_1(this_ptr: &ChannelAnnouncement) -> crate::c_types::Signature {
+pub extern "C" fn ChannelAnnouncement_get_bitcoin_signature_1(this_ptr: &ChannelAnnouncement) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().bitcoin_signature_1;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// Proof of funding UTXO ownership by the first public node
 #[no_mangle]
-pub extern "C" fn ChannelAnnouncement_set_bitcoin_signature_1(this_ptr: &mut ChannelAnnouncement, mut val: crate::c_types::Signature) {
+pub extern "C" fn ChannelAnnouncement_set_bitcoin_signature_1(this_ptr: &mut ChannelAnnouncement, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.bitcoin_signature_1 = val.into_rust();
 }
 /// Proof of funding UTXO ownership by the second public node
 #[no_mangle]
-pub extern "C" fn ChannelAnnouncement_get_bitcoin_signature_2(this_ptr: &ChannelAnnouncement) -> crate::c_types::Signature {
+pub extern "C" fn ChannelAnnouncement_get_bitcoin_signature_2(this_ptr: &ChannelAnnouncement) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().bitcoin_signature_2;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// Proof of funding UTXO ownership by the second public node
 #[no_mangle]
-pub extern "C" fn ChannelAnnouncement_set_bitcoin_signature_2(this_ptr: &mut ChannelAnnouncement, mut val: crate::c_types::Signature) {
+pub extern "C" fn ChannelAnnouncement_set_bitcoin_signature_2(this_ptr: &mut ChannelAnnouncement, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.bitcoin_signature_2 = val.into_rust();
 }
 /// The actual announcement
@@ -6234,7 +6410,7 @@ pub extern "C" fn ChannelAnnouncement_set_contents(this_ptr: &mut ChannelAnnounc
 /// Constructs a new ChannelAnnouncement given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelAnnouncement_new(mut node_signature_1_arg: crate::c_types::Signature, mut node_signature_2_arg: crate::c_types::Signature, mut bitcoin_signature_1_arg: crate::c_types::Signature, mut bitcoin_signature_2_arg: crate::c_types::Signature, mut contents_arg: crate::lightning::ln::msgs::UnsignedChannelAnnouncement) -> ChannelAnnouncement {
+pub extern "C" fn ChannelAnnouncement_new(mut node_signature_1_arg: crate::c_types::ECDSASignature, mut node_signature_2_arg: crate::c_types::ECDSASignature, mut bitcoin_signature_1_arg: crate::c_types::ECDSASignature, mut bitcoin_signature_2_arg: crate::c_types::ECDSASignature, mut contents_arg: crate::lightning::ln::msgs::UnsignedChannelAnnouncement) -> ChannelAnnouncement {
 	ChannelAnnouncement { inner: ObjOps::heap_alloc(nativeChannelAnnouncement {
 		node_signature_1: node_signature_1_arg.into_rust(),
 		node_signature_2: node_signature_2_arg.into_rust(),
@@ -6563,13 +6739,13 @@ impl ChannelUpdate {
 }
 /// A signature of the channel update
 #[no_mangle]
-pub extern "C" fn ChannelUpdate_get_signature(this_ptr: &ChannelUpdate) -> crate::c_types::Signature {
+pub extern "C" fn ChannelUpdate_get_signature(this_ptr: &ChannelUpdate) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().signature;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// A signature of the channel update
 #[no_mangle]
-pub extern "C" fn ChannelUpdate_set_signature(this_ptr: &mut ChannelUpdate, mut val: crate::c_types::Signature) {
+pub extern "C" fn ChannelUpdate_set_signature(this_ptr: &mut ChannelUpdate, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.signature = val.into_rust();
 }
 /// The actual channel update
@@ -6586,7 +6762,7 @@ pub extern "C" fn ChannelUpdate_set_contents(this_ptr: &mut ChannelUpdate, mut v
 /// Constructs a new ChannelUpdate given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelUpdate_new(mut signature_arg: crate::c_types::Signature, mut contents_arg: crate::lightning::ln::msgs::UnsignedChannelUpdate) -> ChannelUpdate {
+pub extern "C" fn ChannelUpdate_new(mut signature_arg: crate::c_types::ECDSASignature, mut contents_arg: crate::lightning::ln::msgs::UnsignedChannelUpdate) -> ChannelUpdate {
 	ChannelUpdate { inner: ObjOps::heap_alloc(nativeChannelUpdate {
 		signature: signature_arg.into_rust(),
 		contents: *unsafe { Box::from_raw(contents_arg.take_inner()) },
@@ -7755,6 +7931,8 @@ pub extern "C" fn CommitmentUpdate_set_commitment_signed(this_ptr: &mut Commitme
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.commitment_signed = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Constructs a new CommitmentUpdate given each field
+///
+/// Note that update_fee_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn CommitmentUpdate_new(mut update_add_htlcs_arg: crate::c_types::derived::CVec_UpdateAddHTLCZ, mut update_fulfill_htlcs_arg: crate::c_types::derived::CVec_UpdateFulfillHTLCZ, mut update_fail_htlcs_arg: crate::c_types::derived::CVec_UpdateFailHTLCZ, mut update_fail_malformed_htlcs_arg: crate::c_types::derived::CVec_UpdateFailMalformedHTLCZ, mut update_fee_arg: crate::lightning::ln::msgs::UpdateFee, mut commitment_signed_arg: crate::lightning::ln::msgs::CommitmentSigned) -> CommitmentUpdate {
@@ -7889,7 +8067,7 @@ pub struct ChannelMessageHandler {
 	///
 	/// If it's `None`, then no particular network chain hash compatibility will be enforced when
 	/// connecting to peers.
-	pub get_genesis_hashes: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ChainHashZZ,
+	pub get_genesis_hashes: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ,
 	/// Implementation of MessageSendEventsProvider for this object.
 	pub MessageSendEventsProvider: crate::lightning::events::MessageSendEventsProvider,
 	/// Frees any resources associated with this object given its this_arg pointer.
@@ -7898,8 +8076,7 @@ pub struct ChannelMessageHandler {
 }
 unsafe impl Send for ChannelMessageHandler {}
 unsafe impl Sync for ChannelMessageHandler {}
-#[no_mangle]
-pub(crate) extern "C" fn ChannelMessageHandler_clone_fields(orig: &ChannelMessageHandler) -> ChannelMessageHandler {
+pub(crate) fn ChannelMessageHandler_clone_fields(orig: &ChannelMessageHandler) -> ChannelMessageHandler {
 	ChannelMessageHandler {
 		this_arg: orig.this_arg,
 		handle_open_channel: Clone::clone(&orig.handle_open_channel),
@@ -8068,6 +8245,11 @@ impl core::ops::Deref for ChannelMessageHandler {
 		self
 	}
 }
+impl core::ops::DerefMut for ChannelMessageHandler {
+	fn deref_mut(&mut self) -> &mut Self {
+		self
+	}
+}
 /// Calls the free function if one is set
 #[no_mangle]
 pub extern "C" fn ChannelMessageHandler_free(this_ptr: ChannelMessageHandler) { }
@@ -8157,8 +8339,7 @@ pub struct RoutingMessageHandler {
 }
 unsafe impl Send for RoutingMessageHandler {}
 unsafe impl Sync for RoutingMessageHandler {}
-#[no_mangle]
-pub(crate) extern "C" fn RoutingMessageHandler_clone_fields(orig: &RoutingMessageHandler) -> RoutingMessageHandler {
+pub(crate) fn RoutingMessageHandler_clone_fields(orig: &RoutingMessageHandler) -> RoutingMessageHandler {
 	RoutingMessageHandler {
 		this_arg: orig.this_arg,
 		handle_node_announcement: Clone::clone(&orig.handle_node_announcement),
@@ -8261,6 +8442,11 @@ impl core::ops::Deref for RoutingMessageHandler {
 		self
 	}
 }
+impl core::ops::DerefMut for RoutingMessageHandler {
+	fn deref_mut(&mut self) -> &mut Self {
+		self
+	}
+}
 /// Calls the free function if one is set
 #[no_mangle]
 pub extern "C" fn RoutingMessageHandler_free(this_ptr: RoutingMessageHandler) { }
@@ -8307,8 +8493,7 @@ pub struct OnionMessageHandler {
 }
 unsafe impl Send for OnionMessageHandler {}
 unsafe impl Sync for OnionMessageHandler {}
-#[no_mangle]
-pub(crate) extern "C" fn OnionMessageHandler_clone_fields(orig: &OnionMessageHandler) -> OnionMessageHandler {
+pub(crate) fn OnionMessageHandler_clone_fields(orig: &OnionMessageHandler) -> OnionMessageHandler {
 	OnionMessageHandler {
 		this_arg: orig.this_arg,
 		handle_onion_message: Clone::clone(&orig.handle_onion_message),
@@ -8359,6 +8544,11 @@ impl core::ops::Deref for OnionMessageHandler {
 		self
 	}
 }
+impl core::ops::DerefMut for OnionMessageHandler {
+	fn deref_mut(&mut self) -> &mut Self {
+		self
+	}
+}
 /// Calls the free function if one is set
 #[no_mangle]
 pub extern "C" fn OnionMessageHandler_free(this_ptr: OnionMessageHandler) { }
@@ -8372,6 +8562,7 @@ impl Drop for OnionMessageHandler {
 mod fuzzy_internal_msgs {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;

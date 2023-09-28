@@ -71,6 +71,7 @@
 //! ```
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -169,9 +170,9 @@ pub extern "C" fn Refund_description(this_arg: &crate::lightning::offers::refund
 /// If `None`, the refund does not expire.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Refund_absolute_expiry(this_arg: &crate::lightning::offers::refund::Refund) -> crate::c_types::derived::COption_DurationZ {
+pub extern "C" fn Refund_absolute_expiry(this_arg: &crate::lightning::offers::refund::Refund) -> crate::c_types::derived::COption_u64Z {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.absolute_expiry();
-	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_DurationZ::None } else { crate::c_types::derived::COption_DurationZ::Some( { ret.unwrap().as_secs() }) };
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { ret.unwrap().as_secs() }) };
 	local_ret
 }
 
@@ -211,8 +212,8 @@ pub extern "C" fn Refund_paths(this_arg: &crate::lightning::offers::refund::Refu
 /// [`payer_id`]: Self::payer_id
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Refund_metadata(this_arg: &crate::lightning::offers::refund::Refund) -> crate::c_types::u8slice {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.metadata();
+pub extern "C" fn Refund_payer_metadata(this_arg: &crate::lightning::offers::refund::Refund) -> crate::c_types::u8slice {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payer_metadata();
 	let mut local_ret = crate::c_types::u8slice::from_slice(ret);
 	local_ret
 }

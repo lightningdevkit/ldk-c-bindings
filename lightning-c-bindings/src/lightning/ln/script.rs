@@ -9,6 +9,7 @@
 //! Abstractions for scripts used in the Lightning Network.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;

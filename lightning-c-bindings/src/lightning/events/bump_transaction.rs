@@ -11,6 +11,7 @@
 //! [`Event`]: crate::events::Event
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -145,6 +146,22 @@ pub extern "C" fn ChannelDerivationParameters_eq(a: &ChannelDerivationParameters
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+#[no_mangle]
+/// Serialize the ChannelDerivationParameters object into a byte array which can be read by ChannelDerivationParameters_read
+pub extern "C" fn ChannelDerivationParameters_write(obj: &crate::lightning::events::bump_transaction::ChannelDerivationParameters) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn ChannelDerivationParameters_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelDerivationParameters) })
+}
+#[no_mangle]
+/// Read a ChannelDerivationParameters from a byte array, created by ChannelDerivationParameters_write
+pub extern "C" fn ChannelDerivationParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelDerivationParametersDecodeErrorZ {
+	let res: Result<lightning::events::bump_transaction::ChannelDerivationParameters, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::events::bump_transaction::ChannelDerivationParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
 }
 
 use lightning::events::bump_transaction::AnchorDescriptor as nativeAnchorDescriptorImport;
@@ -288,7 +305,7 @@ pub extern "C" fn AnchorDescriptor_witness_script(this_arg: &crate::lightning::e
 /// transaction.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn AnchorDescriptor_tx_input_witness(this_arg: &crate::lightning::events::bump_transaction::AnchorDescriptor, mut signature: crate::c_types::Signature) -> crate::c_types::Witness {
+pub extern "C" fn AnchorDescriptor_tx_input_witness(this_arg: &crate::lightning::events::bump_transaction::AnchorDescriptor, mut signature: crate::c_types::ECDSASignature) -> crate::c_types::Witness {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.tx_input_witness(&signature.into_rust());
 	crate::c_types::Witness::from_bitcoin(&ret)
 }
@@ -407,27 +424,27 @@ pub extern "C" fn HTLCDescriptor_set_htlc(this_ptr: &mut HTLCDescriptor, mut val
 /// The preimage, if `Some`, to claim the HTLC output with. If `None`, the timeout path must be
 /// taken.
 #[no_mangle]
-pub extern "C" fn HTLCDescriptor_get_preimage(this_ptr: &HTLCDescriptor) -> crate::c_types::derived::COption_PaymentPreimageZ {
+pub extern "C" fn HTLCDescriptor_get_preimage(this_ptr: &HTLCDescriptor) -> crate::c_types::derived::COption_ThirtyTwoBytesZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().preimage;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_PaymentPreimageZ::None } else { crate::c_types::derived::COption_PaymentPreimageZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().0 } }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().0 } }) };
 	local_inner_val
 }
 /// The preimage, if `Some`, to claim the HTLC output with. If `None`, the timeout path must be
 /// taken.
 #[no_mangle]
-pub extern "C" fn HTLCDescriptor_set_preimage(this_ptr: &mut HTLCDescriptor, mut val: crate::c_types::derived::COption_PaymentPreimageZ) {
+pub extern "C" fn HTLCDescriptor_set_preimage(this_ptr: &mut HTLCDescriptor, mut val: crate::c_types::derived::COption_ThirtyTwoBytesZ) {
 	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentPreimage({ val_opt.take() }.data) }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.preimage = local_val;
 }
 /// The counterparty's signature required to spend the HTLC output.
 #[no_mangle]
-pub extern "C" fn HTLCDescriptor_get_counterparty_sig(this_ptr: &HTLCDescriptor) -> crate::c_types::Signature {
+pub extern "C" fn HTLCDescriptor_get_counterparty_sig(this_ptr: &HTLCDescriptor) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().counterparty_sig;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// The counterparty's signature required to spend the HTLC output.
 #[no_mangle]
-pub extern "C" fn HTLCDescriptor_set_counterparty_sig(this_ptr: &mut HTLCDescriptor, mut val: crate::c_types::Signature) {
+pub extern "C" fn HTLCDescriptor_set_counterparty_sig(this_ptr: &mut HTLCDescriptor, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.counterparty_sig = val.into_rust();
 }
 impl Clone for HTLCDescriptor {
@@ -457,6 +474,22 @@ pub extern "C" fn HTLCDescriptor_eq(a: &HTLCDescriptor, b: &HTLCDescriptor) -> b
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+#[no_mangle]
+/// Serialize the HTLCDescriptor object into a byte array which can be read by HTLCDescriptor_read
+pub extern "C" fn HTLCDescriptor_write(obj: &crate::lightning::events::bump_transaction::HTLCDescriptor) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn HTLCDescriptor_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeHTLCDescriptor) })
+}
+#[no_mangle]
+/// Read a HTLCDescriptor from a byte array, created by HTLCDescriptor_write
+pub extern "C" fn HTLCDescriptor_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_HTLCDescriptorDecodeErrorZ {
+	let res: Result<lightning::events::bump_transaction::HTLCDescriptor, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::events::bump_transaction::HTLCDescriptor { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
 }
 /// Returns the outpoint of the HTLC output in the commitment transaction. This is the outpoint
 /// being spent by the HTLC input in the HTLC transaction.
@@ -506,7 +539,7 @@ pub extern "C" fn HTLCDescriptor_witness_script(this_arg: &crate::lightning::eve
 /// transaction.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn HTLCDescriptor_tx_input_witness(this_arg: &crate::lightning::events::bump_transaction::HTLCDescriptor, mut signature: crate::c_types::Signature, mut witness_script: crate::c_types::u8slice) -> crate::c_types::Witness {
+pub extern "C" fn HTLCDescriptor_tx_input_witness(this_arg: &crate::lightning::events::bump_transaction::HTLCDescriptor, mut signature: crate::c_types::ECDSASignature, mut witness_script: crate::c_types::u8slice) -> crate::c_types::Witness {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.tx_input_witness(&signature.into_rust(), &::bitcoin::blockdata::script::Script::from(Vec::from(witness_script.to_slice())));
 	crate::c_types::Witness::from_bitcoin(&ret)
 }
@@ -1239,8 +1272,7 @@ pub struct CoinSelectionSource {
 }
 unsafe impl Send for CoinSelectionSource {}
 unsafe impl Sync for CoinSelectionSource {}
-#[no_mangle]
-pub(crate) extern "C" fn CoinSelectionSource_clone_fields(orig: &CoinSelectionSource) -> CoinSelectionSource {
+pub(crate) fn CoinSelectionSource_clone_fields(orig: &CoinSelectionSource) -> CoinSelectionSource {
 	CoinSelectionSource {
 		this_arg: orig.this_arg,
 		select_confirmed_utxos: Clone::clone(&orig.select_confirmed_utxos),
@@ -1273,6 +1305,11 @@ impl core::ops::Deref for CoinSelectionSource {
 		self
 	}
 }
+impl core::ops::DerefMut for CoinSelectionSource {
+	fn deref_mut(&mut self) -> &mut Self {
+		self
+	}
+}
 /// Calls the free function if one is set
 #[no_mangle]
 pub extern "C" fn CoinSelectionSource_free(this_ptr: CoinSelectionSource) { }
@@ -1294,7 +1331,7 @@ pub struct WalletSource {
 	pub list_confirmed_utxos: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CResult_CVec_UtxoZNoneZ,
 	/// Returns a script to use for change above dust resulting from a successful coin selection
 	/// attempt.
-	pub get_change_script: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CResult_ScriptNoneZ,
+	pub get_change_script: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CResult_CVec_u8ZNoneZ,
 	/// Signs and provides the full [`TxIn::script_sig`] and [`TxIn::witness`] for all inputs within
 	/// the transaction known to the wallet (i.e., any provided via
 	/// [`WalletSource::list_confirmed_utxos`]).
@@ -1305,8 +1342,7 @@ pub struct WalletSource {
 }
 unsafe impl Send for WalletSource {}
 unsafe impl Sync for WalletSource {}
-#[no_mangle]
-pub(crate) extern "C" fn WalletSource_clone_fields(orig: &WalletSource) -> WalletSource {
+pub(crate) fn WalletSource_clone_fields(orig: &WalletSource) -> WalletSource {
 	WalletSource {
 		this_arg: orig.this_arg,
 		list_confirmed_utxos: Clone::clone(&orig.list_confirmed_utxos),
@@ -1340,6 +1376,11 @@ impl rustWalletSource for WalletSource {
 impl core::ops::Deref for WalletSource {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for WalletSource {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }

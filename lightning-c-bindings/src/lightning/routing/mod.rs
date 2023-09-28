@@ -9,6 +9,7 @@
 //! Structs and impls for receiving messages about the network and storing the topology live here.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;

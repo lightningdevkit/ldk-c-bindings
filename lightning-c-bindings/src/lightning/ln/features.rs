@@ -73,6 +73,7 @@
 //! [messages]: crate::ln::msgs
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -83,6 +84,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod sealed {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -919,6 +921,90 @@ pub extern "C" fn InitFeatures_requires_shutdown_anysegwit(this_arg: &crate::lig
 #[no_mangle]
 pub extern "C" fn NodeFeatures_requires_shutdown_anysegwit(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_shutdown_anysegwit();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_taproot_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_taproot_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_taproot_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_taproot_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_taproot(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_taproot();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_taproot_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_taproot_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_taproot_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_taproot_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_taproot(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_taproot();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_taproot_optional(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_taproot_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_taproot_required(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_taproot_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_supports_taproot(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_taproot();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_taproot(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_taproot();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_taproot(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_taproot();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_requires_taproot(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_taproot();
 	ret
 }
 
@@ -2004,6 +2090,36 @@ pub extern "C" fn InitFeatures_requires_unknown_bits(this_arg: &crate::lightning
 	ret
 }
 
+/// Sets a required feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_required_feature_bit(this_arg: &mut crate::lightning::ln::features::InitFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_required_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_optional_feature_bit(this_arg: &mut crate::lightning::ln::features::InitFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_optional_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
 /// by [bLIP 2] or if it is a known `T` feature.
 ///
@@ -2057,6 +2173,36 @@ pub extern "C" fn NodeFeatures_requires_unknown_bits_from(this_arg: &crate::ligh
 pub extern "C" fn NodeFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
+}
+
+/// Sets a required feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_required_feature_bit(this_arg: &mut crate::lightning::ln::features::NodeFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_required_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_optional_feature_bit(this_arg: &mut crate::lightning::ln::features::NodeFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_optional_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
 }
 
 /// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
@@ -2114,6 +2260,36 @@ pub extern "C" fn ChannelFeatures_requires_unknown_bits(this_arg: &crate::lightn
 	ret
 }
 
+/// Sets a required feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelFeatures_set_required_feature_bit(this_arg: &mut crate::lightning::ln::features::ChannelFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelFeatures)) }.set_required_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelFeatures_set_optional_feature_bit(this_arg: &mut crate::lightning::ln::features::ChannelFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelFeatures)) }.set_optional_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
 /// by [bLIP 2] or if it is a known `T` feature.
 ///
@@ -2167,6 +2343,36 @@ pub extern "C" fn Bolt11InvoiceFeatures_requires_unknown_bits_from(this_arg: &cr
 pub extern "C" fn Bolt11InvoiceFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
+}
+
+/// Sets a required feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt11InvoiceFeatures_set_required_feature_bit(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_required_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt11InvoiceFeatures_set_optional_feature_bit(this_arg: &mut crate::lightning::ln::features::Bolt11InvoiceFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt11InvoiceFeatures)) }.set_optional_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
 }
 
 /// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
@@ -2224,6 +2430,36 @@ pub extern "C" fn OfferFeatures_requires_unknown_bits(this_arg: &crate::lightnin
 	ret
 }
 
+/// Sets a required feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn OfferFeatures_set_required_feature_bit(this_arg: &mut crate::lightning::ln::features::OfferFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeOfferFeatures)) }.set_required_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn OfferFeatures_set_optional_feature_bit(this_arg: &mut crate::lightning::ln::features::OfferFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeOfferFeatures)) }.set_optional_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
 /// by [bLIP 2] or if it is a known `T` feature.
 ///
@@ -2277,6 +2513,36 @@ pub extern "C" fn InvoiceRequestFeatures_requires_unknown_bits_from(this_arg: &c
 pub extern "C" fn InvoiceRequestFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::InvoiceRequestFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
+}
+
+/// Sets a required feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceRequestFeatures_set_required_feature_bit(this_arg: &mut crate::lightning::ln::features::InvoiceRequestFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceRequestFeatures)) }.set_required_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceRequestFeatures_set_optional_feature_bit(this_arg: &mut crate::lightning::ln::features::InvoiceRequestFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInvoiceRequestFeatures)) }.set_optional_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
 }
 
 /// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
@@ -2334,6 +2600,36 @@ pub extern "C" fn Bolt12InvoiceFeatures_requires_unknown_bits(this_arg: &crate::
 	ret
 }
 
+/// Sets a required feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_set_required_feature_bit(this_arg: &mut crate::lightning::ln::features::Bolt12InvoiceFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt12InvoiceFeatures)) }.set_required_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_set_optional_feature_bit(this_arg: &mut crate::lightning::ln::features::Bolt12InvoiceFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBolt12InvoiceFeatures)) }.set_optional_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
 /// by [bLIP 2] or if it is a known `T` feature.
 ///
@@ -2389,6 +2685,36 @@ pub extern "C" fn BlindedHopFeatures_requires_unknown_bits(this_arg: &crate::lig
 	ret
 }
 
+/// Sets a required feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedHopFeatures_set_required_feature_bit(this_arg: &mut crate::lightning::ln::features::BlindedHopFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBlindedHopFeatures)) }.set_required_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedHopFeatures_set_optional_feature_bit(this_arg: &mut crate::lightning::ln::features::BlindedHopFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeBlindedHopFeatures)) }.set_optional_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined
 /// by [bLIP 2] or if it is a known `T` feature.
 ///
@@ -2442,6 +2768,36 @@ pub extern "C" fn ChannelTypeFeatures_requires_unknown_bits_from(this_arg: &crat
 pub extern "C" fn ChannelTypeFeatures_requires_unknown_bits(this_arg: &crate::lightning::ln::features::ChannelTypeFeatures) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_unknown_bits();
 	ret
+}
+
+/// Sets a required feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Required bits are even. If an odd bit is given, then the corresponding even bit will
+/// be set instead (i.e., `bit - 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_required_feature_bit(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_required_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Sets an optional feature bit. Errors if `bit` is outside the feature range as defined
+/// by [BOLT 9].
+///
+/// Note: Optional bits are odd. If an even bit is given, then the corresponding odd bit will be
+/// set instead (i.e., `bit + 1`).
+///
+/// [BOLT 9]: https://github.com/lightning/bolts/blob/master/09-features.md
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_set_optional_feature_bit(this_arg: &mut crate::lightning::ln::features::ChannelTypeFeatures, mut bit: usize) -> crate::c_types::derived::CResult_NoneNoneZ {
+	let mut ret = unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeChannelTypeFeatures)) }.set_optional_feature_bit(bit);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
 }
 
 /// Sets a required custom feature bit. Errors if `bit` is outside the custom range as defined

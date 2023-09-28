@@ -14,6 +14,7 @@
 //! Each module may have its own Logger or share one.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -280,8 +281,7 @@ pub struct Logger {
 }
 unsafe impl Send for Logger {}
 unsafe impl Sync for Logger {}
-#[no_mangle]
-pub(crate) extern "C" fn Logger_clone_fields(orig: &Logger) -> Logger {
+pub(crate) fn Logger_clone_fields(orig: &Logger) -> Logger {
 	Logger {
 		this_arg: orig.this_arg,
 		log: Clone::clone(&orig.log),
@@ -301,6 +301,11 @@ impl rustLogger for Logger {
 impl core::ops::Deref for Logger {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for Logger {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }

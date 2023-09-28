@@ -9,6 +9,7 @@
 //! Parsing and formatting for bech32 message encoding.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -19,6 +20,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod sealed {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;

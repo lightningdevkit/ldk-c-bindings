@@ -18,6 +18,7 @@
 //! [`Bolt11Invoice::from_str`]: crate::Bolt11Invoice#impl-FromStr
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -28,20 +29,10 @@ use alloc::{vec::Vec, boxed::Box};
 pub mod payment;
 pub mod utils;
 pub mod constants;
-mod time_utils {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
 mod de {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -52,6 +43,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod hrp_sm {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -122,6 +114,7 @@ pub extern "C" fn ParseOrSemanticError_to_str(o: &crate::lightning_invoice::Pars
 mod ser {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -153,6 +146,7 @@ pub extern "C" fn SiPrefix_to_str(o: &crate::lightning_invoice::SiPrefix) -> Str
 mod tb {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -164,6 +158,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod prelude {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -175,6 +170,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod sync {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -2179,7 +2175,7 @@ pub extern "C" fn SignedRawBolt11Invoice_signature(this_arg: &crate::lightning_i
 /// Recovers the public key used for signing the invoice from the recoverable signature.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn SignedRawBolt11Invoice_recover_payee_pub_key(this_arg: &crate::lightning_invoice::SignedRawBolt11Invoice) -> crate::c_types::derived::CResult_PayeePubKeyErrorZ {
+pub extern "C" fn SignedRawBolt11Invoice_recover_payee_pub_key(this_arg: &crate::lightning_invoice::SignedRawBolt11Invoice) -> crate::c_types::derived::CResult_PayeePubKeySecp256k1ErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.recover_payee_pub_key();
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning_invoice::PayeePubKey { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
 	local_ret
@@ -2264,9 +2260,9 @@ pub extern "C" fn RawBolt11Invoice_min_final_cltv_expiry_delta(this_arg: &crate:
 
 #[must_use]
 #[no_mangle]
-pub extern "C" fn RawBolt11Invoice_payment_secret(this_arg: &crate::lightning_invoice::RawBolt11Invoice) -> crate::c_types::derived::COption_PaymentSecretZ {
+pub extern "C" fn RawBolt11Invoice_payment_secret(this_arg: &crate::lightning_invoice::RawBolt11Invoice) -> crate::c_types::derived::COption_ThirtyTwoBytesZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_secret();
-	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_PaymentSecretZ::None } else { crate::c_types::derived::COption_PaymentSecretZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*ret.as_ref().unwrap()).clone().0 } }) };
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*ret.as_ref().unwrap()).clone().0 } }) };
 	local_ret
 }
 
@@ -2502,9 +2498,9 @@ pub extern "C" fn Bolt11Invoice_recover_payee_pub_key(this_arg: &crate::lightnin
 /// Returning None if overflow occurred.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Bolt11Invoice_expires_at(this_arg: &crate::lightning_invoice::Bolt11Invoice) -> crate::c_types::derived::COption_DurationZ {
+pub extern "C" fn Bolt11Invoice_expires_at(this_arg: &crate::lightning_invoice::Bolt11Invoice) -> crate::c_types::derived::COption_u64Z {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.expires_at();
-	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_DurationZ::None } else { crate::c_types::derived::COption_DurationZ::Some( { ret.unwrap().as_secs() }) };
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { ret.unwrap().as_secs() }) };
 	local_ret
 }
 
@@ -2562,7 +2558,7 @@ pub extern "C" fn Bolt11Invoice_min_final_cltv_expiry_delta(this_arg: &crate::li
 /// Returns a list of all fallback addresses as [`Address`]es
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Bolt11Invoice_fallback_addresses(this_arg: &crate::lightning_invoice::Bolt11Invoice) -> crate::c_types::derived::CVec_AddressZ {
+pub extern "C" fn Bolt11Invoice_fallback_addresses(this_arg: &crate::lightning_invoice::Bolt11Invoice) -> crate::c_types::derived::CVec_StrZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.fallback_addresses();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { alloc::string::ToString::to_string(&item).into() }); };
 	local_ret.into()

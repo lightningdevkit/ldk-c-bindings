@@ -13,6 +13,7 @@
 //! disconnections, transaction broadcasting, and feerate information requests.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -46,8 +47,7 @@ pub struct BroadcasterInterface {
 }
 unsafe impl Send for BroadcasterInterface {}
 unsafe impl Sync for BroadcasterInterface {}
-#[no_mangle]
-pub(crate) extern "C" fn BroadcasterInterface_clone_fields(orig: &BroadcasterInterface) -> BroadcasterInterface {
+pub(crate) fn BroadcasterInterface_clone_fields(orig: &BroadcasterInterface) -> BroadcasterInterface {
 	BroadcasterInterface {
 		this_arg: orig.this_arg,
 		broadcast_transactions: Clone::clone(&orig.broadcast_transactions),
@@ -68,6 +68,11 @@ impl rustBroadcasterInterface for BroadcasterInterface {
 impl core::ops::Deref for BroadcasterInterface {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for BroadcasterInterface {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }
@@ -210,8 +215,7 @@ pub struct FeeEstimator {
 }
 unsafe impl Send for FeeEstimator {}
 unsafe impl Sync for FeeEstimator {}
-#[no_mangle]
-pub(crate) extern "C" fn FeeEstimator_clone_fields(orig: &FeeEstimator) -> FeeEstimator {
+pub(crate) fn FeeEstimator_clone_fields(orig: &FeeEstimator) -> FeeEstimator {
 	FeeEstimator {
 		this_arg: orig.this_arg,
 		get_est_sat_per_1000_weight: Clone::clone(&orig.get_est_sat_per_1000_weight),
@@ -232,6 +236,11 @@ impl rustFeeEstimator for FeeEstimator {
 impl core::ops::Deref for FeeEstimator {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for FeeEstimator {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }

@@ -9,6 +9,7 @@
 //! This module has a map which can be iterated in a deterministic order. See the [`IndexedMap`].
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;

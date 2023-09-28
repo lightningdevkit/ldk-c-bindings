@@ -23,6 +23,7 @@
 //! servicing [`ChannelMonitor`] updates from the client.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -30,6 +31,18 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
+mod update_origin {
+
+use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
 
 use lightning::chain::chainmonitor::MonitorUpdateId as nativeMonitorUpdateIdImport;
 pub(crate) type nativeMonitorUpdateId = nativeMonitorUpdateIdImport;
@@ -122,23 +135,58 @@ pub extern "C" fn MonitorUpdateId_eq(a: &MonitorUpdateId, b: &MonitorUpdateId) -
 /// `Persist` defines behavior for persisting channel monitors: this could mean
 /// writing once to disk, and/or uploading to one or more backup services.
 ///
-/// Each method can return three possible values:
-///  * If persistence (including any relevant `fsync()` calls) happens immediately, the
-///    implementation should return [`ChannelMonitorUpdateStatus::Completed`], indicating normal
-///    channel operation should continue.
-///  * If persistence happens asynchronously, implementations should first ensure the
-///    [`ChannelMonitor`] or [`ChannelMonitorUpdate`] are written durably to disk, and then return
-///    [`ChannelMonitorUpdateStatus::InProgress`] while the update continues in the background.
-///    Once the update completes, [`ChainMonitor::channel_monitor_updated`] should be called with
-///    the corresponding [`MonitorUpdateId`].
+/// Persistence can happen in one of two ways - synchronously completing before the trait method
+/// calls return or asynchronously in the background.
 ///
-///    Note that unlike the direct [`chain::Watch`] interface,
-///    [`ChainMonitor::channel_monitor_updated`] must be called once for *each* update which occurs.
+/// # For those implementing synchronous persistence
 ///
-///  * If persistence fails for some reason, implementations should return
-///    [`ChannelMonitorUpdateStatus::PermanentFailure`], in which case the channel will likely be
-///    closed without broadcasting the latest state. See
-///    [`ChannelMonitorUpdateStatus::PermanentFailure`] for more details.
+///  * If persistence completes fully (including any relevant `fsync()` calls), the implementation
+///    should return [`ChannelMonitorUpdateStatus::Completed`], indicating normal channel operation
+///    should continue.
+///
+///  * If persistence fails for some reason, implementations should consider returning
+///    [`ChannelMonitorUpdateStatus::InProgress`] and retry all pending persistence operations in
+///    the background with [`ChainMonitor::list_pending_monitor_updates`] and
+///    [`ChainMonitor::get_monitor`].
+///
+///    Once a full [`ChannelMonitor`] has been persisted, all pending updates for that channel can
+///    be marked as complete via [`ChainMonitor::channel_monitor_updated`].
+///
+///    If at some point no further progress can be made towards persisting the pending updates, the
+///    node should simply shut down.
+///
+///  * If the persistence has failed and cannot be retried further (e.g. because of an outage),
+///    [`ChannelMonitorUpdateStatus::UnrecoverableError`] can be used, though this will result in
+///    an immediate panic and future operations in LDK generally failing.
+///
+/// # For those implementing asynchronous persistence
+///
+///  All calls should generally spawn a background task and immediately return
+///  [`ChannelMonitorUpdateStatus::InProgress`]. Once the update completes,
+///  [`ChainMonitor::channel_monitor_updated`] should be called with the corresponding
+///  [`MonitorUpdateId`].
+///
+///  Note that unlike the direct [`chain::Watch`] interface,
+///  [`ChainMonitor::channel_monitor_updated`] must be called once for *each* update which occurs.
+///
+///  If at some point no further progress can be made towards persisting a pending update, the node
+///  should simply shut down. Until then, the background task should either loop indefinitely, or
+///  persistence should be regularly retried with [`ChainMonitor::list_pending_monitor_updates`]
+///  and [`ChainMonitor::get_monitor`] (note that if a full monitor is persisted all pending
+///  monitor updates may be marked completed).
+///
+/// # Using remote watchtowers
+///
+/// Watchtowers may be updated as a part of an implementation of this trait, utilizing the async
+/// update process described above while the watchtower is being updated. The following methods are
+/// provided for bulding transactions for a watchtower:
+/// [`ChannelMonitor::initial_counterparty_commitment_tx`],
+/// [`ChannelMonitor::counterparty_commitment_txs_from_update`],
+/// [`ChannelMonitor::sign_to_local_justice_tx`], [`TrustedCommitmentTransaction::revokeable_output_index`],
+/// [`TrustedCommitmentTransaction::build_to_local_justice_tx`].
+///
+/// [`TrustedCommitmentTransaction::revokeable_output_index`]: crate::ln::chan_utils::TrustedCommitmentTransaction::revokeable_output_index
+/// [`TrustedCommitmentTransaction::build_to_local_justice_tx`]: crate::ln::chan_utils::TrustedCommitmentTransaction::build_to_local_justice_tx
 #[repr(C)]
 pub struct Persist {
 	/// An opaque pointer which is passed to your function implementations as an argument.
@@ -167,8 +215,8 @@ pub struct Persist {
 	/// updated monitor itself to disk/backups. See the [`Persist`] trait documentation for more
 	/// details.
 	///
-	/// During blockchain synchronization operations, this may be called with no
-	/// [`ChannelMonitorUpdate`], in which case the full [`ChannelMonitor`] needs to be persisted.
+	/// During blockchain synchronization operations, and in some rare cases, this may be called with
+	/// no [`ChannelMonitorUpdate`], in which case the full [`ChannelMonitor`] needs to be persisted.
 	/// Note that after the full [`ChannelMonitor`] is persisted any previous
 	/// [`ChannelMonitorUpdate`]s which were persisted should be discarded - they can no longer be
 	/// applied to the persisted [`ChannelMonitor`] as they were already applied.
@@ -202,8 +250,7 @@ pub struct Persist {
 }
 unsafe impl Send for Persist {}
 unsafe impl Sync for Persist {}
-#[no_mangle]
-pub(crate) extern "C" fn Persist_clone_fields(orig: &Persist) -> Persist {
+pub(crate) fn Persist_clone_fields(orig: &Persist) -> Persist {
 	Persist {
 		this_arg: orig.this_arg,
 		persist_new_channel: Clone::clone(&orig.persist_new_channel),
@@ -230,6 +277,11 @@ impl rustPersist<crate::lightning::sign::WriteableEcdsaChannelSigner> for Persis
 impl core::ops::Deref for Persist {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for Persist {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }
@@ -545,9 +597,9 @@ extern "C" fn ChainMonitor_Confirm_best_block_updated(this_arg: *const c_void, h
 	<nativeChainMonitor as lightning::chain::Confirm<>>::best_block_updated(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height)
 }
 #[must_use]
-extern "C" fn ChainMonitor_Confirm_get_relevant_txids(this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_TxidCOption_BlockHashZZZ {
+extern "C" fn ChainMonitor_Confirm_get_relevant_txids(this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_ThirtyTwoBytesCOption_ThirtyTwoBytesZZZ {
 	let mut ret = <nativeChainMonitor as lightning::chain::Confirm<>>::get_relevant_txids(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = if orig_ret_0_1.is_none() { crate::c_types::derived::COption_BlockHashZ::None } else { crate::c_types::derived::COption_BlockHashZ::Some( { crate::c_types::ThirtyTwoBytes { data: orig_ret_0_1.unwrap().into_inner() } }) }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1).into(); local_ret_0 }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = if orig_ret_0_1.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some( { crate::c_types::ThirtyTwoBytes { data: orig_ret_0_1.unwrap().into_inner() } }) }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1).into(); local_ret_0 }); };
 	local_ret.into()
 }
 
@@ -575,9 +627,10 @@ pub extern "C" fn ChainMonitor_as_Watch(this_arg: &ChainMonitor) -> crate::light
 }
 
 #[must_use]
-extern "C" fn ChainMonitor_Watch_watch_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, mut monitor: crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::lightning::chain::ChannelMonitorUpdateStatus {
+extern "C" fn ChainMonitor_Watch_watch_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, mut monitor: crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CResult_ChannelMonitorUpdateStatusNoneZ {
 	let mut ret = <nativeChainMonitor as lightning::chain::Watch<_>>::watch_channel(unsafe { &mut *(this_arg as *mut nativeChainMonitor) }, *unsafe { Box::from_raw(funding_txo.take_inner()) }, *unsafe { Box::from_raw(monitor.take_inner()) });
-	crate::lightning::chain::ChannelMonitorUpdateStatus::native_into(ret)
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::chain::ChannelMonitorUpdateStatus::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
 }
 #[must_use]
 extern "C" fn ChainMonitor_Watch_update_channel(this_arg: *const c_void, mut funding_txo: crate::lightning::chain::transaction::OutPoint, update: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate) -> crate::lightning::chain::ChannelMonitorUpdateStatus {

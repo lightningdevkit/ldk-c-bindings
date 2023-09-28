@@ -351,6 +351,21 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 									if path != "std::ops::Deref" && path != "core::ops::Deref" &&
 									path != "std::ops::DerefMut" && path != "core::ops::DerefMut" {
 										self.typed_generics.insert(&t.ident, path);
+									} else {
+										let last_seg_args = &tr.path.segments.last().unwrap().arguments;
+										if let syn::PathArguments::AngleBracketed(args) = last_seg_args {
+											assert_eq!(args.args.len(), 1);
+											if let syn::GenericArgument::Binding(binding) = &args.args[0] {
+												assert_eq!(format!("{}", binding.ident), "Target");
+												if let syn::Type::Path(p) = &binding.ty {
+													// Note that we are assuming the order of type
+													// declarations here, but that should be easy
+													// to handle.
+													let real_path = self.maybe_resolve_path(&p.path).unwrap();
+													self.typed_generics.insert(&t.ident, real_path.clone());
+												} else { unimplemented!(); }
+											} else { unimplemented!(); }
+										} else { unimplemented!(); }
 									}
 								} else { unimplemented!(); }
 								for bound in bounds_iter {
@@ -670,6 +685,33 @@ impl<'mod_lifetime, 'crate_lft: 'mod_lifetime> ImportResolver<'mod_lifetime, 'cr
 
 	pub fn maybe_resolve_path(&self, p: &syn::Path, generics: Option<&GenericTypes>) -> Option<String> {
 		self.maybe_resolve_imported_path(p, generics).map(|mut path| {
+			if path == "core::ops::Deref" || path == "core::ops::DerefMut" {
+				let last_seg = p.segments.last().unwrap();
+				if let syn::PathArguments::AngleBracketed(args) = &last_seg.arguments {
+					assert_eq!(args.args.len(), 1);
+					if let syn::GenericArgument::Binding(binding) = &args.args[0] {
+						if let syn::Type::Path(p) = &binding.ty {
+							if let Some(inner_ty) = self.maybe_resolve_path(&p.path, generics) {
+								let mut module_riter = inner_ty.rsplitn(2, "::");
+								let ty_ident = module_riter.next().unwrap();
+								let module_name = module_riter.next().unwrap();
+								let module = self.library.modules.get(module_name).unwrap();
+								for item in module.items.iter() {
+									match item {
+										syn::Item::Trait(t) => {
+											if t.ident == ty_ident {
+												path = inner_ty;
+												break;
+											}
+										},
+										_ => {}
+									}
+								}
+							}
+						} else { unimplemented!(); }
+					} else { unimplemented!(); }
+				}
+			}
 			loop {
 				// Now that we've resolved the path to the path as-imported, check whether the path
 				// is actually a pub(.*) use statement and map it to the real path.

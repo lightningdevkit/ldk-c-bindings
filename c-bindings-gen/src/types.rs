@@ -225,7 +225,8 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								if path == "Sized" { continue; }
 								if non_lifetimes_processed { return false; }
 								non_lifetimes_processed = true;
-								if path != "std::ops::Deref" && path != "core::ops::Deref" {
+								if path != "std::ops::Deref" && path != "core::ops::Deref" &&
+									path != "std::ops::DerefMut" && path != "core::ops::DerefMut"  {
 									let p = string_path_to_syn_path(&path);
 									let ref_ty = parse_quote!(&#p);
 									let mut_ref_ty = parse_quote!(&mut #p);
@@ -347,7 +348,8 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 									// implement Deref<Target=Self> for relevant types). We don't
 									// bother to implement it for associated types, however, so we just
 									// ignore such bounds.
-									if path != "std::ops::Deref" && path != "core::ops::Deref" {
+									if path != "std::ops::Deref" && path != "core::ops::Deref" &&
+									path != "std::ops::DerefMut" && path != "core::ops::DerefMut" {
 										self.typed_generics.insert(&t.ident, path);
 									}
 								} else { unimplemented!(); }

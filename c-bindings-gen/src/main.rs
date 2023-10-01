@@ -812,6 +812,19 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 	if all_fields_settable {
 		// Build a constructor!
 		writeln!(w, "/// Constructs a new {} given each field", struct_name).unwrap();
+		match &s.fields {
+			syn::Fields::Named(fields) => {
+				writeln_arg_docs(w, &[], "", types, Some(&gen_types),
+					fields.named.iter().map(|field| (format!("{}_arg", field.ident.as_ref().unwrap()), &field.ty)),
+					None);
+			},
+			syn::Fields::Unnamed(fields) => {
+				writeln_arg_docs(w, &[], "", types, Some(&gen_types),
+					fields.unnamed.iter().enumerate().map(|(idx, field)| (format!("{}_arg", ('a' as u8 + idx as u8)), &field.ty)),
+					None);
+			},
+			syn::Fields::Unit => {},
+		}
 		write!(w, "#[must_use]\n#[no_mangle]\npub extern \"C\" fn {}_new(", struct_name).unwrap();
 
 		match &s.fields {

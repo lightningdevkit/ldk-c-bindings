@@ -554,8 +554,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap();
 	writeln!(w, "unsafe impl Sync for {} {{}}", trait_name).unwrap();
 
-	writeln!(w, "#[no_mangle]").unwrap();
-	writeln!(w, "pub(crate) extern \"C\" fn {}_clone_fields(orig: &{}) -> {} {{", trait_name, trait_name, trait_name).unwrap();
+	writeln!(w, "pub(crate) fn {}_clone_fields(orig: &{}) -> {} {{", trait_name, trait_name, trait_name).unwrap();
 	writeln!(w, "\t{} {{", trait_name).unwrap();
 	writeln!(w, "\t\tthis_arg: orig.this_arg,").unwrap();
 	for (field, clone_fn, _) in generated_fields.iter() {

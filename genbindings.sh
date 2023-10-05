@@ -353,13 +353,33 @@ if [ "$2" = "true" ]; then
 	ls -lha a.out
 fi
 
+function REALLY_PIN_CC {
+	# -Zbuild-std fails if we have any dependencies of build-deps, which
+	# cc added in 1.0.80, thus we pin back to 1.0.79 to avoid that.
+	cargo update -p cc --precise "1.0.79" --verbose
+	( cargo build --features=std -v --release -Zbuild-std=std,panic_abort > /dev/null 2>&1 ) || echo -n
+	( cargo build --features=std -v --release --target aarch64-apple-darwin -Zbuild-std=std,panic_abort > /dev/null 2>&1 ) || echo -n
+	# Sadly, std also depends on cc, and we can't pin it in that tree
+	# directly. Instead, we have to delete the file out of the cargo
+	# registry and build --offline to avoid it using the latest version.
+	NEW_CC_DEP="$CARGO_HOME"
+	[ "$NEW_CC_DEP" = "" ] && NEW_CC_DEP="$HOME"
+	if [ -f "$NEW_CC_DEP/.cargo/registry/cache/github.com-"*/cc-1.0.79.crate ]; then
+		mv "$NEW_CC_DEP/.cargo/registry/cache/github.com-"*/cc-1.0.79.crate ./
+	fi
+	rm -f "$NEW_CC_DEP/.cargo/registry/cache/github.com-"*/cc-*.crate
+	[ -f ./cc-1.0.79.crate ] && mv ./cc-1.0.79.crate "$NEW_CC_DEP/.cargo/registry/cache/github.com-"*/
+}
+
 # Then, check with memory sanitizer, if we're on Linux and have rustc nightly
 if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" ]; then
 	if cargo +nightly --version >/dev/null 2>&1; then
 		LLVM_V=$(rustc +nightly --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 2); }')
 		if [ -x "$(which clang-$LLVM_V)" ]; then
 			cargo +nightly clean
-			cargo +nightly rustc $CARGO_BUILD_ARGS -Zbuild-std=std,panic_abort --target x86_64-unknown-linux-gnu -v -- -Zsanitizer=memory -Zsanitizer-memory-track-origins -Cforce-frame-pointers=yes
+
+			REALLY_PIN_CC
+			cargo +nightly rustc --offline $CARGO_BUILD_ARGS -Zbuild-std=std,panic_abort --target x86_64-unknown-linux-gnu -v -- -Zsanitizer=memory -Zsanitizer-memory-track-origins -Cforce-frame-pointers=yes
 			mv target/x86_64-unknown-linux-gnu/debug/libldk.* target/debug/
 
 			# Sadly, std doesn't seem to compile into something that is memsan-safe as of Aug 2020,
@@ -552,12 +572,13 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 	LINK_ARG_FLAGS="-C link-arg=-fuse-ld=$LLD"
 	export LDK_CLANG_PATH=$(which $CLANG)
 	if [ "$MACOS_SDK" != "" ]; then
+		REALLY_PIN_CC
 		export CLANG="$(pwd)/../deterministic-build-wrappers/clang-lto-link-osx"
 		for ARG in $CFLAGS_aarch64_apple_darwin; do
 			MANUAL_LINK_CFLAGS="$MANUAL_LINK_CFLAGS -C link-arg=$ARG"
 		done
 		export CFLAGS_aarch64_apple_darwin="$CFLAGS_aarch64_apple_darwin -O3 -fPIC -fembed-bitcode"
-		RUSTC_BOOTSTRAP=1 RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14 -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $MANUAL_LINK_CFLAGS $LINK_ARG_FLAGS -C link-arg=-mcpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target aarch64-apple-darwin -Zbuild-std=std,panic_abort
+		RUSTC_BOOTSTRAP=1 RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14 -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $MANUAL_LINK_CFLAGS $LINK_ARG_FLAGS -C link-arg=-mcpu=apple-a14" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS --offline -v --release --target aarch64-apple-darwin -Zbuild-std=std,panic_abort
 		if [ "$HOST_OSX" != "true" ]; then
 			# If we're not on OSX but can build OSX binaries, build the x86_64 OSX release now
 			MANUAL_LINK_CFLAGS=""
@@ -565,7 +586,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 				MANUAL_LINK_CFLAGS="$MANUAL_LINK_CFLAGS -C link-arg=$ARG"
 			done
 			export CFLAGS_x86_64_apple_darwin="$CFLAGS_x86_64_apple_darwin -O3 -fPIC -fembed-bitcode"
-			RUSTC_BOOTSTRAP=1 RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $MANUAL_LINK_CFLAGS $LINK_ARG_FLAGS -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target x86_64-apple-darwin -Zbuild-std=std,panic_abort
+			RUSTC_BOOTSTRAP=1 RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $MANUAL_LINK_CFLAGS $LINK_ARG_FLAGS -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS --offline -v --release --target x86_64-apple-darwin -Zbuild-std=std,panic_abort
 		fi
 	fi
 	# If we're on an M1 don't bother building X86 binaries

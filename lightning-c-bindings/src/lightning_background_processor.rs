@@ -11,6 +11,7 @@
 //! [`BackgroundProcessor`] for more details on the nitty-gritty.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -227,7 +228,7 @@ pub extern "C" fn BackgroundProcessor_start(mut persister: crate::lightning::uti
 /// [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BackgroundProcessor_join(mut this_arg: crate::lightning_background_processor::BackgroundProcessor) -> crate::c_types::derived::CResult_NoneErrorZ {
+pub extern "C" fn BackgroundProcessor_join(mut this_arg: crate::lightning_background_processor::BackgroundProcessor) -> crate::c_types::derived::CResult_NoneIOErrorZ {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).join();
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
 	local_ret
@@ -244,7 +245,7 @@ pub extern "C" fn BackgroundProcessor_join(mut this_arg: crate::lightning_backgr
 /// [`ChannelManager`]: lightning::ln::channelmanager::ChannelManager
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BackgroundProcessor_stop(mut this_arg: crate::lightning_background_processor::BackgroundProcessor) -> crate::c_types::derived::CResult_NoneErrorZ {
+pub extern "C" fn BackgroundProcessor_stop(mut this_arg: crate::lightning_background_processor::BackgroundProcessor) -> crate::c_types::derived::CResult_NoneIOErrorZ {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).stop();
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
 	local_ret

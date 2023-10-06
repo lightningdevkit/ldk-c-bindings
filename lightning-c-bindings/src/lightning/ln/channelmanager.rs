@@ -17,6 +17,7 @@
 //! imply it needs to fail HTLCs/payments/channels it manages).
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -43,6 +44,13 @@ pub enum FailureCode {
 	/// Using this failure code in [`ChannelManager::fail_htlc_backwards_with_reason`] is
 	/// equivalent to calling [`ChannelManager::fail_htlc_backwards`].
 	IncorrectOrUnknownPaymentDetails,
+	/// We failed to process the payload after the onion was decrypted. You may wish to
+	/// use this when receiving custom HTLC TLVs with even type numbers that you don't recognize.
+	///
+	/// If available, the tuple data may include the type number and byte offset in the
+	/// decrypted byte stream where the failure occurred.
+	InvalidOnionPayload(
+		crate::c_types::derived::COption_C2Tuple_u64u16ZZ),
 }
 use lightning::ln::channelmanager::FailureCode as FailureCodeImport;
 pub(crate) type nativeFailureCode = FailureCodeImport;
@@ -54,6 +62,13 @@ impl FailureCode {
 			FailureCode::TemporaryNodeFailure => nativeFailureCode::TemporaryNodeFailure,
 			FailureCode::RequiredNodeFeatureMissing => nativeFailureCode::RequiredNodeFeatureMissing,
 			FailureCode::IncorrectOrUnknownPaymentDetails => nativeFailureCode::IncorrectOrUnknownPaymentDetails,
+			FailureCode::InvalidOnionPayload (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				let mut local_a_nonref = if a_nonref.is_some() { Some( { let (mut orig_a_nonref_0_0, mut orig_a_nonref_0_1) = a_nonref.take().to_rust(); let mut local_a_nonref_0 = (orig_a_nonref_0_0, orig_a_nonref_0_1); local_a_nonref_0 }) } else { None };
+				nativeFailureCode::InvalidOnionPayload (
+					local_a_nonref,
+				)
+			},
 		}
 	}
 	#[allow(unused)]
@@ -62,6 +77,12 @@ impl FailureCode {
 			FailureCode::TemporaryNodeFailure => nativeFailureCode::TemporaryNodeFailure,
 			FailureCode::RequiredNodeFeatureMissing => nativeFailureCode::RequiredNodeFeatureMissing,
 			FailureCode::IncorrectOrUnknownPaymentDetails => nativeFailureCode::IncorrectOrUnknownPaymentDetails,
+			FailureCode::InvalidOnionPayload (mut a, ) => {
+				let mut local_a = if a.is_some() { Some( { let (mut orig_a_0_0, mut orig_a_0_1) = a.take().to_rust(); let mut local_a_0 = (orig_a_0_0, orig_a_0_1); local_a_0 }) } else { None };
+				nativeFailureCode::InvalidOnionPayload (
+					local_a,
+				)
+			},
 		}
 	}
 	#[allow(unused)]
@@ -70,6 +91,13 @@ impl FailureCode {
 			nativeFailureCode::TemporaryNodeFailure => FailureCode::TemporaryNodeFailure,
 			nativeFailureCode::RequiredNodeFeatureMissing => FailureCode::RequiredNodeFeatureMissing,
 			nativeFailureCode::IncorrectOrUnknownPaymentDetails => FailureCode::IncorrectOrUnknownPaymentDetails,
+			nativeFailureCode::InvalidOnionPayload (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				let mut local_a_nonref = if a_nonref.is_none() { crate::c_types::derived::COption_C2Tuple_u64u16ZZ::None } else { crate::c_types::derived::COption_C2Tuple_u64u16ZZ::Some( { let (mut orig_a_nonref_0_0, mut orig_a_nonref_0_1) = (a_nonref.unwrap()); let mut local_a_nonref_0 = (orig_a_nonref_0_0, orig_a_nonref_0_1).into(); local_a_nonref_0 }) };
+				FailureCode::InvalidOnionPayload (
+					local_a_nonref,
+				)
+			},
 		}
 	}
 	#[allow(unused)]
@@ -78,9 +106,18 @@ impl FailureCode {
 			nativeFailureCode::TemporaryNodeFailure => FailureCode::TemporaryNodeFailure,
 			nativeFailureCode::RequiredNodeFeatureMissing => FailureCode::RequiredNodeFeatureMissing,
 			nativeFailureCode::IncorrectOrUnknownPaymentDetails => FailureCode::IncorrectOrUnknownPaymentDetails,
+			nativeFailureCode::InvalidOnionPayload (mut a, ) => {
+				let mut local_a = if a.is_none() { crate::c_types::derived::COption_C2Tuple_u64u16ZZ::None } else { crate::c_types::derived::COption_C2Tuple_u64u16ZZ::Some( { let (mut orig_a_0_0, mut orig_a_0_1) = (a.unwrap()); let mut local_a_0 = (orig_a_0_0, orig_a_0_1).into(); local_a_0 }) };
+				FailureCode::InvalidOnionPayload (
+					local_a,
+				)
+			},
 		}
 	}
 }
+/// Frees any resources used by the FailureCode
+#[no_mangle]
+pub extern "C" fn FailureCode_free(this_ptr: FailureCode) { }
 /// Creates a copy of the FailureCode
 #[no_mangle]
 pub extern "C" fn FailureCode_clone(orig: &FailureCode) -> FailureCode {
@@ -98,6 +135,11 @@ pub extern "C" fn FailureCode_required_node_feature_missing() -> FailureCode {
 /// Utility method to constructs a new IncorrectOrUnknownPaymentDetails-variant FailureCode
 pub extern "C" fn FailureCode_incorrect_or_unknown_payment_details() -> FailureCode {
 	FailureCode::IncorrectOrUnknownPaymentDetails}
+#[no_mangle]
+/// Utility method to constructs a new InvalidOnionPayload-variant FailureCode
+pub extern "C" fn FailureCode_invalid_onion_payload(a: crate::c_types::derived::COption_C2Tuple_u64u16ZZ) -> FailureCode {
+	FailureCode::InvalidOnionPayload(a, )
+}
 
 use lightning::ln::channelmanager::ChannelManager as nativeChannelManagerImport;
 pub(crate) type nativeChannelManager = nativeChannelManagerImport<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>;
@@ -114,12 +156,14 @@ pub(crate) type nativeChannelManager = nativeChannelManagerImport<crate::lightni
 /// called [`funding_transaction_generated`] for outbound channels) being closed.
 ///
 /// Note that you can be a bit lazier about writing out `ChannelManager` than you can be with
-/// [`ChannelMonitor`]. With [`ChannelMonitor`] you MUST write each monitor update out to disk before
-/// returning from [`chain::Watch::watch_channel`]/[`update_channel`], with ChannelManagers, writing updates
-/// happens out-of-band (and will prevent any other `ChannelManager` operations from occurring during
-/// the serialization process). If the deserialized version is out-of-date compared to the
-/// [`ChannelMonitor`] passed by reference to [`read`], those channels will be force-closed based on the
-/// `ChannelMonitor` state and no funds will be lost (mod on-chain transaction fees).
+/// [`ChannelMonitor`]. With [`ChannelMonitor`] you MUST durably write each
+/// [`ChannelMonitorUpdate`] before returning from
+/// [`chain::Watch::watch_channel`]/[`update_channel`] or before completing async writes. With
+/// `ChannelManager`s, writing updates happens out-of-band (and will prevent any other
+/// `ChannelManager` operations from occurring during the serialization process). If the
+/// deserialized version is out-of-date compared to the [`ChannelMonitor`] passed by reference to
+/// [`read`], those channels will be force-closed based on the `ChannelMonitor` state and no funds
+/// will be lost (modulo on-chain transaction fees).
 ///
 /// Note that the deserializer is only implemented for `(`[`BlockHash`]`, `[`ChannelManager`]`)`, which
 /// tells you the last block hash which was connected. You should get the best block tip before using the manager.
@@ -601,6 +645,8 @@ pub extern "C" fn ChannelCounterparty_set_outbound_htlc_maximum_msat(this_ptr: &
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.outbound_htlc_maximum_msat = local_val;
 }
 /// Constructs a new ChannelCounterparty given each field
+///
+/// Note that forwarding_info_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelCounterparty_new(mut node_id_arg: crate::c_types::PublicKey, mut features_arg: crate::lightning::ln::features::InitFeatures, mut unspendable_punishment_reserve_arg: u64, mut forwarding_info_arg: crate::lightning::ln::channelmanager::CounterpartyForwardingInfo, mut outbound_htlc_minimum_msat_arg: crate::c_types::derived::COption_u64Z, mut outbound_htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z) -> ChannelCounterparty {
@@ -693,7 +739,7 @@ impl ChannelDetails {
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_channel_id(this_ptr: &ChannelDetails) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
-	inner_val
+	&inner_val.0
 }
 /// The channel's ID (prior to funding transaction generation, this is a random 32 bytes,
 /// thereafter this is the txid of the funding transaction xor the funding transaction output).
@@ -701,7 +747,7 @@ pub extern "C" fn ChannelDetails_get_channel_id(this_ptr: &ChannelDetails) -> *c
 /// lifetime of the channel.
 #[no_mangle]
 pub extern "C" fn ChannelDetails_set_channel_id(this_ptr: &mut ChannelDetails, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = val.data;
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
 }
 /// Parameters which apply to our counterparty. See individual fields for more information.
 #[no_mangle]
@@ -897,17 +943,29 @@ pub extern "C" fn ChannelDetails_set_unspendable_punishment_reserve(this_ptr: &m
 	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.unspendable_punishment_reserve = local_val;
 }
-/// The `user_channel_id` passed in to create_channel, or a random value if the channel was
-/// inbound. This may be zero for inbound channels serialized with LDK versions prior to
-/// 0.0.113.
+/// The `user_channel_id` value passed in to [`ChannelManager::create_channel`] for outbound
+/// channels, or to [`ChannelManager::accept_inbound_channel`] for inbound channels if
+/// [`UserConfig::manually_accept_inbound_channels`] config flag is set to true. Otherwise
+/// `user_channel_id` will be randomized for an inbound channel.  This may be zero for objects
+/// serialized with LDK versions prior to 0.0.113.
+///
+/// [`ChannelManager::create_channel`]: crate::ln::channelmanager::ChannelManager::create_channel
+/// [`ChannelManager::accept_inbound_channel`]: crate::ln::channelmanager::ChannelManager::accept_inbound_channel
+/// [`UserConfig::manually_accept_inbound_channels`]: crate::util::config::UserConfig::manually_accept_inbound_channels
 #[no_mangle]
 pub extern "C" fn ChannelDetails_get_user_channel_id(this_ptr: &ChannelDetails) -> crate::c_types::U128 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().user_channel_id;
 	inner_val.into()
 }
-/// The `user_channel_id` passed in to create_channel, or a random value if the channel was
-/// inbound. This may be zero for inbound channels serialized with LDK versions prior to
-/// 0.0.113.
+/// The `user_channel_id` value passed in to [`ChannelManager::create_channel`] for outbound
+/// channels, or to [`ChannelManager::accept_inbound_channel`] for inbound channels if
+/// [`UserConfig::manually_accept_inbound_channels`] config flag is set to true. Otherwise
+/// `user_channel_id` will be randomized for an inbound channel.  This may be zero for objects
+/// serialized with LDK versions prior to 0.0.113.
+///
+/// [`ChannelManager::create_channel`]: crate::ln::channelmanager::ChannelManager::create_channel
+/// [`ChannelManager::accept_inbound_channel`]: crate::ln::channelmanager::ChannelManager::accept_inbound_channel
+/// [`UserConfig::manually_accept_inbound_channels`]: crate::util::config::UserConfig::manually_accept_inbound_channels
 #[no_mangle]
 pub extern "C" fn ChannelDetails_set_user_channel_id(this_ptr: &mut ChannelDetails, mut val: crate::c_types::U128) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.user_channel_id = val.into();
@@ -1260,6 +1318,10 @@ pub extern "C" fn ChannelDetails_set_config(this_ptr: &mut ChannelDetails, mut v
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.config = local_val;
 }
 /// Constructs a new ChannelDetails given each field
+///
+/// Note that funding_txo_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
+/// Note that channel_type_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
+/// Note that config_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelDetails_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut counterparty_arg: crate::lightning::ln::channelmanager::ChannelCounterparty, mut funding_txo_arg: crate::lightning::chain::transaction::OutPoint, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures, mut short_channel_id_arg: crate::c_types::derived::COption_u64Z, mut outbound_scid_alias_arg: crate::c_types::derived::COption_u64Z, mut inbound_scid_alias_arg: crate::c_types::derived::COption_u64Z, mut channel_value_satoshis_arg: u64, mut unspendable_punishment_reserve_arg: crate::c_types::derived::COption_u64Z, mut user_channel_id_arg: crate::c_types::U128, mut feerate_sat_per_1000_weight_arg: crate::c_types::derived::COption_u32Z, mut balance_msat_arg: u64, mut outbound_capacity_msat_arg: u64, mut next_outbound_htlc_limit_msat_arg: u64, mut next_outbound_htlc_minimum_msat_arg: u64, mut inbound_capacity_msat_arg: u64, mut confirmations_required_arg: crate::c_types::derived::COption_u32Z, mut confirmations_arg: crate::c_types::derived::COption_u32Z, mut force_close_spend_delay_arg: crate::c_types::derived::COption_u16Z, mut is_outbound_arg: bool, mut is_channel_ready_arg: bool, mut channel_shutdown_state_arg: crate::c_types::derived::COption_ChannelShutdownStateZ, mut is_usable_arg: bool, mut is_public_arg: bool, mut inbound_htlc_minimum_msat_arg: crate::c_types::derived::COption_u64Z, mut inbound_htlc_maximum_msat_arg: crate::c_types::derived::COption_u64Z, mut config_arg: crate::lightning::util::config::ChannelConfig) -> ChannelDetails {
@@ -1278,7 +1340,7 @@ pub extern "C" fn ChannelDetails_new(mut channel_id_arg: crate::c_types::ThirtyT
 	let mut local_inbound_htlc_maximum_msat_arg = if inbound_htlc_maximum_msat_arg.is_some() { Some( { inbound_htlc_maximum_msat_arg.take() }) } else { None };
 	let mut local_config_arg = if config_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(config_arg.take_inner()) } }) };
 	ChannelDetails { inner: ObjOps::heap_alloc(nativeChannelDetails {
-		channel_id: channel_id_arg.data,
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		counterparty: *unsafe { Box::from_raw(counterparty_arg.take_inner()) },
 		funding_txo: local_funding_txo_arg,
 		channel_type: local_channel_type_arg,
@@ -1459,8 +1521,17 @@ pub extern "C" fn ChannelShutdownState_eq(a: &ChannelShutdownState, b: &ChannelS
 #[must_use]
 #[repr(C)]
 pub enum RecentPaymentDetails {
+	/// When an invoice was requested and thus a payment has not yet been sent.
+	AwaitingInvoice {
+		/// A user-provided identifier in [`ChannelManager::send_payment`] used to uniquely identify
+		/// a payment and ensure idempotency in LDK.
+		payment_id: crate::c_types::ThirtyTwoBytes,
+	},
 	/// When a payment is still being sent and awaiting successful delivery.
 	Pending {
+		/// A user-provided identifier in [`ChannelManager::send_payment`] used to uniquely identify
+		/// a payment and ensure idempotency in LDK.
+		payment_id: crate::c_types::ThirtyTwoBytes,
 		/// Hash of the payment that is currently being sent but has yet to be fulfilled or
 		/// abandoned.
 		payment_hash: crate::c_types::ThirtyTwoBytes,
@@ -1472,14 +1543,20 @@ pub enum RecentPaymentDetails {
 	/// been resolved. Upon receiving [`Event::PaymentSent`], we delay for a few minutes before the
 	/// payment is removed from tracking.
 	Fulfilled {
+		/// A user-provided identifier in [`ChannelManager::send_payment`] used to uniquely identify
+		/// a payment and ensure idempotency in LDK.
+		payment_id: crate::c_types::ThirtyTwoBytes,
 		/// Hash of the payment that was claimed. `None` for serializations of [`ChannelManager`]
 		/// made before LDK version 0.0.104.
-		payment_hash: crate::c_types::derived::COption_PaymentHashZ,
+		payment_hash: crate::c_types::derived::COption_ThirtyTwoBytesZ,
 	},
 	/// After a payment's retries are exhausted per the provided [`Retry`], or it is explicitly
 	/// abandoned via [`ChannelManager::abandon_payment`], it is marked as abandoned until all
 	/// pending HTLCs for this payment resolve and an [`Event::PaymentFailed`] is generated.
 	Abandoned {
+		/// A user-provided identifier in [`ChannelManager::send_payment`] used to uniquely identify
+		/// a payment and ensure idempotency in LDK.
+		payment_id: crate::c_types::ThirtyTwoBytes,
 		/// Hash of the payment that we have given up trying to send.
 		payment_hash: crate::c_types::ThirtyTwoBytes,
 	},
@@ -1491,24 +1568,36 @@ impl RecentPaymentDetails {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeRecentPaymentDetails {
 		match self {
-			RecentPaymentDetails::Pending {ref payment_hash, ref total_msat, } => {
+			RecentPaymentDetails::AwaitingInvoice {ref payment_id, } => {
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				nativeRecentPaymentDetails::AwaitingInvoice {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
+				}
+			},
+			RecentPaymentDetails::Pending {ref payment_id, ref payment_hash, ref total_msat, } => {
+				let mut payment_id_nonref = Clone::clone(payment_id);
 				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				let mut total_msat_nonref = Clone::clone(total_msat);
 				nativeRecentPaymentDetails::Pending {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 					total_msat: total_msat_nonref,
 				}
 			},
-			RecentPaymentDetails::Fulfilled {ref payment_hash, } => {
+			RecentPaymentDetails::Fulfilled {ref payment_id, ref payment_hash, } => {
+				let mut payment_id_nonref = Clone::clone(payment_id);
 				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				let mut local_payment_hash_nonref = { /*payment_hash_nonref*/ let payment_hash_nonref_opt = payment_hash_nonref; if payment_hash_nonref_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentHash({ payment_hash_nonref_opt.take() }.data) }})} };
 				nativeRecentPaymentDetails::Fulfilled {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
 					payment_hash: local_payment_hash_nonref,
 				}
 			},
-			RecentPaymentDetails::Abandoned {ref payment_hash, } => {
+			RecentPaymentDetails::Abandoned {ref payment_id, ref payment_hash, } => {
+				let mut payment_id_nonref = Clone::clone(payment_id);
 				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				nativeRecentPaymentDetails::Abandoned {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash_nonref.data),
 				}
 			},
@@ -1517,20 +1606,28 @@ impl RecentPaymentDetails {
 	#[allow(unused)]
 	pub(crate) fn into_native(self) -> nativeRecentPaymentDetails {
 		match self {
-			RecentPaymentDetails::Pending {mut payment_hash, mut total_msat, } => {
+			RecentPaymentDetails::AwaitingInvoice {mut payment_id, } => {
+				nativeRecentPaymentDetails::AwaitingInvoice {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id.data),
+				}
+			},
+			RecentPaymentDetails::Pending {mut payment_id, mut payment_hash, mut total_msat, } => {
 				nativeRecentPaymentDetails::Pending {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id.data),
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
 					total_msat: total_msat,
 				}
 			},
-			RecentPaymentDetails::Fulfilled {mut payment_hash, } => {
+			RecentPaymentDetails::Fulfilled {mut payment_id, mut payment_hash, } => {
 				let mut local_payment_hash = { /*payment_hash*/ let payment_hash_opt = payment_hash; if payment_hash_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentHash({ payment_hash_opt.take() }.data) }})} };
 				nativeRecentPaymentDetails::Fulfilled {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id.data),
 					payment_hash: local_payment_hash,
 				}
 			},
-			RecentPaymentDetails::Abandoned {mut payment_hash, } => {
+			RecentPaymentDetails::Abandoned {mut payment_id, mut payment_hash, } => {
 				nativeRecentPaymentDetails::Abandoned {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id.data),
 					payment_hash: ::lightning::ln::PaymentHash(payment_hash.data),
 				}
 			},
@@ -1539,24 +1636,36 @@ impl RecentPaymentDetails {
 	#[allow(unused)]
 	pub(crate) fn from_native(native: &nativeRecentPaymentDetails) -> Self {
 		match native {
-			nativeRecentPaymentDetails::Pending {ref payment_hash, ref total_msat, } => {
+			nativeRecentPaymentDetails::AwaitingInvoice {ref payment_id, } => {
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				RecentPaymentDetails::AwaitingInvoice {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
+				}
+			},
+			nativeRecentPaymentDetails::Pending {ref payment_id, ref payment_hash, ref total_msat, } => {
+				let mut payment_id_nonref = Clone::clone(payment_id);
 				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				let mut total_msat_nonref = Clone::clone(total_msat);
 				RecentPaymentDetails::Pending {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
 					total_msat: total_msat_nonref,
 				}
 			},
-			nativeRecentPaymentDetails::Fulfilled {ref payment_hash, } => {
+			nativeRecentPaymentDetails::Fulfilled {ref payment_id, ref payment_hash, } => {
+				let mut payment_id_nonref = Clone::clone(payment_id);
 				let mut payment_hash_nonref = Clone::clone(payment_hash);
-				let mut local_payment_hash_nonref = if payment_hash_nonref.is_none() { crate::c_types::derived::COption_PaymentHashZ::None } else { crate::c_types::derived::COption_PaymentHashZ::Some( { crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.unwrap().0 } }) };
+				let mut local_payment_hash_nonref = if payment_hash_nonref.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some( { crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.unwrap().0 } }) };
 				RecentPaymentDetails::Fulfilled {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
 					payment_hash: local_payment_hash_nonref,
 				}
 			},
-			nativeRecentPaymentDetails::Abandoned {ref payment_hash, } => {
+			nativeRecentPaymentDetails::Abandoned {ref payment_id, ref payment_hash, } => {
+				let mut payment_id_nonref = Clone::clone(payment_id);
 				let mut payment_hash_nonref = Clone::clone(payment_hash);
 				RecentPaymentDetails::Abandoned {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash_nonref.0 },
 				}
 			},
@@ -1565,20 +1674,28 @@ impl RecentPaymentDetails {
 	#[allow(unused)]
 	pub(crate) fn native_into(native: nativeRecentPaymentDetails) -> Self {
 		match native {
-			nativeRecentPaymentDetails::Pending {mut payment_hash, mut total_msat, } => {
+			nativeRecentPaymentDetails::AwaitingInvoice {mut payment_id, } => {
+				RecentPaymentDetails::AwaitingInvoice {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id.0 },
+				}
+			},
+			nativeRecentPaymentDetails::Pending {mut payment_id, mut payment_hash, mut total_msat, } => {
 				RecentPaymentDetails::Pending {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id.0 },
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
 					total_msat: total_msat,
 				}
 			},
-			nativeRecentPaymentDetails::Fulfilled {mut payment_hash, } => {
-				let mut local_payment_hash = if payment_hash.is_none() { crate::c_types::derived::COption_PaymentHashZ::None } else { crate::c_types::derived::COption_PaymentHashZ::Some( { crate::c_types::ThirtyTwoBytes { data: payment_hash.unwrap().0 } }) };
+			nativeRecentPaymentDetails::Fulfilled {mut payment_id, mut payment_hash, } => {
+				let mut local_payment_hash = if payment_hash.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some( { crate::c_types::ThirtyTwoBytes { data: payment_hash.unwrap().0 } }) };
 				RecentPaymentDetails::Fulfilled {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id.0 },
 					payment_hash: local_payment_hash,
 				}
 			},
-			nativeRecentPaymentDetails::Abandoned {mut payment_hash, } => {
+			nativeRecentPaymentDetails::Abandoned {mut payment_id, mut payment_hash, } => {
 				RecentPaymentDetails::Abandoned {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id.0 },
 					payment_hash: crate::c_types::ThirtyTwoBytes { data: payment_hash.0 },
 				}
 			},
@@ -1594,24 +1711,34 @@ pub extern "C" fn RecentPaymentDetails_clone(orig: &RecentPaymentDetails) -> Rec
 	orig.clone()
 }
 #[no_mangle]
+/// Utility method to constructs a new AwaitingInvoice-variant RecentPaymentDetails
+pub extern "C" fn RecentPaymentDetails_awaiting_invoice(payment_id: crate::c_types::ThirtyTwoBytes) -> RecentPaymentDetails {
+	RecentPaymentDetails::AwaitingInvoice {
+		payment_id,
+	}
+}
+#[no_mangle]
 /// Utility method to constructs a new Pending-variant RecentPaymentDetails
-pub extern "C" fn RecentPaymentDetails_pending(payment_hash: crate::c_types::ThirtyTwoBytes, total_msat: u64) -> RecentPaymentDetails {
+pub extern "C" fn RecentPaymentDetails_pending(payment_id: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::ThirtyTwoBytes, total_msat: u64) -> RecentPaymentDetails {
 	RecentPaymentDetails::Pending {
+		payment_id,
 		payment_hash,
 		total_msat,
 	}
 }
 #[no_mangle]
 /// Utility method to constructs a new Fulfilled-variant RecentPaymentDetails
-pub extern "C" fn RecentPaymentDetails_fulfilled(payment_hash: crate::c_types::derived::COption_PaymentHashZ) -> RecentPaymentDetails {
+pub extern "C" fn RecentPaymentDetails_fulfilled(payment_id: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::derived::COption_ThirtyTwoBytesZ) -> RecentPaymentDetails {
 	RecentPaymentDetails::Fulfilled {
+		payment_id,
 		payment_hash,
 	}
 }
 #[no_mangle]
 /// Utility method to constructs a new Abandoned-variant RecentPaymentDetails
-pub extern "C" fn RecentPaymentDetails_abandoned(payment_hash: crate::c_types::ThirtyTwoBytes) -> RecentPaymentDetails {
+pub extern "C" fn RecentPaymentDetails_abandoned(payment_id: crate::c_types::ThirtyTwoBytes, payment_hash: crate::c_types::ThirtyTwoBytes) -> RecentPaymentDetails {
 	RecentPaymentDetails::Abandoned {
+		payment_id,
 		payment_hash,
 	}
 }
@@ -1800,10 +1927,10 @@ pub extern "C" fn ChannelManager_get_current_default_configuration(this_arg: &cr
 /// Note that override_config (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_create_channel(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut their_network_key: crate::c_types::PublicKey, mut channel_value_satoshis: u64, mut push_msat: u64, mut user_channel_id: crate::c_types::U128, mut override_config: crate::lightning::util::config::UserConfig) -> crate::c_types::derived::CResult__u832APIErrorZ {
+pub extern "C" fn ChannelManager_create_channel(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut their_network_key: crate::c_types::PublicKey, mut channel_value_satoshis: u64, mut push_msat: u64, mut user_channel_id: crate::c_types::U128, mut override_config: crate::lightning::util::config::UserConfig) -> crate::c_types::derived::CResult_ThirtyTwoBytesAPIErrorZ {
 	let mut local_override_config = if override_config.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(override_config.take_inner()) } }) };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.create_channel(their_network_key.into_rust(), channel_value_satoshis, push_msat, user_channel_id.into(), local_override_config);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -1882,7 +2009,7 @@ pub extern "C" fn ChannelManager_list_recent_payments(this_arg: &crate::lightnin
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_close_channel(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, channel_id: *const [u8; 32], mut counterparty_node_id: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.close_channel(unsafe { &*channel_id}, &counterparty_node_id.into_rust());
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.close_channel(&::lightning::ln::ChannelId(unsafe { *channel_id }), &counterparty_node_id.into_rust());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -1924,7 +2051,7 @@ pub extern "C" fn ChannelManager_close_channel(this_arg: &crate::lightning::ln::
 pub extern "C" fn ChannelManager_close_channel_with_feerate_and_script(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, channel_id: *const [u8; 32], mut counterparty_node_id: crate::c_types::PublicKey, mut target_feerate_sats_per_1000_weight: crate::c_types::derived::COption_u32Z, mut shutdown_script: crate::lightning::ln::script::ShutdownScript) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
 	let mut local_target_feerate_sats_per_1000_weight = if target_feerate_sats_per_1000_weight.is_some() { Some( { target_feerate_sats_per_1000_weight.take() }) } else { None };
 	let mut local_shutdown_script = if shutdown_script.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(shutdown_script.take_inner()) } }) };
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.close_channel_with_feerate_and_script(unsafe { &*channel_id}, &counterparty_node_id.into_rust(), local_target_feerate_sats_per_1000_weight, local_shutdown_script);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.close_channel_with_feerate_and_script(&::lightning::ln::ChannelId(unsafe { *channel_id }), &counterparty_node_id.into_rust(), local_target_feerate_sats_per_1000_weight, local_shutdown_script);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -1936,7 +2063,7 @@ pub extern "C" fn ChannelManager_close_channel_with_feerate_and_script(this_arg:
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_force_close_broadcasting_latest_txn(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, channel_id: *const [u8; 32], mut counterparty_node_id: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.force_close_broadcasting_latest_txn(unsafe { &*channel_id}, &counterparty_node_id.into_rust());
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.force_close_broadcasting_latest_txn(&::lightning::ln::ChannelId(unsafe { *channel_id }), &counterparty_node_id.into_rust());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -1950,7 +2077,7 @@ pub extern "C" fn ChannelManager_force_close_broadcasting_latest_txn(this_arg: &
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_force_close_without_broadcasting_txn(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, channel_id: *const [u8; 32], mut counterparty_node_id: crate::c_types::PublicKey) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.force_close_without_broadcasting_txn(unsafe { &*channel_id}, &counterparty_node_id.into_rust());
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.force_close_without_broadcasting_txn(&::lightning::ln::ChannelId(unsafe { *channel_id }), &counterparty_node_id.into_rust());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -2005,9 +2132,8 @@ pub extern "C" fn ChannelManager_force_close_all_channels_without_broadcasting_t
 /// In general, a path may raise:
 ///  * [`APIError::InvalidRoute`] when an invalid route or forwarding parameter (cltv_delta, fee,
 ///    node public key) is specified.
-///  * [`APIError::ChannelUnavailable`] if the next-hop channel is not available for updates
-///    (including due to previous monitor update failure or new permanent monitor update
-///    failure).
+///  * [`APIError::ChannelUnavailable`] if the next-hop channel is not available as it has been
+///    closed, doesn't exist, or the peer is currently disconnected.
 ///  * [`APIError::MonitorUpdateInProgress`] if a new monitor update failure prevented sending the
 ///    relevant updates.
 ///
@@ -2039,9 +2165,11 @@ pub extern "C" fn ChannelManager_send_payment(this_arg: &crate::lightning::ln::c
 	local_ret
 }
 
-/// Signals that no further retries for the given payment should occur. Useful if you have a
+/// Signals that no further attempts for the given payment should occur. Useful if you have a
 /// pending outbound payment with retries remaining, but wish to stop retrying the payment before
 /// retries are exhausted.
+///
+/// # Event Generation
 ///
 /// If no [`Event::PaymentFailed`] event had been generated before, one will be generated as soon
 /// as there are no remaining pending HTLCs for this payment.
@@ -2050,11 +2178,10 @@ pub extern "C" fn ChannelManager_send_payment(this_arg: &crate::lightning::ln::c
 /// wait until you receive either a [`Event::PaymentFailed`] or [`Event::PaymentSent`] event to
 /// determine the ultimate status of a payment.
 ///
-/// If an [`Event::PaymentFailed`] event is generated and we restart without this
-/// [`ChannelManager`] having been persisted, another [`Event::PaymentFailed`] may be generated.
+/// # Restart Behavior
 ///
-/// [`Event::PaymentFailed`]: events::Event::PaymentFailed
-/// [`Event::PaymentSent`]: events::Event::PaymentSent
+/// If an [`Event::PaymentFailed`] is generated and we restart without first persisting the
+/// [`ChannelManager`], another [`Event::PaymentFailed`] may be generated.
 #[no_mangle]
 pub extern "C" fn ChannelManager_abandon_payment(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut payment_id: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.abandon_payment(::lightning::ln::channelmanager::PaymentId(payment_id.data))
@@ -2075,7 +2202,7 @@ pub extern "C" fn ChannelManager_abandon_payment(this_arg: &crate::lightning::ln
 /// [`send_payment`]: Self::send_payment
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_send_spontaneous_payment(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, route: &crate::lightning::routing::router::Route, mut payment_preimage: crate::c_types::derived::COption_PaymentPreimageZ, mut recipient_onion: crate::lightning::ln::outbound_payment::RecipientOnionFields, mut payment_id: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_PaymentHashPaymentSendFailureZ {
+pub extern "C" fn ChannelManager_send_spontaneous_payment(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, route: &crate::lightning::routing::router::Route, mut payment_preimage: crate::c_types::derived::COption_ThirtyTwoBytesZ, mut recipient_onion: crate::lightning::ln::outbound_payment::RecipientOnionFields, mut payment_id: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_ThirtyTwoBytesPaymentSendFailureZ {
 	let mut local_payment_preimage = { /*payment_preimage*/ let payment_preimage_opt = payment_preimage; if payment_preimage_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentPreimage({ payment_preimage_opt.take() }.data) }})} };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.send_spontaneous_payment(route.get_native_ref(), local_payment_preimage, *unsafe { Box::from_raw(recipient_onion.take_inner()) }, ::lightning::ln::channelmanager::PaymentId(payment_id.data));
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::outbound_payment::PaymentSendFailure::native_into(e) }).into() };
@@ -2091,7 +2218,7 @@ pub extern "C" fn ChannelManager_send_spontaneous_payment(this_arg: &crate::ligh
 /// [`PaymentParameters::for_keysend`]: crate::routing::router::PaymentParameters::for_keysend
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_send_spontaneous_payment_with_retry(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut payment_preimage: crate::c_types::derived::COption_PaymentPreimageZ, mut recipient_onion: crate::lightning::ln::outbound_payment::RecipientOnionFields, mut payment_id: crate::c_types::ThirtyTwoBytes, mut route_params: crate::lightning::routing::router::RouteParameters, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry) -> crate::c_types::derived::CResult_PaymentHashRetryableSendFailureZ {
+pub extern "C" fn ChannelManager_send_spontaneous_payment_with_retry(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut payment_preimage: crate::c_types::derived::COption_ThirtyTwoBytesZ, mut recipient_onion: crate::lightning::ln::outbound_payment::RecipientOnionFields, mut payment_id: crate::c_types::ThirtyTwoBytes, mut route_params: crate::lightning::routing::router::RouteParameters, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry) -> crate::c_types::derived::CResult_ThirtyTwoBytesRetryableSendFailureZ {
 	let mut local_payment_preimage = { /*payment_preimage*/ let payment_preimage_opt = payment_preimage; if payment_preimage_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentPreimage({ payment_preimage_opt.take() }.data) }})} };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.send_spontaneous_payment_with_retry(local_payment_preimage, *unsafe { Box::from_raw(recipient_onion.take_inner()) }, ::lightning::ln::channelmanager::PaymentId(payment_id.data), *unsafe { Box::from_raw(route_params.take_inner()) }, retry_strategy.into_native());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::outbound_payment::RetryableSendFailure::native_into(e) }).into() };
@@ -2103,9 +2230,45 @@ pub extern "C" fn ChannelManager_send_spontaneous_payment_with_retry(this_arg: &
 /// us to easily discern them from real payments.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_send_probe(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut path: crate::lightning::routing::router::Path) -> crate::c_types::derived::CResult_C2Tuple_PaymentHashPaymentIdZPaymentSendFailureZ {
+pub extern "C" fn ChannelManager_send_probe(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut path: crate::lightning::routing::router::Path) -> crate::c_types::derived::CResult_C2Tuple_ThirtyTwoBytesThirtyTwoBytesZPaymentSendFailureZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.send_probe(*unsafe { Box::from_raw(path.take_inner()) });
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.0 }, crate::c_types::ThirtyTwoBytes { data: orig_ret_0_1.0 }).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::outbound_payment::PaymentSendFailure::native_into(e) }).into() };
+	local_ret
+}
+
+/// Sends payment probes over all paths of a route that would be used to pay the given
+/// amount to the given `node_id`.
+///
+/// See [`ChannelManager::send_preflight_probes`] for more information.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_send_spontaneous_preflight_probes(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut node_id: crate::c_types::PublicKey, mut amount_msat: u64, mut final_cltv_expiry_delta: u32, mut liquidity_limit_multiplier: crate::c_types::derived::COption_u64Z) -> crate::c_types::derived::CResult_CVec_C2Tuple_ThirtyTwoBytesThirtyTwoBytesZZProbeSendFailureZ {
+	let mut local_liquidity_limit_multiplier = if liquidity_limit_multiplier.is_some() { Some( { liquidity_limit_multiplier.take() }) } else { None };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.send_spontaneous_preflight_probes(node_id.into_rust(), amount_msat, final_cltv_expiry_delta, local_liquidity_limit_multiplier);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let (mut orig_ret_0_0_0, mut orig_ret_0_0_1) = item; let mut local_ret_0_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_0.0 }, crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_1.0 }).into(); local_ret_0_0 }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::outbound_payment::ProbeSendFailure::native_into(e) }).into() };
+	local_ret
+}
+
+/// Sends payment probes over all paths of a route that would be used to pay a route found
+/// according to the given [`RouteParameters`].
+///
+/// This may be used to send \"pre-flight\" probes, i.e., to train our scorer before conducting
+/// the actual payment. Note this is only useful if there likely is sufficient time for the
+/// probe to settle before sending out the actual payment, e.g., when waiting for user
+/// confirmation in a wallet UI.
+///
+/// Otherwise, there is a chance the probe could take up some liquidity needed to complete the
+/// actual payment. Users should therefore be cautious and might avoid sending probes if
+/// liquidity is scarce and/or they don't expect the probe to return before they send the
+/// payment. To mitigate this issue, channels with available liquidity less than the required
+/// amount times the given `liquidity_limit_multiplier` won't be used to send pre-flight
+/// probes. If `None` is given as `liquidity_limit_multiplier`, it defaults to `3`.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_send_preflight_probes(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut route_params: crate::lightning::routing::router::RouteParameters, mut liquidity_limit_multiplier: crate::c_types::derived::COption_u64Z) -> crate::c_types::derived::CResult_CVec_C2Tuple_ThirtyTwoBytesThirtyTwoBytesZZProbeSendFailureZ {
+	let mut local_liquidity_limit_multiplier = if liquidity_limit_multiplier.is_some() { Some( { liquidity_limit_multiplier.take() }) } else { None };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.send_preflight_probes(*unsafe { Box::from_raw(route_params.take_inner()) }, local_liquidity_limit_multiplier);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let (mut orig_ret_0_0_0, mut orig_ret_0_0_1) = item; let mut local_ret_0_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_0.0 }, crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_1.0 }).into(); local_ret_0_0 }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::outbound_payment::ProbeSendFailure::native_into(e) }).into() };
 	local_ret
 }
 
@@ -2142,7 +2305,26 @@ pub extern "C" fn ChannelManager_send_probe(this_arg: &crate::lightning::ln::cha
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_funding_transaction_generated(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, temporary_channel_id: *const [u8; 32], mut counterparty_node_id: crate::c_types::PublicKey, mut funding_transaction: crate::c_types::Transaction) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.funding_transaction_generated(unsafe { &*temporary_channel_id}, &counterparty_node_id.into_rust(), funding_transaction.into_bitcoin());
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.funding_transaction_generated(&::lightning::ln::ChannelId(unsafe { *temporary_channel_id }), &counterparty_node_id.into_rust(), funding_transaction.into_bitcoin());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
+	local_ret
+}
+
+/// Call this upon creation of a batch funding transaction for the given channels.
+///
+/// Return values are identical to [`Self::funding_transaction_generated`], respective to
+/// each individual channel and transaction output.
+///
+/// Do NOT broadcast the funding transaction yourself. This batch funding transcaction
+/// will only be broadcast when we have safely received and persisted the counterparty's
+/// signature for each channel.
+///
+/// If there is an error, all channels in the batch are to be considered closed.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_batch_funding_transaction_generated(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut temporary_channels: crate::c_types::derived::CVec_C2Tuple_ThirtyTwoBytesPublicKeyZZ, mut funding_transaction: crate::c_types::Transaction) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
+	let mut local_temporary_channels = Vec::new(); for mut item in temporary_channels.into_rust().drain(..) { local_temporary_channels.push( { let (mut orig_temporary_channels_0_0, mut orig_temporary_channels_0_1) = item.to_rust(); let mut local_temporary_channels_0 = (::lightning::ln::ChannelId(orig_temporary_channels_0_0.data), orig_temporary_channels_0_1.into_rust()); local_temporary_channels_0 }); };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.batch_funding_transaction_generated(&local_temporary_channels.iter().map(|(a, b)| (a, b)).collect::<Vec<_>>()[..], funding_transaction.into_bitcoin());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -2172,8 +2354,8 @@ pub extern "C" fn ChannelManager_funding_transaction_generated(this_arg: &crate:
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_update_partial_channel_config(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut counterparty_node_id: crate::c_types::PublicKey, mut channel_ids: crate::c_types::derived::CVec_ThirtyTwoBytesZ, config_update: &crate::lightning::util::config::ChannelConfigUpdate) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
-	let mut local_channel_ids = Vec::new(); for mut item in channel_ids.into_rust().drain(..) { local_channel_ids.push( { item.data }); };
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_partial_channel_config(&counterparty_node_id.into_rust(), &local_channel_ids.iter().map(|a| *a).collect::<Vec<_>>()[..], config_update.get_native_ref());
+	let mut local_channel_ids = Vec::new(); for mut item in channel_ids.into_rust().drain(..) { local_channel_ids.push( { ::lightning::ln::ChannelId(item.data) }); };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_partial_channel_config(&counterparty_node_id.into_rust(), local_channel_ids, config_update.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -2203,8 +2385,8 @@ pub extern "C" fn ChannelManager_update_partial_channel_config(this_arg: &crate:
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_update_channel_config(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut counterparty_node_id: crate::c_types::PublicKey, mut channel_ids: crate::c_types::derived::CVec_ThirtyTwoBytesZ, config: &crate::lightning::util::config::ChannelConfig) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
-	let mut local_channel_ids = Vec::new(); for mut item in channel_ids.into_rust().drain(..) { local_channel_ids.push( { item.data }); };
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_config(&counterparty_node_id.into_rust(), &local_channel_ids.iter().map(|a| *a).collect::<Vec<_>>()[..], config.get_native_ref());
+	let mut local_channel_ids = Vec::new(); for mut item in channel_ids.into_rust().drain(..) { local_channel_ids.push( { ::lightning::ln::ChannelId(item.data) }); };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_config(&counterparty_node_id.into_rust(), local_channel_ids, config.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -2235,7 +2417,7 @@ pub extern "C" fn ChannelManager_update_channel_config(this_arg: &crate::lightni
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_forward_intercepted_htlc(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut intercept_id: crate::c_types::ThirtyTwoBytes, next_hop_channel_id: *const [u8; 32], mut next_node_id: crate::c_types::PublicKey, mut amt_to_forward_msat: u64) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.forward_intercepted_htlc(::lightning::ln::channelmanager::InterceptId(intercept_id.data), unsafe { &*next_hop_channel_id}, next_node_id.into_rust(), amt_to_forward_msat);
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.forward_intercepted_htlc(::lightning::ln::channelmanager::InterceptId(intercept_id.data), &::lightning::ln::ChannelId(unsafe { *next_hop_channel_id }), next_node_id.into_rust(), amt_to_forward_msat);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -2326,15 +2508,34 @@ pub extern "C" fn ChannelManager_fail_htlc_backwards_with_reason(this_arg: &crat
 /// event matches your expectation. If you fail to do so and call this method, you may provide
 /// the sender \"proof-of-payment\" when they did not fulfill the full expected payment.
 ///
+/// This function will fail the payment if it has custom TLVs with even type numbers, as we
+/// will assume they are unknown. If you intend to accept even custom TLVs, you should use
+/// [`claim_funds_with_known_custom_tlvs`].
+///
 /// [`Event::PaymentClaimable`]: crate::events::Event::PaymentClaimable
 /// [`Event::PaymentClaimable::claim_deadline`]: crate::events::Event::PaymentClaimable::claim_deadline
 /// [`Event::PaymentClaimed`]: crate::events::Event::PaymentClaimed
 /// [`process_pending_events`]: EventsProvider::process_pending_events
 /// [`create_inbound_payment`]: Self::create_inbound_payment
 /// [`create_inbound_payment_for_hash`]: Self::create_inbound_payment_for_hash
+/// [`claim_funds_with_known_custom_tlvs`]: Self::claim_funds_with_known_custom_tlvs
 #[no_mangle]
 pub extern "C" fn ChannelManager_claim_funds(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut payment_preimage: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.claim_funds(::lightning::ln::PaymentPreimage(payment_preimage.data))
+}
+
+/// This is a variant of [`claim_funds`] that allows accepting a payment with custom TLVs with
+/// even type numbers.
+///
+/// # Note
+///
+/// You MUST check you've understood all even TLVs before using this to
+/// claim, otherwise you may unintentionally agree to some protocol you do not understand.
+///
+/// [`claim_funds`]: Self::claim_funds
+#[no_mangle]
+pub extern "C" fn ChannelManager_claim_funds_with_known_custom_tlvs(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut payment_preimage: crate::c_types::ThirtyTwoBytes) {
+	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.claim_funds_with_known_custom_tlvs(::lightning::ln::PaymentPreimage(payment_preimage.data))
 }
 
 /// Gets the node_id held by this ChannelManager
@@ -2364,7 +2565,7 @@ pub extern "C" fn ChannelManager_get_our_node_id(this_arg: &crate::lightning::ln
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_accept_inbound_channel(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, temporary_channel_id: *const [u8; 32], mut counterparty_node_id: crate::c_types::PublicKey, mut user_channel_id: crate::c_types::U128) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.accept_inbound_channel(unsafe { &*temporary_channel_id}, &counterparty_node_id.into_rust(), user_channel_id.into());
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.accept_inbound_channel(&::lightning::ln::ChannelId(unsafe { *temporary_channel_id }), &counterparty_node_id.into_rust(), user_channel_id.into());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -2390,7 +2591,7 @@ pub extern "C" fn ChannelManager_accept_inbound_channel(this_arg: &crate::lightn
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelManager_accept_inbound_channel_from_trusted_peer_0conf(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, temporary_channel_id: *const [u8; 32], mut counterparty_node_id: crate::c_types::PublicKey, mut user_channel_id: crate::c_types::U128) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.accept_inbound_channel_from_trusted_peer_0conf(unsafe { &*temporary_channel_id}, &counterparty_node_id.into_rust(), user_channel_id.into());
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.accept_inbound_channel_from_trusted_peer_0conf(&::lightning::ln::ChannelId(unsafe { *temporary_channel_id }), &counterparty_node_id.into_rust(), user_channel_id.into());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
 }
@@ -2429,7 +2630,7 @@ pub extern "C" fn ChannelManager_accept_inbound_channel_from_trusted_peer_0conf(
 /// [`create_inbound_payment_for_hash`]: Self::create_inbound_payment_for_hash
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_create_inbound_payment(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut invoice_expiry_delta_secs: u32, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_C2Tuple_PaymentHashPaymentSecretZNoneZ {
+pub extern "C" fn ChannelManager_create_inbound_payment(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut invoice_expiry_delta_secs: u32, mut min_final_cltv_expiry_delta: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_C2Tuple_ThirtyTwoBytesThirtyTwoBytesZNoneZ {
 	let mut local_min_value_msat = if min_value_msat.is_some() { Some( { min_value_msat.take() }) } else { None };
 	let mut local_min_final_cltv_expiry_delta = if min_final_cltv_expiry_delta.is_some() { Some( { min_final_cltv_expiry_delta.take() }) } else { None };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.create_inbound_payment(local_min_value_msat, invoice_expiry_delta_secs, local_min_final_cltv_expiry_delta);
@@ -2485,7 +2686,7 @@ pub extern "C" fn ChannelManager_create_inbound_payment(this_arg: &crate::lightn
 /// [`PaymentClaimable`]: events::Event::PaymentClaimable
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_create_inbound_payment_for_hash(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut invoice_expiry_delta_secs: u32, mut min_final_cltv_expiry: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_PaymentSecretNoneZ {
+pub extern "C" fn ChannelManager_create_inbound_payment_for_hash(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut min_value_msat: crate::c_types::derived::COption_u64Z, mut invoice_expiry_delta_secs: u32, mut min_final_cltv_expiry: crate::c_types::derived::COption_u16Z) -> crate::c_types::derived::CResult_ThirtyTwoBytesNoneZ {
 	let mut local_min_value_msat = if min_value_msat.is_some() { Some( { min_value_msat.take() }) } else { None };
 	let mut local_min_final_cltv_expiry = if min_final_cltv_expiry.is_some() { Some( { min_final_cltv_expiry.take() }) } else { None };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.create_inbound_payment_for_hash(::lightning::ln::PaymentHash(payment_hash.data), local_min_value_msat, invoice_expiry_delta_secs, local_min_final_cltv_expiry);
@@ -2499,7 +2700,7 @@ pub extern "C" fn ChannelManager_create_inbound_payment_for_hash(this_arg: &crat
 /// [`create_inbound_payment`]: Self::create_inbound_payment
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_get_payment_preimage(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut payment_secret: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_PaymentPreimageAPIErrorZ {
+pub extern "C" fn ChannelManager_get_payment_preimage(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut payment_hash: crate::c_types::ThirtyTwoBytes, mut payment_secret: crate::c_types::ThirtyTwoBytes) -> crate::c_types::derived::CResult_ThirtyTwoBytesAPIErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_payment_preimage(::lightning::ln::PaymentHash(payment_hash.data), ::lightning::ln::PaymentSecret(payment_secret.data));
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
 	local_ret
@@ -2670,22 +2871,33 @@ extern "C" fn ChannelManager_Confirm_best_block_updated(this_arg: *const c_void,
 	<nativeChannelManager as lightning::chain::Confirm<>>::best_block_updated(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, &::bitcoin::consensus::encode::deserialize(unsafe { &*header }).unwrap(), height)
 }
 #[must_use]
-extern "C" fn ChannelManager_Confirm_get_relevant_txids(this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_TxidCOption_BlockHashZZZ {
+extern "C" fn ChannelManager_Confirm_get_relevant_txids(this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_ThirtyTwoBytesCOption_ThirtyTwoBytesZZZ {
 	let mut ret = <nativeChannelManager as lightning::chain::Confirm<>>::get_relevant_txids(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, );
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = if orig_ret_0_1.is_none() { crate::c_types::derived::COption_BlockHashZ::None } else { crate::c_types::derived::COption_BlockHashZ::Some( { crate::c_types::ThirtyTwoBytes { data: orig_ret_0_1.unwrap().into_inner() } }) }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1).into(); local_ret_0 }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = if orig_ret_0_1.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some( { crate::c_types::ThirtyTwoBytes { data: orig_ret_0_1.unwrap().into_inner() } }) }; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, local_orig_ret_0_1).into(); local_ret_0 }); };
 	local_ret.into()
 }
 
-/// Gets a [`Future`] that completes when this [`ChannelManager`] needs to be persisted.
+/// Gets a [`Future`] that completes when this [`ChannelManager`] may need to be persisted or
+/// may have events that need processing.
+///
+/// In order to check if this [`ChannelManager`] needs persisting, call
+/// [`Self::get_and_clear_needs_persistence`].
 ///
 /// Note that callbacks registered on the [`Future`] MUST NOT call back into this
 /// [`ChannelManager`] and should instead register actions to be taken later.
-///
 #[must_use]
 #[no_mangle]
-pub extern "C" fn ChannelManager_get_persistable_update_future(this_arg: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::lightning::util::wakers::Future {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_persistable_update_future();
+pub extern "C" fn ChannelManager_get_event_or_persistence_needed_future(this_arg: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::lightning::util::wakers::Future {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_event_or_persistence_needed_future();
 	crate::lightning::util::wakers::Future { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Returns true if this [`ChannelManager`] needs to be persisted.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_get_and_clear_needs_persistence(this_arg: &crate::lightning::ln::channelmanager::ChannelManager) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_and_clear_needs_persistence();
+	ret
 }
 
 /// Gets the latest best block which was connected either via the [`chain::Listen`] or
@@ -2899,9 +3111,9 @@ extern "C" fn ChannelManager_ChannelMessageHandler_provided_init_features(this_a
 	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 #[must_use]
-extern "C" fn ChannelManager_ChannelMessageHandler_get_genesis_hashes(this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ChainHashZZ {
+extern "C" fn ChannelManager_ChannelMessageHandler_get_genesis_hashes(this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
 	let mut ret = <nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::get_genesis_hashes(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, );
-	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ChainHashZZ::None } else { crate::c_types::derived::COption_CVec_ChainHashZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_ret_0.into() }) };
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_ret_0.into() }) };
 	local_ret
 }
 
@@ -3221,8 +3433,8 @@ pub extern "C" fn ChannelManagerReadArgs_new(mut entropy_source: crate::lightnin
 }
 
 #[no_mangle]
-/// Read a C2Tuple_BlockHashChannelManagerZ from a byte array, created by C2Tuple_BlockHashChannelManagerZ_write
-pub extern "C" fn C2Tuple_BlockHashChannelManagerZ_read(ser: crate::c_types::u8slice, arg: crate::lightning::ln::channelmanager::ChannelManagerReadArgs) -> crate::c_types::derived::CResult_C2Tuple_BlockHashChannelManagerZDecodeErrorZ {
+/// Read a C2Tuple_ThirtyTwoBytesChannelManagerZ from a byte array, created by C2Tuple_ThirtyTwoBytesChannelManagerZ_write
+pub extern "C" fn C2Tuple_ThirtyTwoBytesChannelManagerZ_read(ser: crate::c_types::u8slice, arg: crate::lightning::ln::channelmanager::ChannelManagerReadArgs) -> crate::c_types::derived::CResult_C2Tuple_ThirtyTwoBytesChannelManagerZDecodeErrorZ {
 	let arg_conv = *unsafe { Box::from_raw(arg.take_inner()) };
 	let res: Result<(bitcoin::hash_types::BlockHash, lightning::ln::channelmanager::ChannelManager<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>), lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj_arg(ser, arg_conv);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_res_0_0, mut orig_res_0_1) = o; let mut local_res_0 = (crate::c_types::ThirtyTwoBytes { data: orig_res_0_0.into_inner() }, crate::lightning::ln::channelmanager::ChannelManager { inner: ObjOps::heap_alloc(orig_res_0_1), is_owned: true }).into(); local_res_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };

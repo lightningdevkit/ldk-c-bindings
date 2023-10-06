@@ -9,6 +9,7 @@
 //! Data structures and encoding for `invoice_error` messages.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -105,6 +106,8 @@ pub extern "C" fn InvoiceError_set_message(this_ptr: &mut InvoiceError, mut val:
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.message = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Constructs a new InvoiceError given each field
+///
+/// Note that erroneous_field_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn InvoiceError_new(mut erroneous_field_arg: crate::lightning::offers::invoice_error::ErroneousField, mut message_arg: crate::lightning::util::string::UntrustedString) -> InvoiceError {

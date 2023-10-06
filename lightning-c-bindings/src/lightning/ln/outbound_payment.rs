@@ -9,6 +9,7 @@
 //! Utilities to send payments and manage outbound payment information.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -27,7 +28,7 @@ pub enum Retry {
 	/// retry, and may retry multiple failed HTLCs at once if they failed around the same time and
 	/// were retried along a route from a single call to [`Router::find_route_with_id`].
 	Attempts(
-		usize),
+		u32),
 	/// Time elapsed before abandoning retries for a payment. At least one attempt at payment is made;
 	/// see [`PaymentParameters::expiry_time`] to avoid any attempt at payment after a specific time.
 	///
@@ -114,7 +115,7 @@ pub extern "C" fn Retry_clone(orig: &Retry) -> Retry {
 }
 #[no_mangle]
 /// Utility method to constructs a new Attempts-variant Retry
-pub extern "C" fn Retry_attempts(a: usize) -> Retry {
+pub extern "C" fn Retry_attempts(a: u32) -> Retry {
 	Retry::Attempts(a, )
 }
 #[no_mangle]
@@ -136,6 +137,18 @@ pub extern "C" fn Retry_hash(o: &Retry) -> u64 {
 	let mut hasher = core::hash::SipHasher::new();
 	core::hash::Hash::hash(&o.to_native(), &mut hasher);
 	core::hash::Hasher::finish(&hasher)
+}
+#[no_mangle]
+/// Serialize the Retry object into a byte array which can be read by Retry_read
+pub extern "C" fn Retry_write(obj: &crate::lightning::ln::outbound_payment::Retry) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[no_mangle]
+/// Read a Retry from a byte array, created by Retry_write
+pub extern "C" fn Retry_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_RetryDecodeErrorZ {
+	let res: Result<lightning::ln::outbound_payment::Retry, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::outbound_payment::Retry::native_into(o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
 }
 /// Indicates an immediate error on [`ChannelManager::send_payment`]. Further errors may be
 /// surfaced later via [`Event::PaymentPathFailed`] and [`Event::PaymentFailed`].
@@ -479,6 +492,100 @@ pub extern "C" fn PaymentSendFailure_partial_failure(results: crate::c_types::de
 		payment_id,
 	}
 }
+/// Checks if two PaymentSendFailures contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn PaymentSendFailure_eq(a: &PaymentSendFailure, b: &PaymentSendFailure) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
+/// Indicates that we failed to send a payment probe. Further errors may be surfaced later via
+/// [`Event::ProbeFailed`].
+///
+/// [`Event::ProbeFailed`]: crate::events::Event::ProbeFailed
+#[derive(Clone)]
+#[must_use]
+#[repr(C)]
+pub enum ProbeSendFailure {
+	/// We were unable to find a route to the destination.
+	RouteNotFound,
+	/// We failed to send the payment probes.
+	SendingFailed(
+		crate::lightning::ln::outbound_payment::PaymentSendFailure),
+}
+use lightning::ln::outbound_payment::ProbeSendFailure as ProbeSendFailureImport;
+pub(crate) type nativeProbeSendFailure = ProbeSendFailureImport;
+
+impl ProbeSendFailure {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeProbeSendFailure {
+		match self {
+			ProbeSendFailure::RouteNotFound => nativeProbeSendFailure::RouteNotFound,
+			ProbeSendFailure::SendingFailed (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				nativeProbeSendFailure::SendingFailed (
+					a_nonref.into_native(),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeProbeSendFailure {
+		match self {
+			ProbeSendFailure::RouteNotFound => nativeProbeSendFailure::RouteNotFound,
+			ProbeSendFailure::SendingFailed (mut a, ) => {
+				nativeProbeSendFailure::SendingFailed (
+					a.into_native(),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeProbeSendFailure) -> Self {
+		match native {
+			nativeProbeSendFailure::RouteNotFound => ProbeSendFailure::RouteNotFound,
+			nativeProbeSendFailure::SendingFailed (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				ProbeSendFailure::SendingFailed (
+					crate::lightning::ln::outbound_payment::PaymentSendFailure::native_into(a_nonref),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeProbeSendFailure) -> Self {
+		match native {
+			nativeProbeSendFailure::RouteNotFound => ProbeSendFailure::RouteNotFound,
+			nativeProbeSendFailure::SendingFailed (mut a, ) => {
+				ProbeSendFailure::SendingFailed (
+					crate::lightning::ln::outbound_payment::PaymentSendFailure::native_into(a),
+				)
+			},
+		}
+	}
+}
+/// Frees any resources used by the ProbeSendFailure
+#[no_mangle]
+pub extern "C" fn ProbeSendFailure_free(this_ptr: ProbeSendFailure) { }
+/// Creates a copy of the ProbeSendFailure
+#[no_mangle]
+pub extern "C" fn ProbeSendFailure_clone(orig: &ProbeSendFailure) -> ProbeSendFailure {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new RouteNotFound-variant ProbeSendFailure
+pub extern "C" fn ProbeSendFailure_route_not_found() -> ProbeSendFailure {
+	ProbeSendFailure::RouteNotFound}
+#[no_mangle]
+/// Utility method to constructs a new SendingFailed-variant ProbeSendFailure
+pub extern "C" fn ProbeSendFailure_sending_failed(a: crate::lightning::ln::outbound_payment::PaymentSendFailure) -> ProbeSendFailure {
+	ProbeSendFailure::SendingFailed(a, )
+}
+/// Checks if two ProbeSendFailures contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn ProbeSendFailure_eq(a: &ProbeSendFailure, b: &ProbeSendFailure) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
 
 use lightning::ln::outbound_payment::RecipientOnionFields as nativeRecipientOnionFieldsImport;
 pub(crate) type nativeRecipientOnionFields = nativeRecipientOnionFieldsImport;
@@ -545,9 +652,9 @@ impl RecipientOnionFields {
 /// want to provide a secret for a spontaneous payment if MPP is needed and you know your
 /// recipient will not reject it.
 #[no_mangle]
-pub extern "C" fn RecipientOnionFields_get_payment_secret(this_ptr: &RecipientOnionFields) -> crate::c_types::derived::COption_PaymentSecretZ {
+pub extern "C" fn RecipientOnionFields_get_payment_secret(this_ptr: &RecipientOnionFields) -> crate::c_types::derived::COption_ThirtyTwoBytesZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().payment_secret;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_PaymentSecretZ::None } else { crate::c_types::derived::COption_PaymentSecretZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().0 } }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().0 } }) };
 	local_inner_val
 }
 /// The [`PaymentSecret`] is an arbitrary 32 bytes provided by the recipient for us to repeat
@@ -562,7 +669,7 @@ pub extern "C" fn RecipientOnionFields_get_payment_secret(this_ptr: &RecipientOn
 /// want to provide a secret for a spontaneous payment if MPP is needed and you know your
 /// recipient will not reject it.
 #[no_mangle]
-pub extern "C" fn RecipientOnionFields_set_payment_secret(this_ptr: &mut RecipientOnionFields, mut val: crate::c_types::derived::COption_PaymentSecretZ) {
+pub extern "C" fn RecipientOnionFields_set_payment_secret(this_ptr: &mut RecipientOnionFields, mut val: crate::c_types::derived::COption_ThirtyTwoBytesZ) {
 	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentSecret({ val_opt.take() }.data) }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.payment_secret = local_val;
 }
@@ -602,17 +709,6 @@ pub extern "C" fn RecipientOnionFields_get_payment_metadata(this_ptr: &Recipient
 pub extern "C" fn RecipientOnionFields_set_payment_metadata(this_ptr: &mut RecipientOnionFields, mut val: crate::c_types::derived::COption_CVec_u8ZZ) {
 	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { let mut local_val_0 = Vec::new(); for mut item in { val_opt.take() }.into_rust().drain(..) { local_val_0.push( { item }); }; local_val_0 }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.payment_metadata = local_val;
-}
-/// Constructs a new RecipientOnionFields given each field
-#[must_use]
-#[no_mangle]
-pub extern "C" fn RecipientOnionFields_new(mut payment_secret_arg: crate::c_types::derived::COption_PaymentSecretZ, mut payment_metadata_arg: crate::c_types::derived::COption_CVec_u8ZZ) -> RecipientOnionFields {
-	let mut local_payment_secret_arg = { /*payment_secret_arg*/ let payment_secret_arg_opt = payment_secret_arg; if payment_secret_arg_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentSecret({ payment_secret_arg_opt.take() }.data) }})} };
-	let mut local_payment_metadata_arg = { /*payment_metadata_arg*/ let payment_metadata_arg_opt = payment_metadata_arg; if payment_metadata_arg_opt.is_none() { None } else { Some({ { let mut local_payment_metadata_arg_0 = Vec::new(); for mut item in { payment_metadata_arg_opt.take() }.into_rust().drain(..) { local_payment_metadata_arg_0.push( { item }); }; local_payment_metadata_arg_0 }})} };
-	RecipientOnionFields { inner: ObjOps::heap_alloc(nativeRecipientOnionFields {
-		payment_secret: local_payment_secret_arg,
-		payment_metadata: local_payment_metadata_arg,
-	}), is_owned: true }
 }
 impl Clone for RecipientOnionFields {
 	fn clone(&self) -> Self {
@@ -681,5 +777,41 @@ pub extern "C" fn RecipientOnionFields_secret_only(mut payment_secret: crate::c_
 pub extern "C" fn RecipientOnionFields_spontaneous_empty() -> crate::lightning::ln::outbound_payment::RecipientOnionFields {
 	let mut ret = lightning::ln::outbound_payment::RecipientOnionFields::spontaneous_empty();
 	crate::lightning::ln::outbound_payment::RecipientOnionFields { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Creates a new [`RecipientOnionFields`] from an existing one, adding custom TLVs. Each
+/// TLV is provided as a `(u64, Vec<u8>)` for the type number and serialized value
+/// respectively. TLV type numbers must be unique and within the range
+/// reserved for custom types, i.e. >= 2^16, otherwise this method will return `Err(())`.
+///
+/// This method will also error for types in the experimental range which have been
+/// standardized within the protocol, which only includes 5482373484 (keysend) for now.
+///
+/// See [`Self::custom_tlvs`] for more info.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn RecipientOnionFields_with_custom_tlvs(mut this_arg: crate::lightning::ln::outbound_payment::RecipientOnionFields, mut custom_tlvs: crate::c_types::derived::CVec_C2Tuple_u64CVec_u8ZZZ) -> crate::c_types::derived::CResult_RecipientOnionFieldsNoneZ {
+	let mut local_custom_tlvs = Vec::new(); for mut item in custom_tlvs.into_rust().drain(..) { local_custom_tlvs.push( { let (mut orig_custom_tlvs_0_0, mut orig_custom_tlvs_0_1) = item.to_rust(); let mut local_orig_custom_tlvs_0_1 = Vec::new(); for mut item in orig_custom_tlvs_0_1.into_rust().drain(..) { local_orig_custom_tlvs_0_1.push( { item }); }; let mut local_custom_tlvs_0 = (orig_custom_tlvs_0_0, local_orig_custom_tlvs_0_1); local_custom_tlvs_0 }); };
+	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).with_custom_tlvs(local_custom_tlvs);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::outbound_payment::RecipientOnionFields { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Gets the custom TLVs that will be sent or have been received.
+///
+/// Custom TLVs allow sending extra application-specific data with a payment. They provide
+/// additional flexibility on top of payment metadata, as while other implementations may
+/// require `payment_metadata` to reflect metadata provided in an invoice, custom TLVs
+/// do not have this restriction.
+///
+/// Note that if this field is non-empty, it will contain strictly increasing TLVs, each
+/// represented by a `(u64, Vec<u8>)` for its type number and serialized value respectively.
+/// This is validated when setting this field using [`Self::with_custom_tlvs`].
+#[must_use]
+#[no_mangle]
+pub extern "C" fn RecipientOnionFields_custom_tlvs(this_arg: &crate::lightning::ln::outbound_payment::RecipientOnionFields) -> crate::c_types::derived::CVec_C2Tuple_u64CVec_u8ZZZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.custom_tlvs();
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.drain(..) { local_orig_ret_0_1.push( { item }); }; let mut local_ret_0 = (orig_ret_0_0, local_orig_ret_0_1.into()).into(); local_ret_0 }); };
+	local_ret.into()
 }
 

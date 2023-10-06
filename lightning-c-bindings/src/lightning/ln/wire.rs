@@ -12,6 +12,7 @@
 //! [BOLT #1]: https://github.com/lightning/bolts/blob/master/01-messaging.md
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -37,8 +38,7 @@ pub struct CustomMessageReader {
 }
 unsafe impl Send for CustomMessageReader {}
 unsafe impl Sync for CustomMessageReader {}
-#[no_mangle]
-pub(crate) extern "C" fn CustomMessageReader_clone_fields(orig: &CustomMessageReader) -> CustomMessageReader {
+pub(crate) fn CustomMessageReader_clone_fields(orig: &CustomMessageReader) -> CustomMessageReader {
 	CustomMessageReader {
 		this_arg: orig.this_arg,
 		read: Clone::clone(&orig.read),
@@ -64,6 +64,11 @@ impl core::ops::Deref for CustomMessageReader {
 		self
 	}
 }
+impl core::ops::DerefMut for CustomMessageReader {
+	fn deref_mut(&mut self) -> &mut Self {
+		self
+	}
+}
 /// Calls the free function if one is set
 #[no_mangle]
 pub extern "C" fn CustomMessageReader_free(this_ptr: CustomMessageReader) { }
@@ -77,6 +82,7 @@ impl Drop for CustomMessageReader {
 mod encode {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -99,19 +105,23 @@ pub struct Type {
 	pub debug_str: extern "C" fn (this_arg: *const c_void) -> crate::c_types::Str,
 	/// Serialize the object into a byte array
 	pub write: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_u8Z,
+	/// Called, if set, after this Type has been cloned into a duplicate object.
+	/// The new Type is provided, and should be mutated as needed to perform a
+	/// deep copy of the object pointed to by this_arg or avoid any double-freeing.
+	pub cloned: Option<extern "C" fn (new_Type: &mut Type)>,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for Type {}
 unsafe impl Sync for Type {}
-#[no_mangle]
-pub(crate) extern "C" fn Type_clone_fields(orig: &Type) -> Type {
+pub(crate) fn Type_clone_fields(orig: &Type) -> Type {
 	Type {
 		this_arg: orig.this_arg,
 		type_id: Clone::clone(&orig.type_id),
 		debug_str: Clone::clone(&orig.debug_str),
 		write: Clone::clone(&orig.write),
+		cloned: Clone::clone(&orig.cloned),
 		free: Clone::clone(&orig.free),
 	}
 }
@@ -124,6 +134,18 @@ impl lightning::util::ser::Writeable for Type {
 	fn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), crate::c_types::io::Error> {
 		let vec = (self.write)(self.this_arg);
 		w.write_all(vec.as_slice())
+	}
+}
+#[no_mangle]
+/// Creates a copy of a Type
+pub extern "C" fn Type_clone(orig: &Type) -> Type {
+	let mut res = Type_clone_fields(orig);
+	if let Some(f) = orig.cloned { (f)(&mut res) };
+	res
+}
+impl Clone for Type {
+	fn clone(&self) -> Self {
+		Type_clone(self)
 	}
 }
 
@@ -140,6 +162,11 @@ impl rustType for Type {
 impl core::ops::Deref for Type {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for Type {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }

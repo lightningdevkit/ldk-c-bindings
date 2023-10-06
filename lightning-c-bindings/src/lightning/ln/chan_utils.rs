@@ -10,6 +10,7 @@
 //! largely of interest for those implementing the traits on [`crate::sign`] by hand.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -684,6 +685,16 @@ pub(crate) extern "C" fn ChannelPublicKeys_clone_void(this_ptr: *const c_void) -
 pub extern "C" fn ChannelPublicKeys_clone(orig: &ChannelPublicKeys) -> ChannelPublicKeys {
 	orig.clone()
 }
+/// Generates a non-cryptographic 64-bit hash of the ChannelPublicKeys.
+#[no_mangle]
+pub extern "C" fn ChannelPublicKeys_hash(o: &ChannelPublicKeys) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two ChannelPublicKeyss contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -737,6 +748,14 @@ pub static REVOKEABLE_REDEEMSCRIPT_MAX_LENGTH: usize = lightning::ln::chan_utils
 #[no_mangle]
 pub extern "C" fn get_revokeable_redeemscript(mut revocation_key: crate::c_types::PublicKey, mut contest_delay: u16, mut broadcaster_delayed_payment_key: crate::c_types::PublicKey) -> crate::c_types::derived::CVec_u8Z {
 	let mut ret = lightning::ln::chan_utils::get_revokeable_redeemscript(&revocation_key.into_rust(), contest_delay, &broadcaster_delayed_payment_key.into_rust());
+	ret.into_bytes().into()
+}
+
+/// Returns the script for the counterparty's output on a holder's commitment transaction based on
+/// the channel type.
+#[no_mangle]
+pub extern "C" fn get_counterparty_payment_script(channel_type_features: &crate::lightning::ln::features::ChannelTypeFeatures, mut payment_key: crate::c_types::PublicKey) -> crate::c_types::derived::CVec_u8Z {
+	let mut ret = lightning::ln::chan_utils::get_counterparty_payment_script(channel_type_features.get_native_ref(), &payment_key.into_rust());
 	ret.into_bytes().into()
 }
 
@@ -948,7 +967,7 @@ pub extern "C" fn build_htlc_transaction(commitment_txid: *const [u8; 32], mut f
 
 /// Returns the witness required to satisfy and spend a HTLC input.
 #[no_mangle]
-pub extern "C" fn build_htlc_input_witness(mut local_sig: crate::c_types::Signature, mut remote_sig: crate::c_types::Signature, mut preimage: crate::c_types::derived::COption_PaymentPreimageZ, mut redeem_script: crate::c_types::u8slice, channel_type_features: &crate::lightning::ln::features::ChannelTypeFeatures) -> crate::c_types::Witness {
+pub extern "C" fn build_htlc_input_witness(mut local_sig: crate::c_types::ECDSASignature, mut remote_sig: crate::c_types::ECDSASignature, mut preimage: crate::c_types::derived::COption_ThirtyTwoBytesZ, mut redeem_script: crate::c_types::u8slice, channel_type_features: &crate::lightning::ln::features::ChannelTypeFeatures) -> crate::c_types::Witness {
 	let mut local_preimage = { /*preimage*/ let preimage_opt = preimage; if preimage_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentPreimage({ preimage_opt.take() }.data) }})} };
 	let mut ret = lightning::ln::chan_utils::build_htlc_input_witness(&local_sig.into_rust(), &remote_sig.into_rust(), &local_preimage, &::bitcoin::blockdata::script::Script::from(Vec::from(redeem_script.to_slice())), channel_type_features.get_native_ref());
 	crate::c_types::Witness::from_bitcoin(&ret)
@@ -975,7 +994,7 @@ pub extern "C" fn get_anchor_redeemscript(mut funding_pubkey: crate::c_types::Pu
 
 /// Returns the witness required to satisfy and spend an anchor input.
 #[no_mangle]
-pub extern "C" fn build_anchor_input_witness(mut funding_key: crate::c_types::PublicKey, mut funding_sig: crate::c_types::Signature) -> crate::c_types::Witness {
+pub extern "C" fn build_anchor_input_witness(mut funding_key: crate::c_types::PublicKey, mut funding_sig: crate::c_types::ECDSASignature) -> crate::c_types::Witness {
 	let mut ret = lightning::ln::chan_utils::build_anchor_input_witness(&funding_key.into_rust(), &funding_sig.into_rust());
 	crate::c_types::Witness::from_bitcoin(&ret)
 }
@@ -1120,6 +1139,9 @@ pub extern "C" fn ChannelTransactionParameters_set_channel_type_features(this_pt
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_type_features = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// Constructs a new ChannelTransactionParameters given each field
+///
+/// Note that counterparty_parameters_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
+/// Note that funding_outpoint_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
 #[must_use]
 #[no_mangle]
 pub extern "C" fn ChannelTransactionParameters_new(mut holder_pubkeys_arg: crate::lightning::ln::chan_utils::ChannelPublicKeys, mut holder_selected_contest_delay_arg: u16, mut is_outbound_from_holder_arg: bool, mut counterparty_parameters_arg: crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters, mut funding_outpoint_arg: crate::lightning::chain::transaction::OutPoint, mut channel_type_features_arg: crate::lightning::ln::features::ChannelTypeFeatures) -> ChannelTransactionParameters {
@@ -1152,6 +1174,16 @@ pub(crate) extern "C" fn ChannelTransactionParameters_clone_void(this_ptr: *cons
 /// Creates a copy of the ChannelTransactionParameters
 pub extern "C" fn ChannelTransactionParameters_clone(orig: &ChannelTransactionParameters) -> ChannelTransactionParameters {
 	orig.clone()
+}
+/// Generates a non-cryptographic 64-bit hash of the ChannelTransactionParameters.
+#[no_mangle]
+pub extern "C" fn ChannelTransactionParameters_hash(o: &ChannelTransactionParameters) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two ChannelTransactionParameterss contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -1262,6 +1294,16 @@ pub(crate) extern "C" fn CounterpartyChannelTransactionParameters_clone_void(thi
 /// Creates a copy of the CounterpartyChannelTransactionParameters
 pub extern "C" fn CounterpartyChannelTransactionParameters_clone(orig: &CounterpartyChannelTransactionParameters) -> CounterpartyChannelTransactionParameters {
 	orig.clone()
+}
+/// Generates a non-cryptographic 64-bit hash of the CounterpartyChannelTransactionParameters.
+#[no_mangle]
+pub extern "C" fn CounterpartyChannelTransactionParameters_hash(o: &CounterpartyChannelTransactionParameters) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two CounterpartyChannelTransactionParameterss contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -1496,27 +1538,27 @@ impl HolderCommitmentTransaction {
 }
 /// Our counterparty's signature for the transaction
 #[no_mangle]
-pub extern "C" fn HolderCommitmentTransaction_get_counterparty_sig(this_ptr: &HolderCommitmentTransaction) -> crate::c_types::Signature {
+pub extern "C" fn HolderCommitmentTransaction_get_counterparty_sig(this_ptr: &HolderCommitmentTransaction) -> crate::c_types::ECDSASignature {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().counterparty_sig;
-	crate::c_types::Signature::from_rust(&inner_val)
+	crate::c_types::ECDSASignature::from_rust(&inner_val)
 }
 /// Our counterparty's signature for the transaction
 #[no_mangle]
-pub extern "C" fn HolderCommitmentTransaction_set_counterparty_sig(this_ptr: &mut HolderCommitmentTransaction, mut val: crate::c_types::Signature) {
+pub extern "C" fn HolderCommitmentTransaction_set_counterparty_sig(this_ptr: &mut HolderCommitmentTransaction, mut val: crate::c_types::ECDSASignature) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.counterparty_sig = val.into_rust();
 }
 /// All non-dust counterparty HTLC signatures, in the order they appear in the transaction
 ///
 /// Returns a copy of the field.
 #[no_mangle]
-pub extern "C" fn HolderCommitmentTransaction_get_counterparty_htlc_sigs(this_ptr: &HolderCommitmentTransaction) -> crate::c_types::derived::CVec_SignatureZ {
+pub extern "C" fn HolderCommitmentTransaction_get_counterparty_htlc_sigs(this_ptr: &HolderCommitmentTransaction) -> crate::c_types::derived::CVec_ECDSASignatureZ {
 	let mut inner_val = this_ptr.get_native_mut_ref().counterparty_htlc_sigs.clone();
-	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::c_types::Signature::from_rust(&item) }); };
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { crate::c_types::ECDSASignature::from_rust(&item) }); };
 	local_inner_val.into()
 }
 /// All non-dust counterparty HTLC signatures, in the order they appear in the transaction
 #[no_mangle]
-pub extern "C" fn HolderCommitmentTransaction_set_counterparty_htlc_sigs(this_ptr: &mut HolderCommitmentTransaction, mut val: crate::c_types::derived::CVec_SignatureZ) {
+pub extern "C" fn HolderCommitmentTransaction_set_counterparty_htlc_sigs(this_ptr: &mut HolderCommitmentTransaction, mut val: crate::c_types::derived::CVec_ECDSASignatureZ) {
 	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item.into_rust() }); };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.counterparty_htlc_sigs = local_val;
 }
@@ -1559,7 +1601,7 @@ pub extern "C" fn HolderCommitmentTransaction_read(ser: crate::c_types::u8slice)
 /// The funding keys are used to figure out which signature should go first when building the transaction for broadcast.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn HolderCommitmentTransaction_new(mut commitment_tx: crate::lightning::ln::chan_utils::CommitmentTransaction, mut counterparty_sig: crate::c_types::Signature, mut counterparty_htlc_sigs: crate::c_types::derived::CVec_SignatureZ, mut holder_funding_key: crate::c_types::PublicKey, mut counterparty_funding_key: crate::c_types::PublicKey) -> crate::lightning::ln::chan_utils::HolderCommitmentTransaction {
+pub extern "C" fn HolderCommitmentTransaction_new(mut commitment_tx: crate::lightning::ln::chan_utils::CommitmentTransaction, mut counterparty_sig: crate::c_types::ECDSASignature, mut counterparty_htlc_sigs: crate::c_types::derived::CVec_ECDSASignatureZ, mut holder_funding_key: crate::c_types::PublicKey, mut counterparty_funding_key: crate::c_types::PublicKey) -> crate::lightning::ln::chan_utils::HolderCommitmentTransaction {
 	let mut local_counterparty_htlc_sigs = Vec::new(); for mut item in counterparty_htlc_sigs.into_rust().drain(..) { local_counterparty_htlc_sigs.push( { item.into_rust() }); };
 	let mut ret = lightning::ln::chan_utils::HolderCommitmentTransaction::new(*unsafe { Box::from_raw(commitment_tx.take_inner()) }, counterparty_sig.into_rust(), local_counterparty_htlc_sigs, &holder_funding_key.into_rust(), &counterparty_funding_key.into_rust());
 	crate::lightning::ln::chan_utils::HolderCommitmentTransaction { inner: ObjOps::heap_alloc(ret), is_owned: true }
@@ -1701,17 +1743,17 @@ pub extern "C" fn BuiltCommitmentTransaction_get_sighash_all(this_arg: &crate::l
 /// Signs the counterparty's commitment transaction.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BuiltCommitmentTransaction_sign_counterparty_commitment(this_arg: &crate::lightning::ln::chan_utils::BuiltCommitmentTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64) -> crate::c_types::Signature {
+pub extern "C" fn BuiltCommitmentTransaction_sign_counterparty_commitment(this_arg: &crate::lightning::ln::chan_utils::BuiltCommitmentTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64) -> crate::c_types::ECDSASignature {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign_counterparty_commitment(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, secp256k1::global::SECP256K1);
-	crate::c_types::Signature::from_rust(&ret)
+	crate::c_types::ECDSASignature::from_rust(&ret)
 }
 
 /// Signs the holder commitment transaction because we are about to broadcast it.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn BuiltCommitmentTransaction_sign_holder_commitment(this_arg: &crate::lightning::ln::chan_utils::BuiltCommitmentTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64, entropy_source: &crate::lightning::sign::EntropySource) -> crate::c_types::Signature {
+pub extern "C" fn BuiltCommitmentTransaction_sign_holder_commitment(this_arg: &crate::lightning::ln::chan_utils::BuiltCommitmentTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64, entropy_source: &crate::lightning::sign::EntropySource) -> crate::c_types::ECDSASignature {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign_holder_commitment(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, entropy_source, secp256k1::global::SECP256K1);
-	crate::c_types::Signature::from_rust(&ret)
+	crate::c_types::ECDSASignature::from_rust(&ret)
 }
 
 
@@ -1952,9 +1994,9 @@ pub extern "C" fn TrustedClosingTransaction_get_sighash_all(this_arg: &crate::li
 /// because we are about to broadcast a holder transaction.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn TrustedClosingTransaction_sign(this_arg: &crate::lightning::ln::chan_utils::TrustedClosingTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64) -> crate::c_types::Signature {
+pub extern "C" fn TrustedClosingTransaction_sign(this_arg: &crate::lightning::ln::chan_utils::TrustedClosingTransaction, funding_key: *const [u8; 32], mut funding_redeemscript: crate::c_types::u8slice, mut channel_value_satoshis: u64) -> crate::c_types::ECDSASignature {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sign(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *funding_key}[..]).unwrap(), &::bitcoin::blockdata::script::Script::from(Vec::from(funding_redeemscript.to_slice())), channel_value_satoshis, secp256k1::global::SECP256K1);
-	crate::c_types::Signature::from_rust(&ret)
+	crate::c_types::ECDSASignature::from_rust(&ret)
 }
 
 
@@ -2203,9 +2245,45 @@ pub extern "C" fn TrustedCommitmentTransaction_channel_type_features(this_arg: &
 /// This function is only valid in the holder commitment context, it always uses EcdsaSighashType::All.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn TrustedCommitmentTransaction_get_htlc_sigs(this_arg: &crate::lightning::ln::chan_utils::TrustedCommitmentTransaction, htlc_base_key: *const [u8; 32], channel_parameters: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters, entropy_source: &crate::lightning::sign::EntropySource) -> crate::c_types::derived::CResult_CVec_SignatureZNoneZ {
+pub extern "C" fn TrustedCommitmentTransaction_get_htlc_sigs(this_arg: &crate::lightning::ln::chan_utils::TrustedCommitmentTransaction, htlc_base_key: *const [u8; 32], channel_parameters: &crate::lightning::ln::chan_utils::DirectedChannelTransactionParameters, entropy_source: &crate::lightning::sign::EntropySource) -> crate::c_types::derived::CResult_CVec_ECDSASignatureZNoneZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_htlc_sigs(&::bitcoin::secp256k1::SecretKey::from_slice(&unsafe { *htlc_base_key}[..]).unwrap(), channel_parameters.get_native_ref(), entropy_source, secp256k1::global::SECP256K1);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { crate::c_types::Signature::from_rust(&item) }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { crate::c_types::ECDSASignature::from_rust(&item) }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Returns the index of the revokeable output, i.e. the `to_local` output sending funds to
+/// the broadcaster, in the built transaction, if any exists.
+///
+/// There are two cases where this may return `None`:
+/// - The balance of the revokeable output is below the dust limit (only found on commitments
+/// early in the channel's lifetime, i.e. before the channel reserve is met).
+/// - This commitment was created before LDK 0.0.117. In this case, the
+/// commitment transaction previously didn't contain enough information to locate the
+/// revokeable output.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn TrustedCommitmentTransaction_revokeable_output_index(this_arg: &crate::lightning::ln::chan_utils::TrustedCommitmentTransaction) -> crate::c_types::derived::COption_usizeZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.revokeable_output_index();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_usizeZ::None } else { crate::c_types::derived::COption_usizeZ::Some( { ret.unwrap() }) };
+	local_ret
+}
+
+/// Helper method to build an unsigned justice transaction spending the revokeable
+/// `to_local` output to a destination script. Fee estimation accounts for the expected
+/// revocation witness data that will be added when signed.
+///
+/// This method will error if the given fee rate results in a fee greater than the value
+/// of the output being spent, or if there exists no revokeable `to_local` output on this
+/// commitment transaction. See [`Self::revokeable_output_index`] for more details.
+///
+/// The built transaction will allow fee bumping with RBF, and this method takes
+/// `feerate_per_kw` as an input such that multiple copies of a justice transaction at different
+/// fee rates may be built.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn TrustedCommitmentTransaction_build_to_local_justice_tx(this_arg: &crate::lightning::ln::chan_utils::TrustedCommitmentTransaction, mut feerate_per_kw: u64, mut destination_script: crate::c_types::derived::CVec_u8Z) -> crate::c_types::derived::CResult_TransactionNoneZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.build_to_local_justice_tx(feerate_per_kw, ::bitcoin::blockdata::script::Script::from(destination_script.into_rust()));
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::Transaction::from_bitcoin(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 

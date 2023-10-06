@@ -13,6 +13,7 @@
 //! [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -41,8 +42,7 @@ pub struct FutureCallback {
 }
 unsafe impl Send for FutureCallback {}
 unsafe impl Sync for FutureCallback {}
-#[no_mangle]
-pub(crate) extern "C" fn FutureCallback_clone_fields(orig: &FutureCallback) -> FutureCallback {
+pub(crate) fn FutureCallback_clone_fields(orig: &FutureCallback) -> FutureCallback {
 	FutureCallback {
 		this_arg: orig.this_arg,
 		call: Clone::clone(&orig.call),
@@ -62,6 +62,11 @@ impl rustFutureCallback for FutureCallback {
 impl core::ops::Deref for FutureCallback {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for FutureCallback {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }

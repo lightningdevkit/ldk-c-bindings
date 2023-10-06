@@ -13,6 +13,7 @@
 //! order to announce a channel. This module handles that checking.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -206,8 +207,7 @@ pub struct UtxoLookup {
 }
 unsafe impl Send for UtxoLookup {}
 unsafe impl Sync for UtxoLookup {}
-#[no_mangle]
-pub(crate) extern "C" fn UtxoLookup_clone_fields(orig: &UtxoLookup) -> UtxoLookup {
+pub(crate) fn UtxoLookup_clone_fields(orig: &UtxoLookup) -> UtxoLookup {
 	UtxoLookup {
 		this_arg: orig.this_arg,
 		get_utxo: Clone::clone(&orig.get_utxo),
@@ -228,6 +228,11 @@ impl rustUtxoLookup for UtxoLookup {
 impl core::ops::Deref for UtxoLookup {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for UtxoLookup {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }

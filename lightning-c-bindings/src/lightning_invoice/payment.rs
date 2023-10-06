@@ -6,9 +6,10 @@
 // license as that which applies to the original source files from which this
 // source was automatically generated.
 
-//! Convenient utilities for paying Lightning invoices and sending spontaneous payments.
+//! Convenient utilities for paying Lightning invoices.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -24,8 +25,8 @@ use alloc::{vec::Vec, boxed::Box};
 ///
 /// If you wish to use a different payment idempotency token, see [`pay_invoice_with_id`].
 #[no_mangle]
-pub extern "C" fn pay_invoice(invoice: &crate::lightning_invoice::Bolt11Invoice, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
-	let mut ret = lightning_invoice::payment::pay_invoice::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), retry_strategy.into_native(), channelmanager.get_native_ref());
+pub extern "C" fn pay_invoice(invoice: &crate::lightning_invoice::Bolt11Invoice, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_ThirtyTwoBytesPaymentErrorZ {
+	let mut ret = lightning_invoice::payment::pay_invoice::<_>(invoice.get_native_ref(), retry_strategy.into_native(), channelmanager.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::PaymentError::native_into(e) }).into() };
 	local_ret
 }
@@ -42,7 +43,7 @@ pub extern "C" fn pay_invoice(invoice: &crate::lightning_invoice::Bolt11Invoice,
 /// See [`pay_invoice`] for a variant which uses the [`PaymentHash`] for the idempotency token.
 #[no_mangle]
 pub extern "C" fn pay_invoice_with_id(invoice: &crate::lightning_invoice::Bolt11Invoice, mut payment_id: crate::c_types::ThirtyTwoBytes, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NonePaymentErrorZ {
-	let mut ret = lightning_invoice::payment::pay_invoice_with_id::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), ::lightning::ln::channelmanager::PaymentId(payment_id.data), retry_strategy.into_native(), channelmanager.get_native_ref());
+	let mut ret = lightning_invoice::payment::pay_invoice_with_id::<_>(invoice.get_native_ref(), ::lightning::ln::channelmanager::PaymentId(payment_id.data), retry_strategy.into_native(), channelmanager.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::PaymentError::native_into(e) }).into() };
 	local_ret
 }
@@ -57,8 +58,8 @@ pub extern "C" fn pay_invoice_with_id(invoice: &crate::lightning_invoice::Bolt11
 /// If you wish to use a different payment idempotency token, see
 /// [`pay_zero_value_invoice_with_id`].
 #[no_mangle]
-pub extern "C" fn pay_zero_value_invoice(invoice: &crate::lightning_invoice::Bolt11Invoice, mut amount_msats: u64, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_PaymentIdPaymentErrorZ {
-	let mut ret = lightning_invoice::payment::pay_zero_value_invoice::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), amount_msats, retry_strategy.into_native(), channelmanager.get_native_ref());
+pub extern "C" fn pay_zero_value_invoice(invoice: &crate::lightning_invoice::Bolt11Invoice, mut amount_msats: u64, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_ThirtyTwoBytesPaymentErrorZ {
+	let mut ret = lightning_invoice::payment::pay_zero_value_invoice::<_>(invoice.get_native_ref(), amount_msats, retry_strategy.into_native(), channelmanager.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::PaymentError::native_into(e) }).into() };
 	local_ret
 }
@@ -76,8 +77,31 @@ pub extern "C" fn pay_zero_value_invoice(invoice: &crate::lightning_invoice::Bol
 /// idempotency token.
 #[no_mangle]
 pub extern "C" fn pay_zero_value_invoice_with_id(invoice: &crate::lightning_invoice::Bolt11Invoice, mut amount_msats: u64, mut payment_id: crate::c_types::ThirtyTwoBytes, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CResult_NonePaymentErrorZ {
-	let mut ret = lightning_invoice::payment::pay_zero_value_invoice_with_id::<crate::lightning::chain::Watch, crate::lightning::chain::chaininterface::BroadcasterInterface, crate::lightning::sign::EntropySource, crate::lightning::sign::NodeSigner, crate::lightning::sign::SignerProvider, crate::lightning::chain::chaininterface::FeeEstimator, crate::lightning::routing::router::Router, crate::lightning::util::logger::Logger>(invoice.get_native_ref(), amount_msats, ::lightning::ln::channelmanager::PaymentId(payment_id.data), retry_strategy.into_native(), channelmanager.get_native_ref());
+	let mut ret = lightning_invoice::payment::pay_zero_value_invoice_with_id::<_>(invoice.get_native_ref(), amount_msats, ::lightning::ln::channelmanager::PaymentId(payment_id.data), retry_strategy.into_native(), channelmanager.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::PaymentError::native_into(e) }).into() };
+	local_ret
+}
+
+/// Sends payment probes over all paths of a route that would be used to pay the given invoice.
+///
+/// See [`ChannelManager::send_preflight_probes`] for more information.
+#[no_mangle]
+pub extern "C" fn preflight_probe_invoice(invoice: &crate::lightning_invoice::Bolt11Invoice, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut liquidity_limit_multiplier: crate::c_types::derived::COption_u64Z) -> crate::c_types::derived::CResult_CVec_C2Tuple_ThirtyTwoBytesThirtyTwoBytesZZProbingErrorZ {
+	let mut local_liquidity_limit_multiplier = if liquidity_limit_multiplier.is_some() { Some( { liquidity_limit_multiplier.take() }) } else { None };
+	let mut ret = lightning_invoice::payment::preflight_probe_invoice::<_>(invoice.get_native_ref(), channelmanager.get_native_ref(), local_liquidity_limit_multiplier);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let (mut orig_ret_0_0_0, mut orig_ret_0_0_1) = item; let mut local_ret_0_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_0.0 }, crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_1.0 }).into(); local_ret_0_0 }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::ProbingError::native_into(e) }).into() };
+	local_ret
+}
+
+/// Sends payment probes over all paths of a route that would be used to pay the given zero-value
+/// invoice using the given amount.
+///
+/// See [`ChannelManager::send_preflight_probes`] for more information.
+#[no_mangle]
+pub extern "C" fn preflight_probe_zero_value_invoice(invoice: &crate::lightning_invoice::Bolt11Invoice, mut amount_msat: u64, channelmanager: &crate::lightning::ln::channelmanager::ChannelManager, mut liquidity_limit_multiplier: crate::c_types::derived::COption_u64Z) -> crate::c_types::derived::CResult_CVec_C2Tuple_ThirtyTwoBytesThirtyTwoBytesZZProbingErrorZ {
+	let mut local_liquidity_limit_multiplier = if liquidity_limit_multiplier.is_some() { Some( { liquidity_limit_multiplier.take() }) } else { None };
+	let mut ret = lightning_invoice::payment::preflight_probe_zero_value_invoice::<_>(invoice.get_native_ref(), amount_msat, channelmanager.get_native_ref(), local_liquidity_limit_multiplier);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let (mut orig_ret_0_0_0, mut orig_ret_0_0_1) = item; let mut local_ret_0_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_0.0 }, crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_1.0 }).into(); local_ret_0_0 }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_invoice::payment::ProbingError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -184,5 +208,110 @@ pub extern "C" fn PaymentError_sending(a: crate::lightning::ln::outbound_payment
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
 pub extern "C" fn PaymentError_eq(a: &PaymentError, b: &PaymentError) -> bool {
+	if &a.to_native() == &b.to_native() { true } else { false }
+}
+/// An error that may occur when sending a payment probe.
+#[derive(Clone)]
+#[must_use]
+#[repr(C)]
+pub enum ProbingError {
+	/// An error resulting from the provided [`Bolt11Invoice`].
+	Invoice(
+		crate::c_types::Str),
+	/// An error occurring when sending a payment probe.
+	Sending(
+		crate::lightning::ln::outbound_payment::ProbeSendFailure),
+}
+use lightning_invoice::payment::ProbingError as ProbingErrorImport;
+pub(crate) type nativeProbingError = ProbingErrorImport;
+
+impl ProbingError {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeProbingError {
+		match self {
+			ProbingError::Invoice (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				nativeProbingError::Invoice (
+					a_nonref.into_str(),
+				)
+			},
+			ProbingError::Sending (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				nativeProbingError::Sending (
+					a_nonref.into_native(),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeProbingError {
+		match self {
+			ProbingError::Invoice (mut a, ) => {
+				nativeProbingError::Invoice (
+					a.into_str(),
+				)
+			},
+			ProbingError::Sending (mut a, ) => {
+				nativeProbingError::Sending (
+					a.into_native(),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &nativeProbingError) -> Self {
+		match native {
+			nativeProbingError::Invoice (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				ProbingError::Invoice (
+					a_nonref.into(),
+				)
+			},
+			nativeProbingError::Sending (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				ProbingError::Sending (
+					crate::lightning::ln::outbound_payment::ProbeSendFailure::native_into(a_nonref),
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeProbingError) -> Self {
+		match native {
+			nativeProbingError::Invoice (mut a, ) => {
+				ProbingError::Invoice (
+					a.into(),
+				)
+			},
+			nativeProbingError::Sending (mut a, ) => {
+				ProbingError::Sending (
+					crate::lightning::ln::outbound_payment::ProbeSendFailure::native_into(a),
+				)
+			},
+		}
+	}
+}
+/// Frees any resources used by the ProbingError
+#[no_mangle]
+pub extern "C" fn ProbingError_free(this_ptr: ProbingError) { }
+/// Creates a copy of the ProbingError
+#[no_mangle]
+pub extern "C" fn ProbingError_clone(orig: &ProbingError) -> ProbingError {
+	orig.clone()
+}
+#[no_mangle]
+/// Utility method to constructs a new Invoice-variant ProbingError
+pub extern "C" fn ProbingError_invoice(a: crate::c_types::Str) -> ProbingError {
+	ProbingError::Invoice(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new Sending-variant ProbingError
+pub extern "C" fn ProbingError_sending(a: crate::lightning::ln::outbound_payment::ProbeSendFailure) -> ProbingError {
+	ProbingError::Sending(a, )
+}
+/// Checks if two ProbingErrors contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+#[no_mangle]
+pub extern "C" fn ProbingError_eq(a: &ProbingError, b: &ProbingError) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }

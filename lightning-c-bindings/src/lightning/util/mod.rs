@@ -9,6 +9,7 @@
 //! Some utility modules live here. See individual sub-modules for more info.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -30,6 +31,19 @@ pub mod config;
 mod fuzz_wrappers {
 
 use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
+mod base32 {
+
+use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -41,6 +55,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod atomic_counter {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -52,6 +67,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod byte_utils {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -63,6 +79,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod chacha20 {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -73,6 +90,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod real_chacha {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -81,21 +99,11 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 }
-}
-mod zbase32 {
-
-use alloc::str::FromStr;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
 }
 mod poly1305 {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -107,6 +115,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod chacha20poly1305rfc {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -117,6 +126,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod real_chachapoly {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -129,6 +139,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod transaction_utils {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -140,6 +151,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod scid_utils {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -150,6 +162,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod fake_scid {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -162,6 +175,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod time {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -173,6 +187,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod macro_logger {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -184,6 +199,7 @@ use alloc::{vec::Vec, boxed::Box};
 mod crypto {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;

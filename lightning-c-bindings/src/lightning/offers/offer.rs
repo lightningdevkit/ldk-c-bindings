@@ -66,6 +66,7 @@
 //! ```
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -160,18 +161,10 @@ pub extern "C" fn Offer_clone(orig: &Offer) -> Offer {
 /// for the selected chain.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Offer_chains(this_arg: &crate::lightning::offers::offer::Offer) -> crate::c_types::derived::CVec_ChainHashZ {
+pub extern "C" fn Offer_chains(this_arg: &crate::lightning::offers::offer::Offer) -> crate::c_types::derived::CVec_ThirtyTwoBytesZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chains();
 	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); };
 	local_ret.into()
-}
-
-/// Returns whether the given chain is supported by the offer.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn Offer_supports_chain(this_arg: &crate::lightning::offers::offer::Offer, mut chain: crate::c_types::ThirtyTwoBytes) -> bool {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_chain(::bitcoin::blockdata::constants::ChainHash::from(&chain.data[..]));
-	ret
 }
 
 /// Opaque bytes set by the originator. Useful for authentication and validating fields since it
@@ -207,8 +200,8 @@ pub extern "C" fn Offer_description(this_arg: &crate::lightning::offers::offer::
 /// Features pertaining to the offer.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Offer_features(this_arg: &crate::lightning::offers::offer::Offer) -> crate::lightning::ln::features::OfferFeatures {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.features();
+pub extern "C" fn Offer_offer_features(this_arg: &crate::lightning::offers::offer::Offer) -> crate::lightning::ln::features::OfferFeatures {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.offer_features();
 	crate::lightning::ln::features::OfferFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::features::OfferFeatures<>) as *mut _) }, is_owned: false }
 }
 
@@ -217,18 +210,10 @@ pub extern "C" fn Offer_features(this_arg: &crate::lightning::offers::offer::Off
 /// If `None`, the offer does not expire.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Offer_absolute_expiry(this_arg: &crate::lightning::offers::offer::Offer) -> crate::c_types::derived::COption_DurationZ {
+pub extern "C" fn Offer_absolute_expiry(this_arg: &crate::lightning::offers::offer::Offer) -> crate::c_types::derived::COption_u64Z {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.absolute_expiry();
-	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_DurationZ::None } else { crate::c_types::derived::COption_DurationZ::Some( { ret.unwrap().as_secs() }) };
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { ret.unwrap().as_secs() }) };
 	local_ret
-}
-
-/// Whether the offer has expired.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn Offer_is_expired(this_arg: &crate::lightning::offers::offer::Offer) -> bool {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_expired();
-	ret
 }
 
 /// The issuer of the offer, possibly beginning with `user@domain` or `domain`. Intended to be
@@ -261,6 +246,30 @@ pub extern "C" fn Offer_supported_quantity(this_arg: &crate::lightning::offers::
 	crate::lightning::offers::offer::Quantity { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
+/// The public key used by the recipient to sign invoices.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Offer_signing_pubkey(this_arg: &crate::lightning::offers::offer::Offer) -> crate::c_types::PublicKey {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signing_pubkey();
+	crate::c_types::PublicKey::from_rust(&ret)
+}
+
+/// Returns whether the given chain is supported by the offer.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Offer_supports_chain(this_arg: &crate::lightning::offers::offer::Offer, mut chain: crate::c_types::ThirtyTwoBytes) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_chain(::bitcoin::blockdata::constants::ChainHash::from(&chain.data[..]));
+	ret
+}
+
+/// Whether the offer has expired.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Offer_is_expired(this_arg: &crate::lightning::offers::offer::Offer) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_expired();
+	ret
+}
+
 /// Returns whether the given quantity is valid for the offer.
 #[must_use]
 #[no_mangle]
@@ -277,14 +286,6 @@ pub extern "C" fn Offer_is_valid_quantity(this_arg: &crate::lightning::offers::o
 pub extern "C" fn Offer_expects_quantity(this_arg: &crate::lightning::offers::offer::Offer) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.expects_quantity();
 	ret
-}
-
-/// The public key used by the recipient to sign invoices.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn Offer_signing_pubkey(this_arg: &crate::lightning::offers::offer::Offer) -> crate::c_types::PublicKey {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signing_pubkey();
-	crate::c_types::PublicKey::from_rust(&ret)
 }
 
 #[no_mangle]

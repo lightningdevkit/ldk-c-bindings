@@ -15,6 +15,7 @@
 //! messages they should handle, and encoding/sending response messages.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -63,8 +64,7 @@ pub struct CustomMessageHandler {
 }
 unsafe impl Send for CustomMessageHandler {}
 unsafe impl Sync for CustomMessageHandler {}
-#[no_mangle]
-pub(crate) extern "C" fn CustomMessageHandler_clone_fields(orig: &CustomMessageHandler) -> CustomMessageHandler {
+pub(crate) fn CustomMessageHandler_clone_fields(orig: &CustomMessageHandler) -> CustomMessageHandler {
 	CustomMessageHandler {
 		this_arg: orig.this_arg,
 		handle_custom_message: Clone::clone(&orig.handle_custom_message),
@@ -111,6 +111,11 @@ impl rustCustomMessageHandler for CustomMessageHandler {
 impl core::ops::Deref for CustomMessageHandler {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for CustomMessageHandler {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }
@@ -810,9 +815,9 @@ extern "C" fn ErroringMessageHandler_ChannelMessageHandler_provided_init_feature
 	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 #[must_use]
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_get_genesis_hashes(this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ChainHashZZ {
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_get_genesis_hashes(this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
 	let mut ret = <nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::get_genesis_hashes(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, );
-	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ChainHashZZ::None } else { crate::c_types::derived::COption_CVec_ChainHashZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_ret_0.into() }) };
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_ret_0.into() }) };
 	local_ret
 }
 
@@ -997,8 +1002,7 @@ pub struct SocketDescriptor {
 }
 unsafe impl Send for SocketDescriptor {}
 unsafe impl Sync for SocketDescriptor {}
-#[no_mangle]
-pub(crate) extern "C" fn SocketDescriptor_clone_fields(orig: &SocketDescriptor) -> SocketDescriptor {
+pub(crate) fn SocketDescriptor_clone_fields(orig: &SocketDescriptor) -> SocketDescriptor {
 	SocketDescriptor {
 		this_arg: orig.this_arg,
 		send_data: Clone::clone(&orig.send_data),
@@ -1046,6 +1050,11 @@ impl rustSocketDescriptor for SocketDescriptor {
 impl core::ops::Deref for SocketDescriptor {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for SocketDescriptor {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }
@@ -1235,9 +1244,9 @@ pub extern "C" fn PeerManager_new(mut message_handler: crate::lightning::ln::pee
 /// [`Self::new_outbound_connection`] or [`Self::new_inbound_connection`].
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PeerManager_get_peer_node_ids(this_arg: &crate::lightning::ln::peer_handler::PeerManager) -> crate::c_types::derived::CVec_C2Tuple_PublicKeyCOption_NetAddressZZZ {
+pub extern "C" fn PeerManager_get_peer_node_ids(this_arg: &crate::lightning::ln::peer_handler::PeerManager) -> crate::c_types::derived::CVec_C2Tuple_PublicKeyCOption_SocketAddressZZZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_peer_node_ids();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = if orig_ret_0_1.is_none() { crate::c_types::derived::COption_NetAddressZ::None } else { crate::c_types::derived::COption_NetAddressZ::Some( { crate::lightning::ln::msgs::NetAddress::native_into(orig_ret_0_1.unwrap()) }) }; let mut local_ret_0 = (crate::c_types::PublicKey::from_rust(&orig_ret_0_0), local_orig_ret_0_1).into(); local_ret_0 }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item; let mut local_orig_ret_0_1 = if orig_ret_0_1.is_none() { crate::c_types::derived::COption_SocketAddressZ::None } else { crate::c_types::derived::COption_SocketAddressZ::Some( { crate::lightning::ln::msgs::SocketAddress::native_into(orig_ret_0_1.unwrap()) }) }; let mut local_ret_0 = (crate::c_types::PublicKey::from_rust(&orig_ret_0_0), local_orig_ret_0_1).into(); local_ret_0 }); };
 	local_ret.into()
 }
 
@@ -1258,7 +1267,7 @@ pub extern "C" fn PeerManager_get_peer_node_ids(this_arg: &crate::lightning::ln:
 /// [`socket_disconnected`]: PeerManager::socket_disconnected
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PeerManager_new_outbound_connection(this_arg: &crate::lightning::ln::peer_handler::PeerManager, mut their_node_id: crate::c_types::PublicKey, mut descriptor: crate::lightning::ln::peer_handler::SocketDescriptor, mut remote_network_address: crate::c_types::derived::COption_NetAddressZ) -> crate::c_types::derived::CResult_CVec_u8ZPeerHandleErrorZ {
+pub extern "C" fn PeerManager_new_outbound_connection(this_arg: &crate::lightning::ln::peer_handler::PeerManager, mut their_node_id: crate::c_types::PublicKey, mut descriptor: crate::lightning::ln::peer_handler::SocketDescriptor, mut remote_network_address: crate::c_types::derived::COption_SocketAddressZ) -> crate::c_types::derived::CResult_CVec_u8ZPeerHandleErrorZ {
 	let mut local_remote_network_address = { /*remote_network_address*/ let remote_network_address_opt = remote_network_address; if remote_network_address_opt.is_none() { None } else { Some({ { { remote_network_address_opt.take() }.into_native() }})} };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.new_outbound_connection(their_node_id.into_rust(), descriptor, local_remote_network_address);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { item }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::peer_handler::PeerHandleError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
@@ -1282,7 +1291,7 @@ pub extern "C" fn PeerManager_new_outbound_connection(this_arg: &crate::lightnin
 /// [`socket_disconnected`]: PeerManager::socket_disconnected
 #[must_use]
 #[no_mangle]
-pub extern "C" fn PeerManager_new_inbound_connection(this_arg: &crate::lightning::ln::peer_handler::PeerManager, mut descriptor: crate::lightning::ln::peer_handler::SocketDescriptor, mut remote_network_address: crate::c_types::derived::COption_NetAddressZ) -> crate::c_types::derived::CResult_NonePeerHandleErrorZ {
+pub extern "C" fn PeerManager_new_inbound_connection(this_arg: &crate::lightning::ln::peer_handler::PeerManager, mut descriptor: crate::lightning::ln::peer_handler::SocketDescriptor, mut remote_network_address: crate::c_types::derived::COption_SocketAddressZ) -> crate::c_types::derived::CResult_NonePeerHandleErrorZ {
 	let mut local_remote_network_address = { /*remote_network_address*/ let remote_network_address_opt = remote_network_address; if remote_network_address_opt.is_none() { None } else { Some({ { { remote_network_address_opt.take() }.into_native() }})} };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.new_inbound_connection(descriptor, local_remote_network_address);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::peer_handler::PeerHandleError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
@@ -1413,7 +1422,7 @@ pub extern "C" fn PeerManager_timer_tick_occurred(this_arg: &crate::lightning::l
 ///
 /// [`get_and_clear_pending_msg_events`]: MessageSendEventsProvider::get_and_clear_pending_msg_events
 #[no_mangle]
-pub extern "C" fn PeerManager_broadcast_node_announcement(this_arg: &crate::lightning::ln::peer_handler::PeerManager, mut rgb: crate::c_types::ThreeBytes, mut alias: crate::c_types::ThirtyTwoBytes, mut addresses: crate::c_types::derived::CVec_NetAddressZ) {
+pub extern "C" fn PeerManager_broadcast_node_announcement(this_arg: &crate::lightning::ln::peer_handler::PeerManager, mut rgb: crate::c_types::ThreeBytes, mut alias: crate::c_types::ThirtyTwoBytes, mut addresses: crate::c_types::derived::CVec_SocketAddressZ) {
 	let mut local_addresses = Vec::new(); for mut item in addresses.into_rust().drain(..) { local_addresses.push( { item.into_native() }); };
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.broadcast_node_announcement(rgb.data, alias.data, local_addresses)
 }

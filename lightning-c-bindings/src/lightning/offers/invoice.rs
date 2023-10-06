@@ -51,7 +51,9 @@
 //!     .allow_mpp()
 //!     .fallback_v0_p2wpkh(&wpubkey_hash)
 //!     .build()?
-//!     .sign::<_, Infallible>(|digest| Ok(secp_ctx.sign_schnorr_no_aux_rand(digest, &keys)))
+//!     .sign::<_, Infallible>(
+//!         |message| Ok(secp_ctx.sign_schnorr_no_aux_rand(message.as_ref().as_digest(), &keys))
+//!     )
 //!     .expect(\"failed verifying signature\")
 //!     .write(&mut buffer)
 //!     .unwrap();
@@ -77,7 +79,9 @@
 //!     .allow_mpp()
 //!     .fallback_v0_p2wpkh(&wpubkey_hash)
 //!     .build()?
-//!     .sign::<_, Infallible>(|digest| Ok(secp_ctx.sign_schnorr_no_aux_rand(digest, &keys)))
+//!     .sign::<_, Infallible>(
+//!         |message| Ok(secp_ctx.sign_schnorr_no_aux_rand(message.as_ref().as_digest(), &keys))
+//!     )
 //!     .expect(\"failed verifying signature\")
 //!     .write(&mut buffer)
 //!     .unwrap();
@@ -87,6 +91,7 @@
 //! ```
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -96,9 +101,14 @@ use alloc::{vec::Vec, boxed::Box};
 
 
 use lightning::offers::invoice::UnsignedBolt12Invoice as nativeUnsignedBolt12InvoiceImport;
-pub(crate) type nativeUnsignedBolt12Invoice = nativeUnsignedBolt12InvoiceImport<'static>;
+pub(crate) type nativeUnsignedBolt12Invoice = nativeUnsignedBolt12InvoiceImport;
 
 /// A semantically valid [`Bolt12Invoice`] that hasn't been signed.
+///
+/// # Serialization
+///
+/// This is serialized as a TLV stream, which includes TLV records from the originating message. As
+/// such, it may include unknown, odd TLV records.
 #[must_use]
 #[repr(C)]
 pub struct UnsignedBolt12Invoice {
@@ -145,12 +155,12 @@ impl UnsignedBolt12Invoice {
 		ret
 	}
 }
-/// The public key corresponding to the key needed to sign the invoice.
+/// Returns the [`TaggedHash`] of the invoice to sign.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn UnsignedBolt12Invoice_signing_pubkey(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::PublicKey {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signing_pubkey();
-	crate::c_types::PublicKey::from_rust(&ret)
+pub extern "C" fn UnsignedBolt12Invoice_tagged_hash(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::lightning::offers::merkle::TaggedHash {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.tagged_hash();
+	crate::lightning::offers::merkle::TaggedHash { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::offers::merkle::TaggedHash<>) as *mut _) }, is_owned: false }
 }
 
 
@@ -230,13 +240,463 @@ pub(crate) extern "C" fn Bolt12Invoice_clone_void(this_ptr: *const c_void) -> *m
 pub extern "C" fn Bolt12Invoice_clone(orig: &Bolt12Invoice) -> Bolt12Invoice {
 	orig.clone()
 }
-/// A complete description of the purpose of the originating offer or refund. Intended to be
-/// displayed to the user but with the caveat that it has not been verified in any way.
+/// The chains that may be used when paying a requested invoice.
+///
+/// From [`Offer::chains`]; `None` if the invoice was created in response to a [`Refund`].
+///
+/// [`Offer::chains`]: crate::offers::offer::Offer::chains
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_offer_chains(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.offer_chains();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_ret_0.into() }) };
+	local_ret
+}
+
+/// The chain that must be used when paying the invoice; selected from [`offer_chains`] if the
+/// invoice originated from an offer.
+///
+/// From [`InvoiceRequest::chain`] or [`Refund::chain`].
+///
+/// [`offer_chains`]: Self::offer_chains
+/// [`InvoiceRequest::chain`]: crate::offers::invoice_request::InvoiceRequest::chain
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_chain(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chain();
+	crate::c_types::ThirtyTwoBytes { data: ret.to_bytes() }
+}
+
+/// Opaque bytes set by the originating [`Offer`].
+///
+/// From [`Offer::metadata`]; `None` if the invoice was created in response to a [`Refund`] or
+/// if the [`Offer`] did not set it.
+///
+/// [`Offer`]: crate::offers::offer::Offer
+/// [`Offer::metadata`]: crate::offers::offer::Offer::metadata
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_metadata(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::derived::COption_CVec_u8ZZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.metadata();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { let mut local_ret_0 = Vec::new(); for mut item in (*ret.as_ref().unwrap()).clone().drain(..) { local_ret_0.push( { item }); }; local_ret_0.into() }) };
+	local_ret
+}
+
+/// The minimum amount required for a successful payment of a single item.
+///
+/// From [`Offer::amount`]; `None` if the invoice was created in response to a [`Refund`] or if
+/// the [`Offer`] did not set it.
+///
+/// [`Offer`]: crate::offers::offer::Offer
+/// [`Offer::amount`]: crate::offers::offer::Offer::amount
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_amount(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::lightning::offers::offer::Amount {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.amount();
+	let mut local_ret = crate::lightning::offers::offer::Amount { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::offers::offer::Amount<>) as *mut _ }, is_owned: false };
+	local_ret
+}
+
+/// Features pertaining to the originating [`Offer`].
+///
+/// From [`Offer::offer_features`]; `None` if the invoice was created in response to a
+/// [`Refund`].
+///
+/// [`Offer`]: crate::offers::offer::Offer
+/// [`Offer::offer_features`]: crate::offers::offer::Offer::offer_features
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_offer_features(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::lightning::ln::features::OfferFeatures {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.offer_features();
+	let mut local_ret = crate::lightning::ln::features::OfferFeatures { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::ln::features::OfferFeatures<>) as *mut _ }, is_owned: false };
+	local_ret
+}
+
+/// A complete description of the purpose of the originating offer or refund.
+///
+/// From [`Offer::description`] or [`Refund::description`].
+///
+/// [`Offer::description`]: crate::offers::offer::Offer::description
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_description(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::lightning::util::string::PrintableString {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.description();
+	crate::lightning::util::string::PrintableString { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Duration since the Unix epoch when an invoice should no longer be requested.
+///
+/// From [`Offer::absolute_expiry`] or [`Refund::absolute_expiry`].
+///
+/// [`Offer::absolute_expiry`]: crate::offers::offer::Offer::absolute_expiry
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_absolute_expiry(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::derived::COption_u64Z {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.absolute_expiry();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { ret.unwrap().as_secs() }) };
+	local_ret
+}
+
+/// The issuer of the offer or refund.
+///
+/// From [`Offer::issuer`] or [`Refund::issuer`].
+///
+/// [`Offer::issuer`]: crate::offers::offer::Offer::issuer
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_issuer(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::lightning::util::string::PrintableString {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.issuer();
+	let mut local_ret = crate::lightning::util::string::PrintableString { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
+	local_ret
+}
+
+/// Paths to the recipient originating from publicly reachable nodes.
+///
+/// From [`Offer::paths`] or [`Refund::paths`].
+///
+/// [`Offer::paths`]: crate::offers::offer::Offer::paths
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_message_paths(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::derived::CVec_BlindedPathZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.message_paths();
+	let mut local_ret_clone = Vec::new(); local_ret_clone.extend_from_slice(ret); let mut ret = local_ret_clone; let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+	local_ret.into()
+}
+
+/// The quantity of items supported.
+///
+/// From [`Offer::supported_quantity`]; `None` if the invoice was created in response to a
+/// [`Refund`].
+///
+/// [`Offer::supported_quantity`]: crate::offers::offer::Offer::supported_quantity
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_supported_quantity(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::lightning::offers::offer::Quantity {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supported_quantity();
+	let mut local_ret = crate::lightning::offers::offer::Quantity { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
+	local_ret
+}
+
+/// An unpredictable series of bytes from the payer.
+///
+/// From [`InvoiceRequest::payer_metadata`] or [`Refund::payer_metadata`].
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_payer_metadata(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::u8slice {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payer_metadata();
+	let mut local_ret = crate::c_types::u8slice::from_slice(ret);
+	local_ret
+}
+
+/// Features pertaining to requesting an invoice.
+///
+/// From [`InvoiceRequest::invoice_request_features`] or [`Refund::features`].
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_invoice_request_features(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::lightning::ln::features::InvoiceRequestFeatures {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.invoice_request_features();
+	crate::lightning::ln::features::InvoiceRequestFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::features::InvoiceRequestFeatures<>) as *mut _) }, is_owned: false }
+}
+
+/// The quantity of items requested or refunded for.
+///
+/// From [`InvoiceRequest::quantity`] or [`Refund::quantity`].
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_quantity(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::derived::COption_u64Z {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.quantity();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { ret.unwrap() }) };
+	local_ret
+}
+
+/// A possibly transient pubkey used to sign the invoice request or to send an invoice for a
+/// refund in case there are no [`message_paths`].
+///
+/// [`message_paths`]: Self::message_paths
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_payer_id(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::PublicKey {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payer_id();
+	crate::c_types::PublicKey::from_rust(&ret)
+}
+
+/// A payer-provided note reflected back in the invoice.
+///
+/// From [`InvoiceRequest::payer_note`] or [`Refund::payer_note`].
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_payer_note(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::lightning::util::string::PrintableString {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payer_note();
+	let mut local_ret = crate::lightning::util::string::PrintableString { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
+	local_ret
+}
+
+/// Duration since the Unix epoch when the invoice was created.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_created_at(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.created_at();
+	ret.as_secs()
+}
+
+/// Duration since [`Bolt12Invoice::created_at`] when the invoice has expired and therefore
+/// should no longer be paid.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_relative_expiry(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.relative_expiry();
+	ret.as_secs()
+}
+
+/// Whether the invoice has expired.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_is_expired(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_expired();
+	ret
+}
+
+/// SHA256 hash of the payment preimage that will be given in return for paying the invoice.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_payment_hash(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_hash();
+	crate::c_types::ThirtyTwoBytes { data: ret.0 }
+}
+
+/// The minimum amount required for a successful payment of the invoice.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_amount_msats(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> u64 {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.amount_msats();
+	ret
+}
+
+/// Features pertaining to paying an invoice.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_invoice_features(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::lightning::ln::features::Bolt12InvoiceFeatures {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.invoice_features();
+	crate::lightning::ln::features::Bolt12InvoiceFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::features::Bolt12InvoiceFeatures<>) as *mut _) }, is_owned: false }
+}
+
+/// The public key corresponding to the key used to sign the invoice.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UnsignedBolt12Invoice_signing_pubkey(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::PublicKey {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signing_pubkey();
+	crate::c_types::PublicKey::from_rust(&ret)
+}
+
+/// The chains that may be used when paying a requested invoice.
+///
+/// From [`Offer::chains`]; `None` if the invoice was created in response to a [`Refund`].
+///
+/// [`Offer::chains`]: crate::offers::offer::Offer::chains
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_offer_chains(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.offer_chains();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_ret_0.into() }) };
+	local_ret
+}
+
+/// The chain that must be used when paying the invoice; selected from [`offer_chains`] if the
+/// invoice originated from an offer.
+///
+/// From [`InvoiceRequest::chain`] or [`Refund::chain`].
+///
+/// [`offer_chains`]: Self::offer_chains
+/// [`InvoiceRequest::chain`]: crate::offers::invoice_request::InvoiceRequest::chain
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_chain(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chain();
+	crate::c_types::ThirtyTwoBytes { data: ret.to_bytes() }
+}
+
+/// Opaque bytes set by the originating [`Offer`].
+///
+/// From [`Offer::metadata`]; `None` if the invoice was created in response to a [`Refund`] or
+/// if the [`Offer`] did not set it.
+///
+/// [`Offer`]: crate::offers::offer::Offer
+/// [`Offer::metadata`]: crate::offers::offer::Offer::metadata
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_metadata(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::derived::COption_CVec_u8ZZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.metadata();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { let mut local_ret_0 = Vec::new(); for mut item in (*ret.as_ref().unwrap()).clone().drain(..) { local_ret_0.push( { item }); }; local_ret_0.into() }) };
+	local_ret
+}
+
+/// The minimum amount required for a successful payment of a single item.
+///
+/// From [`Offer::amount`]; `None` if the invoice was created in response to a [`Refund`] or if
+/// the [`Offer`] did not set it.
+///
+/// [`Offer`]: crate::offers::offer::Offer
+/// [`Offer::amount`]: crate::offers::offer::Offer::amount
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_amount(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::lightning::offers::offer::Amount {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.amount();
+	let mut local_ret = crate::lightning::offers::offer::Amount { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::offers::offer::Amount<>) as *mut _ }, is_owned: false };
+	local_ret
+}
+
+/// Features pertaining to the originating [`Offer`].
+///
+/// From [`Offer::offer_features`]; `None` if the invoice was created in response to a
+/// [`Refund`].
+///
+/// [`Offer`]: crate::offers::offer::Offer
+/// [`Offer::offer_features`]: crate::offers::offer::Offer::offer_features
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_offer_features(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::lightning::ln::features::OfferFeatures {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.offer_features();
+	let mut local_ret = crate::lightning::ln::features::OfferFeatures { inner: unsafe { (if ret.is_none() { core::ptr::null() } else { ObjOps::nonnull_ptr_to_inner( { (ret.unwrap()) }) } as *const lightning::ln::features::OfferFeatures<>) as *mut _ }, is_owned: false };
+	local_ret
+}
+
+/// A complete description of the purpose of the originating offer or refund.
+///
+/// From [`Offer::description`] or [`Refund::description`].
+///
+/// [`Offer::description`]: crate::offers::offer::Offer::description
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Bolt12Invoice_description(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::lightning::util::string::PrintableString {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.description();
 	crate::lightning::util::string::PrintableString { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
+/// Duration since the Unix epoch when an invoice should no longer be requested.
+///
+/// From [`Offer::absolute_expiry`] or [`Refund::absolute_expiry`].
+///
+/// [`Offer::absolute_expiry`]: crate::offers::offer::Offer::absolute_expiry
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_absolute_expiry(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::derived::COption_u64Z {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.absolute_expiry();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { ret.unwrap().as_secs() }) };
+	local_ret
+}
+
+/// The issuer of the offer or refund.
+///
+/// From [`Offer::issuer`] or [`Refund::issuer`].
+///
+/// [`Offer::issuer`]: crate::offers::offer::Offer::issuer
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_issuer(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::lightning::util::string::PrintableString {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.issuer();
+	let mut local_ret = crate::lightning::util::string::PrintableString { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
+	local_ret
+}
+
+/// Paths to the recipient originating from publicly reachable nodes.
+///
+/// From [`Offer::paths`] or [`Refund::paths`].
+///
+/// [`Offer::paths`]: crate::offers::offer::Offer::paths
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_message_paths(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::derived::CVec_BlindedPathZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.message_paths();
+	let mut local_ret_clone = Vec::new(); local_ret_clone.extend_from_slice(ret); let mut ret = local_ret_clone; let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::lightning::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+	local_ret.into()
+}
+
+/// The quantity of items supported.
+///
+/// From [`Offer::supported_quantity`]; `None` if the invoice was created in response to a
+/// [`Refund`].
+///
+/// [`Offer::supported_quantity`]: crate::offers::offer::Offer::supported_quantity
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_supported_quantity(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::lightning::offers::offer::Quantity {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supported_quantity();
+	let mut local_ret = crate::lightning::offers::offer::Quantity { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
+	local_ret
+}
+
+/// An unpredictable series of bytes from the payer.
+///
+/// From [`InvoiceRequest::payer_metadata`] or [`Refund::payer_metadata`].
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_payer_metadata(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::u8slice {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payer_metadata();
+	let mut local_ret = crate::c_types::u8slice::from_slice(ret);
+	local_ret
+}
+
+/// Features pertaining to requesting an invoice.
+///
+/// From [`InvoiceRequest::invoice_request_features`] or [`Refund::features`].
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_invoice_request_features(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::lightning::ln::features::InvoiceRequestFeatures {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.invoice_request_features();
+	crate::lightning::ln::features::InvoiceRequestFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::features::InvoiceRequestFeatures<>) as *mut _) }, is_owned: false }
+}
+
+/// The quantity of items requested or refunded for.
+///
+/// From [`InvoiceRequest::quantity`] or [`Refund::quantity`].
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_quantity(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::derived::COption_u64Z {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.quantity();
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { ret.unwrap() }) };
+	local_ret
+}
+
+/// A possibly transient pubkey used to sign the invoice request or to send an invoice for a
+/// refund in case there are no [`message_paths`].
+///
+/// [`message_paths`]: Self::message_paths
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_payer_id(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::PublicKey {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payer_id();
+	crate::c_types::PublicKey::from_rust(&ret)
+}
+
+/// A payer-provided note reflected back in the invoice.
+///
+/// From [`InvoiceRequest::payer_note`] or [`Refund::payer_note`].
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_payer_note(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::lightning::util::string::PrintableString {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payer_note();
+	let mut local_ret = crate::lightning::util::string::PrintableString { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
+	local_ret
 }
 
 /// Duration since the Unix epoch when the invoice was created.
@@ -283,8 +743,8 @@ pub extern "C" fn Bolt12Invoice_amount_msats(this_arg: &crate::lightning::offers
 /// Features pertaining to paying an invoice.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Bolt12Invoice_features(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::lightning::ln::features::Bolt12InvoiceFeatures {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.features();
+pub extern "C" fn Bolt12Invoice_invoice_features(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::lightning::ln::features::Bolt12InvoiceFeatures {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.invoice_features();
 	crate::lightning::ln::features::Bolt12InvoiceFeatures { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::ln::features::Bolt12InvoiceFeatures<>) as *mut _) }, is_owned: false }
 }
 
@@ -296,6 +756,14 @@ pub extern "C" fn Bolt12Invoice_signing_pubkey(this_arg: &crate::lightning::offe
 	crate::c_types::PublicKey::from_rust(&ret)
 }
 
+/// Signature of the invoice verified using [`Bolt12Invoice::signing_pubkey`].
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Bolt12Invoice_signature(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::SchnorrSignature {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.signature();
+	crate::c_types::SchnorrSignature::from_rust(&ret)
+}
+
 /// Hash that was used for signing the invoice.
 #[must_use]
 #[no_mangle]
@@ -304,14 +772,25 @@ pub extern "C" fn Bolt12Invoice_signable_hash(this_arg: &crate::lightning::offer
 	crate::c_types::ThirtyTwoBytes { data: ret }
 }
 
-/// Verifies that the invoice was for a request or refund created using the given key.
+/// Verifies that the invoice was for a request or refund created using the given key. Returns
+/// the associated [`PaymentId`] to use when sending the payment.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Bolt12Invoice_verify(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice, key: &crate::lightning::ln::inbound_payment::ExpandedKey) -> bool {
+pub extern "C" fn Bolt12Invoice_verify(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice, key: &crate::lightning::ln::inbound_payment::ExpandedKey) -> crate::c_types::derived::CResult_ThirtyTwoBytesNoneZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.verify(key.get_native_ref(), secp256k1::global::SECP256K1);
-	ret
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::ThirtyTwoBytes { data: o.0 } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
 }
 
+#[no_mangle]
+/// Serialize the UnsignedBolt12Invoice object into a byte array which can be read by UnsignedBolt12Invoice_read
+pub extern "C" fn UnsignedBolt12Invoice_write(obj: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[no_mangle]
+pub(crate) extern "C" fn UnsignedBolt12Invoice_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUnsignedBolt12Invoice) })
+}
 #[no_mangle]
 /// Serialize the Bolt12Invoice object into a byte array which can be read by Bolt12Invoice_read
 pub extern "C" fn Bolt12Invoice_write(obj: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::derived::CVec_u8Z {

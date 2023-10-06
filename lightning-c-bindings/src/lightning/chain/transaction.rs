@@ -9,6 +9,7 @@
 //! Types describing on-chain transactions.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -144,7 +145,7 @@ pub extern "C" fn OutPoint_hash(o: &OutPoint) -> u64 {
 #[no_mangle]
 pub extern "C" fn OutPoint_to_channel_id(this_arg: &crate::lightning::chain::transaction::OutPoint) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.to_channel_id();
-	crate::c_types::ThirtyTwoBytes { data: ret }
+	crate::c_types::ThirtyTwoBytes { data: ret.0 }
 }
 
 #[no_mangle]

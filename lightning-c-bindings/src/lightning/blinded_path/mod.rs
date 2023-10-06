@@ -9,6 +9,7 @@
 //! Creating blinded paths and related utilities live here.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -16,9 +17,23 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
+pub mod payment;
+mod message {
+
+use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
 mod utils {
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -79,6 +94,66 @@ impl BlindedPath {
 		ret
 	}
 }
+/// To send to a blinded path, the sender first finds a route to the unblinded
+/// `introduction_node_id`, which can unblind its [`encrypted_payload`] to find out the onion
+/// message or payment's next hop and forward it along.
+///
+/// [`encrypted_payload`]: BlindedHop::encrypted_payload
+#[no_mangle]
+pub extern "C" fn BlindedPath_get_introduction_node_id(this_ptr: &BlindedPath) -> crate::c_types::PublicKey {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().introduction_node_id;
+	crate::c_types::PublicKey::from_rust(&inner_val)
+}
+/// To send to a blinded path, the sender first finds a route to the unblinded
+/// `introduction_node_id`, which can unblind its [`encrypted_payload`] to find out the onion
+/// message or payment's next hop and forward it along.
+///
+/// [`encrypted_payload`]: BlindedHop::encrypted_payload
+#[no_mangle]
+pub extern "C" fn BlindedPath_set_introduction_node_id(this_ptr: &mut BlindedPath, mut val: crate::c_types::PublicKey) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.introduction_node_id = val.into_rust();
+}
+/// Used by the introduction node to decrypt its [`encrypted_payload`] to forward the onion
+/// message or payment.
+///
+/// [`encrypted_payload`]: BlindedHop::encrypted_payload
+#[no_mangle]
+pub extern "C" fn BlindedPath_get_blinding_point(this_ptr: &BlindedPath) -> crate::c_types::PublicKey {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().blinding_point;
+	crate::c_types::PublicKey::from_rust(&inner_val)
+}
+/// Used by the introduction node to decrypt its [`encrypted_payload`] to forward the onion
+/// message or payment.
+///
+/// [`encrypted_payload`]: BlindedHop::encrypted_payload
+#[no_mangle]
+pub extern "C" fn BlindedPath_set_blinding_point(this_ptr: &mut BlindedPath, mut val: crate::c_types::PublicKey) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.blinding_point = val.into_rust();
+}
+/// The hops composing the blinded path.
+#[no_mangle]
+pub extern "C" fn BlindedPath_get_blinded_hops(this_ptr: &BlindedPath) -> crate::c_types::derived::CVec_BlindedHopZ {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().blinded_hops;
+	let mut local_inner_val = Vec::new(); for item in inner_val.iter() { local_inner_val.push( { crate::lightning::blinded_path::BlindedHop { inner: unsafe { ObjOps::nonnull_ptr_to_inner((item as *const lightning::blinded_path::BlindedHop<>) as *mut _) }, is_owned: false } }); };
+	local_inner_val.into()
+}
+/// The hops composing the blinded path.
+#[no_mangle]
+pub extern "C" fn BlindedPath_set_blinded_hops(this_ptr: &mut BlindedPath, mut val: crate::c_types::derived::CVec_BlindedHopZ) {
+	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.blinded_hops = local_val;
+}
+/// Constructs a new BlindedPath given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedPath_new(mut introduction_node_id_arg: crate::c_types::PublicKey, mut blinding_point_arg: crate::c_types::PublicKey, mut blinded_hops_arg: crate::c_types::derived::CVec_BlindedHopZ) -> BlindedPath {
+	let mut local_blinded_hops_arg = Vec::new(); for mut item in blinded_hops_arg.into_rust().drain(..) { local_blinded_hops_arg.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+	BlindedPath { inner: ObjOps::heap_alloc(nativeBlindedPath {
+		introduction_node_id: introduction_node_id_arg.into_rust(),
+		blinding_point: blinding_point_arg.into_rust(),
+		blinded_hops: local_blinded_hops_arg,
+	}), is_owned: true }
+}
 impl Clone for BlindedPath {
 	fn clone(&self) -> Self {
 		Self {
@@ -121,8 +196,9 @@ pub extern "C" fn BlindedPath_eq(a: &BlindedPath, b: &BlindedPath) -> bool {
 use lightning::blinded_path::BlindedHop as nativeBlindedHopImport;
 pub(crate) type nativeBlindedHop = nativeBlindedHopImport;
 
-/// Used to construct the blinded hops portion of a blinded path. These hops cannot be identified
-/// by outside observers and thus can be used to hide the identity of the recipient.
+/// An encrypted payload and node id corresponding to a hop in a payment or onion message path, to
+/// be encoded in the sender's onion packet. These hops cannot be identified by outside observers
+/// and thus can be used to hide the identity of the recipient.
 #[must_use]
 #[repr(C)]
 pub struct BlindedHop {
@@ -168,6 +244,42 @@ impl BlindedHop {
 		self.inner = core::ptr::null_mut();
 		ret
 	}
+}
+/// The blinded node id of this hop in a [`BlindedPath`].
+#[no_mangle]
+pub extern "C" fn BlindedHop_get_blinded_node_id(this_ptr: &BlindedHop) -> crate::c_types::PublicKey {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().blinded_node_id;
+	crate::c_types::PublicKey::from_rust(&inner_val)
+}
+/// The blinded node id of this hop in a [`BlindedPath`].
+#[no_mangle]
+pub extern "C" fn BlindedHop_set_blinded_node_id(this_ptr: &mut BlindedHop, mut val: crate::c_types::PublicKey) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.blinded_node_id = val.into_rust();
+}
+/// The encrypted payload intended for this hop in a [`BlindedPath`].
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn BlindedHop_get_encrypted_payload(this_ptr: &BlindedHop) -> crate::c_types::derived::CVec_u8Z {
+	let mut inner_val = this_ptr.get_native_mut_ref().encrypted_payload.clone();
+	let mut local_inner_val = Vec::new(); for mut item in inner_val.drain(..) { local_inner_val.push( { item }); };
+	local_inner_val.into()
+}
+/// The encrypted payload intended for this hop in a [`BlindedPath`].
+#[no_mangle]
+pub extern "C" fn BlindedHop_set_encrypted_payload(this_ptr: &mut BlindedHop, mut val: crate::c_types::derived::CVec_u8Z) {
+	let mut local_val = Vec::new(); for mut item in val.into_rust().drain(..) { local_val.push( { item }); };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.encrypted_payload = local_val;
+}
+/// Constructs a new BlindedHop given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedHop_new(mut blinded_node_id_arg: crate::c_types::PublicKey, mut encrypted_payload_arg: crate::c_types::derived::CVec_u8Z) -> BlindedHop {
+	let mut local_encrypted_payload_arg = Vec::new(); for mut item in encrypted_payload_arg.into_rust().drain(..) { local_encrypted_payload_arg.push( { item }); };
+	BlindedHop { inner: ObjOps::heap_alloc(nativeBlindedHop {
+		blinded_node_id: blinded_node_id_arg.into_rust(),
+		encrypted_payload: local_encrypted_payload_arg,
+	}), is_owned: true }
 }
 impl Clone for BlindedHop {
 	fn clone(&self) -> Self {
@@ -217,6 +329,15 @@ pub extern "C" fn BlindedPath_new_for_message(mut node_pks: crate::c_types::deri
 	let mut local_node_pks = Vec::new(); for mut item in node_pks.into_rust().drain(..) { local_node_pks.push( { item.into_rust() }); };
 	let mut ret = lightning::blinded_path::BlindedPath::new_for_message(&local_node_pks[..], entropy_source, secp256k1::global::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Create a one-hop blinded path for a payment.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedPath_one_hop_for_payment(mut payee_node_id: crate::c_types::PublicKey, mut payee_tlvs: crate::lightning::blinded_path::payment::ReceiveTlvs, entropy_source: &crate::lightning::sign::EntropySource) -> crate::c_types::derived::CResult_C2Tuple_BlindedPayInfoBlindedPathZNoneZ {
+	let mut ret = lightning::blinded_path::BlindedPath::one_hop_for_payment(payee_node_id.into_rust(), *unsafe { Box::from_raw(payee_tlvs.take_inner()) }, entropy_source, secp256k1::global::SECP256K1);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_ret_0 = (crate::lightning::offers::invoice::BlindedPayInfo { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, crate::lightning::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(orig_ret_0_1), is_owned: true }).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }
 

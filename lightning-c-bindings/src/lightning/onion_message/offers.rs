@@ -9,6 +9,7 @@
 //! Message handling for BOLT 12 Offers.
 
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -33,8 +34,7 @@ pub struct OffersMessageHandler {
 }
 unsafe impl Send for OffersMessageHandler {}
 unsafe impl Sync for OffersMessageHandler {}
-#[no_mangle]
-pub(crate) extern "C" fn OffersMessageHandler_clone_fields(orig: &OffersMessageHandler) -> OffersMessageHandler {
+pub(crate) fn OffersMessageHandler_clone_fields(orig: &OffersMessageHandler) -> OffersMessageHandler {
 	OffersMessageHandler {
 		this_arg: orig.this_arg,
 		handle_message: Clone::clone(&orig.handle_message),
@@ -56,6 +56,11 @@ impl rustOffersMessageHandler for OffersMessageHandler {
 impl core::ops::Deref for OffersMessageHandler {
 	type Target = Self;
 	fn deref(&self) -> &Self {
+		self
+	}
+}
+impl core::ops::DerefMut for OffersMessageHandler {
+	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }

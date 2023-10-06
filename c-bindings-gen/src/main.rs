@@ -36,6 +36,7 @@ use blocks::*;
 
 const DEFAULT_IMPORTS: &'static str = "
 use alloc::str::FromStr;
+use alloc::string::String;
 use core::ffi::c_void;
 use core::convert::Infallible;
 use bitcoin::hashes::Hash;
@@ -533,8 +534,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 									writeln!(w, "\ttype {} = crate::{};", t.ident, $type_resolver.resolve_path(&tr.path, Some(&gen_types))).unwrap();
 									for bound in bounds_iter {
 										if let syn::TypeParamBound::Trait(t) = bound {
-											// We only allow for `?Sized` here.
-											if let syn::TraitBoundModifier::Maybe(_) = t.modifier {} else { panic!(); }
+											// We only allow for `Sized` here.
 											assert_eq!(t.path.segments.len(), 1);
 											assert_eq!(format!("{}", t.path.segments[0].ident), "Sized");
 										}
@@ -554,8 +554,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap();
 	writeln!(w, "unsafe impl Sync for {} {{}}", trait_name).unwrap();
 
-	writeln!(w, "#[no_mangle]").unwrap();
-	writeln!(w, "pub(crate) extern \"C\" fn {}_clone_fields(orig: &{}) -> {} {{", trait_name, trait_name, trait_name).unwrap();
+	writeln!(w, "pub(crate) fn {}_clone_fields(orig: &{}) -> {} {{", trait_name, trait_name, trait_name).unwrap();
 	writeln!(w, "\t{} {{", trait_name).unwrap();
 	writeln!(w, "\t\tthis_arg: orig.this_arg,").unwrap();
 	for (field, clone_fn, _) in generated_fields.iter() {
@@ -647,6 +646,8 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		writeln!(w, "// directly as a Deref trait in higher-level structs:").unwrap();
 		writeln!(w, "impl core::ops::Deref for {} {{\n\ttype Target = Self;", trait_name).unwrap();
 		writeln!(w, "\tfn deref(&self) -> &Self {{\n\t\tself\n\t}}\n}}").unwrap();
+		writeln!(w, "impl core::ops::DerefMut for {} {{", trait_name).unwrap();
+		writeln!(w, "\tfn deref_mut(&mut self) -> &mut Self {{\n\t\tself\n\t}}\n}}").unwrap();
 	}
 
 	writeln!(w, "/// Calls the free function if one is set").unwrap();
@@ -811,6 +812,19 @@ fn writeln_struct<'a, 'b, W: std::io::Write>(w: &mut W, s: &'a syn::ItemStruct, 
 	if all_fields_settable {
 		// Build a constructor!
 		writeln!(w, "/// Constructs a new {} given each field", struct_name).unwrap();
+		match &s.fields {
+			syn::Fields::Named(fields) => {
+				writeln_arg_docs(w, &[], "", types, Some(&gen_types),
+					fields.named.iter().map(|field| (format!("{}_arg", field.ident.as_ref().unwrap()), &field.ty)),
+					None);
+			},
+			syn::Fields::Unnamed(fields) => {
+				writeln_arg_docs(w, &[], "", types, Some(&gen_types),
+					fields.unnamed.iter().enumerate().map(|(idx, field)| (format!("{}_arg", ('a' as u8 + idx as u8)), &field.ty)),
+					None);
+			},
+			syn::Fields::Unit => {},
+		}
 		write!(w, "#[must_use]\n#[no_mangle]\npub extern \"C\" fn {}_new(", struct_name).unwrap();
 
 		match &s.fields {

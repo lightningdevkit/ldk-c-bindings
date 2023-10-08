@@ -1254,15 +1254,22 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 							writeln!(w, "extern \"C\" fn {}_{}_cloned(new_obj: &mut crate::{}) {{", trait_obj.ident, ident, full_trait_path).unwrap();
 							writeln!(w, "\tnew_obj.this_arg = {}_clone_void(new_obj.this_arg);", ident).unwrap();
 							writeln!(w, "\tnew_obj.free = Some({}_free_void);", ident).unwrap();
-							walk_supertraits!(trait_obj, Some(&types), (
-								(s, t, _) => {
-									if types.crate_types.traits.get(s).is_some() {
-										assert!(!types.is_clonable(s)); // We don't currently support cloning with a clonable supertrait
-										writeln!(w, "\tnew_obj.{}.this_arg = new_obj.this_arg;", t).unwrap();
-										writeln!(w, "\tnew_obj.{}.free = None;", t).unwrap();
+
+							fn seek_supertraits<W: std::io::Write>(w: &mut W, pfx: &str, tr: &syn::ItemTrait, types: &TypeResolver) {
+								walk_supertraits!(tr, Some(types), (
+									(s, t, _) => {
+										if types.crate_types.traits.get(s).is_some() {
+											assert!(!types.is_clonable(s)); // We don't currently support cloning with a clonable supertrait
+											writeln!(w, "\tnew_obj.{}{}.this_arg = new_obj.this_arg;", pfx, t).unwrap();
+											writeln!(w, "\tnew_obj.{}{}.free = None;", pfx, t).unwrap();
+											let tr = types.crate_types.traits.get(s).unwrap();
+											let resolver = get_module_type_resolver!(s, types.crate_types);
+											seek_supertraits(w, &format!("{}.", t), tr, &resolver);
+										}
 									}
-								}
-							) );
+								) );
+							}
+							seek_supertraits(w, "", trait_obj, types);
 							writeln!(w, "}}").unwrap();
 						}
 						write!(w, "\n").unwrap();

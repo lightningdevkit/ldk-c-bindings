@@ -267,8 +267,8 @@ macro_rules! walk_supertraits { ($t: expr, $types: expr, ($( $($pat: pat)|* => $
 } } }
 
 macro_rules! get_module_type_resolver {
-	($module: expr, $crate_libs: expr, $crate_types: expr) => { {
-		let module: &str = &$module;
+	($type_in_module: expr, $crate_types: expr) => { {
+		let module: &str = &$type_in_module;
 		let mut module_iter = module.rsplitn(2, "::");
 		module_iter.next().unwrap();
 		let module = module_iter.next().unwrap();
@@ -304,7 +304,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		(s, _i, _) => {
 			if let Some(supertrait) = types.crate_types.traits.get(s) {
 				supertrait_name = s.to_string();
-				supertrait_resolver = get_module_type_resolver!(supertrait_name, types.crate_libs, types.crate_types);
+				supertrait_resolver = get_module_type_resolver!(supertrait_name, types.crate_types);
 				gen_types.learn_associated_types(&supertrait, &supertrait_resolver);
 				break;
 			}
@@ -600,10 +600,10 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 		},
 		(s, i, generic_args) => {
 			if let Some(supertrait) = types.crate_types.traits.get(s) {
-				let resolver = get_module_type_resolver!(s, types.crate_libs, types.crate_types);
+				let resolver = get_module_type_resolver!(s, types.crate_types);
 				macro_rules! impl_supertrait {
 					($s: expr, $supertrait: expr, $i: expr, $generic_args: expr) => {
-						let resolver = get_module_type_resolver!($s, types.crate_libs, types.crate_types);
+						let resolver = get_module_type_resolver!($s, types.crate_types);
 
 						// Blindly assume that the same imports where `supertrait` is defined are also
 						// imported here. This will almost certainly break at some point, but it should be
@@ -971,7 +971,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 							(s, _i, _) => {
 								if let Some(supertrait) = types.crate_types.traits.get(s) {
 									supertrait_name = s.to_string();
-									supertrait_resolver = get_module_type_resolver!(supertrait_name, types.crate_libs, types.crate_types);
+									supertrait_resolver = get_module_type_resolver!(supertrait_name, types.crate_types);
 									gen_types.learn_associated_types(&supertrait, &supertrait_resolver);
 									break;
 								}
@@ -982,7 +982,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 						// mappings from a trai defined in a different file, we may mis-resolve or
 						// fail to resolve the mapped types. Thus, we have to construct a new
 						// resolver for the module that the trait was defined in here first.
-						let mut trait_resolver = get_module_type_resolver!(full_trait_path, types.crate_libs, types.crate_types);
+						let mut trait_resolver = get_module_type_resolver!(full_trait_path, types.crate_types);
 						gen_types.learn_associated_types(trait_obj, &trait_resolver);
 						let mut impl_associated_types = HashMap::new();
 						for item in i.items.iter() {
@@ -1115,7 +1115,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 									}
 									write_impl_fields!(s, supertrait_obj, t, "\t", types);
 
-									let resolver = get_module_type_resolver!(s, types.crate_libs, types.crate_types);
+									let resolver = get_module_type_resolver!(s, types.crate_types);
 									walk_supertraits!(supertrait_obj, Some(&resolver), (
 										(s, t, _) => {
 											if let Some(supertrait_obj) = types.crate_types.traits.get(s) {

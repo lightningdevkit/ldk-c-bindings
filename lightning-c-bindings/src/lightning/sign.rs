@@ -2188,6 +2188,8 @@ extern "C" fn WriteableEcdsaChannelSigner_InMemorySigner_cloned(new_obj: &mut cr
 	new_obj.free = Some(InMemorySigner_free_void);
 	new_obj.EcdsaChannelSigner.this_arg = new_obj.this_arg;
 	new_obj.EcdsaChannelSigner.free = None;
+	new_obj.EcdsaChannelSigner.ChannelSigner.this_arg = new_obj.this_arg;
+	new_obj.EcdsaChannelSigner.ChannelSigner.free = None;
 }
 
 #[no_mangle]

@@ -95,7 +95,6 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 
 				writeln!(w, "}}").unwrap();
 				if has_inner {
-					writeln!(w, "#[no_mangle]").unwrap();
 					writeln!(w, "pub(crate) extern \"C\" fn {}_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {{", for_obj).unwrap();
 					writeln!(w, "\tcrate::c_types::serialize_obj(unsafe {{ &*(obj as *const native{}) }})", for_obj).unwrap();
 					writeln!(w, "}}").unwrap();

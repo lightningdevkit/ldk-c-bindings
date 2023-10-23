@@ -13,7 +13,7 @@ void print_log(const void *this_arg, const LDKRecord *record) {
 }
 
 uint32_t get_fee(const void *this_arg, LDKConfirmationTarget target) {
-	if (target == LDKConfirmationTarget_Background) {
+	if (target == LDKConfirmationTarget_AnchorChannelFee || target == LDKConfirmationTarget_MinAllowedAnchorChannelRemoteFee) {
 		return 253;
 	} else {
 		return 507;

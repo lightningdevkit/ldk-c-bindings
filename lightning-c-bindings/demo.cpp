@@ -104,7 +104,7 @@ void print_log(const void *this_arg, const LDKRecord *record) {
 }
 
 uint32_t get_fee(const void *this_arg, LDKConfirmationTarget target) {
-	if (target == LDKConfirmationTarget_Background) {
+	if (target == LDKConfirmationTarget_AnchorChannelFee || target == LDKConfirmationTarget_MinAllowedAnchorChannelRemoteFee) {
 		return 253;
 	} else {
 		return 507;
@@ -386,7 +386,7 @@ public:
 
 struct CustomOnionMsgQueue {
 	std::mutex mtx;
-	std::vector<LDK::CustomOnionMessageContents> msgs;
+	std::vector<LDK::OnionMessageContents> msgs;
 };
 
 uint64_t custom_onion_msg_type_id(const void *this_arg) {
@@ -400,15 +400,15 @@ LDKCVec_u8Z custom_onion_msg_bytes(const void *this_arg) {
 	};
 }
 
-LDKCOption_CustomOnionMessageContentsZ handle_custom_onion_message(const void* this_arg, struct LDKCustomOnionMessageContents msg) {
+LDKCOption_OnionMessageContentsZ handle_custom_onion_message(const void* this_arg, struct LDKOnionMessageContents msg) {
 	CustomOnionMsgQueue* arg = (CustomOnionMsgQueue*) this_arg;
 	std::unique_lock<std::mutex> lck(arg->mtx);
 	arg->msgs.push_back(std::move(msg));
-	return COption_CustomOnionMessageContentsZ_none();
+	return COption_OnionMessageContentsZ_none();
 }
 
-LDKCustomOnionMessageContents build_custom_onion_message() {
-	return LDKCustomOnionMessageContents {
+LDKOnionMessageContents build_custom_onion_message() {
+	return LDKOnionMessageContents {
 		.this_arg = NULL,
 		.tlv_type = custom_onion_msg_type_id,
 		.write = custom_onion_msg_bytes,
@@ -416,15 +416,19 @@ LDKCustomOnionMessageContents build_custom_onion_message() {
 	};
 }
 
-LDKCResult_COption_CustomOnionMessageContentsZDecodeErrorZ read_custom_onion_message(const void* this_arg, uint64_t type, LDKu8slice buf) {
+LDKCResult_COption_OnionMessageContentsZDecodeErrorZ read_custom_onion_message(const void* this_arg, uint64_t type, LDKu8slice buf) {
 	assert(type == 8888);
 	assert(buf.datalen == 1024);
 	uint8_t cmp[1024];
 	memset(cmp, 43, 1024);
 	assert(!memcmp(cmp, buf.data, 1024));
-	return CResult_COption_CustomOnionMessageContentsZDecodeErrorZ_ok(COption_CustomOnionMessageContentsZ_some(build_custom_onion_message()));
+	return CResult_COption_OnionMessageContentsZDecodeErrorZ_ok(COption_OnionMessageContentsZ_some(build_custom_onion_message()));
 }
 
+LDKCVec_C3Tuple_OnionMessageContentsDestinationBlindedPathZZ release_no_messages(const void* this_arg) {
+	return LDKCVec_C3Tuple_OnionMessageContentsDestinationBlindedPathZZ {
+		.data = NULL, .datalen = 0 };
+}
 
 struct CustomMsgQueue {
 	std::vector<LDK::Type> msgs;
@@ -991,6 +995,7 @@ int main() {
 		.this_arg = NULL,
 		.handle_custom_message = NULL, // We only create custom messages, not handle them
 		.read_custom_message = NULL, // We only create custom messages, not handle them
+		.release_pending_custom_messages = release_no_messages,
 		.free = NULL,
 	};
 	LDK::DefaultMessageRouter mr1 = DefaultMessageRouter_new();
@@ -1018,6 +1023,7 @@ int main() {
 		.this_arg = &peer_2_custom_onion_messages,
 		.handle_custom_message = handle_custom_onion_message,
 		.read_custom_message = read_custom_onion_message,
+		.release_pending_custom_messages = release_no_messages,
 		.free = NULL,
 	};
 	LDK::DefaultMessageRouter mr2 = DefaultMessageRouter_new();
@@ -1178,10 +1184,8 @@ int main() {
 				LDKCVec_PublicKeyZ { .data = NULL, .datalen = 0, },
 				Destination_node(ChannelManager_get_our_node_id(&cm2))
 			),
-			LDKOnionMessageContents {
-				.tag = LDKOnionMessageContents_Custom,
-				.custom = build_custom_onion_message()
-			}, LDKBlindedPath { .inner = NULL, .is_owned = true })
+			build_custom_onion_message(),
+			LDKBlindedPath { .inner = NULL, .is_owned = true })
 		.result_ok);
 	PeerManager_process_events(&net1);
 	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting onion message..." << std::endl;

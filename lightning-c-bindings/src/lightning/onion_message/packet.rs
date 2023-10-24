@@ -140,7 +140,7 @@ impl Clone for Packet {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Packet_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePacket)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePacket)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Packet
@@ -161,113 +161,166 @@ pub extern "C" fn Packet_eq(a: &Packet, b: &Packet) -> bool {
 pub extern "C" fn Packet_write(obj: &crate::lightning::onion_message::packet::Packet) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Packet_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativePacket) })
 }
-/// The contents of an onion message. In the context of offers, this would be the invoice, invoice
-/// request, or invoice error.
+/// The contents of an [`OnionMessage`] as read from the wire.
+///
+/// [`OnionMessage`]: crate::ln::msgs::OnionMessage
 #[derive(Clone)]
 #[must_use]
 #[repr(C)]
-pub enum OnionMessageContents {
+pub enum ParsedOnionMessageContents {
 	/// A message related to BOLT 12 Offers.
 	Offers(
 		crate::lightning::onion_message::offers::OffersMessage),
 	/// A custom onion message specified by the user.
 	Custom(
-		crate::lightning::onion_message::packet::CustomOnionMessageContents),
+		crate::lightning::onion_message::packet::OnionMessageContents),
 }
-use lightning::onion_message::packet::OnionMessageContents as OnionMessageContentsImport;
-pub(crate) type nativeOnionMessageContents = OnionMessageContentsImport<crate::lightning::onion_message::packet::CustomOnionMessageContents>;
+use lightning::onion_message::packet::ParsedOnionMessageContents as ParsedOnionMessageContentsImport;
+pub(crate) type nativeParsedOnionMessageContents = ParsedOnionMessageContentsImport<crate::lightning::onion_message::packet::OnionMessageContents>;
 
-impl OnionMessageContents {
+impl ParsedOnionMessageContents {
 	#[allow(unused)]
-	pub(crate) fn to_native(&self) -> nativeOnionMessageContents {
+	pub(crate) fn to_native(&self) -> nativeParsedOnionMessageContents {
 		match self {
-			OnionMessageContents::Offers (ref a, ) => {
+			ParsedOnionMessageContents::Offers (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
-				nativeOnionMessageContents::Offers (
+				nativeParsedOnionMessageContents::Offers (
 					a_nonref.into_native(),
 				)
 			},
-			OnionMessageContents::Custom (ref a, ) => {
+			ParsedOnionMessageContents::Custom (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
-				nativeOnionMessageContents::Custom (
+				nativeParsedOnionMessageContents::Custom (
 					a_nonref,
 				)
 			},
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn into_native(self) -> nativeOnionMessageContents {
+	pub(crate) fn into_native(self) -> nativeParsedOnionMessageContents {
 		match self {
-			OnionMessageContents::Offers (mut a, ) => {
-				nativeOnionMessageContents::Offers (
+			ParsedOnionMessageContents::Offers (mut a, ) => {
+				nativeParsedOnionMessageContents::Offers (
 					a.into_native(),
 				)
 			},
-			OnionMessageContents::Custom (mut a, ) => {
-				nativeOnionMessageContents::Custom (
+			ParsedOnionMessageContents::Custom (mut a, ) => {
+				nativeParsedOnionMessageContents::Custom (
 					a,
 				)
 			},
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeOnionMessageContents) -> Self {
+	pub(crate) fn from_native(native: &nativeParsedOnionMessageContents) -> Self {
 		match native {
-			nativeOnionMessageContents::Offers (ref a, ) => {
+			nativeParsedOnionMessageContents::Offers (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
-				OnionMessageContents::Offers (
+				ParsedOnionMessageContents::Offers (
 					crate::lightning::onion_message::offers::OffersMessage::native_into(a_nonref),
 				)
 			},
-			nativeOnionMessageContents::Custom (ref a, ) => {
+			nativeParsedOnionMessageContents::Custom (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
-				OnionMessageContents::Custom (
+				ParsedOnionMessageContents::Custom (
 					Into::into(a_nonref),
 				)
 			},
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn native_into(native: nativeOnionMessageContents) -> Self {
+	pub(crate) fn native_into(native: nativeParsedOnionMessageContents) -> Self {
 		match native {
-			nativeOnionMessageContents::Offers (mut a, ) => {
-				OnionMessageContents::Offers (
+			nativeParsedOnionMessageContents::Offers (mut a, ) => {
+				ParsedOnionMessageContents::Offers (
 					crate::lightning::onion_message::offers::OffersMessage::native_into(a),
 				)
 			},
-			nativeOnionMessageContents::Custom (mut a, ) => {
-				OnionMessageContents::Custom (
+			nativeParsedOnionMessageContents::Custom (mut a, ) => {
+				ParsedOnionMessageContents::Custom (
 					Into::into(a),
 				)
 			},
 		}
 	}
 }
-/// Frees any resources used by the OnionMessageContents
+/// Frees any resources used by the ParsedOnionMessageContents
 #[no_mangle]
-pub extern "C" fn OnionMessageContents_free(this_ptr: OnionMessageContents) { }
-/// Creates a copy of the OnionMessageContents
+pub extern "C" fn ParsedOnionMessageContents_free(this_ptr: ParsedOnionMessageContents) { }
+/// Creates a copy of the ParsedOnionMessageContents
 #[no_mangle]
-pub extern "C" fn OnionMessageContents_clone(orig: &OnionMessageContents) -> OnionMessageContents {
+pub extern "C" fn ParsedOnionMessageContents_clone(orig: &ParsedOnionMessageContents) -> ParsedOnionMessageContents {
 	orig.clone()
 }
-#[no_mangle]
-/// Utility method to constructs a new Offers-variant OnionMessageContents
-pub extern "C" fn OnionMessageContents_offers(a: crate::lightning::onion_message::offers::OffersMessage) -> OnionMessageContents {
-	OnionMessageContents::Offers(a, )
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ParsedOnionMessageContents_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const ParsedOnionMessageContents)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ParsedOnionMessageContents_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut ParsedOnionMessageContents) };
 }
 #[no_mangle]
-/// Utility method to constructs a new Custom-variant OnionMessageContents
-pub extern "C" fn OnionMessageContents_custom(a: crate::lightning::onion_message::packet::CustomOnionMessageContents) -> OnionMessageContents {
-	OnionMessageContents::Custom(a, )
+/// Utility method to constructs a new Offers-variant ParsedOnionMessageContents
+pub extern "C" fn ParsedOnionMessageContents_offers(a: crate::lightning::onion_message::offers::OffersMessage) -> ParsedOnionMessageContents {
+	ParsedOnionMessageContents::Offers(a, )
 }
-/// The contents of a custom onion message.
+#[no_mangle]
+/// Utility method to constructs a new Custom-variant ParsedOnionMessageContents
+pub extern "C" fn ParsedOnionMessageContents_custom(a: crate::lightning::onion_message::packet::OnionMessageContents) -> ParsedOnionMessageContents {
+	ParsedOnionMessageContents::Custom(a, )
+}
+impl From<nativeParsedOnionMessageContents> for crate::lightning::onion_message::packet::OnionMessageContents {
+	fn from(obj: nativeParsedOnionMessageContents) -> Self {
+		let rust_obj = crate::lightning::onion_message::packet::ParsedOnionMessageContents::native_into(obj);
+		let mut ret = ParsedOnionMessageContents_as_OnionMessageContents(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
+		ret.free = Some(ParsedOnionMessageContents_free_void);
+		ret
+	}
+}
+/// Constructs a new OnionMessageContents which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned OnionMessageContents must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn ParsedOnionMessageContents_as_OnionMessageContents(this_arg: &ParsedOnionMessageContents) -> crate::lightning::onion_message::packet::OnionMessageContents {
+	crate::lightning::onion_message::packet::OnionMessageContents {
+		this_arg: unsafe { ObjOps::untweak_ptr(this_arg as *const ParsedOnionMessageContents as *mut ParsedOnionMessageContents) as *mut c_void },
+		free: None,
+		tlv_type: ParsedOnionMessageContents_OnionMessageContents_tlv_type,
+		write: ParsedOnionMessageContents_write_void,
+		cloned: Some(OnionMessageContents_ParsedOnionMessageContents_cloned),
+	}
+}
+
+#[must_use]
+extern "C" fn ParsedOnionMessageContents_OnionMessageContents_tlv_type(this_arg: *const c_void) -> u64 {
+	let mut ret = <nativeParsedOnionMessageContents as lightning::onion_message::packet::OnionMessageContents<>>::tlv_type(unsafe { &mut *(this_arg as *mut nativeParsedOnionMessageContents) }, );
+	ret
+}
+extern "C" fn OnionMessageContents_ParsedOnionMessageContents_cloned(new_obj: &mut crate::lightning::onion_message::packet::OnionMessageContents) {
+	new_obj.this_arg = ParsedOnionMessageContents_clone_void(new_obj.this_arg);
+	new_obj.free = Some(ParsedOnionMessageContents_free_void);
+}
+
+#[no_mangle]
+/// Serialize the ParsedOnionMessageContents object into a byte array which can be read by ParsedOnionMessageContents_read
+pub extern "C" fn ParsedOnionMessageContents_write(obj: &crate::lightning::onion_message::packet::ParsedOnionMessageContents) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn ParsedOnionMessageContents_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	ParsedOnionMessageContents_write(unsafe { &*(obj as *const ParsedOnionMessageContents) })
+}
+/// The contents of an onion message.
 #[repr(C)]
-pub struct CustomOnionMessageContents {
+pub struct OnionMessageContents {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
@@ -275,18 +328,19 @@ pub struct CustomOnionMessageContents {
 	pub tlv_type: extern "C" fn (this_arg: *const c_void) -> u64,
 	/// Serialize the object into a byte array
 	pub write: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_u8Z,
-	/// Called, if set, after this CustomOnionMessageContents has been cloned into a duplicate object.
-	/// The new CustomOnionMessageContents is provided, and should be mutated as needed to perform a
+	/// Called, if set, after this OnionMessageContents has been cloned into a duplicate object.
+	/// The new OnionMessageContents is provided, and should be mutated as needed to perform a
 	/// deep copy of the object pointed to by this_arg or avoid any double-freeing.
-	pub cloned: Option<extern "C" fn (new_CustomOnionMessageContents: &mut CustomOnionMessageContents)>,
+	pub cloned: Option<extern "C" fn (new_OnionMessageContents: &mut OnionMessageContents)>,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
-unsafe impl Send for CustomOnionMessageContents {}
-unsafe impl Sync for CustomOnionMessageContents {}
-pub(crate) fn CustomOnionMessageContents_clone_fields(orig: &CustomOnionMessageContents) -> CustomOnionMessageContents {
-	CustomOnionMessageContents {
+unsafe impl Send for OnionMessageContents {}
+unsafe impl Sync for OnionMessageContents {}
+#[allow(unused)]
+pub(crate) fn OnionMessageContents_clone_fields(orig: &OnionMessageContents) -> OnionMessageContents {
+	OnionMessageContents {
 		this_arg: orig.this_arg,
 		tlv_type: Clone::clone(&orig.tlv_type),
 		write: Clone::clone(&orig.write),
@@ -294,27 +348,27 @@ pub(crate) fn CustomOnionMessageContents_clone_fields(orig: &CustomOnionMessageC
 		free: Clone::clone(&orig.free),
 	}
 }
-impl lightning::util::ser::Writeable for CustomOnionMessageContents {
+impl lightning::util::ser::Writeable for OnionMessageContents {
 	fn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), crate::c_types::io::Error> {
 		let vec = (self.write)(self.this_arg);
 		w.write_all(vec.as_slice())
 	}
 }
 #[no_mangle]
-/// Creates a copy of a CustomOnionMessageContents
-pub extern "C" fn CustomOnionMessageContents_clone(orig: &CustomOnionMessageContents) -> CustomOnionMessageContents {
-	let mut res = CustomOnionMessageContents_clone_fields(orig);
+/// Creates a copy of a OnionMessageContents
+pub extern "C" fn OnionMessageContents_clone(orig: &OnionMessageContents) -> OnionMessageContents {
+	let mut res = OnionMessageContents_clone_fields(orig);
 	if let Some(f) = orig.cloned { (f)(&mut res) };
 	res
 }
-impl Clone for CustomOnionMessageContents {
+impl Clone for OnionMessageContents {
 	fn clone(&self) -> Self {
-		CustomOnionMessageContents_clone(self)
+		OnionMessageContents_clone(self)
 	}
 }
 
-use lightning::onion_message::packet::CustomOnionMessageContents as rustCustomOnionMessageContents;
-impl rustCustomOnionMessageContents for CustomOnionMessageContents {
+use lightning::onion_message::packet::OnionMessageContents as rustOnionMessageContents;
+impl rustOnionMessageContents for OnionMessageContents {
 	fn tlv_type(&self) -> u64 {
 		let mut ret = (self.tlv_type)(self.this_arg);
 		ret
@@ -323,21 +377,21 @@ impl rustCustomOnionMessageContents for CustomOnionMessageContents {
 
 // We're essentially a pointer already, or at least a set of pointers, so allow us to be used
 // directly as a Deref trait in higher-level structs:
-impl core::ops::Deref for CustomOnionMessageContents {
+impl core::ops::Deref for OnionMessageContents {
 	type Target = Self;
 	fn deref(&self) -> &Self {
 		self
 	}
 }
-impl core::ops::DerefMut for CustomOnionMessageContents {
+impl core::ops::DerefMut for OnionMessageContents {
 	fn deref_mut(&mut self) -> &mut Self {
 		self
 	}
 }
 /// Calls the free function if one is set
 #[no_mangle]
-pub extern "C" fn CustomOnionMessageContents_free(this_ptr: CustomOnionMessageContents) { }
-impl Drop for CustomOnionMessageContents {
+pub extern "C" fn OnionMessageContents_free(this_ptr: OnionMessageContents) { }
+impl Drop for OnionMessageContents {
 	fn drop(&mut self) {
 		if let Some(f) = self.free {
 			f(self.this_arg);

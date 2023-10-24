@@ -127,7 +127,7 @@ impl Clone for ForwardNode {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ForwardNode_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeForwardNode)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeForwardNode)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ForwardNode
@@ -258,7 +258,7 @@ impl Clone for ForwardTlvs {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ForwardTlvs_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeForwardTlvs)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeForwardTlvs)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ForwardTlvs
@@ -360,7 +360,7 @@ impl Clone for ReceiveTlvs {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ReceiveTlvs_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeReceiveTlvs)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeReceiveTlvs)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ReceiveTlvs
@@ -477,7 +477,7 @@ impl Clone for PaymentRelay {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PaymentRelay_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePaymentRelay)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePaymentRelay)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the PaymentRelay
@@ -537,15 +537,13 @@ impl PaymentConstraints {
 		ret
 	}
 }
-/// The maximum total CLTV delta that is acceptable when relaying a payment over this
-/// [`BlindedHop`].
+/// The maximum total CLTV that is acceptable when relaying a payment over this [`BlindedHop`].
 #[no_mangle]
 pub extern "C" fn PaymentConstraints_get_max_cltv_expiry(this_ptr: &PaymentConstraints) -> u32 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().max_cltv_expiry;
 	*inner_val
 }
-/// The maximum total CLTV delta that is acceptable when relaying a payment over this
-/// [`BlindedHop`].
+/// The maximum total CLTV that is acceptable when relaying a payment over this [`BlindedHop`].
 #[no_mangle]
 pub extern "C" fn PaymentConstraints_set_max_cltv_expiry(this_ptr: &mut PaymentConstraints, mut val: u32) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.max_cltv_expiry = val;
@@ -584,7 +582,7 @@ impl Clone for PaymentConstraints {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PaymentConstraints_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePaymentConstraints)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePaymentConstraints)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the PaymentConstraints
@@ -596,7 +594,7 @@ pub extern "C" fn PaymentConstraints_clone(orig: &PaymentConstraints) -> Payment
 pub extern "C" fn ForwardTlvs_write(obj: &crate::lightning::blinded_path::payment::ForwardTlvs) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ForwardTlvs_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeForwardTlvs) })
 }
@@ -605,7 +603,7 @@ pub(crate) extern "C" fn ForwardTlvs_write_void(obj: *const c_void) -> crate::c_
 pub extern "C" fn ReceiveTlvs_write(obj: &crate::lightning::blinded_path::payment::ReceiveTlvs) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ReceiveTlvs_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeReceiveTlvs) })
 }
@@ -621,7 +619,7 @@ pub extern "C" fn ReceiveTlvs_read(ser: crate::c_types::u8slice) -> crate::c_typ
 pub extern "C" fn PaymentRelay_write(obj: &crate::lightning::blinded_path::payment::PaymentRelay) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn PaymentRelay_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativePaymentRelay) })
 }
@@ -637,7 +635,7 @@ pub extern "C" fn PaymentRelay_read(ser: crate::c_types::u8slice) -> crate::c_ty
 pub extern "C" fn PaymentConstraints_write(obj: &crate::lightning::blinded_path::payment::PaymentConstraints) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn PaymentConstraints_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativePaymentConstraints) })
 }

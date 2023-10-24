@@ -195,7 +195,7 @@ impl Clone for InvoiceRequest {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn InvoiceRequest_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInvoiceRequest)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeInvoiceRequest)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the InvoiceRequest
@@ -293,7 +293,7 @@ impl Clone for VerifiedInvoiceRequest {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn VerifiedInvoiceRequest_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeVerifiedInvoiceRequest)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeVerifiedInvoiceRequest)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the VerifiedInvoiceRequest
@@ -829,7 +829,7 @@ pub extern "C" fn VerifiedInvoiceRequest_payer_note(this_arg: &crate::lightning:
 pub extern "C" fn UnsignedInvoiceRequest_write(obj: &crate::lightning::offers::invoice_request::UnsignedInvoiceRequest) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn UnsignedInvoiceRequest_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUnsignedInvoiceRequest) })
 }
@@ -838,7 +838,7 @@ pub(crate) extern "C" fn UnsignedInvoiceRequest_write_void(obj: *const c_void) -
 pub extern "C" fn InvoiceRequest_write(obj: &crate::lightning::offers::invoice_request::InvoiceRequest) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn InvoiceRequest_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeInvoiceRequest) })
 }

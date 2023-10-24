@@ -136,7 +136,7 @@ impl Clone for ChannelMonitorUpdate {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelMonitorUpdate_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelMonitorUpdate)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelMonitorUpdate)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelMonitorUpdate
@@ -168,7 +168,7 @@ pub static CLOSED_CHANNEL_UPDATE_ID: u64 = lightning::chain::channelmonitor::CLO
 pub extern "C" fn ChannelMonitorUpdate_write(obj: &crate::lightning::chain::channelmonitor::ChannelMonitorUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelMonitorUpdate_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelMonitorUpdate) })
 }
@@ -310,6 +310,16 @@ pub extern "C" fn MonitorEvent_free(this_ptr: MonitorEvent) { }
 pub extern "C" fn MonitorEvent_clone(orig: &MonitorEvent) -> MonitorEvent {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn MonitorEvent_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const MonitorEvent)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn MonitorEvent_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut MonitorEvent) };
+}
 #[no_mangle]
 /// Utility method to constructs a new HTLCEvent-variant MonitorEvent
 pub extern "C" fn MonitorEvent_htlcevent(a: crate::lightning::chain::channelmonitor::HTLCUpdate) -> MonitorEvent {
@@ -338,6 +348,10 @@ pub extern "C" fn MonitorEvent_eq(a: &MonitorEvent, b: &MonitorEvent) -> bool {
 /// Serialize the MonitorEvent object into a byte array which can be read by MonitorEvent_read
 pub extern "C" fn MonitorEvent_write(obj: &crate::lightning::chain::channelmonitor::MonitorEvent) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn MonitorEvent_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	MonitorEvent_write(unsafe { &*(obj as *const MonitorEvent) })
 }
 #[no_mangle]
 /// Read a MonitorEvent from a byte array, created by MonitorEvent_write
@@ -411,7 +425,7 @@ impl Clone for HTLCUpdate {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn HTLCUpdate_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeHTLCUpdate)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeHTLCUpdate)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the HTLCUpdate
@@ -432,7 +446,7 @@ pub extern "C" fn HTLCUpdate_eq(a: &HTLCUpdate, b: &HTLCUpdate) -> bool {
 pub extern "C" fn HTLCUpdate_write(obj: &crate::lightning::chain::channelmonitor::HTLCUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn HTLCUpdate_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeHTLCUpdate) })
 }
@@ -750,6 +764,16 @@ pub extern "C" fn Balance_free(this_ptr: Balance) { }
 pub extern "C" fn Balance_clone(orig: &Balance) -> Balance {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Balance_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const Balance)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Balance_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut Balance) };
+}
 #[no_mangle]
 /// Utility method to constructs a new ClaimableOnChannelClose-variant Balance
 pub extern "C" fn Balance_claimable_on_channel_close(amount_satoshis: u64) -> Balance {
@@ -892,7 +916,7 @@ impl Clone for ChannelMonitor {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelMonitor_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelMonitor)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelMonitor)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelMonitor
@@ -904,7 +928,7 @@ pub extern "C" fn ChannelMonitor_clone(orig: &ChannelMonitor) -> ChannelMonitor 
 pub extern "C" fn ChannelMonitor_write(obj: &crate::lightning::chain::channelmonitor::ChannelMonitor) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelMonitor_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelMonitor) })
 }

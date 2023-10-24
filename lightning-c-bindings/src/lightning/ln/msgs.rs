@@ -138,6 +138,16 @@ pub extern "C" fn DecodeError_free(this_ptr: DecodeError) { }
 pub extern "C" fn DecodeError_clone(orig: &DecodeError) -> DecodeError {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn DecodeError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const DecodeError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn DecodeError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut DecodeError) };
+}
 #[no_mangle]
 /// Utility method to constructs a new UnknownVersion-variant DecodeError
 pub extern "C" fn DecodeError_unknown_version() -> DecodeError {
@@ -303,7 +313,7 @@ impl Clone for Init {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Init_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInit)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeInit)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Init
@@ -429,7 +439,7 @@ impl Clone for ErrorMessage {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ErrorMessage_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeErrorMessage)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeErrorMessage)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ErrorMessage
@@ -553,7 +563,7 @@ impl Clone for WarningMessage {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn WarningMessage_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeWarningMessage)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeWarningMessage)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the WarningMessage
@@ -669,7 +679,7 @@ impl Clone for Ping {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Ping_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePing)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePing)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Ping
@@ -773,7 +783,7 @@ impl Clone for Pong {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Pong_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePong)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePong)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Pong
@@ -848,12 +858,12 @@ impl OpenChannel {
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_chain_hash(this_ptr: &OpenChannel) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_inner()
+	inner_val.as_bytes()
 }
 /// The genesis hash of the blockchain where the channel is to be opened
 #[no_mangle]
 pub extern "C" fn OpenChannel_set_chain_hash(this_ptr: &mut OpenChannel, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
 }
 /// A temporary channel ID, until the funding outpoint is announced
 #[no_mangle]
@@ -1091,7 +1101,7 @@ pub extern "C" fn OpenChannel_new(mut chain_hash_arg: crate::c_types::ThirtyTwoB
 	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
 	let mut local_channel_type_arg = if channel_type_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(channel_type_arg.take_inner()) } }) };
 	OpenChannel { inner: ObjOps::heap_alloc(nativeOpenChannel {
-		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
 		temporary_channel_id: ::lightning::ln::ChannelId(temporary_channel_id_arg.data),
 		funding_satoshis: funding_satoshis_arg,
 		push_msat: push_msat_arg,
@@ -1125,7 +1135,7 @@ impl Clone for OpenChannel {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn OpenChannel_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeOpenChannel)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeOpenChannel)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the OpenChannel
@@ -1199,12 +1209,12 @@ impl OpenChannelV2 {
 #[no_mangle]
 pub extern "C" fn OpenChannelV2_get_chain_hash(this_ptr: &OpenChannelV2) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_inner()
+	inner_val.as_bytes()
 }
 /// The genesis hash of the blockchain where the channel is to be opened
 #[no_mangle]
 pub extern "C" fn OpenChannelV2_set_chain_hash(this_ptr: &mut OpenChannelV2, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
 }
 /// A temporary channel ID derived using a zeroed out value for the channel acceptor's revocation basepoint
 #[no_mangle]
@@ -1469,7 +1479,7 @@ pub extern "C" fn OpenChannelV2_new(mut chain_hash_arg: crate::c_types::ThirtyTw
 	let mut local_channel_type_arg = if channel_type_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(channel_type_arg.take_inner()) } }) };
 	let mut local_require_confirmed_inputs_arg = if require_confirmed_inputs_arg.is_some() { Some( { () /*require_confirmed_inputs_arg.take()*/ }) } else { None };
 	OpenChannelV2 { inner: ObjOps::heap_alloc(nativeOpenChannelV2 {
-		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
 		temporary_channel_id: ::lightning::ln::ChannelId(temporary_channel_id_arg.data),
 		funding_feerate_sat_per_1000_weight: funding_feerate_sat_per_1000_weight_arg,
 		commitment_feerate_sat_per_1000_weight: commitment_feerate_sat_per_1000_weight_arg,
@@ -1505,7 +1515,7 @@ impl Clone for OpenChannelV2 {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn OpenChannelV2_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeOpenChannelV2)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeOpenChannelV2)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the OpenChannelV2
@@ -1807,7 +1817,7 @@ impl Clone for AcceptChannel {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn AcceptChannel_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeAcceptChannel)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeAcceptChannel)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the AcceptChannel
@@ -2143,7 +2153,7 @@ impl Clone for AcceptChannelV2 {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn AcceptChannelV2_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeAcceptChannelV2)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeAcceptChannelV2)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the AcceptChannelV2
@@ -2281,7 +2291,7 @@ impl Clone for FundingCreated {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn FundingCreated_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeFundingCreated)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeFundingCreated)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the FundingCreated
@@ -2395,7 +2405,7 @@ impl Clone for FundingSigned {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn FundingSigned_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeFundingSigned)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeFundingSigned)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the FundingSigned
@@ -2528,7 +2538,7 @@ impl Clone for ChannelReady {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelReady_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelReady)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelReady)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelReady
@@ -2679,7 +2689,7 @@ impl Clone for TxAddInput {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TxAddInput_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTxAddInput)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTxAddInput)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the TxAddInput
@@ -2816,7 +2826,7 @@ impl Clone for TxAddOutput {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TxAddOutput_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTxAddOutput)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTxAddOutput)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the TxAddOutput
@@ -2927,7 +2937,7 @@ impl Clone for TxRemoveInput {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TxRemoveInput_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTxRemoveInput)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTxRemoveInput)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the TxRemoveInput
@@ -3038,7 +3048,7 @@ impl Clone for TxRemoveOutput {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TxRemoveOutput_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTxRemoveOutput)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTxRemoveOutput)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the TxRemoveOutput
@@ -3138,7 +3148,7 @@ impl Clone for TxComplete {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TxComplete_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTxComplete)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTxComplete)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the TxComplete
@@ -3267,7 +3277,7 @@ impl Clone for TxSignatures {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TxSignatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTxSignatures)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTxSignatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the TxSignatures
@@ -3408,7 +3418,7 @@ impl Clone for TxInitRbf {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TxInitRbf_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTxInitRbf)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTxInitRbf)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the TxInitRbf
@@ -3525,7 +3535,7 @@ impl Clone for TxAckRbf {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TxAckRbf_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTxAckRbf)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTxAckRbf)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the TxAckRbf
@@ -3641,7 +3651,7 @@ impl Clone for TxAbort {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TxAbort_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTxAbort)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTxAbort)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the TxAbort
@@ -3757,7 +3767,7 @@ impl Clone for Shutdown {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Shutdown_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeShutdown)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeShutdown)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Shutdown
@@ -3874,7 +3884,7 @@ impl Clone for ClosingSignedFeeRange {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ClosingSignedFeeRange_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeClosingSignedFeeRange)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeClosingSignedFeeRange)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ClosingSignedFeeRange
@@ -4021,7 +4031,7 @@ impl Clone for ClosingSigned {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ClosingSigned_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeClosingSigned)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeClosingSigned)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ClosingSigned
@@ -4176,7 +4186,7 @@ impl Clone for UpdateAddHTLC {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UpdateAddHTLC_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUpdateAddHTLC)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUpdateAddHTLC)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the UpdateAddHTLC
@@ -4287,7 +4297,7 @@ impl Clone for OnionMessage {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn OnionMessage_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeOnionMessage)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeOnionMessage)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the OnionMessage
@@ -4411,7 +4421,7 @@ impl Clone for UpdateFulfillHTLC {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UpdateFulfillHTLC_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUpdateFulfillHTLC)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUpdateFulfillHTLC)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the UpdateFulfillHTLC
@@ -4514,7 +4524,7 @@ impl Clone for UpdateFailHTLC {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UpdateFailHTLC_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUpdateFailHTLC)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUpdateFailHTLC)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the UpdateFailHTLC
@@ -4628,7 +4638,7 @@ impl Clone for UpdateFailMalformedHTLC {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UpdateFailMalformedHTLC_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUpdateFailMalformedHTLC)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUpdateFailMalformedHTLC)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the UpdateFailMalformedHTLC
@@ -4757,7 +4767,7 @@ impl Clone for CommitmentSigned {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CommitmentSigned_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCommitmentSigned)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeCommitmentSigned)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the CommitmentSigned
@@ -4881,7 +4891,7 @@ impl Clone for RevokeAndACK {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RevokeAndACK_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRevokeAndACK)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRevokeAndACK)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the RevokeAndACK
@@ -4993,7 +5003,7 @@ impl Clone for UpdateFee {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UpdateFee_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUpdateFee)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUpdateFee)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the UpdateFee
@@ -5158,7 +5168,7 @@ impl Clone for ChannelReestablish {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelReestablish_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelReestablish)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelReestablish)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelReestablish
@@ -5294,7 +5304,7 @@ impl Clone for AnnouncementSignatures {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn AnnouncementSignatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeAnnouncementSignatures)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeAnnouncementSignatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the AnnouncementSignatures
@@ -5536,6 +5546,16 @@ pub extern "C" fn SocketAddress_free(this_ptr: SocketAddress) { }
 pub extern "C" fn SocketAddress_clone(orig: &SocketAddress) -> SocketAddress {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SocketAddress_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const SocketAddress)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SocketAddress_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut SocketAddress) };
+}
 #[no_mangle]
 /// Utility method to constructs a new TcpIpV4-variant SocketAddress
 pub extern "C" fn SocketAddress_tcp_ip_v4(addr: crate::c_types::FourBytes, port: u16) -> SocketAddress {
@@ -5585,6 +5605,10 @@ pub extern "C" fn SocketAddress_eq(a: &SocketAddress, b: &SocketAddress) -> bool
 /// Serialize the SocketAddress object into a byte array which can be read by SocketAddress_read
 pub extern "C" fn SocketAddress_write(obj: &crate::lightning::ln::msgs::SocketAddress) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn SocketAddress_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	SocketAddress_write(unsafe { &*(obj as *const SocketAddress) })
 }
 #[no_mangle]
 /// Read a SocketAddress from a byte array, created by SocketAddress_write
@@ -5653,6 +5677,16 @@ impl SocketAddressParseError {
 pub extern "C" fn SocketAddressParseError_clone(orig: &SocketAddressParseError) -> SocketAddressParseError {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SocketAddressParseError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const SocketAddressParseError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SocketAddressParseError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut SocketAddressParseError) };
+}
 #[no_mangle]
 /// Utility method to constructs a new SocketAddrParse-variant SocketAddressParseError
 pub extern "C" fn SocketAddressParseError_socket_addr_parse() -> SocketAddressParseError {
@@ -5685,6 +5719,11 @@ pub extern "C" fn parse_onion_address(mut host: crate::c_types::Str, mut port: u
 	local_ret
 }
 
+#[no_mangle]
+/// Get the string representation of a SocketAddress object
+pub extern "C" fn SocketAddress_to_str(o: &crate::lightning::ln::msgs::SocketAddress) -> Str {
+	alloc::format!("{}", &o.to_native()).into()
+}
 #[no_mangle]
 /// Read a SocketAddress object from a string
 pub extern "C" fn SocketAddress_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_SocketAddressSocketAddressParseErrorZ {
@@ -5815,6 +5854,16 @@ pub extern "C" fn UnsignedGossipMessage_free(this_ptr: UnsignedGossipMessage) { 
 pub extern "C" fn UnsignedGossipMessage_clone(orig: &UnsignedGossipMessage) -> UnsignedGossipMessage {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn UnsignedGossipMessage_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const UnsignedGossipMessage)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn UnsignedGossipMessage_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut UnsignedGossipMessage) };
+}
 #[no_mangle]
 /// Utility method to constructs a new ChannelAnnouncement-variant UnsignedGossipMessage
 pub extern "C" fn UnsignedGossipMessage_channel_announcement(a: crate::lightning::ln::msgs::UnsignedChannelAnnouncement) -> UnsignedGossipMessage {
@@ -5834,6 +5883,10 @@ pub extern "C" fn UnsignedGossipMessage_node_announcement(a: crate::lightning::l
 /// Serialize the UnsignedGossipMessage object into a byte array which can be read by UnsignedGossipMessage_read
 pub extern "C" fn UnsignedGossipMessage_write(obj: &crate::lightning::ln::msgs::UnsignedGossipMessage) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn UnsignedGossipMessage_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	UnsignedGossipMessage_write(unsafe { &*(obj as *const UnsignedGossipMessage) })
 }
 
 use lightning::ln::msgs::UnsignedNodeAnnouncement as nativeUnsignedNodeAnnouncementImport;
@@ -5976,7 +6029,7 @@ impl Clone for UnsignedNodeAnnouncement {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UnsignedNodeAnnouncement_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUnsignedNodeAnnouncement)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUnsignedNodeAnnouncement)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the UnsignedNodeAnnouncement
@@ -6088,7 +6141,7 @@ impl Clone for NodeAnnouncement {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeAnnouncement_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNodeAnnouncement)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeNodeAnnouncement)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the NodeAnnouncement
@@ -6172,12 +6225,12 @@ pub extern "C" fn UnsignedChannelAnnouncement_set_features(this_ptr: &mut Unsign
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_get_chain_hash(this_ptr: &UnsignedChannelAnnouncement) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_inner()
+	inner_val.as_bytes()
 }
 /// The genesis hash of the blockchain where the channel is to be opened
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_set_chain_hash(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
 }
 /// The short channel ID
 #[no_mangle]
@@ -6262,7 +6315,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_new(mut features_arg: crate::light
 	let mut local_excess_data_arg = Vec::new(); for mut item in excess_data_arg.into_rust().drain(..) { local_excess_data_arg.push( { item }); };
 	UnsignedChannelAnnouncement { inner: ObjOps::heap_alloc(nativeUnsignedChannelAnnouncement {
 		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
-		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
 		short_channel_id: short_channel_id_arg,
 		node_id_1: *unsafe { Box::from_raw(node_id_1_arg.take_inner()) },
 		node_id_2: *unsafe { Box::from_raw(node_id_2_arg.take_inner()) },
@@ -6283,7 +6336,7 @@ impl Clone for UnsignedChannelAnnouncement {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UnsignedChannelAnnouncement_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUnsignedChannelAnnouncement)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUnsignedChannelAnnouncement)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the UnsignedChannelAnnouncement
@@ -6431,7 +6484,7 @@ impl Clone for ChannelAnnouncement {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelAnnouncement_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelAnnouncement)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelAnnouncement)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelAnnouncement
@@ -6504,12 +6557,12 @@ impl UnsignedChannelUpdate {
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_chain_hash(this_ptr: &UnsignedChannelUpdate) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_inner()
+	inner_val.as_bytes()
 }
 /// The genesis hash of the blockchain where the channel is to be opened
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_set_chain_hash(this_ptr: &mut UnsignedChannelUpdate, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
 }
 /// The short channel ID
 #[no_mangle]
@@ -6644,7 +6697,7 @@ pub extern "C" fn UnsignedChannelUpdate_set_excess_data(this_ptr: &mut UnsignedC
 pub extern "C" fn UnsignedChannelUpdate_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut short_channel_id_arg: u64, mut timestamp_arg: u32, mut flags_arg: u8, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: u64, mut htlc_maximum_msat_arg: u64, mut fee_base_msat_arg: u32, mut fee_proportional_millionths_arg: u32, mut excess_data_arg: crate::c_types::derived::CVec_u8Z) -> UnsignedChannelUpdate {
 	let mut local_excess_data_arg = Vec::new(); for mut item in excess_data_arg.into_rust().drain(..) { local_excess_data_arg.push( { item }); };
 	UnsignedChannelUpdate { inner: ObjOps::heap_alloc(nativeUnsignedChannelUpdate {
-		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
 		short_channel_id: short_channel_id_arg,
 		timestamp: timestamp_arg,
 		flags: flags_arg,
@@ -6668,7 +6721,7 @@ impl Clone for UnsignedChannelUpdate {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UnsignedChannelUpdate_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUnsignedChannelUpdate)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUnsignedChannelUpdate)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the UnsignedChannelUpdate
@@ -6780,7 +6833,7 @@ impl Clone for ChannelUpdate {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelUpdate_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelUpdate)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelUpdate)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelUpdate
@@ -6856,12 +6909,12 @@ impl QueryChannelRange {
 #[no_mangle]
 pub extern "C" fn QueryChannelRange_get_chain_hash(this_ptr: &QueryChannelRange) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_inner()
+	inner_val.as_bytes()
 }
 /// The genesis hash of the blockchain being queried
 #[no_mangle]
 pub extern "C" fn QueryChannelRange_set_chain_hash(this_ptr: &mut QueryChannelRange, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
 }
 /// The height of the first block for the channel UTXOs being queried
 #[no_mangle]
@@ -6890,7 +6943,7 @@ pub extern "C" fn QueryChannelRange_set_number_of_blocks(this_ptr: &mut QueryCha
 #[no_mangle]
 pub extern "C" fn QueryChannelRange_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut first_blocknum_arg: u32, mut number_of_blocks_arg: u32) -> QueryChannelRange {
 	QueryChannelRange { inner: ObjOps::heap_alloc(nativeQueryChannelRange {
-		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
 		first_blocknum: first_blocknum_arg,
 		number_of_blocks: number_of_blocks_arg,
 	}), is_owned: true }
@@ -6907,7 +6960,7 @@ impl Clone for QueryChannelRange {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn QueryChannelRange_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeQueryChannelRange)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeQueryChannelRange)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the QueryChannelRange
@@ -6988,12 +7041,12 @@ impl ReplyChannelRange {
 #[no_mangle]
 pub extern "C" fn ReplyChannelRange_get_chain_hash(this_ptr: &ReplyChannelRange) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_inner()
+	inner_val.as_bytes()
 }
 /// The genesis hash of the blockchain being queried
 #[no_mangle]
 pub extern "C" fn ReplyChannelRange_set_chain_hash(this_ptr: &mut ReplyChannelRange, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
 }
 /// The height of the first block in the range of the reply
 #[no_mangle]
@@ -7049,7 +7102,7 @@ pub extern "C" fn ReplyChannelRange_set_short_channel_ids(this_ptr: &mut ReplyCh
 pub extern "C" fn ReplyChannelRange_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut first_blocknum_arg: u32, mut number_of_blocks_arg: u32, mut sync_complete_arg: bool, mut short_channel_ids_arg: crate::c_types::derived::CVec_u64Z) -> ReplyChannelRange {
 	let mut local_short_channel_ids_arg = Vec::new(); for mut item in short_channel_ids_arg.into_rust().drain(..) { local_short_channel_ids_arg.push( { item }); };
 	ReplyChannelRange { inner: ObjOps::heap_alloc(nativeReplyChannelRange {
-		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
 		first_blocknum: first_blocknum_arg,
 		number_of_blocks: number_of_blocks_arg,
 		sync_complete: sync_complete_arg,
@@ -7068,7 +7121,7 @@ impl Clone for ReplyChannelRange {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ReplyChannelRange_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeReplyChannelRange)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeReplyChannelRange)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ReplyChannelRange
@@ -7149,12 +7202,12 @@ impl QueryShortChannelIds {
 #[no_mangle]
 pub extern "C" fn QueryShortChannelIds_get_chain_hash(this_ptr: &QueryShortChannelIds) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_inner()
+	inner_val.as_bytes()
 }
 /// The genesis hash of the blockchain being queried
 #[no_mangle]
 pub extern "C" fn QueryShortChannelIds_set_chain_hash(this_ptr: &mut QueryShortChannelIds, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
 }
 /// The short_channel_ids that are being queried
 ///
@@ -7177,7 +7230,7 @@ pub extern "C" fn QueryShortChannelIds_set_short_channel_ids(this_ptr: &mut Quer
 pub extern "C" fn QueryShortChannelIds_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut short_channel_ids_arg: crate::c_types::derived::CVec_u64Z) -> QueryShortChannelIds {
 	let mut local_short_channel_ids_arg = Vec::new(); for mut item in short_channel_ids_arg.into_rust().drain(..) { local_short_channel_ids_arg.push( { item }); };
 	QueryShortChannelIds { inner: ObjOps::heap_alloc(nativeQueryShortChannelIds {
-		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
 		short_channel_ids: local_short_channel_ids_arg,
 	}), is_owned: true }
 }
@@ -7193,7 +7246,7 @@ impl Clone for QueryShortChannelIds {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn QueryShortChannelIds_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeQueryShortChannelIds)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeQueryShortChannelIds)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the QueryShortChannelIds
@@ -7269,12 +7322,12 @@ impl ReplyShortChannelIdsEnd {
 #[no_mangle]
 pub extern "C" fn ReplyShortChannelIdsEnd_get_chain_hash(this_ptr: &ReplyShortChannelIdsEnd) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_inner()
+	inner_val.as_bytes()
 }
 /// The genesis hash of the blockchain that was queried
 #[no_mangle]
 pub extern "C" fn ReplyShortChannelIdsEnd_set_chain_hash(this_ptr: &mut ReplyShortChannelIdsEnd, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
 }
 /// Indicates if the query recipient maintains up-to-date channel
 /// information for the `chain_hash`
@@ -7294,7 +7347,7 @@ pub extern "C" fn ReplyShortChannelIdsEnd_set_full_information(this_ptr: &mut Re
 #[no_mangle]
 pub extern "C" fn ReplyShortChannelIdsEnd_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut full_information_arg: bool) -> ReplyShortChannelIdsEnd {
 	ReplyShortChannelIdsEnd { inner: ObjOps::heap_alloc(nativeReplyShortChannelIdsEnd {
-		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
 		full_information: full_information_arg,
 	}), is_owned: true }
 }
@@ -7310,7 +7363,7 @@ impl Clone for ReplyShortChannelIdsEnd {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ReplyShortChannelIdsEnd_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeReplyShortChannelIdsEnd)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeReplyShortChannelIdsEnd)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ReplyShortChannelIdsEnd
@@ -7385,12 +7438,12 @@ impl GossipTimestampFilter {
 #[no_mangle]
 pub extern "C" fn GossipTimestampFilter_get_chain_hash(this_ptr: &GossipTimestampFilter) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_inner()
+	inner_val.as_bytes()
 }
 /// The genesis hash of the blockchain for channel and node information
 #[no_mangle]
 pub extern "C" fn GossipTimestampFilter_set_chain_hash(this_ptr: &mut GossipTimestampFilter, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::hash_types::BlockHash::from_slice(&val.data[..]).unwrap();
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
 }
 /// The starting unix timestamp
 #[no_mangle]
@@ -7419,7 +7472,7 @@ pub extern "C" fn GossipTimestampFilter_set_timestamp_range(this_ptr: &mut Gossi
 #[no_mangle]
 pub extern "C" fn GossipTimestampFilter_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut first_timestamp_arg: u32, mut timestamp_range_arg: u32) -> GossipTimestampFilter {
 	GossipTimestampFilter { inner: ObjOps::heap_alloc(nativeGossipTimestampFilter {
-		chain_hash: ::bitcoin::hash_types::BlockHash::from_slice(&chain_hash_arg.data[..]).unwrap(),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
 		first_timestamp: first_timestamp_arg,
 		timestamp_range: timestamp_range_arg,
 	}), is_owned: true }
@@ -7436,7 +7489,7 @@ impl Clone for GossipTimestampFilter {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn GossipTimestampFilter_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeGossipTimestampFilter)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeGossipTimestampFilter)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the GossipTimestampFilter
@@ -7655,6 +7708,16 @@ pub extern "C" fn ErrorAction_free(this_ptr: ErrorAction) { }
 pub extern "C" fn ErrorAction_clone(orig: &ErrorAction) -> ErrorAction {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ErrorAction_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const ErrorAction)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ErrorAction_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut ErrorAction) };
+}
 #[no_mangle]
 /// Utility method to constructs a new DisconnectPeer-variant ErrorAction
 pub extern "C" fn ErrorAction_disconnect_peer(msg: crate::lightning::ln::msgs::ErrorMessage) -> ErrorAction {
@@ -7791,7 +7854,7 @@ impl Clone for LightningError {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn LightningError_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeLightningError)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeLightningError)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the LightningError
@@ -7962,7 +8025,7 @@ impl Clone for CommitmentUpdate {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CommitmentUpdate_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCommitmentUpdate)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeCommitmentUpdate)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the CommitmentUpdate
@@ -8063,11 +8126,11 @@ pub struct ChannelMessageHandler {
 	///
 	/// Note that this method is called before [`Self::peer_connected`].
 	pub provided_init_features: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::features::InitFeatures,
-	/// Gets the genesis hashes for this `ChannelMessageHandler` indicating which chains it supports.
+	/// Gets the chain hashes for this `ChannelMessageHandler` indicating which chains it supports.
 	///
 	/// If it's `None`, then no particular network chain hash compatibility will be enforced when
 	/// connecting to peers.
-	pub get_genesis_hashes: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ,
+	pub get_chain_hashes: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ,
 	/// Implementation of MessageSendEventsProvider for this object.
 	pub MessageSendEventsProvider: crate::lightning::events::MessageSendEventsProvider,
 	/// Frees any resources associated with this object given its this_arg pointer.
@@ -8076,6 +8139,7 @@ pub struct ChannelMessageHandler {
 }
 unsafe impl Send for ChannelMessageHandler {}
 unsafe impl Sync for ChannelMessageHandler {}
+#[allow(unused)]
 pub(crate) fn ChannelMessageHandler_clone_fields(orig: &ChannelMessageHandler) -> ChannelMessageHandler {
 	ChannelMessageHandler {
 		this_arg: orig.this_arg,
@@ -8112,7 +8176,7 @@ pub(crate) fn ChannelMessageHandler_clone_fields(orig: &ChannelMessageHandler) -
 		handle_error: Clone::clone(&orig.handle_error),
 		provided_node_features: Clone::clone(&orig.provided_node_features),
 		provided_init_features: Clone::clone(&orig.provided_init_features),
-		get_genesis_hashes: Clone::clone(&orig.get_genesis_hashes),
+		get_chain_hashes: Clone::clone(&orig.get_chain_hashes),
 		MessageSendEventsProvider: crate::lightning::events::MessageSendEventsProvider_clone_fields(&orig.MessageSendEventsProvider),
 		free: Clone::clone(&orig.free),
 	}
@@ -8230,8 +8294,8 @@ impl rustChannelMessageHandler for ChannelMessageHandler {
 		let mut ret = (self.provided_init_features)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id));
 		*unsafe { Box::from_raw(ret.take_inner()) }
 	}
-	fn get_genesis_hashes(&self) -> Option<Vec<bitcoin::blockdata::constants::ChainHash>> {
-		let mut ret = (self.get_genesis_hashes)(self.this_arg);
+	fn get_chain_hashes(&self) -> Option<Vec<bitcoin::blockdata::constants::ChainHash>> {
+		let mut ret = (self.get_chain_hashes)(self.this_arg);
 		let mut local_ret = { /*ret*/ let ret_opt = ret; if ret_opt.is_none() { None } else { Some({ { let mut local_ret_0 = Vec::new(); for mut item in { ret_opt.take() }.into_rust().drain(..) { local_ret_0.push( { ::bitcoin::blockdata::constants::ChainHash::from(&item.data[..]) }); }; local_ret_0 }})} };
 		local_ret
 	}
@@ -8339,6 +8403,7 @@ pub struct RoutingMessageHandler {
 }
 unsafe impl Send for RoutingMessageHandler {}
 unsafe impl Sync for RoutingMessageHandler {}
+#[allow(unused)]
 pub(crate) fn RoutingMessageHandler_clone_fields(orig: &RoutingMessageHandler) -> RoutingMessageHandler {
 	RoutingMessageHandler {
 		this_arg: orig.this_arg,
@@ -8457,7 +8522,7 @@ impl Drop for RoutingMessageHandler {
 		}
 	}
 }
-/// A trait to describe an object that can receive onion messages.
+/// A handler for received [`OnionMessage`]s and for providing generated ones to send.
 #[repr(C)]
 pub struct OnionMessageHandler {
 	/// An opaque pointer which is passed to your function implementations as an argument.
@@ -8465,6 +8530,10 @@ pub struct OnionMessageHandler {
 	pub this_arg: *mut c_void,
 	/// Handle an incoming `onion_message` message from the given peer.
 	pub handle_onion_message: extern "C" fn (this_arg: *const c_void, peer_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::OnionMessage),
+	/// Returns the next pending onion message for the peer with the given node id.
+	///
+	/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+	pub next_onion_message_for_peer: extern "C" fn (this_arg: *const c_void, peer_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::msgs::OnionMessage,
 	/// Called when a connection is established with a peer. Can be used to track which peers
 	/// advertise onion message support and are online.
 	///
@@ -8485,31 +8554,23 @@ pub struct OnionMessageHandler {
 	///
 	/// Note that this method is called before [`Self::peer_connected`].
 	pub provided_init_features: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::features::InitFeatures,
-	/// Implementation of OnionMessageProvider for this object.
-	pub OnionMessageProvider: crate::lightning::events::OnionMessageProvider,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for OnionMessageHandler {}
 unsafe impl Sync for OnionMessageHandler {}
+#[allow(unused)]
 pub(crate) fn OnionMessageHandler_clone_fields(orig: &OnionMessageHandler) -> OnionMessageHandler {
 	OnionMessageHandler {
 		this_arg: orig.this_arg,
 		handle_onion_message: Clone::clone(&orig.handle_onion_message),
+		next_onion_message_for_peer: Clone::clone(&orig.next_onion_message_for_peer),
 		peer_connected: Clone::clone(&orig.peer_connected),
 		peer_disconnected: Clone::clone(&orig.peer_disconnected),
 		provided_node_features: Clone::clone(&orig.provided_node_features),
 		provided_init_features: Clone::clone(&orig.provided_init_features),
-		OnionMessageProvider: crate::lightning::events::OnionMessageProvider_clone_fields(&orig.OnionMessageProvider),
 		free: Clone::clone(&orig.free),
-	}
-}
-impl lightning::events::OnionMessageProvider for OnionMessageHandler {
-	fn next_onion_message_for_peer(&self, mut peer_node_id: bitcoin::secp256k1::PublicKey) -> Option<lightning::ln::msgs::OnionMessage> {
-		let mut ret = (self.OnionMessageProvider.next_onion_message_for_peer)(self.OnionMessageProvider.this_arg, crate::c_types::PublicKey::from_rust(&peer_node_id));
-		let mut local_ret = if ret.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(ret.take_inner()) } }) };
-		local_ret
 	}
 }
 
@@ -8517,6 +8578,11 @@ use lightning::ln::msgs::OnionMessageHandler as rustOnionMessageHandler;
 impl rustOnionMessageHandler for OnionMessageHandler {
 	fn handle_onion_message(&self, mut peer_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::OnionMessage) {
 		(self.handle_onion_message)(self.this_arg, crate::c_types::PublicKey::from_rust(&peer_node_id), &crate::lightning::ln::msgs::OnionMessage { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::OnionMessage<>) as *mut _) }, is_owned: false })
+	}
+	fn next_onion_message_for_peer(&self, mut peer_node_id: bitcoin::secp256k1::PublicKey) -> Option<lightning::ln::msgs::OnionMessage> {
+		let mut ret = (self.next_onion_message_for_peer)(self.this_arg, crate::c_types::PublicKey::from_rust(&peer_node_id));
+		let mut local_ret = if ret.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(ret.take_inner()) } }) };
+		local_ret
 	}
 	fn peer_connected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut init: &lightning::ln::msgs::Init, mut inbound: bool) -> Result<(), ()> {
 		let mut ret = (self.peer_connected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Init { inner: unsafe { ObjOps::nonnull_ptr_to_inner((init as *const lightning::ln::msgs::Init<>) as *mut _) }, is_owned: false }, inbound);
@@ -8576,7 +8642,7 @@ use alloc::{vec::Vec, boxed::Box};
 pub extern "C" fn AcceptChannel_write(obj: &crate::lightning::ln::msgs::AcceptChannel) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn AcceptChannel_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeAcceptChannel) })
 }
@@ -8592,7 +8658,7 @@ pub extern "C" fn AcceptChannel_read(ser: crate::c_types::u8slice) -> crate::c_t
 pub extern "C" fn AcceptChannelV2_write(obj: &crate::lightning::ln::msgs::AcceptChannelV2) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn AcceptChannelV2_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeAcceptChannelV2) })
 }
@@ -8608,7 +8674,7 @@ pub extern "C" fn AcceptChannelV2_read(ser: crate::c_types::u8slice) -> crate::c
 pub extern "C" fn TxAddInput_write(obj: &crate::lightning::ln::msgs::TxAddInput) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn TxAddInput_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTxAddInput) })
 }
@@ -8624,7 +8690,7 @@ pub extern "C" fn TxAddInput_read(ser: crate::c_types::u8slice) -> crate::c_type
 pub extern "C" fn TxAddOutput_write(obj: &crate::lightning::ln::msgs::TxAddOutput) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn TxAddOutput_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTxAddOutput) })
 }
@@ -8640,7 +8706,7 @@ pub extern "C" fn TxAddOutput_read(ser: crate::c_types::u8slice) -> crate::c_typ
 pub extern "C" fn TxRemoveInput_write(obj: &crate::lightning::ln::msgs::TxRemoveInput) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn TxRemoveInput_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTxRemoveInput) })
 }
@@ -8656,7 +8722,7 @@ pub extern "C" fn TxRemoveInput_read(ser: crate::c_types::u8slice) -> crate::c_t
 pub extern "C" fn TxRemoveOutput_write(obj: &crate::lightning::ln::msgs::TxRemoveOutput) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn TxRemoveOutput_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTxRemoveOutput) })
 }
@@ -8672,7 +8738,7 @@ pub extern "C" fn TxRemoveOutput_read(ser: crate::c_types::u8slice) -> crate::c_
 pub extern "C" fn TxComplete_write(obj: &crate::lightning::ln::msgs::TxComplete) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn TxComplete_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTxComplete) })
 }
@@ -8688,7 +8754,7 @@ pub extern "C" fn TxComplete_read(ser: crate::c_types::u8slice) -> crate::c_type
 pub extern "C" fn TxSignatures_write(obj: &crate::lightning::ln::msgs::TxSignatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn TxSignatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTxSignatures) })
 }
@@ -8704,7 +8770,7 @@ pub extern "C" fn TxSignatures_read(ser: crate::c_types::u8slice) -> crate::c_ty
 pub extern "C" fn TxInitRbf_write(obj: &crate::lightning::ln::msgs::TxInitRbf) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn TxInitRbf_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTxInitRbf) })
 }
@@ -8720,7 +8786,7 @@ pub extern "C" fn TxInitRbf_read(ser: crate::c_types::u8slice) -> crate::c_types
 pub extern "C" fn TxAckRbf_write(obj: &crate::lightning::ln::msgs::TxAckRbf) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn TxAckRbf_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTxAckRbf) })
 }
@@ -8736,7 +8802,7 @@ pub extern "C" fn TxAckRbf_read(ser: crate::c_types::u8slice) -> crate::c_types:
 pub extern "C" fn TxAbort_write(obj: &crate::lightning::ln::msgs::TxAbort) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn TxAbort_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTxAbort) })
 }
@@ -8752,7 +8818,7 @@ pub extern "C" fn TxAbort_read(ser: crate::c_types::u8slice) -> crate::c_types::
 pub extern "C" fn AnnouncementSignatures_write(obj: &crate::lightning::ln::msgs::AnnouncementSignatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn AnnouncementSignatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeAnnouncementSignatures) })
 }
@@ -8768,7 +8834,7 @@ pub extern "C" fn AnnouncementSignatures_read(ser: crate::c_types::u8slice) -> c
 pub extern "C" fn ChannelReestablish_write(obj: &crate::lightning::ln::msgs::ChannelReestablish) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelReestablish_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelReestablish) })
 }
@@ -8784,7 +8850,7 @@ pub extern "C" fn ChannelReestablish_read(ser: crate::c_types::u8slice) -> crate
 pub extern "C" fn ClosingSigned_write(obj: &crate::lightning::ln::msgs::ClosingSigned) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ClosingSigned_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeClosingSigned) })
 }
@@ -8800,7 +8866,7 @@ pub extern "C" fn ClosingSigned_read(ser: crate::c_types::u8slice) -> crate::c_t
 pub extern "C" fn ClosingSignedFeeRange_write(obj: &crate::lightning::ln::msgs::ClosingSignedFeeRange) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ClosingSignedFeeRange_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeClosingSignedFeeRange) })
 }
@@ -8816,7 +8882,7 @@ pub extern "C" fn ClosingSignedFeeRange_read(ser: crate::c_types::u8slice) -> cr
 pub extern "C" fn CommitmentSigned_write(obj: &crate::lightning::ln::msgs::CommitmentSigned) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn CommitmentSigned_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeCommitmentSigned) })
 }
@@ -8832,7 +8898,7 @@ pub extern "C" fn CommitmentSigned_read(ser: crate::c_types::u8slice) -> crate::
 pub extern "C" fn FundingCreated_write(obj: &crate::lightning::ln::msgs::FundingCreated) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn FundingCreated_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeFundingCreated) })
 }
@@ -8848,7 +8914,7 @@ pub extern "C" fn FundingCreated_read(ser: crate::c_types::u8slice) -> crate::c_
 pub extern "C" fn FundingSigned_write(obj: &crate::lightning::ln::msgs::FundingSigned) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn FundingSigned_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeFundingSigned) })
 }
@@ -8864,7 +8930,7 @@ pub extern "C" fn FundingSigned_read(ser: crate::c_types::u8slice) -> crate::c_t
 pub extern "C" fn ChannelReady_write(obj: &crate::lightning::ln::msgs::ChannelReady) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelReady_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelReady) })
 }
@@ -8880,7 +8946,7 @@ pub extern "C" fn ChannelReady_read(ser: crate::c_types::u8slice) -> crate::c_ty
 pub extern "C" fn Init_write(obj: &crate::lightning::ln::msgs::Init) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Init_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeInit) })
 }
@@ -8896,7 +8962,7 @@ pub extern "C" fn Init_read(ser: crate::c_types::u8slice) -> crate::c_types::der
 pub extern "C" fn OpenChannel_write(obj: &crate::lightning::ln::msgs::OpenChannel) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn OpenChannel_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOpenChannel) })
 }
@@ -8912,7 +8978,7 @@ pub extern "C" fn OpenChannel_read(ser: crate::c_types::u8slice) -> crate::c_typ
 pub extern "C" fn OpenChannelV2_write(obj: &crate::lightning::ln::msgs::OpenChannelV2) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn OpenChannelV2_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOpenChannelV2) })
 }
@@ -8928,7 +8994,7 @@ pub extern "C" fn OpenChannelV2_read(ser: crate::c_types::u8slice) -> crate::c_t
 pub extern "C" fn RevokeAndACK_write(obj: &crate::lightning::ln::msgs::RevokeAndACK) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn RevokeAndACK_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRevokeAndACK) })
 }
@@ -8944,7 +9010,7 @@ pub extern "C" fn RevokeAndACK_read(ser: crate::c_types::u8slice) -> crate::c_ty
 pub extern "C" fn Shutdown_write(obj: &crate::lightning::ln::msgs::Shutdown) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Shutdown_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeShutdown) })
 }
@@ -8960,7 +9026,7 @@ pub extern "C" fn Shutdown_read(ser: crate::c_types::u8slice) -> crate::c_types:
 pub extern "C" fn UpdateFailHTLC_write(obj: &crate::lightning::ln::msgs::UpdateFailHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn UpdateFailHTLC_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUpdateFailHTLC) })
 }
@@ -8976,7 +9042,7 @@ pub extern "C" fn UpdateFailHTLC_read(ser: crate::c_types::u8slice) -> crate::c_
 pub extern "C" fn UpdateFailMalformedHTLC_write(obj: &crate::lightning::ln::msgs::UpdateFailMalformedHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn UpdateFailMalformedHTLC_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUpdateFailMalformedHTLC) })
 }
@@ -8992,7 +9058,7 @@ pub extern "C" fn UpdateFailMalformedHTLC_read(ser: crate::c_types::u8slice) -> 
 pub extern "C" fn UpdateFee_write(obj: &crate::lightning::ln::msgs::UpdateFee) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn UpdateFee_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUpdateFee) })
 }
@@ -9008,7 +9074,7 @@ pub extern "C" fn UpdateFee_read(ser: crate::c_types::u8slice) -> crate::c_types
 pub extern "C" fn UpdateFulfillHTLC_write(obj: &crate::lightning::ln::msgs::UpdateFulfillHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn UpdateFulfillHTLC_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUpdateFulfillHTLC) })
 }
@@ -9024,7 +9090,7 @@ pub extern "C" fn UpdateFulfillHTLC_read(ser: crate::c_types::u8slice) -> crate:
 pub extern "C" fn UpdateAddHTLC_write(obj: &crate::lightning::ln::msgs::UpdateAddHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn UpdateAddHTLC_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUpdateAddHTLC) })
 }
@@ -9047,7 +9113,7 @@ pub extern "C" fn OnionMessage_read(ser: crate::c_types::u8slice) -> crate::c_ty
 pub extern "C" fn OnionMessage_write(obj: &crate::lightning::ln::msgs::OnionMessage) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn OnionMessage_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOnionMessage) })
 }
@@ -9056,7 +9122,7 @@ pub(crate) extern "C" fn OnionMessage_write_void(obj: *const c_void) -> crate::c
 pub extern "C" fn Ping_write(obj: &crate::lightning::ln::msgs::Ping) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Ping_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativePing) })
 }
@@ -9072,7 +9138,7 @@ pub extern "C" fn Ping_read(ser: crate::c_types::u8slice) -> crate::c_types::der
 pub extern "C" fn Pong_write(obj: &crate::lightning::ln::msgs::Pong) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Pong_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativePong) })
 }
@@ -9088,7 +9154,7 @@ pub extern "C" fn Pong_read(ser: crate::c_types::u8slice) -> crate::c_types::der
 pub extern "C" fn UnsignedChannelAnnouncement_write(obj: &crate::lightning::ln::msgs::UnsignedChannelAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn UnsignedChannelAnnouncement_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUnsignedChannelAnnouncement) })
 }
@@ -9104,7 +9170,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_read(ser: crate::c_types::u8slice)
 pub extern "C" fn ChannelAnnouncement_write(obj: &crate::lightning::ln::msgs::ChannelAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelAnnouncement_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelAnnouncement) })
 }
@@ -9120,7 +9186,7 @@ pub extern "C" fn ChannelAnnouncement_read(ser: crate::c_types::u8slice) -> crat
 pub extern "C" fn UnsignedChannelUpdate_write(obj: &crate::lightning::ln::msgs::UnsignedChannelUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn UnsignedChannelUpdate_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUnsignedChannelUpdate) })
 }
@@ -9136,7 +9202,7 @@ pub extern "C" fn UnsignedChannelUpdate_read(ser: crate::c_types::u8slice) -> cr
 pub extern "C" fn ChannelUpdate_write(obj: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelUpdate_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelUpdate) })
 }
@@ -9152,7 +9218,7 @@ pub extern "C" fn ChannelUpdate_read(ser: crate::c_types::u8slice) -> crate::c_t
 pub extern "C" fn ErrorMessage_write(obj: &crate::lightning::ln::msgs::ErrorMessage) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ErrorMessage_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeErrorMessage) })
 }
@@ -9168,7 +9234,7 @@ pub extern "C" fn ErrorMessage_read(ser: crate::c_types::u8slice) -> crate::c_ty
 pub extern "C" fn WarningMessage_write(obj: &crate::lightning::ln::msgs::WarningMessage) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn WarningMessage_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeWarningMessage) })
 }
@@ -9184,7 +9250,7 @@ pub extern "C" fn WarningMessage_read(ser: crate::c_types::u8slice) -> crate::c_
 pub extern "C" fn UnsignedNodeAnnouncement_write(obj: &crate::lightning::ln::msgs::UnsignedNodeAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn UnsignedNodeAnnouncement_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUnsignedNodeAnnouncement) })
 }
@@ -9200,7 +9266,7 @@ pub extern "C" fn UnsignedNodeAnnouncement_read(ser: crate::c_types::u8slice) ->
 pub extern "C" fn NodeAnnouncement_write(obj: &crate::lightning::ln::msgs::NodeAnnouncement) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn NodeAnnouncement_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNodeAnnouncement) })
 }
@@ -9223,7 +9289,7 @@ pub extern "C" fn QueryShortChannelIds_read(ser: crate::c_types::u8slice) -> cra
 pub extern "C" fn QueryShortChannelIds_write(obj: &crate::lightning::ln::msgs::QueryShortChannelIds) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn QueryShortChannelIds_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeQueryShortChannelIds) })
 }
@@ -9232,7 +9298,7 @@ pub(crate) extern "C" fn QueryShortChannelIds_write_void(obj: *const c_void) -> 
 pub extern "C" fn ReplyShortChannelIdsEnd_write(obj: &crate::lightning::ln::msgs::ReplyShortChannelIdsEnd) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ReplyShortChannelIdsEnd_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeReplyShortChannelIdsEnd) })
 }
@@ -9258,7 +9324,7 @@ pub extern "C" fn QueryChannelRange_end_blocknum(this_arg: &crate::lightning::ln
 pub extern "C" fn QueryChannelRange_write(obj: &crate::lightning::ln::msgs::QueryChannelRange) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn QueryChannelRange_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeQueryChannelRange) })
 }
@@ -9281,7 +9347,7 @@ pub extern "C" fn ReplyChannelRange_read(ser: crate::c_types::u8slice) -> crate:
 pub extern "C" fn ReplyChannelRange_write(obj: &crate::lightning::ln::msgs::ReplyChannelRange) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ReplyChannelRange_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeReplyChannelRange) })
 }
@@ -9290,7 +9356,7 @@ pub(crate) extern "C" fn ReplyChannelRange_write_void(obj: *const c_void) -> cra
 pub extern "C" fn GossipTimestampFilter_write(obj: &crate::lightning::ln::msgs::GossipTimestampFilter) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn GossipTimestampFilter_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeGossipTimestampFilter) })
 }

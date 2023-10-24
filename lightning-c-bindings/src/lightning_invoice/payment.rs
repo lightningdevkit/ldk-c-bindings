@@ -194,6 +194,16 @@ pub extern "C" fn PaymentError_free(this_ptr: PaymentError) { }
 pub extern "C" fn PaymentError_clone(orig: &PaymentError) -> PaymentError {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn PaymentError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const PaymentError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn PaymentError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut PaymentError) };
+}
 #[no_mangle]
 /// Utility method to constructs a new Invoice-variant PaymentError
 pub extern "C" fn PaymentError_invoice(a: crate::c_types::Str) -> PaymentError {
@@ -298,6 +308,16 @@ pub extern "C" fn ProbingError_free(this_ptr: ProbingError) { }
 #[no_mangle]
 pub extern "C" fn ProbingError_clone(orig: &ProbingError) -> ProbingError {
 	orig.clone()
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ProbingError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const ProbingError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ProbingError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut ProbingError) };
 }
 #[no_mangle]
 /// Utility method to constructs a new Invoice-variant ProbingError

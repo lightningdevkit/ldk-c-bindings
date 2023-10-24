@@ -111,7 +111,7 @@ impl Clone for BigSize {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BigSize_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBigSize)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBigSize)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the BigSize
@@ -142,7 +142,7 @@ pub extern "C" fn BigSize_eq(a: &BigSize, b: &BigSize) -> bool {
 pub extern "C" fn BigSize_write(obj: &crate::lightning::util::ser::BigSize) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn BigSize_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBigSize) })
 }
@@ -222,7 +222,7 @@ impl Clone for Hostname {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Hostname_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeHostname)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeHostname)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Hostname
@@ -251,7 +251,7 @@ pub extern "C" fn Hostname_len(this_arg: &crate::lightning::util::ser::Hostname)
 pub extern "C" fn Hostname_write(obj: &crate::lightning::util::ser::Hostname) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Hostname_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeHostname) })
 }
@@ -328,7 +328,7 @@ impl Clone for TransactionU16LenLimited {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TransactionU16LenLimited_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTransactionU16LenLimited)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTransactionU16LenLimited)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the TransactionU16LenLimited
@@ -367,7 +367,7 @@ pub extern "C" fn TransactionU16LenLimited_into_transaction(mut this_arg: crate:
 pub extern "C" fn TransactionU16LenLimited_write(obj: &crate::lightning::util::ser::TransactionU16LenLimited) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn TransactionU16LenLimited_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTransactionU16LenLimited) })
 }

@@ -233,7 +233,7 @@ impl Clone for Bolt12Invoice {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Bolt12Invoice_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBolt12Invoice)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBolt12Invoice)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Bolt12Invoice
@@ -787,7 +787,7 @@ pub extern "C" fn Bolt12Invoice_verify(this_arg: &crate::lightning::offers::invo
 pub extern "C" fn UnsignedBolt12Invoice_write(obj: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn UnsignedBolt12Invoice_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUnsignedBolt12Invoice) })
 }
@@ -796,7 +796,7 @@ pub(crate) extern "C" fn UnsignedBolt12Invoice_write_void(obj: *const c_void) ->
 pub extern "C" fn Bolt12Invoice_write(obj: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Bolt12Invoice_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBolt12Invoice) })
 }
@@ -956,7 +956,7 @@ impl Clone for BlindedPayInfo {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BlindedPayInfo_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBlindedPayInfo)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBlindedPayInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the BlindedPayInfo
@@ -987,7 +987,7 @@ pub extern "C" fn BlindedPayInfo_eq(a: &BlindedPayInfo, b: &BlindedPayInfo) -> b
 pub extern "C" fn BlindedPayInfo_write(obj: &crate::lightning::offers::invoice::BlindedPayInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn BlindedPayInfo_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBlindedPayInfo) })
 }

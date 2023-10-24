@@ -92,7 +92,7 @@ impl Clone for Bolt12ParseError {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Bolt12ParseError_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBolt12ParseError)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBolt12ParseError)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Bolt12ParseError
@@ -146,6 +146,8 @@ pub enum Bolt12SemanticError {
 	MissingPayerMetadata,
 	/// A payer id was expected but was missing.
 	MissingPayerId,
+	/// The payment id for a refund or request is already in use.
+	DuplicatePaymentId,
 	/// Blinded paths were expected but were missing.
 	MissingPaths,
 	/// The blinded payinfo given does not match the number of blinded path hops.
@@ -185,6 +187,7 @@ impl Bolt12SemanticError {
 			Bolt12SemanticError::UnexpectedMetadata => nativeBolt12SemanticError::UnexpectedMetadata,
 			Bolt12SemanticError::MissingPayerMetadata => nativeBolt12SemanticError::MissingPayerMetadata,
 			Bolt12SemanticError::MissingPayerId => nativeBolt12SemanticError::MissingPayerId,
+			Bolt12SemanticError::DuplicatePaymentId => nativeBolt12SemanticError::DuplicatePaymentId,
 			Bolt12SemanticError::MissingPaths => nativeBolt12SemanticError::MissingPaths,
 			Bolt12SemanticError::InvalidPayInfo => nativeBolt12SemanticError::InvalidPayInfo,
 			Bolt12SemanticError::MissingCreationTime => nativeBolt12SemanticError::MissingCreationTime,
@@ -216,6 +219,7 @@ impl Bolt12SemanticError {
 			Bolt12SemanticError::UnexpectedMetadata => nativeBolt12SemanticError::UnexpectedMetadata,
 			Bolt12SemanticError::MissingPayerMetadata => nativeBolt12SemanticError::MissingPayerMetadata,
 			Bolt12SemanticError::MissingPayerId => nativeBolt12SemanticError::MissingPayerId,
+			Bolt12SemanticError::DuplicatePaymentId => nativeBolt12SemanticError::DuplicatePaymentId,
 			Bolt12SemanticError::MissingPaths => nativeBolt12SemanticError::MissingPaths,
 			Bolt12SemanticError::InvalidPayInfo => nativeBolt12SemanticError::InvalidPayInfo,
 			Bolt12SemanticError::MissingCreationTime => nativeBolt12SemanticError::MissingCreationTime,
@@ -247,6 +251,7 @@ impl Bolt12SemanticError {
 			nativeBolt12SemanticError::UnexpectedMetadata => Bolt12SemanticError::UnexpectedMetadata,
 			nativeBolt12SemanticError::MissingPayerMetadata => Bolt12SemanticError::MissingPayerMetadata,
 			nativeBolt12SemanticError::MissingPayerId => Bolt12SemanticError::MissingPayerId,
+			nativeBolt12SemanticError::DuplicatePaymentId => Bolt12SemanticError::DuplicatePaymentId,
 			nativeBolt12SemanticError::MissingPaths => Bolt12SemanticError::MissingPaths,
 			nativeBolt12SemanticError::InvalidPayInfo => Bolt12SemanticError::InvalidPayInfo,
 			nativeBolt12SemanticError::MissingCreationTime => Bolt12SemanticError::MissingCreationTime,
@@ -278,6 +283,7 @@ impl Bolt12SemanticError {
 			nativeBolt12SemanticError::UnexpectedMetadata => Bolt12SemanticError::UnexpectedMetadata,
 			nativeBolt12SemanticError::MissingPayerMetadata => Bolt12SemanticError::MissingPayerMetadata,
 			nativeBolt12SemanticError::MissingPayerId => Bolt12SemanticError::MissingPayerId,
+			nativeBolt12SemanticError::DuplicatePaymentId => Bolt12SemanticError::DuplicatePaymentId,
 			nativeBolt12SemanticError::MissingPaths => Bolt12SemanticError::MissingPaths,
 			nativeBolt12SemanticError::InvalidPayInfo => Bolt12SemanticError::InvalidPayInfo,
 			nativeBolt12SemanticError::MissingCreationTime => Bolt12SemanticError::MissingCreationTime,
@@ -290,6 +296,16 @@ impl Bolt12SemanticError {
 #[no_mangle]
 pub extern "C" fn Bolt12SemanticError_clone(orig: &Bolt12SemanticError) -> Bolt12SemanticError {
 	orig.clone()
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Bolt12SemanticError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const Bolt12SemanticError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Bolt12SemanticError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut Bolt12SemanticError) };
 }
 #[no_mangle]
 /// Utility method to constructs a new AlreadyExpired-variant Bolt12SemanticError
@@ -375,6 +391,10 @@ pub extern "C" fn Bolt12SemanticError_missing_payer_metadata() -> Bolt12Semantic
 /// Utility method to constructs a new MissingPayerId-variant Bolt12SemanticError
 pub extern "C" fn Bolt12SemanticError_missing_payer_id() -> Bolt12SemanticError {
 	Bolt12SemanticError::MissingPayerId}
+#[no_mangle]
+/// Utility method to constructs a new DuplicatePaymentId-variant Bolt12SemanticError
+pub extern "C" fn Bolt12SemanticError_duplicate_payment_id() -> Bolt12SemanticError {
+	Bolt12SemanticError::DuplicatePaymentId}
 #[no_mangle]
 /// Utility method to constructs a new MissingPaths-variant Bolt12SemanticError
 pub extern "C" fn Bolt12SemanticError_missing_paths() -> Bolt12SemanticError {

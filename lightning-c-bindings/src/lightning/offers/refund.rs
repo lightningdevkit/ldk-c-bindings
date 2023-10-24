@@ -17,6 +17,8 @@
 //! [`InvoiceRequest`]: crate::offers::invoice_request::InvoiceRequest
 //! [`Offer`]: crate::offers::offer::Offer
 //!
+//! # Example
+//!
 //! ```
 //! extern crate bitcoin;
 //! extern crate core;
@@ -69,6 +71,14 @@
 //! # Ok(())
 //! # }
 //! ```
+//!
+//! # Note
+//!
+//! If constructing a [`Refund`] for use with a [`ChannelManager`], use
+//! [`ChannelManager::create_refund_builder`] instead of [`RefundBuilder::new`].
+//!
+//! [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
+//! [`ChannelManager::create_refund_builder`]: crate::ln::channelmanager::ChannelManager::create_refund_builder
 
 use alloc::str::FromStr;
 use alloc::string::String;
@@ -149,7 +159,7 @@ impl Clone for Refund {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Refund_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRefund)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRefund)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Refund
@@ -280,7 +290,7 @@ pub extern "C" fn Refund_payer_note(this_arg: &crate::lightning::offers::refund:
 pub extern "C" fn Refund_write(obj: &crate::lightning::offers::refund::Refund) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Refund_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRefund) })
 }

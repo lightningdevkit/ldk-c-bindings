@@ -114,7 +114,7 @@ impl Clone for OutPoint {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn OutPoint_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeOutPoint)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeOutPoint)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the OutPoint
@@ -153,7 +153,7 @@ pub extern "C" fn OutPoint_to_channel_id(this_arg: &crate::lightning::chain::tra
 pub extern "C" fn OutPoint_write(obj: &crate::lightning::chain::transaction::OutPoint) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn OutPoint_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOutPoint) })
 }

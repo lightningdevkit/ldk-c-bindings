@@ -89,6 +89,7 @@ pub struct ScoreLookUp {
 }
 unsafe impl Send for ScoreLookUp {}
 unsafe impl Sync for ScoreLookUp {}
+#[allow(unused)]
 pub(crate) fn ScoreLookUp_clone_fields(orig: &ScoreLookUp) -> ScoreLookUp {
 	ScoreLookUp {
 		this_arg: orig.this_arg,
@@ -148,6 +149,7 @@ pub struct ScoreUpdate {
 }
 unsafe impl Send for ScoreUpdate {}
 unsafe impl Sync for ScoreUpdate {}
+#[allow(unused)]
 pub(crate) fn ScoreUpdate_clone_fields(orig: &ScoreUpdate) -> ScoreUpdate {
 	ScoreUpdate {
 		this_arg: orig.this_arg,
@@ -221,6 +223,7 @@ pub struct Score {
 }
 unsafe impl Send for Score {}
 unsafe impl Sync for Score {}
+#[allow(unused)]
 pub(crate) fn Score_clone_fields(orig: &Score) -> Score {
 	Score {
 		this_arg: orig.this_arg,
@@ -307,6 +310,7 @@ pub struct LockableScore {
 }
 unsafe impl Send for LockableScore {}
 unsafe impl Sync for LockableScore {}
+#[allow(unused)]
 pub(crate) fn LockableScore_clone_fields(orig: &LockableScore) -> LockableScore {
 	LockableScore {
 		this_arg: orig.this_arg,
@@ -374,6 +378,7 @@ pub struct WriteableScore {
 }
 unsafe impl Send for WriteableScore {}
 unsafe impl Sync for WriteableScore {}
+#[allow(unused)]
 pub(crate) fn WriteableScore_clone_fields(orig: &WriteableScore) -> WriteableScore {
 	WriteableScore {
 		this_arg: orig.this_arg,
@@ -483,10 +488,10 @@ impl MultiThreadedLockableScore {
 }
 impl From<nativeMultiThreadedLockableScore> for crate::lightning::routing::scoring::LockableScore {
 	fn from(obj: nativeMultiThreadedLockableScore) -> Self {
-		let mut rust_obj = MultiThreadedLockableScore { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::scoring::MultiThreadedLockableScore { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = MultiThreadedLockableScore_as_LockableScore(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(MultiThreadedLockableScore_free_void);
 		ret
 	}
@@ -519,16 +524,16 @@ extern "C" fn MultiThreadedLockableScore_LockableScore_write_lock(this_arg: *con
 pub extern "C" fn MultiThreadedLockableScore_write(obj: &crate::lightning::routing::scoring::MultiThreadedLockableScore) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn MultiThreadedLockableScore_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeMultiThreadedLockableScore) })
 }
 impl From<nativeMultiThreadedLockableScore> for crate::lightning::routing::scoring::WriteableScore {
 	fn from(obj: nativeMultiThreadedLockableScore) -> Self {
-		let mut rust_obj = MultiThreadedLockableScore { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::scoring::MultiThreadedLockableScore { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = MultiThreadedLockableScore_as_WriteableScore(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(MultiThreadedLockableScore_free_void);
 		ret
 	}
@@ -663,10 +668,10 @@ impl MultiThreadedScoreLockWrite {
 }
 impl From<nativeMultiThreadedScoreLockRead> for crate::lightning::routing::scoring::ScoreLookUp {
 	fn from(obj: nativeMultiThreadedScoreLockRead) -> Self {
-		let mut rust_obj = MultiThreadedScoreLockRead { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::scoring::MultiThreadedScoreLockRead { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = MultiThreadedScoreLockRead_as_ScoreLookUp(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(MultiThreadedScoreLockRead_free_void);
 		ret
 	}
@@ -693,16 +698,16 @@ extern "C" fn MultiThreadedScoreLockRead_ScoreLookUp_channel_penalty_msat(this_a
 pub extern "C" fn MultiThreadedScoreLockWrite_write(obj: &crate::lightning::routing::scoring::MultiThreadedScoreLockWrite) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn MultiThreadedScoreLockWrite_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeMultiThreadedScoreLockWrite) })
 }
 impl From<nativeMultiThreadedScoreLockWrite> for crate::lightning::routing::scoring::ScoreUpdate {
 	fn from(obj: nativeMultiThreadedScoreLockWrite) -> Self {
-		let mut rust_obj = MultiThreadedScoreLockWrite { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::scoring::MultiThreadedScoreLockWrite { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = MultiThreadedScoreLockWrite_as_ScoreUpdate(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(MultiThreadedScoreLockWrite_free_void);
 		ret
 	}
@@ -842,7 +847,7 @@ impl Clone for ChannelUsage {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelUsage_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelUsage)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelUsage)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelUsage
@@ -912,7 +917,7 @@ impl Clone for FixedPenaltyScorer {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn FixedPenaltyScorer_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeFixedPenaltyScorer)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeFixedPenaltyScorer)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the FixedPenaltyScorer
@@ -929,10 +934,10 @@ pub extern "C" fn FixedPenaltyScorer_with_penalty(mut penalty_msat: u64) -> crat
 
 impl From<nativeFixedPenaltyScorer> for crate::lightning::routing::scoring::ScoreLookUp {
 	fn from(obj: nativeFixedPenaltyScorer) -> Self {
-		let mut rust_obj = FixedPenaltyScorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::scoring::FixedPenaltyScorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = FixedPenaltyScorer_as_ScoreLookUp(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(FixedPenaltyScorer_free_void);
 		ret
 	}
@@ -956,10 +961,10 @@ extern "C" fn FixedPenaltyScorer_ScoreLookUp_channel_penalty_msat(this_arg: *con
 
 impl From<nativeFixedPenaltyScorer> for crate::lightning::routing::scoring::ScoreUpdate {
 	fn from(obj: nativeFixedPenaltyScorer) -> Self {
-		let mut rust_obj = FixedPenaltyScorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::scoring::FixedPenaltyScorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = FixedPenaltyScorer_as_ScoreUpdate(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(FixedPenaltyScorer_free_void);
 		ret
 	}
@@ -996,7 +1001,7 @@ extern "C" fn FixedPenaltyScorer_ScoreUpdate_probe_successful(this_arg: *mut c_v
 pub extern "C" fn FixedPenaltyScorer_write(obj: &crate::lightning::routing::scoring::FixedPenaltyScorer) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn FixedPenaltyScorer_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeFixedPenaltyScorer) })
 }
@@ -1502,7 +1507,7 @@ impl Clone for ProbabilisticScoringFeeParameters {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ProbabilisticScoringFeeParameters_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeProbabilisticScoringFeeParameters)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeProbabilisticScoringFeeParameters)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ProbabilisticScoringFeeParameters
@@ -1708,7 +1713,7 @@ impl Clone for ProbabilisticScoringDecayParameters {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ProbabilisticScoringDecayParameters_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeProbabilisticScoringDecayParameters)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeProbabilisticScoringDecayParameters)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ProbabilisticScoringDecayParameters
@@ -1800,10 +1805,10 @@ pub extern "C" fn ProbabilisticScorer_historical_estimated_payment_success_proba
 
 impl From<nativeProbabilisticScorer> for crate::lightning::routing::scoring::ScoreLookUp {
 	fn from(obj: nativeProbabilisticScorer) -> Self {
-		let mut rust_obj = ProbabilisticScorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::scoring::ProbabilisticScorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ProbabilisticScorer_as_ScoreLookUp(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ProbabilisticScorer_free_void);
 		ret
 	}
@@ -1827,10 +1832,10 @@ extern "C" fn ProbabilisticScorer_ScoreLookUp_channel_penalty_msat(this_arg: *co
 
 impl From<nativeProbabilisticScorer> for crate::lightning::routing::scoring::ScoreUpdate {
 	fn from(obj: nativeProbabilisticScorer) -> Self {
-		let mut rust_obj = ProbabilisticScorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::scoring::ProbabilisticScorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ProbabilisticScorer_as_ScoreUpdate(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ProbabilisticScorer_free_void);
 		ret
 	}
@@ -1864,10 +1869,10 @@ extern "C" fn ProbabilisticScorer_ScoreUpdate_probe_successful(this_arg: *mut c_
 
 impl From<nativeProbabilisticScorer> for crate::lightning::routing::scoring::Score {
 	fn from(obj: nativeProbabilisticScorer) -> Self {
-		let mut rust_obj = ProbabilisticScorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::scoring::ProbabilisticScorer { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ProbabilisticScorer_as_Score(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ProbabilisticScorer_free_void);
 		ret
 	}
@@ -1926,7 +1931,7 @@ use alloc::{vec::Vec, boxed::Box};
 pub extern "C" fn ProbabilisticScorer_write(obj: &crate::lightning::routing::scoring::ProbabilisticScorer) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ProbabilisticScorer_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeProbabilisticScorer) })
 }

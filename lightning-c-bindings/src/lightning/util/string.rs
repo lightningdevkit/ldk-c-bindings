@@ -97,7 +97,7 @@ impl Clone for UntrustedString {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UntrustedString_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUntrustedString)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUntrustedString)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the UntrustedString
@@ -118,7 +118,7 @@ pub extern "C" fn UntrustedString_eq(a: &UntrustedString, b: &UntrustedString) -
 pub extern "C" fn UntrustedString_write(obj: &crate::lightning::util::string::UntrustedString) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn UntrustedString_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeUntrustedString) })
 }

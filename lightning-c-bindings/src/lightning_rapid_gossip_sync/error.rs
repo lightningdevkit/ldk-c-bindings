@@ -108,6 +108,16 @@ pub extern "C" fn GraphSyncError_free(this_ptr: GraphSyncError) { }
 pub extern "C" fn GraphSyncError_clone(orig: &GraphSyncError) -> GraphSyncError {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn GraphSyncError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const GraphSyncError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn GraphSyncError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut GraphSyncError) };
+}
 #[no_mangle]
 /// Utility method to constructs a new DecodeError-variant GraphSyncError
 pub extern "C" fn GraphSyncError_decode_error(a: crate::lightning::ln::msgs::DecodeError) -> GraphSyncError {

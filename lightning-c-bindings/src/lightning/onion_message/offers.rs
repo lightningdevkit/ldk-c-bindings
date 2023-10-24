@@ -27,17 +27,28 @@ pub struct OffersMessageHandler {
 	pub this_arg: *mut c_void,
 	/// Handles the given message by either responding with an [`Bolt12Invoice`], sending a payment,
 	/// or replying with an error.
+	///
+	/// The returned [`OffersMessage`], if any, is enqueued to be sent by [`OnionMessenger`].
+	///
+	/// [`OnionMessenger`]: crate::onion_message::OnionMessenger
 	pub handle_message: extern "C" fn (this_arg: *const c_void, message: crate::lightning::onion_message::offers::OffersMessage) -> crate::c_types::derived::COption_OffersMessageZ,
+	/// Releases any [`OffersMessage`]s that need to be sent.
+	///
+	/// Typically, this is used for messages initiating a payment flow rather than in response to
+	/// another message. The latter should use the return value of [`Self::handle_message`].
+	pub release_pending_messages: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_C3Tuple_OffersMessageDestinationBlindedPathZZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for OffersMessageHandler {}
 unsafe impl Sync for OffersMessageHandler {}
+#[allow(unused)]
 pub(crate) fn OffersMessageHandler_clone_fields(orig: &OffersMessageHandler) -> OffersMessageHandler {
 	OffersMessageHandler {
 		this_arg: orig.this_arg,
 		handle_message: Clone::clone(&orig.handle_message),
+		release_pending_messages: Clone::clone(&orig.release_pending_messages),
 		free: Clone::clone(&orig.free),
 	}
 }
@@ -47,6 +58,11 @@ impl rustOffersMessageHandler for OffersMessageHandler {
 	fn handle_message(&self, mut message: lightning::onion_message::offers::OffersMessage) -> Option<lightning::onion_message::offers::OffersMessage> {
 		let mut ret = (self.handle_message)(self.this_arg, crate::lightning::onion_message::offers::OffersMessage::native_into(message));
 		let mut local_ret = { /*ret*/ let ret_opt = ret; if ret_opt.is_none() { None } else { Some({ { { ret_opt.take() }.into_native() }})} };
+		local_ret
+	}
+	fn release_pending_messages(&self) -> Vec<(lightning::onion_message::offers::OffersMessage, lightning::onion_message::messenger::Destination, Option<lightning::blinded_path::BlindedPath>)> {
+		let mut ret = (self.release_pending_messages)(self.this_arg);
+		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item.to_rust(); let mut local_orig_ret_0_2 = if orig_ret_0_2.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(orig_ret_0_2.take_inner()) } }) }; let mut local_ret_0 = (orig_ret_0_0.into_native(), orig_ret_0_1.into_native(), local_orig_ret_0_2); local_ret_0 }); };
 		local_ret
 	}
 }
@@ -194,6 +210,16 @@ pub extern "C" fn OffersMessage_free(this_ptr: OffersMessage) { }
 pub extern "C" fn OffersMessage_clone(orig: &OffersMessage) -> OffersMessage {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn OffersMessage_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const OffersMessage)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn OffersMessage_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut OffersMessage) };
+}
 #[no_mangle]
 /// Utility method to constructs a new InvoiceRequest-variant OffersMessage
 pub extern "C" fn OffersMessage_invoice_request(a: crate::lightning::offers::invoice_request::InvoiceRequest) -> OffersMessage {
@@ -217,18 +243,14 @@ pub extern "C" fn OffersMessage_is_known_type(mut tlv_type: u64) -> bool {
 	ret
 }
 
-/// The TLV record type for the message as used in an `onionmsg_tlv` TLV stream.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn OffersMessage_tlv_type(this_arg: &crate::lightning::onion_message::offers::OffersMessage) -> u64 {
-	let mut ret = this_arg.to_native().tlv_type();
-	ret
-}
-
 #[no_mangle]
 /// Serialize the OffersMessage object into a byte array which can be read by OffersMessage_read
 pub extern "C" fn OffersMessage_write(obj: &crate::lightning::onion_message::offers::OffersMessage) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn OffersMessage_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	OffersMessage_write(unsafe { &*(obj as *const OffersMessage) })
 }
 #[no_mangle]
 /// Read a OffersMessage from a byte array, created by OffersMessage_write

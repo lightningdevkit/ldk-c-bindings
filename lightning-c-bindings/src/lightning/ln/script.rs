@@ -82,7 +82,7 @@ impl Clone for ShutdownScript {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ShutdownScript_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeShutdownScript)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeShutdownScript)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ShutdownScript
@@ -184,7 +184,7 @@ impl Clone for InvalidShutdownScript {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn InvalidShutdownScript_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInvalidShutdownScript)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeInvalidShutdownScript)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the InvalidShutdownScript
@@ -196,7 +196,7 @@ pub extern "C" fn InvalidShutdownScript_clone(orig: &InvalidShutdownScript) -> I
 pub extern "C" fn ShutdownScript_write(obj: &crate::lightning::ln::script::ShutdownScript) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ShutdownScript_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeShutdownScript) })
 }

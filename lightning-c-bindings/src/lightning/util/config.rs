@@ -514,7 +514,7 @@ impl Clone for ChannelHandshakeConfig {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelHandshakeConfig_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelHandshakeConfig)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelHandshakeConfig)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelHandshakeConfig
@@ -833,7 +833,7 @@ impl Clone for ChannelHandshakeLimits {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelHandshakeLimits_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelHandshakeLimits)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelHandshakeLimits)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelHandshakeLimits
@@ -970,6 +970,16 @@ pub extern "C" fn MaxDustHTLCExposure_free(this_ptr: MaxDustHTLCExposure) { }
 pub extern "C" fn MaxDustHTLCExposure_clone(orig: &MaxDustHTLCExposure) -> MaxDustHTLCExposure {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn MaxDustHTLCExposure_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const MaxDustHTLCExposure)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn MaxDustHTLCExposure_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut MaxDustHTLCExposure) };
+}
 #[no_mangle]
 /// Utility method to constructs a new FixedLimitMsat-variant MaxDustHTLCExposure
 pub extern "C" fn MaxDustHTLCExposure_fixed_limit_msat(a: u64) -> MaxDustHTLCExposure {
@@ -990,6 +1000,10 @@ pub extern "C" fn MaxDustHTLCExposure_eq(a: &MaxDustHTLCExposure, b: &MaxDustHTL
 /// Serialize the MaxDustHTLCExposure object into a byte array which can be read by MaxDustHTLCExposure_read
 pub extern "C" fn MaxDustHTLCExposure_write(obj: &crate::lightning::util::config::MaxDustHTLCExposure) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn MaxDustHTLCExposure_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	MaxDustHTLCExposure_write(unsafe { &*(obj as *const MaxDustHTLCExposure) })
 }
 #[no_mangle]
 /// Read a MaxDustHTLCExposure from a byte array, created by MaxDustHTLCExposure_write
@@ -1210,20 +1224,20 @@ pub extern "C" fn ChannelConfig_set_max_dust_htlc_exposure(this_ptr: &mut Channe
 /// funder/initiator.
 ///
 /// When we are the funder, because we have to pay the channel closing fee, we bound the
-/// acceptable fee by our [`Background`] and [`Normal`] fees, with the upper bound increased by
+/// acceptable fee by our [`ChannelCloseMinimum`] and [`NonAnchorChannelFee`] fees, with the upper bound increased by
 /// this value. Because the on-chain fee we'd pay to force-close the channel is kept near our
-/// [`Normal`] feerate during normal operation, this value represents the additional fee we're
+/// [`NonAnchorChannelFee`] feerate during normal operation, this value represents the additional fee we're
 /// willing to pay in order to avoid waiting for our counterparty's to_self_delay to reclaim our
 /// funds.
 ///
 /// When we are not the funder, we require the closing transaction fee pay at least our
-/// [`Background`] fee estimate, but allow our counterparty to pay as much fee as they like.
+/// [`ChannelCloseMinimum`] fee estimate, but allow our counterparty to pay as much fee as they like.
 /// Thus, this value is ignored when we are not the funder.
 ///
 /// Default value: 1000 satoshis.
 ///
-/// [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
-/// [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
+/// [`NonAnchorChannelFee`]: crate::chain::chaininterface::ConfirmationTarget::NonAnchorChannelFee
+/// [`ChannelCloseMinimum`]: crate::chain::chaininterface::ConfirmationTarget::ChannelCloseMinimum
 #[no_mangle]
 pub extern "C" fn ChannelConfig_get_force_close_avoidance_max_fee_satoshis(this_ptr: &ChannelConfig) -> u64 {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().force_close_avoidance_max_fee_satoshis;
@@ -1237,20 +1251,20 @@ pub extern "C" fn ChannelConfig_get_force_close_avoidance_max_fee_satoshis(this_
 /// funder/initiator.
 ///
 /// When we are the funder, because we have to pay the channel closing fee, we bound the
-/// acceptable fee by our [`Background`] and [`Normal`] fees, with the upper bound increased by
+/// acceptable fee by our [`ChannelCloseMinimum`] and [`NonAnchorChannelFee`] fees, with the upper bound increased by
 /// this value. Because the on-chain fee we'd pay to force-close the channel is kept near our
-/// [`Normal`] feerate during normal operation, this value represents the additional fee we're
+/// [`NonAnchorChannelFee`] feerate during normal operation, this value represents the additional fee we're
 /// willing to pay in order to avoid waiting for our counterparty's to_self_delay to reclaim our
 /// funds.
 ///
 /// When we are not the funder, we require the closing transaction fee pay at least our
-/// [`Background`] fee estimate, but allow our counterparty to pay as much fee as they like.
+/// [`ChannelCloseMinimum`] fee estimate, but allow our counterparty to pay as much fee as they like.
 /// Thus, this value is ignored when we are not the funder.
 ///
 /// Default value: 1000 satoshis.
 ///
-/// [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
-/// [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
+/// [`NonAnchorChannelFee`]: crate::chain::chaininterface::ConfirmationTarget::NonAnchorChannelFee
+/// [`ChannelCloseMinimum`]: crate::chain::chaininterface::ConfirmationTarget::ChannelCloseMinimum
 #[no_mangle]
 pub extern "C" fn ChannelConfig_set_force_close_avoidance_max_fee_satoshis(this_ptr: &mut ChannelConfig, mut val: u64) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.force_close_avoidance_max_fee_satoshis = val;
@@ -1347,7 +1361,7 @@ impl Clone for ChannelConfig {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelConfig_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelConfig)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelConfig)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelConfig
@@ -1380,7 +1394,7 @@ pub extern "C" fn ChannelConfig_default() -> ChannelConfig {
 pub extern "C" fn ChannelConfig_write(obj: &crate::lightning::util::config::ChannelConfig) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelConfig_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelConfig) })
 }
@@ -1783,7 +1797,7 @@ impl Clone for UserConfig {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UserConfig_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUserConfig)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUserConfig)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the UserConfig

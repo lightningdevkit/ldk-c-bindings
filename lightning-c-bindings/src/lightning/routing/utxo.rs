@@ -69,6 +69,16 @@ impl UtxoLookupError {
 pub extern "C" fn UtxoLookupError_clone(orig: &UtxoLookupError) -> UtxoLookupError {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn UtxoLookupError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const UtxoLookupError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn UtxoLookupError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut UtxoLookupError) };
+}
 #[no_mangle]
 /// Utility method to constructs a new UnknownChain-variant UtxoLookupError
 pub extern "C" fn UtxoLookupError_unknown_chain() -> UtxoLookupError {
@@ -179,6 +189,16 @@ pub extern "C" fn UtxoResult_free(this_ptr: UtxoResult) { }
 pub extern "C" fn UtxoResult_clone(orig: &UtxoResult) -> UtxoResult {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn UtxoResult_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const UtxoResult)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn UtxoResult_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut UtxoResult) };
+}
 #[no_mangle]
 /// Utility method to constructs a new Sync-variant UtxoResult
 pub extern "C" fn UtxoResult_sync(a: crate::c_types::derived::CResult_TxOutUtxoLookupErrorZ) -> UtxoResult {
@@ -196,17 +216,18 @@ pub struct UtxoLookup {
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
 	/// Returns the transaction output of a funding transaction encoded by [`short_channel_id`].
-	/// Returns an error if `genesis_hash` is for a different chain or if such a transaction output
-	/// is unknown.
+	/// Returns an error if `chain_hash` is for a different chain or if such a transaction output is
+	/// unknown.
 	///
 	/// [`short_channel_id`]: https://github.com/lightning/bolts/blob/master/07-routing-gossip.md#definition-of-short_channel_id
-	pub get_utxo: extern "C" fn (this_arg: *const c_void, genesis_hash: *const [u8; 32], short_channel_id: u64) -> crate::lightning::routing::utxo::UtxoResult,
+	pub get_utxo: extern "C" fn (this_arg: *const c_void, chain_hash: *const [u8; 32], short_channel_id: u64) -> crate::lightning::routing::utxo::UtxoResult,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
 }
 unsafe impl Send for UtxoLookup {}
 unsafe impl Sync for UtxoLookup {}
+#[allow(unused)]
 pub(crate) fn UtxoLookup_clone_fields(orig: &UtxoLookup) -> UtxoLookup {
 	UtxoLookup {
 		this_arg: orig.this_arg,
@@ -217,8 +238,8 @@ pub(crate) fn UtxoLookup_clone_fields(orig: &UtxoLookup) -> UtxoLookup {
 
 use lightning::routing::utxo::UtxoLookup as rustUtxoLookup;
 impl rustUtxoLookup for UtxoLookup {
-	fn get_utxo(&self, mut genesis_hash: &bitcoin::BlockHash, mut short_channel_id: u64) -> lightning::routing::utxo::UtxoResult {
-		let mut ret = (self.get_utxo)(self.this_arg, genesis_hash.as_inner(), short_channel_id);
+	fn get_utxo(&self, mut chain_hash: &bitcoin::blockdata::constants::ChainHash, mut short_channel_id: u64) -> lightning::routing::utxo::UtxoResult {
+		let mut ret = (self.get_utxo)(self.this_arg, chain_hash.as_bytes(), short_channel_id);
 		ret.into_native()
 	}
 }
@@ -311,7 +332,7 @@ impl Clone for UtxoFuture {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn UtxoFuture_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUtxoFuture)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUtxoFuture)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the UtxoFuture

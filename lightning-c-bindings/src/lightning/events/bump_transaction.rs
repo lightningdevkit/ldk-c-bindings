@@ -20,150 +20,6 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 
-use lightning::events::bump_transaction::ChannelDerivationParameters as nativeChannelDerivationParametersImport;
-pub(crate) type nativeChannelDerivationParameters = nativeChannelDerivationParametersImport;
-
-/// The parameters required to derive a channel signer via [`SignerProvider`].
-#[must_use]
-#[repr(C)]
-pub struct ChannelDerivationParameters {
-	/// A pointer to the opaque Rust object.
-
-	/// Nearly everywhere, inner must be non-null, however in places where
-	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeChannelDerivationParameters,
-	/// Indicates that this is the only struct which contains the same pointer.
-
-	/// Rust functions which take ownership of an object provided via an argument require
-	/// this to be true and invalidate the object pointed to by inner.
-	pub is_owned: bool,
-}
-
-impl Drop for ChannelDerivationParameters {
-	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeChannelDerivationParameters>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
-		}
-	}
-}
-/// Frees any resources used by the ChannelDerivationParameters, if is_owned is set and inner is non-NULL.
-#[no_mangle]
-pub extern "C" fn ChannelDerivationParameters_free(this_obj: ChannelDerivationParameters) { }
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn ChannelDerivationParameters_free_void(this_ptr: *mut c_void) {
-	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeChannelDerivationParameters) };
-}
-#[allow(unused)]
-impl ChannelDerivationParameters {
-	pub(crate) fn get_native_ref(&self) -> &'static nativeChannelDerivationParameters {
-		unsafe { &*ObjOps::untweak_ptr(self.inner) }
-	}
-	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeChannelDerivationParameters {
-		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
-	}
-	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-	pub(crate) fn take_inner(mut self) -> *mut nativeChannelDerivationParameters {
-		assert!(self.is_owned);
-		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = core::ptr::null_mut();
-		ret
-	}
-}
-/// The value in satoshis of the channel we're attempting to spend the anchor output of.
-#[no_mangle]
-pub extern "C" fn ChannelDerivationParameters_get_value_satoshis(this_ptr: &ChannelDerivationParameters) -> u64 {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().value_satoshis;
-	*inner_val
-}
-/// The value in satoshis of the channel we're attempting to spend the anchor output of.
-#[no_mangle]
-pub extern "C" fn ChannelDerivationParameters_set_value_satoshis(this_ptr: &mut ChannelDerivationParameters, mut val: u64) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.value_satoshis = val;
-}
-/// The unique identifier to re-derive the signer for the associated channel.
-#[no_mangle]
-pub extern "C" fn ChannelDerivationParameters_get_keys_id(this_ptr: &ChannelDerivationParameters) -> *const [u8; 32] {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().keys_id;
-	inner_val
-}
-/// The unique identifier to re-derive the signer for the associated channel.
-#[no_mangle]
-pub extern "C" fn ChannelDerivationParameters_set_keys_id(this_ptr: &mut ChannelDerivationParameters, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.keys_id = val.data;
-}
-/// The necessary channel parameters that need to be provided to the re-derived signer through
-/// [`ChannelSigner::provide_channel_parameters`].
-///
-/// [`ChannelSigner::provide_channel_parameters`]: crate::sign::ChannelSigner::provide_channel_parameters
-#[no_mangle]
-pub extern "C" fn ChannelDerivationParameters_get_transaction_parameters(this_ptr: &ChannelDerivationParameters) -> crate::lightning::ln::chan_utils::ChannelTransactionParameters {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().transaction_parameters;
-	crate::lightning::ln::chan_utils::ChannelTransactionParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::chan_utils::ChannelTransactionParameters<>) as *mut _) }, is_owned: false }
-}
-/// The necessary channel parameters that need to be provided to the re-derived signer through
-/// [`ChannelSigner::provide_channel_parameters`].
-///
-/// [`ChannelSigner::provide_channel_parameters`]: crate::sign::ChannelSigner::provide_channel_parameters
-#[no_mangle]
-pub extern "C" fn ChannelDerivationParameters_set_transaction_parameters(this_ptr: &mut ChannelDerivationParameters, mut val: crate::lightning::ln::chan_utils::ChannelTransactionParameters) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.transaction_parameters = *unsafe { Box::from_raw(val.take_inner()) };
-}
-/// Constructs a new ChannelDerivationParameters given each field
-#[must_use]
-#[no_mangle]
-pub extern "C" fn ChannelDerivationParameters_new(mut value_satoshis_arg: u64, mut keys_id_arg: crate::c_types::ThirtyTwoBytes, mut transaction_parameters_arg: crate::lightning::ln::chan_utils::ChannelTransactionParameters) -> ChannelDerivationParameters {
-	ChannelDerivationParameters { inner: ObjOps::heap_alloc(nativeChannelDerivationParameters {
-		value_satoshis: value_satoshis_arg,
-		keys_id: keys_id_arg.data,
-		transaction_parameters: *unsafe { Box::from_raw(transaction_parameters_arg.take_inner()) },
-	}), is_owned: true }
-}
-impl Clone for ChannelDerivationParameters {
-	fn clone(&self) -> Self {
-		Self {
-			inner: if <*mut nativeChannelDerivationParameters>::is_null(self.inner) { core::ptr::null_mut() } else {
-				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
-			is_owned: true,
-		}
-	}
-}
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn ChannelDerivationParameters_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelDerivationParameters)).clone() })) as *mut c_void
-}
-#[no_mangle]
-/// Creates a copy of the ChannelDerivationParameters
-pub extern "C" fn ChannelDerivationParameters_clone(orig: &ChannelDerivationParameters) -> ChannelDerivationParameters {
-	orig.clone()
-}
-/// Checks if two ChannelDerivationParameterss contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
-#[no_mangle]
-pub extern "C" fn ChannelDerivationParameters_eq(a: &ChannelDerivationParameters, b: &ChannelDerivationParameters) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
-}
-#[no_mangle]
-/// Serialize the ChannelDerivationParameters object into a byte array which can be read by ChannelDerivationParameters_read
-pub extern "C" fn ChannelDerivationParameters_write(obj: &crate::lightning::events::bump_transaction::ChannelDerivationParameters) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
-}
-#[no_mangle]
-pub(crate) extern "C" fn ChannelDerivationParameters_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelDerivationParameters) })
-}
-#[no_mangle]
-/// Read a ChannelDerivationParameters from a byte array, created by ChannelDerivationParameters_write
-pub extern "C" fn ChannelDerivationParameters_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ChannelDerivationParametersDecodeErrorZ {
-	let res: Result<lightning::events::bump_transaction::ChannelDerivationParameters, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::events::bump_transaction::ChannelDerivationParameters { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
-	local_res
-}
-
 use lightning::events::bump_transaction::AnchorDescriptor as nativeAnchorDescriptorImport;
 pub(crate) type nativeAnchorDescriptor = nativeAnchorDescriptorImport;
 
@@ -216,13 +72,13 @@ impl AnchorDescriptor {
 }
 /// The parameters required to derive the signer for the anchor input.
 #[no_mangle]
-pub extern "C" fn AnchorDescriptor_get_channel_derivation_parameters(this_ptr: &AnchorDescriptor) -> crate::lightning::events::bump_transaction::ChannelDerivationParameters {
+pub extern "C" fn AnchorDescriptor_get_channel_derivation_parameters(this_ptr: &AnchorDescriptor) -> crate::lightning::sign::ChannelDerivationParameters {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_derivation_parameters;
-	crate::lightning::events::bump_transaction::ChannelDerivationParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::events::bump_transaction::ChannelDerivationParameters<>) as *mut _) }, is_owned: false }
+	crate::lightning::sign::ChannelDerivationParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::sign::ChannelDerivationParameters<>) as *mut _) }, is_owned: false }
 }
 /// The parameters required to derive the signer for the anchor input.
 #[no_mangle]
-pub extern "C" fn AnchorDescriptor_set_channel_derivation_parameters(this_ptr: &mut AnchorDescriptor, mut val: crate::lightning::events::bump_transaction::ChannelDerivationParameters) {
+pub extern "C" fn AnchorDescriptor_set_channel_derivation_parameters(this_ptr: &mut AnchorDescriptor, mut val: crate::lightning::sign::ChannelDerivationParameters) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_derivation_parameters = *unsafe { Box::from_raw(val.take_inner()) };
 }
 /// The transaction input's outpoint corresponding to the commitment transaction's anchor
@@ -241,7 +97,7 @@ pub extern "C" fn AnchorDescriptor_set_outpoint(this_ptr: &mut AnchorDescriptor,
 /// Constructs a new AnchorDescriptor given each field
 #[must_use]
 #[no_mangle]
-pub extern "C" fn AnchorDescriptor_new(mut channel_derivation_parameters_arg: crate::lightning::events::bump_transaction::ChannelDerivationParameters, mut outpoint_arg: crate::lightning::chain::transaction::OutPoint) -> AnchorDescriptor {
+pub extern "C" fn AnchorDescriptor_new(mut channel_derivation_parameters_arg: crate::lightning::sign::ChannelDerivationParameters, mut outpoint_arg: crate::lightning::chain::transaction::OutPoint) -> AnchorDescriptor {
 	AnchorDescriptor { inner: ObjOps::heap_alloc(nativeAnchorDescriptor {
 		channel_derivation_parameters: *unsafe { Box::from_raw(channel_derivation_parameters_arg.take_inner()) },
 		outpoint: crate::c_types::C_to_bitcoin_outpoint(outpoint_arg),
@@ -259,7 +115,7 @@ impl Clone for AnchorDescriptor {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn AnchorDescriptor_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeAnchorDescriptor)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeAnchorDescriptor)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the AnchorDescriptor
@@ -314,240 +170,6 @@ pub extern "C" fn AnchorDescriptor_tx_input_witness(this_arg: &crate::lightning:
 #[must_use]
 #[no_mangle]
 pub extern "C" fn AnchorDescriptor_derive_channel_signer(this_arg: &crate::lightning::events::bump_transaction::AnchorDescriptor, signer_provider: &crate::lightning::sign::SignerProvider) -> crate::lightning::sign::WriteableEcdsaChannelSigner {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.derive_channel_signer(signer_provider);
-	Into::into(ret)
-}
-
-
-use lightning::events::bump_transaction::HTLCDescriptor as nativeHTLCDescriptorImport;
-pub(crate) type nativeHTLCDescriptor = nativeHTLCDescriptorImport;
-
-/// A descriptor used to sign for a commitment transaction's HTLC output.
-#[must_use]
-#[repr(C)]
-pub struct HTLCDescriptor {
-	/// A pointer to the opaque Rust object.
-
-	/// Nearly everywhere, inner must be non-null, however in places where
-	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
-	pub inner: *mut nativeHTLCDescriptor,
-	/// Indicates that this is the only struct which contains the same pointer.
-
-	/// Rust functions which take ownership of an object provided via an argument require
-	/// this to be true and invalidate the object pointed to by inner.
-	pub is_owned: bool,
-}
-
-impl Drop for HTLCDescriptor {
-	fn drop(&mut self) {
-		if self.is_owned && !<*mut nativeHTLCDescriptor>::is_null(self.inner) {
-			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
-		}
-	}
-}
-/// Frees any resources used by the HTLCDescriptor, if is_owned is set and inner is non-NULL.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_free(this_obj: HTLCDescriptor) { }
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn HTLCDescriptor_free_void(this_ptr: *mut c_void) {
-	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeHTLCDescriptor) };
-}
-#[allow(unused)]
-impl HTLCDescriptor {
-	pub(crate) fn get_native_ref(&self) -> &'static nativeHTLCDescriptor {
-		unsafe { &*ObjOps::untweak_ptr(self.inner) }
-	}
-	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeHTLCDescriptor {
-		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
-	}
-	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
-	pub(crate) fn take_inner(mut self) -> *mut nativeHTLCDescriptor {
-		assert!(self.is_owned);
-		let ret = ObjOps::untweak_ptr(self.inner);
-		self.inner = core::ptr::null_mut();
-		ret
-	}
-}
-/// The parameters required to derive the signer for the HTLC input.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_get_channel_derivation_parameters(this_ptr: &HTLCDescriptor) -> crate::lightning::events::bump_transaction::ChannelDerivationParameters {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_derivation_parameters;
-	crate::lightning::events::bump_transaction::ChannelDerivationParameters { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::events::bump_transaction::ChannelDerivationParameters<>) as *mut _) }, is_owned: false }
-}
-/// The parameters required to derive the signer for the HTLC input.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_set_channel_derivation_parameters(this_ptr: &mut HTLCDescriptor, mut val: crate::lightning::events::bump_transaction::ChannelDerivationParameters) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_derivation_parameters = *unsafe { Box::from_raw(val.take_inner()) };
-}
-/// The number of the commitment transaction in which the HTLC output lives.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_get_per_commitment_number(this_ptr: &HTLCDescriptor) -> u64 {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().per_commitment_number;
-	*inner_val
-}
-/// The number of the commitment transaction in which the HTLC output lives.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_set_per_commitment_number(this_ptr: &mut HTLCDescriptor, mut val: u64) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.per_commitment_number = val;
-}
-/// The key tweak corresponding to the number of the commitment transaction in which the HTLC
-/// output lives. This tweak is applied to all the basepoints for both parties in the channel to
-/// arrive at unique keys per commitment.
-///
-/// See <https://github.com/lightning/bolts/blob/master/03-transactions.md#keys> for more info.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_get_per_commitment_point(this_ptr: &HTLCDescriptor) -> crate::c_types::PublicKey {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().per_commitment_point;
-	crate::c_types::PublicKey::from_rust(&inner_val)
-}
-/// The key tweak corresponding to the number of the commitment transaction in which the HTLC
-/// output lives. This tweak is applied to all the basepoints for both parties in the channel to
-/// arrive at unique keys per commitment.
-///
-/// See <https://github.com/lightning/bolts/blob/master/03-transactions.md#keys> for more info.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_set_per_commitment_point(this_ptr: &mut HTLCDescriptor, mut val: crate::c_types::PublicKey) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.per_commitment_point = val.into_rust();
-}
-/// The details of the HTLC as it appears in the commitment transaction.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_get_htlc(this_ptr: &HTLCDescriptor) -> crate::lightning::ln::chan_utils::HTLCOutputInCommitment {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().htlc;
-	crate::lightning::ln::chan_utils::HTLCOutputInCommitment { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::chan_utils::HTLCOutputInCommitment<>) as *mut _) }, is_owned: false }
-}
-/// The details of the HTLC as it appears in the commitment transaction.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_set_htlc(this_ptr: &mut HTLCDescriptor, mut val: crate::lightning::ln::chan_utils::HTLCOutputInCommitment) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.htlc = *unsafe { Box::from_raw(val.take_inner()) };
-}
-/// The preimage, if `Some`, to claim the HTLC output with. If `None`, the timeout path must be
-/// taken.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_get_preimage(this_ptr: &HTLCDescriptor) -> crate::c_types::derived::COption_ThirtyTwoBytesZ {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().preimage;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().0 } }) };
-	local_inner_val
-}
-/// The preimage, if `Some`, to claim the HTLC output with. If `None`, the timeout path must be
-/// taken.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_set_preimage(this_ptr: &mut HTLCDescriptor, mut val: crate::c_types::derived::COption_ThirtyTwoBytesZ) {
-	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::lightning::ln::PaymentPreimage({ val_opt.take() }.data) }})} };
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.preimage = local_val;
-}
-/// The counterparty's signature required to spend the HTLC output.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_get_counterparty_sig(this_ptr: &HTLCDescriptor) -> crate::c_types::ECDSASignature {
-	let mut inner_val = &mut this_ptr.get_native_mut_ref().counterparty_sig;
-	crate::c_types::ECDSASignature::from_rust(&inner_val)
-}
-/// The counterparty's signature required to spend the HTLC output.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_set_counterparty_sig(this_ptr: &mut HTLCDescriptor, mut val: crate::c_types::ECDSASignature) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.counterparty_sig = val.into_rust();
-}
-impl Clone for HTLCDescriptor {
-	fn clone(&self) -> Self {
-		Self {
-			inner: if <*mut nativeHTLCDescriptor>::is_null(self.inner) { core::ptr::null_mut() } else {
-				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
-			is_owned: true,
-		}
-	}
-}
-#[allow(unused)]
-/// Used only if an object of this type is returned as a trait impl by a method
-pub(crate) extern "C" fn HTLCDescriptor_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeHTLCDescriptor)).clone() })) as *mut c_void
-}
-#[no_mangle]
-/// Creates a copy of the HTLCDescriptor
-pub extern "C" fn HTLCDescriptor_clone(orig: &HTLCDescriptor) -> HTLCDescriptor {
-	orig.clone()
-}
-/// Checks if two HTLCDescriptors contain equal inner contents.
-/// This ignores pointers and is_owned flags and looks at the values in fields.
-/// Two objects with NULL inner values will be considered "equal" here.
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_eq(a: &HTLCDescriptor, b: &HTLCDescriptor) -> bool {
-	if a.inner == b.inner { return true; }
-	if a.inner.is_null() || b.inner.is_null() { return false; }
-	if a.get_native_ref() == b.get_native_ref() { true } else { false }
-}
-#[no_mangle]
-/// Serialize the HTLCDescriptor object into a byte array which can be read by HTLCDescriptor_read
-pub extern "C" fn HTLCDescriptor_write(obj: &crate::lightning::events::bump_transaction::HTLCDescriptor) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
-}
-#[no_mangle]
-pub(crate) extern "C" fn HTLCDescriptor_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
-	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeHTLCDescriptor) })
-}
-#[no_mangle]
-/// Read a HTLCDescriptor from a byte array, created by HTLCDescriptor_write
-pub extern "C" fn HTLCDescriptor_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_HTLCDescriptorDecodeErrorZ {
-	let res: Result<lightning::events::bump_transaction::HTLCDescriptor, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::events::bump_transaction::HTLCDescriptor { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
-	local_res
-}
-/// Returns the outpoint of the HTLC output in the commitment transaction. This is the outpoint
-/// being spent by the HTLC input in the HTLC transaction.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_outpoint(this_arg: &crate::lightning::events::bump_transaction::HTLCDescriptor) -> crate::lightning::chain::transaction::OutPoint {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.outpoint();
-	crate::c_types::bitcoin_to_C_outpoint(&ret)
-}
-
-/// Returns the UTXO to be spent by the HTLC input, which can be obtained via
-/// [`Self::unsigned_tx_input`].
-#[must_use]
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_previous_utxo(this_arg: &crate::lightning::events::bump_transaction::HTLCDescriptor) -> crate::c_types::TxOut {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.previous_utxo(secp256k1::global::SECP256K1);
-	crate::c_types::TxOut::from_rust(&ret)
-}
-
-/// Returns the unsigned transaction input spending the HTLC output in the commitment
-/// transaction.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_unsigned_tx_input(this_arg: &crate::lightning::events::bump_transaction::HTLCDescriptor) -> crate::c_types::TxIn {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.unsigned_tx_input();
-	crate::c_types::TxIn::from_rust(&ret)
-}
-
-/// Returns the delayed output created as a result of spending the HTLC output in the commitment
-/// transaction.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_tx_output(this_arg: &crate::lightning::events::bump_transaction::HTLCDescriptor) -> crate::c_types::TxOut {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.tx_output(secp256k1::global::SECP256K1);
-	crate::c_types::TxOut::from_rust(&ret)
-}
-
-/// Returns the witness script of the HTLC output in the commitment transaction.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_witness_script(this_arg: &crate::lightning::events::bump_transaction::HTLCDescriptor) -> crate::c_types::derived::CVec_u8Z {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.witness_script(secp256k1::global::SECP256K1);
-	ret.into_bytes().into()
-}
-
-/// Returns the fully signed witness required to spend the HTLC output in the commitment
-/// transaction.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_tx_input_witness(this_arg: &crate::lightning::events::bump_transaction::HTLCDescriptor, mut signature: crate::c_types::ECDSASignature, mut witness_script: crate::c_types::u8slice) -> crate::c_types::Witness {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.tx_input_witness(&signature.into_rust(), &::bitcoin::blockdata::script::Script::from(Vec::from(witness_script.to_slice())));
-	crate::c_types::Witness::from_bitcoin(&ret)
-}
-
-/// Derives the channel signer required to sign the HTLC input.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn HTLCDescriptor_derive_channel_signer(this_arg: &crate::lightning::events::bump_transaction::HTLCDescriptor, signer_provider: &crate::lightning::sign::SignerProvider) -> crate::lightning::sign::WriteableEcdsaChannelSigner {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.derive_channel_signer(signer_provider);
 	Into::into(ret)
 }
@@ -649,7 +271,6 @@ pub enum BumpTransactionEvent {
 	///
 	/// [`EcdsaChannelSigner`]: crate::sign::EcdsaChannelSigner
 	/// [`EcdsaChannelSigner::sign_holder_htlc_transaction`]: crate::sign::EcdsaChannelSigner::sign_holder_htlc_transaction
-	/// [`HTLCDescriptor::tx_input_witness`]: HTLCDescriptor::tx_input_witness
 	HTLCResolution {
 		/// The unique identifier for the claim of the HTLCs in the confirmed commitment
 		/// transaction.
@@ -755,7 +376,7 @@ impl BumpTransactionEvent {
 				let mut claim_id_nonref = Clone::clone(claim_id);
 				let mut target_feerate_sat_per_1000_weight_nonref = Clone::clone(target_feerate_sat_per_1000_weight);
 				let mut htlc_descriptors_nonref = Clone::clone(htlc_descriptors);
-				let mut local_htlc_descriptors_nonref = Vec::new(); for mut item in htlc_descriptors_nonref.drain(..) { local_htlc_descriptors_nonref.push( { crate::lightning::events::bump_transaction::HTLCDescriptor { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+				let mut local_htlc_descriptors_nonref = Vec::new(); for mut item in htlc_descriptors_nonref.drain(..) { local_htlc_descriptors_nonref.push( { crate::lightning::sign::HTLCDescriptor { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
 				let mut tx_lock_time_nonref = Clone::clone(tx_lock_time);
 				BumpTransactionEvent::HTLCResolution {
 					claim_id: crate::c_types::ThirtyTwoBytes { data: claim_id_nonref.0 },
@@ -781,7 +402,7 @@ impl BumpTransactionEvent {
 				}
 			},
 			nativeBumpTransactionEvent::HTLCResolution {mut claim_id, mut target_feerate_sat_per_1000_weight, mut htlc_descriptors, mut tx_lock_time, } => {
-				let mut local_htlc_descriptors = Vec::new(); for mut item in htlc_descriptors.drain(..) { local_htlc_descriptors.push( { crate::lightning::events::bump_transaction::HTLCDescriptor { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
+				let mut local_htlc_descriptors = Vec::new(); for mut item in htlc_descriptors.drain(..) { local_htlc_descriptors.push( { crate::lightning::sign::HTLCDescriptor { inner: ObjOps::heap_alloc(item), is_owned: true } }); };
 				BumpTransactionEvent::HTLCResolution {
 					claim_id: crate::c_types::ThirtyTwoBytes { data: claim_id.0 },
 					target_feerate_sat_per_1000_weight: target_feerate_sat_per_1000_weight,
@@ -799,6 +420,16 @@ pub extern "C" fn BumpTransactionEvent_free(this_ptr: BumpTransactionEvent) { }
 #[no_mangle]
 pub extern "C" fn BumpTransactionEvent_clone(orig: &BumpTransactionEvent) -> BumpTransactionEvent {
 	orig.clone()
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn BumpTransactionEvent_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const BumpTransactionEvent)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn BumpTransactionEvent_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut BumpTransactionEvent) };
 }
 #[no_mangle]
 /// Utility method to constructs a new ChannelClose-variant BumpTransactionEvent
@@ -940,7 +571,7 @@ impl Clone for Input {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Input_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInput)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeInput)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Input
@@ -1077,7 +708,7 @@ impl Clone for Utxo {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Utxo_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeUtxo)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeUtxo)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Utxo
@@ -1220,7 +851,7 @@ impl Clone for CoinSelection {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CoinSelection_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCoinSelection)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeCoinSelection)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the CoinSelection
@@ -1272,6 +903,7 @@ pub struct CoinSelectionSource {
 }
 unsafe impl Send for CoinSelectionSource {}
 unsafe impl Sync for CoinSelectionSource {}
+#[allow(unused)]
 pub(crate) fn CoinSelectionSource_clone_fields(orig: &CoinSelectionSource) -> CoinSelectionSource {
 	CoinSelectionSource {
 		this_arg: orig.this_arg,
@@ -1342,6 +974,7 @@ pub struct WalletSource {
 }
 unsafe impl Send for WalletSource {}
 unsafe impl Sync for WalletSource {}
+#[allow(unused)]
 pub(crate) fn WalletSource_clone_fields(orig: &WalletSource) -> WalletSource {
 	WalletSource {
 		this_arg: orig.this_arg,
@@ -1458,10 +1091,10 @@ pub extern "C" fn Wallet_new(mut source: crate::lightning::events::bump_transact
 
 impl From<nativeWallet> for crate::lightning::events::bump_transaction::CoinSelectionSource {
 	fn from(obj: nativeWallet) -> Self {
-		let mut rust_obj = Wallet { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::events::bump_transaction::Wallet { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = Wallet_as_CoinSelectionSource(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(Wallet_free_void);
 		ret
 	}

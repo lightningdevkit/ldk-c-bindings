@@ -406,6 +406,16 @@ pub extern "C" fn Bolt11ParseError_free(this_ptr: Bolt11ParseError) { }
 pub extern "C" fn Bolt11ParseError_clone(orig: &Bolt11ParseError) -> Bolt11ParseError {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Bolt11ParseError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const Bolt11ParseError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Bolt11ParseError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut Bolt11ParseError) };
+}
 #[no_mangle]
 /// Utility method to constructs a new Bech32Error-variant Bolt11ParseError
 pub extern "C" fn Bolt11ParseError_bech32_error(a: crate::c_types::Bech32Error) -> Bolt11ParseError {
@@ -580,6 +590,16 @@ pub extern "C" fn ParseOrSemanticError_free(this_ptr: ParseOrSemanticError) { }
 pub extern "C" fn ParseOrSemanticError_clone(orig: &ParseOrSemanticError) -> ParseOrSemanticError {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ParseOrSemanticError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const ParseOrSemanticError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ParseOrSemanticError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut ParseOrSemanticError) };
+}
 #[no_mangle]
 /// Utility method to constructs a new ParseError-variant ParseOrSemanticError
 pub extern "C" fn ParseOrSemanticError_parse_error(a: crate::lightning_invoice::Bolt11ParseError) -> ParseOrSemanticError {
@@ -697,7 +717,7 @@ impl Clone for Bolt11Invoice {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Bolt11Invoice_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBolt11Invoice)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBolt11Invoice)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Bolt11Invoice
@@ -790,7 +810,7 @@ impl Clone for SignedRawBolt11Invoice {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn SignedRawBolt11Invoice_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeSignedRawBolt11Invoice)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeSignedRawBolt11Invoice)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the SignedRawBolt11Invoice
@@ -894,7 +914,7 @@ impl Clone for RawBolt11Invoice {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RawBolt11Invoice_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRawBolt11Invoice)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRawBolt11Invoice)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the RawBolt11Invoice
@@ -994,7 +1014,7 @@ impl Clone for RawDataPart {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RawDataPart_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRawDataPart)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRawDataPart)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the RawDataPart
@@ -1088,7 +1108,7 @@ impl Clone for PositiveTimestamp {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PositiveTimestamp_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePositiveTimestamp)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePositiveTimestamp)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the PositiveTimestamp
@@ -1164,6 +1184,16 @@ impl SiPrefix {
 #[no_mangle]
 pub extern "C" fn SiPrefix_clone(orig: &SiPrefix) -> SiPrefix {
 	orig.clone()
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SiPrefix_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const SiPrefix)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SiPrefix_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut SiPrefix) };
 }
 #[no_mangle]
 /// Utility method to constructs a new Milli-variant SiPrefix
@@ -1271,6 +1301,16 @@ impl Currency {
 pub extern "C" fn Currency_clone(orig: &Currency) -> Currency {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Currency_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const Currency)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Currency_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut Currency) };
+}
 #[no_mangle]
 /// Utility method to constructs a new Bitcoin-variant Currency
 pub extern "C" fn Currency_bitcoin() -> Currency {
@@ -1369,7 +1409,7 @@ impl Clone for Sha256 {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Sha256_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeSha256)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeSha256)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Sha256
@@ -1470,7 +1510,7 @@ impl Clone for Description {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Description_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeDescription)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeDescription)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Description
@@ -1576,7 +1616,7 @@ impl Clone for PayeePubKey {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PayeePubKey_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePayeePubKey)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePayeePubKey)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the PayeePubKey
@@ -1666,7 +1706,7 @@ impl Clone for ExpiryTime {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ExpiryTime_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeExpiryTime)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeExpiryTime)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ExpiryTime
@@ -1772,7 +1812,7 @@ impl Clone for MinFinalCltvExpiryDelta {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn MinFinalCltvExpiryDelta_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeMinFinalCltvExpiryDelta)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeMinFinalCltvExpiryDelta)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the MinFinalCltvExpiryDelta
@@ -1921,6 +1961,16 @@ pub extern "C" fn Fallback_free(this_ptr: Fallback) { }
 pub extern "C" fn Fallback_clone(orig: &Fallback) -> Fallback {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Fallback_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const Fallback)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Fallback_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut Fallback) };
+}
 #[no_mangle]
 /// Utility method to constructs a new SegWitProgram-variant Fallback
 pub extern "C" fn Fallback_seg_wit_program(version: crate::c_types::WitnessVersion, program: crate::c_types::derived::CVec_u8Z) -> Fallback {
@@ -2017,7 +2067,7 @@ impl Clone for Bolt11InvoiceSignature {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Bolt11InvoiceSignature_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBolt11InvoiceSignature)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBolt11InvoiceSignature)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Bolt11InvoiceSignature
@@ -2110,7 +2160,7 @@ impl Clone for PrivateRoute {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PrivateRoute_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePrivateRoute)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePrivateRoute)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the PrivateRoute
@@ -2745,6 +2795,16 @@ impl CreationError {
 pub extern "C" fn CreationError_clone(orig: &CreationError) -> CreationError {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn CreationError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const CreationError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn CreationError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut CreationError) };
+}
 #[no_mangle]
 /// Utility method to constructs a new DescriptionTooLong-variant CreationError
 pub extern "C" fn CreationError_description_too_long() -> CreationError {
@@ -2878,6 +2938,16 @@ impl Bolt11SemanticError {
 pub extern "C" fn Bolt11SemanticError_clone(orig: &Bolt11SemanticError) -> Bolt11SemanticError {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Bolt11SemanticError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const Bolt11SemanticError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Bolt11SemanticError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut Bolt11SemanticError) };
+}
 #[no_mangle]
 /// Utility method to constructs a new NoPaymentHash-variant Bolt11SemanticError
 pub extern "C" fn Bolt11SemanticError_no_payment_hash() -> Bolt11SemanticError {
@@ -3009,6 +3079,16 @@ pub extern "C" fn SignOrCreationError_free(this_ptr: SignOrCreationError) { }
 #[no_mangle]
 pub extern "C" fn SignOrCreationError_clone(orig: &SignOrCreationError) -> SignOrCreationError {
 	orig.clone()
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SignOrCreationError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const SignOrCreationError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SignOrCreationError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut SignOrCreationError) };
 }
 #[no_mangle]
 /// Utility method to constructs a new SignError-variant SignOrCreationError

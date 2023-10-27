@@ -226,6 +226,16 @@ pub extern "C" fn APIError_free(this_ptr: APIError) { }
 pub extern "C" fn APIError_clone(orig: &APIError) -> APIError {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn APIError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const APIError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn APIError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut APIError) };
+}
 #[no_mangle]
 /// Utility method to constructs a new APIMisuseError-variant APIError
 pub extern "C" fn APIError_apimisuse_error(err: crate::c_types::Str) -> APIError {
@@ -276,6 +286,10 @@ pub extern "C" fn APIError_eq(a: &APIError, b: &APIError) -> bool {
 /// Serialize the APIError object into a byte array which can be read by APIError_read
 pub extern "C" fn APIError_write(obj: &crate::lightning::util::errors::APIError) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn APIError_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	APIError_write(unsafe { &*(obj as *const APIError) })
 }
 #[no_mangle]
 /// Read a APIError from a byte array, created by APIError_write

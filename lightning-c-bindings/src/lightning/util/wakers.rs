@@ -42,6 +42,7 @@ pub struct FutureCallback {
 }
 unsafe impl Send for FutureCallback {}
 unsafe impl Sync for FutureCallback {}
+#[allow(unused)]
 pub(crate) fn FutureCallback_clone_fields(orig: &FutureCallback) -> FutureCallback {
 	FutureCallback {
 		this_arg: orig.this_arg,
@@ -145,7 +146,7 @@ impl Clone for Future {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Future_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeFuture)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeFuture)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Future

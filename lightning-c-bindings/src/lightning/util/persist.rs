@@ -90,6 +90,7 @@ pub struct KVStore {
 }
 unsafe impl Send for KVStore {}
 unsafe impl Sync for KVStore {}
+#[allow(unused)]
 pub(crate) fn KVStore_clone_fields(orig: &KVStore) -> KVStore {
 	KVStore {
 		this_arg: orig.this_arg,
@@ -167,6 +168,7 @@ pub struct Persister {
 }
 unsafe impl Send for Persister {}
 unsafe impl Sync for Persister {}
+#[allow(unused)]
 pub(crate) fn Persister_clone_fields(orig: &Persister) -> Persister {
 	Persister {
 		this_arg: orig.this_arg,
@@ -436,10 +438,10 @@ pub extern "C" fn MonitorUpdatingPersister_cleanup_stale_updates(this_arg: &crat
 
 impl From<nativeMonitorUpdatingPersister> for crate::lightning::chain::chainmonitor::Persist {
 	fn from(obj: nativeMonitorUpdatingPersister) -> Self {
-		let mut rust_obj = MonitorUpdatingPersister { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::util::persist::MonitorUpdatingPersister { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = MonitorUpdatingPersister_as_Persist(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(MonitorUpdatingPersister_free_void);
 		ret
 	}

@@ -78,10 +78,10 @@ pub extern "C" fn DefaultRouter_new(network_graph: &crate::lightning::routing::g
 
 impl From<nativeDefaultRouter> for crate::lightning::routing::router::Router {
 	fn from(obj: nativeDefaultRouter) -> Self {
-		let mut rust_obj = DefaultRouter { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::router::DefaultRouter { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = DefaultRouter_as_Router(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(DefaultRouter_free_void);
 		ret
 	}
@@ -142,6 +142,7 @@ pub struct Router {
 }
 unsafe impl Send for Router {}
 unsafe impl Sync for Router {}
+#[allow(unused)]
 pub(crate) fn Router_clone_fields(orig: &Router) -> Router {
 	Router {
 		this_arg: orig.this_arg,
@@ -256,10 +257,10 @@ pub extern "C" fn ScorerAccountingForInFlightHtlcs_new(mut scorer: crate::lightn
 
 impl From<nativeScorerAccountingForInFlightHtlcs> for crate::lightning::routing::scoring::ScoreLookUp {
 	fn from(obj: nativeScorerAccountingForInFlightHtlcs) -> Self {
-		let mut rust_obj = ScorerAccountingForInFlightHtlcs { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::router::ScorerAccountingForInFlightHtlcs { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ScorerAccountingForInFlightHtlcs_as_ScoreLookUp(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ScorerAccountingForInFlightHtlcs_free_void);
 		ret
 	}
@@ -345,7 +346,7 @@ impl Clone for InFlightHtlcs {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn InFlightHtlcs_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInFlightHtlcs)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeInFlightHtlcs)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the InFlightHtlcs
@@ -388,7 +389,7 @@ pub extern "C" fn InFlightHtlcs_used_liquidity_msat(this_arg: &crate::lightning:
 pub extern "C" fn InFlightHtlcs_write(obj: &crate::lightning::routing::router::InFlightHtlcs) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn InFlightHtlcs_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeInFlightHtlcs) })
 }
@@ -592,7 +593,7 @@ impl Clone for RouteHop {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RouteHop_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRouteHop)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRouteHop)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the RouteHop
@@ -623,7 +624,7 @@ pub extern "C" fn RouteHop_eq(a: &RouteHop, b: &RouteHop) -> bool {
 pub extern "C" fn RouteHop_write(obj: &crate::lightning::routing::router::RouteHop) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn RouteHop_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRouteHop) })
 }
@@ -768,7 +769,7 @@ impl Clone for BlindedTail {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BlindedTail_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBlindedTail)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBlindedTail)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the BlindedTail
@@ -799,7 +800,7 @@ pub extern "C" fn BlindedTail_eq(a: &BlindedTail, b: &BlindedTail) -> bool {
 pub extern "C" fn BlindedTail_write(obj: &crate::lightning::routing::router::BlindedTail) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn BlindedTail_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBlindedTail) })
 }
@@ -917,7 +918,7 @@ impl Clone for Path {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Path_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePath)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePath)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Path
@@ -1087,7 +1088,7 @@ impl Clone for Route {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Route_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRoute)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRoute)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Route
@@ -1145,7 +1146,7 @@ pub extern "C" fn Route_get_total_amount(this_arg: &crate::lightning::routing::r
 pub extern "C" fn Route_write(obj: &crate::lightning::routing::router::Route) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Route_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRoute) })
 }
@@ -1277,7 +1278,7 @@ impl Clone for RouteParameters {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RouteParameters_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRouteParameters)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRouteParameters)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the RouteParameters
@@ -1318,7 +1319,7 @@ pub extern "C" fn RouteParameters_from_payment_params_and_value(mut payment_para
 pub extern "C" fn RouteParameters_write(obj: &crate::lightning::routing::router::RouteParameters) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn RouteParameters_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRouteParameters) })
 }
@@ -1519,7 +1520,7 @@ impl Clone for PaymentParameters {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PaymentParameters_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePaymentParameters)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePaymentParameters)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the PaymentParameters
@@ -1550,7 +1551,7 @@ pub extern "C" fn PaymentParameters_eq(a: &PaymentParameters, b: &PaymentParamet
 pub extern "C" fn PaymentParameters_write(obj: &crate::lightning::routing::router::PaymentParameters) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn PaymentParameters_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativePaymentParameters) })
 }
@@ -1766,6 +1767,16 @@ pub extern "C" fn Payee_free(this_ptr: Payee) { }
 pub extern "C" fn Payee_clone(orig: &Payee) -> Payee {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Payee_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const Payee)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Payee_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut Payee) };
+}
 #[no_mangle]
 /// Utility method to constructs a new Blinded-variant Payee
 pub extern "C" fn Payee_blinded(route_hints: crate::c_types::derived::CVec_C2Tuple_BlindedPayInfoBlindedPathZZ, features: crate::lightning::ln::features::Bolt12InvoiceFeatures) -> Payee {
@@ -1882,7 +1893,7 @@ impl Clone for RouteHint {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RouteHint_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRouteHint)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRouteHint)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the RouteHint
@@ -1913,7 +1924,7 @@ pub extern "C" fn RouteHint_eq(a: &RouteHint, b: &RouteHint) -> bool {
 pub extern "C" fn RouteHint_write(obj: &crate::lightning::routing::router::RouteHint) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn RouteHint_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRouteHint) })
 }
@@ -2072,7 +2083,7 @@ impl Clone for RouteHintHop {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RouteHintHop_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRouteHintHop)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRouteHintHop)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the RouteHintHop
@@ -2103,7 +2114,7 @@ pub extern "C" fn RouteHintHop_eq(a: &RouteHintHop, b: &RouteHintHop) -> bool {
 pub extern "C" fn RouteHintHop_write(obj: &crate::lightning::routing::router::RouteHintHop) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn RouteHintHop_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRouteHintHop) })
 }

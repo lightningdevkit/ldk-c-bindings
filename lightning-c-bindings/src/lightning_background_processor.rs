@@ -151,6 +151,11 @@ impl GossipSync {
 /// Frees any resources used by the GossipSync
 #[no_mangle]
 pub extern "C" fn GossipSync_free(this_ptr: GossipSync) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn GossipSync_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut GossipSync) };
+}
 #[no_mangle]
 /// Utility method to constructs a new P2P-variant GossipSync
 pub extern "C" fn GossipSync_p2_p(a: &crate::lightning::routing::gossip::P2PGossipSync) -> GossipSync {

@@ -166,7 +166,7 @@ impl Clone for BlindedPath {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BlindedPath_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBlindedPath)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBlindedPath)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the BlindedPath
@@ -293,7 +293,7 @@ impl Clone for BlindedHop {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BlindedHop_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBlindedHop)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBlindedHop)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the BlindedHop
@@ -319,10 +319,19 @@ pub extern "C" fn BlindedHop_eq(a: &BlindedHop, b: &BlindedHop) -> bool {
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
+/// Create a one-hop blinded path for a message.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedPath_one_hop_for_message(mut recipient_node_id: crate::c_types::PublicKey, entropy_source: &crate::lightning::sign::EntropySource) -> crate::c_types::derived::CResult_BlindedPathNoneZ {
+	let mut ret = lightning::blinded_path::BlindedPath::one_hop_for_message(recipient_node_id.into_rust(), entropy_source, secp256k1::global::SECP256K1);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
 /// Create a blinded path for an onion message, to be forwarded along `node_pks`. The last node
 /// pubkey in `node_pks` will be the destination node.
 ///
-/// Errors if less than two hops are provided or if `node_pk`(s) are invalid.
+/// Errors if no hops are provided or if `node_pk`(s) are invalid.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn BlindedPath_new_for_message(mut node_pks: crate::c_types::derived::CVec_PublicKeyZ, entropy_source: &crate::lightning::sign::EntropySource) -> crate::c_types::derived::CResult_BlindedPathNoneZ {
@@ -346,7 +355,7 @@ pub extern "C" fn BlindedPath_one_hop_for_payment(mut payee_node_id: crate::c_ty
 pub extern "C" fn BlindedPath_write(obj: &crate::lightning::blinded_path::BlindedPath) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn BlindedPath_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBlindedPath) })
 }
@@ -362,7 +371,7 @@ pub extern "C" fn BlindedPath_read(ser: crate::c_types::u8slice) -> crate::c_typ
 pub extern "C" fn BlindedHop_write(obj: &crate::lightning::blinded_path::BlindedHop) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn BlindedHop_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBlindedHop) })
 }

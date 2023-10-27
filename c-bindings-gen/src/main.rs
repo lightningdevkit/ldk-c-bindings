@@ -94,12 +94,15 @@ fn maybe_convert_trait_impl<W: std::io::Write>(w: &mut W, trait_path: &syn::Path
 				writeln!(w, ")").unwrap();
 
 				writeln!(w, "}}").unwrap();
+
+				writeln!(w, "#[allow(unused)]").unwrap();
+				writeln!(w, "pub(crate) extern \"C\" fn {}_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {{", for_obj).unwrap();
 				if has_inner {
-					writeln!(w, "#[no_mangle]").unwrap();
-					writeln!(w, "pub(crate) extern \"C\" fn {}_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {{", for_obj).unwrap();
 					writeln!(w, "\tcrate::c_types::serialize_obj(unsafe {{ &*(obj as *const native{}) }})", for_obj).unwrap();
-					writeln!(w, "}}").unwrap();
+				} else {
+					writeln!(w, "\t{}_write(unsafe {{ &*(obj as *const {}) }})", for_obj, for_obj).unwrap();
 				}
+				writeln!(w, "}}").unwrap();
 			},
 			"lightning::util::ser::Readable"|"lightning::util::ser::ReadableArgs"|"lightning::util::ser::MaybeReadable" => {
 				// Create the Result<Object, DecodeError> syn::Type
@@ -554,6 +557,7 @@ fn writeln_trait<'a, 'b, W: std::io::Write>(w: &mut W, t: &'a syn::ItemTrait, ty
 	writeln!(w, "unsafe impl Send for {} {{}}", trait_name).unwrap();
 	writeln!(w, "unsafe impl Sync for {} {{}}", trait_name).unwrap();
 
+	writeln!(w, "#[allow(unused)]").unwrap();
 	writeln!(w, "pub(crate) fn {}_clone_fields(orig: &{}) -> {} {{", trait_name, trait_name, trait_name).unwrap();
 	writeln!(w, "\t{} {{", trait_name).unwrap();
 	writeln!(w, "\t\tthis_arg: orig.this_arg,").unwrap();
@@ -1023,10 +1027,14 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 						if is_type_unconstructable(&resolved_path) {
 							writeln!(w, "\t\tunreachable!();").unwrap();
 						} else {
-							writeln!(w, "\t\tlet mut rust_obj = {} {{ inner: ObjOps::heap_alloc(obj), is_owned: true }};", ident).unwrap();
-							writeln!(w, "\t\tlet mut ret = {}_as_{}(&rust_obj);", ident, trait_obj.ident).unwrap();
-							writeln!(w, "\t\t// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn").unwrap();
-							writeln!(w, "\t\trust_obj.inner = core::ptr::null_mut();").unwrap();
+							types.write_to_c_conversion_new_var(w, &format_ident!("obj"), &*i.self_ty, Some(&gen_types), false);
+							write!(w, "\t\tlet rust_obj = ").unwrap();
+							types.write_to_c_conversion_inline_prefix(w, &*i.self_ty, Some(&gen_types), false);
+							write!(w, "obj").unwrap();
+							types.write_to_c_conversion_inline_suffix(w, &*i.self_ty, Some(&gen_types), false);
+							writeln!(w, ";\n\t\tlet mut ret = {}_as_{}(&rust_obj);", ident, trait_obj.ident).unwrap();
+							writeln!(w, "\t\t// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn").unwrap();
+							writeln!(w, "\t\tcore::mem::forget(rust_obj);").unwrap();
 							writeln!(w, "\t\tret.free = Some({}_free_void);", ident).unwrap();
 							writeln!(w, "\t\tret").unwrap();
 						}
@@ -1041,7 +1049,11 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 						writeln!(w, "/// This copies the `inner` pointer in this_arg and thus the returned {} must be freed before this_arg is", trait_obj.ident).unwrap();
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_as_{}(this_arg: &{}) -> crate::{} {{\n", ident, trait_obj.ident, ident, full_trait_path).unwrap();
 						writeln!(w, "\tcrate::{} {{", full_trait_path).unwrap();
-						writeln!(w, "\t\tthis_arg: unsafe {{ ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void }},").unwrap();
+						if types.c_type_has_inner_from_path(&resolved_path) {
+							writeln!(w, "\t\tthis_arg: unsafe {{ ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void }},").unwrap();
+						} else {
+							writeln!(w, "\t\tthis_arg: unsafe {{ ObjOps::untweak_ptr(this_arg as *const {} as *mut {}) as *mut c_void }},", ident, ident).unwrap();
+						}
 						writeln!(w, "\t\tfree: None,").unwrap();
 
 						macro_rules! write_meth {
@@ -1345,7 +1357,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 						writeln!(w, "#[allow(unused)]").unwrap();
 						writeln!(w, "/// Used only if an object of this type is returned as a trait impl by a method").unwrap();
 						writeln!(w, "pub(crate) extern \"C\" fn {}_clone_void(this_ptr: *const c_void) -> *mut c_void {{", ident).unwrap();
-						writeln!(w, "\tBox::into_raw(Box::new(unsafe {{ (*(this_ptr as *mut native{})).clone() }})) as *mut c_void", ident).unwrap();
+						writeln!(w, "\tBox::into_raw(Box::new(unsafe {{ (*(this_ptr as *const native{})).clone() }})) as *mut c_void", ident).unwrap();
 						writeln!(w, "}}").unwrap();
 						writeln!(w, "#[no_mangle]").unwrap();
 						writeln!(w, "/// Creates a copy of the {}", ident).unwrap();
@@ -1936,7 +1948,18 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 		writeln!(w, "pub extern \"C\" fn {}_clone(orig: &{}) -> {} {{", e.ident, e.ident, e.ident).unwrap();
 		writeln!(w, "\torig.clone()").unwrap();
 		writeln!(w, "}}").unwrap();
+		writeln!(w, "#[allow(unused)]").unwrap();
+		writeln!(w, "/// Used only if an object of this type is returned as a trait impl by a method").unwrap();
+		writeln!(w, "pub(crate) extern \"C\" fn {}_clone_void(this_ptr: *const c_void) -> *mut c_void {{", e.ident).unwrap();
+		writeln!(w, "\tBox::into_raw(Box::new(unsafe {{ (*(this_ptr as *const {})).clone() }})) as *mut c_void", e.ident).unwrap();
+		writeln!(w, "}}").unwrap();
 	}
+
+	writeln!(w, "#[allow(unused)]").unwrap();
+	writeln!(w, "/// Used only if an object of this type is returned as a trait impl by a method").unwrap();
+	writeln!(w, "pub(crate) extern \"C\" fn {}_free_void(this_ptr: *mut c_void) {{", e.ident).unwrap();
+	writeln!(w, "\tlet _ = unsafe {{ Box::from_raw(this_ptr as *mut {}) }};\n}}", e.ident).unwrap();
+
 	w.write_all(&constr).unwrap();
 	write_cpp_wrapper(cpp_headers, &format!("{}", e.ident), needs_free, None);
 }

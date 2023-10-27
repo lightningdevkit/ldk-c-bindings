@@ -1438,7 +1438,7 @@ impl Clone for InitFeatures {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn InitFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInitFeatures)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeInitFeatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the InitFeatures
@@ -1457,7 +1457,7 @@ impl Clone for NodeFeatures {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNodeFeatures)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeNodeFeatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the NodeFeatures
@@ -1476,7 +1476,7 @@ impl Clone for ChannelFeatures {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelFeatures)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelFeatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelFeatures
@@ -1495,7 +1495,7 @@ impl Clone for Bolt11InvoiceFeatures {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Bolt11InvoiceFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBolt11InvoiceFeatures)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBolt11InvoiceFeatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Bolt11InvoiceFeatures
@@ -1514,7 +1514,7 @@ impl Clone for OfferFeatures {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn OfferFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeOfferFeatures)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeOfferFeatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the OfferFeatures
@@ -1533,7 +1533,7 @@ impl Clone for InvoiceRequestFeatures {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn InvoiceRequestFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInvoiceRequestFeatures)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeInvoiceRequestFeatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the InvoiceRequestFeatures
@@ -1552,7 +1552,7 @@ impl Clone for Bolt12InvoiceFeatures {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Bolt12InvoiceFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBolt12InvoiceFeatures)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBolt12InvoiceFeatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Bolt12InvoiceFeatures
@@ -1571,7 +1571,7 @@ impl Clone for BlindedHopFeatures {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BlindedHopFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBlindedHopFeatures)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBlindedHopFeatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the BlindedHopFeatures
@@ -1590,7 +1590,7 @@ impl Clone for ChannelTypeFeatures {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelTypeFeatures_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelTypeFeatures)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelTypeFeatures)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelTypeFeatures
@@ -2835,7 +2835,7 @@ pub extern "C" fn ChannelTypeFeatures_set_optional_custom_bit(this_arg: &mut cra
 pub extern "C" fn InitFeatures_write(obj: &crate::lightning::ln::features::InitFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn InitFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeInitFeatures) })
 }
@@ -2851,7 +2851,7 @@ pub extern "C" fn InitFeatures_read(ser: crate::c_types::u8slice) -> crate::c_ty
 pub extern "C" fn ChannelFeatures_write(obj: &crate::lightning::ln::features::ChannelFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelFeatures) })
 }
@@ -2867,7 +2867,7 @@ pub extern "C" fn ChannelFeatures_read(ser: crate::c_types::u8slice) -> crate::c
 pub extern "C" fn NodeFeatures_write(obj: &crate::lightning::ln::features::NodeFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn NodeFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNodeFeatures) })
 }
@@ -2883,7 +2883,7 @@ pub extern "C" fn NodeFeatures_read(ser: crate::c_types::u8slice) -> crate::c_ty
 pub extern "C" fn Bolt11InvoiceFeatures_write(obj: &crate::lightning::ln::features::Bolt11InvoiceFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Bolt11InvoiceFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBolt11InvoiceFeatures) })
 }
@@ -2899,7 +2899,7 @@ pub extern "C" fn Bolt11InvoiceFeatures_read(ser: crate::c_types::u8slice) -> cr
 pub extern "C" fn Bolt12InvoiceFeatures_write(obj: &crate::lightning::ln::features::Bolt12InvoiceFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Bolt12InvoiceFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBolt12InvoiceFeatures) })
 }
@@ -2915,7 +2915,7 @@ pub extern "C" fn Bolt12InvoiceFeatures_read(ser: crate::c_types::u8slice) -> cr
 pub extern "C" fn BlindedHopFeatures_write(obj: &crate::lightning::ln::features::BlindedHopFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn BlindedHopFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBlindedHopFeatures) })
 }
@@ -2931,7 +2931,7 @@ pub extern "C" fn BlindedHopFeatures_read(ser: crate::c_types::u8slice) -> crate
 pub extern "C" fn ChannelTypeFeatures_write(obj: &crate::lightning::ln::features::ChannelTypeFeatures) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelTypeFeatures_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelTypeFeatures) })
 }

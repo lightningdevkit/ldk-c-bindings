@@ -113,6 +113,16 @@ pub extern "C" fn Retry_free(this_ptr: Retry) { }
 pub extern "C" fn Retry_clone(orig: &Retry) -> Retry {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Retry_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const Retry)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Retry_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut Retry) };
+}
 #[no_mangle]
 /// Utility method to constructs a new Attempts-variant Retry
 pub extern "C" fn Retry_attempts(a: u32) -> Retry {
@@ -142,6 +152,10 @@ pub extern "C" fn Retry_hash(o: &Retry) -> u64 {
 /// Serialize the Retry object into a byte array which can be read by Retry_read
 pub extern "C" fn Retry_write(obj: &crate::lightning::ln::outbound_payment::Retry) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn Retry_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	Retry_write(unsafe { &*(obj as *const Retry) })
 }
 #[no_mangle]
 /// Read a Retry from a byte array, created by Retry_write
@@ -216,6 +230,16 @@ impl RetryableSendFailure {
 #[no_mangle]
 pub extern "C" fn RetryableSendFailure_clone(orig: &RetryableSendFailure) -> RetryableSendFailure {
 	orig.clone()
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn RetryableSendFailure_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const RetryableSendFailure)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn RetryableSendFailure_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut RetryableSendFailure) };
 }
 #[no_mangle]
 /// Utility method to constructs a new PaymentExpired-variant RetryableSendFailure
@@ -464,6 +488,16 @@ pub extern "C" fn PaymentSendFailure_free(this_ptr: PaymentSendFailure) { }
 pub extern "C" fn PaymentSendFailure_clone(orig: &PaymentSendFailure) -> PaymentSendFailure {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn PaymentSendFailure_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const PaymentSendFailure)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn PaymentSendFailure_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut PaymentSendFailure) };
+}
 #[no_mangle]
 /// Utility method to constructs a new ParameterError-variant PaymentSendFailure
 pub extern "C" fn PaymentSendFailure_parameter_error(a: crate::lightning::util::errors::APIError) -> PaymentSendFailure {
@@ -570,6 +604,16 @@ pub extern "C" fn ProbeSendFailure_free(this_ptr: ProbeSendFailure) { }
 #[no_mangle]
 pub extern "C" fn ProbeSendFailure_clone(orig: &ProbeSendFailure) -> ProbeSendFailure {
 	orig.clone()
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ProbeSendFailure_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const ProbeSendFailure)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ProbeSendFailure_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut ProbeSendFailure) };
 }
 #[no_mangle]
 /// Utility method to constructs a new RouteNotFound-variant ProbeSendFailure
@@ -722,7 +766,7 @@ impl Clone for RecipientOnionFields {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RecipientOnionFields_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRecipientOnionFields)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRecipientOnionFields)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the RecipientOnionFields
@@ -743,7 +787,7 @@ pub extern "C" fn RecipientOnionFields_eq(a: &RecipientOnionFields, b: &Recipien
 pub extern "C" fn RecipientOnionFields_write(obj: &crate::lightning::ln::outbound_payment::RecipientOnionFields) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn RecipientOnionFields_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRecipientOnionFields) })
 }

@@ -123,6 +123,16 @@ pub extern "C" fn FailureCode_free(this_ptr: FailureCode) { }
 pub extern "C" fn FailureCode_clone(orig: &FailureCode) -> FailureCode {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn FailureCode_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const FailureCode)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn FailureCode_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut FailureCode) };
+}
 #[no_mangle]
 /// Utility method to constructs a new TemporaryNodeFailure-variant FailureCode
 pub extern "C" fn FailureCode_temporary_node_failure() -> FailureCode {
@@ -346,7 +356,7 @@ impl Clone for ChainParameters {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChainParameters_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChainParameters)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChainParameters)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChainParameters
@@ -487,7 +497,7 @@ impl Clone for CounterpartyForwardingInfo {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CounterpartyForwardingInfo_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCounterpartyForwardingInfo)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeCounterpartyForwardingInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the CounterpartyForwardingInfo
@@ -674,7 +684,7 @@ impl Clone for ChannelCounterparty {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelCounterparty_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelCounterparty)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelCounterparty)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelCounterparty
@@ -1381,7 +1391,7 @@ impl Clone for ChannelDetails {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelDetails_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelDetails)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelDetails)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelDetails
@@ -1488,6 +1498,16 @@ impl ChannelShutdownState {
 #[no_mangle]
 pub extern "C" fn ChannelShutdownState_clone(orig: &ChannelShutdownState) -> ChannelShutdownState {
 	orig.clone()
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ChannelShutdownState_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const ChannelShutdownState)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ChannelShutdownState_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut ChannelShutdownState) };
 }
 #[no_mangle]
 /// Utility method to constructs a new NotShuttingDown-variant ChannelShutdownState
@@ -1710,6 +1730,16 @@ pub extern "C" fn RecentPaymentDetails_free(this_ptr: RecentPaymentDetails) { }
 pub extern "C" fn RecentPaymentDetails_clone(orig: &RecentPaymentDetails) -> RecentPaymentDetails {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn RecentPaymentDetails_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const RecentPaymentDetails)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn RecentPaymentDetails_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut RecentPaymentDetails) };
+}
 #[no_mangle]
 /// Utility method to constructs a new AwaitingInvoice-variant RecentPaymentDetails
 pub extern "C" fn RecentPaymentDetails_awaiting_invoice(payment_id: crate::c_types::ThirtyTwoBytes) -> RecentPaymentDetails {
@@ -1855,7 +1885,7 @@ impl Clone for PhantomRouteHints {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PhantomRouteHints_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePhantomRouteHints)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePhantomRouteHints)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the PhantomRouteHints
@@ -1987,11 +2017,11 @@ pub extern "C" fn ChannelManager_list_recent_payments(this_arg: &crate::lightnin
 /// will be accepted on the given channel, and after additional timeout/the closing of all
 /// pending HTLCs, the channel will be closed on chain.
 ///
-///  * If we are the channel initiator, we will pay between our [`Background`] and
-///    [`ChannelConfig::force_close_avoidance_max_fee_satoshis`] plus our [`Normal`] fee
-///    estimate.
+///  * If we are the channel initiator, we will pay between our [`ChannelCloseMinimum`] and
+///    [`ChannelConfig::force_close_avoidance_max_fee_satoshis`] plus our [`NonAnchorChannelFee`]
+///    fee estimate.
 ///  * If our counterparty is the channel initiator, we will require a channel closing
-///    transaction feerate of at least our [`Background`] feerate or the feerate which
+///    transaction feerate of at least our [`ChannelCloseMinimum`] feerate or the feerate which
 ///    would appear on a force-closure transaction, whichever is lower. We will allow our
 ///    counterparty to pay as much fee as they'd like, however.
 ///
@@ -2003,8 +2033,8 @@ pub extern "C" fn ChannelManager_list_recent_payments(this_arg: &crate::lightnin
 /// channel.
 ///
 /// [`ChannelConfig::force_close_avoidance_max_fee_satoshis`]: crate::util::config::ChannelConfig::force_close_avoidance_max_fee_satoshis
-/// [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
-/// [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
+/// [`ChannelCloseMinimum`]: crate::chain::chaininterface::ConfirmationTarget::ChannelCloseMinimum
+/// [`NonAnchorChannelFee`]: crate::chain::chaininterface::ConfirmationTarget::NonAnchorChannelFee
 /// [`SendShutdown`]: crate::events::MessageSendEvent::SendShutdown
 #[must_use]
 #[no_mangle]
@@ -2022,8 +2052,8 @@ pub extern "C" fn ChannelManager_close_channel(this_arg: &crate::lightning::ln::
 /// the channel being closed or not:
 ///  * If we are the channel initiator, we will pay at least this feerate on the closing
 ///    transaction. The upper-bound is set by
-///    [`ChannelConfig::force_close_avoidance_max_fee_satoshis`] plus our [`Normal`] fee
-///    estimate (or `target_feerate_sat_per_1000_weight`, if it is greater).
+///    [`ChannelConfig::force_close_avoidance_max_fee_satoshis`] plus our [`NonAnchorChannelFee`]
+///    fee estimate (or `target_feerate_sat_per_1000_weight`, if it is greater).
 ///  * If our counterparty is the channel initiator, we will refuse to accept a channel closure
 ///    transaction feerate below `target_feerate_sat_per_1000_weight` (or the feerate which
 ///    will appear on a force-closure transaction, whichever is lower).
@@ -2041,8 +2071,7 @@ pub extern "C" fn ChannelManager_close_channel(this_arg: &crate::lightning::ln::
 /// channel.
 ///
 /// [`ChannelConfig::force_close_avoidance_max_fee_satoshis`]: crate::util::config::ChannelConfig::force_close_avoidance_max_fee_satoshis
-/// [`Background`]: crate::chain::chaininterface::ConfirmationTarget::Background
-/// [`Normal`]: crate::chain::chaininterface::ConfirmationTarget::Normal
+/// [`NonAnchorChannelFee`]: crate::chain::chaininterface::ConfirmationTarget::NonAnchorChannelFee
 /// [`SendShutdown`]: crate::events::MessageSendEvent::SendShutdown
 ///
 /// Note that shutdown_script (or a relevant inner pointer) may be NULL or all-0s to represent None
@@ -2178,10 +2207,20 @@ pub extern "C" fn ChannelManager_send_payment(this_arg: &crate::lightning::ln::c
 /// wait until you receive either a [`Event::PaymentFailed`] or [`Event::PaymentSent`] event to
 /// determine the ultimate status of a payment.
 ///
+/// # Requested Invoices
+///
+/// In the case of paying a [`Bolt12Invoice`] via [`ChannelManager::pay_for_offer`], abandoning
+/// the payment prior to receiving the invoice will result in an [`Event::InvoiceRequestFailed`]
+/// and prevent any attempts at paying it once received. The other events may only be generated
+/// once the invoice has been received.
+///
 /// # Restart Behavior
 ///
 /// If an [`Event::PaymentFailed`] is generated and we restart without first persisting the
-/// [`ChannelManager`], another [`Event::PaymentFailed`] may be generated.
+/// [`ChannelManager`], another [`Event::PaymentFailed`] may be generated; likewise for
+/// [`Event::InvoiceRequestFailed`].
+///
+/// [`Bolt12Invoice`]: crate::offers::invoice::Bolt12Invoice
 #[no_mangle]
 pub extern "C" fn ChannelManager_abandon_payment(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, mut payment_id: crate::c_types::ThirtyTwoBytes) {
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.abandon_payment(::lightning::ln::channelmanager::PaymentId(payment_id.data))
@@ -2457,6 +2496,10 @@ pub extern "C" fn ChannelManager_process_pending_htlc_forwards(this_arg: &crate:
 ///    with the current [`ChannelConfig`].
 ///  * Removing peers which have disconnected but and no longer have any channels.
 ///  * Force-closing and removing channels which have not completed establishment in a timely manner.
+///  * Forgetting about stale outbound payments, either those that have already been fulfilled
+///    or those awaiting an invoice that hasn't been delivered in the necessary amount of time.
+///    The latter is determined using the system clock in `std` and the highest seen block time
+///    minus two hours in `no-std`.
 ///
 /// Note that this may cause reentrancy through [`chain::Watch::update_channel`] calls or feerate
 /// estimate fetches.
@@ -2593,6 +2636,91 @@ pub extern "C" fn ChannelManager_accept_inbound_channel(this_arg: &crate::lightn
 pub extern "C" fn ChannelManager_accept_inbound_channel_from_trusted_peer_0conf(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, temporary_channel_id: *const [u8; 32], mut counterparty_node_id: crate::c_types::PublicKey, mut user_channel_id: crate::c_types::U128) -> crate::c_types::derived::CResult_NoneAPIErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.accept_inbound_channel_from_trusted_peer_0conf(&::lightning::ln::ChannelId(unsafe { *temporary_channel_id }), &counterparty_node_id.into_rust(), user_channel_id.into());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::util::errors::APIError::native_into(e) }).into() };
+	local_ret
+}
+
+/// Pays for an [`Offer`] using the given parameters by creating an [`InvoiceRequest`] and
+/// enqueuing it to be sent via an onion message. [`ChannelManager`] will pay the actual
+/// [`Bolt12Invoice`] once it is received.
+///
+/// Uses [`InvoiceRequestBuilder`] such that the [`InvoiceRequest`] it builds is recognized by
+/// the [`ChannelManager`] when handling a [`Bolt12Invoice`] message in response to the request.
+/// The optional parameters are used in the builder, if `Some`:
+/// - `quantity` for [`InvoiceRequest::quantity`] which must be set if
+///   [`Offer::expects_quantity`] is `true`.
+/// - `amount_msats` if overpaying what is required for the given `quantity` is desired, and
+/// - `payer_note` for [`InvoiceRequest::payer_note`].
+///
+/// If `max_total_routing_fee_msat` is not specified, The default from
+/// [`RouteParameters::from_payment_params_and_value`] is applied.
+///
+/// # Payment
+///
+/// The provided `payment_id` is used to ensure that only one invoice is paid for the request
+/// when received. See [Avoiding Duplicate Payments] for other requirements once the payment has
+/// been sent.
+///
+/// To revoke the request, use [`ChannelManager::abandon_payment`] prior to receiving the
+/// invoice. If abandoned, or an invoice isn't received in a reasonable amount of time, the
+/// payment will fail with an [`Event::InvoiceRequestFailed`].
+///
+/// # Privacy
+///
+/// Uses a one-hop [`BlindedPath`] for the reply path with [`ChannelManager::get_our_node_id`]
+/// as the introduction node and a derived payer id for payer privacy. As such, currently, the
+/// node must be announced. Otherwise, there is no way to find a path to the introduction node
+/// in order to send the [`Bolt12Invoice`].
+///
+/// # Limitations
+///
+/// Requires a direct connection to an introduction node in [`Offer::paths`] or to
+/// [`Offer::signing_pubkey`], if empty. A similar restriction applies to the responding
+/// [`Bolt12Invoice::payment_paths`].
+///
+/// # Errors
+///
+/// Errors if a duplicate `payment_id` is provided given the caveats in the aforementioned link
+/// or if the provided parameters are invalid for the offer.
+///
+/// [`InvoiceRequest`]: crate::offers::invoice_request::InvoiceRequest
+/// [`InvoiceRequest::quantity`]: crate::offers::invoice_request::InvoiceRequest::quantity
+/// [`InvoiceRequest::payer_note`]: crate::offers::invoice_request::InvoiceRequest::payer_note
+/// [`InvoiceRequestBuilder`]: crate::offers::invoice_request::InvoiceRequestBuilder
+/// [`Bolt12Invoice`]: crate::offers::invoice::Bolt12Invoice
+/// [`Bolt12Invoice::payment_paths`]: crate::offers::invoice::Bolt12Invoice::payment_paths
+/// [Avoiding Duplicate Payments]: #avoiding-duplicate-payments
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_pay_for_offer(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, offer: &crate::lightning::offers::offer::Offer, mut quantity: crate::c_types::derived::COption_u64Z, mut amount_msats: crate::c_types::derived::COption_u64Z, mut payer_note: crate::c_types::derived::COption_StrZ, mut payment_id: crate::c_types::ThirtyTwoBytes, mut retry_strategy: crate::lightning::ln::outbound_payment::Retry, mut max_total_routing_fee_msat: crate::c_types::derived::COption_u64Z) -> crate::c_types::derived::CResult_NoneBolt12SemanticErrorZ {
+	let mut local_quantity = if quantity.is_some() { Some( { quantity.take() }) } else { None };
+	let mut local_amount_msats = if amount_msats.is_some() { Some( { amount_msats.take() }) } else { None };
+	let mut local_payer_note = { /*payer_note*/ let payer_note_opt = payer_note; if payer_note_opt.is_none() { None } else { Some({ { { payer_note_opt.take() }.into_string() }})} };
+	let mut local_max_total_routing_fee_msat = if max_total_routing_fee_msat.is_some() { Some( { max_total_routing_fee_msat.take() }) } else { None };
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.pay_for_offer(offer.get_native_ref(), local_quantity, local_amount_msats, local_payer_note, ::lightning::ln::channelmanager::PaymentId(payment_id.data), retry_strategy.into_native(), local_max_total_routing_fee_msat);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::offers::parse::Bolt12SemanticError::native_into(e) }).into() };
+	local_ret
+}
+
+/// Creates a [`Bolt12Invoice`] for a [`Refund`] and enqueues it to be sent via an onion
+/// message.
+///
+/// The resulting invoice uses a [`PaymentHash`] recognized by the [`ChannelManager`] and a
+/// [`BlindedPath`] containing the [`PaymentSecret`] needed to reconstruct the corresponding
+/// [`PaymentPreimage`].
+///
+/// # Limitations
+///
+/// Requires a direct connection to an introduction node in [`Refund::paths`] or to
+/// [`Refund::payer_id`], if empty. This request is best effort; an invoice will be sent to each
+/// node meeting the aforementioned criteria, but there's no guarantee that they will be
+/// received and no retries will be made.
+///
+/// [`Bolt12Invoice`]: crate::offers::invoice::Bolt12Invoice
+#[must_use]
+#[no_mangle]
+pub extern "C" fn ChannelManager_request_refund_payment(this_arg: &crate::lightning::ln::channelmanager::ChannelManager, refund: &crate::lightning::offers::refund::Refund) -> crate::c_types::derived::CResult_NoneBolt12SemanticErrorZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.request_refund_payment(refund.get_native_ref());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::offers::parse::Bolt12SemanticError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -2751,10 +2879,10 @@ pub extern "C" fn ChannelManager_compute_inflight_htlcs(this_arg: &crate::lightn
 
 impl From<nativeChannelManager> for crate::lightning::events::MessageSendEventsProvider {
 	fn from(obj: nativeChannelManager) -> Self {
-		let mut rust_obj = ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::channelmanager::ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChannelManager_as_MessageSendEventsProvider(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ChannelManager_free_void);
 		ret
 	}
@@ -2779,10 +2907,10 @@ extern "C" fn ChannelManager_MessageSendEventsProvider_get_and_clear_pending_msg
 
 impl From<nativeChannelManager> for crate::lightning::events::EventsProvider {
 	fn from(obj: nativeChannelManager) -> Self {
-		let mut rust_obj = ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::channelmanager::ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChannelManager_as_EventsProvider(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ChannelManager_free_void);
 		ret
 	}
@@ -2804,10 +2932,10 @@ extern "C" fn ChannelManager_EventsProvider_process_pending_events(this_arg: *co
 
 impl From<nativeChannelManager> for crate::lightning::chain::Listen {
 	fn from(obj: nativeChannelManager) -> Self {
-		let mut rust_obj = ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::channelmanager::ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChannelManager_as_Listen(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ChannelManager_free_void);
 		ret
 	}
@@ -2838,10 +2966,10 @@ extern "C" fn ChannelManager_Listen_block_disconnected(this_arg: *const c_void, 
 
 impl From<nativeChannelManager> for crate::lightning::chain::Confirm {
 	fn from(obj: nativeChannelManager) -> Self {
-		let mut rust_obj = ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::channelmanager::ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChannelManager_as_Confirm(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ChannelManager_free_void);
 		ret
 	}
@@ -2909,7 +3037,7 @@ pub extern "C" fn ChannelManager_current_best_block(this_arg: &crate::lightning:
 	crate::lightning::chain::BestBlock { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Fetches the set of [`NodeFeatures`] flags which are provided by or required by
+/// Fetches the set of [`NodeFeatures`] flags that are provided by or required by
 /// [`ChannelManager`].
 #[must_use]
 #[no_mangle]
@@ -2918,7 +3046,7 @@ pub extern "C" fn ChannelManager_node_features(this_arg: &crate::lightning::ln::
 	crate::lightning::ln::features::NodeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Fetches the set of [`ChannelFeatures`] flags which are provided by or required by
+/// Fetches the set of [`ChannelFeatures`] flags that are provided by or required by
 /// [`ChannelManager`].
 #[must_use]
 #[no_mangle]
@@ -2927,7 +3055,7 @@ pub extern "C" fn ChannelManager_channel_features(this_arg: &crate::lightning::l
 	crate::lightning::ln::features::ChannelFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Fetches the set of [`ChannelTypeFeatures`] flags which are provided by or required by
+/// Fetches the set of [`ChannelTypeFeatures`] flags that are provided by or required by
 /// [`ChannelManager`].
 #[must_use]
 #[no_mangle]
@@ -2936,7 +3064,7 @@ pub extern "C" fn ChannelManager_channel_type_features(this_arg: &crate::lightni
 	crate::lightning::ln::features::ChannelTypeFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-/// Fetches the set of [`InitFeatures`] flags which are provided by or required by
+/// Fetches the set of [`InitFeatures`] flags that are provided by or required by
 /// [`ChannelManager`].
 #[must_use]
 #[no_mangle]
@@ -2947,10 +3075,10 @@ pub extern "C" fn ChannelManager_init_features(this_arg: &crate::lightning::ln::
 
 impl From<nativeChannelManager> for crate::lightning::ln::msgs::ChannelMessageHandler {
 	fn from(obj: nativeChannelManager) -> Self {
-		let mut rust_obj = ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::channelmanager::ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChannelManager_as_ChannelMessageHandler(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ChannelManager_free_void);
 		ret
 	}
@@ -2995,7 +3123,7 @@ pub extern "C" fn ChannelManager_as_ChannelMessageHandler(this_arg: &ChannelMana
 		handle_error: ChannelManager_ChannelMessageHandler_handle_error,
 		provided_node_features: ChannelManager_ChannelMessageHandler_provided_node_features,
 		provided_init_features: ChannelManager_ChannelMessageHandler_provided_init_features,
-		get_genesis_hashes: ChannelManager_ChannelMessageHandler_get_genesis_hashes,
+		get_chain_hashes: ChannelManager_ChannelMessageHandler_get_chain_hashes,
 		MessageSendEventsProvider: crate::lightning::events::MessageSendEventsProvider {
 			this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 			free: None,
@@ -3111,13 +3239,48 @@ extern "C" fn ChannelManager_ChannelMessageHandler_provided_init_features(this_a
 	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 #[must_use]
-extern "C" fn ChannelManager_ChannelMessageHandler_get_genesis_hashes(this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
-	let mut ret = <nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::get_genesis_hashes(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, );
+extern "C" fn ChannelManager_ChannelMessageHandler_get_chain_hashes(this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
+	let mut ret = <nativeChannelManager as lightning::ln::msgs::ChannelMessageHandler<>>::get_chain_hashes(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, );
 	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_ret_0.into() }) };
 	local_ret
 }
 
-/// Fetches the set of [`InitFeatures`] flags which are provided by or required by
+impl From<nativeChannelManager> for crate::lightning::onion_message::offers::OffersMessageHandler {
+	fn from(obj: nativeChannelManager) -> Self {
+		let rust_obj = crate::lightning::ln::channelmanager::ChannelManager { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let mut ret = ChannelManager_as_OffersMessageHandler(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
+		ret.free = Some(ChannelManager_free_void);
+		ret
+	}
+}
+/// Constructs a new OffersMessageHandler which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned OffersMessageHandler must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn ChannelManager_as_OffersMessageHandler(this_arg: &ChannelManager) -> crate::lightning::onion_message::offers::OffersMessageHandler {
+	crate::lightning::onion_message::offers::OffersMessageHandler {
+		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
+		free: None,
+		handle_message: ChannelManager_OffersMessageHandler_handle_message,
+		release_pending_messages: ChannelManager_OffersMessageHandler_release_pending_messages,
+	}
+}
+
+#[must_use]
+extern "C" fn ChannelManager_OffersMessageHandler_handle_message(this_arg: *const c_void, mut message: crate::lightning::onion_message::offers::OffersMessage) -> crate::c_types::derived::COption_OffersMessageZ {
+	let mut ret = <nativeChannelManager as lightning::onion_message::offers::OffersMessageHandler<>>::handle_message(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, message.into_native());
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_OffersMessageZ::None } else { crate::c_types::derived::COption_OffersMessageZ::Some( { crate::lightning::onion_message::offers::OffersMessage::native_into(ret.unwrap()) }) };
+	local_ret
+}
+#[must_use]
+extern "C" fn ChannelManager_OffersMessageHandler_release_pending_messages(this_arg: *const c_void) -> crate::c_types::derived::CVec_C3Tuple_OffersMessageDestinationBlindedPathZZ {
+	let mut ret = <nativeChannelManager as lightning::onion_message::offers::OffersMessageHandler<>>::release_pending_messages(unsafe { &mut *(this_arg as *mut nativeChannelManager) }, );
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item; let mut local_orig_ret_0_2 = crate::lightning::blinded_path::BlindedPath { inner: if orig_ret_0_2.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_2.unwrap())) } }, is_owned: true }; let mut local_ret_0 = (crate::lightning::onion_message::offers::OffersMessage::native_into(orig_ret_0_0), crate::lightning::onion_message::messenger::Destination::native_into(orig_ret_0_1), local_orig_ret_0_2).into(); local_ret_0 }); };
+	local_ret.into()
+}
+
+/// Fetches the set of [`InitFeatures`] flags that are provided by or required by
 /// [`ChannelManager`].
 #[no_mangle]
 pub extern "C" fn provided_init_features(config: &crate::lightning::util::config::UserConfig) -> crate::lightning::ln::features::InitFeatures {
@@ -3130,7 +3293,7 @@ pub extern "C" fn provided_init_features(config: &crate::lightning::util::config
 pub extern "C" fn CounterpartyForwardingInfo_write(obj: &crate::lightning::ln::channelmanager::CounterpartyForwardingInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn CounterpartyForwardingInfo_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeCounterpartyForwardingInfo) })
 }
@@ -3146,7 +3309,7 @@ pub extern "C" fn CounterpartyForwardingInfo_read(ser: crate::c_types::u8slice) 
 pub extern "C" fn ChannelCounterparty_write(obj: &crate::lightning::ln::channelmanager::ChannelCounterparty) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelCounterparty_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelCounterparty) })
 }
@@ -3162,7 +3325,7 @@ pub extern "C" fn ChannelCounterparty_read(ser: crate::c_types::u8slice) -> crat
 pub extern "C" fn ChannelDetails_write(obj: &crate::lightning::ln::channelmanager::ChannelDetails) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelDetails_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelDetails) })
 }
@@ -3178,7 +3341,7 @@ pub extern "C" fn ChannelDetails_read(ser: crate::c_types::u8slice) -> crate::c_
 pub extern "C" fn PhantomRouteHints_write(obj: &crate::lightning::ln::channelmanager::PhantomRouteHints) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn PhantomRouteHints_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativePhantomRouteHints) })
 }
@@ -3194,7 +3357,7 @@ pub extern "C" fn PhantomRouteHints_read(ser: crate::c_types::u8slice) -> crate:
 pub extern "C" fn ChannelManager_write(obj: &crate::lightning::ln::channelmanager::ChannelManager) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelManager_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelManager) })
 }
@@ -3202,6 +3365,10 @@ pub(crate) extern "C" fn ChannelManager_write_void(obj: *const c_void) -> crate:
 /// Serialize the ChannelShutdownState object into a byte array which can be read by ChannelShutdownState_read
 pub extern "C" fn ChannelShutdownState_write(obj: &crate::lightning::ln::channelmanager::ChannelShutdownState) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn ChannelShutdownState_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	ChannelShutdownState_write(unsafe { &*(obj as *const ChannelShutdownState) })
 }
 #[no_mangle]
 /// Read a ChannelShutdownState from a byte array, created by ChannelShutdownState_write

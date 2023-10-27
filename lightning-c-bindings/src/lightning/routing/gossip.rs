@@ -80,7 +80,7 @@ impl Clone for NodeId {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeId_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNodeId)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeNodeId)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the NodeId
@@ -128,7 +128,7 @@ pub extern "C" fn NodeId_hash(o: &NodeId) -> u64 {
 pub extern "C" fn NodeId_write(obj: &crate::lightning::routing::gossip::NodeId) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn NodeId_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNodeId) })
 }
@@ -385,6 +385,16 @@ pub extern "C" fn NetworkUpdate_free(this_ptr: NetworkUpdate) { }
 pub extern "C" fn NetworkUpdate_clone(orig: &NetworkUpdate) -> NetworkUpdate {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn NetworkUpdate_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const NetworkUpdate)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn NetworkUpdate_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut NetworkUpdate) };
+}
 #[no_mangle]
 /// Utility method to constructs a new ChannelUpdateMessage-variant NetworkUpdate
 pub extern "C" fn NetworkUpdate_channel_update_message(msg: crate::lightning::ln::msgs::ChannelUpdate) -> NetworkUpdate {
@@ -418,6 +428,10 @@ pub extern "C" fn NetworkUpdate_eq(a: &NetworkUpdate, b: &NetworkUpdate) -> bool
 /// Serialize the NetworkUpdate object into a byte array which can be read by NetworkUpdate_read
 pub extern "C" fn NetworkUpdate_write(obj: &crate::lightning::routing::gossip::NetworkUpdate) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn NetworkUpdate_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	NetworkUpdate_write(unsafe { &*(obj as *const NetworkUpdate) })
 }
 #[no_mangle]
 /// Read a NetworkUpdate from a byte array, created by NetworkUpdate_write
@@ -503,6 +517,8 @@ pub extern "C" fn P2PGossipSync_add_utxo_lookup(this_arg: &crate::lightning::rou
 }
 
 /// Handles any network updates originating from [`Event`]s.
+/// Note that this will skip applying any [`NetworkUpdate::ChannelUpdateMessage`] to avoid
+/// leaking possibly identifying information of the sender to the public network.
 ///
 /// [`Event`]: crate::events::Event
 #[no_mangle]
@@ -510,12 +526,12 @@ pub extern "C" fn NetworkGraph_handle_network_update(this_arg: &crate::lightning
 	unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.handle_network_update(&network_update.to_native())
 }
 
-/// Gets the genesis hash for this network graph.
+/// Gets the chain hash for this network graph.
 #[must_use]
 #[no_mangle]
-pub extern "C" fn NetworkGraph_get_genesis_hash(this_arg: &crate::lightning::routing::gossip::NetworkGraph) -> crate::c_types::ThirtyTwoBytes {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_genesis_hash();
-	crate::c_types::ThirtyTwoBytes { data: ret.into_inner() }
+pub extern "C" fn NetworkGraph_get_chain_hash(this_arg: &crate::lightning::routing::gossip::NetworkGraph) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_chain_hash();
+	crate::c_types::ThirtyTwoBytes { data: ret.to_bytes() }
 }
 
 /// Verifies the signature of a [`NodeAnnouncement`].
@@ -540,10 +556,10 @@ pub extern "C" fn verify_channel_announcement(msg: &crate::lightning::ln::msgs::
 
 impl From<nativeP2PGossipSync> for crate::lightning::ln::msgs::RoutingMessageHandler {
 	fn from(obj: nativeP2PGossipSync) -> Self {
-		let mut rust_obj = P2PGossipSync { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::gossip::P2PGossipSync { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = P2PGossipSync_as_RoutingMessageHandler(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(P2PGossipSync_free_void);
 		ret
 	}
@@ -655,10 +671,10 @@ extern "C" fn P2PGossipSync_RoutingMessageHandler_provided_init_features(this_ar
 
 impl From<nativeP2PGossipSync> for crate::lightning::events::MessageSendEventsProvider {
 	fn from(obj: nativeP2PGossipSync) -> Self {
-		let mut rust_obj = P2PGossipSync { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::routing::gossip::P2PGossipSync { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = P2PGossipSync_as_MessageSendEventsProvider(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(P2PGossipSync_free_void);
 		ret
 	}
@@ -852,7 +868,7 @@ impl Clone for ChannelUpdateInfo {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelUpdateInfo_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelUpdateInfo)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelUpdateInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelUpdateInfo
@@ -873,7 +889,7 @@ pub extern "C" fn ChannelUpdateInfo_eq(a: &ChannelUpdateInfo, b: &ChannelUpdateI
 pub extern "C" fn ChannelUpdateInfo_write(obj: &crate::lightning::routing::gossip::ChannelUpdateInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelUpdateInfo_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelUpdateInfo) })
 }
@@ -1051,7 +1067,7 @@ impl Clone for ChannelInfo {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelInfo_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelInfo)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelInfo
@@ -1083,7 +1099,7 @@ pub extern "C" fn ChannelInfo_get_directional_info(this_arg: &crate::lightning::
 pub extern "C" fn ChannelInfo_write(obj: &crate::lightning::routing::gossip::ChannelInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelInfo_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelInfo) })
 }
@@ -1158,7 +1174,7 @@ impl Clone for DirectedChannelInfo {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn DirectedChannelInfo_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeDirectedChannelInfo)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeDirectedChannelInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the DirectedChannelInfo
@@ -1367,6 +1383,16 @@ pub extern "C" fn EffectiveCapacity_free(this_ptr: EffectiveCapacity) { }
 pub extern "C" fn EffectiveCapacity_clone(orig: &EffectiveCapacity) -> EffectiveCapacity {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn EffectiveCapacity_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const EffectiveCapacity)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn EffectiveCapacity_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut EffectiveCapacity) };
+}
 #[no_mangle]
 /// Utility method to constructs a new ExactLiquidity-variant EffectiveCapacity
 pub extern "C" fn EffectiveCapacity_exact_liquidity(liquidity_msat: u64) -> EffectiveCapacity {
@@ -1522,7 +1548,7 @@ impl Clone for RoutingFees {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn RoutingFees_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRoutingFees)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRoutingFees)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the RoutingFees
@@ -1544,7 +1570,7 @@ pub extern "C" fn RoutingFees_hash(o: &RoutingFees) -> u64 {
 pub extern "C" fn RoutingFees_write(obj: &crate::lightning::routing::gossip::RoutingFees) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn RoutingFees_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeRoutingFees) })
 }
@@ -1706,7 +1732,7 @@ impl Clone for NodeAnnouncementInfo {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeAnnouncementInfo_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNodeAnnouncementInfo)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeNodeAnnouncementInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the NodeAnnouncementInfo
@@ -1736,7 +1762,7 @@ pub extern "C" fn NodeAnnouncementInfo_addresses(this_arg: &crate::lightning::ro
 pub extern "C" fn NodeAnnouncementInfo_write(obj: &crate::lightning::routing::gossip::NodeAnnouncementInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn NodeAnnouncementInfo_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNodeAnnouncementInfo) })
 }
@@ -1830,7 +1856,7 @@ impl Clone for NodeAlias {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeAlias_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNodeAlias)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeNodeAlias)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the NodeAlias
@@ -1851,7 +1877,7 @@ pub extern "C" fn NodeAlias_eq(a: &NodeAlias, b: &NodeAlias) -> bool {
 pub extern "C" fn NodeAlias_write(obj: &crate::lightning::routing::gossip::NodeAlias) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn NodeAlias_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNodeAlias) })
 }
@@ -1974,7 +2000,7 @@ impl Clone for NodeInfo {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn NodeInfo_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeNodeInfo)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeNodeInfo)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the NodeInfo
@@ -1995,7 +2021,7 @@ pub extern "C" fn NodeInfo_eq(a: &NodeInfo, b: &NodeInfo) -> bool {
 pub extern "C" fn NodeInfo_write(obj: &crate::lightning::routing::gossip::NodeInfo) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn NodeInfo_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNodeInfo) })
 }
@@ -2011,7 +2037,7 @@ pub extern "C" fn NodeInfo_read(ser: crate::c_types::u8slice) -> crate::c_types:
 pub extern "C" fn NetworkGraph_write(obj: &crate::lightning::routing::gossip::NetworkGraph) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn NetworkGraph_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeNetworkGraph) })
 }
@@ -2200,8 +2226,8 @@ pub extern "C" fn NetworkGraph_remove_stale_channels_and_tracking_with_time(this
 /// For an already known (from announcement) channel, update info about one of the directions
 /// of the channel.
 ///
-/// You probably don't want to call this directly, instead relying on a P2PGossipSync's
-/// RoutingMessageHandler implementation to call it indirectly. This may be useful to accept
+/// You probably don't want to call this directly, instead relying on a [`P2PGossipSync`]'s
+/// [`RoutingMessageHandler`] implementation to call it indirectly. This may be useful to accept
 /// routing messages from a source using a protocol other than the lightning P2P protocol.
 ///
 /// If built with `no-std`, any updates with a timestamp more than two weeks in the past or
@@ -2224,6 +2250,20 @@ pub extern "C" fn NetworkGraph_update_channel(this_arg: &crate::lightning::routi
 #[no_mangle]
 pub extern "C" fn NetworkGraph_update_channel_unsigned(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::UnsignedChannelUpdate) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_channel_unsigned(msg.get_native_ref());
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
+	local_ret
+}
+
+/// For an already known (from announcement) channel, verify the given [`ChannelUpdate`].
+///
+/// This checks whether the update currently is applicable by [`Self::update_channel`].
+///
+/// If built with `no-std`, any updates with a timestamp more than two weeks in the past or
+/// materially in the future will be rejected.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NetworkGraph_verify_channel_update(this_arg: &crate::lightning::routing::gossip::NetworkGraph, msg: &crate::lightning::ln::msgs::ChannelUpdate) -> crate::c_types::derived::CResult_NoneLightningErrorZ {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.verify_channel_update(msg.get_native_ref());
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { () /*o*/ }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(e), is_owned: true } }).into() };
 	local_ret
 }

@@ -47,6 +47,7 @@ pub struct BroadcasterInterface {
 }
 unsafe impl Send for BroadcasterInterface {}
 unsafe impl Sync for BroadcasterInterface {}
+#[allow(unused)]
 pub(crate) fn BroadcasterInterface_clone_fields(orig: &BroadcasterInterface) -> BroadcasterInterface {
 	BroadcasterInterface {
 		this_arg: orig.this_arg,
@@ -92,21 +93,98 @@ impl Drop for BroadcasterInterface {
 #[must_use]
 #[repr(C)]
 pub enum ConfirmationTarget {
-	/// We'd like a transaction to confirm in the future, but don't want to commit most of the fees
-	/// required to do so yet. The remaining fees will come via a Child-Pays-For-Parent (CPFP) fee
-	/// bump of the transaction.
+	/// We have some funds available on chain which we need to spend prior to some expiry time at
+	/// which point our counterparty may be able to steal them. Generally we have in the high tens
+	/// to low hundreds of blocks to get our transaction on-chain, but we shouldn't risk too low a
+	/// fee - this should be a relatively high priority feerate.
+	OnChainSweep,
+	/// The highest feerate we will allow our channel counterparty to have in a non-anchor channel.
 	///
-	/// The feerate returned should be the absolute minimum feerate required to enter most node
-	/// mempools across the network. Note that if you are not able to obtain this feerate estimate,
-	/// you should likely use the furthest-out estimate allowed by your fee estimator.
-	MempoolMinimum,
-	/// We are happy with a transaction confirming slowly, at least within a day or so worth of
-	/// blocks.
-	Background,
-	/// We'd like a transaction to confirm without major delayed, i.e., within the next 12-24 blocks.
-	Normal,
-	/// We'd like a transaction to confirm in the next few blocks.
-	HighPriority,
+	/// This is the feerate on the transaction which we (or our counterparty) will broadcast in
+	/// order to close the channel unilaterally. Because our counterparty must ensure they can
+	/// always broadcast the latest state, this value being too low will cause immediate
+	/// force-closures.
+	///
+	/// Allowing this value to be too high can allow our counterparty to burn our HTLC outputs to
+	/// dust, which can result in HTLCs failing or force-closures (when the dust HTLCs exceed
+	/// [`ChannelConfig::max_dust_htlc_exposure`]).
+	///
+	/// Because most nodes use a feerate estimate which is based on a relatively high priority
+	/// transaction entering the current mempool, setting this to a small multiple of your current
+	/// high priority feerate estimate should suffice.
+	///
+	/// [`ChannelConfig::max_dust_htlc_exposure`]: crate::util::config::ChannelConfig::max_dust_htlc_exposure
+	MaxAllowedNonAnchorChannelRemoteFee,
+	/// This is the lowest feerate we will allow our channel counterparty to have in an anchor
+	/// channel in order to close the channel if a channel party goes away.
+	///
+	/// This needs to be sufficient to get into the mempool when the channel needs to
+	/// be force-closed. Setting too high may result in force-closures if our counterparty attempts
+	/// to use a lower feerate. Because this is for anchor channels, we can always bump the feerate
+	/// later; the feerate here only needs to be sufficient to enter the mempool.
+	///
+	/// A good estimate is the expected mempool minimum at the time of force-closure. Obviously this
+	/// is not an estimate which is very easy to calculate because we do not know the future. Using
+	/// a simple long-term fee estimate or tracking of the mempool minimum is a good approach to
+	/// ensure you can always close the channel. A future change to Bitcoin's P2P network
+	/// (package relay) may obviate the need for this entirely.
+	MinAllowedAnchorChannelRemoteFee,
+	/// The lowest feerate we will allow our channel counterparty to have in a non-anchor channel.
+	///
+	/// This is the feerate on the transaction which we (or our counterparty) will broadcast in
+	/// order to close the channel if a channel party goes away. Setting this value too high will
+	/// cause immediate force-closures in order to avoid having an unbroadcastable state.
+	///
+	/// This feerate represents the fee we pick now, which must be sufficient to enter a block at an
+	/// arbitrary time in the future. Obviously this is not an estimate which is very easy to
+	/// calculate. This can leave channels subject to being unable to close if feerates rise, and in
+	/// general you should prefer anchor channels to ensure you can increase the feerate when the
+	/// transactions need broadcasting.
+	///
+	/// Do note some fee estimators round up to the next full sat/vbyte (ie 250 sats per kw),
+	/// causing occasional issues with feerate disagreements between an initiator that wants a
+	/// feerate of 1.1 sat/vbyte and a receiver that wants 1.1 rounded up to 2. If your fee
+	/// estimator rounds subtracting 250 to your desired feerate here can help avoid this issue.
+	///
+	/// [`ChannelConfig::max_dust_htlc_exposure`]: crate::util::config::ChannelConfig::max_dust_htlc_exposure
+	MinAllowedNonAnchorChannelRemoteFee,
+	/// This is the feerate on the transaction which we (or our counterparty) will broadcast in
+	/// order to close the channel if a channel party goes away.
+	///
+	/// This needs to be sufficient to get into the mempool when the channel needs to
+	/// be force-closed. Setting too low may result in force-closures. Because this is for anchor
+	/// channels, it can be a low value as we can always bump the feerate later.
+	///
+	/// A good estimate is the expected mempool minimum at the time of force-closure. Obviously this
+	/// is not an estimate which is very easy to calculate because we do not know the future. Using
+	/// a simple long-term fee estimate or tracking of the mempool minimum is a good approach to
+	/// ensure you can always close the channel. A future change to Bitcoin's P2P network
+	/// (package relay) may obviate the need for this entirely.
+	AnchorChannelFee,
+	/// Lightning is built around the ability to broadcast a transaction in the future to close our
+	/// channel and claim all pending funds. In order to do so, non-anchor channels are built with
+	/// transactions which we need to be able to broadcast at some point in the future.
+	///
+	/// This feerate represents the fee we pick now, which must be sufficient to enter a block at an
+	/// arbitrary time in the future. Obviously this is not an estimate which is very easy to
+	/// calculate, so most lightning nodes use some relatively high-priority feerate using the
+	/// current mempool. This leaves channels subject to being unable to close if feerates rise, and
+	/// in general you should prefer anchor channels to ensure you can increase the feerate when the
+	/// transactions need broadcasting.
+	///
+	/// Since this should represent the feerate of a channel close that does not need fee
+	/// bumping, this is also used as an upper bound for our attempted feerate when doing cooperative
+	/// closure of any channel.
+	NonAnchorChannelFee,
+	/// When cooperatively closing a channel, this is the minimum feerate we will accept.
+	/// Recommended at least within a day or so worth of blocks.
+	///
+	/// This will also be used when initiating a cooperative close of a channel. When closing a
+	/// channel you can override this fee by using
+	/// [`ChannelManager::close_channel_with_feerate_and_script`].
+	///
+	/// [`ChannelManager::close_channel_with_feerate_and_script`]: crate::ln::channelmanager::ChannelManager::close_channel_with_feerate_and_script
+	ChannelCloseMinimum,
 }
 use lightning::chain::chaininterface::ConfirmationTarget as ConfirmationTargetImport;
 pub(crate) type nativeConfirmationTarget = ConfirmationTargetImport;
@@ -115,37 +193,49 @@ impl ConfirmationTarget {
 	#[allow(unused)]
 	pub(crate) fn to_native(&self) -> nativeConfirmationTarget {
 		match self {
-			ConfirmationTarget::MempoolMinimum => nativeConfirmationTarget::MempoolMinimum,
-			ConfirmationTarget::Background => nativeConfirmationTarget::Background,
-			ConfirmationTarget::Normal => nativeConfirmationTarget::Normal,
-			ConfirmationTarget::HighPriority => nativeConfirmationTarget::HighPriority,
+			ConfirmationTarget::OnChainSweep => nativeConfirmationTarget::OnChainSweep,
+			ConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee => nativeConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee,
+			ConfirmationTarget::MinAllowedAnchorChannelRemoteFee => nativeConfirmationTarget::MinAllowedAnchorChannelRemoteFee,
+			ConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee => nativeConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee,
+			ConfirmationTarget::AnchorChannelFee => nativeConfirmationTarget::AnchorChannelFee,
+			ConfirmationTarget::NonAnchorChannelFee => nativeConfirmationTarget::NonAnchorChannelFee,
+			ConfirmationTarget::ChannelCloseMinimum => nativeConfirmationTarget::ChannelCloseMinimum,
 		}
 	}
 	#[allow(unused)]
 	pub(crate) fn into_native(self) -> nativeConfirmationTarget {
 		match self {
-			ConfirmationTarget::MempoolMinimum => nativeConfirmationTarget::MempoolMinimum,
-			ConfirmationTarget::Background => nativeConfirmationTarget::Background,
-			ConfirmationTarget::Normal => nativeConfirmationTarget::Normal,
-			ConfirmationTarget::HighPriority => nativeConfirmationTarget::HighPriority,
+			ConfirmationTarget::OnChainSweep => nativeConfirmationTarget::OnChainSweep,
+			ConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee => nativeConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee,
+			ConfirmationTarget::MinAllowedAnchorChannelRemoteFee => nativeConfirmationTarget::MinAllowedAnchorChannelRemoteFee,
+			ConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee => nativeConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee,
+			ConfirmationTarget::AnchorChannelFee => nativeConfirmationTarget::AnchorChannelFee,
+			ConfirmationTarget::NonAnchorChannelFee => nativeConfirmationTarget::NonAnchorChannelFee,
+			ConfirmationTarget::ChannelCloseMinimum => nativeConfirmationTarget::ChannelCloseMinimum,
 		}
 	}
 	#[allow(unused)]
 	pub(crate) fn from_native(native: &nativeConfirmationTarget) -> Self {
 		match native {
-			nativeConfirmationTarget::MempoolMinimum => ConfirmationTarget::MempoolMinimum,
-			nativeConfirmationTarget::Background => ConfirmationTarget::Background,
-			nativeConfirmationTarget::Normal => ConfirmationTarget::Normal,
-			nativeConfirmationTarget::HighPriority => ConfirmationTarget::HighPriority,
+			nativeConfirmationTarget::OnChainSweep => ConfirmationTarget::OnChainSweep,
+			nativeConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee => ConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee,
+			nativeConfirmationTarget::MinAllowedAnchorChannelRemoteFee => ConfirmationTarget::MinAllowedAnchorChannelRemoteFee,
+			nativeConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee => ConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee,
+			nativeConfirmationTarget::AnchorChannelFee => ConfirmationTarget::AnchorChannelFee,
+			nativeConfirmationTarget::NonAnchorChannelFee => ConfirmationTarget::NonAnchorChannelFee,
+			nativeConfirmationTarget::ChannelCloseMinimum => ConfirmationTarget::ChannelCloseMinimum,
 		}
 	}
 	#[allow(unused)]
 	pub(crate) fn native_into(native: nativeConfirmationTarget) -> Self {
 		match native {
-			nativeConfirmationTarget::MempoolMinimum => ConfirmationTarget::MempoolMinimum,
-			nativeConfirmationTarget::Background => ConfirmationTarget::Background,
-			nativeConfirmationTarget::Normal => ConfirmationTarget::Normal,
-			nativeConfirmationTarget::HighPriority => ConfirmationTarget::HighPriority,
+			nativeConfirmationTarget::OnChainSweep => ConfirmationTarget::OnChainSweep,
+			nativeConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee => ConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee,
+			nativeConfirmationTarget::MinAllowedAnchorChannelRemoteFee => ConfirmationTarget::MinAllowedAnchorChannelRemoteFee,
+			nativeConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee => ConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee,
+			nativeConfirmationTarget::AnchorChannelFee => ConfirmationTarget::AnchorChannelFee,
+			nativeConfirmationTarget::NonAnchorChannelFee => ConfirmationTarget::NonAnchorChannelFee,
+			nativeConfirmationTarget::ChannelCloseMinimum => ConfirmationTarget::ChannelCloseMinimum,
 		}
 	}
 }
@@ -154,22 +244,44 @@ impl ConfirmationTarget {
 pub extern "C" fn ConfirmationTarget_clone(orig: &ConfirmationTarget) -> ConfirmationTarget {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ConfirmationTarget_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const ConfirmationTarget)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ConfirmationTarget_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut ConfirmationTarget) };
+}
 #[no_mangle]
-/// Utility method to constructs a new MempoolMinimum-variant ConfirmationTarget
-pub extern "C" fn ConfirmationTarget_mempool_minimum() -> ConfirmationTarget {
-	ConfirmationTarget::MempoolMinimum}
+/// Utility method to constructs a new OnChainSweep-variant ConfirmationTarget
+pub extern "C" fn ConfirmationTarget_on_chain_sweep() -> ConfirmationTarget {
+	ConfirmationTarget::OnChainSweep}
 #[no_mangle]
-/// Utility method to constructs a new Background-variant ConfirmationTarget
-pub extern "C" fn ConfirmationTarget_background() -> ConfirmationTarget {
-	ConfirmationTarget::Background}
+/// Utility method to constructs a new MaxAllowedNonAnchorChannelRemoteFee-variant ConfirmationTarget
+pub extern "C" fn ConfirmationTarget_max_allowed_non_anchor_channel_remote_fee() -> ConfirmationTarget {
+	ConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee}
 #[no_mangle]
-/// Utility method to constructs a new Normal-variant ConfirmationTarget
-pub extern "C" fn ConfirmationTarget_normal() -> ConfirmationTarget {
-	ConfirmationTarget::Normal}
+/// Utility method to constructs a new MinAllowedAnchorChannelRemoteFee-variant ConfirmationTarget
+pub extern "C" fn ConfirmationTarget_min_allowed_anchor_channel_remote_fee() -> ConfirmationTarget {
+	ConfirmationTarget::MinAllowedAnchorChannelRemoteFee}
 #[no_mangle]
-/// Utility method to constructs a new HighPriority-variant ConfirmationTarget
-pub extern "C" fn ConfirmationTarget_high_priority() -> ConfirmationTarget {
-	ConfirmationTarget::HighPriority}
+/// Utility method to constructs a new MinAllowedNonAnchorChannelRemoteFee-variant ConfirmationTarget
+pub extern "C" fn ConfirmationTarget_min_allowed_non_anchor_channel_remote_fee() -> ConfirmationTarget {
+	ConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee}
+#[no_mangle]
+/// Utility method to constructs a new AnchorChannelFee-variant ConfirmationTarget
+pub extern "C" fn ConfirmationTarget_anchor_channel_fee() -> ConfirmationTarget {
+	ConfirmationTarget::AnchorChannelFee}
+#[no_mangle]
+/// Utility method to constructs a new NonAnchorChannelFee-variant ConfirmationTarget
+pub extern "C" fn ConfirmationTarget_non_anchor_channel_fee() -> ConfirmationTarget {
+	ConfirmationTarget::NonAnchorChannelFee}
+#[no_mangle]
+/// Utility method to constructs a new ChannelCloseMinimum-variant ConfirmationTarget
+pub extern "C" fn ConfirmationTarget_channel_close_minimum() -> ConfirmationTarget {
+	ConfirmationTarget::ChannelCloseMinimum}
 /// Generates a non-cryptographic 64-bit hash of the ConfirmationTarget.
 #[no_mangle]
 pub extern "C" fn ConfirmationTarget_hash(o: &ConfirmationTarget) -> u64 {
@@ -215,6 +327,7 @@ pub struct FeeEstimator {
 }
 unsafe impl Send for FeeEstimator {}
 unsafe impl Sync for FeeEstimator {}
+#[allow(unused)]
 pub(crate) fn FeeEstimator_clone_fields(orig: &FeeEstimator) -> FeeEstimator {
 	FeeEstimator {
 		this_arg: orig.this_arg,

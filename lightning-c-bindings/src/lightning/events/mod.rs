@@ -142,6 +142,16 @@ pub extern "C" fn PaymentPurpose_free(this_ptr: PaymentPurpose) { }
 pub extern "C" fn PaymentPurpose_clone(orig: &PaymentPurpose) -> PaymentPurpose {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn PaymentPurpose_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const PaymentPurpose)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn PaymentPurpose_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut PaymentPurpose) };
+}
 #[no_mangle]
 /// Utility method to constructs a new InvoicePayment-variant PaymentPurpose
 pub extern "C" fn PaymentPurpose_invoice_payment(payment_preimage: crate::c_types::derived::COption_ThirtyTwoBytesZ, payment_secret: crate::c_types::ThirtyTwoBytes) -> PaymentPurpose {
@@ -165,6 +175,10 @@ pub extern "C" fn PaymentPurpose_eq(a: &PaymentPurpose, b: &PaymentPurpose) -> b
 /// Serialize the PaymentPurpose object into a byte array which can be read by PaymentPurpose_read
 pub extern "C" fn PaymentPurpose_write(obj: &crate::lightning::events::PaymentPurpose) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn PaymentPurpose_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	PaymentPurpose_write(unsafe { &*(obj as *const PaymentPurpose) })
 }
 #[no_mangle]
 /// Read a PaymentPurpose from a byte array, created by PaymentPurpose_write
@@ -315,7 +329,7 @@ impl Clone for ClaimedHTLC {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ClaimedHTLC_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeClaimedHTLC)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeClaimedHTLC)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ClaimedHTLC
@@ -336,7 +350,7 @@ pub extern "C" fn ClaimedHTLC_eq(a: &ClaimedHTLC, b: &ClaimedHTLC) -> bool {
 pub extern "C" fn ClaimedHTLC_write(obj: &crate::lightning::events::ClaimedHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ClaimedHTLC_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeClaimedHTLC) })
 }
@@ -453,6 +467,16 @@ pub extern "C" fn PathFailure_free(this_ptr: PathFailure) { }
 pub extern "C" fn PathFailure_clone(orig: &PathFailure) -> PathFailure {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn PathFailure_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const PathFailure)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn PathFailure_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut PathFailure) };
+}
 #[no_mangle]
 /// Utility method to constructs a new InitialSend-variant PathFailure
 pub extern "C" fn PathFailure_initial_send(err: crate::lightning::util::errors::APIError) -> PathFailure {
@@ -477,6 +501,10 @@ pub extern "C" fn PathFailure_eq(a: &PathFailure, b: &PathFailure) -> bool {
 /// Serialize the PathFailure object into a byte array which can be read by PathFailure_read
 pub extern "C" fn PathFailure_write(obj: &crate::lightning::events::PathFailure) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn PathFailure_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	PathFailure_write(unsafe { &*(obj as *const PathFailure) })
 }
 #[no_mangle]
 /// Read a PathFailure from a byte array, created by PathFailure_write
@@ -655,6 +683,16 @@ pub extern "C" fn ClosureReason_free(this_ptr: ClosureReason) { }
 pub extern "C" fn ClosureReason_clone(orig: &ClosureReason) -> ClosureReason {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ClosureReason_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const ClosureReason)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ClosureReason_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut ClosureReason) };
+}
 #[no_mangle]
 /// Utility method to constructs a new CounterpartyForceClosed-variant ClosureReason
 pub extern "C" fn ClosureReason_counterparty_force_closed(peer_msg: crate::lightning::util::string::UntrustedString) -> ClosureReason {
@@ -711,6 +749,10 @@ pub extern "C" fn ClosureReason_eq(a: &ClosureReason, b: &ClosureReason) -> bool
 /// Serialize the ClosureReason object into a byte array which can be read by ClosureReason_read
 pub extern "C" fn ClosureReason_write(obj: &crate::lightning::events::ClosureReason) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn ClosureReason_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	ClosureReason_write(unsafe { &*(obj as *const ClosureReason) })
 }
 #[no_mangle]
 /// Read a ClosureReason from a byte array, created by ClosureReason_write
@@ -893,6 +935,16 @@ pub extern "C" fn HTLCDestination_free(this_ptr: HTLCDestination) { }
 pub extern "C" fn HTLCDestination_clone(orig: &HTLCDestination) -> HTLCDestination {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn HTLCDestination_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const HTLCDestination)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn HTLCDestination_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut HTLCDestination) };
+}
 #[no_mangle]
 /// Utility method to constructs a new NextHopChannel-variant HTLCDestination
 pub extern "C" fn HTLCDestination_next_hop_channel(node_id: crate::c_types::PublicKey, channel_id: crate::c_types::ThirtyTwoBytes) -> HTLCDestination {
@@ -932,6 +984,10 @@ pub extern "C" fn HTLCDestination_eq(a: &HTLCDestination, b: &HTLCDestination) -
 /// Serialize the HTLCDestination object into a byte array which can be read by HTLCDestination_read
 pub extern "C" fn HTLCDestination_write(obj: &crate::lightning::events::HTLCDestination) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn HTLCDestination_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	HTLCDestination_write(unsafe { &*(obj as *const HTLCDestination) })
 }
 #[no_mangle]
 /// Read a HTLCDestination from a byte array, created by HTLCDestination_write
@@ -1023,6 +1079,16 @@ impl PaymentFailureReason {
 pub extern "C" fn PaymentFailureReason_clone(orig: &PaymentFailureReason) -> PaymentFailureReason {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn PaymentFailureReason_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const PaymentFailureReason)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn PaymentFailureReason_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut PaymentFailureReason) };
+}
 #[no_mangle]
 /// Utility method to constructs a new RecipientRejected-variant PaymentFailureReason
 pub extern "C" fn PaymentFailureReason_recipient_rejected() -> PaymentFailureReason {
@@ -1057,6 +1123,10 @@ pub extern "C" fn PaymentFailureReason_eq(a: &PaymentFailureReason, b: &PaymentF
 /// Serialize the PaymentFailureReason object into a byte array which can be read by PaymentFailureReason_read
 pub extern "C" fn PaymentFailureReason_write(obj: &crate::lightning::events::PaymentFailureReason) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn PaymentFailureReason_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	PaymentFailureReason_write(unsafe { &*(obj as *const PaymentFailureReason) })
 }
 #[no_mangle]
 /// Read a PaymentFailureReason from a byte array, created by PaymentFailureReason_write
@@ -1236,6 +1306,18 @@ pub enum Event {
 		/// The sender-intended sum total of all the MPP parts. This will be `None` for events
 		/// serialized prior to LDK version 0.0.117.
 		sender_intended_total_msat: crate::c_types::derived::COption_u64Z,
+	},
+	/// Indicates a request for an invoice failed to yield a response in a reasonable amount of time
+	/// or was explicitly abandoned by [`ChannelManager::abandon_payment`]. This may be for an
+	/// [`InvoiceRequest`] sent for an [`Offer`] or for a [`Refund`] that hasn't been redeemed.
+	///
+	/// [`ChannelManager::abandon_payment`]: crate::ln::channelmanager::ChannelManager::abandon_payment
+	/// [`InvoiceRequest`]: crate::offers::invoice_request::InvoiceRequest
+	/// [`Offer`]: crate::offers::offer::Offer
+	/// [`Refund`]: crate::offers::refund::Refund
+	InvoiceRequestFailed {
+		/// The `payment_id` to have been associated with payment for the requested invoice.
+		payment_id: crate::c_types::ThirtyTwoBytes,
 	},
 	/// Indicates an outbound payment we made succeeded (i.e. it made it all the way to its target
 	/// and we got back the payment preimage for it).
@@ -1720,6 +1802,12 @@ impl Event {
 					sender_intended_total_msat: local_sender_intended_total_msat_nonref,
 				}
 			},
+			Event::InvoiceRequestFailed {ref payment_id, } => {
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				nativeEvent::InvoiceRequestFailed {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id_nonref.data),
+				}
+			},
 			Event::PaymentSent {ref payment_id, ref payment_preimage, ref payment_hash, ref fee_paid_msat, } => {
 				let mut payment_id_nonref = Clone::clone(payment_id);
 				let mut local_payment_id_nonref = { /*payment_id_nonref*/ let payment_id_nonref_opt = payment_id_nonref; if payment_id_nonref_opt.is_none() { None } else { Some({ { ::lightning::ln::channelmanager::PaymentId({ payment_id_nonref_opt.take() }.data) }})} };
@@ -1969,6 +2057,11 @@ impl Event {
 					sender_intended_total_msat: local_sender_intended_total_msat,
 				}
 			},
+			Event::InvoiceRequestFailed {mut payment_id, } => {
+				nativeEvent::InvoiceRequestFailed {
+					payment_id: ::lightning::ln::channelmanager::PaymentId(payment_id.data),
+				}
+			},
 			Event::PaymentSent {mut payment_id, mut payment_preimage, mut payment_hash, mut fee_paid_msat, } => {
 				let mut local_payment_id = { /*payment_id*/ let payment_id_opt = payment_id; if payment_id_opt.is_none() { None } else { Some({ { ::lightning::ln::channelmanager::PaymentId({ payment_id_opt.take() }.data) }})} };
 				let mut local_fee_paid_msat = if fee_paid_msat.is_some() { Some( { fee_paid_msat.take() }) } else { None };
@@ -2176,6 +2269,12 @@ impl Event {
 					purpose: crate::lightning::events::PaymentPurpose::native_into(purpose_nonref),
 					htlcs: local_htlcs_nonref.into(),
 					sender_intended_total_msat: local_sender_intended_total_msat_nonref,
+				}
+			},
+			nativeEvent::InvoiceRequestFailed {ref payment_id, } => {
+				let mut payment_id_nonref = Clone::clone(payment_id);
+				Event::InvoiceRequestFailed {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id_nonref.0 },
 				}
 			},
 			nativeEvent::PaymentSent {ref payment_id, ref payment_preimage, ref payment_hash, ref fee_paid_msat, } => {
@@ -2427,6 +2526,11 @@ impl Event {
 					sender_intended_total_msat: local_sender_intended_total_msat,
 				}
 			},
+			nativeEvent::InvoiceRequestFailed {mut payment_id, } => {
+				Event::InvoiceRequestFailed {
+					payment_id: crate::c_types::ThirtyTwoBytes { data: payment_id.0 },
+				}
+			},
 			nativeEvent::PaymentSent {mut payment_id, mut payment_preimage, mut payment_hash, mut fee_paid_msat, } => {
 				let mut local_payment_id = if payment_id.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some( { crate::c_types::ThirtyTwoBytes { data: payment_id.unwrap().0 } }) };
 				let mut local_fee_paid_msat = if fee_paid_msat.is_none() { crate::c_types::derived::COption_u64Z::None } else { crate::c_types::derived::COption_u64Z::Some( { fee_paid_msat.unwrap() }) };
@@ -2582,6 +2686,16 @@ pub extern "C" fn Event_free(this_ptr: Event) { }
 pub extern "C" fn Event_clone(orig: &Event) -> Event {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Event_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const Event)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Event_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut Event) };
+}
 #[no_mangle]
 /// Utility method to constructs a new FundingGenerationReady-variant Event
 pub extern "C" fn Event_funding_generation_ready(temporary_channel_id: crate::c_types::ThirtyTwoBytes, counterparty_node_id: crate::c_types::PublicKey, channel_value_satoshis: u64, output_script: crate::c_types::derived::CVec_u8Z, user_channel_id: crate::c_types::U128) -> Event {
@@ -2618,6 +2732,13 @@ pub extern "C" fn Event_payment_claimed(receiver_node_id: crate::c_types::Public
 		purpose,
 		htlcs,
 		sender_intended_total_msat,
+	}
+}
+#[no_mangle]
+/// Utility method to constructs a new InvoiceRequestFailed-variant Event
+pub extern "C" fn Event_invoice_request_failed(payment_id: crate::c_types::ThirtyTwoBytes) -> Event {
+	Event::InvoiceRequestFailed {
+		payment_id,
 	}
 }
 #[no_mangle]
@@ -2790,6 +2911,10 @@ pub extern "C" fn Event_eq(a: &Event, b: &Event) -> bool {
 /// Serialize the Event object into a byte array which can be read by Event_read
 pub extern "C" fn Event_write(obj: &crate::lightning::events::Event) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(&unsafe { &*obj }.to_native())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn Event_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	Event_write(unsafe { &*(obj as *const Event) })
 }
 #[no_mangle]
 /// Read a Event from a byte array, created by Event_write
@@ -3977,6 +4102,16 @@ pub extern "C" fn MessageSendEvent_free(this_ptr: MessageSendEvent) { }
 pub extern "C" fn MessageSendEvent_clone(orig: &MessageSendEvent) -> MessageSendEvent {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn MessageSendEvent_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const MessageSendEvent)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn MessageSendEvent_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut MessageSendEvent) };
+}
 #[no_mangle]
 /// Utility method to constructs a new SendAcceptChannel-variant MessageSendEvent
 pub extern "C" fn MessageSendEvent_send_accept_channel(node_id: crate::c_types::PublicKey, msg: crate::lightning::ln::msgs::AcceptChannel) -> MessageSendEvent {
@@ -4247,6 +4382,7 @@ pub struct MessageSendEventsProvider {
 }
 unsafe impl Send for MessageSendEventsProvider {}
 unsafe impl Sync for MessageSendEventsProvider {}
+#[allow(unused)]
 pub(crate) fn MessageSendEventsProvider_clone_fields(orig: &MessageSendEventsProvider) -> MessageSendEventsProvider {
 	MessageSendEventsProvider {
 		this_arg: orig.this_arg,
@@ -4281,62 +4417,6 @@ impl core::ops::DerefMut for MessageSendEventsProvider {
 #[no_mangle]
 pub extern "C" fn MessageSendEventsProvider_free(this_ptr: MessageSendEventsProvider) { }
 impl Drop for MessageSendEventsProvider {
-	fn drop(&mut self) {
-		if let Some(f) = self.free {
-			f(self.this_arg);
-		}
-	}
-}
-/// A trait indicating an object may generate onion messages to send
-#[repr(C)]
-pub struct OnionMessageProvider {
-	/// An opaque pointer which is passed to your function implementations as an argument.
-	/// This has no meaning in the LDK, and can be NULL or any other value.
-	pub this_arg: *mut c_void,
-	/// Gets the next pending onion message for the peer with the given node id.
-	///
-	/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
-	pub next_onion_message_for_peer: extern "C" fn (this_arg: *const c_void, peer_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::msgs::OnionMessage,
-	/// Frees any resources associated with this object given its this_arg pointer.
-	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
-	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
-}
-unsafe impl Send for OnionMessageProvider {}
-unsafe impl Sync for OnionMessageProvider {}
-pub(crate) fn OnionMessageProvider_clone_fields(orig: &OnionMessageProvider) -> OnionMessageProvider {
-	OnionMessageProvider {
-		this_arg: orig.this_arg,
-		next_onion_message_for_peer: Clone::clone(&orig.next_onion_message_for_peer),
-		free: Clone::clone(&orig.free),
-	}
-}
-
-use lightning::events::OnionMessageProvider as rustOnionMessageProvider;
-impl rustOnionMessageProvider for OnionMessageProvider {
-	fn next_onion_message_for_peer(&self, mut peer_node_id: bitcoin::secp256k1::PublicKey) -> Option<lightning::ln::msgs::OnionMessage> {
-		let mut ret = (self.next_onion_message_for_peer)(self.this_arg, crate::c_types::PublicKey::from_rust(&peer_node_id));
-		let mut local_ret = if ret.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(ret.take_inner()) } }) };
-		local_ret
-	}
-}
-
-// We're essentially a pointer already, or at least a set of pointers, so allow us to be used
-// directly as a Deref trait in higher-level structs:
-impl core::ops::Deref for OnionMessageProvider {
-	type Target = Self;
-	fn deref(&self) -> &Self {
-		self
-	}
-}
-impl core::ops::DerefMut for OnionMessageProvider {
-	fn deref_mut(&mut self) -> &mut Self {
-		self
-	}
-}
-/// Calls the free function if one is set
-#[no_mangle]
-pub extern "C" fn OnionMessageProvider_free(this_ptr: OnionMessageProvider) { }
-impl Drop for OnionMessageProvider {
 	fn drop(&mut self) {
 		if let Some(f) = self.free {
 			f(self.this_arg);
@@ -4394,6 +4474,7 @@ pub struct EventsProvider {
 }
 unsafe impl Send for EventsProvider {}
 unsafe impl Sync for EventsProvider {}
+#[allow(unused)]
 pub(crate) fn EventsProvider_clone_fields(orig: &EventsProvider) -> EventsProvider {
 	EventsProvider {
 		this_arg: orig.this_arg,
@@ -4433,6 +4514,7 @@ pub struct EventHandler {
 }
 unsafe impl Send for EventHandler {}
 unsafe impl Sync for EventHandler {}
+#[allow(unused)]
 pub(crate) fn EventHandler_clone_fields(orig: &EventHandler) -> EventHandler {
 	EventHandler {
 		this_arg: orig.this_arg,

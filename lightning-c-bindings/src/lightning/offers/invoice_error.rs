@@ -129,7 +129,7 @@ impl Clone for InvoiceError {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn InvoiceError_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeInvoiceError)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeInvoiceError)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the InvoiceError
@@ -238,19 +238,27 @@ impl Clone for ErroneousField {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ErroneousField_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeErroneousField)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeErroneousField)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ErroneousField
 pub extern "C" fn ErroneousField_clone(orig: &ErroneousField) -> ErroneousField {
 	orig.clone()
 }
+/// Creates an [`InvoiceError`] with the given message.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InvoiceError_from_string(mut s: crate::c_types::Str) -> crate::lightning::offers::invoice_error::InvoiceError {
+	let mut ret = lightning::offers::invoice_error::InvoiceError::from_string(s.into_string());
+	crate::lightning::offers::invoice_error::InvoiceError { inner: ObjOps::heap_alloc(ret), is_owned: true }
+}
+
 #[no_mangle]
 /// Serialize the InvoiceError object into a byte array which can be read by InvoiceError_read
 pub extern "C" fn InvoiceError_write(obj: &crate::lightning::offers::invoice_error::InvoiceError) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn InvoiceError_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeInvoiceError) })
 }

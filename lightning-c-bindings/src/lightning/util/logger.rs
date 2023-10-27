@@ -94,6 +94,16 @@ impl Level {
 pub extern "C" fn Level_clone(orig: &Level) -> Level {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Level_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const Level)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Level_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut Level) };
+}
 #[no_mangle]
 /// Utility method to constructs a new Gossip-variant Level
 pub extern "C" fn Level_gossip() -> Level {
@@ -260,7 +270,7 @@ impl Clone for Record {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Record_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeRecord)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeRecord)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Record
@@ -281,6 +291,7 @@ pub struct Logger {
 }
 unsafe impl Send for Logger {}
 unsafe impl Sync for Logger {}
+#[allow(unused)]
 pub(crate) fn Logger_clone_fields(orig: &Logger) -> Logger {
 	Logger {
 		this_arg: orig.this_arg,

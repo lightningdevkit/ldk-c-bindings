@@ -12,6 +12,8 @@
 //! published as a QR code to be scanned by a customer. The customer uses the offer to request an
 //! invoice from the merchant to be paid.
 //!
+//! # Example
+//!
 //! ```
 //! extern crate bitcoin;
 //! extern crate core;
@@ -64,6 +66,14 @@
 //! # Ok(())
 //! # }
 //! ```
+//!
+//! # Note
+//!
+//! If constructing an [`Offer`] for use with a [`ChannelManager`], use
+//! [`ChannelManager::create_offer_builder`] instead of [`OfferBuilder::new`].
+//!
+//! [`ChannelManager`]: crate::ln::channelmanager::ChannelManager
+//! [`ChannelManager::create_offer_builder`]: crate::ln::channelmanager::ChannelManager::create_offer_builder
 
 use alloc::str::FromStr;
 use alloc::string::String;
@@ -149,7 +159,7 @@ impl Clone for Offer {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Offer_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeOffer)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeOffer)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Offer
@@ -293,7 +303,7 @@ pub extern "C" fn Offer_expects_quantity(this_arg: &crate::lightning::offers::of
 pub extern "C" fn Offer_write(obj: &crate::lightning::offers::offer::Offer) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn Offer_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOffer) })
 }
@@ -361,7 +371,7 @@ impl Clone for Amount {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Amount_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeAmount)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeAmount)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Amount
@@ -431,7 +441,7 @@ impl Clone for Quantity {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn Quantity_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeQuantity)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeQuantity)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the Quantity

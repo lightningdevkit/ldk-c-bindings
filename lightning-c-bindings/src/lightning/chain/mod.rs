@@ -108,7 +108,7 @@ impl Clone for BestBlock {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BestBlock_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBestBlock)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBestBlock)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the BestBlock
@@ -186,6 +186,7 @@ pub struct Listen {
 }
 unsafe impl Send for Listen {}
 unsafe impl Sync for Listen {}
+#[allow(unused)]
 pub(crate) fn Listen_clone_fields(orig: &Listen) -> Listen {
 	Listen {
 		this_arg: orig.this_arg,
@@ -334,6 +335,7 @@ pub struct Confirm {
 }
 unsafe impl Send for Confirm {}
 unsafe impl Sync for Confirm {}
+#[allow(unused)]
 pub(crate) fn Confirm_clone_fields(orig: &Confirm) -> Confirm {
 	Confirm {
 		this_arg: orig.this_arg,
@@ -500,6 +502,16 @@ impl ChannelMonitorUpdateStatus {
 pub extern "C" fn ChannelMonitorUpdateStatus_clone(orig: &ChannelMonitorUpdateStatus) -> ChannelMonitorUpdateStatus {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ChannelMonitorUpdateStatus_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const ChannelMonitorUpdateStatus)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn ChannelMonitorUpdateStatus_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut ChannelMonitorUpdateStatus) };
+}
 #[no_mangle]
 /// Utility method to constructs a new Completed-variant ChannelMonitorUpdateStatus
 pub extern "C" fn ChannelMonitorUpdateStatus_completed() -> ChannelMonitorUpdateStatus {
@@ -581,6 +593,7 @@ pub struct Watch {
 }
 unsafe impl Send for Watch {}
 unsafe impl Sync for Watch {}
+#[allow(unused)]
 pub(crate) fn Watch_clone_fields(orig: &Watch) -> Watch {
 	Watch {
 		this_arg: orig.this_arg,
@@ -673,6 +686,7 @@ pub struct Filter {
 }
 unsafe impl Send for Filter {}
 unsafe impl Sync for Filter {}
+#[allow(unused)]
 pub(crate) fn Filter_clone_fields(orig: &Filter) -> Filter {
 	Filter {
 		this_arg: orig.this_arg,
@@ -834,7 +848,7 @@ impl Clone for WatchedOutput {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn WatchedOutput_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeWatchedOutput)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeWatchedOutput)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the WatchedOutput

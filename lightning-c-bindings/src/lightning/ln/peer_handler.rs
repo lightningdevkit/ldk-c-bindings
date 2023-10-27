@@ -64,6 +64,7 @@ pub struct CustomMessageHandler {
 }
 unsafe impl Send for CustomMessageHandler {}
 unsafe impl Sync for CustomMessageHandler {}
+#[allow(unused)]
 pub(crate) fn CustomMessageHandler_clone_fields(orig: &CustomMessageHandler) -> CustomMessageHandler {
 	CustomMessageHandler {
 		this_arg: orig.this_arg,
@@ -190,10 +191,10 @@ pub extern "C" fn IgnoringMessageHandler_new() -> IgnoringMessageHandler {
 }
 impl From<nativeIgnoringMessageHandler> for crate::lightning::events::MessageSendEventsProvider {
 	fn from(obj: nativeIgnoringMessageHandler) -> Self {
-		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::peer_handler::IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = IgnoringMessageHandler_as_MessageSendEventsProvider(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(IgnoringMessageHandler_free_void);
 		ret
 	}
@@ -218,10 +219,10 @@ extern "C" fn IgnoringMessageHandler_MessageSendEventsProvider_get_and_clear_pen
 
 impl From<nativeIgnoringMessageHandler> for crate::lightning::ln::msgs::RoutingMessageHandler {
 	fn from(obj: nativeIgnoringMessageHandler) -> Self {
-		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::peer_handler::IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = IgnoringMessageHandler_as_RoutingMessageHandler(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(IgnoringMessageHandler_free_void);
 		ret
 	}
@@ -331,40 +332,12 @@ extern "C" fn IgnoringMessageHandler_RoutingMessageHandler_provided_init_feature
 	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
-impl From<nativeIgnoringMessageHandler> for crate::lightning::events::OnionMessageProvider {
-	fn from(obj: nativeIgnoringMessageHandler) -> Self {
-		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
-		let mut ret = IgnoringMessageHandler_as_OnionMessageProvider(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
-		ret.free = Some(IgnoringMessageHandler_free_void);
-		ret
-	}
-}
-/// Constructs a new OnionMessageProvider which calls the relevant methods on this_arg.
-/// This copies the `inner` pointer in this_arg and thus the returned OnionMessageProvider must be freed before this_arg is
-#[no_mangle]
-pub extern "C" fn IgnoringMessageHandler_as_OnionMessageProvider(this_arg: &IgnoringMessageHandler) -> crate::lightning::events::OnionMessageProvider {
-	crate::lightning::events::OnionMessageProvider {
-		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
-		free: None,
-		next_onion_message_for_peer: IgnoringMessageHandler_OnionMessageProvider_next_onion_message_for_peer,
-	}
-}
-
-#[must_use]
-extern "C" fn IgnoringMessageHandler_OnionMessageProvider_next_onion_message_for_peer(this_arg: *const c_void, mut peer_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::msgs::OnionMessage {
-	let mut ret = <nativeIgnoringMessageHandler as lightning::events::OnionMessageProvider<>>::next_onion_message_for_peer(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, peer_node_id.into_rust());
-	let mut local_ret = crate::lightning::ln::msgs::OnionMessage { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
-	local_ret
-}
-
 impl From<nativeIgnoringMessageHandler> for crate::lightning::ln::msgs::OnionMessageHandler {
 	fn from(obj: nativeIgnoringMessageHandler) -> Self {
-		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::peer_handler::IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = IgnoringMessageHandler_as_OnionMessageHandler(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(IgnoringMessageHandler_free_void);
 		ret
 	}
@@ -377,20 +350,22 @@ pub extern "C" fn IgnoringMessageHandler_as_OnionMessageHandler(this_arg: &Ignor
 		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		handle_onion_message: IgnoringMessageHandler_OnionMessageHandler_handle_onion_message,
+		next_onion_message_for_peer: IgnoringMessageHandler_OnionMessageHandler_next_onion_message_for_peer,
 		peer_connected: IgnoringMessageHandler_OnionMessageHandler_peer_connected,
 		peer_disconnected: IgnoringMessageHandler_OnionMessageHandler_peer_disconnected,
 		provided_node_features: IgnoringMessageHandler_OnionMessageHandler_provided_node_features,
 		provided_init_features: IgnoringMessageHandler_OnionMessageHandler_provided_init_features,
-		OnionMessageProvider: crate::lightning::events::OnionMessageProvider {
-			this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
-			free: None,
-			next_onion_message_for_peer: IgnoringMessageHandler_OnionMessageProvider_next_onion_message_for_peer,
-		},
 	}
 }
 
 extern "C" fn IgnoringMessageHandler_OnionMessageHandler_handle_onion_message(this_arg: *const c_void, mut peer_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::OnionMessage) {
 	<nativeIgnoringMessageHandler as lightning::ln::msgs::OnionMessageHandler<>>::handle_onion_message(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, &peer_node_id.into_rust(), msg.get_native_ref())
+}
+#[must_use]
+extern "C" fn IgnoringMessageHandler_OnionMessageHandler_next_onion_message_for_peer(this_arg: *const c_void, mut peer_node_id: crate::c_types::PublicKey) -> crate::lightning::ln::msgs::OnionMessage {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::ln::msgs::OnionMessageHandler<>>::next_onion_message_for_peer(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, peer_node_id.into_rust());
+	let mut local_ret = crate::lightning::ln::msgs::OnionMessage { inner: if ret.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((ret.unwrap())) } }, is_owned: true };
+	local_ret
 }
 #[must_use]
 extern "C" fn IgnoringMessageHandler_OnionMessageHandler_peer_connected(this_arg: *const c_void, mut their_node_id: crate::c_types::PublicKey, init: &crate::lightning::ln::msgs::Init, mut inbound: bool) -> crate::c_types::derived::CResult_NoneNoneZ {
@@ -414,10 +389,10 @@ extern "C" fn IgnoringMessageHandler_OnionMessageHandler_provided_init_features(
 
 impl From<nativeIgnoringMessageHandler> for crate::lightning::onion_message::offers::OffersMessageHandler {
 	fn from(obj: nativeIgnoringMessageHandler) -> Self {
-		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::peer_handler::IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = IgnoringMessageHandler_as_OffersMessageHandler(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(IgnoringMessageHandler_free_void);
 		ret
 	}
@@ -430,6 +405,7 @@ pub extern "C" fn IgnoringMessageHandler_as_OffersMessageHandler(this_arg: &Igno
 		this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 		free: None,
 		handle_message: IgnoringMessageHandler_OffersMessageHandler_handle_message,
+		release_pending_messages: IgnoringMessageHandler_OffersMessageHandler_release_pending_messages,
 	}
 }
 
@@ -439,13 +415,19 @@ extern "C" fn IgnoringMessageHandler_OffersMessageHandler_handle_message(this_ar
 	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_OffersMessageZ::None } else { crate::c_types::derived::COption_OffersMessageZ::Some( { crate::lightning::onion_message::offers::OffersMessage::native_into(ret.unwrap()) }) };
 	local_ret
 }
+#[must_use]
+extern "C" fn IgnoringMessageHandler_OffersMessageHandler_release_pending_messages(this_arg: *const c_void) -> crate::c_types::derived::CVec_C3Tuple_OffersMessageDestinationBlindedPathZZ {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::onion_message::offers::OffersMessageHandler<>>::release_pending_messages(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, );
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item; let mut local_orig_ret_0_2 = crate::lightning::blinded_path::BlindedPath { inner: if orig_ret_0_2.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_2.unwrap())) } }, is_owned: true }; let mut local_ret_0 = (crate::lightning::onion_message::offers::OffersMessage::native_into(orig_ret_0_0), crate::lightning::onion_message::messenger::Destination::native_into(orig_ret_0_1), local_orig_ret_0_2).into(); local_ret_0 }); };
+	local_ret.into()
+}
 
 impl From<nativeIgnoringMessageHandler> for crate::lightning::onion_message::messenger::CustomOnionMessageHandler {
 	fn from(obj: nativeIgnoringMessageHandler) -> Self {
-		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::peer_handler::IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = IgnoringMessageHandler_as_CustomOnionMessageHandler(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(IgnoringMessageHandler_free_void);
 		ret
 	}
@@ -459,21 +441,28 @@ pub extern "C" fn IgnoringMessageHandler_as_CustomOnionMessageHandler(this_arg: 
 		free: None,
 		handle_custom_message: IgnoringMessageHandler_CustomOnionMessageHandler_handle_custom_message,
 		read_custom_message: IgnoringMessageHandler_CustomOnionMessageHandler_read_custom_message,
+		release_pending_custom_messages: IgnoringMessageHandler_CustomOnionMessageHandler_release_pending_custom_messages,
 	}
 }
 
 #[must_use]
-extern "C" fn IgnoringMessageHandler_CustomOnionMessageHandler_handle_custom_message(this_arg: *const c_void, mut msg: crate::lightning::onion_message::packet::CustomOnionMessageContents) -> crate::c_types::derived::COption_CustomOnionMessageContentsZ {
+extern "C" fn IgnoringMessageHandler_CustomOnionMessageHandler_handle_custom_message(this_arg: *const c_void, mut msg: crate::lightning::onion_message::packet::OnionMessageContents) -> crate::c_types::derived::COption_OnionMessageContentsZ {
 	unreachable!();
 }
 #[must_use]
-extern "C" fn IgnoringMessageHandler_CustomOnionMessageHandler_read_custom_message(this_arg: *const c_void, mut message_type: u64, mut buffer: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_CustomOnionMessageContentsZDecodeErrorZ {
+extern "C" fn IgnoringMessageHandler_CustomOnionMessageHandler_read_custom_message(this_arg: *const c_void, mut message_type: u64, mut buffer: crate::c_types::u8slice) -> crate::c_types::derived::CResult_COption_OnionMessageContentsZDecodeErrorZ {
 	let mut ret = <nativeIgnoringMessageHandler as lightning::onion_message::messenger::CustomOnionMessageHandler<>>::read_custom_message(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, message_type, &mut buffer.to_reader());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = if o.is_none() { crate::c_types::derived::COption_CustomOnionMessageContentsZ::None } else { crate::c_types::derived::COption_CustomOnionMessageContentsZ::Some( { Into::into(o.unwrap()) }) }; local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = if o.is_none() { crate::c_types::derived::COption_OnionMessageContentsZ::None } else { crate::c_types::derived::COption_OnionMessageContentsZ::Some( { Into::into(o.unwrap()) }) }; local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_ret
 }
+#[must_use]
+extern "C" fn IgnoringMessageHandler_CustomOnionMessageHandler_release_pending_custom_messages(this_arg: *const c_void) -> crate::c_types::derived::CVec_C3Tuple_OnionMessageContentsDestinationBlindedPathZZ {
+	let mut ret = <nativeIgnoringMessageHandler as lightning::onion_message::messenger::CustomOnionMessageHandler<>>::release_pending_custom_messages(unsafe { &mut *(this_arg as *mut nativeIgnoringMessageHandler) }, );
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item; let mut local_orig_ret_0_2 = crate::lightning::blinded_path::BlindedPath { inner: if orig_ret_0_2.is_none() { core::ptr::null_mut() } else {  { ObjOps::heap_alloc((orig_ret_0_2.unwrap())) } }, is_owned: true }; let mut local_ret_0 = (Into::into(orig_ret_0_0), crate::lightning::onion_message::messenger::Destination::native_into(orig_ret_0_1), local_orig_ret_0_2).into(); local_ret_0 }); };
+	local_ret.into()
+}
 
-impl From<nativeInfallible> for crate::lightning::onion_message::packet::CustomOnionMessageContents {
+impl From<nativeInfallible> for crate::lightning::onion_message::packet::OnionMessageContents {
 	fn from(obj: nativeInfallible) -> Self {
 		unreachable!();
 	}
@@ -485,10 +474,10 @@ impl From<nativeInfallible> for crate::lightning::ln::wire::Type {
 }
 impl From<nativeIgnoringMessageHandler> for crate::lightning::ln::wire::CustomMessageReader {
 	fn from(obj: nativeIgnoringMessageHandler) -> Self {
-		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::peer_handler::IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = IgnoringMessageHandler_as_CustomMessageReader(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(IgnoringMessageHandler_free_void);
 		ret
 	}
@@ -513,10 +502,10 @@ extern "C" fn IgnoringMessageHandler_CustomMessageReader_read(this_arg: *const c
 
 impl From<nativeIgnoringMessageHandler> for crate::lightning::ln::peer_handler::CustomMessageHandler {
 	fn from(obj: nativeIgnoringMessageHandler) -> Self {
-		let mut rust_obj = IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::peer_handler::IgnoringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = IgnoringMessageHandler_as_CustomMessageHandler(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(IgnoringMessageHandler_free_void);
 		ret
 	}
@@ -623,10 +612,10 @@ pub extern "C" fn ErroringMessageHandler_new() -> crate::lightning::ln::peer_han
 
 impl From<nativeErroringMessageHandler> for crate::lightning::events::MessageSendEventsProvider {
 	fn from(obj: nativeErroringMessageHandler) -> Self {
-		let mut rust_obj = ErroringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::peer_handler::ErroringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ErroringMessageHandler_as_MessageSendEventsProvider(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ErroringMessageHandler_free_void);
 		ret
 	}
@@ -651,10 +640,10 @@ extern "C" fn ErroringMessageHandler_MessageSendEventsProvider_get_and_clear_pen
 
 impl From<nativeErroringMessageHandler> for crate::lightning::ln::msgs::ChannelMessageHandler {
 	fn from(obj: nativeErroringMessageHandler) -> Self {
-		let mut rust_obj = ErroringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::ln::peer_handler::ErroringMessageHandler { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ErroringMessageHandler_as_ChannelMessageHandler(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ErroringMessageHandler_free_void);
 		ret
 	}
@@ -699,7 +688,7 @@ pub extern "C" fn ErroringMessageHandler_as_ChannelMessageHandler(this_arg: &Err
 		handle_error: ErroringMessageHandler_ChannelMessageHandler_handle_error,
 		provided_node_features: ErroringMessageHandler_ChannelMessageHandler_provided_node_features,
 		provided_init_features: ErroringMessageHandler_ChannelMessageHandler_provided_init_features,
-		get_genesis_hashes: ErroringMessageHandler_ChannelMessageHandler_get_genesis_hashes,
+		get_chain_hashes: ErroringMessageHandler_ChannelMessageHandler_get_chain_hashes,
 		MessageSendEventsProvider: crate::lightning::events::MessageSendEventsProvider {
 			this_arg: unsafe { ObjOps::untweak_ptr((*this_arg).inner) as *mut c_void },
 			free: None,
@@ -815,8 +804,8 @@ extern "C" fn ErroringMessageHandler_ChannelMessageHandler_provided_init_feature
 	crate::lightning::ln::features::InitFeatures { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 #[must_use]
-extern "C" fn ErroringMessageHandler_ChannelMessageHandler_get_genesis_hashes(this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
-	let mut ret = <nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::get_genesis_hashes(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, );
+extern "C" fn ErroringMessageHandler_ChannelMessageHandler_get_chain_hashes(this_arg: *const c_void) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
+	let mut ret = <nativeErroringMessageHandler as lightning::ln::msgs::ChannelMessageHandler<>>::get_chain_hashes(unsafe { &mut *(this_arg as *mut nativeErroringMessageHandler) }, );
 	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_ret_0.into() }) };
 	local_ret
 }
@@ -1002,6 +991,7 @@ pub struct SocketDescriptor {
 }
 unsafe impl Send for SocketDescriptor {}
 unsafe impl Sync for SocketDescriptor {}
+#[allow(unused)]
 pub(crate) fn SocketDescriptor_clone_fields(orig: &SocketDescriptor) -> SocketDescriptor {
 	SocketDescriptor {
 		this_arg: orig.this_arg,
@@ -1140,7 +1130,7 @@ impl Clone for PeerHandleError {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn PeerHandleError_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativePeerHandleError)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativePeerHandleError)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the PeerHandleError

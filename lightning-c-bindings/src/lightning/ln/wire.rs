@@ -38,6 +38,7 @@ pub struct CustomMessageReader {
 }
 unsafe impl Send for CustomMessageReader {}
 unsafe impl Sync for CustomMessageReader {}
+#[allow(unused)]
 pub(crate) fn CustomMessageReader_clone_fields(orig: &CustomMessageReader) -> CustomMessageReader {
 	CustomMessageReader {
 		this_arg: orig.this_arg,
@@ -115,6 +116,7 @@ pub struct Type {
 }
 unsafe impl Send for Type {}
 unsafe impl Sync for Type {}
+#[allow(unused)]
 pub(crate) fn Type_clone_fields(orig: &Type) -> Type {
 	Type {
 		this_arg: orig.this_arg,

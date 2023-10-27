@@ -86,10 +86,10 @@ pub extern "C" fn FilesystemStore_get_data_dir(this_arg: &crate::lightning_persi
 
 impl From<nativeFilesystemStore> for crate::lightning::util::persist::KVStore {
 	fn from(obj: nativeFilesystemStore) -> Self {
-		let mut rust_obj = FilesystemStore { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning_persister::fs_store::FilesystemStore { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = FilesystemStore_as_KVStore(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(FilesystemStore_free_void);
 		ret
 	}

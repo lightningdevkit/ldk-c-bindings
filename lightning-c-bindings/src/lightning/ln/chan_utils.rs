@@ -130,6 +130,16 @@ impl HTLCClaim {
 pub extern "C" fn HTLCClaim_clone(orig: &HTLCClaim) -> HTLCClaim {
 	orig.clone()
 }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn HTLCClaim_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const HTLCClaim)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn HTLCClaim_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut HTLCClaim) };
+}
 #[no_mangle]
 /// Utility method to constructs a new OfferedTimeout-variant HTLCClaim
 pub extern "C" fn HTLCClaim_offered_timeout() -> HTLCClaim {
@@ -246,7 +256,7 @@ impl Clone for CounterpartyCommitmentSecrets {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CounterpartyCommitmentSecrets_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCounterpartyCommitmentSecrets)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeCounterpartyCommitmentSecrets)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the CounterpartyCommitmentSecrets
@@ -297,7 +307,7 @@ pub extern "C" fn CounterpartyCommitmentSecrets_get_secret(this_arg: &crate::lig
 pub extern "C" fn CounterpartyCommitmentSecrets_write(obj: &crate::lightning::ln::chan_utils::CounterpartyCommitmentSecrets) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn CounterpartyCommitmentSecrets_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeCounterpartyCommitmentSecrets) })
 }
@@ -507,7 +517,7 @@ impl Clone for TxCreationKeys {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn TxCreationKeys_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeTxCreationKeys)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTxCreationKeys)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the TxCreationKeys
@@ -519,7 +529,7 @@ pub extern "C" fn TxCreationKeys_clone(orig: &TxCreationKeys) -> TxCreationKeys 
 pub extern "C" fn TxCreationKeys_write(obj: &crate::lightning::ln::chan_utils::TxCreationKeys) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn TxCreationKeys_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeTxCreationKeys) })
 }
@@ -678,7 +688,7 @@ impl Clone for ChannelPublicKeys {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelPublicKeys_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelPublicKeys)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelPublicKeys)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelPublicKeys
@@ -709,7 +719,7 @@ pub extern "C" fn ChannelPublicKeys_eq(a: &ChannelPublicKeys, b: &ChannelPublicK
 pub extern "C" fn ChannelPublicKeys_write(obj: &crate::lightning::ln::chan_utils::ChannelPublicKeys) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelPublicKeys_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelPublicKeys) })
 }
@@ -904,7 +914,7 @@ impl Clone for HTLCOutputInCommitment {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn HTLCOutputInCommitment_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeHTLCOutputInCommitment)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeHTLCOutputInCommitment)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the HTLCOutputInCommitment
@@ -925,7 +935,7 @@ pub extern "C" fn HTLCOutputInCommitment_eq(a: &HTLCOutputInCommitment, b: &HTLC
 pub extern "C" fn HTLCOutputInCommitment_write(obj: &crate::lightning::ln::chan_utils::HTLCOutputInCommitment) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn HTLCOutputInCommitment_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeHTLCOutputInCommitment) })
 }
@@ -1168,7 +1178,7 @@ impl Clone for ChannelTransactionParameters {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ChannelTransactionParameters_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeChannelTransactionParameters)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeChannelTransactionParameters)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ChannelTransactionParameters
@@ -1288,7 +1298,7 @@ impl Clone for CounterpartyChannelTransactionParameters {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CounterpartyChannelTransactionParameters_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCounterpartyChannelTransactionParameters)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeCounterpartyChannelTransactionParameters)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the CounterpartyChannelTransactionParameters
@@ -1349,7 +1359,7 @@ pub extern "C" fn ChannelTransactionParameters_as_counterparty_broadcastable(thi
 pub extern "C" fn CounterpartyChannelTransactionParameters_write(obj: &crate::lightning::ln::chan_utils::CounterpartyChannelTransactionParameters) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn CounterpartyChannelTransactionParameters_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeCounterpartyChannelTransactionParameters) })
 }
@@ -1365,7 +1375,7 @@ pub extern "C" fn CounterpartyChannelTransactionParameters_read(ser: crate::c_ty
 pub extern "C" fn ChannelTransactionParameters_write(obj: &crate::lightning::ln::chan_utils::ChannelTransactionParameters) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn ChannelTransactionParameters_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeChannelTransactionParameters) })
 }
@@ -1574,7 +1584,7 @@ impl Clone for HolderCommitmentTransaction {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn HolderCommitmentTransaction_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeHolderCommitmentTransaction)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeHolderCommitmentTransaction)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the HolderCommitmentTransaction
@@ -1586,7 +1596,7 @@ pub extern "C" fn HolderCommitmentTransaction_clone(orig: &HolderCommitmentTrans
 pub extern "C" fn HolderCommitmentTransaction_write(obj: &crate::lightning::ln::chan_utils::HolderCommitmentTransaction) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn HolderCommitmentTransaction_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeHolderCommitmentTransaction) })
 }
@@ -1707,7 +1717,7 @@ impl Clone for BuiltCommitmentTransaction {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn BuiltCommitmentTransaction_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeBuiltCommitmentTransaction)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeBuiltCommitmentTransaction)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the BuiltCommitmentTransaction
@@ -1719,7 +1729,7 @@ pub extern "C" fn BuiltCommitmentTransaction_clone(orig: &BuiltCommitmentTransac
 pub extern "C" fn BuiltCommitmentTransaction_write(obj: &crate::lightning::ln::chan_utils::BuiltCommitmentTransaction) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn BuiltCommitmentTransaction_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeBuiltCommitmentTransaction) })
 }
@@ -1823,7 +1833,7 @@ impl Clone for ClosingTransaction {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn ClosingTransaction_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeClosingTransaction)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeClosingTransaction)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the ClosingTransaction
@@ -2067,7 +2077,7 @@ impl Clone for CommitmentTransaction {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn CommitmentTransaction_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeCommitmentTransaction)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeCommitmentTransaction)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the CommitmentTransaction
@@ -2079,7 +2089,7 @@ pub extern "C" fn CommitmentTransaction_clone(orig: &CommitmentTransaction) -> C
 pub extern "C" fn CommitmentTransaction_write(obj: &crate::lightning::ln::chan_utils::CommitmentTransaction) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
 }
-#[no_mangle]
+#[allow(unused)]
 pub(crate) extern "C" fn CommitmentTransaction_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeCommitmentTransaction) })
 }
@@ -2096,6 +2106,14 @@ pub extern "C" fn CommitmentTransaction_read(ser: crate::c_types::u8slice) -> cr
 pub extern "C" fn CommitmentTransaction_commitment_number(this_arg: &crate::lightning::ln::chan_utils::CommitmentTransaction) -> u64 {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.commitment_number();
 	ret
+}
+
+/// The per commitment point used by the broadcaster.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn CommitmentTransaction_per_commitment_point(this_arg: &crate::lightning::ln::chan_utils::CommitmentTransaction) -> crate::c_types::PublicKey {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.per_commitment_point();
+	crate::c_types::PublicKey::from_rust(&ret)
 }
 
 /// The value to be sent to the broadcaster

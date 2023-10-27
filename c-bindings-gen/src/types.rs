@@ -1534,7 +1534,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 				if is_ref => Some(".as_inner()"),
 			"bitcoin::hash_types::Txid"|"bitcoin::BlockHash"|"bitcoin::hash_types::BlockHash"|"bitcoin_hashes::sha256::Hash"
 				if !is_ref => Some(".into_inner() }"),
-			"bitcoin::blockdata::constants::ChainHash" if is_ref => Some(".as_bytes() }"),
+			"bitcoin::blockdata::constants::ChainHash" if is_ref => Some(".as_bytes()"),
 			"bitcoin::blockdata::constants::ChainHash" if !is_ref => Some(".to_bytes() }"),
 			"bitcoin::secp256k1::Message" if !is_ref => Some(".as_ref().clone() }"),
 			"lightning::ln::PaymentHash"|"lightning::ln::PaymentPreimage"|"lightning::ln::PaymentSecret"

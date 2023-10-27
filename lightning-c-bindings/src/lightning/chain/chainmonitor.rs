@@ -106,7 +106,7 @@ impl Clone for MonitorUpdateId {
 #[allow(unused)]
 /// Used only if an object of this type is returned as a trait impl by a method
 pub(crate) extern "C" fn MonitorUpdateId_clone_void(this_ptr: *const c_void) -> *mut c_void {
-	Box::into_raw(Box::new(unsafe { (*(this_ptr as *mut nativeMonitorUpdateId)).clone() })) as *mut c_void
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeMonitorUpdateId)).clone() })) as *mut c_void
 }
 #[no_mangle]
 /// Creates a copy of the MonitorUpdateId
@@ -250,6 +250,7 @@ pub struct Persist {
 }
 unsafe impl Send for Persist {}
 unsafe impl Sync for Persist {}
+#[allow(unused)]
 pub(crate) fn Persist_clone_fields(orig: &Persist) -> Persist {
 	Persist {
 		this_arg: orig.this_arg,
@@ -530,10 +531,10 @@ pub extern "C" fn ChainMonitor_rebroadcast_pending_claims(this_arg: &crate::ligh
 
 impl From<nativeChainMonitor> for crate::lightning::chain::Listen {
 	fn from(obj: nativeChainMonitor) -> Self {
-		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::chain::chainmonitor::ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_Listen(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ChainMonitor_free_void);
 		ret
 	}
@@ -564,10 +565,10 @@ extern "C" fn ChainMonitor_Listen_block_disconnected(this_arg: *const c_void, he
 
 impl From<nativeChainMonitor> for crate::lightning::chain::Confirm {
 	fn from(obj: nativeChainMonitor) -> Self {
-		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::chain::chainmonitor::ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_Confirm(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ChainMonitor_free_void);
 		ret
 	}
@@ -605,10 +606,10 @@ extern "C" fn ChainMonitor_Confirm_get_relevant_txids(this_arg: *const c_void) -
 
 impl From<nativeChainMonitor> for crate::lightning::chain::Watch {
 	fn from(obj: nativeChainMonitor) -> Self {
-		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::chain::chainmonitor::ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_Watch(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ChainMonitor_free_void);
 		ret
 	}
@@ -646,10 +647,10 @@ extern "C" fn ChainMonitor_Watch_release_pending_monitor_events(this_arg: *const
 
 impl From<nativeChainMonitor> for crate::lightning::events::EventsProvider {
 	fn from(obj: nativeChainMonitor) -> Self {
-		let mut rust_obj = ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
+		let rust_obj = crate::lightning::chain::chainmonitor::ChainMonitor { inner: ObjOps::heap_alloc(obj), is_owned: true };
 		let mut ret = ChainMonitor_as_EventsProvider(&rust_obj);
-		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so wipe rust_obj's pointer and set ret's free() fn
-		rust_obj.inner = core::ptr::null_mut();
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
 		ret.free = Some(ChainMonitor_free_void);
 		ret
 	}

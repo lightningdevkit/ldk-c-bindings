@@ -242,6 +242,7 @@ public:
 
 		// Then disconnect the "main" connection, while another connection is being made.
 		PeerManager_disconnect_by_node_id(&net1, ChannelManager_get_our_node_id(&cm2));
+		PeerManager_disconnect_by_node_id(&net2, ChannelManager_get_our_node_id(&cm1));
 		assert(!socket_connect(node1_handler, ChannelManager_get_our_node_id(&cm2), (sockaddr*)&listen_addr, sizeof(listen_addr)));
 
 		std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting new connection handshake..." << std::endl;

@@ -74,7 +74,7 @@ rm genbindings_path_map_test_file.c
 case "$ENV_TARGET" in
 	"x86_64"*)
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge"
-		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -march=sandybridge -mtune=sandybridge"
 		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS"
 		;;
 	"aarch64_apple_darwin")
@@ -85,7 +85,7 @@ case "$ENV_TARGET" in
 	*)
 		# Assume this isn't targeted at another host and build for the host's CPU.
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=native"
-		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -mcpu=native"
+		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -march=native -mtune=native"
 		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS"
 		;;
 esac
@@ -588,7 +588,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 				MANUAL_LINK_CFLAGS="$MANUAL_LINK_CFLAGS -C link-arg=$ARG"
 			done
 			export CFLAGS_x86_64_apple_darwin="$CFLAGS_x86_64_apple_darwin -O3 -fPIC -fembed-bitcode"
-			RUSTC_BOOTSTRAP=1 RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $MANUAL_LINK_CFLAGS $LINK_ARG_FLAGS -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS --offline -v --release --target x86_64-apple-darwin -Zbuild-std=std,panic_abort
+			RUSTC_BOOTSTRAP=1 RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $MANUAL_LINK_CFLAGS $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mtune=sandybridge" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS --offline -v --release --target x86_64-apple-darwin -Zbuild-std=std,panic_abort
 		fi
 	fi
 	# If we're on an M1 don't bother building X86 binaries
@@ -597,7 +597,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -O3 -fPIC -fembed-bitcode"
 		# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 		cargo clean --release
-		CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge" cargo build $CARGO_BUILD_ARGS -v --release
+		CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mtune=sandybridge" cargo build $CARGO_BUILD_ARGS -v --release
 
 		if [ "$2" = "true" ]; then
 			$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -O2 -c demo.cpp -o demo.o

@@ -74,7 +74,7 @@ rm genbindings_path_map_test_file.c
 case "$ENV_TARGET" in
 	"x86_64"*)
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge"
-		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -march=sandybridge -mcpu=sandybridge -mtune=sandybridge"
+		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -march=sandybridge -mtune=sandybridge"
 		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS"
 		;;
 	"aarch64_apple_darwin")
@@ -85,7 +85,7 @@ case "$ENV_TARGET" in
 	*)
 		# Assume this isn't targeted at another host and build for the host's CPU.
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=native"
-		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -mcpu=native"
+		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -march=native -mtune=native"
 		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS"
 		;;
 esac
@@ -429,7 +429,9 @@ if [ "$HOST_OSX" = "true" ]; then
 		fi
 	fi
 else
-	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }')
+	# Output is something like clang version 17.0.3 (Fedora 17.0.3-1.fc39) or Debian clang version 14.0.6
+	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($3, 0, 2); }')
+	[ "$CLANG_LLVM_V" = "ve" ] && CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }')
 	if [ -x "$(which ld.lld)" ]; then
 		LLD_LLVM_V="$(ld.lld --version | awk '{ print $2; }')"
 		if [ "$LLD_LLVM_V" = "LLD" ]; then # eg if the output is "Debian LLD ..."
@@ -586,7 +588,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 				MANUAL_LINK_CFLAGS="$MANUAL_LINK_CFLAGS -C link-arg=$ARG"
 			done
 			export CFLAGS_x86_64_apple_darwin="$CFLAGS_x86_64_apple_darwin -O3 -fPIC -fembed-bitcode"
-			RUSTC_BOOTSTRAP=1 RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $MANUAL_LINK_CFLAGS $LINK_ARG_FLAGS -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS --offline -v --release --target x86_64-apple-darwin -Zbuild-std=std,panic_abort
+			RUSTC_BOOTSTRAP=1 RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $MANUAL_LINK_CFLAGS $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mtune=sandybridge" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS --offline -v --release --target x86_64-apple-darwin -Zbuild-std=std,panic_abort
 		fi
 	fi
 	# If we're on an M1 don't bother building X86 binaries
@@ -595,7 +597,7 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -O3 -fPIC -fembed-bitcode"
 		# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 		cargo clean --release
-		CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mcpu=sandybridge -C link-arg=-mtune=sandybridge" cargo build $CARGO_BUILD_ARGS -v --release
+		CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mtune=sandybridge" cargo build $CARGO_BUILD_ARGS -v --release
 
 		if [ "$2" = "true" ]; then
 			$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -O2 -c demo.cpp -o demo.o

@@ -4,18 +4,27 @@ on: [push, pull_request]
 
 jobs:
   check_bindings:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Ubuntu's version of rustc uses its own LLVM instead of being a real native package.
+        # This leaves us with an incompatible LLVM version when linking. Instead, use a real OS.
+        distro: [ "debian:bullseye", "fedora:39" ]
     runs-on: ubuntu-latest
-    # Ubuntu's version of rustc uses its own LLVM instead of being a real native package.
-    # This leaves us with an incompatible LLVM version when linking. Instead, use a real OS.
-    container: debian:bullseye
+    container: ${{ matrix.distro }}
     env:
       TOOLCHAIN: stable
     steps:
       - name: Install native Rust toolchain, Valgrind, and build utilitis
+        if: "matrix.distro == 'debian:bullseye'"
         run: |
           apt-get update
           apt-get -y dist-upgrade
           apt-get -y install cargo libstd-rust-dev-wasm32 valgrind lld git g++ clang wget
+      - name: Install native Rust toolchain, Valgrind, and build utilitis
+        if: "matrix.distro == 'fedora:39'"
+        run: |
+          dnf -y install cargo rust-std-static-wasm32-wasi valgrind lld git g++ clang wget which diffutils
       - name: Checkout source code
         uses: actions/checkout@v2
         with:
@@ -38,7 +47,11 @@ jobs:
           git clone https://github.com/rust-bitcoin/rust-lightning
           cd rust-lightning
           git checkout 0.0.118-bindings
+      - name: Pin memchr
+        if: "matrix.distro == 'debian:bullseye'"
+        run: |
           # Pin memchr until we can remove it
+          cd rust-lightning
           cargo update -p memchr --precise "2.5.0" --verbose
       - name: Fix Github Actions to not be broken
         run: git config --global --add safe.directory /__w/ldk-c-bindings/ldk-c-bindings

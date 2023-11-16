@@ -429,7 +429,9 @@ if [ "$HOST_OSX" = "true" ]; then
 		fi
 	fi
 else
-	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }')
+	# Output is something like clang version 17.0.3 (Fedora 17.0.3-1.fc39) or Debian clang version 14.0.6
+	CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($3, 0, 2); }')
+	[ "$CLANG_LLVM_V" = "ve" ] && CLANG_LLVM_V=$(clang --version | head -n1 | awk '{ print substr($4, 0, 2); }')
 	if [ -x "$(which ld.lld)" ]; then
 		LLD_LLVM_V="$(ld.lld --version | awk '{ print $2; }')"
 		if [ "$LLD_LLVM_V" = "LLD" ]; then # eg if the output is "Debian LLD ..."

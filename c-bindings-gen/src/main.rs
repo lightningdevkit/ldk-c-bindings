@@ -1809,7 +1809,11 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 
 	macro_rules! write_conv {
 		($fn_sig: expr, $to_c: expr, $ref: expr) => {
-			writeln!(w, "\t#[allow(unused)]\n\tpub(crate) fn {} {{\n\t\tmatch {} {{", $fn_sig, if $to_c { "native" } else { "self" }).unwrap();
+			writeln!(w, "\t#[allow(unused)]\n\tpub(crate) fn {} {{", $fn_sig).unwrap();
+			if $to_c && $ref {
+				writeln!(w, "\t\tlet native = unsafe {{ &*(native as *const _ as *const c_void as *const native{}) }};", e.ident).unwrap();
+			}
+			writeln!(w, "\t\tmatch {} {{", if $to_c { "native" } else { "self" }).unwrap();
 			for var in e.variants.iter() {
 				write!(w, "\t\t\t{}{}::{} ", if $to_c { "native" } else { "" }, e.ident, var.ident).unwrap();
 				let mut empty_tuple_variant = false;
@@ -1933,7 +1937,10 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	}
 	write_conv!(format!("into_native(self) -> native{}", e.ident), false, false);
 	if is_clonable {
-		write_conv!(format!("from_native(native: &native{}) -> Self", e.ident), true, true);
+		let mut args = Vec::new();
+		maybe_write_non_lifetime_generics(&mut args, &e.generics, &syn::PathArguments::None, &types);
+		let fn_line = format!("from_native(native: &{}Import{}) -> Self", e.ident, String::from_utf8(args).unwrap());
+		write_conv!(fn_line, true, true);
 	}
 	write_conv!(format!("native_into(native: native{}) -> Self", e.ident), true, false);
 	writeln!(w, "}}").unwrap();

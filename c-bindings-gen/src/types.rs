@@ -223,6 +223,15 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 							if let Some(path) = types.maybe_resolve_path(&trait_bound.path, None) {
 								if types.skip_path(&path) { continue; }
 								if path == "Sized" { continue; }
+								if path == "core::fmt::Debug" {
+									// #[derive(Debug)] will add Debug bounds on each genericin the
+									// auto-generated impl. In cases where the existing generic
+									// bound already requires Debug this is redundant and should be
+									// ignored (which we do here). However, in cases where this is
+									// not redundant, this may cause spurious Debug impls which may
+									// fail to compile.
+									continue;
+								}
 								if non_lifetimes_processed { return false; }
 								non_lifetimes_processed = true;
 								if path != "std::ops::Deref" && path != "core::ops::Deref" &&

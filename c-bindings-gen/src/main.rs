@@ -1300,8 +1300,8 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 						write!(w, "#[must_use]\n#[no_mangle]\npub extern \"C\" fn {}_default() -> {} {{\n", ident, ident).unwrap();
 						write!(w, "\t{} {{ inner: ObjOps::heap_alloc(Default::default()), is_owned: true }}\n", ident).unwrap();
 						write!(w, "}}\n").unwrap();
-					} else if path_matches_nongeneric(&trait_path.1, &["core", "cmp", "PartialEq"]) {
-					} else if path_matches_nongeneric(&trait_path.1, &["core", "cmp", "Eq"]) {
+					} else if full_trait_path_opt.as_ref().map(|s| s.as_str()) == Some("core::cmp::PartialEq") {
+					} else if full_trait_path_opt.as_ref().map(|s| s.as_str()) == Some("core::cmp::Eq") {
 						writeln!(w, "/// Checks if two {}s contain equal inner contents.", ident).unwrap();
 						writeln!(w, "/// This ignores pointers and is_owned flags and looks at the values in fields.").unwrap();
 						if types.c_type_has_inner_from_path(&resolved_path) {
@@ -1327,7 +1327,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
 
 						writeln!(w, " {{ true }} else {{ false }}\n}}").unwrap();
-					} else if path_matches_nongeneric(&trait_path.1, &["core", "hash", "Hash"]) {
+					} else if full_trait_path_opt.as_ref().map(|s| s.as_str()) == Some("core::hash::Hash") {
 						writeln!(w, "/// Generates a non-cryptographic 64-bit hash of the {}.", ident).unwrap();
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_hash(o: &{}) -> u64 {{\n", ident, ident).unwrap();
 						if types.c_type_has_inner_from_path(&resolved_path) {
@@ -1347,8 +1347,8 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
 						writeln!(w, ", &mut hasher);").unwrap();
 						writeln!(w, "\tcore::hash::Hasher::finish(&hasher)\n}}").unwrap();
-					} else if (path_matches_nongeneric(&trait_path.1, &["core", "clone", "Clone"]) || path_matches_nongeneric(&trait_path.1, &["Clone"])) &&
-							types.c_type_has_inner_from_path(&resolved_path) {
+					} else if (full_trait_path_opt.as_ref().map(|s| s.as_str()) == Some("core::clone::Clone") || path_matches_nongeneric(&trait_path.1, &["Clone"])) &&
+					types.c_type_has_inner_from_path(&resolved_path) {
 						writeln!(w, "impl Clone for {} {{", ident).unwrap();
 						writeln!(w, "\tfn clone(&self) -> Self {{").unwrap();
 						writeln!(w, "\t\tSelf {{").unwrap();
@@ -1401,7 +1401,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 
 							writeln!(w, "\t}}.into()\n}}").unwrap();
 						}
-					} else if path_matches_nongeneric(&trait_path.1, &["core", "fmt", "Debug"]) {
+					} else if full_trait_path_opt.as_ref().map(|s| s.as_str()) == Some("core::fmt::Debug") {
 						writeln!(w, "/// Get a string which allows debug introspection of a {} object", ident).unwrap();
 						writeln!(w, "pub extern \"C\" fn {}_debug_str_void(o: *const c_void) -> Str {{", ident).unwrap();
 

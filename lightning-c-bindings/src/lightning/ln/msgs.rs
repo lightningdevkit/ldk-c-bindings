@@ -97,7 +97,8 @@ impl DecodeError {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeDecodeError) -> Self {
+	pub(crate) fn from_native(native: &DecodeErrorImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeDecodeError) };
 		match native {
 			nativeDecodeError::UnknownVersion => DecodeError::UnknownVersion,
 			nativeDecodeError::UnknownRequiredFeature => DecodeError::UnknownRequiredFeature,
@@ -177,6 +178,18 @@ pub extern "C" fn DecodeError_io(a: crate::c_types::IOError) -> DecodeError {
 /// Utility method to constructs a new UnsupportedCompression-variant DecodeError
 pub extern "C" fn DecodeError_unsupported_compression() -> DecodeError {
 	DecodeError::UnsupportedCompression}
+/// Get a string which allows debug introspection of a DecodeError object
+pub extern "C" fn DecodeError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::DecodeError }).into()}
+/// Generates a non-cryptographic 64-bit hash of the DecodeError.
+#[no_mangle]
+pub extern "C" fn DecodeError_hash(o: &DecodeError) -> u64 {
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(&o.to_native(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two DecodeErrors contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -255,7 +268,7 @@ pub extern "C" fn Init_set_features(this_ptr: &mut Init, mut val: crate::lightni
 #[no_mangle]
 pub extern "C" fn Init_get_networks(this_ptr: &Init) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
 	let mut inner_val = this_ptr.get_native_mut_ref().networks.clone();
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_inner_val_0 = Vec::new(); for mut item in inner_val.unwrap().drain(..) { local_inner_val_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_inner_val_0.into() }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_inner_val_0 = Vec::new(); for mut item in inner_val.unwrap().drain(..) { local_inner_val_0.push( { crate::c_types::ThirtyTwoBytes { data: *item.as_ref() } }); }; local_inner_val_0.into() }) };
 	local_inner_val
 }
 /// Indicates chains the sender is interested in.
@@ -263,7 +276,7 @@ pub extern "C" fn Init_get_networks(this_ptr: &Init) -> crate::c_types::derived:
 /// If there are no common chains, the connection will be closed.
 #[no_mangle]
 pub extern "C" fn Init_set_networks(this_ptr: &mut Init, mut val: crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ) {
-	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { let mut local_val_0 = Vec::new(); for mut item in { val_opt.take() }.into_rust().drain(..) { local_val_0.push( { ::bitcoin::blockdata::constants::ChainHash::from(&item.data[..]) }); }; local_val_0 }})} };
+	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { let mut local_val_0 = Vec::new(); for mut item in { val_opt.take() }.into_rust().drain(..) { local_val_0.push( { ::bitcoin::blockdata::constants::ChainHash::from(&item.data) }); }; local_val_0 }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.networks = local_val;
 }
 /// The receipient's network address.
@@ -293,7 +306,7 @@ pub extern "C" fn Init_set_remote_network_address(this_ptr: &mut Init, mut val: 
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Init_new(mut features_arg: crate::lightning::ln::features::InitFeatures, mut networks_arg: crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ, mut remote_network_address_arg: crate::c_types::derived::COption_SocketAddressZ) -> Init {
-	let mut local_networks_arg = { /*networks_arg*/ let networks_arg_opt = networks_arg; if networks_arg_opt.is_none() { None } else { Some({ { let mut local_networks_arg_0 = Vec::new(); for mut item in { networks_arg_opt.take() }.into_rust().drain(..) { local_networks_arg_0.push( { ::bitcoin::blockdata::constants::ChainHash::from(&item.data[..]) }); }; local_networks_arg_0 }})} };
+	let mut local_networks_arg = { /*networks_arg*/ let networks_arg_opt = networks_arg; if networks_arg_opt.is_none() { None } else { Some({ { let mut local_networks_arg_0 = Vec::new(); for mut item in { networks_arg_opt.take() }.into_rust().drain(..) { local_networks_arg_0.push( { ::bitcoin::blockdata::constants::ChainHash::from(&item.data) }); }; local_networks_arg_0 }})} };
 	let mut local_remote_network_address_arg = { /*remote_network_address_arg*/ let remote_network_address_arg_opt = remote_network_address_arg; if remote_network_address_arg_opt.is_none() { None } else { Some({ { { remote_network_address_arg_opt.take() }.into_native() }})} };
 	Init { inner: ObjOps::heap_alloc(nativeInit {
 		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
@@ -319,6 +332,19 @@ pub(crate) extern "C" fn Init_clone_void(this_ptr: *const c_void) -> *mut c_void
 /// Creates a copy of the Init
 pub extern "C" fn Init_clone(orig: &Init) -> Init {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a Init object
+pub extern "C" fn Init_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::Init }).into()}
+/// Generates a non-cryptographic 64-bit hash of the Init.
+#[no_mangle]
+pub extern "C" fn Init_hash(o: &Init) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two Inits contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -446,6 +472,19 @@ pub(crate) extern "C" fn ErrorMessage_clone_void(this_ptr: *const c_void) -> *mu
 pub extern "C" fn ErrorMessage_clone(orig: &ErrorMessage) -> ErrorMessage {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ErrorMessage object
+pub extern "C" fn ErrorMessage_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::ErrorMessage }).into()}
+/// Generates a non-cryptographic 64-bit hash of the ErrorMessage.
+#[no_mangle]
+pub extern "C" fn ErrorMessage_hash(o: &ErrorMessage) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two ErrorMessages contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -570,6 +609,19 @@ pub(crate) extern "C" fn WarningMessage_clone_void(this_ptr: *const c_void) -> *
 pub extern "C" fn WarningMessage_clone(orig: &WarningMessage) -> WarningMessage {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a WarningMessage object
+pub extern "C" fn WarningMessage_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::WarningMessage }).into()}
+/// Generates a non-cryptographic 64-bit hash of the WarningMessage.
+#[no_mangle]
+pub extern "C" fn WarningMessage_hash(o: &WarningMessage) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two WarningMessages contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -686,6 +738,19 @@ pub(crate) extern "C" fn Ping_clone_void(this_ptr: *const c_void) -> *mut c_void
 pub extern "C" fn Ping_clone(orig: &Ping) -> Ping {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Ping object
+pub extern "C" fn Ping_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::Ping }).into()}
+/// Generates a non-cryptographic 64-bit hash of the Ping.
+#[no_mangle]
+pub extern "C" fn Ping_hash(o: &Ping) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two Pings contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -790,6 +855,19 @@ pub(crate) extern "C" fn Pong_clone_void(this_ptr: *const c_void) -> *mut c_void
 pub extern "C" fn Pong_clone(orig: &Pong) -> Pong {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Pong object
+pub extern "C" fn Pong_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::Pong }).into()}
+/// Generates a non-cryptographic 64-bit hash of the Pong.
+#[no_mangle]
+pub extern "C" fn Pong_hash(o: &Pong) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two Pongs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -858,12 +936,12 @@ impl OpenChannel {
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_chain_hash(this_ptr: &OpenChannel) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_bytes()
+	inner_val.as_ref()
 }
 /// The genesis hash of the blockchain where the channel is to be opened
 #[no_mangle]
 pub extern "C" fn OpenChannel_set_chain_hash(this_ptr: &mut OpenChannel, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data);
 }
 /// A temporary channel ID, until the funding outpoint is announced
 #[no_mangle]
@@ -1060,13 +1138,13 @@ pub extern "C" fn OpenChannel_set_channel_flags(this_ptr: &mut OpenChannel, mut 
 #[no_mangle]
 pub extern "C" fn OpenChannel_get_shutdown_scriptpubkey(this_ptr: &OpenChannel) -> crate::c_types::derived::COption_CVec_u8ZZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().shutdown_scriptpubkey;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().to_bytes().into() }) };
 	local_inner_val
 }
 /// A request to pre-set the to-sender output's `scriptPubkey` for when we collaboratively close
 #[no_mangle]
 pub extern "C" fn OpenChannel_set_shutdown_scriptpubkey(this_ptr: &mut OpenChannel, mut val: crate::c_types::derived::COption_CVec_u8ZZ) {
-	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ val_opt.take() }.into_rust()) }})} };
+	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::ScriptBuf::from({ val_opt.take() }.into_rust()) }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.shutdown_scriptpubkey = local_val;
 }
 /// The channel type that this channel will represent
@@ -1098,10 +1176,10 @@ pub extern "C" fn OpenChannel_set_channel_type(this_ptr: &mut OpenChannel, mut v
 #[must_use]
 #[no_mangle]
 pub extern "C" fn OpenChannel_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_satoshis_arg: u64, mut push_msat_arg: u64, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut channel_reserve_satoshis_arg: u64, mut htlc_minimum_msat_arg: u64, mut feerate_per_kw_arg: u32, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_point_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut channel_flags_arg: u8, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_CVec_u8ZZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures) -> OpenChannel {
-	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
+	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::ScriptBuf::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
 	let mut local_channel_type_arg = if channel_type_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(channel_type_arg.take_inner()) } }) };
 	OpenChannel { inner: ObjOps::heap_alloc(nativeOpenChannel {
-		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data),
 		temporary_channel_id: ::lightning::ln::ChannelId(temporary_channel_id_arg.data),
 		funding_satoshis: funding_satoshis_arg,
 		push_msat: push_msat_arg,
@@ -1141,6 +1219,19 @@ pub(crate) extern "C" fn OpenChannel_clone_void(this_ptr: *const c_void) -> *mut
 /// Creates a copy of the OpenChannel
 pub extern "C" fn OpenChannel_clone(orig: &OpenChannel) -> OpenChannel {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a OpenChannel object
+pub extern "C" fn OpenChannel_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::OpenChannel }).into()}
+/// Generates a non-cryptographic 64-bit hash of the OpenChannel.
+#[no_mangle]
+pub extern "C" fn OpenChannel_hash(o: &OpenChannel) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two OpenChannels contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -1209,12 +1300,12 @@ impl OpenChannelV2 {
 #[no_mangle]
 pub extern "C" fn OpenChannelV2_get_chain_hash(this_ptr: &OpenChannelV2) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_bytes()
+	inner_val.as_ref()
 }
 /// The genesis hash of the blockchain where the channel is to be opened
 #[no_mangle]
 pub extern "C" fn OpenChannelV2_set_chain_hash(this_ptr: &mut OpenChannelV2, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data);
 }
 /// A temporary channel ID derived using a zeroed out value for the channel acceptor's revocation basepoint
 #[no_mangle]
@@ -1425,14 +1516,14 @@ pub extern "C" fn OpenChannelV2_set_channel_flags(this_ptr: &mut OpenChannelV2, 
 #[no_mangle]
 pub extern "C" fn OpenChannelV2_get_shutdown_scriptpubkey(this_ptr: &OpenChannelV2) -> crate::c_types::derived::COption_CVec_u8ZZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().shutdown_scriptpubkey;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().to_bytes().into() }) };
 	local_inner_val
 }
 /// Optionally, a request to pre-set the to-channel-initiator output's scriptPubkey for when we
 /// collaboratively close
 #[no_mangle]
 pub extern "C" fn OpenChannelV2_set_shutdown_scriptpubkey(this_ptr: &mut OpenChannelV2, mut val: crate::c_types::derived::COption_CVec_u8ZZ) {
-	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ val_opt.take() }.into_rust()) }})} };
+	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::ScriptBuf::from({ val_opt.take() }.into_rust()) }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.shutdown_scriptpubkey = local_val;
 }
 /// The channel type that this channel will represent. If none is set, we derive the channel
@@ -1475,11 +1566,11 @@ pub extern "C" fn OpenChannelV2_set_require_confirmed_inputs(this_ptr: &mut Open
 #[must_use]
 #[no_mangle]
 pub extern "C" fn OpenChannelV2_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_feerate_sat_per_1000_weight_arg: u32, mut commitment_feerate_sat_per_1000_weight_arg: u32, mut funding_satoshis_arg: u64, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut htlc_minimum_msat_arg: u64, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut locktime_arg: u32, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_basepoint_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut second_per_commitment_point_arg: crate::c_types::PublicKey, mut channel_flags_arg: u8, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_CVec_u8ZZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures, mut require_confirmed_inputs_arg: crate::c_types::derived::COption_NoneZ) -> OpenChannelV2 {
-	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
+	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::ScriptBuf::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
 	let mut local_channel_type_arg = if channel_type_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(channel_type_arg.take_inner()) } }) };
 	let mut local_require_confirmed_inputs_arg = if require_confirmed_inputs_arg.is_some() { Some( { () /*require_confirmed_inputs_arg.take()*/ }) } else { None };
 	OpenChannelV2 { inner: ObjOps::heap_alloc(nativeOpenChannelV2 {
-		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data),
 		temporary_channel_id: ::lightning::ln::ChannelId(temporary_channel_id_arg.data),
 		funding_feerate_sat_per_1000_weight: funding_feerate_sat_per_1000_weight_arg,
 		commitment_feerate_sat_per_1000_weight: commitment_feerate_sat_per_1000_weight_arg,
@@ -1521,6 +1612,19 @@ pub(crate) extern "C" fn OpenChannelV2_clone_void(this_ptr: *const c_void) -> *m
 /// Creates a copy of the OpenChannelV2
 pub extern "C" fn OpenChannelV2_clone(orig: &OpenChannelV2) -> OpenChannelV2 {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a OpenChannelV2 object
+pub extern "C" fn OpenChannelV2_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::OpenChannelV2 }).into()}
+/// Generates a non-cryptographic 64-bit hash of the OpenChannelV2.
+#[no_mangle]
+pub extern "C" fn OpenChannelV2_hash(o: &OpenChannelV2) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two OpenChannelV2s contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -1744,13 +1848,13 @@ pub extern "C" fn AcceptChannel_set_first_per_commitment_point(this_ptr: &mut Ac
 #[no_mangle]
 pub extern "C" fn AcceptChannel_get_shutdown_scriptpubkey(this_ptr: &AcceptChannel) -> crate::c_types::derived::COption_CVec_u8ZZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().shutdown_scriptpubkey;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().to_bytes().into() }) };
 	local_inner_val
 }
 /// A request to pre-set the to-sender output's scriptPubkey for when we collaboratively close
 #[no_mangle]
 pub extern "C" fn AcceptChannel_set_shutdown_scriptpubkey(this_ptr: &mut AcceptChannel, mut val: crate::c_types::derived::COption_CVec_u8ZZ) {
-	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ val_opt.take() }.into_rust()) }})} };
+	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::ScriptBuf::from({ val_opt.take() }.into_rust()) }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.shutdown_scriptpubkey = local_val;
 }
 /// The channel type that this channel will represent.
@@ -1784,7 +1888,7 @@ pub extern "C" fn AcceptChannel_set_channel_type(this_ptr: &mut AcceptChannel, m
 #[must_use]
 #[no_mangle]
 pub extern "C" fn AcceptChannel_new(mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut channel_reserve_satoshis_arg: u64, mut htlc_minimum_msat_arg: u64, mut minimum_depth_arg: u32, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_point_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_CVec_u8ZZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures) -> AcceptChannel {
-	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
+	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::ScriptBuf::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
 	let mut local_channel_type_arg = if channel_type_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(channel_type_arg.take_inner()) } }) };
 	AcceptChannel { inner: ObjOps::heap_alloc(nativeAcceptChannel {
 		temporary_channel_id: ::lightning::ln::ChannelId(temporary_channel_id_arg.data),
@@ -1823,6 +1927,19 @@ pub(crate) extern "C" fn AcceptChannel_clone_void(this_ptr: *const c_void) -> *m
 /// Creates a copy of the AcceptChannel
 pub extern "C" fn AcceptChannel_clone(orig: &AcceptChannel) -> AcceptChannel {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a AcceptChannel object
+pub extern "C" fn AcceptChannel_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::AcceptChannel }).into()}
+/// Generates a non-cryptographic 64-bit hash of the AcceptChannel.
+#[no_mangle]
+pub extern "C" fn AcceptChannel_hash(o: &AcceptChannel) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two AcceptChannels contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -2063,14 +2180,14 @@ pub extern "C" fn AcceptChannelV2_set_second_per_commitment_point(this_ptr: &mut
 #[no_mangle]
 pub extern "C" fn AcceptChannelV2_get_shutdown_scriptpubkey(this_ptr: &AcceptChannelV2) -> crate::c_types::derived::COption_CVec_u8ZZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().shutdown_scriptpubkey;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().into_bytes().into() }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_CVec_u8ZZ::None } else { crate::c_types::derived::COption_CVec_u8ZZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { (*inner_val.as_ref().unwrap()).clone().to_bytes().into() }) };
 	local_inner_val
 }
 /// Optionally, a request to pre-set the to-channel-acceptor output's scriptPubkey for when we
 /// collaboratively close
 #[no_mangle]
 pub extern "C" fn AcceptChannelV2_set_shutdown_scriptpubkey(this_ptr: &mut AcceptChannelV2, mut val: crate::c_types::derived::COption_CVec_u8ZZ) {
-	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ val_opt.take() }.into_rust()) }})} };
+	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::ScriptBuf::from({ val_opt.take() }.into_rust()) }})} };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.shutdown_scriptpubkey = local_val;
 }
 /// The channel type that this channel will represent. If none is set, we derive the channel
@@ -2117,7 +2234,7 @@ pub extern "C" fn AcceptChannelV2_set_require_confirmed_inputs(this_ptr: &mut Ac
 #[must_use]
 #[no_mangle]
 pub extern "C" fn AcceptChannelV2_new(mut temporary_channel_id_arg: crate::c_types::ThirtyTwoBytes, mut funding_satoshis_arg: u64, mut dust_limit_satoshis_arg: u64, mut max_htlc_value_in_flight_msat_arg: u64, mut htlc_minimum_msat_arg: u64, mut minimum_depth_arg: u32, mut to_self_delay_arg: u16, mut max_accepted_htlcs_arg: u16, mut funding_pubkey_arg: crate::c_types::PublicKey, mut revocation_basepoint_arg: crate::c_types::PublicKey, mut payment_basepoint_arg: crate::c_types::PublicKey, mut delayed_payment_basepoint_arg: crate::c_types::PublicKey, mut htlc_basepoint_arg: crate::c_types::PublicKey, mut first_per_commitment_point_arg: crate::c_types::PublicKey, mut second_per_commitment_point_arg: crate::c_types::PublicKey, mut shutdown_scriptpubkey_arg: crate::c_types::derived::COption_CVec_u8ZZ, mut channel_type_arg: crate::lightning::ln::features::ChannelTypeFeatures, mut require_confirmed_inputs_arg: crate::c_types::derived::COption_NoneZ) -> AcceptChannelV2 {
-	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::Script::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
+	let mut local_shutdown_scriptpubkey_arg = { /*shutdown_scriptpubkey_arg*/ let shutdown_scriptpubkey_arg_opt = shutdown_scriptpubkey_arg; if shutdown_scriptpubkey_arg_opt.is_none() { None } else { Some({ { ::bitcoin::blockdata::script::ScriptBuf::from({ shutdown_scriptpubkey_arg_opt.take() }.into_rust()) }})} };
 	let mut local_channel_type_arg = if channel_type_arg.inner.is_null() { None } else { Some( { *unsafe { Box::from_raw(channel_type_arg.take_inner()) } }) };
 	let mut local_require_confirmed_inputs_arg = if require_confirmed_inputs_arg.is_some() { Some( { () /*require_confirmed_inputs_arg.take()*/ }) } else { None };
 	AcceptChannelV2 { inner: ObjOps::heap_alloc(nativeAcceptChannelV2 {
@@ -2159,6 +2276,19 @@ pub(crate) extern "C" fn AcceptChannelV2_clone_void(this_ptr: *const c_void) -> 
 /// Creates a copy of the AcceptChannelV2
 pub extern "C" fn AcceptChannelV2_clone(orig: &AcceptChannelV2) -> AcceptChannelV2 {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a AcceptChannelV2 object
+pub extern "C" fn AcceptChannelV2_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::AcceptChannelV2 }).into()}
+/// Generates a non-cryptographic 64-bit hash of the AcceptChannelV2.
+#[no_mangle]
+pub extern "C" fn AcceptChannelV2_hash(o: &AcceptChannelV2) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two AcceptChannelV2s contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -2239,7 +2369,7 @@ pub extern "C" fn FundingCreated_set_temporary_channel_id(this_ptr: &mut Funding
 #[no_mangle]
 pub extern "C" fn FundingCreated_get_funding_txid(this_ptr: &FundingCreated) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().funding_txid;
-	inner_val.as_inner()
+	inner_val.as_ref()
 }
 /// The funding transaction ID
 #[no_mangle]
@@ -2297,6 +2427,19 @@ pub(crate) extern "C" fn FundingCreated_clone_void(this_ptr: *const c_void) -> *
 /// Creates a copy of the FundingCreated
 pub extern "C" fn FundingCreated_clone(orig: &FundingCreated) -> FundingCreated {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a FundingCreated object
+pub extern "C" fn FundingCreated_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::FundingCreated }).into()}
+/// Generates a non-cryptographic 64-bit hash of the FundingCreated.
+#[no_mangle]
+pub extern "C" fn FundingCreated_hash(o: &FundingCreated) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two FundingCreateds contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -2411,6 +2554,19 @@ pub(crate) extern "C" fn FundingSigned_clone_void(this_ptr: *const c_void) -> *m
 /// Creates a copy of the FundingSigned
 pub extern "C" fn FundingSigned_clone(orig: &FundingSigned) -> FundingSigned {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a FundingSigned object
+pub extern "C" fn FundingSigned_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::FundingSigned }).into()}
+/// Generates a non-cryptographic 64-bit hash of the FundingSigned.
+#[no_mangle]
+pub extern "C" fn FundingSigned_hash(o: &FundingSigned) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two FundingSigneds contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -2545,11 +2701,542 @@ pub(crate) extern "C" fn ChannelReady_clone_void(this_ptr: *const c_void) -> *mu
 pub extern "C" fn ChannelReady_clone(orig: &ChannelReady) -> ChannelReady {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ChannelReady object
+pub extern "C" fn ChannelReady_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::ChannelReady }).into()}
+/// Generates a non-cryptographic 64-bit hash of the ChannelReady.
+#[no_mangle]
+pub extern "C" fn ChannelReady_hash(o: &ChannelReady) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two ChannelReadys contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
 #[no_mangle]
 pub extern "C" fn ChannelReady_eq(a: &ChannelReady, b: &ChannelReady) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+
+use lightning::ln::msgs::Stfu as nativeStfuImport;
+pub(crate) type nativeStfu = nativeStfuImport;
+
+/// An stfu (quiescence) message to be sent by or received from the stfu initiator.
+#[must_use]
+#[repr(C)]
+pub struct Stfu {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeStfu,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for Stfu {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeStfu>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the Stfu, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn Stfu_free(this_obj: Stfu) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Stfu_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeStfu) };
+}
+#[allow(unused)]
+impl Stfu {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeStfu {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeStfu {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeStfu {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// The channel ID where quiescence is intended
+#[no_mangle]
+pub extern "C" fn Stfu_get_channel_id(this_ptr: &Stfu) -> *const [u8; 32] {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
+	&inner_val.0
+}
+/// The channel ID where quiescence is intended
+#[no_mangle]
+pub extern "C" fn Stfu_set_channel_id(this_ptr: &mut Stfu, mut val: crate::c_types::ThirtyTwoBytes) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
+}
+/// Initiator flag, 1 if initiating, 0 if replying to an stfu.
+#[no_mangle]
+pub extern "C" fn Stfu_get_initiator(this_ptr: &Stfu) -> u8 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().initiator;
+	*inner_val
+}
+/// Initiator flag, 1 if initiating, 0 if replying to an stfu.
+#[no_mangle]
+pub extern "C" fn Stfu_set_initiator(this_ptr: &mut Stfu, mut val: u8) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.initiator = val;
+}
+/// Constructs a new Stfu given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Stfu_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut initiator_arg: u8) -> Stfu {
+	Stfu { inner: ObjOps::heap_alloc(nativeStfu {
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
+		initiator: initiator_arg,
+	}), is_owned: true }
+}
+impl Clone for Stfu {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeStfu>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Stfu_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeStfu)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the Stfu
+pub extern "C" fn Stfu_clone(orig: &Stfu) -> Stfu {
+	orig.clone()
+}
+/// Get a string which allows debug introspection of a Stfu object
+pub extern "C" fn Stfu_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::Stfu }).into()}
+/// Checks if two Stfus contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Stfu_eq(a: &Stfu, b: &Stfu) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+
+use lightning::ln::msgs::Splice as nativeSpliceImport;
+pub(crate) type nativeSplice = nativeSpliceImport;
+
+/// A splice message to be sent by or received from the stfu initiator (splice initiator).
+#[must_use]
+#[repr(C)]
+pub struct Splice {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeSplice,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for Splice {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeSplice>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the Splice, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn Splice_free(this_obj: Splice) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Splice_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeSplice) };
+}
+#[allow(unused)]
+impl Splice {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeSplice {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeSplice {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeSplice {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// The channel ID where splicing is intended
+#[no_mangle]
+pub extern "C" fn Splice_get_channel_id(this_ptr: &Splice) -> *const [u8; 32] {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
+	&inner_val.0
+}
+/// The channel ID where splicing is intended
+#[no_mangle]
+pub extern "C" fn Splice_set_channel_id(this_ptr: &mut Splice, mut val: crate::c_types::ThirtyTwoBytes) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
+}
+/// The genesis hash of the blockchain where the channel is intended to be spliced
+#[no_mangle]
+pub extern "C" fn Splice_get_chain_hash(this_ptr: &Splice) -> *const [u8; 32] {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
+	inner_val.as_ref()
+}
+/// The genesis hash of the blockchain where the channel is intended to be spliced
+#[no_mangle]
+pub extern "C" fn Splice_set_chain_hash(this_ptr: &mut Splice, mut val: crate::c_types::ThirtyTwoBytes) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data);
+}
+/// The intended change in channel capacity: the amount to be added (positive value)
+/// or removed (negative value) by the sender (splice initiator) by splicing into/from the channel.
+#[no_mangle]
+pub extern "C" fn Splice_get_relative_satoshis(this_ptr: &Splice) -> i64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().relative_satoshis;
+	*inner_val
+}
+/// The intended change in channel capacity: the amount to be added (positive value)
+/// or removed (negative value) by the sender (splice initiator) by splicing into/from the channel.
+#[no_mangle]
+pub extern "C" fn Splice_set_relative_satoshis(this_ptr: &mut Splice, mut val: i64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.relative_satoshis = val;
+}
+/// The feerate for the new funding transaction, set by the splice initiator
+#[no_mangle]
+pub extern "C" fn Splice_get_funding_feerate_perkw(this_ptr: &Splice) -> u32 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().funding_feerate_perkw;
+	*inner_val
+}
+/// The feerate for the new funding transaction, set by the splice initiator
+#[no_mangle]
+pub extern "C" fn Splice_set_funding_feerate_perkw(this_ptr: &mut Splice, mut val: u32) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.funding_feerate_perkw = val;
+}
+/// The locktime for the new funding transaction
+#[no_mangle]
+pub extern "C" fn Splice_get_locktime(this_ptr: &Splice) -> u32 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().locktime;
+	*inner_val
+}
+/// The locktime for the new funding transaction
+#[no_mangle]
+pub extern "C" fn Splice_set_locktime(this_ptr: &mut Splice, mut val: u32) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.locktime = val;
+}
+/// The key of the sender (splice initiator) controlling the new funding transaction
+#[no_mangle]
+pub extern "C" fn Splice_get_funding_pubkey(this_ptr: &Splice) -> crate::c_types::PublicKey {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().funding_pubkey;
+	crate::c_types::PublicKey::from_rust(&inner_val)
+}
+/// The key of the sender (splice initiator) controlling the new funding transaction
+#[no_mangle]
+pub extern "C" fn Splice_set_funding_pubkey(this_ptr: &mut Splice, mut val: crate::c_types::PublicKey) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.funding_pubkey = val.into_rust();
+}
+/// Constructs a new Splice given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Splice_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut relative_satoshis_arg: i64, mut funding_feerate_perkw_arg: u32, mut locktime_arg: u32, mut funding_pubkey_arg: crate::c_types::PublicKey) -> Splice {
+	Splice { inner: ObjOps::heap_alloc(nativeSplice {
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data),
+		relative_satoshis: relative_satoshis_arg,
+		funding_feerate_perkw: funding_feerate_perkw_arg,
+		locktime: locktime_arg,
+		funding_pubkey: funding_pubkey_arg.into_rust(),
+	}), is_owned: true }
+}
+impl Clone for Splice {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeSplice>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn Splice_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeSplice)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the Splice
+pub extern "C" fn Splice_clone(orig: &Splice) -> Splice {
+	orig.clone()
+}
+/// Get a string which allows debug introspection of a Splice object
+pub extern "C" fn Splice_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::Splice }).into()}
+/// Checks if two Splices contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn Splice_eq(a: &Splice, b: &Splice) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+
+use lightning::ln::msgs::SpliceAck as nativeSpliceAckImport;
+pub(crate) type nativeSpliceAck = nativeSpliceAckImport;
+
+/// A splice_ack message to be received by or sent to the splice initiator.
+///
+#[must_use]
+#[repr(C)]
+pub struct SpliceAck {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeSpliceAck,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for SpliceAck {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeSpliceAck>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the SpliceAck, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn SpliceAck_free(this_obj: SpliceAck) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SpliceAck_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeSpliceAck) };
+}
+#[allow(unused)]
+impl SpliceAck {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeSpliceAck {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeSpliceAck {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeSpliceAck {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// The channel ID where splicing is intended
+#[no_mangle]
+pub extern "C" fn SpliceAck_get_channel_id(this_ptr: &SpliceAck) -> *const [u8; 32] {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
+	&inner_val.0
+}
+/// The channel ID where splicing is intended
+#[no_mangle]
+pub extern "C" fn SpliceAck_set_channel_id(this_ptr: &mut SpliceAck, mut val: crate::c_types::ThirtyTwoBytes) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
+}
+/// The genesis hash of the blockchain where the channel is intended to be spliced
+#[no_mangle]
+pub extern "C" fn SpliceAck_get_chain_hash(this_ptr: &SpliceAck) -> *const [u8; 32] {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
+	inner_val.as_ref()
+}
+/// The genesis hash of the blockchain where the channel is intended to be spliced
+#[no_mangle]
+pub extern "C" fn SpliceAck_set_chain_hash(this_ptr: &mut SpliceAck, mut val: crate::c_types::ThirtyTwoBytes) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data);
+}
+/// The intended change in channel capacity: the amount to be added (positive value)
+/// or removed (negative value) by the sender (splice acceptor) by splicing into/from the channel.
+#[no_mangle]
+pub extern "C" fn SpliceAck_get_relative_satoshis(this_ptr: &SpliceAck) -> i64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().relative_satoshis;
+	*inner_val
+}
+/// The intended change in channel capacity: the amount to be added (positive value)
+/// or removed (negative value) by the sender (splice acceptor) by splicing into/from the channel.
+#[no_mangle]
+pub extern "C" fn SpliceAck_set_relative_satoshis(this_ptr: &mut SpliceAck, mut val: i64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.relative_satoshis = val;
+}
+/// The key of the sender (splice acceptor) controlling the new funding transaction
+#[no_mangle]
+pub extern "C" fn SpliceAck_get_funding_pubkey(this_ptr: &SpliceAck) -> crate::c_types::PublicKey {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().funding_pubkey;
+	crate::c_types::PublicKey::from_rust(&inner_val)
+}
+/// The key of the sender (splice acceptor) controlling the new funding transaction
+#[no_mangle]
+pub extern "C" fn SpliceAck_set_funding_pubkey(this_ptr: &mut SpliceAck, mut val: crate::c_types::PublicKey) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.funding_pubkey = val.into_rust();
+}
+/// Constructs a new SpliceAck given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn SpliceAck_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut relative_satoshis_arg: i64, mut funding_pubkey_arg: crate::c_types::PublicKey) -> SpliceAck {
+	SpliceAck { inner: ObjOps::heap_alloc(nativeSpliceAck {
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data),
+		relative_satoshis: relative_satoshis_arg,
+		funding_pubkey: funding_pubkey_arg.into_rust(),
+	}), is_owned: true }
+}
+impl Clone for SpliceAck {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeSpliceAck>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SpliceAck_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeSpliceAck)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the SpliceAck
+pub extern "C" fn SpliceAck_clone(orig: &SpliceAck) -> SpliceAck {
+	orig.clone()
+}
+/// Get a string which allows debug introspection of a SpliceAck object
+pub extern "C" fn SpliceAck_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::SpliceAck }).into()}
+/// Checks if two SpliceAcks contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn SpliceAck_eq(a: &SpliceAck, b: &SpliceAck) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+
+use lightning::ln::msgs::SpliceLocked as nativeSpliceLockedImport;
+pub(crate) type nativeSpliceLocked = nativeSpliceLockedImport;
+
+/// A splice_locked message to be sent to or received from a peer.
+///
+#[must_use]
+#[repr(C)]
+pub struct SpliceLocked {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeSpliceLocked,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for SpliceLocked {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeSpliceLocked>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the SpliceLocked, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn SpliceLocked_free(this_obj: SpliceLocked) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SpliceLocked_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeSpliceLocked) };
+}
+#[allow(unused)]
+impl SpliceLocked {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeSpliceLocked {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeSpliceLocked {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeSpliceLocked {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// The channel ID
+#[no_mangle]
+pub extern "C" fn SpliceLocked_get_channel_id(this_ptr: &SpliceLocked) -> *const [u8; 32] {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
+	&inner_val.0
+}
+/// The channel ID
+#[no_mangle]
+pub extern "C" fn SpliceLocked_set_channel_id(this_ptr: &mut SpliceLocked, mut val: crate::c_types::ThirtyTwoBytes) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = ::lightning::ln::ChannelId(val.data);
+}
+/// Constructs a new SpliceLocked given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn SpliceLocked_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes) -> SpliceLocked {
+	SpliceLocked { inner: ObjOps::heap_alloc(nativeSpliceLocked {
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
+	}), is_owned: true }
+}
+impl Clone for SpliceLocked {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeSpliceLocked>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn SpliceLocked_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeSpliceLocked)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the SpliceLocked
+pub extern "C" fn SpliceLocked_clone(orig: &SpliceLocked) -> SpliceLocked {
+	orig.clone()
+}
+/// Get a string which allows debug introspection of a SpliceLocked object
+pub extern "C" fn SpliceLocked_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::SpliceLocked }).into()}
+/// Checks if two SpliceLockeds contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn SpliceLocked_eq(a: &SpliceLocked, b: &SpliceLocked) -> bool {
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
@@ -2696,6 +3383,19 @@ pub(crate) extern "C" fn TxAddInput_clone_void(this_ptr: *const c_void) -> *mut 
 pub extern "C" fn TxAddInput_clone(orig: &TxAddInput) -> TxAddInput {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a TxAddInput object
+pub extern "C" fn TxAddInput_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::TxAddInput }).into()}
+/// Generates a non-cryptographic 64-bit hash of the TxAddInput.
+#[no_mangle]
+pub extern "C" fn TxAddInput_hash(o: &TxAddInput) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two TxAddInputs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -2794,14 +3494,14 @@ pub extern "C" fn TxAddOutput_set_sats(this_ptr: &mut TxAddOutput, mut val: u64)
 }
 /// The scriptPubKey for the output
 #[no_mangle]
-pub extern "C" fn TxAddOutput_get_script(this_ptr: &TxAddOutput) -> crate::c_types::u8slice {
+pub extern "C" fn TxAddOutput_get_script(this_ptr: &TxAddOutput) -> crate::c_types::derived::CVec_u8Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().script;
-	crate::c_types::u8slice::from_slice(&inner_val[..])
+	inner_val.as_bytes().to_vec().into()
 }
 /// The scriptPubKey for the output
 #[no_mangle]
 pub extern "C" fn TxAddOutput_set_script(this_ptr: &mut TxAddOutput, mut val: crate::c_types::derived::CVec_u8Z) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.script = ::bitcoin::blockdata::script::Script::from(val.into_rust());
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.script = ::bitcoin::blockdata::script::ScriptBuf::from(val.into_rust());
 }
 /// Constructs a new TxAddOutput given each field
 #[must_use]
@@ -2811,7 +3511,7 @@ pub extern "C" fn TxAddOutput_new(mut channel_id_arg: crate::c_types::ThirtyTwoB
 		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
 		serial_id: serial_id_arg,
 		sats: sats_arg,
-		script: ::bitcoin::blockdata::script::Script::from(script_arg.into_rust()),
+		script: ::bitcoin::blockdata::script::ScriptBuf::from(script_arg.into_rust()),
 	}), is_owned: true }
 }
 impl Clone for TxAddOutput {
@@ -2832,6 +3532,19 @@ pub(crate) extern "C" fn TxAddOutput_clone_void(this_ptr: *const c_void) -> *mut
 /// Creates a copy of the TxAddOutput
 pub extern "C" fn TxAddOutput_clone(orig: &TxAddOutput) -> TxAddOutput {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a TxAddOutput object
+pub extern "C" fn TxAddOutput_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::TxAddOutput }).into()}
+/// Generates a non-cryptographic 64-bit hash of the TxAddOutput.
+#[no_mangle]
+pub extern "C" fn TxAddOutput_hash(o: &TxAddOutput) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two TxAddOutputs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -2944,6 +3657,19 @@ pub(crate) extern "C" fn TxRemoveInput_clone_void(this_ptr: *const c_void) -> *m
 pub extern "C" fn TxRemoveInput_clone(orig: &TxRemoveInput) -> TxRemoveInput {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a TxRemoveInput object
+pub extern "C" fn TxRemoveInput_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::TxRemoveInput }).into()}
+/// Generates a non-cryptographic 64-bit hash of the TxRemoveInput.
+#[no_mangle]
+pub extern "C" fn TxRemoveInput_hash(o: &TxRemoveInput) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two TxRemoveInputs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -3055,6 +3781,19 @@ pub(crate) extern "C" fn TxRemoveOutput_clone_void(this_ptr: *const c_void) -> *
 pub extern "C" fn TxRemoveOutput_clone(orig: &TxRemoveOutput) -> TxRemoveOutput {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a TxRemoveOutput object
+pub extern "C" fn TxRemoveOutput_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::TxRemoveOutput }).into()}
+/// Generates a non-cryptographic 64-bit hash of the TxRemoveOutput.
+#[no_mangle]
+pub extern "C" fn TxRemoveOutput_hash(o: &TxRemoveOutput) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two TxRemoveOutputs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -3155,6 +3894,19 @@ pub(crate) extern "C" fn TxComplete_clone_void(this_ptr: *const c_void) -> *mut 
 pub extern "C" fn TxComplete_clone(orig: &TxComplete) -> TxComplete {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a TxComplete object
+pub extern "C" fn TxComplete_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::TxComplete }).into()}
+/// Generates a non-cryptographic 64-bit hash of the TxComplete.
+#[no_mangle]
+pub extern "C" fn TxComplete_hash(o: &TxComplete) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two TxCompletes contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -3232,7 +3984,7 @@ pub extern "C" fn TxSignatures_set_channel_id(this_ptr: &mut TxSignatures, mut v
 #[no_mangle]
 pub extern "C" fn TxSignatures_get_tx_hash(this_ptr: &TxSignatures) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().tx_hash;
-	inner_val.as_inner()
+	inner_val.as_ref()
 }
 /// The TXID
 #[no_mangle]
@@ -3283,6 +4035,19 @@ pub(crate) extern "C" fn TxSignatures_clone_void(this_ptr: *const c_void) -> *mu
 /// Creates a copy of the TxSignatures
 pub extern "C" fn TxSignatures_clone(orig: &TxSignatures) -> TxSignatures {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a TxSignatures object
+pub extern "C" fn TxSignatures_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::TxSignatures }).into()}
+/// Generates a non-cryptographic 64-bit hash of the TxSignatures.
+#[no_mangle]
+pub extern "C" fn TxSignatures_hash(o: &TxSignatures) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two TxSignaturess contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -3425,6 +4190,19 @@ pub(crate) extern "C" fn TxInitRbf_clone_void(this_ptr: *const c_void) -> *mut c
 pub extern "C" fn TxInitRbf_clone(orig: &TxInitRbf) -> TxInitRbf {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a TxInitRbf object
+pub extern "C" fn TxInitRbf_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::TxInitRbf }).into()}
+/// Generates a non-cryptographic 64-bit hash of the TxInitRbf.
+#[no_mangle]
+pub extern "C" fn TxInitRbf_hash(o: &TxInitRbf) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two TxInitRbfs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -3542,6 +4320,19 @@ pub(crate) extern "C" fn TxAckRbf_clone_void(this_ptr: *const c_void) -> *mut c_
 pub extern "C" fn TxAckRbf_clone(orig: &TxAckRbf) -> TxAckRbf {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a TxAckRbf object
+pub extern "C" fn TxAckRbf_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::TxAckRbf }).into()}
+/// Generates a non-cryptographic 64-bit hash of the TxAckRbf.
+#[no_mangle]
+pub extern "C" fn TxAckRbf_hash(o: &TxAckRbf) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two TxAckRbfs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -3658,6 +4449,19 @@ pub(crate) extern "C" fn TxAbort_clone_void(this_ptr: *const c_void) -> *mut c_v
 pub extern "C" fn TxAbort_clone(orig: &TxAbort) -> TxAbort {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a TxAbort object
+pub extern "C" fn TxAbort_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::TxAbort }).into()}
+/// Generates a non-cryptographic 64-bit hash of the TxAbort.
+#[no_mangle]
+pub extern "C" fn TxAbort_hash(o: &TxAbort) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two TxAborts contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -3735,16 +4539,16 @@ pub extern "C" fn Shutdown_set_channel_id(this_ptr: &mut Shutdown, mut val: crat
 ///
 /// Must be in one of these forms: P2PKH, P2SH, P2WPKH, P2WSH, P2TR.
 #[no_mangle]
-pub extern "C" fn Shutdown_get_scriptpubkey(this_ptr: &Shutdown) -> crate::c_types::u8slice {
+pub extern "C" fn Shutdown_get_scriptpubkey(this_ptr: &Shutdown) -> crate::c_types::derived::CVec_u8Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().scriptpubkey;
-	crate::c_types::u8slice::from_slice(&inner_val[..])
+	inner_val.as_bytes().to_vec().into()
 }
 /// The destination of this peer's funds on closing.
 ///
 /// Must be in one of these forms: P2PKH, P2SH, P2WPKH, P2WSH, P2TR.
 #[no_mangle]
 pub extern "C" fn Shutdown_set_scriptpubkey(this_ptr: &mut Shutdown, mut val: crate::c_types::derived::CVec_u8Z) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.scriptpubkey = ::bitcoin::blockdata::script::Script::from(val.into_rust());
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.scriptpubkey = ::bitcoin::blockdata::script::ScriptBuf::from(val.into_rust());
 }
 /// Constructs a new Shutdown given each field
 #[must_use]
@@ -3752,7 +4556,7 @@ pub extern "C" fn Shutdown_set_scriptpubkey(this_ptr: &mut Shutdown, mut val: cr
 pub extern "C" fn Shutdown_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut scriptpubkey_arg: crate::c_types::derived::CVec_u8Z) -> Shutdown {
 	Shutdown { inner: ObjOps::heap_alloc(nativeShutdown {
 		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
-		scriptpubkey: ::bitcoin::blockdata::script::Script::from(scriptpubkey_arg.into_rust()),
+		scriptpubkey: ::bitcoin::blockdata::script::ScriptBuf::from(scriptpubkey_arg.into_rust()),
 	}), is_owned: true }
 }
 impl Clone for Shutdown {
@@ -3773,6 +4577,19 @@ pub(crate) extern "C" fn Shutdown_clone_void(this_ptr: *const c_void) -> *mut c_
 /// Creates a copy of the Shutdown
 pub extern "C" fn Shutdown_clone(orig: &Shutdown) -> Shutdown {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a Shutdown object
+pub extern "C" fn Shutdown_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::Shutdown }).into()}
+/// Generates a non-cryptographic 64-bit hash of the Shutdown.
+#[no_mangle]
+pub extern "C" fn Shutdown_hash(o: &Shutdown) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two Shutdowns contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -3890,6 +4707,19 @@ pub(crate) extern "C" fn ClosingSignedFeeRange_clone_void(this_ptr: *const c_voi
 /// Creates a copy of the ClosingSignedFeeRange
 pub extern "C" fn ClosingSignedFeeRange_clone(orig: &ClosingSignedFeeRange) -> ClosingSignedFeeRange {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a ClosingSignedFeeRange object
+pub extern "C" fn ClosingSignedFeeRange_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::ClosingSignedFeeRange }).into()}
+/// Generates a non-cryptographic 64-bit hash of the ClosingSignedFeeRange.
+#[no_mangle]
+pub extern "C" fn ClosingSignedFeeRange_hash(o: &ClosingSignedFeeRange) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two ClosingSignedFeeRanges contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -4038,6 +4868,19 @@ pub(crate) extern "C" fn ClosingSigned_clone_void(this_ptr: *const c_void) -> *m
 pub extern "C" fn ClosingSigned_clone(orig: &ClosingSigned) -> ClosingSigned {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ClosingSigned object
+pub extern "C" fn ClosingSigned_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::ClosingSigned }).into()}
+/// Generates a non-cryptographic 64-bit hash of the ClosingSigned.
+#[no_mangle]
+pub extern "C" fn ClosingSigned_hash(o: &ClosingSigned) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two ClosingSigneds contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -4174,6 +5017,55 @@ pub extern "C" fn UpdateAddHTLC_set_skimmed_fee_msat(this_ptr: &mut UpdateAddHTL
 	let mut local_val = if val.is_some() { Some( { val.take() }) } else { None };
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.skimmed_fee_msat = local_val;
 }
+/// The onion routing packet with encrypted data for the next hop.
+#[no_mangle]
+pub extern "C" fn UpdateAddHTLC_get_onion_routing_packet(this_ptr: &UpdateAddHTLC) -> crate::lightning::ln::msgs::OnionPacket {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().onion_routing_packet;
+	crate::lightning::ln::msgs::OnionPacket { inner: unsafe { ObjOps::nonnull_ptr_to_inner((inner_val as *const lightning::ln::msgs::OnionPacket<>) as *mut _) }, is_owned: false }
+}
+/// The onion routing packet with encrypted data for the next hop.
+#[no_mangle]
+pub extern "C" fn UpdateAddHTLC_set_onion_routing_packet(this_ptr: &mut UpdateAddHTLC, mut val: crate::lightning::ln::msgs::OnionPacket) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.onion_routing_packet = *unsafe { Box::from_raw(val.take_inner()) };
+}
+/// Provided if we are relaying or receiving a payment within a blinded path, to decrypt the onion
+/// routing packet and the recipient-provided encrypted payload within.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn UpdateAddHTLC_get_blinding_point(this_ptr: &UpdateAddHTLC) -> crate::c_types::PublicKey {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().blinding_point;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(inner_val.unwrap())) } };
+	local_inner_val
+}
+/// Provided if we are relaying or receiving a payment within a blinded path, to decrypt the onion
+/// routing packet and the recipient-provided encrypted payload within.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn UpdateAddHTLC_set_blinding_point(this_ptr: &mut UpdateAddHTLC, mut val: crate::c_types::PublicKey) {
+	let mut local_val = if val.is_null() { None } else { Some( { val.into_rust() }) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.blinding_point = local_val;
+}
+/// Constructs a new UpdateAddHTLC given each field
+///
+/// Note that blinding_point_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn UpdateAddHTLC_new(mut channel_id_arg: crate::c_types::ThirtyTwoBytes, mut htlc_id_arg: u64, mut amount_msat_arg: u64, mut payment_hash_arg: crate::c_types::ThirtyTwoBytes, mut cltv_expiry_arg: u32, mut skimmed_fee_msat_arg: crate::c_types::derived::COption_u64Z, mut onion_routing_packet_arg: crate::lightning::ln::msgs::OnionPacket, mut blinding_point_arg: crate::c_types::PublicKey) -> UpdateAddHTLC {
+	let mut local_skimmed_fee_msat_arg = if skimmed_fee_msat_arg.is_some() { Some( { skimmed_fee_msat_arg.take() }) } else { None };
+	let mut local_blinding_point_arg = if blinding_point_arg.is_null() { None } else { Some( { blinding_point_arg.into_rust() }) };
+	UpdateAddHTLC { inner: ObjOps::heap_alloc(nativeUpdateAddHTLC {
+		channel_id: ::lightning::ln::ChannelId(channel_id_arg.data),
+		htlc_id: htlc_id_arg,
+		amount_msat: amount_msat_arg,
+		payment_hash: ::lightning::ln::PaymentHash(payment_hash_arg.data),
+		cltv_expiry: cltv_expiry_arg,
+		skimmed_fee_msat: local_skimmed_fee_msat_arg,
+		onion_routing_packet: *unsafe { Box::from_raw(onion_routing_packet_arg.take_inner()) },
+		blinding_point: local_blinding_point_arg,
+	}), is_owned: true }
+}
 impl Clone for UpdateAddHTLC {
 	fn clone(&self) -> Self {
 		Self {
@@ -4192,6 +5084,19 @@ pub(crate) extern "C" fn UpdateAddHTLC_clone_void(this_ptr: *const c_void) -> *m
 /// Creates a copy of the UpdateAddHTLC
 pub extern "C" fn UpdateAddHTLC_clone(orig: &UpdateAddHTLC) -> UpdateAddHTLC {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a UpdateAddHTLC object
+pub extern "C" fn UpdateAddHTLC_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::UpdateAddHTLC }).into()}
+/// Generates a non-cryptographic 64-bit hash of the UpdateAddHTLC.
+#[no_mangle]
+pub extern "C" fn UpdateAddHTLC_hash(o: &UpdateAddHTLC) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two UpdateAddHTLCs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -4303,6 +5208,19 @@ pub(crate) extern "C" fn OnionMessage_clone_void(this_ptr: *const c_void) -> *mu
 /// Creates a copy of the OnionMessage
 pub extern "C" fn OnionMessage_clone(orig: &OnionMessage) -> OnionMessage {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a OnionMessage object
+pub extern "C" fn OnionMessage_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::OnionMessage }).into()}
+/// Generates a non-cryptographic 64-bit hash of the OnionMessage.
+#[no_mangle]
+pub extern "C" fn OnionMessage_hash(o: &OnionMessage) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two OnionMessages contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -4428,6 +5346,19 @@ pub(crate) extern "C" fn UpdateFulfillHTLC_clone_void(this_ptr: *const c_void) -
 pub extern "C" fn UpdateFulfillHTLC_clone(orig: &UpdateFulfillHTLC) -> UpdateFulfillHTLC {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a UpdateFulfillHTLC object
+pub extern "C" fn UpdateFulfillHTLC_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::UpdateFulfillHTLC }).into()}
+/// Generates a non-cryptographic 64-bit hash of the UpdateFulfillHTLC.
+#[no_mangle]
+pub extern "C" fn UpdateFulfillHTLC_hash(o: &UpdateFulfillHTLC) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two UpdateFulfillHTLCs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -4530,6 +5461,19 @@ pub(crate) extern "C" fn UpdateFailHTLC_clone_void(this_ptr: *const c_void) -> *
 /// Creates a copy of the UpdateFailHTLC
 pub extern "C" fn UpdateFailHTLC_clone(orig: &UpdateFailHTLC) -> UpdateFailHTLC {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a UpdateFailHTLC object
+pub extern "C" fn UpdateFailHTLC_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::UpdateFailHTLC }).into()}
+/// Generates a non-cryptographic 64-bit hash of the UpdateFailHTLC.
+#[no_mangle]
+pub extern "C" fn UpdateFailHTLC_hash(o: &UpdateFailHTLC) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two UpdateFailHTLCs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -4644,6 +5588,19 @@ pub(crate) extern "C" fn UpdateFailMalformedHTLC_clone_void(this_ptr: *const c_v
 /// Creates a copy of the UpdateFailMalformedHTLC
 pub extern "C" fn UpdateFailMalformedHTLC_clone(orig: &UpdateFailMalformedHTLC) -> UpdateFailMalformedHTLC {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a UpdateFailMalformedHTLC object
+pub extern "C" fn UpdateFailMalformedHTLC_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::UpdateFailMalformedHTLC }).into()}
+/// Generates a non-cryptographic 64-bit hash of the UpdateFailMalformedHTLC.
+#[no_mangle]
+pub extern "C" fn UpdateFailMalformedHTLC_hash(o: &UpdateFailMalformedHTLC) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two UpdateFailMalformedHTLCs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -4774,6 +5731,19 @@ pub(crate) extern "C" fn CommitmentSigned_clone_void(this_ptr: *const c_void) ->
 pub extern "C" fn CommitmentSigned_clone(orig: &CommitmentSigned) -> CommitmentSigned {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a CommitmentSigned object
+pub extern "C" fn CommitmentSigned_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::CommitmentSigned }).into()}
+/// Generates a non-cryptographic 64-bit hash of the CommitmentSigned.
+#[no_mangle]
+pub extern "C" fn CommitmentSigned_hash(o: &CommitmentSigned) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two CommitmentSigneds contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -4898,6 +5868,19 @@ pub(crate) extern "C" fn RevokeAndACK_clone_void(this_ptr: *const c_void) -> *mu
 pub extern "C" fn RevokeAndACK_clone(orig: &RevokeAndACK) -> RevokeAndACK {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a RevokeAndACK object
+pub extern "C" fn RevokeAndACK_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::RevokeAndACK }).into()}
+/// Generates a non-cryptographic 64-bit hash of the RevokeAndACK.
+#[no_mangle]
+pub extern "C" fn RevokeAndACK_hash(o: &RevokeAndACK) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two RevokeAndACKs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -5009,6 +5992,19 @@ pub(crate) extern "C" fn UpdateFee_clone_void(this_ptr: *const c_void) -> *mut c
 /// Creates a copy of the UpdateFee
 pub extern "C" fn UpdateFee_clone(orig: &UpdateFee) -> UpdateFee {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a UpdateFee object
+pub extern "C" fn UpdateFee_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::UpdateFee }).into()}
+/// Generates a non-cryptographic 64-bit hash of the UpdateFee.
+#[no_mangle]
+pub extern "C" fn UpdateFee_hash(o: &UpdateFee) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two UpdateFees contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -5133,7 +6129,7 @@ pub extern "C" fn ChannelReestablish_set_my_current_per_commitment_point(this_pt
 #[no_mangle]
 pub extern "C" fn ChannelReestablish_get_next_funding_txid(this_ptr: &ChannelReestablish) -> crate::c_types::derived::COption_ThirtyTwoBytesZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().next_funding_txid;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().into_inner() } }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: *(*inner_val.as_ref().unwrap()).clone().as_ref() } }) };
 	local_inner_val
 }
 /// The next funding transaction ID
@@ -5174,6 +6170,19 @@ pub(crate) extern "C" fn ChannelReestablish_clone_void(this_ptr: *const c_void) 
 /// Creates a copy of the ChannelReestablish
 pub extern "C" fn ChannelReestablish_clone(orig: &ChannelReestablish) -> ChannelReestablish {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a ChannelReestablish object
+pub extern "C" fn ChannelReestablish_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::ChannelReestablish }).into()}
+/// Generates a non-cryptographic 64-bit hash of the ChannelReestablish.
+#[no_mangle]
+pub extern "C" fn ChannelReestablish_hash(o: &ChannelReestablish) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two ChannelReestablishs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -5310,6 +6319,19 @@ pub(crate) extern "C" fn AnnouncementSignatures_clone_void(this_ptr: *const c_vo
 /// Creates a copy of the AnnouncementSignatures
 pub extern "C" fn AnnouncementSignatures_clone(orig: &AnnouncementSignatures) -> AnnouncementSignatures {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a AnnouncementSignatures object
+pub extern "C" fn AnnouncementSignatures_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::AnnouncementSignatures }).into()}
+/// Generates a non-cryptographic 64-bit hash of the AnnouncementSignatures.
+#[no_mangle]
+pub extern "C" fn AnnouncementSignatures_hash(o: &AnnouncementSignatures) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two AnnouncementSignaturess contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -5455,7 +6477,8 @@ impl SocketAddress {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeSocketAddress) -> Self {
+	pub(crate) fn from_native(native: &SocketAddressImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeSocketAddress) };
 		match native {
 			nativeSocketAddress::TcpIpV4 {ref addr, ref port, } => {
 				let mut addr_nonref = Clone::clone(addr);
@@ -5595,6 +6618,18 @@ pub extern "C" fn SocketAddress_hostname(hostname: crate::lightning::util::ser::
 		port,
 	}
 }
+/// Get a string which allows debug introspection of a SocketAddress object
+pub extern "C" fn SocketAddress_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::SocketAddress }).into()}
+/// Generates a non-cryptographic 64-bit hash of the SocketAddress.
+#[no_mangle]
+pub extern "C" fn SocketAddress_hash(o: &SocketAddress) -> u64 {
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(&o.to_native(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two SocketAddresss contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -5654,7 +6689,8 @@ impl SocketAddressParseError {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeSocketAddressParseError) -> Self {
+	pub(crate) fn from_native(native: &SocketAddressParseErrorImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeSocketAddressParseError) };
 		match native {
 			nativeSocketAddressParseError::SocketAddrParse => SocketAddressParseError::SocketAddrParse,
 			nativeSocketAddressParseError::InvalidInput => SocketAddressParseError::InvalidInput,
@@ -5703,6 +6739,18 @@ pub extern "C" fn SocketAddressParseError_invalid_port() -> SocketAddressParseEr
 /// Utility method to constructs a new InvalidOnionV3-variant SocketAddressParseError
 pub extern "C" fn SocketAddressParseError_invalid_onion_v3() -> SocketAddressParseError {
 	SocketAddressParseError::InvalidOnionV3}
+/// Get a string which allows debug introspection of a SocketAddressParseError object
+pub extern "C" fn SocketAddressParseError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::SocketAddressParseError }).into()}
+/// Generates a non-cryptographic 64-bit hash of the SocketAddressParseError.
+#[no_mangle]
+pub extern "C" fn SocketAddressParseError_hash(o: &SocketAddressParseError) -> u64 {
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(&o.to_native(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two SocketAddressParseErrors contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -5803,7 +6851,8 @@ impl UnsignedGossipMessage {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeUnsignedGossipMessage) -> Self {
+	pub(crate) fn from_native(native: &UnsignedGossipMessageImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeUnsignedGossipMessage) };
 		match native {
 			nativeUnsignedGossipMessage::ChannelAnnouncement (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
@@ -6036,6 +7085,19 @@ pub(crate) extern "C" fn UnsignedNodeAnnouncement_clone_void(this_ptr: *const c_
 pub extern "C" fn UnsignedNodeAnnouncement_clone(orig: &UnsignedNodeAnnouncement) -> UnsignedNodeAnnouncement {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a UnsignedNodeAnnouncement object
+pub extern "C" fn UnsignedNodeAnnouncement_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::UnsignedNodeAnnouncement }).into()}
+/// Generates a non-cryptographic 64-bit hash of the UnsignedNodeAnnouncement.
+#[no_mangle]
+pub extern "C" fn UnsignedNodeAnnouncement_hash(o: &UnsignedNodeAnnouncement) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two UnsignedNodeAnnouncements contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -6148,6 +7210,19 @@ pub(crate) extern "C" fn NodeAnnouncement_clone_void(this_ptr: *const c_void) ->
 pub extern "C" fn NodeAnnouncement_clone(orig: &NodeAnnouncement) -> NodeAnnouncement {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a NodeAnnouncement object
+pub extern "C" fn NodeAnnouncement_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::NodeAnnouncement }).into()}
+/// Generates a non-cryptographic 64-bit hash of the NodeAnnouncement.
+#[no_mangle]
+pub extern "C" fn NodeAnnouncement_hash(o: &NodeAnnouncement) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two NodeAnnouncements contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -6225,12 +7300,12 @@ pub extern "C" fn UnsignedChannelAnnouncement_set_features(this_ptr: &mut Unsign
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_get_chain_hash(this_ptr: &UnsignedChannelAnnouncement) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_bytes()
+	inner_val.as_ref()
 }
 /// The genesis hash of the blockchain where the channel is to be opened
 #[no_mangle]
 pub extern "C" fn UnsignedChannelAnnouncement_set_chain_hash(this_ptr: &mut UnsignedChannelAnnouncement, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data);
 }
 /// The short channel ID
 #[no_mangle]
@@ -6315,7 +7390,7 @@ pub extern "C" fn UnsignedChannelAnnouncement_new(mut features_arg: crate::light
 	let mut local_excess_data_arg = Vec::new(); for mut item in excess_data_arg.into_rust().drain(..) { local_excess_data_arg.push( { item }); };
 	UnsignedChannelAnnouncement { inner: ObjOps::heap_alloc(nativeUnsignedChannelAnnouncement {
 		features: *unsafe { Box::from_raw(features_arg.take_inner()) },
-		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data),
 		short_channel_id: short_channel_id_arg,
 		node_id_1: *unsafe { Box::from_raw(node_id_1_arg.take_inner()) },
 		node_id_2: *unsafe { Box::from_raw(node_id_2_arg.take_inner()) },
@@ -6342,6 +7417,19 @@ pub(crate) extern "C" fn UnsignedChannelAnnouncement_clone_void(this_ptr: *const
 /// Creates a copy of the UnsignedChannelAnnouncement
 pub extern "C" fn UnsignedChannelAnnouncement_clone(orig: &UnsignedChannelAnnouncement) -> UnsignedChannelAnnouncement {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a UnsignedChannelAnnouncement object
+pub extern "C" fn UnsignedChannelAnnouncement_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::UnsignedChannelAnnouncement }).into()}
+/// Generates a non-cryptographic 64-bit hash of the UnsignedChannelAnnouncement.
+#[no_mangle]
+pub extern "C" fn UnsignedChannelAnnouncement_hash(o: &UnsignedChannelAnnouncement) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two UnsignedChannelAnnouncements contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -6491,6 +7579,19 @@ pub(crate) extern "C" fn ChannelAnnouncement_clone_void(this_ptr: *const c_void)
 pub extern "C" fn ChannelAnnouncement_clone(orig: &ChannelAnnouncement) -> ChannelAnnouncement {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ChannelAnnouncement object
+pub extern "C" fn ChannelAnnouncement_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::ChannelAnnouncement }).into()}
+/// Generates a non-cryptographic 64-bit hash of the ChannelAnnouncement.
+#[no_mangle]
+pub extern "C" fn ChannelAnnouncement_hash(o: &ChannelAnnouncement) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two ChannelAnnouncements contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -6557,12 +7658,12 @@ impl UnsignedChannelUpdate {
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_get_chain_hash(this_ptr: &UnsignedChannelUpdate) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_bytes()
+	inner_val.as_ref()
 }
 /// The genesis hash of the blockchain where the channel is to be opened
 #[no_mangle]
 pub extern "C" fn UnsignedChannelUpdate_set_chain_hash(this_ptr: &mut UnsignedChannelUpdate, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data);
 }
 /// The short channel ID
 #[no_mangle]
@@ -6697,7 +7798,7 @@ pub extern "C" fn UnsignedChannelUpdate_set_excess_data(this_ptr: &mut UnsignedC
 pub extern "C" fn UnsignedChannelUpdate_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut short_channel_id_arg: u64, mut timestamp_arg: u32, mut flags_arg: u8, mut cltv_expiry_delta_arg: u16, mut htlc_minimum_msat_arg: u64, mut htlc_maximum_msat_arg: u64, mut fee_base_msat_arg: u32, mut fee_proportional_millionths_arg: u32, mut excess_data_arg: crate::c_types::derived::CVec_u8Z) -> UnsignedChannelUpdate {
 	let mut local_excess_data_arg = Vec::new(); for mut item in excess_data_arg.into_rust().drain(..) { local_excess_data_arg.push( { item }); };
 	UnsignedChannelUpdate { inner: ObjOps::heap_alloc(nativeUnsignedChannelUpdate {
-		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data),
 		short_channel_id: short_channel_id_arg,
 		timestamp: timestamp_arg,
 		flags: flags_arg,
@@ -6727,6 +7828,19 @@ pub(crate) extern "C" fn UnsignedChannelUpdate_clone_void(this_ptr: *const c_voi
 /// Creates a copy of the UnsignedChannelUpdate
 pub extern "C" fn UnsignedChannelUpdate_clone(orig: &UnsignedChannelUpdate) -> UnsignedChannelUpdate {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a UnsignedChannelUpdate object
+pub extern "C" fn UnsignedChannelUpdate_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::UnsignedChannelUpdate }).into()}
+/// Generates a non-cryptographic 64-bit hash of the UnsignedChannelUpdate.
+#[no_mangle]
+pub extern "C" fn UnsignedChannelUpdate_hash(o: &UnsignedChannelUpdate) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two UnsignedChannelUpdates contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -6840,6 +7954,19 @@ pub(crate) extern "C" fn ChannelUpdate_clone_void(this_ptr: *const c_void) -> *m
 pub extern "C" fn ChannelUpdate_clone(orig: &ChannelUpdate) -> ChannelUpdate {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ChannelUpdate object
+pub extern "C" fn ChannelUpdate_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::ChannelUpdate }).into()}
+/// Generates a non-cryptographic 64-bit hash of the ChannelUpdate.
+#[no_mangle]
+pub extern "C" fn ChannelUpdate_hash(o: &ChannelUpdate) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two ChannelUpdates contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -6909,12 +8036,12 @@ impl QueryChannelRange {
 #[no_mangle]
 pub extern "C" fn QueryChannelRange_get_chain_hash(this_ptr: &QueryChannelRange) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_bytes()
+	inner_val.as_ref()
 }
 /// The genesis hash of the blockchain being queried
 #[no_mangle]
 pub extern "C" fn QueryChannelRange_set_chain_hash(this_ptr: &mut QueryChannelRange, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data);
 }
 /// The height of the first block for the channel UTXOs being queried
 #[no_mangle]
@@ -6943,7 +8070,7 @@ pub extern "C" fn QueryChannelRange_set_number_of_blocks(this_ptr: &mut QueryCha
 #[no_mangle]
 pub extern "C" fn QueryChannelRange_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut first_blocknum_arg: u32, mut number_of_blocks_arg: u32) -> QueryChannelRange {
 	QueryChannelRange { inner: ObjOps::heap_alloc(nativeQueryChannelRange {
-		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data),
 		first_blocknum: first_blocknum_arg,
 		number_of_blocks: number_of_blocks_arg,
 	}), is_owned: true }
@@ -6966,6 +8093,19 @@ pub(crate) extern "C" fn QueryChannelRange_clone_void(this_ptr: *const c_void) -
 /// Creates a copy of the QueryChannelRange
 pub extern "C" fn QueryChannelRange_clone(orig: &QueryChannelRange) -> QueryChannelRange {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a QueryChannelRange object
+pub extern "C" fn QueryChannelRange_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::QueryChannelRange }).into()}
+/// Generates a non-cryptographic 64-bit hash of the QueryChannelRange.
+#[no_mangle]
+pub extern "C" fn QueryChannelRange_hash(o: &QueryChannelRange) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two QueryChannelRanges contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -7041,12 +8181,12 @@ impl ReplyChannelRange {
 #[no_mangle]
 pub extern "C" fn ReplyChannelRange_get_chain_hash(this_ptr: &ReplyChannelRange) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_bytes()
+	inner_val.as_ref()
 }
 /// The genesis hash of the blockchain being queried
 #[no_mangle]
 pub extern "C" fn ReplyChannelRange_set_chain_hash(this_ptr: &mut ReplyChannelRange, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data);
 }
 /// The height of the first block in the range of the reply
 #[no_mangle]
@@ -7102,7 +8242,7 @@ pub extern "C" fn ReplyChannelRange_set_short_channel_ids(this_ptr: &mut ReplyCh
 pub extern "C" fn ReplyChannelRange_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut first_blocknum_arg: u32, mut number_of_blocks_arg: u32, mut sync_complete_arg: bool, mut short_channel_ids_arg: crate::c_types::derived::CVec_u64Z) -> ReplyChannelRange {
 	let mut local_short_channel_ids_arg = Vec::new(); for mut item in short_channel_ids_arg.into_rust().drain(..) { local_short_channel_ids_arg.push( { item }); };
 	ReplyChannelRange { inner: ObjOps::heap_alloc(nativeReplyChannelRange {
-		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data),
 		first_blocknum: first_blocknum_arg,
 		number_of_blocks: number_of_blocks_arg,
 		sync_complete: sync_complete_arg,
@@ -7127,6 +8267,19 @@ pub(crate) extern "C" fn ReplyChannelRange_clone_void(this_ptr: *const c_void) -
 /// Creates a copy of the ReplyChannelRange
 pub extern "C" fn ReplyChannelRange_clone(orig: &ReplyChannelRange) -> ReplyChannelRange {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a ReplyChannelRange object
+pub extern "C" fn ReplyChannelRange_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::ReplyChannelRange }).into()}
+/// Generates a non-cryptographic 64-bit hash of the ReplyChannelRange.
+#[no_mangle]
+pub extern "C" fn ReplyChannelRange_hash(o: &ReplyChannelRange) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two ReplyChannelRanges contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -7202,12 +8355,12 @@ impl QueryShortChannelIds {
 #[no_mangle]
 pub extern "C" fn QueryShortChannelIds_get_chain_hash(this_ptr: &QueryShortChannelIds) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_bytes()
+	inner_val.as_ref()
 }
 /// The genesis hash of the blockchain being queried
 #[no_mangle]
 pub extern "C" fn QueryShortChannelIds_set_chain_hash(this_ptr: &mut QueryShortChannelIds, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data);
 }
 /// The short_channel_ids that are being queried
 ///
@@ -7230,7 +8383,7 @@ pub extern "C" fn QueryShortChannelIds_set_short_channel_ids(this_ptr: &mut Quer
 pub extern "C" fn QueryShortChannelIds_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut short_channel_ids_arg: crate::c_types::derived::CVec_u64Z) -> QueryShortChannelIds {
 	let mut local_short_channel_ids_arg = Vec::new(); for mut item in short_channel_ids_arg.into_rust().drain(..) { local_short_channel_ids_arg.push( { item }); };
 	QueryShortChannelIds { inner: ObjOps::heap_alloc(nativeQueryShortChannelIds {
-		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data),
 		short_channel_ids: local_short_channel_ids_arg,
 	}), is_owned: true }
 }
@@ -7252,6 +8405,19 @@ pub(crate) extern "C" fn QueryShortChannelIds_clone_void(this_ptr: *const c_void
 /// Creates a copy of the QueryShortChannelIds
 pub extern "C" fn QueryShortChannelIds_clone(orig: &QueryShortChannelIds) -> QueryShortChannelIds {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a QueryShortChannelIds object
+pub extern "C" fn QueryShortChannelIds_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::QueryShortChannelIds }).into()}
+/// Generates a non-cryptographic 64-bit hash of the QueryShortChannelIds.
+#[no_mangle]
+pub extern "C" fn QueryShortChannelIds_hash(o: &QueryShortChannelIds) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two QueryShortChannelIdss contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -7322,12 +8488,12 @@ impl ReplyShortChannelIdsEnd {
 #[no_mangle]
 pub extern "C" fn ReplyShortChannelIdsEnd_get_chain_hash(this_ptr: &ReplyShortChannelIdsEnd) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_bytes()
+	inner_val.as_ref()
 }
 /// The genesis hash of the blockchain that was queried
 #[no_mangle]
 pub extern "C" fn ReplyShortChannelIdsEnd_set_chain_hash(this_ptr: &mut ReplyShortChannelIdsEnd, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data);
 }
 /// Indicates if the query recipient maintains up-to-date channel
 /// information for the `chain_hash`
@@ -7347,7 +8513,7 @@ pub extern "C" fn ReplyShortChannelIdsEnd_set_full_information(this_ptr: &mut Re
 #[no_mangle]
 pub extern "C" fn ReplyShortChannelIdsEnd_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut full_information_arg: bool) -> ReplyShortChannelIdsEnd {
 	ReplyShortChannelIdsEnd { inner: ObjOps::heap_alloc(nativeReplyShortChannelIdsEnd {
-		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data),
 		full_information: full_information_arg,
 	}), is_owned: true }
 }
@@ -7369,6 +8535,19 @@ pub(crate) extern "C" fn ReplyShortChannelIdsEnd_clone_void(this_ptr: *const c_v
 /// Creates a copy of the ReplyShortChannelIdsEnd
 pub extern "C" fn ReplyShortChannelIdsEnd_clone(orig: &ReplyShortChannelIdsEnd) -> ReplyShortChannelIdsEnd {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a ReplyShortChannelIdsEnd object
+pub extern "C" fn ReplyShortChannelIdsEnd_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::ReplyShortChannelIdsEnd }).into()}
+/// Generates a non-cryptographic 64-bit hash of the ReplyShortChannelIdsEnd.
+#[no_mangle]
+pub extern "C" fn ReplyShortChannelIdsEnd_hash(o: &ReplyShortChannelIdsEnd) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two ReplyShortChannelIdsEnds contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -7438,12 +8617,12 @@ impl GossipTimestampFilter {
 #[no_mangle]
 pub extern "C" fn GossipTimestampFilter_get_chain_hash(this_ptr: &GossipTimestampFilter) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().chain_hash;
-	inner_val.as_bytes()
+	inner_val.as_ref()
 }
 /// The genesis hash of the blockchain for channel and node information
 #[no_mangle]
 pub extern "C" fn GossipTimestampFilter_set_chain_hash(this_ptr: &mut GossipTimestampFilter, mut val: crate::c_types::ThirtyTwoBytes) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data[..]);
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.chain_hash = ::bitcoin::blockdata::constants::ChainHash::from(&val.data);
 }
 /// The starting unix timestamp
 #[no_mangle]
@@ -7472,7 +8651,7 @@ pub extern "C" fn GossipTimestampFilter_set_timestamp_range(this_ptr: &mut Gossi
 #[no_mangle]
 pub extern "C" fn GossipTimestampFilter_new(mut chain_hash_arg: crate::c_types::ThirtyTwoBytes, mut first_timestamp_arg: u32, mut timestamp_range_arg: u32) -> GossipTimestampFilter {
 	GossipTimestampFilter { inner: ObjOps::heap_alloc(nativeGossipTimestampFilter {
-		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data[..]),
+		chain_hash: ::bitcoin::blockdata::constants::ChainHash::from(&chain_hash_arg.data),
 		first_timestamp: first_timestamp_arg,
 		timestamp_range: timestamp_range_arg,
 	}), is_owned: true }
@@ -7495,6 +8674,19 @@ pub(crate) extern "C" fn GossipTimestampFilter_clone_void(this_ptr: *const c_voi
 /// Creates a copy of the GossipTimestampFilter
 pub extern "C" fn GossipTimestampFilter_clone(orig: &GossipTimestampFilter) -> GossipTimestampFilter {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a GossipTimestampFilter object
+pub extern "C" fn GossipTimestampFilter_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::GossipTimestampFilter }).into()}
+/// Generates a non-cryptographic 64-bit hash of the GossipTimestampFilter.
+#[no_mangle]
+pub extern "C" fn GossipTimestampFilter_hash(o: &GossipTimestampFilter) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two GossipTimestampFilters contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -7626,7 +8818,8 @@ impl ErrorAction {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeErrorAction) -> Self {
+	pub(crate) fn from_native(native: &ErrorActionImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeErrorAction) };
 		match native {
 			nativeErrorAction::DisconnectPeer {ref msg, } => {
 				let mut msg_nonref = Clone::clone(msg);
@@ -7760,6 +8953,18 @@ pub extern "C" fn ErrorAction_send_warning_message(msg: crate::lightning::ln::ms
 		log_level,
 	}
 }
+/// Get a string which allows debug introspection of a ErrorAction object
+pub extern "C" fn ErrorAction_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::ErrorAction }).into()}
+/// Generates a non-cryptographic 64-bit hash of the ErrorAction.
+#[no_mangle]
+pub extern "C" fn ErrorAction_hash(o: &ErrorAction) -> u64 {
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(&o.to_native(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 
 use lightning::ln::msgs::LightningError as nativeLightningErrorImport;
 pub(crate) type nativeLightningError = nativeLightningErrorImport;
@@ -7861,6 +9066,9 @@ pub(crate) extern "C" fn LightningError_clone_void(this_ptr: *const c_void) -> *
 pub extern "C" fn LightningError_clone(orig: &LightningError) -> LightningError {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a LightningError object
+pub extern "C" fn LightningError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::LightningError }).into()}
 
 use lightning::ln::msgs::CommitmentUpdate as nativeCommitmentUpdateImport;
 pub(crate) type nativeCommitmentUpdate = nativeCommitmentUpdateImport;
@@ -8032,6 +9240,19 @@ pub(crate) extern "C" fn CommitmentUpdate_clone_void(this_ptr: *const c_void) ->
 pub extern "C" fn CommitmentUpdate_clone(orig: &CommitmentUpdate) -> CommitmentUpdate {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a CommitmentUpdate object
+pub extern "C" fn CommitmentUpdate_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::CommitmentUpdate }).into()}
+/// Generates a non-cryptographic 64-bit hash of the CommitmentUpdate.
+#[no_mangle]
+pub extern "C" fn CommitmentUpdate_hash(o: &CommitmentUpdate) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two CommitmentUpdates contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -8068,6 +9289,14 @@ pub struct ChannelMessageHandler {
 	pub handle_shutdown: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::Shutdown),
 	/// Handle an incoming `closing_signed` message from the given peer.
 	pub handle_closing_signed: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::ClosingSigned),
+	/// Handle an incoming `stfu` message from the given peer.
+	pub handle_stfu: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::Stfu),
+	/// Handle an incoming `splice` message from the given peer.
+	pub handle_splice: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::Splice),
+	/// Handle an incoming `splice_ack` message from the given peer.
+	pub handle_splice_ack: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::SpliceAck),
+	/// Handle an incoming `splice_locked` message from the given peer.
+	pub handle_splice_locked: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::SpliceLocked),
 	/// Handle an incoming `tx_add_input message` from the given peer.
 	pub handle_tx_add_input: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::TxAddInput),
 	/// Handle an incoming `tx_add_output` message from the given peer.
@@ -8152,6 +9381,10 @@ pub(crate) fn ChannelMessageHandler_clone_fields(orig: &ChannelMessageHandler) -
 		handle_channel_ready: Clone::clone(&orig.handle_channel_ready),
 		handle_shutdown: Clone::clone(&orig.handle_shutdown),
 		handle_closing_signed: Clone::clone(&orig.handle_closing_signed),
+		handle_stfu: Clone::clone(&orig.handle_stfu),
+		handle_splice: Clone::clone(&orig.handle_splice),
+		handle_splice_ack: Clone::clone(&orig.handle_splice_ack),
+		handle_splice_locked: Clone::clone(&orig.handle_splice_locked),
 		handle_tx_add_input: Clone::clone(&orig.handle_tx_add_input),
 		handle_tx_add_output: Clone::clone(&orig.handle_tx_add_output),
 		handle_tx_remove_input: Clone::clone(&orig.handle_tx_remove_input),
@@ -8217,6 +9450,18 @@ impl rustChannelMessageHandler for ChannelMessageHandler {
 	}
 	fn handle_closing_signed(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::ClosingSigned) {
 		(self.handle_closing_signed)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::ClosingSigned { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::ClosingSigned<>) as *mut _) }, is_owned: false })
+	}
+	fn handle_stfu(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::Stfu) {
+		(self.handle_stfu)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Stfu { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Stfu<>) as *mut _) }, is_owned: false })
+	}
+	fn handle_splice(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::Splice) {
+		(self.handle_splice)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::Splice { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::Splice<>) as *mut _) }, is_owned: false })
+	}
+	fn handle_splice_ack(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::SpliceAck) {
+		(self.handle_splice_ack)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::SpliceAck { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::SpliceAck<>) as *mut _) }, is_owned: false })
+	}
+	fn handle_splice_locked(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::SpliceLocked) {
+		(self.handle_splice_locked)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::SpliceLocked { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::SpliceLocked<>) as *mut _) }, is_owned: false })
 	}
 	fn handle_tx_add_input(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::TxAddInput) {
 		(self.handle_tx_add_input)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id), &crate::lightning::ln::msgs::TxAddInput { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::TxAddInput<>) as *mut _) }, is_owned: false })
@@ -8296,7 +9541,7 @@ impl rustChannelMessageHandler for ChannelMessageHandler {
 	}
 	fn get_chain_hashes(&self) -> Option<Vec<bitcoin::blockdata::constants::ChainHash>> {
 		let mut ret = (self.get_chain_hashes)(self.this_arg);
-		let mut local_ret = { /*ret*/ let ret_opt = ret; if ret_opt.is_none() { None } else { Some({ { let mut local_ret_0 = Vec::new(); for mut item in { ret_opt.take() }.into_rust().drain(..) { local_ret_0.push( { ::bitcoin::blockdata::constants::ChainHash::from(&item.data[..]) }); }; local_ret_0 }})} };
+		let mut local_ret = { /*ret*/ let ret_opt = ret; if ret_opt.is_none() { None } else { Some({ { let mut local_ret_0 = Vec::new(); for mut item in { ret_opt.take() }.into_rust().drain(..) { local_ret_0.push( { ::bitcoin::blockdata::constants::ChainHash::from(&item.data) }); }; local_ret_0 }})} };
 		local_ret
 	}
 }
@@ -8528,6 +9773,14 @@ pub struct OnionMessageHandler {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
+	/// Because much of the lightning network does not yet support forwarding onion messages, we
+	/// may need to directly connect to a node which will forward a message for us. In such a case,
+	/// this method will return the set of nodes which need connection by node_id and the
+	/// corresponding socket addresses where they may accept incoming connections.
+	///
+	/// Thus, this method should be polled regularly to detect messages await such a direct
+	/// connection.
+	pub get_and_clear_connections_needed: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_PublicKeyCVec_SocketAddressZZZ,
 	/// Handle an incoming `onion_message` message from the given peer.
 	pub handle_onion_message: extern "C" fn (this_arg: *const c_void, peer_node_id: crate::c_types::PublicKey, msg: &crate::lightning::ln::msgs::OnionMessage),
 	/// Returns the next pending onion message for the peer with the given node id.
@@ -8544,6 +9797,9 @@ pub struct OnionMessageHandler {
 	/// Indicates a connection to the peer failed/an existing connection was lost. Allows handlers to
 	/// drop and refuse to forward onion messages to this peer.
 	pub peer_disconnected: extern "C" fn (this_arg: *const c_void, their_node_id: crate::c_types::PublicKey),
+	/// Performs actions that should happen roughly every ten seconds after startup. Allows handlers
+	/// to drop any buffered onion messages intended for prospective peers.
+	pub timer_tick_occurred: extern "C" fn (this_arg: *const c_void),
 	/// Gets the node feature flags which this handler itself supports. All available handlers are
 	/// queried similarly and their feature flags are OR'd together to form the [`NodeFeatures`]
 	/// which are broadcasted in our [`NodeAnnouncement`] message.
@@ -8564,10 +9820,12 @@ unsafe impl Sync for OnionMessageHandler {}
 pub(crate) fn OnionMessageHandler_clone_fields(orig: &OnionMessageHandler) -> OnionMessageHandler {
 	OnionMessageHandler {
 		this_arg: orig.this_arg,
+		get_and_clear_connections_needed: Clone::clone(&orig.get_and_clear_connections_needed),
 		handle_onion_message: Clone::clone(&orig.handle_onion_message),
 		next_onion_message_for_peer: Clone::clone(&orig.next_onion_message_for_peer),
 		peer_connected: Clone::clone(&orig.peer_connected),
 		peer_disconnected: Clone::clone(&orig.peer_disconnected),
+		timer_tick_occurred: Clone::clone(&orig.timer_tick_occurred),
 		provided_node_features: Clone::clone(&orig.provided_node_features),
 		provided_init_features: Clone::clone(&orig.provided_init_features),
 		free: Clone::clone(&orig.free),
@@ -8576,6 +9834,11 @@ pub(crate) fn OnionMessageHandler_clone_fields(orig: &OnionMessageHandler) -> On
 
 use lightning::ln::msgs::OnionMessageHandler as rustOnionMessageHandler;
 impl rustOnionMessageHandler for OnionMessageHandler {
+	fn get_and_clear_connections_needed(&self) -> Vec<(bitcoin::secp256k1::PublicKey, Vec<lightning::ln::msgs::SocketAddress>)> {
+		let mut ret = (self.get_and_clear_connections_needed)(self.this_arg);
+		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item.to_rust(); let mut local_orig_ret_0_1 = Vec::new(); for mut item in orig_ret_0_1.into_rust().drain(..) { local_orig_ret_0_1.push( { item.into_native() }); }; let mut local_ret_0 = (orig_ret_0_0.into_rust(), local_orig_ret_0_1); local_ret_0 }); };
+		local_ret
+	}
 	fn handle_onion_message(&self, mut peer_node_id: &bitcoin::secp256k1::PublicKey, mut msg: &lightning::ln::msgs::OnionMessage) {
 		(self.handle_onion_message)(self.this_arg, crate::c_types::PublicKey::from_rust(&peer_node_id), &crate::lightning::ln::msgs::OnionMessage { inner: unsafe { ObjOps::nonnull_ptr_to_inner((msg as *const lightning::ln::msgs::OnionMessage<>) as *mut _) }, is_owned: false })
 	}
@@ -8591,6 +9854,9 @@ impl rustOnionMessageHandler for OnionMessageHandler {
 	}
 	fn peer_disconnected(&self, mut their_node_id: &bitcoin::secp256k1::PublicKey) {
 		(self.peer_disconnected)(self.this_arg, crate::c_types::PublicKey::from_rust(&their_node_id))
+	}
+	fn timer_tick_occurred(&self) {
+		(self.timer_tick_occurred)(self.this_arg)
 	}
 	fn provided_node_features(&self) -> lightning::ln::features::NodeFeatures {
 		let mut ret = (self.provided_node_features)(self.this_arg);
@@ -8625,6 +9891,116 @@ impl Drop for OnionMessageHandler {
 		}
 	}
 }
+
+use lightning::ln::msgs::FinalOnionHopData as nativeFinalOnionHopDataImport;
+pub(crate) type nativeFinalOnionHopData = nativeFinalOnionHopDataImport;
+
+/// Information communicated in the onion to the recipient for multi-part tracking and proof that
+/// the payment is associated with an invoice.
+#[must_use]
+#[repr(C)]
+pub struct FinalOnionHopData {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeFinalOnionHopData,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for FinalOnionHopData {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeFinalOnionHopData>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the FinalOnionHopData, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn FinalOnionHopData_free(this_obj: FinalOnionHopData) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn FinalOnionHopData_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeFinalOnionHopData) };
+}
+#[allow(unused)]
+impl FinalOnionHopData {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeFinalOnionHopData {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeFinalOnionHopData {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeFinalOnionHopData {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// When sending a multi-part payment, this secret is used to identify a payment across HTLCs.
+/// Because it is generated by the recipient and included in the invoice, it also provides
+/// proof to the recipient that the payment was sent by someone with the generated invoice.
+#[no_mangle]
+pub extern "C" fn FinalOnionHopData_get_payment_secret(this_ptr: &FinalOnionHopData) -> *const [u8; 32] {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().payment_secret;
+	&inner_val.0
+}
+/// When sending a multi-part payment, this secret is used to identify a payment across HTLCs.
+/// Because it is generated by the recipient and included in the invoice, it also provides
+/// proof to the recipient that the payment was sent by someone with the generated invoice.
+#[no_mangle]
+pub extern "C" fn FinalOnionHopData_set_payment_secret(this_ptr: &mut FinalOnionHopData, mut val: crate::c_types::ThirtyTwoBytes) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.payment_secret = ::lightning::ln::PaymentSecret(val.data);
+}
+/// The intended total amount that this payment is for.
+///
+/// Message serialization may panic if this value is more than 21 million Bitcoin.
+#[no_mangle]
+pub extern "C" fn FinalOnionHopData_get_total_msat(this_ptr: &FinalOnionHopData) -> u64 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().total_msat;
+	*inner_val
+}
+/// The intended total amount that this payment is for.
+///
+/// Message serialization may panic if this value is more than 21 million Bitcoin.
+#[no_mangle]
+pub extern "C" fn FinalOnionHopData_set_total_msat(this_ptr: &mut FinalOnionHopData, mut val: u64) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.total_msat = val;
+}
+/// Constructs a new FinalOnionHopData given each field
+#[must_use]
+#[no_mangle]
+pub extern "C" fn FinalOnionHopData_new(mut payment_secret_arg: crate::c_types::ThirtyTwoBytes, mut total_msat_arg: u64) -> FinalOnionHopData {
+	FinalOnionHopData { inner: ObjOps::heap_alloc(nativeFinalOnionHopData {
+		payment_secret: ::lightning::ln::PaymentSecret(payment_secret_arg.data),
+		total_msat: total_msat_arg,
+	}), is_owned: true }
+}
+impl Clone for FinalOnionHopData {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeFinalOnionHopData>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn FinalOnionHopData_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeFinalOnionHopData)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the FinalOnionHopData
+pub extern "C" fn FinalOnionHopData_clone(orig: &FinalOnionHopData) -> FinalOnionHopData {
+	orig.clone()
+}
 mod fuzzy_internal_msgs {
 
 use alloc::str::FromStr;
@@ -8637,6 +10013,143 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 }
+
+use lightning::ln::msgs::OnionPacket as nativeOnionPacketImport;
+pub(crate) type nativeOnionPacket = nativeOnionPacketImport;
+
+/// BOLT 4 onion packet including hop data for the next peer.
+#[must_use]
+#[repr(C)]
+pub struct OnionPacket {
+	/// A pointer to the opaque Rust object.
+
+	/// Nearly everywhere, inner must be non-null, however in places where
+	/// the Rust equivalent takes an Option, it may be set to null to indicate None.
+	pub inner: *mut nativeOnionPacket,
+	/// Indicates that this is the only struct which contains the same pointer.
+
+	/// Rust functions which take ownership of an object provided via an argument require
+	/// this to be true and invalidate the object pointed to by inner.
+	pub is_owned: bool,
+}
+
+impl Drop for OnionPacket {
+	fn drop(&mut self) {
+		if self.is_owned && !<*mut nativeOnionPacket>::is_null(self.inner) {
+			let _ = unsafe { Box::from_raw(ObjOps::untweak_ptr(self.inner)) };
+		}
+	}
+}
+/// Frees any resources used by the OnionPacket, if is_owned is set and inner is non-NULL.
+#[no_mangle]
+pub extern "C" fn OnionPacket_free(this_obj: OnionPacket) { }
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn OnionPacket_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut nativeOnionPacket) };
+}
+#[allow(unused)]
+impl OnionPacket {
+	pub(crate) fn get_native_ref(&self) -> &'static nativeOnionPacket {
+		unsafe { &*ObjOps::untweak_ptr(self.inner) }
+	}
+	pub(crate) fn get_native_mut_ref(&self) -> &'static mut nativeOnionPacket {
+		unsafe { &mut *ObjOps::untweak_ptr(self.inner) }
+	}
+	/// When moving out of the pointer, we have to ensure we aren't a reference, this makes that easy
+	pub(crate) fn take_inner(mut self) -> *mut nativeOnionPacket {
+		assert!(self.is_owned);
+		let ret = ObjOps::untweak_ptr(self.inner);
+		self.inner = core::ptr::null_mut();
+		ret
+	}
+}
+/// BOLT 4 version number.
+#[no_mangle]
+pub extern "C" fn OnionPacket_get_version(this_ptr: &OnionPacket) -> u8 {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().version;
+	*inner_val
+}
+/// BOLT 4 version number.
+#[no_mangle]
+pub extern "C" fn OnionPacket_set_version(this_ptr: &mut OnionPacket, mut val: u8) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.version = val;
+}
+/// In order to ensure we always return an error on onion decode in compliance with [BOLT
+/// #4](https://github.com/lightning/bolts/blob/master/04-onion-routing.md), we have to
+/// deserialize `OnionPacket`s contained in [`UpdateAddHTLC`] messages even if the ephemeral
+/// public key (here) is bogus, so we hold a [`Result`] instead of a [`PublicKey`] as we'd
+/// like.
+///
+/// Returns a copy of the field.
+#[no_mangle]
+pub extern "C" fn OnionPacket_get_public_key(this_ptr: &OnionPacket) -> crate::c_types::derived::CResult_PublicKeySecp256k1ErrorZ {
+	let mut inner_val = this_ptr.get_native_mut_ref().public_key.clone();
+	let mut local_inner_val = match inner_val { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::c_types::PublicKey::from_rust(&o) }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::Secp256k1Error::from_rust(e) }).into() };
+	local_inner_val
+}
+/// In order to ensure we always return an error on onion decode in compliance with [BOLT
+/// #4](https://github.com/lightning/bolts/blob/master/04-onion-routing.md), we have to
+/// deserialize `OnionPacket`s contained in [`UpdateAddHTLC`] messages even if the ephemeral
+/// public key (here) is bogus, so we hold a [`Result`] instead of a [`PublicKey`] as we'd
+/// like.
+#[no_mangle]
+pub extern "C" fn OnionPacket_set_public_key(this_ptr: &mut OnionPacket, mut val: crate::c_types::derived::CResult_PublicKeySecp256k1ErrorZ) {
+	let mut local_val = match val.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut val.contents.result)) }).into_rust() }), false => Err( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut val.contents.err)) }).into_rust() })};
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.public_key = local_val;
+}
+/// HMAC to verify the integrity of hop_data.
+#[no_mangle]
+pub extern "C" fn OnionPacket_get_hmac(this_ptr: &OnionPacket) -> *const [u8; 32] {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().hmac;
+	inner_val
+}
+/// HMAC to verify the integrity of hop_data.
+#[no_mangle]
+pub extern "C" fn OnionPacket_set_hmac(this_ptr: &mut OnionPacket, mut val: crate::c_types::ThirtyTwoBytes) {
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.hmac = val.data;
+}
+impl Clone for OnionPacket {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeOnionPacket>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn OnionPacket_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeOnionPacket)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the OnionPacket
+pub extern "C" fn OnionPacket_clone(orig: &OnionPacket) -> OnionPacket {
+	orig.clone()
+}
+/// Generates a non-cryptographic 64-bit hash of the OnionPacket.
+#[no_mangle]
+pub extern "C" fn OnionPacket_hash(o: &OnionPacket) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Checks if two OnionPackets contain equal inner contents.
+/// This ignores pointers and is_owned flags and looks at the values in fields.
+/// Two objects with NULL inner values will be considered "equal" here.
+#[no_mangle]
+pub extern "C" fn OnionPacket_eq(a: &OnionPacket, b: &OnionPacket) -> bool {
+	if a.inner == b.inner { return true; }
+	if a.inner.is_null() || b.inner.is_null() { return false; }
+	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+/// Get a string which allows debug introspection of a OnionPacket object
+pub extern "C" fn OnionPacket_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::msgs::OnionPacket }).into()}
 #[no_mangle]
 /// Serialize the AcceptChannel object into a byte array which can be read by AcceptChannel_read
 pub extern "C" fn AcceptChannel_write(obj: &crate::lightning::ln::msgs::AcceptChannel) -> crate::c_types::derived::CVec_u8Z {
@@ -8667,6 +10180,70 @@ pub(crate) extern "C" fn AcceptChannelV2_write_void(obj: *const c_void) -> crate
 pub extern "C" fn AcceptChannelV2_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_AcceptChannelV2DecodeErrorZ {
 	let res: Result<lightning::ln::msgs::AcceptChannelV2, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
 	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::AcceptChannelV2 { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the Stfu object into a byte array which can be read by Stfu_read
+pub extern "C" fn Stfu_write(obj: &crate::lightning::ln::msgs::Stfu) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn Stfu_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeStfu) })
+}
+#[no_mangle]
+/// Read a Stfu from a byte array, created by Stfu_write
+pub extern "C" fn Stfu_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_StfuDecodeErrorZ {
+	let res: Result<lightning::ln::msgs::Stfu, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::Stfu { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the Splice object into a byte array which can be read by Splice_read
+pub extern "C" fn Splice_write(obj: &crate::lightning::ln::msgs::Splice) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn Splice_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeSplice) })
+}
+#[no_mangle]
+/// Read a Splice from a byte array, created by Splice_write
+pub extern "C" fn Splice_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_SpliceDecodeErrorZ {
+	let res: Result<lightning::ln::msgs::Splice, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::Splice { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the SpliceAck object into a byte array which can be read by SpliceAck_read
+pub extern "C" fn SpliceAck_write(obj: &crate::lightning::ln::msgs::SpliceAck) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn SpliceAck_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeSpliceAck) })
+}
+#[no_mangle]
+/// Read a SpliceAck from a byte array, created by SpliceAck_write
+pub extern "C" fn SpliceAck_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_SpliceAckDecodeErrorZ {
+	let res: Result<lightning::ln::msgs::SpliceAck, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::SpliceAck { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
+}
+#[no_mangle]
+/// Serialize the SpliceLocked object into a byte array which can be read by SpliceLocked_read
+pub extern "C" fn SpliceLocked_write(obj: &crate::lightning::ln::msgs::SpliceLocked) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn SpliceLocked_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeSpliceLocked) })
+}
+#[no_mangle]
+/// Read a SpliceLocked from a byte array, created by SpliceLocked_write
+pub extern "C" fn SpliceLocked_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_SpliceLockedDecodeErrorZ {
+	let res: Result<lightning::ln::msgs::SpliceLocked, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::SpliceLocked { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
 	local_res
 }
 #[no_mangle]
@@ -9086,6 +10663,22 @@ pub extern "C" fn UpdateFulfillHTLC_read(ser: crate::c_types::u8slice) -> crate:
 	local_res
 }
 #[no_mangle]
+/// Serialize the OnionPacket object into a byte array which can be read by OnionPacket_read
+pub extern "C" fn OnionPacket_write(obj: &crate::lightning::ln::msgs::OnionPacket) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn OnionPacket_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOnionPacket) })
+}
+#[no_mangle]
+/// Read a OnionPacket from a byte array, created by OnionPacket_write
+pub extern "C" fn OnionPacket_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_OnionPacketDecodeErrorZ {
+	let res: Result<lightning::ln::msgs::OnionPacket, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::OnionPacket { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
+}
+#[no_mangle]
 /// Serialize the UpdateAddHTLC object into a byte array which can be read by UpdateAddHTLC_read
 pub extern "C" fn UpdateAddHTLC_write(obj: &crate::lightning::ln::msgs::UpdateAddHTLC) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
@@ -9116,6 +10709,22 @@ pub extern "C" fn OnionMessage_write(obj: &crate::lightning::ln::msgs::OnionMess
 #[allow(unused)]
 pub(crate) extern "C" fn OnionMessage_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeOnionMessage) })
+}
+#[no_mangle]
+/// Serialize the FinalOnionHopData object into a byte array which can be read by FinalOnionHopData_read
+pub extern "C" fn FinalOnionHopData_write(obj: &crate::lightning::ln::msgs::FinalOnionHopData) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*obj }.get_native_ref())
+}
+#[allow(unused)]
+pub(crate) extern "C" fn FinalOnionHopData_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
+	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeFinalOnionHopData) })
+}
+#[no_mangle]
+/// Read a FinalOnionHopData from a byte array, created by FinalOnionHopData_write
+pub extern "C" fn FinalOnionHopData_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_FinalOnionHopDataDecodeErrorZ {
+	let res: Result<lightning::ln::msgs::FinalOnionHopData, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
+	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::ln::msgs::FinalOnionHopData { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
+	local_res
 }
 #[no_mangle]
 /// Serialize the Ping object into a byte array which can be read by Ping_read

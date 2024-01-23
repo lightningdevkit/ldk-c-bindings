@@ -45,7 +45,7 @@
 //! # use lightning::util::logger::{Logger, Record};
 //! # struct FakeLogger {}
 //! # impl Logger for FakeLogger {
-//! #     fn log(&self, record: &Record) { }
+//! #     fn log(&self, record: Record) { }
 //! # }
 //! # let logger = FakeLogger {};
 //!
@@ -67,7 +67,6 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
-pub mod error;
 mod processing {
 
 use alloc::str::FromStr;
@@ -80,6 +79,121 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 }
+/// All-encompassing standard error type that processing can return
+#[derive(Clone)]
+#[must_use]
+#[repr(C)]
+pub enum GraphSyncError {
+	/// Error trying to read the update data, typically due to an erroneous data length indication
+	/// that is greater than the actual amount of data provided
+	DecodeError(
+		crate::lightning::ln::msgs::DecodeError),
+	/// Error applying the patch to the network graph, usually the result of updates that are too
+	/// old or missing prerequisite data to the application of updates out of order
+	LightningError(
+		crate::lightning::ln::msgs::LightningError),
+}
+use lightning_rapid_gossip_sync::GraphSyncError as GraphSyncErrorImport;
+pub(crate) type nativeGraphSyncError = GraphSyncErrorImport;
+
+impl GraphSyncError {
+	#[allow(unused)]
+	pub(crate) fn to_native(&self) -> nativeGraphSyncError {
+		match self {
+			GraphSyncError::DecodeError (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				nativeGraphSyncError::DecodeError (
+					a_nonref.into_native(),
+				)
+			},
+			GraphSyncError::LightningError (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				nativeGraphSyncError::LightningError (
+					*unsafe { Box::from_raw(a_nonref.take_inner()) },
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn into_native(self) -> nativeGraphSyncError {
+		match self {
+			GraphSyncError::DecodeError (mut a, ) => {
+				nativeGraphSyncError::DecodeError (
+					a.into_native(),
+				)
+			},
+			GraphSyncError::LightningError (mut a, ) => {
+				nativeGraphSyncError::LightningError (
+					*unsafe { Box::from_raw(a.take_inner()) },
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn from_native(native: &GraphSyncErrorImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeGraphSyncError) };
+		match native {
+			nativeGraphSyncError::DecodeError (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				GraphSyncError::DecodeError (
+					crate::lightning::ln::msgs::DecodeError::native_into(a_nonref),
+				)
+			},
+			nativeGraphSyncError::LightningError (ref a, ) => {
+				let mut a_nonref = Clone::clone(a);
+				GraphSyncError::LightningError (
+					crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(a_nonref), is_owned: true },
+				)
+			},
+		}
+	}
+	#[allow(unused)]
+	pub(crate) fn native_into(native: nativeGraphSyncError) -> Self {
+		match native {
+			nativeGraphSyncError::DecodeError (mut a, ) => {
+				GraphSyncError::DecodeError (
+					crate::lightning::ln::msgs::DecodeError::native_into(a),
+				)
+			},
+			nativeGraphSyncError::LightningError (mut a, ) => {
+				GraphSyncError::LightningError (
+					crate::lightning::ln::msgs::LightningError { inner: ObjOps::heap_alloc(a), is_owned: true },
+				)
+			},
+		}
+	}
+}
+/// Frees any resources used by the GraphSyncError
+#[no_mangle]
+pub extern "C" fn GraphSyncError_free(this_ptr: GraphSyncError) { }
+/// Creates a copy of the GraphSyncError
+#[no_mangle]
+pub extern "C" fn GraphSyncError_clone(orig: &GraphSyncError) -> GraphSyncError {
+	orig.clone()
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn GraphSyncError_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const GraphSyncError)).clone() })) as *mut c_void
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn GraphSyncError_free_void(this_ptr: *mut c_void) {
+	let _ = unsafe { Box::from_raw(this_ptr as *mut GraphSyncError) };
+}
+#[no_mangle]
+/// Utility method to constructs a new DecodeError-variant GraphSyncError
+pub extern "C" fn GraphSyncError_decode_error(a: crate::lightning::ln::msgs::DecodeError) -> GraphSyncError {
+	GraphSyncError::DecodeError(a, )
+}
+#[no_mangle]
+/// Utility method to constructs a new LightningError-variant GraphSyncError
+pub extern "C" fn GraphSyncError_lightning_error(a: crate::lightning::ln::msgs::LightningError) -> GraphSyncError {
+	GraphSyncError::LightningError(a, )
+}
+/// Get a string which allows debug introspection of a GraphSyncError object
+pub extern "C" fn GraphSyncError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_rapid_gossip_sync::GraphSyncError }).into()}
 
 use lightning_rapid_gossip_sync::RapidGossipSync as nativeRapidGossipSyncImport;
 pub(crate) type nativeRapidGossipSync = nativeRapidGossipSyncImport<&'static lightning::routing::gossip::NetworkGraph<crate::lightning::util::logger::Logger>, crate::lightning::util::logger::Logger>;
@@ -154,7 +268,7 @@ pub extern "C" fn RapidGossipSync_new(network_graph: &crate::lightning::routing:
 #[no_mangle]
 pub extern "C" fn RapidGossipSync_sync_network_graph_with_file_path(this_arg: &crate::lightning_rapid_gossip_sync::RapidGossipSync, mut sync_path: crate::c_types::Str) -> crate::c_types::derived::CResult_u32GraphSyncErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.sync_network_graph_with_file_path(sync_path.into_str());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_rapid_gossip_sync::error::GraphSyncError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_rapid_gossip_sync::GraphSyncError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -166,7 +280,7 @@ pub extern "C" fn RapidGossipSync_sync_network_graph_with_file_path(this_arg: &c
 #[no_mangle]
 pub extern "C" fn RapidGossipSync_update_network_graph(this_arg: &crate::lightning_rapid_gossip_sync::RapidGossipSync, mut update_data: crate::c_types::u8slice) -> crate::c_types::derived::CResult_u32GraphSyncErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_network_graph(update_data.to_slice());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_rapid_gossip_sync::error::GraphSyncError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_rapid_gossip_sync::GraphSyncError::native_into(e) }).into() };
 	local_ret
 }
 
@@ -180,7 +294,7 @@ pub extern "C" fn RapidGossipSync_update_network_graph(this_arg: &crate::lightni
 pub extern "C" fn RapidGossipSync_update_network_graph_no_std(this_arg: &crate::lightning_rapid_gossip_sync::RapidGossipSync, mut update_data: crate::c_types::u8slice, mut current_time_unix: crate::c_types::derived::COption_u64Z) -> crate::c_types::derived::CResult_u32GraphSyncErrorZ {
 	let mut local_current_time_unix = if current_time_unix.is_some() { Some( { current_time_unix.take() }) } else { None };
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.update_network_graph_no_std(update_data.to_slice(), local_current_time_unix);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_rapid_gossip_sync::error::GraphSyncError::native_into(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { o }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning_rapid_gossip_sync::GraphSyncError::native_into(e) }).into() };
 	local_ret
 }
 

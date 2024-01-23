@@ -118,6 +118,9 @@ pub(crate) extern "C" fn BigSize_clone_void(this_ptr: *const c_void) -> *mut c_v
 pub extern "C" fn BigSize_clone(orig: &BigSize) -> BigSize {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a BigSize object
+pub extern "C" fn BigSize_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::ser::BigSize }).into()}
 /// Generates a non-cryptographic 64-bit hash of the BigSize.
 #[no_mangle]
 pub extern "C" fn BigSize_hash(o: &BigSize) -> u64 {
@@ -229,6 +232,19 @@ pub(crate) extern "C" fn Hostname_clone_void(this_ptr: *const c_void) -> *mut c_
 pub extern "C" fn Hostname_clone(orig: &Hostname) -> Hostname {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Hostname object
+pub extern "C" fn Hostname_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::ser::Hostname }).into()}
+/// Generates a non-cryptographic 64-bit hash of the Hostname.
+#[no_mangle]
+pub extern "C" fn Hostname_hash(o: &Hostname) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two Hostnames contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -334,6 +350,19 @@ pub(crate) extern "C" fn TransactionU16LenLimited_clone_void(this_ptr: *const c_
 /// Creates a copy of the TransactionU16LenLimited
 pub extern "C" fn TransactionU16LenLimited_clone(orig: &TransactionU16LenLimited) -> TransactionU16LenLimited {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a TransactionU16LenLimited object
+pub extern "C" fn TransactionU16LenLimited_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::ser::TransactionU16LenLimited }).into()}
+/// Generates a non-cryptographic 64-bit hash of the TransactionU16LenLimited.
+#[no_mangle]
+pub extern "C" fn TransactionU16LenLimited_hash(o: &TransactionU16LenLimited) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two TransactionU16LenLimiteds contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.

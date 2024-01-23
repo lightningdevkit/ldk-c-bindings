@@ -134,6 +134,9 @@ pub(crate) extern "C" fn ForwardNode_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn ForwardNode_clone(orig: &ForwardNode) -> ForwardNode {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ForwardNode object
+pub extern "C" fn ForwardNode_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::blinded_path::payment::ForwardNode }).into()}
 
 use lightning::blinded_path::payment::ForwardTlvs as nativeForwardTlvsImport;
 pub(crate) type nativeForwardTlvs = nativeForwardTlvsImport;
@@ -265,6 +268,9 @@ pub(crate) extern "C" fn ForwardTlvs_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn ForwardTlvs_clone(orig: &ForwardTlvs) -> ForwardTlvs {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ForwardTlvs object
+pub extern "C" fn ForwardTlvs_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::blinded_path::payment::ForwardTlvs }).into()}
 
 use lightning::blinded_path::payment::ReceiveTlvs as nativeReceiveTlvsImport;
 pub(crate) type nativeReceiveTlvs = nativeReceiveTlvsImport;
@@ -367,6 +373,9 @@ pub(crate) extern "C" fn ReceiveTlvs_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn ReceiveTlvs_clone(orig: &ReceiveTlvs) -> ReceiveTlvs {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ReceiveTlvs object
+pub extern "C" fn ReceiveTlvs_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::blinded_path::payment::ReceiveTlvs }).into()}
 
 use lightning::blinded_path::payment::PaymentRelay as nativePaymentRelayImport;
 pub(crate) type nativePaymentRelay = nativePaymentRelayImport;
@@ -484,6 +493,9 @@ pub(crate) extern "C" fn PaymentRelay_clone_void(this_ptr: *const c_void) -> *mu
 pub extern "C" fn PaymentRelay_clone(orig: &PaymentRelay) -> PaymentRelay {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a PaymentRelay object
+pub extern "C" fn PaymentRelay_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::blinded_path::payment::PaymentRelay }).into()}
 
 use lightning::blinded_path::payment::PaymentConstraints as nativePaymentConstraintsImport;
 pub(crate) type nativePaymentConstraints = nativePaymentConstraintsImport;
@@ -589,6 +601,9 @@ pub(crate) extern "C" fn PaymentConstraints_clone_void(this_ptr: *const c_void) 
 pub extern "C" fn PaymentConstraints_clone(orig: &PaymentConstraints) -> PaymentConstraints {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a PaymentConstraints object
+pub extern "C" fn PaymentConstraints_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::blinded_path::payment::PaymentConstraints }).into()}
 #[no_mangle]
 /// Serialize the ForwardTlvs object into a byte array which can be read by ForwardTlvs_read
 pub extern "C" fn ForwardTlvs_write(obj: &crate::lightning::blinded_path::payment::ForwardTlvs) -> crate::c_types::derived::CVec_u8Z {
@@ -606,13 +621,6 @@ pub extern "C" fn ReceiveTlvs_write(obj: &crate::lightning::blinded_path::paymen
 #[allow(unused)]
 pub(crate) extern "C" fn ReceiveTlvs_write_void(obj: *const c_void) -> crate::c_types::derived::CVec_u8Z {
 	crate::c_types::serialize_obj(unsafe { &*(obj as *const nativeReceiveTlvs) })
-}
-#[no_mangle]
-/// Read a ReceiveTlvs from a byte array, created by ReceiveTlvs_write
-pub extern "C" fn ReceiveTlvs_read(ser: crate::c_types::u8slice) -> crate::c_types::derived::CResult_ReceiveTlvsDecodeErrorZ {
-	let res: Result<lightning::blinded_path::payment::ReceiveTlvs, lightning::ln::msgs::DecodeError> = crate::c_types::deserialize_obj(ser);
-	let mut local_res = match res { Ok(mut o) => crate::c_types::CResultTempl::ok( { crate::lightning::blinded_path::payment::ReceiveTlvs { inner: ObjOps::heap_alloc(o), is_owned: true } }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::lightning::ln::msgs::DecodeError::native_into(e) }).into() };
-	local_res
 }
 #[no_mangle]
 /// Serialize the PaymentRelay object into a byte array which can be read by PaymentRelay_read

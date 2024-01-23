@@ -99,6 +99,9 @@ pub(crate) extern "C" fn Bolt12ParseError_clone_void(this_ptr: *const c_void) ->
 pub extern "C" fn Bolt12ParseError_clone(orig: &Bolt12ParseError) -> Bolt12ParseError {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Bolt12ParseError object
+pub extern "C" fn Bolt12ParseError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::parse::Bolt12ParseError }).into()}
 /// Error when interpreting a TLV stream as a specific type.
 #[derive(Clone)]
 #[must_use]
@@ -228,7 +231,8 @@ impl Bolt12SemanticError {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeBolt12SemanticError) -> Self {
+	pub(crate) fn from_native(native: &Bolt12SemanticErrorImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeBolt12SemanticError) };
 		match native {
 			nativeBolt12SemanticError::AlreadyExpired => Bolt12SemanticError::AlreadyExpired,
 			nativeBolt12SemanticError::UnsupportedChain => Bolt12SemanticError::UnsupportedChain,
@@ -415,3 +419,6 @@ pub extern "C" fn Bolt12SemanticError_missing_payment_hash() -> Bolt12SemanticEr
 /// Utility method to constructs a new MissingSignature-variant Bolt12SemanticError
 pub extern "C" fn Bolt12SemanticError_missing_signature() -> Bolt12SemanticError {
 	Bolt12SemanticError::MissingSignature}
+/// Get a string which allows debug introspection of a Bolt12SemanticError object
+pub extern "C" fn Bolt12SemanticError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::parse::Bolt12SemanticError }).into()}

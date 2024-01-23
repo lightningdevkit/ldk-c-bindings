@@ -18,6 +18,7 @@
 //!
 //! [offers]: <https://github.com/lightning/bolts/pull/798>
 //! [blinded paths]: crate::blinded_path::BlindedPath
+//! [`OnionMessenger`]: self::messenger::OnionMessenger
 
 use alloc::str::FromStr;
 use alloc::string::String;

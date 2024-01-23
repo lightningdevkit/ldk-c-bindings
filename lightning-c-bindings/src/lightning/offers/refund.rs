@@ -166,6 +166,9 @@ pub(crate) extern "C" fn Refund_clone_void(this_ptr: *const c_void) -> *mut c_vo
 pub extern "C" fn Refund_clone(orig: &Refund) -> Refund {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Refund object
+pub extern "C" fn Refund_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::refund::Refund }).into()}
 /// A complete description of the purpose of the refund. Intended to be displayed to the user
 /// but with the caveat that it has not been verified in any way.
 #[must_use]
@@ -191,6 +194,14 @@ pub extern "C" fn Refund_absolute_expiry(this_arg: &crate::lightning::offers::re
 #[no_mangle]
 pub extern "C" fn Refund_is_expired(this_arg: &crate::lightning::offers::refund::Refund) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_expired();
+	ret
+}
+
+/// Whether the refund has expired given the duration since the Unix epoch.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Refund_is_expired_no_std(this_arg: &crate::lightning::offers::refund::Refund, mut duration_since_epoch: u64) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_expired_no_std(core::time::Duration::from_secs(duration_since_epoch));
 	ret
 }
 
@@ -233,7 +244,7 @@ pub extern "C" fn Refund_payer_metadata(this_arg: &crate::lightning::offers::ref
 #[no_mangle]
 pub extern "C" fn Refund_chain(this_arg: &crate::lightning::offers::refund::Refund) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chain();
-	crate::c_types::ThirtyTwoBytes { data: ret.to_bytes() }
+	crate::c_types::ThirtyTwoBytes { data: *ret.as_ref() }
 }
 
 /// The amount to refund in msats (i.e., the minimum lightning-payable unit for [`chain`]).

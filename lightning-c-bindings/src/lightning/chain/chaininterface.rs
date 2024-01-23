@@ -39,7 +39,7 @@ pub struct BroadcasterInterface {
 	/// be sure to manage both cases correctly.
 	///
 	/// Bitcoin transaction packages are defined in BIP 331 and here:
-	/// https://github.com/bitcoin/bitcoin/blob/master/doc/policy/packages.md
+	/// <https://github.com/bitcoin/bitcoin/blob/master/doc/policy/packages.md>
 	pub broadcast_transactions: extern "C" fn (this_arg: *const c_void, txs: crate::c_types::derived::CVec_TransactionZ),
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
@@ -98,23 +98,6 @@ pub enum ConfirmationTarget {
 	/// to low hundreds of blocks to get our transaction on-chain, but we shouldn't risk too low a
 	/// fee - this should be a relatively high priority feerate.
 	OnChainSweep,
-	/// The highest feerate we will allow our channel counterparty to have in a non-anchor channel.
-	///
-	/// This is the feerate on the transaction which we (or our counterparty) will broadcast in
-	/// order to close the channel unilaterally. Because our counterparty must ensure they can
-	/// always broadcast the latest state, this value being too low will cause immediate
-	/// force-closures.
-	///
-	/// Allowing this value to be too high can allow our counterparty to burn our HTLC outputs to
-	/// dust, which can result in HTLCs failing or force-closures (when the dust HTLCs exceed
-	/// [`ChannelConfig::max_dust_htlc_exposure`]).
-	///
-	/// Because most nodes use a feerate estimate which is based on a relatively high priority
-	/// transaction entering the current mempool, setting this to a small multiple of your current
-	/// high priority feerate estimate should suffice.
-	///
-	/// [`ChannelConfig::max_dust_htlc_exposure`]: crate::util::config::ChannelConfig::max_dust_htlc_exposure
-	MaxAllowedNonAnchorChannelRemoteFee,
 	/// This is the lowest feerate we will allow our channel counterparty to have in an anchor
 	/// channel in order to close the channel if a channel party goes away.
 	///
@@ -194,7 +177,6 @@ impl ConfirmationTarget {
 	pub(crate) fn to_native(&self) -> nativeConfirmationTarget {
 		match self {
 			ConfirmationTarget::OnChainSweep => nativeConfirmationTarget::OnChainSweep,
-			ConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee => nativeConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee,
 			ConfirmationTarget::MinAllowedAnchorChannelRemoteFee => nativeConfirmationTarget::MinAllowedAnchorChannelRemoteFee,
 			ConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee => nativeConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee,
 			ConfirmationTarget::AnchorChannelFee => nativeConfirmationTarget::AnchorChannelFee,
@@ -206,7 +188,6 @@ impl ConfirmationTarget {
 	pub(crate) fn into_native(self) -> nativeConfirmationTarget {
 		match self {
 			ConfirmationTarget::OnChainSweep => nativeConfirmationTarget::OnChainSweep,
-			ConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee => nativeConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee,
 			ConfirmationTarget::MinAllowedAnchorChannelRemoteFee => nativeConfirmationTarget::MinAllowedAnchorChannelRemoteFee,
 			ConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee => nativeConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee,
 			ConfirmationTarget::AnchorChannelFee => nativeConfirmationTarget::AnchorChannelFee,
@@ -215,10 +196,10 @@ impl ConfirmationTarget {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeConfirmationTarget) -> Self {
+	pub(crate) fn from_native(native: &ConfirmationTargetImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeConfirmationTarget) };
 		match native {
 			nativeConfirmationTarget::OnChainSweep => ConfirmationTarget::OnChainSweep,
-			nativeConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee => ConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee,
 			nativeConfirmationTarget::MinAllowedAnchorChannelRemoteFee => ConfirmationTarget::MinAllowedAnchorChannelRemoteFee,
 			nativeConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee => ConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee,
 			nativeConfirmationTarget::AnchorChannelFee => ConfirmationTarget::AnchorChannelFee,
@@ -230,7 +211,6 @@ impl ConfirmationTarget {
 	pub(crate) fn native_into(native: nativeConfirmationTarget) -> Self {
 		match native {
 			nativeConfirmationTarget::OnChainSweep => ConfirmationTarget::OnChainSweep,
-			nativeConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee => ConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee,
 			nativeConfirmationTarget::MinAllowedAnchorChannelRemoteFee => ConfirmationTarget::MinAllowedAnchorChannelRemoteFee,
 			nativeConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee => ConfirmationTarget::MinAllowedNonAnchorChannelRemoteFee,
 			nativeConfirmationTarget::AnchorChannelFee => ConfirmationTarget::AnchorChannelFee,
@@ -259,10 +239,6 @@ pub(crate) extern "C" fn ConfirmationTarget_free_void(this_ptr: *mut c_void) {
 pub extern "C" fn ConfirmationTarget_on_chain_sweep() -> ConfirmationTarget {
 	ConfirmationTarget::OnChainSweep}
 #[no_mangle]
-/// Utility method to constructs a new MaxAllowedNonAnchorChannelRemoteFee-variant ConfirmationTarget
-pub extern "C" fn ConfirmationTarget_max_allowed_non_anchor_channel_remote_fee() -> ConfirmationTarget {
-	ConfirmationTarget::MaxAllowedNonAnchorChannelRemoteFee}
-#[no_mangle]
 /// Utility method to constructs a new MinAllowedAnchorChannelRemoteFee-variant ConfirmationTarget
 pub extern "C" fn ConfirmationTarget_min_allowed_anchor_channel_remote_fee() -> ConfirmationTarget {
 	ConfirmationTarget::MinAllowedAnchorChannelRemoteFee}
@@ -282,6 +258,9 @@ pub extern "C" fn ConfirmationTarget_non_anchor_channel_fee() -> ConfirmationTar
 /// Utility method to constructs a new ChannelCloseMinimum-variant ConfirmationTarget
 pub extern "C" fn ConfirmationTarget_channel_close_minimum() -> ConfirmationTarget {
 	ConfirmationTarget::ChannelCloseMinimum}
+/// Get a string which allows debug introspection of a ConfirmationTarget object
+pub extern "C" fn ConfirmationTarget_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::chain::chaininterface::ConfirmationTarget }).into()}
 /// Generates a non-cryptographic 64-bit hash of the ConfirmationTarget.
 #[no_mangle]
 pub extern "C" fn ConfirmationTarget_hash(o: &ConfirmationTarget) -> u64 {

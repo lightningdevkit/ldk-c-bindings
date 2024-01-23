@@ -225,7 +225,7 @@ impl Drop for Persister {
 #[no_mangle]
 pub extern "C" fn read_channel_monitors(mut kv_store: crate::lightning::util::persist::KVStore, mut entropy_source: crate::lightning::sign::EntropySource, mut signer_provider: crate::lightning::sign::SignerProvider) -> crate::c_types::derived::CResult_CVec_C2Tuple_ThirtyTwoBytesChannelMonitorZZIOErrorZ {
 	let mut ret = lightning::util::persist::read_channel_monitors::<crate::lightning::util::persist::KVStore, crate::lightning::sign::EntropySource, crate::lightning::sign::SignerProvider>(kv_store, entropy_source, signer_provider);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let (mut orig_ret_0_0_0, mut orig_ret_0_0_1) = item; let mut local_ret_0_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_ret_0_0_1), is_owned: true }).into(); local_ret_0_0 }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let (mut orig_ret_0_0_0, mut orig_ret_0_0_1) = item; let mut local_ret_0_0 = (crate::c_types::ThirtyTwoBytes { data: *orig_ret_0_0_0.as_ref() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_ret_0_0_1), is_owned: true }).into(); local_ret_0_0 }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
 	local_ret
 }
 
@@ -294,9 +294,9 @@ pub(crate) type nativeMonitorUpdatingPersister = nativeMonitorUpdatingPersisterI
 /// [`MonitorUpdatingPersister::read_all_channel_monitors_with_updates`]. Alternatively, users can
 /// list channel monitors themselves and load channels individually using
 /// [`MonitorUpdatingPersister::read_channel_monitor_with_updates`].
-/// 
+///
 /// ## EXTREMELY IMPORTANT
-/// 
+///
 /// It is extremely important that your [`KVStore::read`] implementation uses the
 /// [`io::ErrorKind::NotFound`] variant correctly: that is, when a file is not found, and _only_ in
 /// that circumstance (not when there is really a permissions error, for example). This is because
@@ -306,9 +306,10 @@ pub(crate) type nativeMonitorUpdatingPersister = nativeMonitorUpdatingPersisterI
 ///
 /// # Pruning stale channel updates
 ///
-/// Stale updates are pruned when a full monitor is written. The old monitor is first read, and if
-/// that succeeds, updates in the range between the old and new monitors are deleted. The `lazy`
-/// flag is used on the [`KVStore::remove`] method, so there are no guarantees that the deletions
+/// Stale updates are pruned when the consolidation threshold is reached according to `maximum_pending_updates`.
+/// Monitor updates in the range between the latest `update_id` and `update_id - maximum_pending_updates`
+/// are deleted.
+/// The `lazy` flag is used on the [`KVStore::remove`] method, so there are no guarantees that the deletions
 /// will complete. However, stale updates are not a problem for data integrity, since updates are
 /// only read that are higher than the stored [`ChannelMonitor`]'s `update_id`.
 ///
@@ -368,7 +369,7 @@ impl MonitorUpdatingPersister {
 /// consolidation will frequently occur with fewer updates than what you set here; this number
 /// is merely the maximum that may be stored. When setting this value, consider that for higher
 /// values of `maximum_pending_updates`:
-/// 
+///
 ///   - [`MonitorUpdatingPersister`] will tend to write more [`ChannelMonitorUpdate`]s than
 /// [`ChannelMonitor`]s, approaching one [`ChannelMonitor`] write for every
 /// `maximum_pending_updates` [`ChannelMonitorUpdate`]s.
@@ -393,7 +394,7 @@ pub extern "C" fn MonitorUpdatingPersister_new(mut kv_store: crate::lightning::u
 #[no_mangle]
 pub extern "C" fn MonitorUpdatingPersister_read_all_channel_monitors_with_updates(this_arg: &crate::lightning::util::persist::MonitorUpdatingPersister, broadcaster: &crate::lightning::chain::chaininterface::BroadcasterInterface, fee_estimator: &crate::lightning::chain::chaininterface::FeeEstimator) -> crate::c_types::derived::CResult_CVec_C2Tuple_ThirtyTwoBytesChannelMonitorZZIOErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.read_all_channel_monitors_with_updates(broadcaster, fee_estimator);
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let (mut orig_ret_0_0_0, mut orig_ret_0_0_1) = item; let mut local_ret_0_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_ret_0_0_1), is_owned: true }).into(); local_ret_0_0 }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let mut local_ret_0 = Vec::new(); for mut item in o.drain(..) { local_ret_0.push( { let (mut orig_ret_0_0_0, mut orig_ret_0_0_1) = item; let mut local_ret_0_0 = (crate::c_types::ThirtyTwoBytes { data: *orig_ret_0_0_0.as_ref() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_ret_0_0_1), is_owned: true }).into(); local_ret_0_0 }); }; local_ret_0.into() }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
 	local_ret
 }
 
@@ -411,14 +412,14 @@ pub extern "C" fn MonitorUpdatingPersister_read_all_channel_monitors_with_update
 ///
 /// The correct `monitor_key` would be:
 /// `deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef_1`
-/// 
+///
 /// Loading a large number of monitors will be faster if done in parallel. You can use this
 /// function to accomplish this. Take care to limit the number of parallel readers.
 #[must_use]
 #[no_mangle]
 pub extern "C" fn MonitorUpdatingPersister_read_channel_monitor_with_updates(this_arg: &crate::lightning::util::persist::MonitorUpdatingPersister, broadcaster: &crate::lightning::chain::chaininterface::BroadcasterInterface, fee_estimator: &crate::lightning::chain::chaininterface::FeeEstimator, mut monitor_key: crate::c_types::Str) -> crate::c_types::derived::CResult_C2Tuple_ThirtyTwoBytesChannelMonitorZIOErrorZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.read_channel_monitor_with_updates(broadcaster, fee_estimator, monitor_key.into_string());
-	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: orig_ret_0_0.into_inner() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_ret_0_1), is_owned: true }).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_ret_0 = (crate::c_types::ThirtyTwoBytes { data: *orig_ret_0_0.as_ref() }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(orig_ret_0_1), is_owned: true }).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { crate::c_types::IOError::from_rust(e) }).into() };
 	local_ret
 }
 

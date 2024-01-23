@@ -146,7 +146,7 @@ pub extern "C" fn BestBlock_new(mut block_hash: crate::c_types::ThirtyTwoBytes, 
 #[no_mangle]
 pub extern "C" fn BestBlock_block_hash(this_arg: &crate::lightning::chain::BestBlock) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.block_hash();
-	crate::c_types::ThirtyTwoBytes { data: ret.into_inner() }
+	crate::c_types::ThirtyTwoBytes { data: *ret.as_ref() }
 }
 
 /// Returns the best block height.
@@ -199,7 +199,7 @@ pub(crate) fn Listen_clone_fields(orig: &Listen) -> Listen {
 
 use lightning::chain::Listen as rustListen;
 impl rustListen for Listen {
-	fn filtered_block_connected(&self, mut header: &bitcoin::blockdata::block::BlockHeader, mut txdata: &lightning::chain::transaction::TransactionData, mut height: u32) {
+	fn filtered_block_connected(&self, mut header: &bitcoin::blockdata::block::Header, mut txdata: &lightning::chain::transaction::TransactionData, mut height: u32) {
 		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
 		let mut local_txdata = Vec::new(); for item in txdata.iter() { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item; let mut local_txdata_0 = (orig_txdata_0_0, crate::c_types::Transaction::from_bitcoin(&orig_txdata_0_1)).into(); local_txdata_0 }); };
 		(self.filtered_block_connected)(self.this_arg, &local_header, local_txdata.into(), height)
@@ -208,7 +208,7 @@ impl rustListen for Listen {
 		let mut local_block = ::bitcoin::consensus::encode::serialize(block);
 		(self.block_connected)(self.this_arg, crate::c_types::u8slice::from_slice(&local_block), height)
 	}
-	fn block_disconnected(&self, mut header: &bitcoin::blockdata::block::BlockHeader, mut height: u32) {
+	fn block_disconnected(&self, mut header: &bitcoin::blockdata::block::Header, mut height: u32) {
 		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
 		(self.block_disconnected)(self.this_arg, &local_header, height)
 	}
@@ -308,7 +308,7 @@ pub struct Confirm {
 	/// blocks.
 	pub best_block_updated: extern "C" fn (this_arg: *const c_void, header: *const [u8; 80], height: u32),
 	/// Returns transactions that must be monitored for reorganization out of the chain along
-	/// with the hash of the block as part of which it had been previously confirmed.
+	/// with the height and the hash of the block as part of which it had been previously confirmed.
 	///
 	/// Note that the returned `Option<BlockHash>` might be `None` for channels created with LDK
 	/// 0.0.112 and prior, in which case you need to manually track previous confirmations.
@@ -323,12 +323,12 @@ pub struct Confirm {
 	/// given to [`transaction_unconfirmed`].
 	///
 	/// If any of the returned transactions are confirmed in a block other than the one with the
-	/// given hash, they need to be unconfirmed and reconfirmed via [`transaction_unconfirmed`] and
-	/// [`transactions_confirmed`], respectively.
+	/// given hash at the given height, they need to be unconfirmed and reconfirmed via
+	/// [`transaction_unconfirmed`] and [`transactions_confirmed`], respectively.
 	///
 	/// [`transactions_confirmed`]: Self::transactions_confirmed
 	/// [`transaction_unconfirmed`]: Self::transaction_unconfirmed
-	pub get_relevant_txids: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_C2Tuple_ThirtyTwoBytesCOption_ThirtyTwoBytesZZZ,
+	pub get_relevant_txids: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_C3Tuple_ThirtyTwoBytesu32COption_ThirtyTwoBytesZZZ,
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -349,21 +349,21 @@ pub(crate) fn Confirm_clone_fields(orig: &Confirm) -> Confirm {
 
 use lightning::chain::Confirm as rustConfirm;
 impl rustConfirm for Confirm {
-	fn transactions_confirmed(&self, mut header: &bitcoin::blockdata::block::BlockHeader, mut txdata: &lightning::chain::transaction::TransactionData, mut height: u32) {
+	fn transactions_confirmed(&self, mut header: &bitcoin::blockdata::block::Header, mut txdata: &lightning::chain::transaction::TransactionData, mut height: u32) {
 		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
 		let mut local_txdata = Vec::new(); for item in txdata.iter() { local_txdata.push( { let (mut orig_txdata_0_0, mut orig_txdata_0_1) = item; let mut local_txdata_0 = (orig_txdata_0_0, crate::c_types::Transaction::from_bitcoin(&orig_txdata_0_1)).into(); local_txdata_0 }); };
 		(self.transactions_confirmed)(self.this_arg, &local_header, local_txdata.into(), height)
 	}
 	fn transaction_unconfirmed(&self, mut txid: &bitcoin::hash_types::Txid) {
-		(self.transaction_unconfirmed)(self.this_arg, txid.as_inner())
+		(self.transaction_unconfirmed)(self.this_arg, txid.as_ref())
 	}
-	fn best_block_updated(&self, mut header: &bitcoin::blockdata::block::BlockHeader, mut height: u32) {
+	fn best_block_updated(&self, mut header: &bitcoin::blockdata::block::Header, mut height: u32) {
 		let mut local_header = { let mut s = [0u8; 80]; s[..].copy_from_slice(&::bitcoin::consensus::encode::serialize(header)); s };
 		(self.best_block_updated)(self.this_arg, &local_header, height)
 	}
-	fn get_relevant_txids(&self) -> Vec<(bitcoin::hash_types::Txid, Option<bitcoin::hash_types::BlockHash>)> {
+	fn get_relevant_txids(&self) -> Vec<(bitcoin::hash_types::Txid, u32, Option<bitcoin::hash_types::BlockHash>)> {
 		let mut ret = (self.get_relevant_txids)(self.this_arg);
-		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1) = item.to_rust(); let mut local_orig_ret_0_1 = { /*orig_ret_0_1*/ let orig_ret_0_1_opt = orig_ret_0_1; if orig_ret_0_1_opt.is_none() { None } else { Some({ { ::bitcoin::hash_types::BlockHash::from_slice(&{ orig_ret_0_1_opt.take() }.data[..]).unwrap() }})} }; let mut local_ret_0 = (::bitcoin::hash_types::Txid::from_slice(&orig_ret_0_0.data[..]).unwrap(), local_orig_ret_0_1); local_ret_0 }); };
+		let mut local_ret = Vec::new(); for mut item in ret.into_rust().drain(..) { local_ret.push( { let (mut orig_ret_0_0, mut orig_ret_0_1, mut orig_ret_0_2) = item.to_rust(); let mut local_orig_ret_0_2 = { /*orig_ret_0_2*/ let orig_ret_0_2_opt = orig_ret_0_2; if orig_ret_0_2_opt.is_none() { None } else { Some({ { ::bitcoin::hash_types::BlockHash::from_slice(&{ orig_ret_0_2_opt.take() }.data[..]).unwrap() }})} }; let mut local_ret_0 = (::bitcoin::hash_types::Txid::from_slice(&orig_ret_0_0.data[..]).unwrap(), orig_ret_0_1, local_orig_ret_0_2); local_ret_0 }); };
 		local_ret
 	}
 }
@@ -481,7 +481,8 @@ impl ChannelMonitorUpdateStatus {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeChannelMonitorUpdateStatus) -> Self {
+	pub(crate) fn from_native(native: &ChannelMonitorUpdateStatusImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeChannelMonitorUpdateStatus) };
 		match native {
 			nativeChannelMonitorUpdateStatus::Completed => ChannelMonitorUpdateStatus::Completed,
 			nativeChannelMonitorUpdateStatus::InProgress => ChannelMonitorUpdateStatus::InProgress,
@@ -524,6 +525,9 @@ pub extern "C" fn ChannelMonitorUpdateStatus_in_progress() -> ChannelMonitorUpda
 /// Utility method to constructs a new UnrecoverableError-variant ChannelMonitorUpdateStatus
 pub extern "C" fn ChannelMonitorUpdateStatus_unrecoverable_error() -> ChannelMonitorUpdateStatus {
 	ChannelMonitorUpdateStatus::UnrecoverableError}
+/// Get a string which allows debug introspection of a ChannelMonitorUpdateStatus object
+pub extern "C" fn ChannelMonitorUpdateStatus_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::chain::ChannelMonitorUpdateStatus }).into()}
 /// Checks if two ChannelMonitorUpdateStatuss contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -605,8 +609,8 @@ pub(crate) fn Watch_clone_fields(orig: &Watch) -> Watch {
 }
 
 use lightning::chain::Watch as rustWatch;
-impl rustWatch<crate::lightning::sign::WriteableEcdsaChannelSigner> for Watch {
-	fn watch_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::sign::WriteableEcdsaChannelSigner>) -> Result<lightning::chain::ChannelMonitorUpdateStatus, ()> {
+impl rustWatch<crate::lightning::sign::ecdsa::WriteableEcdsaChannelSigner> for Watch {
+	fn watch_channel(&self, mut funding_txo: lightning::chain::transaction::OutPoint, mut monitor: lightning::chain::channelmonitor::ChannelMonitor<crate::lightning::sign::ecdsa::WriteableEcdsaChannelSigner>) -> Result<lightning::chain::ChannelMonitorUpdateStatus, ()> {
 		let mut ret = (self.watch_channel)(self.this_arg, crate::lightning::chain::transaction::OutPoint { inner: ObjOps::heap_alloc(funding_txo), is_owned: true }, crate::lightning::chain::channelmonitor::ChannelMonitor { inner: ObjOps::heap_alloc(monitor), is_owned: true });
 		let mut local_ret = match ret.result_ok { true => Ok( { (*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.result)) }).into_native() }), false => Err( { () /*(*unsafe { Box::from_raw(<*mut _>::take_ptr(&mut ret.contents.err)) })*/ })};
 		local_ret
@@ -699,7 +703,7 @@ pub(crate) fn Filter_clone_fields(orig: &Filter) -> Filter {
 use lightning::chain::Filter as rustFilter;
 impl rustFilter for Filter {
 	fn register_tx(&self, mut txid: &bitcoin::hash_types::Txid, mut script_pubkey: &bitcoin::blockdata::script::Script) {
-		(self.register_tx)(self.this_arg, txid.as_inner(), crate::c_types::u8slice::from_slice(&script_pubkey[..]))
+		(self.register_tx)(self.this_arg, txid.as_ref(), crate::c_types::u8slice::from_slice(script_pubkey.as_ref()))
 	}
 	fn register_output(&self, mut output: lightning::chain::WatchedOutput) {
 		(self.register_output)(self.this_arg, crate::lightning::chain::WatchedOutput { inner: ObjOps::heap_alloc(output), is_owned: true })
@@ -794,7 +798,7 @@ impl WatchedOutput {
 #[no_mangle]
 pub extern "C" fn WatchedOutput_get_block_hash(this_ptr: &WatchedOutput) -> crate::c_types::derived::COption_ThirtyTwoBytesZ {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().block_hash;
-	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().into_inner() } }) };
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: *(*inner_val.as_ref().unwrap()).clone().as_ref() } }) };
 	local_inner_val
 }
 /// First block where the transaction output may have been spent.
@@ -816,14 +820,14 @@ pub extern "C" fn WatchedOutput_set_outpoint(this_ptr: &mut WatchedOutput, mut v
 }
 /// Spending condition of the transaction output.
 #[no_mangle]
-pub extern "C" fn WatchedOutput_get_script_pubkey(this_ptr: &WatchedOutput) -> crate::c_types::u8slice {
+pub extern "C" fn WatchedOutput_get_script_pubkey(this_ptr: &WatchedOutput) -> crate::c_types::derived::CVec_u8Z {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().script_pubkey;
-	crate::c_types::u8slice::from_slice(&inner_val[..])
+	inner_val.as_bytes().to_vec().into()
 }
 /// Spending condition of the transaction output.
 #[no_mangle]
 pub extern "C" fn WatchedOutput_set_script_pubkey(this_ptr: &mut WatchedOutput, mut val: crate::c_types::derived::CVec_u8Z) {
-	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.script_pubkey = ::bitcoin::blockdata::script::Script::from(val.into_rust());
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.script_pubkey = ::bitcoin::blockdata::script::ScriptBuf::from(val.into_rust());
 }
 /// Constructs a new WatchedOutput given each field
 #[must_use]
@@ -833,7 +837,7 @@ pub extern "C" fn WatchedOutput_new(mut block_hash_arg: crate::c_types::derived:
 	WatchedOutput { inner: ObjOps::heap_alloc(nativeWatchedOutput {
 		block_hash: local_block_hash_arg,
 		outpoint: *unsafe { Box::from_raw(outpoint_arg.take_inner()) },
-		script_pubkey: ::bitcoin::blockdata::script::Script::from(script_pubkey_arg.into_rust()),
+		script_pubkey: ::bitcoin::blockdata::script::ScriptBuf::from(script_pubkey_arg.into_rust()),
 	}), is_owned: true }
 }
 impl Clone for WatchedOutput {

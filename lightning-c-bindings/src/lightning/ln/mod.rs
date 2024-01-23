@@ -17,7 +17,9 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
+pub mod onion_payment;
 pub mod channelmanager;
+pub mod channel_keys;
 pub mod inbound_payment;
 pub mod msgs;
 pub mod peer_handler;
@@ -61,6 +63,18 @@ use crate::c_types::*;
 #[cfg(feature="no-std")]
 use alloc::{vec::Vec, boxed::Box};
 
+mod state_flags {
+
+use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
 }
 mod onion_utils {
 

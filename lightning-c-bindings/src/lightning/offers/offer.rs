@@ -166,6 +166,9 @@ pub(crate) extern "C" fn Offer_clone_void(this_ptr: *const c_void) -> *mut c_voi
 pub extern "C" fn Offer_clone(orig: &Offer) -> Offer {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Offer object
+pub extern "C" fn Offer_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::offer::Offer }).into()}
 /// The chains that may be used when paying a requested invoice (e.g., bitcoin mainnet).
 /// Payments must be denominated in units of the minimal lightning-payable unit (e.g., msats)
 /// for the selected chain.
@@ -173,7 +176,7 @@ pub extern "C" fn Offer_clone(orig: &Offer) -> Offer {
 #[no_mangle]
 pub extern "C" fn Offer_chains(this_arg: &crate::lightning::offers::offer::Offer) -> crate::c_types::derived::CVec_ThirtyTwoBytesZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chains();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: *item.as_ref() } }); };
 	local_ret.into()
 }
 
@@ -268,7 +271,7 @@ pub extern "C" fn Offer_signing_pubkey(this_arg: &crate::lightning::offers::offe
 #[must_use]
 #[no_mangle]
 pub extern "C" fn Offer_supports_chain(this_arg: &crate::lightning::offers::offer::Offer, mut chain: crate::c_types::ThirtyTwoBytes) -> bool {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_chain(::bitcoin::blockdata::constants::ChainHash::from(&chain.data[..]));
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_chain(::bitcoin::blockdata::constants::ChainHash::from(&chain.data));
 	ret
 }
 
@@ -277,6 +280,14 @@ pub extern "C" fn Offer_supports_chain(this_arg: &crate::lightning::offers::offe
 #[no_mangle]
 pub extern "C" fn Offer_is_expired(this_arg: &crate::lightning::offers::offer::Offer) -> bool {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_expired();
+	ret
+}
+
+/// Whether the offer has expired given the duration since the Unix epoch.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Offer_is_expired_no_std(this_arg: &crate::lightning::offers::offer::Offer, mut duration_since_epoch: u64) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.is_expired_no_std(core::time::Duration::from_secs(duration_since_epoch));
 	ret
 }
 
@@ -378,6 +389,9 @@ pub(crate) extern "C" fn Amount_clone_void(this_ptr: *const c_void) -> *mut c_vo
 pub extern "C" fn Amount_clone(orig: &Amount) -> Amount {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Amount object
+pub extern "C" fn Amount_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::offer::Amount }).into()}
 
 use lightning::offers::offer::Quantity as nativeQuantityImport;
 pub(crate) type nativeQuantity = nativeQuantityImport;
@@ -448,6 +462,9 @@ pub(crate) extern "C" fn Quantity_clone_void(this_ptr: *const c_void) -> *mut c_
 pub extern "C" fn Quantity_clone(orig: &Quantity) -> Quantity {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Quantity object
+pub extern "C" fn Quantity_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::offer::Quantity }).into()}
 #[no_mangle]
 /// Read a Offer object from a string
 pub extern "C" fn Offer_from_str(s: crate::c_types::Str) -> crate::c_types::derived::CResult_OfferBolt12ParseErrorZ {

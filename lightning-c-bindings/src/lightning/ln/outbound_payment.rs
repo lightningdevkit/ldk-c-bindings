@@ -73,7 +73,8 @@ impl Retry {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeRetry) -> Self {
+	pub(crate) fn from_native(native: &RetryImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeRetry) };
 		match native {
 			nativeRetry::Attempts (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
@@ -133,6 +134,9 @@ pub extern "C" fn Retry_attempts(a: u32) -> Retry {
 pub extern "C" fn Retry_timeout(a: u64) -> Retry {
 	Retry::Timeout(a, )
 }
+/// Get a string which allows debug introspection of a Retry object
+pub extern "C" fn Retry_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::outbound_payment::Retry }).into()}
 /// Checks if two Retrys contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -210,7 +214,8 @@ impl RetryableSendFailure {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeRetryableSendFailure) -> Self {
+	pub(crate) fn from_native(native: &RetryableSendFailureImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeRetryableSendFailure) };
 		match native {
 			nativeRetryableSendFailure::PaymentExpired => RetryableSendFailure::PaymentExpired,
 			nativeRetryableSendFailure::RouteNotFound => RetryableSendFailure::RouteNotFound,
@@ -253,6 +258,9 @@ pub extern "C" fn RetryableSendFailure_route_not_found() -> RetryableSendFailure
 /// Utility method to constructs a new DuplicatePayment-variant RetryableSendFailure
 pub extern "C" fn RetryableSendFailure_duplicate_payment() -> RetryableSendFailure {
 	RetryableSendFailure::DuplicatePayment}
+/// Get a string which allows debug introspection of a RetryableSendFailure object
+pub extern "C" fn RetryableSendFailure_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::outbound_payment::RetryableSendFailure }).into()}
 /// Checks if two RetryableSendFailures contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -410,7 +418,8 @@ impl PaymentSendFailure {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativePaymentSendFailure) -> Self {
+	pub(crate) fn from_native(native: &PaymentSendFailureImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativePaymentSendFailure) };
 		match native {
 			nativePaymentSendFailure::ParameterError (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
@@ -526,6 +535,9 @@ pub extern "C" fn PaymentSendFailure_partial_failure(results: crate::c_types::de
 		payment_id,
 	}
 }
+/// Get a string which allows debug introspection of a PaymentSendFailure object
+pub extern "C" fn PaymentSendFailure_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::outbound_payment::PaymentSendFailure }).into()}
 /// Checks if two PaymentSendFailures contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -574,7 +586,8 @@ impl ProbeSendFailure {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeProbeSendFailure) -> Self {
+	pub(crate) fn from_native(native: &ProbeSendFailureImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeProbeSendFailure) };
 		match native {
 			nativeProbeSendFailure::RouteNotFound => ProbeSendFailure::RouteNotFound,
 			nativeProbeSendFailure::SendingFailed (ref a, ) => {
@@ -624,6 +637,9 @@ pub extern "C" fn ProbeSendFailure_route_not_found() -> ProbeSendFailure {
 pub extern "C" fn ProbeSendFailure_sending_failed(a: crate::lightning::ln::outbound_payment::PaymentSendFailure) -> ProbeSendFailure {
 	ProbeSendFailure::SendingFailed(a, )
 }
+/// Get a string which allows debug introspection of a ProbeSendFailure object
+pub extern "C" fn ProbeSendFailure_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::outbound_payment::ProbeSendFailure }).into()}
 /// Checks if two ProbeSendFailures contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -773,6 +789,9 @@ pub(crate) extern "C" fn RecipientOnionFields_clone_void(this_ptr: *const c_void
 pub extern "C" fn RecipientOnionFields_clone(orig: &RecipientOnionFields) -> RecipientOnionFields {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a RecipientOnionFields object
+pub extern "C" fn RecipientOnionFields_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::outbound_payment::RecipientOnionFields }).into()}
 /// Checks if two RecipientOnionFieldss contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.

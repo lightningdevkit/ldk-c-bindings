@@ -67,7 +67,8 @@ impl Level {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeLevel) -> Self {
+	pub(crate) fn from_native(native: &LevelImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeLevel) };
 		match native {
 			nativeLevel::Gossip => Level::Gossip,
 			nativeLevel::Trace => Level::Trace,
@@ -134,6 +135,9 @@ pub extern "C" fn Level_error() -> Level {
 pub extern "C" fn Level_eq(a: &Level, b: &Level) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
+/// Get a string which allows debug introspection of a Level object
+pub extern "C" fn Level_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::logger::Level }).into()}
 /// Generates a non-cryptographic 64-bit hash of the Level.
 #[no_mangle]
 pub extern "C" fn Level_hash(o: &Level) -> u64 {
@@ -153,7 +157,7 @@ pub extern "C" fn Level_max() -> crate::lightning::util::logger::Level {
 
 
 use lightning::util::logger::Record as nativeRecordImport;
-pub(crate) type nativeRecord = nativeRecordImport<'static>;
+pub(crate) type nativeRecord = nativeRecordImport;
 
 /// A Record, unit of logging output with Metadata to enable filtering
 /// Module_path, file, line to inform on log's source
@@ -214,6 +218,46 @@ pub extern "C" fn Record_get_level(this_ptr: &Record) -> crate::lightning::util:
 pub extern "C" fn Record_set_level(this_ptr: &mut Record, mut val: crate::lightning::util::logger::Level) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.level = val.into_native();
 }
+/// The node id of the peer pertaining to the logged record.
+///
+/// Note that in some cases a [`Self::channel_id`] may be filled in but this may still be
+/// `None`, depending on if the peer information is readily available in LDK when the log is
+/// generated.
+///
+/// Note that the return value (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn Record_get_peer_id(this_ptr: &Record) -> crate::c_types::PublicKey {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().peer_id;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::PublicKey::null() } else {  { crate::c_types::PublicKey::from_rust(&(inner_val.unwrap())) } };
+	local_inner_val
+}
+/// The node id of the peer pertaining to the logged record.
+///
+/// Note that in some cases a [`Self::channel_id`] may be filled in but this may still be
+/// `None`, depending on if the peer information is readily available in LDK when the log is
+/// generated.
+///
+/// Note that val (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[no_mangle]
+pub extern "C" fn Record_set_peer_id(this_ptr: &mut Record, mut val: crate::c_types::PublicKey) {
+	let mut local_val = if val.is_null() { None } else { Some( { val.into_rust() }) };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.peer_id = local_val;
+}
+/// The channel id of the channel pertaining to the logged record. May be a temporary id before
+/// the channel has been funded.
+#[no_mangle]
+pub extern "C" fn Record_get_channel_id(this_ptr: &Record) -> crate::c_types::derived::COption_ThirtyTwoBytesZ {
+	let mut inner_val = &mut this_ptr.get_native_mut_ref().channel_id;
+	let mut local_inner_val = if inner_val.is_none() { crate::c_types::derived::COption_ThirtyTwoBytesZ::None } else { crate::c_types::derived::COption_ThirtyTwoBytesZ::Some(/* WARNING: CLONING CONVERSION HERE! &Option<Enum> is otherwise un-expressable. */ { crate::c_types::ThirtyTwoBytes { data: (*inner_val.as_ref().unwrap()).clone().0 } }) };
+	local_inner_val
+}
+/// The channel id of the channel pertaining to the logged record. May be a temporary id before
+/// the channel has been funded.
+#[no_mangle]
+pub extern "C" fn Record_set_channel_id(this_ptr: &mut Record, mut val: crate::c_types::derived::COption_ThirtyTwoBytesZ) {
+	let mut local_val = { /*val*/ let val_opt = val; if val_opt.is_none() { None } else { Some({ { ::lightning::ln::ChannelId({ val_opt.take() }.data) }})} };
+	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.channel_id = local_val;
+}
 /// The message body.
 #[no_mangle]
 pub extern "C" fn Record_get_args(this_ptr: &Record) -> crate::c_types::Str {
@@ -258,6 +302,24 @@ pub extern "C" fn Record_get_line(this_ptr: &Record) -> u32 {
 pub extern "C" fn Record_set_line(this_ptr: &mut Record, mut val: u32) {
 	unsafe { &mut *ObjOps::untweak_ptr(this_ptr.inner) }.line = val;
 }
+/// Constructs a new Record given each field
+///
+/// Note that peer_id_arg (or a relevant inner pointer) may be NULL or all-0s to represent None
+#[must_use]
+#[no_mangle]
+pub extern "C" fn Record_new(mut level_arg: crate::lightning::util::logger::Level, mut peer_id_arg: crate::c_types::PublicKey, mut channel_id_arg: crate::c_types::derived::COption_ThirtyTwoBytesZ, mut args_arg: crate::c_types::Str, mut module_path_arg: crate::c_types::Str, mut file_arg: crate::c_types::Str, mut line_arg: u32) -> Record {
+	let mut local_peer_id_arg = if peer_id_arg.is_null() { None } else { Some( { peer_id_arg.into_rust() }) };
+	let mut local_channel_id_arg = { /*channel_id_arg*/ let channel_id_arg_opt = channel_id_arg; if channel_id_arg_opt.is_none() { None } else { Some({ { ::lightning::ln::ChannelId({ channel_id_arg_opt.take() }.data) }})} };
+	Record { inner: ObjOps::heap_alloc(nativeRecord {
+		level: level_arg.into_native(),
+		peer_id: local_peer_id_arg,
+		channel_id: local_channel_id_arg,
+		args: args_arg.into_string(),
+		module_path: module_path_arg.into_str(),
+		file: file_arg.into_str(),
+		line: line_arg,
+	}), is_owned: true }
+}
 impl Clone for Record {
 	fn clone(&self) -> Self {
 		Self {
@@ -277,14 +339,17 @@ pub(crate) extern "C" fn Record_clone_void(this_ptr: *const c_void) -> *mut c_vo
 pub extern "C" fn Record_clone(orig: &Record) -> Record {
 	orig.clone()
 }
-/// A trait encapsulating the operations required of a logger
+/// Get a string which allows debug introspection of a Record object
+pub extern "C" fn Record_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::logger::Record }).into()}
+/// A trait encapsulating the operations required of a logger.
 #[repr(C)]
 pub struct Logger {
 	/// An opaque pointer which is passed to your function implementations as an argument.
 	/// This has no meaning in the LDK, and can be NULL or any other value.
 	pub this_arg: *mut c_void,
-	/// Logs the `Record`
-	pub log: extern "C" fn (this_arg: *const c_void, record: &crate::lightning::util::logger::Record),
+	/// Logs the [`Record`].
+	pub log: extern "C" fn (this_arg: *const c_void, record: crate::lightning::util::logger::Record),
 	/// Frees any resources associated with this object given its this_arg pointer.
 	/// Does not need to free the outer struct containing function pointers and may be NULL is no resources need to be freed.
 	pub free: Option<extern "C" fn(this_arg: *mut c_void)>,
@@ -302,8 +367,8 @@ pub(crate) fn Logger_clone_fields(orig: &Logger) -> Logger {
 
 use lightning::util::logger::Logger as rustLogger;
 impl rustLogger for Logger {
-	fn log(&self, mut record: &lightning::util::logger::Record) {
-		(self.log)(self.this_arg, &crate::lightning::util::logger::Record { inner: unsafe { ObjOps::nonnull_ptr_to_inner((record as *const lightning::util::logger::Record<'_, >) as *mut _) }, is_owned: false })
+	fn log(&self, mut record: lightning::util::logger::Record) {
+		(self.log)(self.this_arg, crate::lightning::util::logger::Record { inner: ObjOps::heap_alloc(record), is_owned: true })
 	}
 }
 

@@ -147,6 +147,19 @@ pub(crate) extern "C" fn Packet_clone_void(this_ptr: *const c_void) -> *mut c_vo
 pub extern "C" fn Packet_clone(orig: &Packet) -> Packet {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Packet object
+pub extern "C" fn Packet_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::onion_message::packet::Packet }).into()}
+/// Generates a non-cryptographic 64-bit hash of the Packet.
+#[no_mangle]
+pub extern "C" fn Packet_hash(o: &Packet) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
 /// Checks if two Packets contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -216,7 +229,8 @@ impl ParsedOnionMessageContents {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeParsedOnionMessageContents) -> Self {
+	pub(crate) fn from_native(native: &ParsedOnionMessageContentsImport<crate::lightning::onion_message::packet::OnionMessageContents>) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeParsedOnionMessageContents) };
 		match native {
 			nativeParsedOnionMessageContents::Offers (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
@@ -276,6 +290,9 @@ pub extern "C" fn ParsedOnionMessageContents_offers(a: crate::lightning::onion_m
 pub extern "C" fn ParsedOnionMessageContents_custom(a: crate::lightning::onion_message::packet::OnionMessageContents) -> ParsedOnionMessageContents {
 	ParsedOnionMessageContents::Custom(a, )
 }
+/// Get a string which allows debug introspection of a ParsedOnionMessageContents object
+pub extern "C" fn ParsedOnionMessageContents_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::onion_message::packet::ParsedOnionMessageContents }).into()}
 impl From<nativeParsedOnionMessageContents> for crate::lightning::onion_message::packet::OnionMessageContents {
 	fn from(obj: nativeParsedOnionMessageContents) -> Self {
 		let rust_obj = crate::lightning::onion_message::packet::ParsedOnionMessageContents::native_into(obj);
@@ -295,6 +312,7 @@ pub extern "C" fn ParsedOnionMessageContents_as_OnionMessageContents(this_arg: &
 		free: None,
 		tlv_type: ParsedOnionMessageContents_OnionMessageContents_tlv_type,
 		write: ParsedOnionMessageContents_write_void,
+		debug_str: ParsedOnionMessageContents_debug_str_void,
 		cloned: Some(OnionMessageContents_ParsedOnionMessageContents_cloned),
 	}
 }
@@ -328,6 +346,8 @@ pub struct OnionMessageContents {
 	pub tlv_type: extern "C" fn (this_arg: *const c_void) -> u64,
 	/// Serialize the object into a byte array
 	pub write: extern "C" fn (this_arg: *const c_void) -> crate::c_types::derived::CVec_u8Z,
+	/// Return a human-readable "debug" string describing this object
+	pub debug_str: extern "C" fn (this_arg: *const c_void) -> crate::c_types::Str,
 	/// Called, if set, after this OnionMessageContents has been cloned into a duplicate object.
 	/// The new OnionMessageContents is provided, and should be mutated as needed to perform a
 	/// deep copy of the object pointed to by this_arg or avoid any double-freeing.
@@ -344,6 +364,7 @@ pub(crate) fn OnionMessageContents_clone_fields(orig: &OnionMessageContents) -> 
 		this_arg: orig.this_arg,
 		tlv_type: Clone::clone(&orig.tlv_type),
 		write: Clone::clone(&orig.write),
+		debug_str: Clone::clone(&orig.debug_str),
 		cloned: Clone::clone(&orig.cloned),
 		free: Clone::clone(&orig.free),
 	}
@@ -352,6 +373,11 @@ impl lightning::util::ser::Writeable for OnionMessageContents {
 	fn write<W: lightning::util::ser::Writer>(&self, w: &mut W) -> Result<(), crate::c_types::io::Error> {
 		let vec = (self.write)(self.this_arg);
 		w.write_all(vec.as_slice())
+	}
+}
+impl core::fmt::Debug for OnionMessageContents {
+	fn fmt(&self, f: &mut core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+		f.write_str((self.debug_str)(self.this_arg).into_str())
 	}
 }
 #[no_mangle]

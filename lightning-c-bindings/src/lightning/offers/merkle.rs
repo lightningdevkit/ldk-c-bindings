@@ -72,3 +72,49 @@ impl TaggedHash {
 		ret
 	}
 }
+impl Clone for TaggedHash {
+	fn clone(&self) -> Self {
+		Self {
+			inner: if <*mut nativeTaggedHash>::is_null(self.inner) { core::ptr::null_mut() } else {
+				ObjOps::heap_alloc(unsafe { &*ObjOps::untweak_ptr(self.inner) }.clone()) },
+			is_owned: true,
+		}
+	}
+}
+#[allow(unused)]
+/// Used only if an object of this type is returned as a trait impl by a method
+pub(crate) extern "C" fn TaggedHash_clone_void(this_ptr: *const c_void) -> *mut c_void {
+	Box::into_raw(Box::new(unsafe { (*(this_ptr as *const nativeTaggedHash)).clone() })) as *mut c_void
+}
+#[no_mangle]
+/// Creates a copy of the TaggedHash
+pub extern "C" fn TaggedHash_clone(orig: &TaggedHash) -> TaggedHash {
+	orig.clone()
+}
+/// Get a string which allows debug introspection of a TaggedHash object
+pub extern "C" fn TaggedHash_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::merkle::TaggedHash }).into()}
+/// Returns the digest to sign.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn TaggedHash_as_digest(this_arg: &crate::lightning::offers::merkle::TaggedHash) -> *const [u8; 32] {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_digest();
+	ret.as_ref()
+}
+
+/// Returns the tag used in the tagged hash.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn TaggedHash_tag(this_arg: &crate::lightning::offers::merkle::TaggedHash) -> crate::c_types::Str {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.tag();
+	ret.into()
+}
+
+/// Returns the merkle root used in the tagged hash.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn TaggedHash_merkle_root(this_arg: &crate::lightning::offers::merkle::TaggedHash) -> crate::c_types::ThirtyTwoBytes {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.merkle_root();
+	crate::c_types::ThirtyTwoBytes { data: *ret.as_ref() }
+}
+

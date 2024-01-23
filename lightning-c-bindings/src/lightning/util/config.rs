@@ -521,6 +521,9 @@ pub(crate) extern "C" fn ChannelHandshakeConfig_clone_void(this_ptr: *const c_vo
 pub extern "C" fn ChannelHandshakeConfig_clone(orig: &ChannelHandshakeConfig) -> ChannelHandshakeConfig {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ChannelHandshakeConfig object
+pub extern "C" fn ChannelHandshakeConfig_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::config::ChannelHandshakeConfig }).into()}
 /// Creates a "default" ChannelHandshakeConfig. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
@@ -840,6 +843,9 @@ pub(crate) extern "C" fn ChannelHandshakeLimits_clone_void(this_ptr: *const c_vo
 pub extern "C" fn ChannelHandshakeLimits_clone(orig: &ChannelHandshakeLimits) -> ChannelHandshakeLimits {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ChannelHandshakeLimits object
+pub extern "C" fn ChannelHandshakeLimits_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::config::ChannelHandshakeLimits }).into()}
 /// Creates a "default" ChannelHandshakeLimits. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]
@@ -930,7 +936,8 @@ impl MaxDustHTLCExposure {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeMaxDustHTLCExposure) -> Self {
+	pub(crate) fn from_native(native: &MaxDustHTLCExposureImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeMaxDustHTLCExposure) };
 		match native {
 			nativeMaxDustHTLCExposure::FixedLimitMsat (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
@@ -990,6 +997,9 @@ pub extern "C" fn MaxDustHTLCExposure_fixed_limit_msat(a: u64) -> MaxDustHTLCExp
 pub extern "C" fn MaxDustHTLCExposure_fee_rate_multiplier(a: u64) -> MaxDustHTLCExposure {
 	MaxDustHTLCExposure::FeeRateMultiplier(a, )
 }
+/// Get a string which allows debug introspection of a MaxDustHTLCExposure object
+pub extern "C" fn MaxDustHTLCExposure_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::config::MaxDustHTLCExposure }).into()}
 /// Checks if two MaxDustHTLCExposures contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -1278,7 +1288,9 @@ pub extern "C" fn ChannelConfig_set_force_close_avoidance_max_fee_satoshis(this_
 /// - The counterparty will get an [`HTLCIntercepted`] event upon payment forward, and call
 ///   [`forward_intercepted_htlc`] with less than the amount provided in
 ///   [`HTLCIntercepted::expected_outbound_amount_msat`]. The difference between the expected and
-///   actual forward amounts is their fee.
+///   actual forward amounts is their fee. See
+///   <https://github.com/BitcoinAndLightningLayerSpecs/lsp/tree/main/LSPS2#flow-lsp-trusts-client-model>
+///   for how this feature may be used in the LSP use case.
 ///
 /// # Note
 /// It's important for payee wallet software to verify that [`PaymentClaimable::amount_msat`] is
@@ -1312,7 +1324,9 @@ pub extern "C" fn ChannelConfig_get_accept_underpaying_htlcs(this_ptr: &ChannelC
 /// - The counterparty will get an [`HTLCIntercepted`] event upon payment forward, and call
 ///   [`forward_intercepted_htlc`] with less than the amount provided in
 ///   [`HTLCIntercepted::expected_outbound_amount_msat`]. The difference between the expected and
-///   actual forward amounts is their fee.
+///   actual forward amounts is their fee. See
+///   <https://github.com/BitcoinAndLightningLayerSpecs/lsp/tree/main/LSPS2#flow-lsp-trusts-client-model>
+///   for how this feature may be used in the LSP use case.
 ///
 /// # Note
 /// It's important for payee wallet software to verify that [`PaymentClaimable::amount_msat`] is
@@ -1368,6 +1382,9 @@ pub(crate) extern "C" fn ChannelConfig_clone_void(this_ptr: *const c_void) -> *m
 pub extern "C" fn ChannelConfig_clone(orig: &ChannelConfig) -> ChannelConfig {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ChannelConfig object
+pub extern "C" fn ChannelConfig_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::config::ChannelConfig }).into()}
 /// Checks if two ChannelConfigs contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -1804,6 +1821,9 @@ pub(crate) extern "C" fn UserConfig_clone_void(this_ptr: *const c_void) -> *mut 
 pub extern "C" fn UserConfig_clone(orig: &UserConfig) -> UserConfig {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a UserConfig object
+pub extern "C" fn UserConfig_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::config::UserConfig }).into()}
 /// Creates a "default" UserConfig. See struct and individual field documentaiton for details on which values are used.
 #[must_use]
 #[no_mangle]

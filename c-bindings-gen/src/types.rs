@@ -294,6 +294,8 @@ impl<'a, 'p: 'a> GenericTypes<'a, 'p> {
 								if let syn::TypeParamBound::Trait(trait_bound) = bound {
 									if let Some(id) = trait_bound.path.get_ident() {
 										if format!("{}", id) == "Sized" { continue; }
+										if format!("{}", id) == "Send" { continue; }
+										if format!("{}", id) == "Sync" { continue; }
 									}
 									if non_lifetimes_processed { return false; }
 									non_lifetimes_processed = true;

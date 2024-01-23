@@ -4,12 +4,13 @@
 #include <stdio.h>
 #include <string.h>
 
-void print_log(const void *this_arg, const LDKRecord *record) {
-	LDKStr mod = Record_get_module_path(record);
-	LDKStr str = Record_get_args(record);
-	printf("%.*s:%d - %.*s\n", (int)mod.len, mod.chars, Record_get_line(record), (int)str.len, str.chars);
+void print_log(const void *this_arg, const LDKRecord record) {
+	LDKStr mod = Record_get_module_path(&record);
+	LDKStr str = Record_get_args(&record);
+	printf("%.*s:%d - %.*s\n", (int)mod.len, mod.chars, Record_get_line(&record), (int)str.len, str.chars);
 	Str_free(str);
 	Str_free(mod);
+	Record_free(record);
 }
 
 uint32_t get_fee(const void *this_arg, LDKConfirmationTarget target) {

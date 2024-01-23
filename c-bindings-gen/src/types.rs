@@ -1037,6 +1037,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			// Note that no !is_ref types can map to an array because Rust and C's call semantics
 			// for arrays are different (https://github.com/eqrion/cbindgen/issues/528)
 
+			"[u8; 33]" if !is_ref => Some("crate::c_types::ThirtyThreeBytes"),
 			"[u8; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoBytes"),
 			"[u8; 20]" if !is_ref => Some("crate::c_types::TwentyBytes"),
 			"[u8; 16]" if !is_ref => Some("crate::c_types::SixteenBytes"),
@@ -1145,6 +1146,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"Option" if is_ref => Some("&local_"),
 			"Option" => Some("local_"),
 
+			"[u8; 33]" if !is_ref => Some(""),
 			"[u8; 32]" if is_ref => Some("unsafe { &*"),
 			"[u8; 32]" if !is_ref => Some(""),
 			"[u8; 20]" if !is_ref => Some(""),
@@ -1259,6 +1261,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"Option" => Some(""),
 			"Result" if !is_ref => Some(""),
 
+			"[u8; 33]" if !is_ref => Some(".data"),
 			"[u8; 32]" if is_ref => Some("}"),
 			"[u8; 32]" if !is_ref => Some(".data"),
 			"[u8; 20]" if !is_ref => Some(".data"),
@@ -1373,6 +1376,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"Vec" if !is_ref => Some("local_"),
 			"Option" => Some("local_"),
 
+			"[u8; 33]" if is_ref => Some(""),
 			"[u8; 32]" if !is_ref => Some("crate::c_types::ThirtyTwoBytes { data: "),
 			"[u8; 32]" if is_ref => Some(""),
 			"[u8; 20]" if !is_ref => Some("crate::c_types::TwentyBytes { data: "),
@@ -1477,6 +1481,7 @@ impl<'a, 'c: 'a> TypeResolver<'a, 'c> {
 			"Vec" if !is_ref => Some(".into()"),
 			"Option" => Some(""),
 
+			"[u8; 33]" if is_ref => Some(""),
 			"[u8; 32]" if !is_ref => Some(" }"),
 			"[u8; 32]" if is_ref => Some(""),
 			"[u8; 20]" if !is_ref => Some(" }"),

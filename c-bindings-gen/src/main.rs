@@ -1101,7 +1101,9 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 							},
 							("Sync", _, _) => {}, ("Send", _, _) => {},
 							("std::marker::Sync", _, _) => {}, ("std::marker::Send", _, _) => {},
-							("core::fmt::Debug", _, _) => {},
+							("core::fmt::Debug", _, _) => {
+								writeln!(w, "\t\tdebug_str: {}_debug_str_void,", ident).unwrap();
+							},
 							(s, t, _) => {
 								if let Some(supertrait_obj) = types.crate_types.traits.get(s) {
 									macro_rules! write_impl_fields {
@@ -1399,6 +1401,12 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 
 							writeln!(w, "\t}}.into()\n}}").unwrap();
 						}
+					} else if path_matches_nongeneric(&trait_path.1, &["core", "fmt", "Debug"]) {
+						writeln!(w, "/// Get a string which allows debug introspection of a {} object", ident).unwrap();
+						writeln!(w, "pub extern \"C\" fn {}_debug_str_void(o: *const c_void) -> Str {{", ident).unwrap();
+
+						write!(w, "\talloc::format!(\"{{:?}}\", unsafe {{ o as *const crate::{} }}).into()", resolved_path).unwrap();
+						writeln!(w, "}}").unwrap();
 					} else if path_matches_nongeneric(&trait_path.1, &["Display"]) {
 						writeln!(w, "#[no_mangle]").unwrap();
 						writeln!(w, "/// Get the string representation of a {} object", ident).unwrap();

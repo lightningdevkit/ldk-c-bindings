@@ -47,21 +47,13 @@ jobs:
           git clone https://github.com/rust-bitcoin/rust-lightning
           cd rust-lightning
           git checkout 0.0.121-bindings
-      - name: Pin memchr
-        if: "matrix.distro == 'debian:bookworm'"
-        run: |
-          # Pin memchr until we can remove it
-          cd rust-lightning
-          cargo update -p memchr --precise "2.5.0" --verbose
       - name: Fix Github Actions to not be broken
         run: git config --global --add safe.directory /__w/ldk-c-bindings/ldk-c-bindings
-      - name: Pin proc-macro, quote and memchr to meet MSRV
+      - name: Pin proc-macro and quote to meet MSRV
         run: |
           cd c-bindings-gen
           cargo update -p quote --precise "1.0.30" --verbose
           cargo update -p proc-macro2 --precise "1.0.65" --verbose
-          cd ../lightning-c-bindings
-          cargo update -p memchr --precise "2.5.0" --verbose
       - name: Rebuild bindings without std, and check the sample app builds + links
         run: ./genbindings.sh ./rust-lightning false
       - name: Rebuild bindings, and check the sample app builds + links

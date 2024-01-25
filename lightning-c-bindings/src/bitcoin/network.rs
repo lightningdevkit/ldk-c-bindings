@@ -30,6 +30,7 @@ impl Network {
 			BitcoinNetwork::Testnet => Network::Testnet,
 			BitcoinNetwork::Regtest => Network::Regtest,
 			BitcoinNetwork::Signet => Network::Signet,
+			_ => unreachable!(),
 		}
 	}
 }

@@ -97,10 +97,11 @@ const uint8_t block_2[81] = {
 	0x00, // transaction count
 };
 
-void print_log(const void *this_arg, const LDKRecord *record) {
-	LDK::Str mod = Record_get_module_path(record);
-	LDK::Str str = Record_get_args(record);
-	printf("%p - %.*s:%d - %.*s\n", this_arg, (int)mod->len, mod->chars, Record_get_line(record), (int)str->len, str->chars);
+void print_log(const void *this_arg, LDKRecord record_arg) {
+	LDK::Record record(std::move(record_arg));
+	LDK::Str mod = Record_get_module_path(&record);
+	LDK::Str str = Record_get_args(&record);
+	printf("%p - %.*s:%d - %.*s\n", this_arg, (int)mod->len, mod->chars, Record_get_line(&record), (int)str->len, str->chars);
 }
 
 uint32_t get_fee(const void *this_arg, LDKConfirmationTarget target) {
@@ -132,7 +133,7 @@ struct NodeMonitors {
 	void ConnectBlock(const uint8_t (*header)[80], uint32_t height, LDKCVec_C2Tuple_usizeTransactionZZ tx_data, LDKBroadcasterInterface broadcast, LDKFeeEstimator fee_est) {
 		std::unique_lock<std::mutex> l(mut);
 		for (auto& mon : mons) {
-			LDK::CVec_TransactionOutputsZ res = ChannelMonitor_block_connected(&mon.second, header, tx_data, height, broadcast, fee_est, *logger);
+			LDK::CVec_TransactionOutputsZ res = ChannelMonitor_block_connected(&mon.second, header, tx_data, height, broadcast, fee_est, logger);
 		}
 	}
 };
@@ -400,6 +401,12 @@ LDKCVec_u8Z custom_onion_msg_bytes(const void *this_arg) {
 		.data = bytes, .datalen = 1024
 	};
 }
+LDKStr custom_onion_msg_str(const void *this_arg) {
+	return LDKStr {
+		.chars = (const uint8_t*)"Custom Onion Message",
+		.len = 20, .chars_is_owned = false
+	};
+}
 
 LDKCOption_OnionMessageContentsZ handle_custom_onion_message(const void* this_arg, struct LDKOnionMessageContents msg) {
 	CustomOnionMsgQueue* arg = (CustomOnionMsgQueue*) this_arg;
@@ -413,6 +420,8 @@ LDKOnionMessageContents build_custom_onion_message() {
 		.this_arg = NULL,
 		.tlv_type = custom_onion_msg_type_id,
 		.write = custom_onion_msg_bytes,
+		.debug_str = custom_onion_msg_str,
+		.cloned = NULL,
 		.free = NULL,
 	};
 }
@@ -502,7 +511,7 @@ LDKInitFeatures custom_init_features(const void *this_arg, struct LDKPublicKey t
 	return InitFeatures_empty();
 }
 
-uint64_t get_chan_score(const void *this_arg, uint64_t scid, const LDKNodeId *src, const LDKNodeId *dst, LDKChannelUsage usage_in, const LDKProbabilisticScoringFeeParameters *params) {
+uint64_t get_chan_score(const void *this_arg, const LDKCandidateRouteHop *hop, LDKChannelUsage usage_in, const LDKProbabilisticScoringFeeParameters *params) {
 	LDK::ChannelUsage usage(std::move(usage_in));
 	return 42;
 }
@@ -602,7 +611,7 @@ int main() {
 		LDK::IgnoringMessageHandler ignoring_handler1 = IgnoringMessageHandler_new();
 		LDK::CustomMessageHandler custom_msg_handler1 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler1);
 		LDK::CustomOnionMessageHandler custom_onion_msg_handler1 = IgnoringMessageHandler_as_CustomOnionMessageHandler(&ignoring_handler1);
-		LDK::DefaultMessageRouter mr1 = DefaultMessageRouter_new();
+		LDK::DefaultMessageRouter mr1 = DefaultMessageRouter_new(&net_graph1, KeysManager_as_EntropySource(&keys1));
 		LDK::OnionMessenger om1 = OnionMessenger_new(KeysManager_as_EntropySource(&keys1), KeysManager_as_NodeSigner(&keys1), logger1, DefaultMessageRouter_as_MessageRouter(&mr1), IgnoringMessageHandler_as_OffersMessageHandler(&ignoring_handler1), std::move(custom_onion_msg_handler1));
 
 		LDK::CVec_ChannelDetailsZ channels = ChannelManager_list_channels(&cm1);
@@ -638,7 +647,7 @@ int main() {
 		LDK::IgnoringMessageHandler ignoring_handler2 = IgnoringMessageHandler_new();
 		LDK::CustomMessageHandler custom_msg_handler2 = IgnoringMessageHandler_as_CustomMessageHandler(&ignoring_handler2);
 		LDK::CustomOnionMessageHandler custom_onion_msg_handler2 = IgnoringMessageHandler_as_CustomOnionMessageHandler(&ignoring_handler2);
-		LDK::DefaultMessageRouter mr2 = DefaultMessageRouter_new();
+		LDK::DefaultMessageRouter mr2 = DefaultMessageRouter_new(&net_graph2, KeysManager_as_EntropySource(&keys2));
 		LDK::OnionMessenger om2 = OnionMessenger_new(KeysManager_as_EntropySource(&keys2), KeysManager_as_NodeSigner(&keys2), logger2, DefaultMessageRouter_as_MessageRouter(&mr2), IgnoringMessageHandler_as_OffersMessageHandler(&ignoring_handler2), std::move(custom_onion_msg_handler2));
 
 		LDK::CVec_ChannelDetailsZ channels2 = ChannelManager_list_channels(&cm2);
@@ -659,7 +668,7 @@ int main() {
 		PeersConnection conn(cm1, cm2, net1, net2);
 
 		// Note that we have to bind the result to a C++ class to make sure it gets free'd
-		LDK::CResult_ThirtyTwoBytesAPIErrorZ res = ChannelManager_create_channel(&cm1, ChannelManager_get_our_node_id(&cm2), 40000, 1000, U128_new(user_id_1), UserConfig_default());
+		LDK::CResult_ThirtyTwoBytesAPIErrorZ res = ChannelManager_create_channel(&cm1, ChannelManager_get_our_node_id(&cm2), 40000, 1000, U128_new(user_id_1), COption_ThirtyTwoBytesZ_none(), UserConfig_default());
 		assert(res->result_ok);
 		PeerManager_process_events(&net1);
 
@@ -862,7 +871,7 @@ int main() {
 				}, Bolt11Invoice_min_final_cltv_expiry_delta(invoice->contents.result));
 			LDK::RouteParameters route_params = RouteParameters_from_payment_params_and_value(
 				PaymentParameters_new(std::move(payee), COption_u64Z_none(), 0xffffffff, 1, 2,
-					LDKCVec_u64Z { .data = NULL, .datalen = 0 }),
+					LDKCVec_u64Z { .data = NULL, .datalen = 0 }, LDKCVec_u64Z { .data = NULL, .datalen = 0 }),
 				5000);
 			random_bytes = entropy_source1.get_secure_random_bytes();
 			LDK::ProbabilisticScoringFeeParameters params = ProbabilisticScoringFeeParameters_default();
@@ -978,7 +987,7 @@ int main() {
 	LDK::MultiThreadedLockableScore scorer_mtx1 = MultiThreadedLockableScore_new(std::move(scorer_trait1));
 	LDK::LockableScore scorer_mtx_trait1 = MultiThreadedLockableScore_as_LockableScore(&scorer_mtx1);
 	LDK::ProbabilisticScoringFeeParameters params = ProbabilisticScoringFeeParameters_default();
-	const LDK::DefaultRouter default_router_1 = DefaultRouter_new(&net_graph1, logger1, entropy_source1.get_secure_random_bytes(), std::move(scorer_mtx_trait1), std::move(params));
+	const LDK::DefaultRouter default_router_1 = DefaultRouter_new(&net_graph1, logger1, KeysManager_as_EntropySource(&keys1), std::move(scorer_mtx_trait1), std::move(params));
 	LDKRouter router1 = {
 		.this_arg = (void*)&default_router_1,
 		.find_route = NULL, // LDK currently doesn't use this, its just a default-impl
@@ -999,7 +1008,7 @@ int main() {
 		.release_pending_custom_messages = release_no_messages,
 		.free = NULL,
 	};
-	LDK::DefaultMessageRouter mr1 = DefaultMessageRouter_new();
+	LDK::DefaultMessageRouter mr1 = DefaultMessageRouter_new(&net_graph1, KeysManager_as_EntropySource(&keys1));
 	LDK::IgnoringMessageHandler ignorer_1 = IgnoringMessageHandler_new();
 	LDK::OnionMessenger om1 = OnionMessenger_new(KeysManager_as_EntropySource(&keys1), KeysManager_as_NodeSigner(&keys1), logger1, DefaultMessageRouter_as_MessageRouter(&mr1), IgnoringMessageHandler_as_OffersMessageHandler(&ignorer_1), std::move(custom_onion_msg_handler1));
 
@@ -1027,7 +1036,7 @@ int main() {
 		.release_pending_custom_messages = release_no_messages,
 		.free = NULL,
 	};
-	LDK::DefaultMessageRouter mr2 = DefaultMessageRouter_new();
+	LDK::DefaultMessageRouter mr2 = DefaultMessageRouter_new(&net_graph2, KeysManager_as_EntropySource(&keys2));
 	LDK::IgnoringMessageHandler ignorer_2 = IgnoringMessageHandler_new();
 	LDK::OnionMessenger om2 = OnionMessenger_new(KeysManager_as_EntropySource(&keys2), KeysManager_as_NodeSigner(&keys2), logger2, DefaultMessageRouter_as_MessageRouter(&mr2), IgnoringMessageHandler_as_OffersMessageHandler(&ignorer_2), custom_onion_msg_handler2);
 
@@ -1098,7 +1107,16 @@ int main() {
 		}, 3600, COption_u16Z_none());
 	assert(invoice_res2->result_ok);
 	const LDKBolt11Invoice *invoice2 = invoice_res2->contents.result;
-	LDK::CResult_ThirtyTwoBytesPaymentErrorZ invoice_pay_res = pay_invoice(invoice2, Retry_attempts(0), &cm1);
+	LDK::CResult_C3Tuple_ThirtyTwoBytesRecipientOnionFieldsRouteParametersZNoneZ pay_params =
+		payment_parameters_from_invoice(invoice2);
+	LDK::RecipientOnionFields invoice2_recipient(std::move(pay_params->contents.result->b));
+	LDK::RouteParameters invoice2_params(std::move(pay_params->contents.result->c));
+	assert(pay_params->result_ok);
+	LDKThirtyTwoBytes payment_id { .data = 0 };
+	LDK::CResult_NoneRetryableSendFailureZ invoice_pay_res = ChannelManager_send_payment(
+		&cm1, std::move(pay_params->contents.result->a), std::move(invoice2_recipient),
+		std::move(payment_id), std::move(invoice2_params), Retry_attempts(0)
+	);
 	assert(invoice_pay_res->result_ok);
 	PeerManager_process_events(&net1);
 
@@ -1180,14 +1198,12 @@ int main() {
 	LDK::CVec_ChannelDetailsZ chans_after_close2 = ChannelManager_list_channels(&cm2);
 	assert(chans_after_close2->datalen == 0);
 
-	assert(OnionMessenger_send_onion_message(&om1,
-			OnionMessagePath_new(
-				LDKCVec_PublicKeyZ { .data = NULL, .datalen = 0, },
-				Destination_node(ChannelManager_get_our_node_id(&cm2))
-			),
+	LDK::CResult_SendSuccessSendErrorZ om_send_res =
+		OnionMessenger_send_onion_message(&om1,
 			build_custom_onion_message(),
-			LDKBlindedPath { .inner = NULL, .is_owned = true })
-		.result_ok);
+			Destination_node(ChannelManager_get_our_node_id(&cm2)),
+			LDKBlindedPath { .inner = NULL, .is_owned = true });
+	assert(om_send_res->result_ok);
 	PeerManager_process_events(&net1);
 	std::cout << __FILE__ << ":" << __LINE__ << " - " << "Awaiting onion message..." << std::endl;
 	while (true) {

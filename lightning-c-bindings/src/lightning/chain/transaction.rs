@@ -75,7 +75,7 @@ impl OutPoint {
 #[no_mangle]
 pub extern "C" fn OutPoint_get_txid(this_ptr: &OutPoint) -> *const [u8; 32] {
 	let mut inner_val = &mut this_ptr.get_native_mut_ref().txid;
-	inner_val.as_inner()
+	inner_val.as_ref()
 }
 /// The referenced transaction's txid.
 #[no_mangle]
@@ -130,6 +130,9 @@ pub extern "C" fn OutPoint_eq(a: &OutPoint, b: &OutPoint) -> bool {
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
+/// Get a string which allows debug introspection of a OutPoint object
+pub extern "C" fn OutPoint_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::chain::transaction::OutPoint }).into()}
 /// Generates a non-cryptographic 64-bit hash of the OutPoint.
 #[no_mangle]
 pub extern "C" fn OutPoint_hash(o: &OutPoint) -> u64 {

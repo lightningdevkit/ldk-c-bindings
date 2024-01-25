@@ -148,7 +148,8 @@ impl APIError {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeAPIError) -> Self {
+	pub(crate) fn from_native(native: &APIErrorImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeAPIError) };
 		match native {
 			nativeAPIError::APIMisuseError {ref err, } => {
 				let mut err_nonref = Clone::clone(err);
@@ -282,6 +283,9 @@ pub extern "C" fn APIError_incompatible_shutdown_script(script: crate::lightning
 pub extern "C" fn APIError_eq(a: &APIError, b: &APIError) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
+/// Get a string which allows debug introspection of a APIError object
+pub extern "C" fn APIError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::errors::APIError }).into()}
 #[no_mangle]
 /// Serialize the APIError object into a byte array which can be read by APIError_read
 pub extern "C" fn APIError_write(obj: &crate::lightning::util::errors::APIError) -> crate::c_types::derived::CVec_u8Z {

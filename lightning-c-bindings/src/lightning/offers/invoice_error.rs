@@ -136,6 +136,9 @@ pub(crate) extern "C" fn InvoiceError_clone_void(this_ptr: *const c_void) -> *mu
 pub extern "C" fn InvoiceError_clone(orig: &InvoiceError) -> InvoiceError {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a InvoiceError object
+pub extern "C" fn InvoiceError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::invoice_error::InvoiceError }).into()}
 
 use lightning::offers::invoice_error::ErroneousField as nativeErroneousFieldImport;
 pub(crate) type nativeErroneousField = nativeErroneousFieldImport;
@@ -245,6 +248,9 @@ pub(crate) extern "C" fn ErroneousField_clone_void(this_ptr: *const c_void) -> *
 pub extern "C" fn ErroneousField_clone(orig: &ErroneousField) -> ErroneousField {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ErroneousField object
+pub extern "C" fn ErroneousField_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::invoice_error::ErroneousField }).into()}
 /// Creates an [`InvoiceError`] with the given message.
 #[must_use]
 #[no_mangle]

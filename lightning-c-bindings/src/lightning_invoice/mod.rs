@@ -167,18 +167,6 @@ use crate::c_types::*;
 use alloc::{vec::Vec, boxed::Box};
 
 }
-mod sync {
-
-use alloc::str::FromStr;
-use alloc::string::String;
-use core::ffi::c_void;
-use core::convert::Infallible;
-use bitcoin::hashes::Hash;
-use crate::c_types::*;
-#[cfg(feature="no-std")]
-use alloc::{vec::Vec, boxed::Box};
-
-}
 /// Errors that indicate what is wrong with the invoice. They have some granularity for debug
 /// reasons, but should generally result in an \"invalid BOLT11 invoice\" message for the user.
 #[derive(Clone)]
@@ -307,7 +295,8 @@ impl Bolt11ParseError {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeBolt11ParseError) -> Self {
+	pub(crate) fn from_native(native: &Bolt11ParseErrorImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeBolt11ParseError) };
 		match native {
 			nativeBolt11ParseError::Bech32Error (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
@@ -499,6 +488,9 @@ pub extern "C" fn Bolt11ParseError_skip() -> Bolt11ParseError {
 pub extern "C" fn Bolt11ParseError_eq(a: &Bolt11ParseError, b: &Bolt11ParseError) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
+/// Get a string which allows debug introspection of a Bolt11ParseError object
+pub extern "C" fn Bolt11ParseError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::Bolt11ParseError }).into()}
 /// Indicates that something went wrong while parsing or validating the invoice. Parsing errors
 /// should be mostly seen as opaque and are only there for debugging reasons. Semantic errors
 /// like wrong signatures, missing fields etc. could mean that someone tampered with the invoice.
@@ -550,7 +542,8 @@ impl ParseOrSemanticError {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeParseOrSemanticError) -> Self {
+	pub(crate) fn from_native(native: &ParseOrSemanticErrorImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeParseOrSemanticError) };
 		match native {
 			nativeParseOrSemanticError::ParseError (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
@@ -616,6 +609,9 @@ pub extern "C" fn ParseOrSemanticError_semantic_error(a: crate::lightning_invoic
 pub extern "C" fn ParseOrSemanticError_eq(a: &ParseOrSemanticError, b: &ParseOrSemanticError) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
+/// Get a string which allows debug introspection of a ParseOrSemanticError object
+pub extern "C" fn ParseOrSemanticError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::ParseOrSemanticError }).into()}
 /// The maximum timestamp as [`Duration::as_secs`] since the Unix epoch allowed by [`BOLT 11`].
 ///
 /// [BOLT 11]: https://github.com/lightning/bolts/blob/master/11-payment-encoding.md
@@ -705,6 +701,9 @@ pub extern "C" fn Bolt11Invoice_eq(a: &Bolt11Invoice, b: &Bolt11Invoice) -> bool
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
+/// Get a string which allows debug introspection of a Bolt11Invoice object
+pub extern "C" fn Bolt11Invoice_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::Bolt11Invoice }).into()}
 impl Clone for Bolt11Invoice {
 	fn clone(&self) -> Self {
 		Self {
@@ -798,6 +797,9 @@ pub extern "C" fn SignedRawBolt11Invoice_eq(a: &SignedRawBolt11Invoice, b: &Sign
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
+/// Get a string which allows debug introspection of a SignedRawBolt11Invoice object
+pub extern "C" fn SignedRawBolt11Invoice_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::SignedRawBolt11Invoice }).into()}
 impl Clone for SignedRawBolt11Invoice {
 	fn clone(&self) -> Self {
 		Self {
@@ -902,6 +904,9 @@ pub extern "C" fn RawBolt11Invoice_eq(a: &RawBolt11Invoice, b: &RawBolt11Invoice
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
+/// Get a string which allows debug introspection of a RawBolt11Invoice object
+pub extern "C" fn RawBolt11Invoice_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::RawBolt11Invoice }).into()}
 impl Clone for RawBolt11Invoice {
 	fn clone(&self) -> Self {
 		Self {
@@ -1002,6 +1007,9 @@ pub extern "C" fn RawDataPart_eq(a: &RawDataPart, b: &RawDataPart) -> bool {
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
+/// Get a string which allows debug introspection of a RawDataPart object
+pub extern "C" fn RawDataPart_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::RawDataPart }).into()}
 impl Clone for RawDataPart {
 	fn clone(&self) -> Self {
 		Self {
@@ -1096,6 +1104,9 @@ pub extern "C" fn PositiveTimestamp_eq(a: &PositiveTimestamp, b: &PositiveTimest
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
 }
+/// Get a string which allows debug introspection of a PositiveTimestamp object
+pub extern "C" fn PositiveTimestamp_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::PositiveTimestamp }).into()}
 impl Clone for PositiveTimestamp {
 	fn clone(&self) -> Self {
 		Self {
@@ -1162,7 +1173,8 @@ impl SiPrefix {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeSiPrefix) -> Self {
+	pub(crate) fn from_native(native: &SiPrefixImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeSiPrefix) };
 		match native {
 			nativeSiPrefix::Milli => SiPrefix::Milli,
 			nativeSiPrefix::Micro => SiPrefix::Micro,
@@ -1217,6 +1229,9 @@ pub extern "C" fn SiPrefix_pico() -> SiPrefix {
 pub extern "C" fn SiPrefix_eq(a: &SiPrefix, b: &SiPrefix) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
+/// Get a string which allows debug introspection of a SiPrefix object
+pub extern "C" fn SiPrefix_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::SiPrefix }).into()}
 /// Generates a non-cryptographic 64-bit hash of the SiPrefix.
 #[no_mangle]
 pub extern "C" fn SiPrefix_hash(o: &SiPrefix) -> u64 {
@@ -1276,7 +1291,8 @@ impl Currency {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeCurrency) -> Self {
+	pub(crate) fn from_native(native: &CurrencyImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeCurrency) };
 		match native {
 			nativeCurrency::Bitcoin => Currency::Bitcoin,
 			nativeCurrency::BitcoinTestnet => Currency::BitcoinTestnet,
@@ -1331,6 +1347,9 @@ pub extern "C" fn Currency_simnet() -> Currency {
 /// Utility method to constructs a new Signet-variant Currency
 pub extern "C" fn Currency_signet() -> Currency {
 	Currency::Signet}
+/// Get a string which allows debug introspection of a Currency object
+pub extern "C" fn Currency_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::Currency }).into()}
 /// Generates a non-cryptographic 64-bit hash of the Currency.
 #[no_mangle]
 pub extern "C" fn Currency_hash(o: &Currency) -> u64 {
@@ -1416,6 +1435,9 @@ pub(crate) extern "C" fn Sha256_clone_void(this_ptr: *const c_void) -> *mut c_vo
 pub extern "C" fn Sha256_clone(orig: &Sha256) -> Sha256 {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Sha256 object
+pub extern "C" fn Sha256_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::Sha256 }).into()}
 /// Generates a non-cryptographic 64-bit hash of the Sha256.
 #[no_mangle]
 pub extern "C" fn Sha256_hash(o: &Sha256) -> u64 {
@@ -1517,6 +1539,9 @@ pub(crate) extern "C" fn Description_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn Description_clone(orig: &Description) -> Description {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Description object
+pub extern "C" fn Description_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::Description }).into()}
 /// Generates a non-cryptographic 64-bit hash of the Description.
 #[no_mangle]
 pub extern "C" fn Description_hash(o: &Description) -> u64 {
@@ -1623,6 +1648,9 @@ pub(crate) extern "C" fn PayeePubKey_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn PayeePubKey_clone(orig: &PayeePubKey) -> PayeePubKey {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a PayeePubKey object
+pub extern "C" fn PayeePubKey_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::PayeePubKey }).into()}
 /// Generates a non-cryptographic 64-bit hash of the PayeePubKey.
 #[no_mangle]
 pub extern "C" fn PayeePubKey_hash(o: &PayeePubKey) -> u64 {
@@ -1713,6 +1741,9 @@ pub(crate) extern "C" fn ExpiryTime_clone_void(this_ptr: *const c_void) -> *mut 
 pub extern "C" fn ExpiryTime_clone(orig: &ExpiryTime) -> ExpiryTime {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ExpiryTime object
+pub extern "C" fn ExpiryTime_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::ExpiryTime }).into()}
 /// Generates a non-cryptographic 64-bit hash of the ExpiryTime.
 #[no_mangle]
 pub extern "C" fn ExpiryTime_hash(o: &ExpiryTime) -> u64 {
@@ -1819,6 +1850,9 @@ pub(crate) extern "C" fn MinFinalCltvExpiryDelta_clone_void(this_ptr: *const c_v
 pub extern "C" fn MinFinalCltvExpiryDelta_clone(orig: &MinFinalCltvExpiryDelta) -> MinFinalCltvExpiryDelta {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a MinFinalCltvExpiryDelta object
+pub extern "C" fn MinFinalCltvExpiryDelta_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::MinFinalCltvExpiryDelta }).into()}
 /// Generates a non-cryptographic 64-bit hash of the MinFinalCltvExpiryDelta.
 #[no_mangle]
 pub extern "C" fn MinFinalCltvExpiryDelta_hash(o: &MinFinalCltvExpiryDelta) -> u64 {
@@ -1871,13 +1905,13 @@ impl Fallback {
 			Fallback::PubKeyHash (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
 				nativeFallback::PubKeyHash (
-					bitcoin::hash_types::PubkeyHash::from_hash(bitcoin::hashes::Hash::from_inner(a_nonref.data)),
+					bitcoin::hash_types::PubkeyHash::from_raw_hash(bitcoin::hashes::Hash::from_byte_array(a_nonref.data)),
 				)
 			},
 			Fallback::ScriptHash (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
 				nativeFallback::ScriptHash (
-					bitcoin::hash_types::ScriptHash::from_hash(bitcoin::hashes::Hash::from_inner(a_nonref.data)),
+					bitcoin::hash_types::ScriptHash::from_raw_hash(bitcoin::hashes::Hash::from_byte_array(a_nonref.data)),
 				)
 			},
 		}
@@ -1894,18 +1928,19 @@ impl Fallback {
 			},
 			Fallback::PubKeyHash (mut a, ) => {
 				nativeFallback::PubKeyHash (
-					bitcoin::hash_types::PubkeyHash::from_hash(bitcoin::hashes::Hash::from_inner(a.data)),
+					bitcoin::hash_types::PubkeyHash::from_raw_hash(bitcoin::hashes::Hash::from_byte_array(a.data)),
 				)
 			},
 			Fallback::ScriptHash (mut a, ) => {
 				nativeFallback::ScriptHash (
-					bitcoin::hash_types::ScriptHash::from_hash(bitcoin::hashes::Hash::from_inner(a.data)),
+					bitcoin::hash_types::ScriptHash::from_raw_hash(bitcoin::hashes::Hash::from_byte_array(a.data)),
 				)
 			},
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeFallback) -> Self {
+	pub(crate) fn from_native(native: &FallbackImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeFallback) };
 		match native {
 			nativeFallback::SegWitProgram {ref version, ref program, } => {
 				let mut version_nonref = Clone::clone(version);
@@ -1919,13 +1954,13 @@ impl Fallback {
 			nativeFallback::PubKeyHash (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
 				Fallback::PubKeyHash (
-					crate::c_types::TwentyBytes { data: a_nonref.as_hash().into_inner() },
+					crate::c_types::TwentyBytes { data: *a_nonref.as_ref() },
 				)
 			},
 			nativeFallback::ScriptHash (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
 				Fallback::ScriptHash (
-					crate::c_types::TwentyBytes { data: a_nonref.as_hash().into_inner() },
+					crate::c_types::TwentyBytes { data: *a_nonref.as_ref() },
 				)
 			},
 		}
@@ -1942,12 +1977,12 @@ impl Fallback {
 			},
 			nativeFallback::PubKeyHash (mut a, ) => {
 				Fallback::PubKeyHash (
-					crate::c_types::TwentyBytes { data: a.as_hash().into_inner() },
+					crate::c_types::TwentyBytes { data: *a.as_ref() },
 				)
 			},
 			nativeFallback::ScriptHash (mut a, ) => {
 				Fallback::ScriptHash (
-					crate::c_types::TwentyBytes { data: a.as_hash().into_inner() },
+					crate::c_types::TwentyBytes { data: *a.as_ref() },
 				)
 			},
 		}
@@ -1989,6 +2024,9 @@ pub extern "C" fn Fallback_pub_key_hash(a: crate::c_types::TwentyBytes) -> Fallb
 pub extern "C" fn Fallback_script_hash(a: crate::c_types::TwentyBytes) -> Fallback {
 	Fallback::ScriptHash(a, )
 }
+/// Get a string which allows debug introspection of a Fallback object
+pub extern "C" fn Fallback_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::Fallback }).into()}
 /// Generates a non-cryptographic 64-bit hash of the Fallback.
 #[no_mangle]
 pub extern "C" fn Fallback_hash(o: &Fallback) -> u64 {
@@ -2074,6 +2112,9 @@ pub(crate) extern "C" fn Bolt11InvoiceSignature_clone_void(this_ptr: *const c_vo
 pub extern "C" fn Bolt11InvoiceSignature_clone(orig: &Bolt11InvoiceSignature) -> Bolt11InvoiceSignature {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Bolt11InvoiceSignature object
+pub extern "C" fn Bolt11InvoiceSignature_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::Bolt11InvoiceSignature }).into()}
 /// Generates a non-cryptographic 64-bit hash of the Bolt11InvoiceSignature.
 #[no_mangle]
 pub extern "C" fn Bolt11InvoiceSignature_hash(o: &Bolt11InvoiceSignature) -> u64 {
@@ -2167,6 +2208,9 @@ pub(crate) extern "C" fn PrivateRoute_clone_void(this_ptr: *const c_void) -> *mu
 pub extern "C" fn PrivateRoute_clone(orig: &PrivateRoute) -> PrivateRoute {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a PrivateRoute object
+pub extern "C" fn PrivateRoute_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::PrivateRoute }).into()}
 /// Generates a non-cryptographic 64-bit hash of the PrivateRoute.
 #[no_mangle]
 pub extern "C" fn PrivateRoute_hash(o: &PrivateRoute) -> u64 {
@@ -2494,7 +2538,7 @@ pub extern "C" fn Bolt11Invoice_duration_since_epoch(this_arg: &crate::lightning
 #[no_mangle]
 pub extern "C" fn Bolt11Invoice_payment_hash(this_arg: &crate::lightning_invoice::Bolt11Invoice) -> *const [u8; 32] {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.payment_hash();
-	ret.as_inner()
+	ret.as_ref()
 }
 
 /// Get the payee's public key if one was included in the invoice
@@ -2661,14 +2705,19 @@ pub extern "C" fn Description_new(mut description: crate::c_types::Str) -> crate
 	local_ret
 }
 
-/// Returns the underlying description [`String`]
+/// Returns the underlying description [`UntrustedString`]
 #[must_use]
 #[no_mangle]
-pub extern "C" fn Description_into_inner(mut this_arg: crate::lightning_invoice::Description) -> crate::c_types::Str {
+pub extern "C" fn Description_into_inner(mut this_arg: crate::lightning_invoice::Description) -> crate::lightning::util::string::UntrustedString {
 	let mut ret = (*unsafe { Box::from_raw(this_arg.take_inner()) }).into_inner();
-	ret.into()
+	crate::lightning::util::string::UntrustedString { inner: ObjOps::heap_alloc(ret), is_owned: true }
 }
 
+#[no_mangle]
+/// Get the string representation of a Description object
+pub extern "C" fn Description_to_str(o: &crate::lightning_invoice::Description) -> Str {
+	alloc::format!("{}", o.get_native_ref()).into()
+}
 /// Construct an `ExpiryTime` from seconds.
 #[must_use]
 #[no_mangle]
@@ -2768,7 +2817,8 @@ impl CreationError {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeCreationError) -> Self {
+	pub(crate) fn from_native(native: &CreationErrorImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeCreationError) };
 		match native {
 			nativeCreationError::DescriptionTooLong => CreationError::DescriptionTooLong,
 			nativeCreationError::RouteTooLong => CreationError::RouteTooLong,
@@ -2835,6 +2885,9 @@ pub extern "C" fn CreationError_min_final_cltv_expiry_delta_too_short() -> Creat
 pub extern "C" fn CreationError_eq(a: &CreationError, b: &CreationError) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
+/// Get a string which allows debug introspection of a CreationError object
+pub extern "C" fn CreationError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::CreationError }).into()}
 #[no_mangle]
 /// Get the string representation of a CreationError object
 pub extern "C" fn CreationError_to_str(o: &crate::lightning_invoice::CreationError) -> Str {
@@ -2903,7 +2956,8 @@ impl Bolt11SemanticError {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeBolt11SemanticError) -> Self {
+	pub(crate) fn from_native(native: &Bolt11SemanticErrorImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeBolt11SemanticError) };
 		match native {
 			nativeBolt11SemanticError::NoPaymentHash => Bolt11SemanticError::NoPaymentHash,
 			nativeBolt11SemanticError::MultiplePaymentHashes => Bolt11SemanticError::MultiplePaymentHashes,
@@ -2994,6 +3048,9 @@ pub extern "C" fn Bolt11SemanticError_imprecise_amount() -> Bolt11SemanticError 
 pub extern "C" fn Bolt11SemanticError_eq(a: &Bolt11SemanticError, b: &Bolt11SemanticError) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
+/// Get a string which allows debug introspection of a Bolt11SemanticError object
+pub extern "C" fn Bolt11SemanticError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::Bolt11SemanticError }).into()}
 #[no_mangle]
 /// Get the string representation of a Bolt11SemanticError object
 pub extern "C" fn Bolt11SemanticError_to_str(o: &crate::lightning_invoice::Bolt11SemanticError) -> Str {
@@ -3047,7 +3104,8 @@ impl SignOrCreationError {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeSignOrCreationError) -> Self {
+	pub(crate) fn from_native(native: &SignOrCreationErrorImport<>) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeSignOrCreationError) };
 		match native {
 			nativeSignOrCreationError::SignError (ref a, ) => {
 				SignOrCreationError::SignError			},
@@ -3106,6 +3164,9 @@ pub extern "C" fn SignOrCreationError_creation_error(a: crate::lightning_invoice
 pub extern "C" fn SignOrCreationError_eq(a: &SignOrCreationError, b: &SignOrCreationError) -> bool {
 	if &a.to_native() == &b.to_native() { true } else { false }
 }
+/// Get a string which allows debug introspection of a SignOrCreationError object
+pub extern "C" fn SignOrCreationError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning_invoice::SignOrCreationError }).into()}
 #[no_mangle]
 /// Get the string representation of a SignOrCreationError object
 pub extern "C" fn SignOrCreationError_to_str(o: &crate::lightning_invoice::SignOrCreationError) -> Str {

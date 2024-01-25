@@ -748,6 +748,14 @@ pub fn write_method_call_params<W: std::io::Write>(w: &mut W, sig: &syn::Signatu
 /// Prints concrete generic parameters for a struct/trait/function, including the less-than and
 /// greater-than symbols, if any generic parameters are defined.
 pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generics, generics_impld: &syn::PathArguments, types: &TypeResolver, concrete_lifetimes: bool) {
+	maybe_write_generics_intern(w, generics, generics_impld, types, concrete_lifetimes, false);
+}
+
+pub fn maybe_write_non_lifetime_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generics, generics_impld: &syn::PathArguments, types: &TypeResolver) {
+	maybe_write_generics_intern(w, generics, generics_impld, types, false, true);
+}
+
+fn maybe_write_generics_intern<W: std::io::Write>(w: &mut W, generics: &syn::Generics, generics_impld: &syn::PathArguments, types: &TypeResolver, concrete_lifetimes: bool, dummy_lifetimes: bool) {
 	let mut gen_types = GenericTypes::new(None);
 	assert!(gen_types.learn_generics(generics, types));
 	if generics.params.is_empty() { return; }
@@ -789,7 +797,9 @@ pub fn maybe_write_generics<W: std::io::Write>(w: &mut W, generics: &syn::Generi
 				}
 			},
 			syn::GenericParam::Lifetime(lt) => {
-				if concrete_lifetimes {
+				if dummy_lifetimes {
+					write!(w, "'_").unwrap();
+				} else if concrete_lifetimes {
 					write!(w, "'static").unwrap();
 				} else {
 					write!(w, "{}'{}", if idx != 0 { ", " } else { "" }, lt.lifetime.ident).unwrap();

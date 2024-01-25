@@ -39,7 +39,7 @@
 //! let secp_ctx = Secp256k1::new();
 //! let keys = KeyPair::from_secret_key(&secp_ctx, &SecretKey::from_slice(&[42; 32])?);
 //! let pubkey = PublicKey::from(keys);
-//! let wpubkey_hash = bitcoin::util::key::PublicKey::new(pubkey).wpubkey_hash().unwrap();
+//! let wpubkey_hash = bitcoin::key::PublicKey::new(pubkey).wpubkey_hash().unwrap();
 //! let mut buffer = Vec::new();
 //!
 //! // Invoice for the \"offer to be paid\" flow.
@@ -66,7 +66,7 @@
 //! # let secp_ctx = Secp256k1::new();
 //! # let keys = KeyPair::from_secret_key(&secp_ctx, &SecretKey::from_slice(&[42; 32])?);
 //! # let pubkey = PublicKey::from(keys);
-//! # let wpubkey_hash = bitcoin::util::key::PublicKey::new(pubkey).wpubkey_hash().unwrap();
+//! # let wpubkey_hash = bitcoin::key::PublicKey::new(pubkey).wpubkey_hash().unwrap();
 //! # let mut buffer = Vec::new();
 //!
 //! // Invoice for the \"offer for money\" flow.
@@ -240,6 +240,9 @@ pub(crate) extern "C" fn Bolt12Invoice_clone_void(this_ptr: *const c_void) -> *m
 pub extern "C" fn Bolt12Invoice_clone(orig: &Bolt12Invoice) -> Bolt12Invoice {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a Bolt12Invoice object
+pub extern "C" fn Bolt12Invoice_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::invoice::Bolt12Invoice }).into()}
 /// The chains that may be used when paying a requested invoice.
 ///
 /// From [`Offer::chains`]; `None` if the invoice was created in response to a [`Refund`].
@@ -249,7 +252,7 @@ pub extern "C" fn Bolt12Invoice_clone(orig: &Bolt12Invoice) -> Bolt12Invoice {
 #[no_mangle]
 pub extern "C" fn UnsignedBolt12Invoice_offer_chains(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.offer_chains();
-	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_ret_0.into() }) };
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: *item.as_ref() } }); }; local_ret_0.into() }) };
 	local_ret
 }
 
@@ -264,7 +267,7 @@ pub extern "C" fn UnsignedBolt12Invoice_offer_chains(this_arg: &crate::lightning
 #[no_mangle]
 pub extern "C" fn UnsignedBolt12Invoice_chain(this_arg: &crate::lightning::offers::invoice::UnsignedBolt12Invoice) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chain();
-	crate::c_types::ThirtyTwoBytes { data: ret.to_bytes() }
+	crate::c_types::ThirtyTwoBytes { data: *ret.as_ref() }
 }
 
 /// Opaque bytes set by the originating [`Offer`].
@@ -507,7 +510,7 @@ pub extern "C" fn UnsignedBolt12Invoice_signing_pubkey(this_arg: &crate::lightni
 #[no_mangle]
 pub extern "C" fn Bolt12Invoice_offer_chains(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.offer_chains();
-	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); }; local_ret_0.into() }) };
+	let mut local_ret = if ret.is_none() { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::None } else { crate::c_types::derived::COption_CVec_ThirtyTwoBytesZZ::Some( { let mut local_ret_0 = Vec::new(); for mut item in ret.unwrap().drain(..) { local_ret_0.push( { crate::c_types::ThirtyTwoBytes { data: *item.as_ref() } }); }; local_ret_0.into() }) };
 	local_ret
 }
 
@@ -522,7 +525,7 @@ pub extern "C" fn Bolt12Invoice_offer_chains(this_arg: &crate::lightning::offers
 #[no_mangle]
 pub extern "C" fn Bolt12Invoice_chain(this_arg: &crate::lightning::offers::invoice::Bolt12Invoice) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chain();
-	crate::c_types::ThirtyTwoBytes { data: ret.to_bytes() }
+	crate::c_types::ThirtyTwoBytes { data: *ret.as_ref() }
 }
 
 /// Opaque bytes set by the originating [`Offer`].
@@ -963,6 +966,9 @@ pub(crate) extern "C" fn BlindedPayInfo_clone_void(this_ptr: *const c_void) -> *
 pub extern "C" fn BlindedPayInfo_clone(orig: &BlindedPayInfo) -> BlindedPayInfo {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a BlindedPayInfo object
+pub extern "C" fn BlindedPayInfo_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::invoice::BlindedPayInfo }).into()}
 /// Generates a non-cryptographic 64-bit hash of the BlindedPayInfo.
 #[no_mangle]
 pub extern "C" fn BlindedPayInfo_hash(o: &BlindedPayInfo) -> u64 {

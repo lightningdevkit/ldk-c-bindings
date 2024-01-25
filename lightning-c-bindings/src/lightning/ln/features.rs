@@ -40,6 +40,12 @@
 //!     (see [BOLT-4](https://github.com/lightning/bolts/blob/master/04-onion-routing.md#basic-multi-part-payments) for more information).
 //! - `Wumbo` - requires/supports that a node create large channels. Called `option_support_large_channel` in the spec.
 //!     (see [BOLT-2](https://github.com/lightning/bolts/blob/master/02-peer-protocol.md#the-open_channel-message) for more information).
+//! - `AnchorsZeroFeeHtlcTx` - requires/supports that commitment transactions include anchor outputs
+//!     and HTLC transactions are pre-signed with zero fee (see
+//!     [BOLT-3](https://github.com/lightning/bolts/blob/master/03-transactions.md) for more
+//!     information).
+//! - `RouteBlinding` - requires/supports that a node can relay payments over blinded paths
+//!     (see [BOLT-4](https://github.com/lightning/bolts/blob/master/04-onion-routing.md#route-blinding) for more information).
 //! - `ShutdownAnySegwit` - requires/supports that future segwit versions are allowed in `shutdown`
 //!     (see [BOLT-2](https://github.com/lightning/bolts/blob/master/02-peer-protocol.md) for more information).
 //! - `OnionMessages` - requires/supports forwarding onion messages
@@ -58,10 +64,6 @@
 //!      for more info).
 //! - `Keysend` - send funds to a node without an invoice
 //!     (see the [`Keysend` feature assignment proposal](https://github.com/lightning/bolts/issues/605#issuecomment-606679798) for more information).
-//! - `AnchorsZeroFeeHtlcTx` - requires/supports that commitment transactions include anchor outputs
-//!     and HTLC transactions are pre-signed with zero fee (see
-//!     [BOLT-3](https://github.com/lightning/bolts/blob/master/03-transactions.md) for more
-//!     information).
 //!
 //! LDK knows about the following features, but does not support them:
 //! - `AnchorsNonzeroFeeHtlcTx` - the initial version of anchor outputs, which was later found to be
@@ -870,6 +872,62 @@ pub extern "C" fn ChannelTypeFeatures_requires_anchors_zero_fee_htlc_tx(this_arg
 
 /// Set this feature as optional.
 #[no_mangle]
+pub extern "C" fn InitFeatures_set_route_blinding_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_route_blinding_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn InitFeatures_set_route_blinding_required(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_route_blinding_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_supports_route_blinding(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_route_blinding();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_route_blinding_optional(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_route_blinding_optional()
+}
+
+/// Set this feature as required.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_set_route_blinding_required(this_arg: &mut crate::lightning::ln::features::NodeFeatures) {
+	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeNodeFeatures)) }.set_route_blinding_required()
+}
+
+/// Checks if this feature is supported.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_supports_route_blinding(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.supports_route_blinding();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn InitFeatures_requires_route_blinding(this_arg: &crate::lightning::ln::features::InitFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_route_blinding();
+	ret
+}
+
+/// Checks if this feature is required.
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeFeatures_requires_route_blinding(this_arg: &crate::lightning::ln::features::NodeFeatures) -> bool {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.requires_route_blinding();
+	ret
+}
+
+/// Set this feature as optional.
+#[no_mangle]
 pub extern "C" fn InitFeatures_set_shutdown_any_segwit_optional(this_arg: &mut crate::lightning::ln::features::InitFeatures) {
 	unsafe { &mut (*ObjOps::untweak_ptr(this_arg.inner as *mut crate::lightning::ln::features::nativeInitFeatures)) }.set_shutdown_any_segwit_optional()
 }
@@ -1597,6 +1655,123 @@ pub(crate) extern "C" fn ChannelTypeFeatures_clone_void(this_ptr: *const c_void)
 pub extern "C" fn ChannelTypeFeatures_clone(orig: &ChannelTypeFeatures) -> ChannelTypeFeatures {
 	orig.clone()
 }
+/// Generates a non-cryptographic 64-bit hash of the InitFeatures.
+#[no_mangle]
+pub extern "C" fn InitFeatures_hash(o: &InitFeatures) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Generates a non-cryptographic 64-bit hash of the NodeFeatures.
+#[no_mangle]
+pub extern "C" fn NodeFeatures_hash(o: &NodeFeatures) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Generates a non-cryptographic 64-bit hash of the ChannelFeatures.
+#[no_mangle]
+pub extern "C" fn ChannelFeatures_hash(o: &ChannelFeatures) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Generates a non-cryptographic 64-bit hash of the Bolt11InvoiceFeatures.
+#[no_mangle]
+pub extern "C" fn Bolt11InvoiceFeatures_hash(o: &Bolt11InvoiceFeatures) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Generates a non-cryptographic 64-bit hash of the OfferFeatures.
+#[no_mangle]
+pub extern "C" fn OfferFeatures_hash(o: &OfferFeatures) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Generates a non-cryptographic 64-bit hash of the InvoiceRequestFeatures.
+#[no_mangle]
+pub extern "C" fn InvoiceRequestFeatures_hash(o: &InvoiceRequestFeatures) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Generates a non-cryptographic 64-bit hash of the Bolt12InvoiceFeatures.
+#[no_mangle]
+pub extern "C" fn Bolt12InvoiceFeatures_hash(o: &Bolt12InvoiceFeatures) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Generates a non-cryptographic 64-bit hash of the BlindedHopFeatures.
+#[no_mangle]
+pub extern "C" fn BlindedHopFeatures_hash(o: &BlindedHopFeatures) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Generates a non-cryptographic 64-bit hash of the ChannelTypeFeatures.
+#[no_mangle]
+pub extern "C" fn ChannelTypeFeatures_hash(o: &ChannelTypeFeatures) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
+}
+/// Get a string which allows debug introspection of a InitFeatures object
+pub extern "C" fn InitFeatures_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::features::InitFeatures }).into()}
+/// Get a string which allows debug introspection of a NodeFeatures object
+pub extern "C" fn NodeFeatures_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::features::NodeFeatures }).into()}
+/// Get a string which allows debug introspection of a ChannelFeatures object
+pub extern "C" fn ChannelFeatures_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::features::ChannelFeatures }).into()}
+/// Get a string which allows debug introspection of a Bolt11InvoiceFeatures object
+pub extern "C" fn Bolt11InvoiceFeatures_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::features::Bolt11InvoiceFeatures }).into()}
+/// Get a string which allows debug introspection of a OfferFeatures object
+pub extern "C" fn OfferFeatures_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::features::OfferFeatures }).into()}
+/// Get a string which allows debug introspection of a InvoiceRequestFeatures object
+pub extern "C" fn InvoiceRequestFeatures_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::features::InvoiceRequestFeatures }).into()}
+/// Get a string which allows debug introspection of a Bolt12InvoiceFeatures object
+pub extern "C" fn Bolt12InvoiceFeatures_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::features::Bolt12InvoiceFeatures }).into()}
+/// Get a string which allows debug introspection of a BlindedHopFeatures object
+pub extern "C" fn BlindedHopFeatures_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::features::BlindedHopFeatures }).into()}
+/// Get a string which allows debug introspection of a ChannelTypeFeatures object
+pub extern "C" fn ChannelTypeFeatures_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::ln::features::ChannelTypeFeatures }).into()}
 
 use lightning::ln::features::InitFeatures as nativeInitFeaturesImport;
 pub(crate) type nativeInitFeatures = nativeInitFeaturesImport;

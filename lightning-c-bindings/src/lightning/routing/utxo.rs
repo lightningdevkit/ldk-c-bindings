@@ -50,7 +50,8 @@ impl UtxoLookupError {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeUtxoLookupError) -> Self {
+	pub(crate) fn from_native(native: &UtxoLookupErrorImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeUtxoLookupError) };
 		match native {
 			nativeUtxoLookupError::UnknownChain => UtxoLookupError::UnknownChain,
 			nativeUtxoLookupError::UnknownTx => UtxoLookupError::UnknownTx,
@@ -87,6 +88,9 @@ pub extern "C" fn UtxoLookupError_unknown_chain() -> UtxoLookupError {
 /// Utility method to constructs a new UnknownTx-variant UtxoLookupError
 pub extern "C" fn UtxoLookupError_unknown_tx() -> UtxoLookupError {
 	UtxoLookupError::UnknownTx}
+/// Get a string which allows debug introspection of a UtxoLookupError object
+pub extern "C" fn UtxoLookupError_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::routing::utxo::UtxoLookupError }).into()}
 /// The result of a [`UtxoLookup::get_utxo`] call. A call may resolve either synchronously,
 /// returning the `Sync` variant, or asynchronously, returning an [`UtxoFuture`] in the `Async`
 /// variant.
@@ -147,7 +151,8 @@ impl UtxoResult {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeUtxoResult) -> Self {
+	pub(crate) fn from_native(native: &UtxoResultImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeUtxoResult) };
 		match native {
 			nativeUtxoResult::Sync (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
@@ -239,7 +244,7 @@ pub(crate) fn UtxoLookup_clone_fields(orig: &UtxoLookup) -> UtxoLookup {
 use lightning::routing::utxo::UtxoLookup as rustUtxoLookup;
 impl rustUtxoLookup for UtxoLookup {
 	fn get_utxo(&self, mut chain_hash: &bitcoin::blockdata::constants::ChainHash, mut short_channel_id: u64) -> lightning::routing::utxo::UtxoResult {
-		let mut ret = (self.get_utxo)(self.this_arg, chain_hash.as_bytes(), short_channel_id);
+		let mut ret = (self.get_utxo)(self.this_arg, chain_hash.as_ref(), short_channel_id);
 		ret.into_native()
 	}
 }

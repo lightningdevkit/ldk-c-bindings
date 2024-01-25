@@ -53,6 +53,102 @@ pub mod sign;
 pub mod onion_message;
 pub mod blinded_path;
 pub mod events;
+mod crypto {
+
+use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+mod chacha20 {
+
+use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+mod real_chacha {
+
+use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
+}
+mod poly1305 {
+
+use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
+mod chacha20poly1305rfc {
+
+use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+mod real_chachapoly {
+
+use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
+}
+mod streams {
+
+use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
+mod utils {
+
+use alloc::str::FromStr;
+use alloc::string::String;
+use core::ffi::c_void;
+use core::convert::Infallible;
+use bitcoin::hashes::Hash;
+use crate::c_types::*;
+#[cfg(feature="no-std")]
+use alloc::{vec::Vec, boxed::Box};
+
+}
+}
 mod io_extras {
 
 use alloc::str::FromStr;

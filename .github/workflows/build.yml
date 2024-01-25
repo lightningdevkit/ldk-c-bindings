@@ -9,18 +9,18 @@ jobs:
       matrix:
         # Ubuntu's version of rustc uses its own LLVM instead of being a real native package.
         # This leaves us with an incompatible LLVM version when linking. Instead, use a real OS.
-        distro: [ "debian:bullseye", "fedora:39" ]
+        distro: [ "debian:bookworm", "fedora:39" ]
     runs-on: ubuntu-latest
     container: ${{ matrix.distro }}
     env:
       TOOLCHAIN: stable
     steps:
       - name: Install native Rust toolchain, Valgrind, and build utilitis
-        if: "matrix.distro == 'debian:bullseye'"
+        if: "matrix.distro == 'debian:bookworm'"
         run: |
           apt-get update
           apt-get -y dist-upgrade
-          apt-get -y install cargo libstd-rust-dev-wasm32 valgrind lld git g++ clang wget
+          apt-get -y install cargo libstd-rust-dev-wasm32 wasi-libc valgrind lld git g++ clang wget
       - name: Install native Rust toolchain, Valgrind, and build utilitis
         if: "matrix.distro == 'fedora:39'"
         run: |
@@ -46,22 +46,14 @@ jobs:
         run: |
           git clone https://github.com/rust-bitcoin/rust-lightning
           cd rust-lightning
-          git checkout 0.0.118-bindings
-      - name: Pin memchr
-        if: "matrix.distro == 'debian:bullseye'"
-        run: |
-          # Pin memchr until we can remove it
-          cd rust-lightning
-          cargo update -p memchr --precise "2.5.0" --verbose
+          git checkout 0.0.121-bindings
       - name: Fix Github Actions to not be broken
         run: git config --global --add safe.directory /__w/ldk-c-bindings/ldk-c-bindings
-      - name: Pin proc-macro, quote and memchr to meet MSRV
+      - name: Pin proc-macro and quote to meet MSRV
         run: |
           cd c-bindings-gen
           cargo update -p quote --precise "1.0.30" --verbose
           cargo update -p proc-macro2 --precise "1.0.65" --verbose
-          cd ../lightning-c-bindings
-          cargo update -p memchr --precise "2.5.0" --verbose
       - name: Rebuild bindings without std, and check the sample app builds + links
         run: ./genbindings.sh ./rust-lightning false
       - name: Rebuild bindings, and check the sample app builds + links
@@ -114,7 +106,7 @@ jobs:
         run: |
           git clone https://github.com/rust-bitcoin/rust-lightning
           cd rust-lightning
-          git checkout 0.0.118-bindings
+          git checkout 0.0.121-bindings
       - name: Fix Github Actions to not be broken
         run: git config --global --add safe.directory /__w/ldk-c-bindings/ldk-c-bindings
       - name: Fetch MacOS SDK
@@ -161,7 +153,7 @@ jobs:
         run: |
           git clone https://github.com/rust-bitcoin/rust-lightning
           cd rust-lightning
-          git checkout 0.0.118-bindings
+          git checkout 0.0.121-bindings
       - name: Rebuild bindings using Apple clang, and check the sample app builds + links
         run: ./genbindings.sh ./rust-lightning true
       - name: Rebuild bindings using upstream clang, and check the sample app builds + links

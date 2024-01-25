@@ -202,6 +202,9 @@ pub(crate) extern "C" fn InvoiceRequest_clone_void(this_ptr: *const c_void) -> *
 pub extern "C" fn InvoiceRequest_clone(orig: &InvoiceRequest) -> InvoiceRequest {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a InvoiceRequest object
+pub extern "C" fn InvoiceRequest_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::invoice_request::InvoiceRequest }).into()}
 
 use lightning::offers::invoice_request::VerifiedInvoiceRequest as nativeVerifiedInvoiceRequestImport;
 pub(crate) type nativeVerifiedInvoiceRequest = nativeVerifiedInvoiceRequestImport;
@@ -300,6 +303,9 @@ pub(crate) extern "C" fn VerifiedInvoiceRequest_clone_void(this_ptr: *const c_vo
 pub extern "C" fn VerifiedInvoiceRequest_clone(orig: &VerifiedInvoiceRequest) -> VerifiedInvoiceRequest {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a VerifiedInvoiceRequest object
+pub extern "C" fn VerifiedInvoiceRequest_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::offers::invoice_request::VerifiedInvoiceRequest }).into()}
 /// The chains that may be used when paying a requested invoice (e.g., bitcoin mainnet).
 /// Payments must be denominated in units of the minimal lightning-payable unit (e.g., msats)
 /// for the selected chain.
@@ -307,7 +313,7 @@ pub extern "C" fn VerifiedInvoiceRequest_clone(orig: &VerifiedInvoiceRequest) ->
 #[no_mangle]
 pub extern "C" fn UnsignedInvoiceRequest_chains(this_arg: &crate::lightning::offers::invoice_request::UnsignedInvoiceRequest) -> crate::c_types::derived::CVec_ThirtyTwoBytesZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chains();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: *item.as_ref() } }); };
 	local_ret.into()
 }
 
@@ -415,7 +421,7 @@ pub extern "C" fn UnsignedInvoiceRequest_payer_metadata(this_arg: &crate::lightn
 #[no_mangle]
 pub extern "C" fn UnsignedInvoiceRequest_chain(this_arg: &crate::lightning::offers::invoice_request::UnsignedInvoiceRequest) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chain();
-	crate::c_types::ThirtyTwoBytes { data: ret.to_bytes() }
+	crate::c_types::ThirtyTwoBytes { data: *ret.as_ref() }
 }
 
 /// The amount to pay in msats (i.e., the minimum lightning-payable unit for [`chain`]), which
@@ -474,7 +480,7 @@ pub extern "C" fn UnsignedInvoiceRequest_payer_note(this_arg: &crate::lightning:
 #[no_mangle]
 pub extern "C" fn InvoiceRequest_chains(this_arg: &crate::lightning::offers::invoice_request::InvoiceRequest) -> crate::c_types::derived::CVec_ThirtyTwoBytesZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chains();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: *item.as_ref() } }); };
 	local_ret.into()
 }
 
@@ -582,7 +588,7 @@ pub extern "C" fn InvoiceRequest_payer_metadata(this_arg: &crate::lightning::off
 #[no_mangle]
 pub extern "C" fn InvoiceRequest_chain(this_arg: &crate::lightning::offers::invoice_request::InvoiceRequest) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chain();
-	crate::c_types::ThirtyTwoBytes { data: ret.to_bytes() }
+	crate::c_types::ThirtyTwoBytes { data: *ret.as_ref() }
 }
 
 /// The amount to pay in msats (i.e., the minimum lightning-payable unit for [`chain`]), which
@@ -664,7 +670,7 @@ pub extern "C" fn InvoiceRequest_verify(mut this_arg: crate::lightning::offers::
 #[no_mangle]
 pub extern "C" fn VerifiedInvoiceRequest_chains(this_arg: &crate::lightning::offers::invoice_request::VerifiedInvoiceRequest) -> crate::c_types::derived::CVec_ThirtyTwoBytesZ {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chains();
-	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: item.to_bytes() } }); };
+	let mut local_ret = Vec::new(); for mut item in ret.drain(..) { local_ret.push( { crate::c_types::ThirtyTwoBytes { data: *item.as_ref() } }); };
 	local_ret.into()
 }
 
@@ -772,7 +778,7 @@ pub extern "C" fn VerifiedInvoiceRequest_payer_metadata(this_arg: &crate::lightn
 #[no_mangle]
 pub extern "C" fn VerifiedInvoiceRequest_chain(this_arg: &crate::lightning::offers::invoice_request::VerifiedInvoiceRequest) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.chain();
-	crate::c_types::ThirtyTwoBytes { data: ret.to_bytes() }
+	crate::c_types::ThirtyTwoBytes { data: *ret.as_ref() }
 }
 
 /// The amount to pay in msats (i.e., the minimum lightning-payable unit for [`chain`]), which

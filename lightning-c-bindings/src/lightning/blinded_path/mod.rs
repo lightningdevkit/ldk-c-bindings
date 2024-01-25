@@ -173,6 +173,9 @@ pub(crate) extern "C" fn BlindedPath_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn BlindedPath_clone(orig: &BlindedPath) -> BlindedPath {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a BlindedPath object
+pub extern "C" fn BlindedPath_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::blinded_path::BlindedPath }).into()}
 /// Generates a non-cryptographic 64-bit hash of the BlindedPath.
 #[no_mangle]
 pub extern "C" fn BlindedPath_hash(o: &BlindedPath) -> u64 {
@@ -300,6 +303,9 @@ pub(crate) extern "C" fn BlindedHop_clone_void(this_ptr: *const c_void) -> *mut 
 pub extern "C" fn BlindedHop_clone(orig: &BlindedHop) -> BlindedHop {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a BlindedHop object
+pub extern "C" fn BlindedHop_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::blinded_path::BlindedHop }).into()}
 /// Generates a non-cryptographic 64-bit hash of the BlindedHop.
 #[no_mangle]
 pub extern "C" fn BlindedHop_hash(o: &BlindedHop) -> u64 {
@@ -346,6 +352,23 @@ pub extern "C" fn BlindedPath_new_for_message(mut node_pks: crate::c_types::deri
 #[no_mangle]
 pub extern "C" fn BlindedPath_one_hop_for_payment(mut payee_node_id: crate::c_types::PublicKey, mut payee_tlvs: crate::lightning::blinded_path::payment::ReceiveTlvs, entropy_source: &crate::lightning::sign::EntropySource) -> crate::c_types::derived::CResult_C2Tuple_BlindedPayInfoBlindedPathZNoneZ {
 	let mut ret = lightning::blinded_path::BlindedPath::one_hop_for_payment(payee_node_id.into_rust(), *unsafe { Box::from_raw(payee_tlvs.take_inner()) }, entropy_source, secp256k1::global::SECP256K1);
+	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_ret_0 = (crate::lightning::offers::invoice::BlindedPayInfo { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, crate::lightning::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(orig_ret_0_1), is_owned: true }).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
+	local_ret
+}
+
+/// Create a blinded path for a payment, to be forwarded along `intermediate_nodes`.
+///
+/// Errors if:
+/// * a provided node id is invalid
+/// * [`BlindedPayInfo`] calculation results in an integer overflow
+/// * any unknown features are required in the provided [`ForwardTlvs`]
+///
+/// [`ForwardTlvs`]: crate::blinded_path::payment::ForwardTlvs
+#[must_use]
+#[no_mangle]
+pub extern "C" fn BlindedPath_new_for_payment(mut intermediate_nodes: crate::c_types::derived::CVec_ForwardNodeZ, mut payee_node_id: crate::c_types::PublicKey, mut payee_tlvs: crate::lightning::blinded_path::payment::ReceiveTlvs, mut htlc_maximum_msat: u64, entropy_source: &crate::lightning::sign::EntropySource) -> crate::c_types::derived::CResult_C2Tuple_BlindedPayInfoBlindedPathZNoneZ {
+	let mut local_intermediate_nodes = Vec::new(); for mut item in intermediate_nodes.into_rust().drain(..) { local_intermediate_nodes.push( { *unsafe { Box::from_raw(item.take_inner()) } }); };
+	let mut ret = lightning::blinded_path::BlindedPath::new_for_payment(local_intermediate_nodes, payee_node_id.into_rust(), *unsafe { Box::from_raw(payee_tlvs.take_inner()) }, htlc_maximum_msat, entropy_source, secp256k1::global::SECP256K1);
 	let mut local_ret = match ret { Ok(mut o) => crate::c_types::CResultTempl::ok( { let (mut orig_ret_0_0, mut orig_ret_0_1) = o; let mut local_ret_0 = (crate::lightning::offers::invoice::BlindedPayInfo { inner: ObjOps::heap_alloc(orig_ret_0_0), is_owned: true }, crate::lightning::blinded_path::BlindedPath { inner: ObjOps::heap_alloc(orig_ret_0_1), is_owned: true }).into(); local_ret_0 }).into(), Err(mut e) => crate::c_types::CResultTempl::err( { () /*e*/ }).into() };
 	local_ret
 }

@@ -30,7 +30,7 @@ pub struct OffersMessageHandler {
 	///
 	/// The returned [`OffersMessage`], if any, is enqueued to be sent by [`OnionMessenger`].
 	///
-	/// [`OnionMessenger`]: crate::onion_message::OnionMessenger
+	/// [`OnionMessenger`]: crate::onion_message::messenger::OnionMessenger
 	pub handle_message: extern "C" fn (this_arg: *const c_void, message: crate::lightning::onion_message::offers::OffersMessage) -> crate::c_types::derived::COption_OffersMessageZ,
 	/// Releases any [`OffersMessage`]s that need to be sent.
 	///
@@ -159,7 +159,8 @@ impl OffersMessage {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeOffersMessage) -> Self {
+	pub(crate) fn from_native(native: &OffersMessageImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeOffersMessage) };
 		match native {
 			nativeOffersMessage::InvoiceRequest (ref a, ) => {
 				let mut a_nonref = Clone::clone(a);
@@ -241,6 +242,43 @@ pub extern "C" fn OffersMessage_invoice_error(a: crate::lightning::offers::invoi
 pub extern "C" fn OffersMessage_is_known_type(mut tlv_type: u64) -> bool {
 	let mut ret = lightning::onion_message::offers::OffersMessage::is_known_type(tlv_type);
 	ret
+}
+
+/// Get a string which allows debug introspection of a OffersMessage object
+pub extern "C" fn OffersMessage_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::onion_message::offers::OffersMessage }).into()}
+impl From<nativeOffersMessage> for crate::lightning::onion_message::packet::OnionMessageContents {
+	fn from(obj: nativeOffersMessage) -> Self {
+		let rust_obj = crate::lightning::onion_message::offers::OffersMessage::native_into(obj);
+		let mut ret = OffersMessage_as_OnionMessageContents(&rust_obj);
+		// We want to free rust_obj when ret gets drop()'d, not rust_obj, so forget it and set ret's free() fn
+		core::mem::forget(rust_obj);
+		ret.free = Some(OffersMessage_free_void);
+		ret
+	}
+}
+/// Constructs a new OnionMessageContents which calls the relevant methods on this_arg.
+/// This copies the `inner` pointer in this_arg and thus the returned OnionMessageContents must be freed before this_arg is
+#[no_mangle]
+pub extern "C" fn OffersMessage_as_OnionMessageContents(this_arg: &OffersMessage) -> crate::lightning::onion_message::packet::OnionMessageContents {
+	crate::lightning::onion_message::packet::OnionMessageContents {
+		this_arg: unsafe { ObjOps::untweak_ptr(this_arg as *const OffersMessage as *mut OffersMessage) as *mut c_void },
+		free: None,
+		tlv_type: OffersMessage_OnionMessageContents_tlv_type,
+		write: OffersMessage_write_void,
+		debug_str: OffersMessage_debug_str_void,
+		cloned: Some(OnionMessageContents_OffersMessage_cloned),
+	}
+}
+
+#[must_use]
+extern "C" fn OffersMessage_OnionMessageContents_tlv_type(this_arg: *const c_void) -> u64 {
+	let mut ret = <nativeOffersMessage as lightning::onion_message::packet::OnionMessageContents<>>::tlv_type(unsafe { &mut *(this_arg as *mut nativeOffersMessage) }, );
+	ret
+}
+extern "C" fn OnionMessageContents_OffersMessage_cloned(new_obj: &mut crate::lightning::onion_message::packet::OnionMessageContents) {
+	new_obj.this_arg = OffersMessage_clone_void(new_obj.this_arg);
+	new_obj.free = Some(OffersMessage_free_void);
 }
 
 #[no_mangle]

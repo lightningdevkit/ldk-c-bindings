@@ -1101,7 +1101,9 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 							},
 							("Sync", _, _) => {}, ("Send", _, _) => {},
 							("std::marker::Sync", _, _) => {}, ("std::marker::Send", _, _) => {},
-							("core::fmt::Debug", _, _) => {},
+							("core::fmt::Debug", _, _) => {
+								writeln!(w, "\t\tdebug_str: {}_debug_str_void,", ident).unwrap();
+							},
 							(s, t, _) => {
 								if let Some(supertrait_obj) = types.crate_types.traits.get(s) {
 									macro_rules! write_impl_fields {
@@ -1298,8 +1300,8 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 						write!(w, "#[must_use]\n#[no_mangle]\npub extern \"C\" fn {}_default() -> {} {{\n", ident, ident).unwrap();
 						write!(w, "\t{} {{ inner: ObjOps::heap_alloc(Default::default()), is_owned: true }}\n", ident).unwrap();
 						write!(w, "}}\n").unwrap();
-					} else if path_matches_nongeneric(&trait_path.1, &["core", "cmp", "PartialEq"]) {
-					} else if path_matches_nongeneric(&trait_path.1, &["core", "cmp", "Eq"]) {
+					} else if full_trait_path_opt.as_ref().map(|s| s.as_str()) == Some("core::cmp::PartialEq") {
+					} else if full_trait_path_opt.as_ref().map(|s| s.as_str()) == Some("core::cmp::Eq") {
 						writeln!(w, "/// Checks if two {}s contain equal inner contents.", ident).unwrap();
 						writeln!(w, "/// This ignores pointers and is_owned flags and looks at the values in fields.").unwrap();
 						if types.c_type_has_inner_from_path(&resolved_path) {
@@ -1325,7 +1327,7 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
 
 						writeln!(w, " {{ true }} else {{ false }}\n}}").unwrap();
-					} else if path_matches_nongeneric(&trait_path.1, &["core", "hash", "Hash"]) {
+					} else if full_trait_path_opt.as_ref().map(|s| s.as_str()) == Some("core::hash::Hash") {
 						writeln!(w, "/// Generates a non-cryptographic 64-bit hash of the {}.", ident).unwrap();
 						write!(w, "#[no_mangle]\npub extern \"C\" fn {}_hash(o: &{}) -> u64 {{\n", ident, ident).unwrap();
 						if types.c_type_has_inner_from_path(&resolved_path) {
@@ -1345,8 +1347,8 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 						types.write_from_c_conversion_suffix(w, &ref_type, Some(&gen_types));
 						writeln!(w, ", &mut hasher);").unwrap();
 						writeln!(w, "\tcore::hash::Hasher::finish(&hasher)\n}}").unwrap();
-					} else if (path_matches_nongeneric(&trait_path.1, &["core", "clone", "Clone"]) || path_matches_nongeneric(&trait_path.1, &["Clone"])) &&
-							types.c_type_has_inner_from_path(&resolved_path) {
+					} else if (full_trait_path_opt.as_ref().map(|s| s.as_str()) == Some("core::clone::Clone") || path_matches_nongeneric(&trait_path.1, &["Clone"])) &&
+					types.c_type_has_inner_from_path(&resolved_path) {
 						writeln!(w, "impl Clone for {} {{", ident).unwrap();
 						writeln!(w, "\tfn clone(&self) -> Self {{").unwrap();
 						writeln!(w, "\t\tSelf {{").unwrap();
@@ -1399,6 +1401,12 @@ fn writeln_impl<W: std::io::Write>(w: &mut W, w_uses: &mut HashSet<String, NonRa
 
 							writeln!(w, "\t}}.into()\n}}").unwrap();
 						}
+					} else if full_trait_path_opt.as_ref().map(|s| s.as_str()) == Some("core::fmt::Debug") {
+						writeln!(w, "/// Get a string which allows debug introspection of a {} object", ident).unwrap();
+						writeln!(w, "pub extern \"C\" fn {}_debug_str_void(o: *const c_void) -> Str {{", ident).unwrap();
+
+						write!(w, "\talloc::format!(\"{{:?}}\", unsafe {{ o as *const crate::{} }}).into()", resolved_path).unwrap();
+						writeln!(w, "}}").unwrap();
 					} else if path_matches_nongeneric(&trait_path.1, &["Display"]) {
 						writeln!(w, "#[no_mangle]").unwrap();
 						writeln!(w, "/// Get the string representation of a {} object", ident).unwrap();
@@ -1809,7 +1817,11 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 
 	macro_rules! write_conv {
 		($fn_sig: expr, $to_c: expr, $ref: expr) => {
-			writeln!(w, "\t#[allow(unused)]\n\tpub(crate) fn {} {{\n\t\tmatch {} {{", $fn_sig, if $to_c { "native" } else { "self" }).unwrap();
+			writeln!(w, "\t#[allow(unused)]\n\tpub(crate) fn {} {{", $fn_sig).unwrap();
+			if $to_c && $ref {
+				writeln!(w, "\t\tlet native = unsafe {{ &*(native as *const _ as *const c_void as *const native{}) }};", e.ident).unwrap();
+			}
+			writeln!(w, "\t\tmatch {} {{", if $to_c { "native" } else { "self" }).unwrap();
 			for var in e.variants.iter() {
 				write!(w, "\t\t\t{}{}::{} ", if $to_c { "native" } else { "" }, e.ident, var.ident).unwrap();
 				let mut empty_tuple_variant = false;
@@ -1933,7 +1945,10 @@ fn writeln_enum<'a, 'b, W: std::io::Write>(w: &mut W, e: &'a syn::ItemEnum, type
 	}
 	write_conv!(format!("into_native(self) -> native{}", e.ident), false, false);
 	if is_clonable {
-		write_conv!(format!("from_native(native: &native{}) -> Self", e.ident), true, true);
+		let mut args = Vec::new();
+		maybe_write_non_lifetime_generics(&mut args, &e.generics, &syn::PathArguments::None, &types);
+		let fn_line = format!("from_native(native: &{}Import{}) -> Self", e.ident, String::from_utf8(args).unwrap());
+		write_conv!(fn_line, true, true);
 	}
 	write_conv!(format!("native_into(native: native{}) -> Self", e.ident), true, false);
 	writeln!(w, "}}").unwrap();

@@ -5,6 +5,8 @@ pub mod derived;
 
 use bitcoin::Transaction as BitcoinTransaction;
 use bitcoin::Witness as BitcoinWitness;
+use bitcoin::address;
+use bitcoin::address::WitnessProgram as BitcoinWitnessProgram;
 use bitcoin::hashes::Hash;
 use bitcoin::secp256k1::PublicKey as SecpPublicKey;
 use bitcoin::secp256k1::SecretKey as SecpSecretKey;
@@ -15,7 +17,6 @@ use bitcoin::secp256k1::ecdsa::RecoveryId;
 use bitcoin::secp256k1::ecdsa::RecoverableSignature as SecpRecoverableSignature;
 use bitcoin::secp256k1::Scalar as SecpScalar;
 use bitcoin::bech32;
-use bitcoin::util::address;
 
 use core::convert::TryInto; // Bindings need at least rustc 1.34
 use alloc::borrow::ToOwned;
@@ -95,6 +96,58 @@ impl Into<address::WitnessVersion> for WitnessVersion {
 		address::WitnessVersion::try_from(self.0).expect("WitnessVersion objects must be in the range 0..=16")
 	}
 }
+
+/// A segregated witness version byte and script bytes
+#[repr(C)]
+#[derive(Clone)]
+pub struct WitnessProgram {
+	version: WitnessVersion,
+	program: derived::CVec_u8Z,
+}
+impl WitnessProgram {
+	pub(crate) fn from_bitcoin(o: BitcoinWitnessProgram) -> Self {
+		Self {
+			version: o.version().into(),
+			program: o.program().as_bytes().to_vec().into(),
+		}
+	}
+	pub(crate) fn into_bitcoin(mut self) -> BitcoinWitnessProgram {
+		BitcoinWitnessProgram::new(
+			self.version.into(),
+			self.program.into_rust(),
+		).expect("Program length was previously checked")
+	}
+}
+
+#[no_mangle]
+/// Constructs a new WitnessProgram given a version and program bytes.
+///
+/// The program MUST be at least 2 bytes and no longer than 40 bytes long.
+/// Further, if the version is 0, the program MUST be either exactly 20 or exactly 32 bytes long.
+pub extern "C" fn WitnessProgram_new(version: WitnessVersion, program: derived::CVec_u8Z) -> WitnessProgram {
+	assert!(program.datalen >= 2, "WitnessProgram program lengths must be at least 2 bytes long");
+	assert!(program.datalen <= 40, "WitnessProgram program lengths must be no longer than 40 bytes");
+	if version.0 == 0 {
+		assert!(program.datalen == 20 || program.datalen == 32, "WitnessProgram program length must be 20 or 32 for version-0 programs");
+	}
+	WitnessProgram { version, program }
+}
+#[no_mangle]
+/// Gets the `WitnessVersion` of the given `WitnessProgram`
+pub extern "C" fn WitnessProgram_get_version(prog: &WitnessProgram) -> WitnessVersion {
+	prog.version
+}
+#[no_mangle]
+/// Gets the witness program bytes of the given `WitnessProgram`
+pub extern "C" fn WitnessProgram_get_program(prog: &WitnessProgram) -> u8slice {
+	u8slice::from_vec(&prog.program)
+}
+#[no_mangle]
+/// Creates a new WitnessProgram which has the same data as `orig`
+pub extern "C" fn WitnessProgram_clone(orig: &WitnessProgram) -> WitnessProgram { orig.clone() }
+#[no_mangle]
+/// Releases any memory held by the given `WitnessProgram` (which is currently none)
+pub extern "C" fn WitnessProgram_free(o: WitnessProgram) { }
 
 #[derive(Clone)]
 #[repr(C)]
@@ -534,7 +587,7 @@ pub extern "C" fn Witness_clone(orig: &Witness) -> Witness { orig.clone() }
 pub extern "C" fn Witness_free(_res: Witness) { }
 
 pub(crate) fn bitcoin_to_C_outpoint(outpoint: &::bitcoin::blockdata::transaction::OutPoint) -> crate::lightning::chain::transaction::OutPoint {
-	crate::lightning::chain::transaction::OutPoint_new(ThirtyTwoBytes { data: outpoint.txid.into_inner() }, outpoint.vout.try_into().unwrap())
+	crate::lightning::chain::transaction::OutPoint_new(ThirtyTwoBytes { data: *outpoint.txid.as_ref() }, outpoint.vout.try_into().unwrap())
 }
 pub(crate) fn C_to_bitcoin_outpoint(outpoint: crate::lightning::chain::transaction::OutPoint) -> ::bitcoin::blockdata::transaction::OutPoint {
 	unsafe {
@@ -570,22 +623,44 @@ impl TxIn {
 			witness: Witness::from_bitcoin(&txin.witness),
 			script_sig: derived::CVec_u8Z::from(txin.script_sig.clone().into_bytes()),
 			sequence: txin.sequence.0,
-			previous_txid: ThirtyTwoBytes { data: txin.previous_output.txid.into_inner() },
+			previous_txid: ThirtyTwoBytes { data: *txin.previous_output.txid.as_ref() },
 			previous_vout: txin.previous_output.vout,
 		}
 	}
 }
-
-#[no_mangle]
-/// Frees the witness and script_sig in a TxIn
-pub extern "C" fn TxIn_free(_res: TxIn) { }
-
 #[no_mangle]
 /// Convenience function for constructing a new TxIn
 pub extern "C" fn TxIn_new(witness: Witness, script_sig: derived::CVec_u8Z, sequence: u32, previous_txid: ThirtyTwoBytes, previous_vout: u32) -> TxIn {
 	TxIn { witness, script_sig, sequence, previous_txid, previous_vout }
 }
-
+#[no_mangle]
+/// Gets the `witness` in the given `TxIn`.
+pub extern "C" fn TxIn_get_witness(txin: &TxIn) -> Witness {
+	txin.witness.clone()
+}
+#[no_mangle]
+/// Gets the `script_sig` in the given `TxIn`.
+pub extern "C" fn TxIn_get_script_sig(txin: &TxIn) -> u8slice {
+	u8slice::from_vec(&txin.script_sig)
+}
+#[no_mangle]
+/// Gets the `sequence` in the given `TxIn`.
+pub extern "C" fn TxIn_get_sequence(txin: &TxIn) -> u32 {
+	txin.sequence
+}
+#[no_mangle]
+/// Gets the previous outpoint txid in the given `TxIn`.
+pub extern "C" fn TxIn_get_previous_txid(txin: &TxIn) -> ThirtyTwoBytes {
+	txin.previous_txid
+}
+#[no_mangle]
+/// Gets the previout outpoint index in the given `TxIn`.
+pub extern "C" fn TxIn_get_previous_vout(txin: &TxIn) -> u32 {
+	txin.previous_vout
+}
+#[no_mangle]
+/// Frees the witness and script_sig in a TxIn
+pub extern "C" fn TxIn_free(_res: TxIn) { }
 
 #[repr(C)]
 #[derive(Clone)]
@@ -617,6 +692,16 @@ impl TxOut {
 /// Convenience function for constructing a new TxOut
 pub extern "C" fn TxOut_new(script_pubkey: derived::CVec_u8Z, value: u64) -> TxOut {
 	TxOut { script_pubkey, value }
+}
+#[no_mangle]
+/// Gets the `script_pubkey` in the given `TxOut`.
+pub extern "C" fn TxOut_get_script_pubkey(txout: &TxOut) -> u8slice {
+	u8slice::from_vec(&txout.script_pubkey)
+}
+#[no_mangle]
+/// Gets the value in the given `TxOut`.
+pub extern "C" fn TxOut_get_value(txout: &TxOut) -> u64 {
+	txout.value
 }
 #[no_mangle]
 /// Frees the data pointed to by script_pubkey.

@@ -104,6 +104,14 @@ pub extern "C" fn NodeId_as_slice(this_arg: &crate::lightning::routing::gossip::
 	local_ret
 }
 
+/// Get the public key as an array from this NodeId
+#[must_use]
+#[no_mangle]
+pub extern "C" fn NodeId_as_array(this_arg: &crate::lightning::routing::gossip::NodeId) -> *const [u8; 33] {
+	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.as_array();
+	ret
+}
+
 /// Get the public key from this NodeId
 #[must_use]
 #[no_mangle]
@@ -113,6 +121,9 @@ pub extern "C" fn NodeId_as_pubkey(this_arg: &crate::lightning::routing::gossip:
 	local_ret
 }
 
+/// Get a string which allows debug introspection of a NodeId object
+pub extern "C" fn NodeId_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::routing::gossip::NodeId }).into()}
 /// Generates a non-cryptographic 64-bit hash of the NodeId.
 #[no_mangle]
 pub extern "C" fn NodeId_hash(o: &NodeId) -> u64 {
@@ -328,7 +339,8 @@ impl NetworkUpdate {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeNetworkUpdate) -> Self {
+	pub(crate) fn from_native(native: &NetworkUpdateImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeNetworkUpdate) };
 		match native {
 			nativeNetworkUpdate::ChannelUpdateMessage {ref msg, } => {
 				let mut msg_nonref = Clone::clone(msg);
@@ -418,6 +430,9 @@ pub extern "C" fn NetworkUpdate_node_failure(node_id: crate::c_types::PublicKey,
 		is_permanent,
 	}
 }
+/// Get a string which allows debug introspection of a NetworkUpdate object
+pub extern "C" fn NetworkUpdate_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::routing::gossip::NetworkUpdate }).into()}
 /// Checks if two NetworkUpdates contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 #[no_mangle]
@@ -531,7 +546,7 @@ pub extern "C" fn NetworkGraph_handle_network_update(this_arg: &crate::lightning
 #[no_mangle]
 pub extern "C" fn NetworkGraph_get_chain_hash(this_arg: &crate::lightning::routing::gossip::NetworkGraph) -> crate::c_types::ThirtyTwoBytes {
 	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.get_chain_hash();
-	crate::c_types::ThirtyTwoBytes { data: ret.to_bytes() }
+	crate::c_types::ThirtyTwoBytes { data: *ret.as_ref() }
 }
 
 /// Verifies the signature of a [`NodeAnnouncement`].
@@ -875,6 +890,9 @@ pub(crate) extern "C" fn ChannelUpdateInfo_clone_void(this_ptr: *const c_void) -
 pub extern "C" fn ChannelUpdateInfo_clone(orig: &ChannelUpdateInfo) -> ChannelUpdateInfo {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ChannelUpdateInfo object
+pub extern "C" fn ChannelUpdateInfo_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::routing::gossip::ChannelUpdateInfo }).into()}
 /// Checks if two ChannelUpdateInfos contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -1074,6 +1092,9 @@ pub(crate) extern "C" fn ChannelInfo_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn ChannelInfo_clone(orig: &ChannelInfo) -> ChannelInfo {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a ChannelInfo object
+pub extern "C" fn ChannelInfo_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::routing::gossip::ChannelInfo }).into()}
 /// Checks if two ChannelInfos contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -1189,14 +1210,6 @@ pub extern "C" fn DirectedChannelInfo_channel(this_arg: &crate::lightning::routi
 	crate::lightning::routing::gossip::ChannelInfo { inner: unsafe { ObjOps::nonnull_ptr_to_inner((ret as *const lightning::routing::gossip::ChannelInfo<>) as *mut _) }, is_owned: false }
 }
 
-/// Returns the maximum HTLC amount allowed over the channel in the direction.
-#[must_use]
-#[no_mangle]
-pub extern "C" fn DirectedChannelInfo_htlc_maximum_msat(this_arg: &crate::lightning::routing::gossip::DirectedChannelInfo) -> u64 {
-	let mut ret = unsafe { &*ObjOps::untweak_ptr(this_arg.inner) }.htlc_maximum_msat();
-	ret
-}
-
 /// Returns the [`EffectiveCapacity`] of the channel in the direction.
 ///
 /// This is either the total capacity from the funding transaction, if known, or the
@@ -1209,6 +1222,9 @@ pub extern "C" fn DirectedChannelInfo_effective_capacity(this_arg: &crate::light
 	crate::lightning::routing::gossip::EffectiveCapacity::native_into(ret)
 }
 
+/// Get a string which allows debug introspection of a DirectedChannelInfo object
+pub extern "C" fn DirectedChannelInfo_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::routing::gossip::DirectedChannelInfo }).into()}
 /// The effective capacity of a channel for routing purposes.
 ///
 /// While this may be smaller than the actual channel capacity, amounts greater than
@@ -1314,7 +1330,8 @@ impl EffectiveCapacity {
 		}
 	}
 	#[allow(unused)]
-	pub(crate) fn from_native(native: &nativeEffectiveCapacity) -> Self {
+	pub(crate) fn from_native(native: &EffectiveCapacityImport) -> Self {
+		let native = unsafe { &*(native as *const _ as *const c_void as *const nativeEffectiveCapacity) };
 		match native {
 			nativeEffectiveCapacity::ExactLiquidity {ref liquidity_msat, } => {
 				let mut liquidity_msat_nonref = Clone::clone(liquidity_msat);
@@ -1430,6 +1447,9 @@ pub extern "C" fn EffectiveCapacity_hint_max_htlc(amount_msat: u64) -> Effective
 /// Utility method to constructs a new Unknown-variant EffectiveCapacity
 pub extern "C" fn EffectiveCapacity_unknown() -> EffectiveCapacity {
 	EffectiveCapacity::Unknown}
+/// Get a string which allows debug introspection of a EffectiveCapacity object
+pub extern "C" fn EffectiveCapacity_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::routing::gossip::EffectiveCapacity }).into()}
 /// The presumed channel capacity denominated in millisatoshi for [`EffectiveCapacity::Unknown`] to
 /// use when making routing decisions.
 
@@ -1555,6 +1575,9 @@ pub(crate) extern "C" fn RoutingFees_clone_void(this_ptr: *const c_void) -> *mut
 pub extern "C" fn RoutingFees_clone(orig: &RoutingFees) -> RoutingFees {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a RoutingFees object
+pub extern "C" fn RoutingFees_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::routing::gossip::RoutingFees }).into()}
 /// Generates a non-cryptographic 64-bit hash of the RoutingFees.
 #[no_mangle]
 pub extern "C" fn RoutingFees_hash(o: &RoutingFees) -> u64 {
@@ -1739,6 +1762,9 @@ pub(crate) extern "C" fn NodeAnnouncementInfo_clone_void(this_ptr: *const c_void
 pub extern "C" fn NodeAnnouncementInfo_clone(orig: &NodeAnnouncementInfo) -> NodeAnnouncementInfo {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a NodeAnnouncementInfo object
+pub extern "C" fn NodeAnnouncementInfo_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::routing::gossip::NodeAnnouncementInfo }).into()}
 /// Checks if two NodeAnnouncementInfos contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -1862,6 +1888,19 @@ pub(crate) extern "C" fn NodeAlias_clone_void(this_ptr: *const c_void) -> *mut c
 /// Creates a copy of the NodeAlias
 pub extern "C" fn NodeAlias_clone(orig: &NodeAlias) -> NodeAlias {
 	orig.clone()
+}
+/// Get a string which allows debug introspection of a NodeAlias object
+pub extern "C" fn NodeAlias_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::routing::gossip::NodeAlias }).into()}
+/// Generates a non-cryptographic 64-bit hash of the NodeAlias.
+#[no_mangle]
+pub extern "C" fn NodeAlias_hash(o: &NodeAlias) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 /// Checks if two NodeAliass contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
@@ -2007,6 +2046,9 @@ pub(crate) extern "C" fn NodeInfo_clone_void(this_ptr: *const c_void) -> *mut c_
 pub extern "C" fn NodeInfo_clone(orig: &NodeInfo) -> NodeInfo {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a NodeInfo object
+pub extern "C" fn NodeInfo_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::routing::gossip::NodeInfo }).into()}
 /// Checks if two NodeInfos contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.

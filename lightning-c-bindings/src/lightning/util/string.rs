@@ -104,6 +104,9 @@ pub(crate) extern "C" fn UntrustedString_clone_void(this_ptr: *const c_void) -> 
 pub extern "C" fn UntrustedString_clone(orig: &UntrustedString) -> UntrustedString {
 	orig.clone()
 }
+/// Get a string which allows debug introspection of a UntrustedString object
+pub extern "C" fn UntrustedString_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::string::UntrustedString }).into()}
 /// Checks if two UntrustedStrings contain equal inner contents.
 /// This ignores pointers and is_owned flags and looks at the values in fields.
 /// Two objects with NULL inner values will be considered "equal" here.
@@ -112,6 +115,16 @@ pub extern "C" fn UntrustedString_eq(a: &UntrustedString, b: &UntrustedString) -
 	if a.inner == b.inner { return true; }
 	if a.inner.is_null() || b.inner.is_null() { return false; }
 	if a.get_native_ref() == b.get_native_ref() { true } else { false }
+}
+/// Generates a non-cryptographic 64-bit hash of the UntrustedString.
+#[no_mangle]
+pub extern "C" fn UntrustedString_hash(o: &UntrustedString) -> u64 {
+	if o.inner.is_null() { return 0; }
+	// Note that we'd love to use alloc::collections::hash_map::DefaultHasher but it's not in core
+	#[allow(deprecated)]
+	let mut hasher = core::hash::SipHasher::new();
+	core::hash::Hash::hash(o.get_native_ref(), &mut hasher);
+	core::hash::Hasher::finish(&hasher)
 }
 #[no_mangle]
 /// Serialize the UntrustedString object into a byte array which can be read by UntrustedString_read
@@ -198,3 +211,6 @@ pub extern "C" fn PrintableString_new(mut a_arg: crate::c_types::Str) -> Printab
 		a_arg.into_str(),
 	)), is_owned: true }
 }
+/// Get a string which allows debug introspection of a PrintableString object
+pub extern "C" fn PrintableString_debug_str_void(o: *const c_void) -> Str {
+	alloc::format!("{:?}", unsafe { o as *const crate::lightning::util::string::PrintableString }).into()}

@@ -1112,7 +1112,8 @@ int main() {
 	LDK::RecipientOnionFields invoice2_recipient(std::move(pay_params->contents.result->b));
 	LDK::RouteParameters invoice2_params(std::move(pay_params->contents.result->c));
 	assert(pay_params->result_ok);
-	LDKThirtyTwoBytes payment_id { .data = 0 };
+	LDKThirtyTwoBytes payment_id;
+	memset(&payment_id, 0, 32);
 	LDK::CResult_NoneRetryableSendFailureZ invoice_pay_res = ChannelManager_send_payment(
 		&cm1, std::move(pay_params->contents.result->a), std::move(invoice2_recipient),
 		std::move(payment_id), std::move(invoice2_params), Retry_attempts(0)

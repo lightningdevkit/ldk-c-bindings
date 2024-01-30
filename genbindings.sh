@@ -9,6 +9,18 @@ if [ ! -d "$1/lightning" -o "$2" != "true" -a "$2" != "false" ]; then
 	exit 1
 fi
 
+SKIP_TESTS_ARGUMENT=$3
+SKIP_TESTS=false
+
+if [ ! -z "$SKIP_TESTS_ARGUMENT" ]; then
+  if [ "$SKIP_TESTS_ARGUMENT" != "skip-tests" ]; then
+    echo "To skip tests, usage must be: $0 path-to-rust-lightning allow-std skip-tests"
+    exit 1
+  else
+    SKIP_TESTS=true
+  fi
+fi
+
 export LC_ALL=C
 
 # On reasonable systems, we can use realpath here, but OSX is a diva with 20-year-old software.
@@ -247,6 +259,11 @@ else
 	# stdlib.h doesn't exist in clang's wasm sysroot, and cbindgen
 	# doesn't actually use it anyway, so drop the import.
 	sed -i '' 's/#include <stdlib.h>/#include "ldk_rust_types.h"/g' include/lightning.h
+fi
+
+if $SKIP_TESTS; then
+  echo "Skipping tests!"
+  exit 0
 fi
 
 # Build C++ class methods which call trait methods

@@ -1,2 +1,2 @@
 #!/bin/bash
-clang -target x86_64-pc-windows-gnu -L/usr/lib/gcc/x86_64-w64-mingw32/12-win32/ "$@"
+clang -fembed-bitcode -fuse-ld=lld -target x86_64-pc-windows-gnu "$@"

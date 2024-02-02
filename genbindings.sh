@@ -552,6 +552,7 @@ fi
 
 EXTRA_TARGETS=( $LDK_C_BINDINGS_EXTRA_TARGETS )
 EXTRA_CCS=( $LDK_C_BINDINGS_EXTRA_TARGET_CCS )
+EXTRA_LINK_LTO=( $LDK_C_BINDINGS_EXTRA_TARGET_LINK_LTO )
 
 if [ ${#EXTRA_TARGETS[@]} != ${#EXTRA_CCS[@]} ]; then
 	echo "LDK_C_BINDINGS_EXTRA_TARGETS and LDK_C_BINDINGS_EXTRA_TARGET_CCS didn't have the same number of elements!"
@@ -562,7 +563,15 @@ for IDX in ${!EXTRA_TARGETS[@]}; do
 	EXTRA_ENV_TARGET=$(echo "${EXTRA_TARGETS[$IDX]}" | sed 's/-/_/g')
 	export CFLAGS_$EXTRA_ENV_TARGET="$BASE_CFLAGS"
 	export CC_$EXTRA_ENV_TARGET=${EXTRA_CCS[$IDX]}
-	RUSTFLAGS="$BASE_RUSTFLAGS -C embed-bitcode=yes -C lto -C linker=${EXTRA_CCS[$IDX]}" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target "${EXTRA_TARGETS[$IDX]}"
+	EXTRA_RUSTFLAGS=""
+	case "$EXTRA_ENV_TARGET" in
+		"x86_64"*)
+			export CFLAGS_$EXTRA_ENV_TARGET="$BASE_CFLAGS -march=sandybridge -mtune=sandybridge"
+			EXTRA_RUSTFLAGS="-C target-cpu=sandybridge"
+			;;
+	esac
+	[ "${EXTRA_LINK_LTO[$IDX]}" != "" ] && EXTRA_RUSTFLAGS="-C linker-plugin-lto"
+	RUSTFLAGS="$BASE_RUSTFLAGS -C embed-bitcode=yes -C lto -C linker=${EXTRA_CCS[$IDX]} $EXTRA_RUSTFLAGS" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target "${EXTRA_TARGETS[$IDX]}"
 done
 
 if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then

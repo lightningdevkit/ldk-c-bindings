@@ -261,11 +261,6 @@ else
 	sed -i '' 's/#include <stdlib.h>/#include "ldk_rust_types.h"/g' include/lightning.h
 fi
 
-if $SKIP_TESTS; then
-  echo "Skipping tests!"
-  exit 0
-fi
-
 # Build C++ class methods which call trait methods
 echo "Updating C++ header, this may take some time, especially on macOS"
 set +x # Echoing every command is very verbose here
@@ -333,6 +328,11 @@ echo "}" >> include/lightningpp_new.hpp
 export IFS="$OLD_IFS"
 set -x
 mv include/lightningpp_new.hpp include/lightningpp.hpp
+
+if $SKIP_TESTS; then
+  echo "Skipping tests!"
+  exit 0
+fi
 
 # Finally, sanity-check the generated C and C++ bindings with demo apps:
 # Naively run the C demo app:

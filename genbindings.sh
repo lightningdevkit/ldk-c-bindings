@@ -10,14 +10,14 @@ if [ ! -d "$1/lightning" -o "$2" != "true" -a "$2" != "false" ]; then
 fi
 
 SKIP_TESTS_ARGUMENT=$3
-SKIP_TESTS=false
+RUN_CPP_TESTS=true
 
 if [ ! -z "$SKIP_TESTS_ARGUMENT" ]; then
   if [ "$SKIP_TESTS_ARGUMENT" != "skip-tests" ]; then
     echo "To skip tests, usage must be: $0 path-to-rust-lightning allow-std skip-tests"
     exit 1
   else
-    SKIP_TESTS=true
+    RUN_CPP_TESTS=false
   fi
 fi
 
@@ -329,45 +329,45 @@ export IFS="$OLD_IFS"
 set -x
 mv include/lightningpp_new.hpp include/lightningpp.hpp
 
-if $SKIP_TESTS; then
+if $RUN_CPP_TESTS; then
+  # Finally, sanity-check the generated C and C++ bindings with demo apps:
+  # Naively run the C demo app:
+  gcc $LOCAL_CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl -lm
+  ./a.out
+
+  # And run the C++ demo app
+  if [ "$2" = "true" ]; then
+    g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread demo.cpp -Ltarget/debug/ -lldk -ldl
+    LD_LIBRARY_PATH=target/debug/ ./a.out > /dev/null
+  fi
+
+  # Finally, run the C++ demo app with our native networking library
+  # in valgrind to test memory model correctness and lack of leaks.
+  gcc $LOCAL_CFLAGS -fPIC -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+  if [ "$2" = "true" ]; then
+    g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl -lm
+    if [ -x "`which valgrind`" -a "$(uname -m)" != "ppc64le" ]; then
+      valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
+      echo
+    else
+      echo "WARNING: Please install valgrind for more testing"
+      ./a.out
+    fi
+  fi
+
+
+  # Test a statically-linked C++ version, tracking the resulting binary size and runtime
+  # across debug, LTO, and cross-language LTO builds (using the same compiler each time).
+  if [ "$2" = "true" ]; then
+    clang++ $LOCAL_CFLAGS -std=c++11 demo.cpp target/debug/libldk.a -ldl
+    strip ./a.out
+    time ./a.out
+    echo " C++ Bin size and runtime w/o optimization:"
+    ls -lha a.out
+  fi
+
+else
   echo "Skipping tests!"
-  exit 0
-fi
-
-# Finally, sanity-check the generated C and C++ bindings with demo apps:
-# Naively run the C demo app:
-gcc $LOCAL_CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl -lm
-./a.out
-
-# And run the C++ demo app
-if [ "$2" = "true" ]; then
-	g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread demo.cpp -Ltarget/debug/ -lldk -ldl
-	LD_LIBRARY_PATH=target/debug/ ./a.out > /dev/null
-fi
-
-# Finally, run the C++ demo app with our native networking library
-# in valgrind to test memory model correctness and lack of leaks.
-gcc $LOCAL_CFLAGS -fPIC -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
-if [ "$2" = "true" ]; then
-	g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl -lm
-	if [ -x "`which valgrind`" -a "$(uname -m)" != "ppc64le" ]; then
-		valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
-		echo
-	else
-		echo "WARNING: Please install valgrind for more testing"
-		./a.out
-	fi
-fi
-
-
-# Test a statically-linked C++ version, tracking the resulting binary size and runtime
-# across debug, LTO, and cross-language LTO builds (using the same compiler each time).
-if [ "$2" = "true" ]; then
-	clang++ $LOCAL_CFLAGS -std=c++11 demo.cpp target/debug/libldk.a -ldl
-	strip ./a.out
-	time ./a.out
-	echo " C++ Bin size and runtime w/o optimization:"
-	ls -lha a.out
 fi
 
 function REALLY_PIN_CC {

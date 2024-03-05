@@ -374,18 +374,24 @@ function REALLY_PIN_CC {
 	# -Zbuild-std fails if we have any dependencies of build-deps, which
 	# cc added in 1.0.80, thus we pin back to 1.0.79 to avoid that.
 	cargo update -p cc --precise "1.0.79" --verbose
-	( cargo build --features=std -v --release -Zbuild-std=std,panic_abort > /dev/null 2>&1 ) || echo -n
-	( cargo build --features=std -v --release --target aarch64-apple-darwin -Zbuild-std=std,panic_abort > /dev/null 2>&1 ) || echo -n
+	( RUSTC_BOOTSTRAP=1 cargo build --features=std -v --release --target x86_64-apple-darwin -Zbuild-std=std,panic_abort > /dev/null 2>&1 ) || echo -n
+	( RUSTC_BOOTSTRAP=1 cargo build --features=std -v --release --target aarch64-apple-darwin -Zbuild-std=std,panic_abort > /dev/null 2>&1 ) || echo -n
 	# Sadly, std also depends on cc, and we can't pin it in that tree
 	# directly. Instead, we have to delete the file out of the cargo
 	# registry and build --offline to avoid it using the latest version.
 	NEW_CC_DEP="$CARGO_HOME"
 	[ "$NEW_CC_DEP" = "" ] && NEW_CC_DEP="$HOME"
-	if [ -f "$NEW_CC_DEP/.cargo/registry/cache/github.com-"*/cc-1.0.79.crate ]; then
-		mv "$NEW_CC_DEP/.cargo/registry/cache/github.com-"*/cc-1.0.79.crate ./
+	[ -d "$NEW_CC_DEP/.cargo/registry/cache/"github.com-* ] && CARGO_REGISTRY_CACHE="$NEW_CC_DEP/.cargo/registry/cache/"github.com-*
+	[ -d "$NEW_CC_DEP/.cargo/registry/cache/"index.crates.io-* ] && CARGO_REGISTRY_CACHE="$NEW_CC_DEP/.cargo/registry/cache/"index.crates.io-*
+	if [ -d "$CARGO_REGISTRY_CACHE" ]; then
+		if [ -f "$CARGO_REGISTRY_CACHE/cc-1.0.79.crate" ]; then
+			mv "$CARGO_REGISTRY_CACHE/cc-1.0.79.crate" ./
+		fi
+		rm -f "$CARGO_REGISTRY_CACHE/"*/cc-*.crate
+		[ -f ./cc-1.0.79.crate ] && mv ./cc-1.0.79.crate "$CARGO_REGISTRY_CACHE/"
+	else
+		echo "Couldn't find cargo cache, build-std builds are likely to fail!"
 	fi
-	rm -f "$NEW_CC_DEP/.cargo/registry/cache/github.com-"*/cc-*.crate
-	[ -f ./cc-1.0.79.crate ] && mv ./cc-1.0.79.crate "$NEW_CC_DEP/.cargo/registry/cache/github.com-"*/
 }
 
 # Then, check with memory sanitizer, if we're on Linux and have rustc nightly

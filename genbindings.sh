@@ -514,20 +514,23 @@ if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" ]; then
 		RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" RUSTC_BOOTSTRAP=1 cargo rustc $CARGO_BUILD_ARGS -v -- -Zsanitizer=address -Cforce-frame-pointers=yes || ( mv Cargo.toml.bk Cargo.toml; exit 1)
 		mv Cargo.toml.bk Cargo.toml
 
+		# Sadly, address sanitizer appears to have had some regression on Debian and now fails to
+		# get past its init stage, so we disable it for now.
+
 		# First the C demo app...
-		$CLANG $LOCAL_CFLAGS -fsanitize=address -g demo.c target/debug/libldk.a -ldl
-		ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out
+		#$CLANG $LOCAL_CFLAGS -fsanitize=address -g demo.c target/debug/libldk.a -ldl
+		#ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out
 
-		if [ "$2" = "true" ]; then
-			# ...then the C++ demo app
-			$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g demo.cpp target/debug/libldk.a -ldl
-			ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
+		#if [ "$2" = "true" ]; then
+		#	# ...then the C++ demo app
+		#	$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g demo.cpp target/debug/libldk.a -ldl
+		#	ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
 
-			# ...then the C++ demo app with the ldk_net network implementation
-			$CLANG $LOCAL_CFLAGS -fPIC -fsanitize=address -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
-			$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
-			ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
-		fi
+		#	# ...then the C++ demo app with the ldk_net network implementation
+		#	$CLANG $LOCAL_CFLAGS -fPIC -fsanitize=address -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+		#	$CLANGPP $LOCAL_CFLAGS -std=c++11 -fsanitize=address -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
+		#	ASAN_OPTIONS='detect_leaks=1 detect_invalid_pointer_pairs=1 detect_stack_use_after_return=1' ./a.out >/dev/null
+		#fi
 	else
 		echo "WARNING: Please install clang-$RUSTC_LLVM_V and clang++-$RUSTC_LLVM_V to build with address sanitizer"
 	fi

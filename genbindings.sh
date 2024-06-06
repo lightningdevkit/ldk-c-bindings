@@ -3,7 +3,7 @@
 set -e
 set -x
 
-if [ ! -d "$1/lightning" -o "$2" != "true" -a "$2" != "false" ]; then
+if [ ! -d "$1/lightning" ] || [ "$2" != "true" ] && [ "$2" != "false" ]; then
 	echo "USAGE: $0 path-to-rust-lightning allow-std"
 	echo "allow-std must be either 'true' or 'false' to indicate if we should be built relying on time and pthread support"
 	exit 1
@@ -12,7 +12,7 @@ fi
 SKIP_TESTS_ARGUMENT=$3
 RUN_CPP_TESTS=true
 
-if [ ! -z "$SKIP_TESTS_ARGUMENT" ]; then
+if [ -n "$SKIP_TESTS_ARGUMENT" ]; then
   if [ "$SKIP_TESTS_ARGUMENT" != "skip-tests" ]; then
     echo "To skip tests, usage must be: $0 path-to-rust-lightning allow-std skip-tests"
     exit 1
@@ -34,12 +34,14 @@ cd "$ORIG_PWD"
 
 # First we set various compiler flags...
 HOST_PLATFORM="$(rustc --version --verbose | grep "host:" | awk '{ print $2 }')"
-ENV_TARGET=$(echo $HOST_PLATFORM | sed 's/-/_/g')
+ENV_TARGET=${HOST_PLATFORM//-/_}
 
 # Set path to include our rustc wrapper as well as cbindgen
-export LDK_RUSTC_PATH="$(which rustc)"
-export RUSTC="$(pwd)/deterministic-build-wrappers/rustc"
-PATH="$PATH:~/.cargo/bin"
+LDK_RUSTC_PATH="$(which rustc)"
+export LDK_RUSTC_PATH
+RUSTC="$(pwd)/deterministic-build-wrappers/rustc"
+export RUSTC
+PATH="$PATH:$HOME/.cargo/bin"
 
 # Set up CFLAGS and RUSTFLAGS vars appropriately for building libsecp256k1 and demo apps...
 BASE_CFLAGS="" # CFLAGS for libsecp256k1
@@ -50,7 +52,7 @@ BASE_RUSTFLAGS="--cfg=c_bindings --remap-path-prefix $LIGHTNING_PATH=rust-lightn
 
 # If the C compiler supports it, also set -ffile-prefix-map
 echo "int main() {}" > genbindings_path_map_test_file.c
-clang -o /dev/null -ffile-prefix-map=$HOME/.cargo= genbindings_path_map_test_file.c > /dev/null 2>&1 &&
+clang -o /dev/null -ffile-prefix-map="$HOME"/.cargo= genbindings_path_map_test_file.c > /dev/null 2>&1 &&
 export BASE_CFLAGS="-ffile-prefix-map=$HOME/.cargo="
 
 BASE_CFLAGS="$BASE_CFLAGS -frandom-seed=42"
@@ -65,7 +67,7 @@ fi
 
 BASE_HOST_CFLAGS="$BASE_CFLAGS"
 
-if [ "$MACOS_SDK" = "" -a "$HOST_OSX" = "true" ]; then
+if [ "$MACOS_SDK" = "" ] && [ "$HOST_OSX" = "true" ]; then
 	MACOS_SDK="$(xcrun --show-sdk-path)"
 	[ "$MACOS_SDK" = "" ] && exit 1
 fi
@@ -87,18 +89,18 @@ case "$ENV_TARGET" in
 	"x86_64"*)
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=sandybridge"
 		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -march=sandybridge -mtune=sandybridge"
-		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS"
+		export "CFLAGS_$ENV_TARGET"="$BASE_HOST_CFLAGS"
 		;;
 	"aarch64_apple_darwin")
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14"
 		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -mcpu=apple-a14"
-		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS"
+		export "CFLAGS_$ENV_TARGET"="$BASE_HOST_CFLAGS"
 		;;
 	*)
 		# Assume this isn't targeted at another host and build for the host's CPU.
 		export RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=native"
 		export BASE_HOST_CFLAGS="$BASE_HOST_CFLAGS -march=native -mtune=native"
-		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS"
+		export "CFLAGS_$ENV_TARGET"="$BASE_HOST_CFLAGS"
 		;;
 esac
 
@@ -168,32 +170,32 @@ function is_gnu_sed(){
 
 function add_crate() {
 	pushd "$LIGHTNING_PATH/$1"
-	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check -Z avoid-dev-deps --no-default-features $3 -- --cfg=c_bindings -Zunpretty=expanded > /tmp/$1-crate-source.txt
+	RUSTC_BOOTSTRAP=1 cargo rustc --profile=check -Z avoid-dev-deps --no-default-features "$3" -- --cfg=c_bindings -Zunpretty=expanded > "/tmp/$1-crate-source.txt"
 	popd
 	if [ "$HOST_OSX" = "true" ]; then
 		sed -i".original" "1i\\
 pub mod $2 {
-" /tmp/$1-crate-source.txt
+" "/tmp/$1-crate-source.txt"
 	else
-		sed -i "1ipub mod $2 {\n" /tmp/$1-crate-source.txt
+		sed -i "1ipub mod $2 {\n" "/tmp/$1-crate-source.txt"
 	fi
-	echo "}" >> /tmp/$1-crate-source.txt
-	cat /tmp/$1-crate-source.txt >> /tmp/crate-source.txt
-	rm /tmp/$1-crate-source.txt
+	echo "}" >> "/tmp/$1-crate-source.txt"
+	cat "/tmp/$1-crate-source.txt" >> /tmp/crate-source.txt
+	rm "/tmp/$1-crate-source.txt"
 	if is_gnu_sed; then
-		sed -E -i 's|#*'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'", default-features = false }|' lightning-c-bindings/Cargo.toml
+		sed -E -i 's|#*'"$1"' = \{ .*|'"$1"' = \{ path = "'"$LIGHTNING_PATH"'/'"$1"'", default-features = false }|' lightning-c-bindings/Cargo.toml
 	else
 		# OSX sed is for some reason not compatible with GNU sed
-		sed -E -i '' 's|#*'$1' = \{ .*|'$1' = \{ path = "'"$LIGHTNING_PATH"'/'$1'", default-features = false }|' lightning-c-bindings/Cargo.toml
+		sed -E -i '' 's|#*'"$1"' = \{ .*|'"$1"' = \{ path = "'"$LIGHTNING_PATH"'/'"$1"'", default-features = false }|' lightning-c-bindings/Cargo.toml
 	fi
 }
 
 function drop_crate() {
 	if is_gnu_sed; then
-		sed -E -i 's|'$1' = \{ (.*)|#'$1' = \{ \1|' lightning-c-bindings/Cargo.toml
+		sed -E -i 's|'"$1"' = \{ (.*)|#'"$1"' = \{ \1|' lightning-c-bindings/Cargo.toml
 	else
 		# OSX sed is for some reason not compatible with GNU sed
-		sed -E -i '' 's|'$1' = \{ (.*)|#'$1' = \{ \1|' lightning-c-bindings/Cargo.toml
+		sed -E -i '' 's|'"$1"' = \{ (.*)|#'"$1"' = \{ \1|' lightning-c-bindings/Cargo.toml
 	fi
 }
 
@@ -232,7 +234,7 @@ EOF
 cd lightning-c-bindings
 
 RUSTFLAGS="$RUSTFLAGS --cfg=test_mod_pointers" cargo build $CARGO_BUILD_ARGS
-if [ "$CFLAGS_aarch64_apple_darwin" != "" -a "$HOST_OSX" = "true" ]; then
+if [ "$CFLAGS_aarch64_apple_darwin" != "" ] && [ "$HOST_OSX" = "true" ]; then
 	RUSTFLAGS="$BASE_RUSTFLAGS -C target-cpu=apple-a14" cargo build $CARGO_BUILD_ARGS --target aarch64-apple-darwin
 fi
 cbindgen -v --config cbindgen.toml -o include/lightning.h >/dev/null 2>&1
@@ -266,14 +268,16 @@ echo "Updating C++ header, this may take some time, especially on macOS"
 set +x # Echoing every command is very verbose here
 OLD_IFS="$IFS"
 export IFS=''
-echo '#include <string.h>' > include/lightningpp_new.hpp
-echo 'namespace LDK {' >> include/lightningpp_new.hpp
-echo '// Forward declarations' >> include/lightningpp_new.hpp
+{
+	echo '#include <string.h>'
+	echo 'namespace LDK {'
+	echo '// Forward declarations'
+} > include/lightningpp_new.hpp
 cat include/lightningpp.hpp | sed -n 's/class \(.*\) {/class \1;/p' >> include/lightningpp_new.hpp
 echo '' >> include/lightningpp_new.hpp
 
 DECLS=""
-while read LINE; do
+while read -r LINE; do
 	case "$LINE" in
 		"#include <string.h>")
 			# We already printed this above.
@@ -311,7 +315,7 @@ while read LINE; do
 
 			IFS=','; for PARAM in $PARAMS; do
 				DECLS="$DECLS, "
-				DECLS="$DECLS$(echo $PARAM | sed 's/.* (*\**\([a-zA-Z0-9_]*\)\()[\[0-9\]*]\)*/\1/')"
+				DECLS="$DECLS$(echo "$PARAM" | sed 's/.* (*\**\([a-zA-Z0-9_]*\)\()[\[0-9\]*]\)*/\1/')"
 			done
 			IFS=''
 
@@ -333,21 +337,21 @@ mv include/lightningpp_new.hpp include/lightningpp.hpp
 if $RUN_CPP_TESTS; then
   # Finally, sanity-check the generated C and C++ bindings with demo apps:
   # Naively run the C demo app:
-  gcc $LOCAL_CFLAGS -Wall -g -pthread demo.c target/debug/libldk.a -ldl -lm
+  gcc "$LOCAL_CFLAGS" -Wall -g -pthread demo.c target/debug/libldk.a -ldl -lm
   ./a.out
 
   # And run the C++ demo app
   if [ "$2" = "true" ]; then
-    g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread demo.cpp -Ltarget/debug/ -lldk -ldl
+    g++ "$LOCAL_CFLAGS" -std=c++11 -Wall -g -pthread demo.cpp -Ltarget/debug/ -lldk -ldl
     LD_LIBRARY_PATH=target/debug/ ./a.out > /dev/null
   fi
 
   # Finally, run the C++ demo app with our native networking library
   # in valgrind to test memory model correctness and lack of leaks.
-  gcc $LOCAL_CFLAGS -fPIC -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+  gcc "$LOCAL_CFLAGS" -fPIC -std=c99 -Wall -g -pthread -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
   if [ "$2" = "true" ]; then
-    g++ $LOCAL_CFLAGS -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl -lm
-    if [ -x "`which valgrind`" -a "$(uname -m)" != "ppc64le" ]; then
+    g++ "$LOCAL_CFLAGS" -std=c++11 -Wall -g -pthread -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl -lm
+	if [ -x "$(which valgrind)" ] && [ "$(uname -m)" != "ppc64le" ]; then
       valgrind --error-exitcode=4 --memcheck:leak-check=full --show-leak-kinds=all ./a.out
       echo
     else
@@ -360,7 +364,7 @@ if $RUN_CPP_TESTS; then
   # Test a statically-linked C++ version, tracking the resulting binary size and runtime
   # across debug, LTO, and cross-language LTO builds (using the same compiler each time).
   if [ "$2" = "true" ]; then
-    clang++ $LOCAL_CFLAGS -std=c++11 demo.cpp target/debug/libldk.a -ldl
+    clang++ "$LOCAL_CFLAGS" -std=c++11 demo.cpp target/debug/libldk.a -ldl
     strip ./a.out
     time ./a.out
     echo " C++ Bin size and runtime w/o optimization:"
@@ -385,8 +389,12 @@ function REALLY_PIN_CC {
 	# registry and build --offline to avoid it using the latest version.
 	NEW_CC_DEP="$CARGO_HOME"
 	[ "$NEW_CC_DEP" = "" ] && NEW_CC_DEP="$HOME"
-	[ -d "$NEW_CC_DEP/.cargo/registry/cache/"github.com-* ] && CARGO_REGISTRY_CACHE="$(echo "$NEW_CC_DEP/.cargo/registry/cache/"github.com-*)"
-	[ -d "$NEW_CC_DEP/.cargo/registry/cache/"index.crates.io-* ] && CARGO_REGISTRY_CACHE="$(echo "$NEW_CC_DEP/.cargo/registry/cache/"index.crates.io-*)"
+	for dir in "$NEW_CC_DEP/.cargo/registry/cache/"github.com-*; do
+		CARGO_REGISTRY_CACHE="$dir"
+	done
+	for dir in "$NEW_CC_DEP/.cargo/registry/cache/"index.crates.io-*; do
+		CARGO_REGISTRY_CACHE="$dir"
+	done
 	if [ -d "$CARGO_REGISTRY_CACHE" ]; then
 		if [ -f "$CARGO_REGISTRY_CACHE/compiler_builtins-0.1.109.crate" ]; then
 			mv "$CARGO_REGISTRY_CACHE/compiler_builtins-0.1.109.crate" ./
@@ -407,11 +415,11 @@ function REALLY_PIN_CC {
 if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" ]; then
 	if cargo +nightly --version >/dev/null 2>&1; then
 		LLVM_V=$(rustc +nightly --version --verbose | grep "LLVM version" | awk '{ print substr($3, 0, 2); }')
-		if [ -x "$(which clang-$LLVM_V)" ]; then
+		if [ -x "$(which clang-"$LLVM_V")" ]; then
 			cargo +nightly clean
 
 			REALLY_PIN_CC
-			cargo +nightly rustc --offline $CARGO_BUILD_ARGS -Zbuild-std=std,panic_abort --target x86_64-unknown-linux-gnu -v -- -Zsanitizer=memory -Zsanitizer-memory-track-origins -Cforce-frame-pointers=yes
+			cargo +nightly rustc --offline "$CARGO_BUILD_ARGS" -Zbuild-std=std,panic_abort --target x86_64-unknown-linux-gnu -v -- -Zsanitizer=memory -Zsanitizer-memory-track-origins -Cforce-frame-pointers=yes
 			mv target/x86_64-unknown-linux-gnu/debug/libldk.* target/debug/
 
 			# Sadly, std doesn't seem to compile into something that is memsan-safe as of Aug 2020,
@@ -420,17 +428,17 @@ if [ "$HOST_PLATFORM" = "x86_64-unknown-linux-gnu" ]; then
 			set +e
 
 			# First the C demo app...
-			clang-$LLVM_V $LOCAL_CFLAGS -fsanitize=memory -fsanitize-memory-track-origins -g demo.c target/debug/libldk.a -ldl
+			"clang-$LLVM_V" "$LOCAL_CFLAGS" -fsanitize=memory -fsanitize-memory-track-origins -g demo.c target/debug/libldk.a -ldl
 			./a.out
 
 			if [ "$2" = "true" ]; then
 				# ...then the C++ demo app
-				clang++-$LLVM_V $LOCAL_CFLAGS -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g demo.cpp target/debug/libldk.a -ldl
+				"clang++-$LLVM_V" "$LOCAL_CFLAGS" -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g demo.cpp target/debug/libldk.a -ldl
 				./a.out >/dev/null
 
 				# ...then the C++ demo app with the ldk_net network implementation
-				clang-$LLVM_V $LOCAL_CFLAGS -std=c99 -fsanitize=memory -fsanitize-memory-track-origins -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
-				clang++-$LLVM_V $LOCAL_CFLAGS -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
+				"clang-$LLVM_V" "$LOCAL_CFLAGS" -std=c99 -fsanitize=memory -fsanitize-memory-track-origins -g -I../ldk-net ../ldk-net/ldk_net.c -c -o ldk_net.o
+				"clang++-$LLVM_V" "$LOCAL_CFLAGS" -std=c++11 -fsanitize=memory -fsanitize-memory-track-origins -g -DREAL_NET -I../ldk-net ldk_net.o demo.cpp target/debug/libldk.a -ldl
 				./a.out >/dev/null
 			fi
 
@@ -481,9 +489,9 @@ if [ "$CLANG_LLVM_V" = "$RUSTC_LLVM_V" ]; then
 	if [ "$LLD_LLVM_V" = "$CLANG_LLVM_V" ]; then
 		LLD=lld
 	fi
-elif [ -x "$(which clang-$RUSTC_LLVM_V)" ]; then
-	CLANG="$(which clang-$RUSTC_LLVM_V)"
-	CLANGPP="$(which clang++-$RUSTC_LLVM_V || echo clang++)"
+elif [ -x "$(which "clang-$RUSTC_LLVM_V")" ]; then
+	CLANG="$(which "clang-$RUSTC_LLVM_V")"
+	CLANGPP="$(which "clang++-$RUSTC_LLVM_V" || echo clang++)"
 	if [ "$($CLANG --version)" != "$($CLANGPP --version)" ]; then
 		echo "$CLANG and $CLANGPP are not the same version of clang!"
 		unset CLANG
@@ -491,12 +499,12 @@ elif [ -x "$(which clang-$RUSTC_LLVM_V)" ]; then
 	fi
 	if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
 		LLD="lld"
-		[ -x "$(which lld-$RUSTC_LLVM_V)" ] && LLD="lld-$RUSTC_LLVM_V"
-		LLD_LLVM_V="$(ld.lld-$RUSTC_LLVM_V --version | awk '{ print $2; }')"
+		[ -x "$(which "lld-$RUSTC_LLVM_V")" ] && LLD="lld-$RUSTC_LLVM_V"
+		LLD_LLVM_V="$("ld.lld-$RUSTC_LLVM_V" --version | awk '{ print $2; }')"
 		if [ "$LLD_LLVM_V" = "LLD" ]; then # eg if the output is "Debian LLD ..."
-			LLD_LLVM_V="$(ld.lld-$RUSTC_LLVM_V --version | awk '{ print substr($3, 0, 2); }')"
+			LLD_LLVM_V="$("ld.lld-$RUSTC_LLVM_V" --version | awk '{ print substr($3, 0, 2); }')"
 		else
-			LLD_LLVM_V="$(ld.lld-$RUSTC_LLVM_V --version | awk '{ print substr($2, 0, 2); }')"
+			LLD_LLVM_V="$("ld.lld-$RUSTC_LLVM_V" --version | awk '{ print substr($2, 0, 2); }')"
 		fi
 		if [ "$LLD_LLVM_V" != "$RUSTC_LLVM_V" ]; then
 			echo "Could not find a workable version of lld, not using cross-language LTO"
@@ -505,9 +513,9 @@ elif [ -x "$(which clang-$RUSTC_LLVM_V)" ]; then
 	fi
 fi
 
-if [ "$CLANG" != "" -a "$CLANGPP" = "" ]; then
+if [ "$CLANG" != "" ] && [ "$CLANGPP" = "" ]; then
 	echo "WARNING: It appears you have a clang-$RUSTC_LLVM_V but not clang++-$RUSTC_LLVM_V. This is common, but leaves us unable to compile C++ with LLVM $RUSTC_LLVM_V"
-	echo "You should create a symlink called clang++-$RUSTC_LLVM_V pointing to $CLANG in $(dirname $CLANG)"
+	echo "You should create a symlink called clang++-$RUSTC_LLVM_V pointing to $CLANG in $(dirname "$CLANG")"
 fi
 
 # Finally, if we're on Linux, build the final debug binary with address sanitizer (and leave it there)
@@ -550,9 +558,9 @@ fi
 # Now build with LTO on on both C++ and rust, but without cross-language LTO:
 # Clear stale release build artifacts from previous runs
 cargo clean --release
-CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C lto" cargo build $CARGO_BUILD_ARGS -v --release
+CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C lto" cargo build "$CARGO_BUILD_ARGS" -v --release
 if [ "$2" = "true" ]; then
-	clang++ $LOCAL_CFLAGS -std=c++11 -O2 demo.cpp target/release/libldk.a -ldl
+	clang++ "$LOCAL_CFLAGS" -std=c++11 -O2 demo.cpp target/release/libldk.a -ldl
 fi
 
 strip ./a.out
@@ -566,17 +574,17 @@ if [ "$CLANGPP" != "" ]; then
 	# The cc-rs crate tries to force -fdata-sections and -ffunction-sections on, which
 	# breaks -fembed-bitcode, so we turn off cc-rs' default flags and specify exactly
 	# what we want here.
-	export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -fPIC -fembed-bitcode"
+	export "CFLAGS_$ENV_TARGET"="$BASE_HOST_CFLAGS -fPIC -fembed-bitcode"
 	export CRATE_CC_NO_DEFAULTS=true
 fi
 
-if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]; then
+if [ "$2" = "false" ] && [ "$(rustc --print target-list | grep wasm32-wasi)" != "" ]; then
 	# Test to see if clang supports wasm32 as a target (which is needed to build rust-secp256k1)
 	echo "int main() {}" > genbindings_wasm_test_file.c
 	if clang -nostdlib -o /dev/null --target=wasm32-wasi -Wl,--no-entry genbindings_wasm_test_file.c > /dev/null 2>&1; then
 		# And if it does, build a WASM binary without capturing errors
 		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -target wasm32-wasi -O1"
-		RUSTFLAGS="$BASE_RUSTFLAGS -C opt-level=1 --cfg=test_mod_pointers" cargo build $CARGO_BUILD_ARGS -v --target=wasm32-wasi
+		RUSTFLAGS="$BASE_RUSTFLAGS -C opt-level=1 --cfg=test_mod_pointers" cargo build "$CARGO_BUILD_ARGS" -v --target=wasm32-wasi
 		export CFLAGS_wasm32_wasi="$BASE_CFLAGS -fembed-bitcode -target wasm32-wasi -Oz"
 		RUSTFLAGS="$BASE_RUSTFLAGS -C embed-bitcode=yes -C opt-level=z -C linker-plugin-lto -C lto" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target=wasm32-wasi
 	else
@@ -585,23 +593,23 @@ if [ "$2" = "false" -a "$(rustc --print target-list | grep wasm32-wasi)" != "" ]
 	rm genbindings_wasm_test_file.c
 fi
 
-EXTRA_TARGETS=( $LDK_C_BINDINGS_EXTRA_TARGETS )
-EXTRA_CCS=( $LDK_C_BINDINGS_EXTRA_TARGET_CCS )
-EXTRA_LINK_LTO=( $LDK_C_BINDINGS_EXTRA_TARGET_LINK_LTO )
+EXTRA_TARGETS=( "$LDK_C_BINDINGS_EXTRA_TARGETS" )
+EXTRA_CCS=( "$LDK_C_BINDINGS_EXTRA_TARGET_CCS" )
+EXTRA_LINK_LTO=( "$LDK_C_BINDINGS_EXTRA_TARGET_LINK_LTO" )
 
 if [ ${#EXTRA_TARGETS[@]} != ${#EXTRA_CCS[@]} ]; then
 	echo "LDK_C_BINDINGS_EXTRA_TARGETS and LDK_C_BINDINGS_EXTRA_TARGET_CCS didn't have the same number of elements!"
 	exit 1
 fi
 
-for IDX in ${!EXTRA_TARGETS[@]}; do
-	EXTRA_ENV_TARGET=$(echo "${EXTRA_TARGETS[$IDX]}" | sed 's/-/_/g')
-	export CFLAGS_$EXTRA_ENV_TARGET="$BASE_CFLAGS"
-	export CC_$EXTRA_ENV_TARGET=${EXTRA_CCS[$IDX]}
+for IDX in "${!EXTRA_TARGETS[@]}"; do
+	EXTRA_ENV_TARGET="${EXTRA_TARGETS[$IDX]//-/_}"
+	export "CFLAGS_$EXTRA_ENV_TARGET"="$BASE_CFLAGS"
+	export "CC_$EXTRA_ENV_TARGET"="${EXTRA_CCS[$IDX]}"
 	EXTRA_RUSTFLAGS=""
 	case "$EXTRA_ENV_TARGET" in
 		"x86_64"*)
-			export CFLAGS_$EXTRA_ENV_TARGET="$BASE_CFLAGS -march=sandybridge -mtune=sandybridge"
+			export "CFLAGS_$EXTRA_ENV_TARGET"="$BASE_CFLAGS -march=sandybridge -mtune=sandybridge"
 			EXTRA_RUSTFLAGS="-C target-cpu=sandybridge"
 			;;
 	esac
@@ -609,17 +617,19 @@ for IDX in ${!EXTRA_TARGETS[@]}; do
 	RUSTFLAGS="$BASE_RUSTFLAGS -C embed-bitcode=yes -C lto -C linker=${EXTRA_CCS[$IDX]} $EXTRA_RUSTFLAGS" CARGO_PROFILE_RELEASE_LTO=true cargo build $CARGO_BUILD_ARGS -v --release --target "${EXTRA_TARGETS[$IDX]}"
 done
 
-if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
+if [ "$CLANGPP" != "" ] && [ "$LLD" != "" ]; then
 	# Finally, test cross-language LTO. Note that this will fail if rustc and clang++
 	# build against different versions of LLVM (eg when rustc is installed via rustup
 	# or Ubuntu packages). This should work fine on Distros which do more involved
 	# packaging than simply shipping the rustup binaries (eg Debian should Just Work
 	# here).
 	LINK_ARG_FLAGS="-C link-arg=-fuse-ld=$LLD"
-	export LDK_CLANG_PATH=$(which $CLANG)
+	LDK_CLANG_PATH=$(which "$CLANG")
+	export LDK_CLANG_PATH
 	if [ "$MACOS_SDK" != "" ]; then
 		REALLY_PIN_CC
-		export CLANG="$(pwd)/../deterministic-build-wrappers/clang-lto-link-osx"
+		CLANG="$(pwd)/../deterministic-build-wrappers/clang-lto-link-osx"
+		export CLANG
 		for ARG in $CFLAGS_aarch64_apple_darwin; do
 			MANUAL_LINK_CFLAGS="$MANUAL_LINK_CFLAGS -C link-arg=$ARG"
 		done
@@ -638,14 +648,14 @@ if [ "$CLANGPP" != "" -a "$LLD" != "" ]; then
 	# If we're on an M1 don't bother building X86 binaries
 	if [ "$HOST_PLATFORM" != "aarch64-apple-darwin" ]; then
 		[ "$HOST_OSX" != "true" ] && export CLANG="$LDK_CLANG_PATH"
-		export CFLAGS_$ENV_TARGET="$BASE_HOST_CFLAGS -O3 -fPIC -fembed-bitcode"
+		export "CFLAGS_$ENV_TARGET"="$BASE_HOST_CFLAGS -O3 -fPIC -fembed-bitcode"
 		# Rust doesn't recognize CFLAGS changes, so we need to clean build artifacts
 		cargo clean --release
 		CARGO_PROFILE_RELEASE_LTO=true RUSTFLAGS="$RUSTFLAGS -C embed-bitcode=yes -C linker-plugin-lto -C lto -C linker=$CLANG $LINK_ARG_FLAGS -C link-arg=-march=sandybridge -C link-arg=-mtune=sandybridge" cargo build $CARGO_BUILD_ARGS -v --release
 
 		if [ "$2" = "true" ]; then
-			$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -O2 -c demo.cpp -o demo.o
-			$CLANGPP $LOCAL_CFLAGS -flto -fuse-ld=$LLD -Wl,--lto-O2 -Wl,-O2 -O2 demo.o target/release/libldk.a -ldl
+			"$CLANGPP" "$LOCAL_CFLAGS" -flto -fuse-ld="$LLD" -O2 -c demo.cpp -o demo.o
+			"$CLANGPP" "$LOCAL_CFLAGS" -flto -fuse-ld="$LLD" -Wl,--lto-O2 -Wl,-O2 -O2 demo.o target/release/libldk.a -ldl
 			strip ./a.out
 			time ./a.out
 			echo "C++ Bin size and runtime with cross-language LTO:"

@@ -15,13 +15,13 @@ jobs:
     env:
       TOOLCHAIN: stable
     steps:
-      - name: Install native Rust toolchain, Valgrind, and build utilitis
+      - name: Install native Rust toolchain, Valgrind, and build utilities
         if: "matrix.distro == 'debian:bookworm'"
         run: |
           apt-get update
           apt-get -y dist-upgrade
           apt-get -y install cargo libstd-rust-dev-wasm32 wasi-libc valgrind lld git g++ clang wget
-      - name: Install native Rust toolchain, Valgrind, and build utilitis
+      - name: Install native Rust toolchain, Valgrind, and build utilities
         if: "matrix.distro == 'fedora:39'"
         run: |
           dnf -y install cargo rust-std-static-wasm32-wasi valgrind lld git g++ clang wget which diffutils
@@ -85,7 +85,7 @@ jobs:
     env:
       TOOLCHAIN: stable
     steps:
-      - name: Install native Rust toolchain, Valgrind, and build utilitis
+      - name: Install native Rust toolchain, Valgrind, and build utilities
         run: |
           apt-get update
           apt-get -y dist-upgrade

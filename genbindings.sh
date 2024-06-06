@@ -322,6 +322,7 @@ while read LINE; do
 		*)
 			echo "$LINE" >> include/lightningpp_new.hpp
 	esac
+	echo -n "."
 done < include/lightningpp.hpp
 echo "$DECLS" >> include/lightningpp_new.hpp
 echo "}" >> include/lightningpp_new.hpp

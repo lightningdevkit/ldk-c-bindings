@@ -29,6 +29,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: shellcheck the genbindings script
+        if: "matrix.distro == 'debian:bookworm'"
+        run: |
+          apt-get -y install shellcheck
+          shellcheck -e SC2005,SC2002,SC2001 genbindings.sh
       - name: Sanity test bindings against Cargo.toml RL
         working-directory: lightning-c-bindings
         run: |
